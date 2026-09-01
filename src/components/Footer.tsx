@@ -114,7 +114,7 @@ export const Footer: React.FC = () => {
               </a>
 
               <a
-                href="https://github.com"
+                href="https://github.com/jarzha-dotcom"
                 target="_blank"
                 rel="noreferrer"
                 title="GitHub"

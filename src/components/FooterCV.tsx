@@ -109,7 +109,7 @@ export const FooterCV: React.FC = () => {
                                 <Linkedin className="w-3.5 h-3.5" />
                             </a>
                             <a
-                                href="https://github.com"
+                                href="https://github.com/jarzha-dotcom"
                                 target="_blank"
                                 rel="noreferrer"
                                 title="GitHub"
