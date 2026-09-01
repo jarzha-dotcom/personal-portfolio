@@ -25,6 +25,13 @@ interface CVDocumentModalProps {
 // bergaya situs (itu urusan CVPage) — modal ini murni untuk hasil cetak
 // yang rapi: header, ringkasan, pengalaman, dan keahlian dalam satu alur
 // dokumen sederhana, selalu tema terang agar hemat tinta.
+//
+// PENTING soal print: ada DUA lapis container di sini (overlay luar +
+// kartu putih di dalamnya) dan keduanya punya overflow/max-height
+// sendiri-sendiri untuk kebutuhan tampilan di layar. Kalau salah satu
+// saja lupa di-override saat print, hasilnya kepotong/cuma capture
+// bagian yang keliatan di layar — makanya class `print:` di bawah
+// dipasang di KEDUA div, bukan cuma yang luar.
 export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClose }) => {
   const cardRef = useRef<HTMLDivElement>(null);
   useFocusTrap(cardRef, isOpen);
@@ -47,7 +54,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
   return (
     <div
       id="cv-document-modal"
-      className="fixed inset-0 z-[80] overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
+      className="fixed inset-0 z-[80] overflow-y-auto bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200 print:static print:block print:p-0 print:bg-white print:backdrop-blur-none print:overflow-visible print:h-auto"
     >
       <div
         ref={cardRef}
@@ -55,7 +62,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
         aria-modal="true"
         aria-label={`Dokumen CV ${PERSONAL_INFO.name}`}
         tabIndex={-1}
-        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl bg-white text-slate-900 focus:outline-none"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl border border-slate-200 shadow-2xl bg-white text-slate-900 focus:outline-none print:max-h-none print:max-w-none print:overflow-visible print:rounded-none print:border-none print:shadow-none"
       >
 
         {/* Floating Top Controls (No-print) */}
@@ -93,7 +100,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
         <div className="p-8 sm:p-12 space-y-8 bg-white text-slate-900 print:p-0 print:m-0">
 
           {/* Header */}
-          <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+          <div className="border-b border-slate-200 pb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 print:break-inside-avoid">
             <div>
               <h1 className="text-3xl font-extrabold text-slate-950 tracking-tight">
                 {PERSONAL_INFO.name}
@@ -125,7 +132,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Ringkasan Profil */}
-          <div>
+          <div className="print:break-inside-avoid">
             <h2 className="text-sm font-bold uppercase tracking-wider text-teal-800 border-b border-teal-100 pb-1 mb-2">
               Ringkasan Profesional
             </h2>
@@ -141,7 +148,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
             </h2>
             <div className="space-y-6">
               {EXPERIENCES.map((exp) => (
-                <div key={exp.id} className="space-y-2">
+                <div key={exp.id} className="space-y-2 print:break-inside-avoid">
                   <div className="flex flex-wrap items-center justify-between text-xs sm:text-sm">
                     <h3 className="font-bold text-slate-900 flex items-center gap-1.5">
                       <Building2 className="w-4 h-4 text-teal-600" />
@@ -152,7 +159,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
 
                   <div className="pl-4 space-y-3 border-l-2 border-slate-200">
                     {exp.roles.map((role, rIdx) => (
-                      <div key={rIdx} className="space-y-1">
+                      <div key={rIdx} className="space-y-1 print:break-inside-avoid">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-800">{role.role}</span>
                           {role.period && <span className="text-[11px] text-teal-700 font-medium">{role.period}</span>}
@@ -171,7 +178,7 @@ export const CVDocumentModal: React.FC<CVDocumentModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Keahlian Teknis & Soft Skills */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 print:break-inside-avoid">
             <div>
               <h2 className="text-sm font-bold uppercase tracking-wider text-teal-800 border-b border-teal-100 pb-1 mb-3">
                 Keahlian Teknis (Hard Skills)

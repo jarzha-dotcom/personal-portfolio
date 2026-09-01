@@ -44,6 +44,10 @@ export const CVPage: React.FC<CVPageProps> = ({ darkMode, setDarkMode, onExit })
         belakangnya, bukan juga NavbarCV/HeroCV/dsb di Mode CV ini.
       */}
             <style>{`
+        @page {
+          size: A4;
+          margin: 14mm 12mm;
+        }
         @media print {
           html, body {
             height: auto !important;
@@ -54,15 +58,6 @@ export const CVPage: React.FC<CVPageProps> = ({ darkMode, setDarkMode, onExit })
           }
           #cv-easter-egg-page > *:not(#cv-document-modal) {
             display: none !important;
-          }
-          #cv-document-modal {
-            position: static !important;
-            inset: auto !important;
-            overflow: visible !important;
-            height: auto !important;
-            width: 100% !important;
-            background: white !important;
-            backdrop-filter: none !important;
           }
           #cv-document-modal .no-print {
             display: none !important;
