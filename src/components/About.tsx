@@ -9,6 +9,7 @@ import {
   Code2
 } from 'lucide-react';
 import { PERSONAL_INFO, STATS } from '../data/portfolioData';
+import { CountUp } from './CountUp';
 
 interface AboutProps {
   darkMode: boolean;
@@ -208,7 +209,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
             >
               <p className={`text-xl sm:text-2xl font-extrabold mb-0.5 ${darkMode ? 'text-teal-400' : 'text-teal-600'
                 }`}>
-                {stat.value}
+                <CountUp value={stat.value} />
               </p>
               <p className={`text-xs font-bold mb-0.5 ${darkMode ? 'text-white' : 'text-slate-900'
                 }`}>

@@ -35,24 +35,26 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   ];
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 30) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 30);
 
-      // Active section calculation
-      const sections = navLinks.map(link => document.getElementById(link.id));
-      const scrollPosition = window.scrollY + 140;
+        // Active section calculation
+        const sections = navLinks.map(link => document.getElementById(link.id));
+        const scrollPosition = window.scrollY + 140;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(navLinks[i].id);
-          break;
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const section = sections[i];
+          if (section && section.offsetTop <= scrollPosition) {
+            setActiveSection(navLinks[i].id);
+            break;
+          }
         }
-      }
+        ticking = false;
+      });
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });

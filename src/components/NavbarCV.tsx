@@ -41,19 +41,25 @@ export const NavbarCV: React.FC<NavbarCVProps> = ({ darkMode, setDarkMode, onExi
     const container = document.getElementById('cv-easter-egg-page');
     if (!container) return;
 
+    let ticking = false;
     const handleScroll = () => {
-      setIsScrolled(container.scrollTop > 30);
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setIsScrolled(container.scrollTop > 30);
 
-      const sections = navLinks.map((link) => document.getElementById(link.id));
-      const scrollPosition = container.scrollTop + 140;
+        const sections = navLinks.map((link) => document.getElementById(link.id));
+        const scrollPosition = container.scrollTop + 140;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(navLinks[i].id);
-          break;
+        for (let i = sections.length - 1; i >= 0; i--) {
+          const section = sections[i];
+          if (section && section.offsetTop <= scrollPosition) {
+            setActiveSection(navLinks[i].id);
+            break;
+          }
         }
-      }
+        ticking = false;
+      });
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });

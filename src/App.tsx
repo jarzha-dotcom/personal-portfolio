@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -7,11 +7,22 @@ import { Services } from './components/Services';
 import { Skills } from './components/Skills';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
-import { ChatWidget } from './components/ChatWidget';
-import { CVPage } from './components/CVPage';
 import { EasterEggToast } from './components/EasterEggToast';
+import { Reveal } from './components/Reveal';
 import { ArrowUp, MessageCircle } from 'lucide-react';
 import { CONTACT_INFO } from './data/portfolioData';
+
+// Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
+// benar-benar dipakai kalau tombolnya diklik, dan CVPage (berat — isinya
+// 9 komponen: NavbarCV, HeroCV, AboutCV, Experience, SkillsCV, ContactCV,
+// FooterCV, ChatWidgetCV, CVDocumentModal) cuma dipakai kalau easter egg
+// (klik logo 5x) ditemukan — mayoritas pengunjung nggak pernah ke sana.
+const ChatWidget = lazy(() =>
+  import('./components/ChatWidget').then((m) => ({ default: m.ChatWidget }))
+);
+const CVPage = lazy(() =>
+  import('./components/CVPage').then((m) => ({ default: m.CVPage }))
+);
 
 export default function App() {
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -52,12 +63,14 @@ export default function App() {
   }, [darkMode]);
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      if (window.scrollY > 400) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
-      }
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        setShowBackToTop(window.scrollY > 400);
+        ticking = false;
+      });
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -110,18 +123,20 @@ export default function App() {
           Experience sekarang eksklusif dipakai di dalam CVPage. */}
       <main id="main-content">
         <Hero darkMode={darkMode} />
-        <About darkMode={darkMode} />
-        <Projects darkMode={darkMode} />
-        <Services darkMode={darkMode} />
-        <Skills darkMode={darkMode} />
-        <Contact darkMode={darkMode} />
+        <Reveal><About darkMode={darkMode} /></Reveal>
+        <Reveal><Projects darkMode={darkMode} /></Reveal>
+        <Reveal><Services darkMode={darkMode} /></Reveal>
+        <Reveal><Skills darkMode={darkMode} /></Reveal>
+        <Reveal><Contact darkMode={darkMode} /></Reveal>
       </main>
 
       {/* Footer */}
       <Footer />
 
-      {/* Chat Widget */}
-      <ChatWidget darkMode={darkMode} />
+      {/* Chat Widget — lazy loaded */}
+      <Suspense fallback={null}>
+        <ChatWidget darkMode={darkMode} />
+      </Suspense>
 
       {/* Floating Action Buttons (Back to Top & Quick WhatsApp) */}
       <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3 no-print">
@@ -129,7 +144,7 @@ export default function App() {
         <a
           id="floating-wa-btn"
           href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-            'Halo Pak Arzha, saya melihat portofolio Anda dan ingin berdiskusi...'
+            'Halo Pak Kidung Arzhaning, saya melihat portofolio Anda dan ingin berdiskusi...'
           )}`}
           target="_blank"
           rel="noreferrer"
@@ -155,14 +170,24 @@ export default function App() {
         )}
       </div>
 
-      {/* Easter Egg: Mode CV — full page transform */}
-      {cvEggUnlocked && (
-        <CVPage
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          onExit={() => setCvEggUnlocked(false)}
-        />
-      )}
+      {/* Easter Egg: Mode CV — full page transform, lazy loaded.
+          Fallback spinner ini jarang kelihatan karena EasterEggToast
+          (di bawah) biasanya sudah menutupi jeda loading chunk-nya. */}
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950">
+            <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+          </div>
+        }
+      >
+        {cvEggUnlocked && (
+          <CVPage
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            onExit={() => setCvEggUnlocked(false)}
+          />
+        )}
+      </Suspense>
       <EasterEggToast show={showUnlockToast} />
     </div>
   );

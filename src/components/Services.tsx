@@ -5,17 +5,29 @@ import {
     GraduationCap,
     FileSpreadsheet,
     ArrowRight,
-    CheckCircle2,
     Sparkles,
     Zap,
     Shield,
-    MessageCircle
+    MessageCircle,
+    Tag,
+    Rocket,
+    CheckCircle2,
+    Globe,
+    LayoutDashboard,
+    Smartphone
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
 
 interface ServicesProps {
     darkMode: boolean;
 }
+
+// ⚠️ MANUAL — situs ini nggak punya backend, jadi angka ini HARUS kamu
+// update sendiri tiap dapat klien baru dari promo peluncuran. Begitu
+// PROMO_SLOTS_TAKEN mencapai PROMO_SLOTS_TOTAL, sebaiknya banner promo
+// di bawah dihapus/diganti (biar nggak keliatan "penuh" selamanya).
+const PROMO_SLOTS_TOTAL = 5;
+const PROMO_SLOTS_TAKEN = 1;
 
 export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
     const services = [
@@ -43,6 +55,41 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
             features: ['Data Reconciliation', 'Export Excel/PDF', 'Realtime Dashboard', 'Audit Log'],
             color: 'indigo'
         }
+    ];
+
+    // Estimasi harga "mulai dari" — bukan harga final. Final tetap lewat
+    // diskusi kebutuhan (fitur, kompleksitas, timeline) di WhatsApp/form.
+    const pricingTiers = [
+        {
+            icon: <Globe className="w-5 h-5" />,
+            title: 'Landing Page',
+            price: 'Rp 800rb',
+            desc: 'Satu halaman untuk personal branding atau promosi produk tunggal.',
+        },
+        {
+            icon: <LayoutDashboard className="w-5 h-5" />,
+            title: 'Company Profile / Web App Sederhana',
+            price: 'Rp 2,5jt',
+            desc: 'Beberapa halaman informasi bisnis dengan desain custom & form kontak.',
+        },
+        {
+            icon: <FileSpreadsheet className="w-5 h-5" />,
+            title: 'Web App Custom',
+            price: 'Rp 6jt',
+            desc: 'Dashboard, sistem internal, atau tools bisnis sesuai kebutuhan spesifik.',
+        },
+        {
+            icon: <Smartphone className="w-5 h-5" />,
+            title: 'Aplikasi Mobile',
+            price: 'Rp 6jt',
+            desc: 'Aplikasi Android/iOS dengan fitur custom sesuai kebutuhan.',
+        },
+        {
+            icon: <Gamepad2 className="w-5 h-5" />,
+            title: 'Game / Platform Multiplayer',
+            price: 'Rp 12jt',
+            desc: 'Game interaktif dengan backend realtime, matchmaking, dan sistem skor.',
+        },
     ];
 
     const workflow = [
@@ -119,7 +166,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                 </div>
 
                 {/* Services Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
                     {services.map((service, idx) => {
                         const colors = getColorClasses(service.color);
                         return (
@@ -154,6 +201,99 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             </div>
                         );
                     })}
+                </div>
+
+                {/* Promo Peluncuran Banner */}
+                <div className={`relative overflow-hidden p-5 sm:p-6 rounded-2xl border mb-6 ${darkMode
+                        ? 'bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-amber-800/40'
+                        : 'bg-gradient-to-r from-amber-50 via-white to-white border-amber-200'
+                    }`}>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${darkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-500/15 text-amber-600'
+                            }`}>
+                            <Rocket className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                                <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    Promo Peluncuran — Kuota 5 Klien Pertama
+                                </h3>
+                                <span className={`text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${darkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-500/15 text-amber-700'
+                                    }`}>
+                                    Terbatas
+                                </span>
+                            </div>
+                            <ul className={`space-y-1 text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                                <li className="flex items-start gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                                    <span>Gratis technical support & bug fix 1 bulan pasca rilis di semua paket</span>
+                                </li>
+                                <li className="flex items-start gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                                    <span>Tambahan 2x revisi mayor (di luar revisi standar)</span>
+                                </li>
+                                <li className="flex items-start gap-1.5">
+                                    <CheckCircle2 className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
+                                    <span>Bersedia proyek Anda dijadikan studi kasus portofolio (+testimoni)? Dapatkan diskon tambahan 15% dari estimasi harga</span>
+                                </li>
+                            </ul>
+
+                            {/* Progress kuota — angkanya di-update manual di const di atas */}
+                            <div className="mt-3 pt-3 border-t border-amber-500/20">
+                                <div className="flex items-center justify-between text-[11px] mb-1.5">
+                                    <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>Slot promo terisi</span>
+                                    <span className={`font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
+                                        {PROMO_SLOTS_TAKEN} / {PROMO_SLOTS_TOTAL}
+                                    </span>
+                                </div>
+                                <div className={`w-full h-2 rounded-full overflow-hidden ${darkMode ? 'bg-slate-800' : 'bg-amber-100'
+                                    }`}>
+                                    <div
+                                        className="bg-amber-500 h-full rounded-full transition-all duration-700"
+                                        style={{ width: `${Math.min((PROMO_SLOTS_TAKEN / PROMO_SLOTS_TOTAL) * 100, 100)}%` }}
+                                        role="progressbar"
+                                        aria-valuenow={PROMO_SLOTS_TAKEN}
+                                        aria-valuemin={0}
+                                        aria-valuemax={PROMO_SLOTS_TOTAL}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Pricing Tiers */}
+                <div className={`p-6 rounded-2xl border mb-10 ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
+                    }`}>
+                    <div className="flex items-center gap-2 mb-5">
+                        <Tag className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
+                        <h3 className={`text-sm font-bold uppercase tracking-wider ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                            Paket & Estimasi Harga
+                        </h3>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                        {pricingTiers.map((tier, i) => (
+                            <div key={i} className={`p-4 rounded-xl border flex flex-col ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                }`}>
+                                <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 ${darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-500/15 text-teal-600'
+                                    }`}>
+                                    {tier.icon}
+                                </div>
+                                <h4 className={`text-xs font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                    {tier.title}
+                                </h4>
+                                <p className={`text-base font-extrabold mb-1.5 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>
+                                    Mulai {tier.price}
+                                </p>
+                                <p className={`text-[11px] leading-snug ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    {tier.desc}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                    <p className={`text-[11px] mt-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Harga di atas adalah estimasi awal — harga final ditentukan setelah diskusi kebutuhan detail (fitur, kompleksitas, timeline). Konsultasi awal selalu gratis.
+                    </p>
                 </div>
 
                 {/* Why Choose Me — Mini Value Props */}
@@ -232,7 +372,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                     <div className="text-center">
                         <a
                             href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-                                'Halo Pak Arzha, saya tertarik dengan jasa development aplikasi. Boleh diskusi lebih lanjut?'
+                                'Halo Pak Arzha, saya tertarik dengan jasa development aplikasi (lihat ada promo peluncuran juga). Boleh diskusi lebih lanjut?'
                             )}`}
                             target="_blank"
                             rel="noreferrer"
