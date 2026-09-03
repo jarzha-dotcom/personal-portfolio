@@ -121,6 +121,21 @@ const FAQ_ITEMS: FAQItem[] = [
     keywords: ['masih buka', 'terima proyek', 'available', 'slot kosong'],
     answer: 'Masih buka untuk proyek baru! Apalagi lagi ada promo peluncuran buat klien-klien awal — cek bagian Layanan buat detailnya.',
   },
+  {
+    id: 'objection-trust', categoryId: 'proses', quickLabel: 'Kenapa harus percaya Arzha?',
+    keywords: ['ga percaya', 'tidak percaya', 'ragu', 'takut ditipu', 'penipuan', 'aman ga', 'terpercaya', 'bukti kerja', 'ga mau'],
+    answer: 'Hehe, wajar banget kok kak kalau ada ragu di awal 😊 Memang paling enak lihat hasil kerjanya langsung biar mantap di hati. Kakak bisa intip dan tes langsung 3 proyek live yang udah rilis di bagian Proyek. Biar makin tenang, pembayarannya juga bertahap per milestone (hasil kelihatan dulu baru bayar). Santai aja kak, gak ada paksaan sama sekali kok 🙏',
+  },
+  {
+    id: 'objection-mahal', categoryId: 'harga', quickLabel: 'Bisa nego atau budget pas-pasan?',
+    keywords: ['mahal', 'kemahalan', 'kurang murah', 'bisa nego', 'budget minim', 'diskon dong', 'ada potongan'],
+    answer: 'Bisa banget diobrolin kok kak! Fitur dan budget bisa kita sesuaikan sama skala kebutuhan kakak. Landing page ada yang mulai Rp800rb, plus lagi ada promo peluncuran diskon 15% buat 5 klien pertama. Yuk ngobrol santai dulu via WhatsApp biar ketemu solusi yang pas di kantong 😊',
+  },
+  {
+    id: 'objection-keunggulan', categoryId: 'tech', quickLabel: 'Apa keunggulan jasa Arzha?',
+    keywords: ['keunggulan', 'kelebihan', 'kenapa harus arzha', 'bedanya apa', 'keistimewaan'],
+    answer: 'Yang utama ada 3 hal kak: 1) Etos kerja disiplin & teliti berkat pengalaman korporat 7+ tahun, 2) Teknologi modern yang kencang & rapi (React, TypeScript), dan 3) Garansi support teknis 1 bulan pasca rilis biar kakak tenang operasionalnya lancar.',
+  },
 ];
 
 const fuse = new Fuse(FAQ_ITEMS, {
@@ -207,7 +222,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const respondWithFallback = () => {
     setIsTyping(true);
     const text =
-      'Hmm, aku belum punya jawaban pasti soal itu. Tapi bisa langsung tanya Arzha lewat WhatsApp — dijawab langsung! 👇';
+      'Biar kakak dapet estimasi biaya & solusi paling tepat tanpa nebak-nebak, yuk ngobrol langsung sama Arzha via WhatsApp! Konsultasi awal 100% gratis & santai kok 👇';
     setTimeout(() => {
       setIsTyping(false);
       appendBotMessage(text, standardCTA, false);
