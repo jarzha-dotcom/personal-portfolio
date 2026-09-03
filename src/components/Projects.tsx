@@ -361,35 +361,35 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
             <div
               className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
                 }`}
-              style={{ maxHeight: 'calc(100vh - 2rem)' }}
+              style={{ height: 'min(640px, calc(100vh - 2rem))', maxHeight: 'calc(100vh - 2rem)' }}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal Header */}
               <div
-                className={`flex-shrink-0 p-4 sm:p-5 border-b flex items-center justify-between ${darkMode
+                className={`flex-shrink-0 p-3.5 sm:p-4 border-b flex items-center justify-between ${darkMode
                     ? 'bg-gradient-to-r from-teal-900/40 to-emerald-900/40 border-slate-700'
                     : 'bg-gradient-to-r from-teal-50 to-emerald-50 border-slate-200'
                   }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${darkMode ? 'bg-teal-500/20' : 'bg-teal-100'
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center ${darkMode ? 'bg-teal-500/20' : 'bg-teal-100'
                       }`}
                   >
                     <Bot className={`w-5 h-5 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
                   </div>
                   <div>
-                    <h3 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                    <h3 className={`text-sm sm:text-base font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                       AI Chatbot Portfolio
                     </h3>
-                    <p className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Demo live • Gemini 2.0 Flash • Serverless protected
+                    <p className={`text-[10px] sm:text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      Demo live • Gemini 3.5 Flash • Serverless protected
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsChatbotOpen(false)}
-                  className={`p-2 rounded-lg transition-colors ${darkMode
+                  className={`p-1.5 rounded-lg transition-colors ${darkMode
                       ? 'text-slate-400 hover:text-white hover:bg-slate-800'
                       : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                     }`}
@@ -398,8 +398,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                 </button>
               </div>
 
-              {/* Chatbot - flex-1 */}
-              <div className="flex-1 overflow-hidden">
+              {/* Chatbot - flex-1 min-h-0 */}
+              <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
                 <AIChatbotShowcase darkMode={darkMode} />
               </div>
 

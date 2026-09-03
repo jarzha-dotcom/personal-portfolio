@@ -3,10 +3,16 @@ export interface ChatMessage {
     parts: { text: string }[];
 }
 
+export interface GeminiResponse {
+    reply: string;
+    model: string;
+    remainingQuota: number;
+}
+
 export async function sendMessageToGemini(
     history: ChatMessage[],
     newUserMessage: string
-): Promise<string> {
+): Promise<GeminiResponse> {
     const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -21,8 +27,9 @@ export async function sendMessageToGemini(
         throw new Error(err.error || `Server error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data: GeminiResponse = await response.json();
+
     if (!data.reply) throw new Error('Respons kosong dari server');
 
-    return data.reply;
+    return data;
 }
