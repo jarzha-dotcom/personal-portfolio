@@ -144,7 +144,7 @@ export default function App() {
         <a
           id="floating-wa-btn"
           href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-            'Halo Pak Kidung Arzhaning, saya melihat portofolio Anda dan ingin berdiskusi...'
+            'Halo Pak Arzha, saya melihat portofolio Anda dan ingin berdiskusi...'
           )}`}
           target="_blank"
           rel="noreferrer"

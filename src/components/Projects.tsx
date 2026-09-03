@@ -8,24 +8,15 @@ import {
   FileSpreadsheet,
   BarChart3,
   X,
-  Sparkles,
   ChevronRight,
-  Monitor,
   Layers
 } from 'lucide-react';
-import { PROJECTS, TECH_STACK_GROUPS } from '../data/portfolioData';
+import { PROJECTS } from '../data/portfolioData';
 import { ProjectItem } from '../types';
 
 interface ProjectsProps {
   darkMode: boolean;
 }
-
-const sampleFlashcards = [
-  { word: 'Gajah', en: 'Elephant', icon: '🐘', phonetic: '/ˈɛl.ɪ.fənt/' },
-  { word: 'Bintang', en: 'Star', icon: '⭐', phonetic: '/stɑːr/' },
-  { word: 'Apel', en: 'Apple', icon: '🍎', phonetic: '/ˈæp.əl/' },
-  { word: 'Kucing', en: 'Cat', icon: '🐱', phonetic: '/kæt/' },
-];
 
 export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeFilter, setActiveFilter] = useState<string>('Semua');
@@ -79,8 +70,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2 ${darkMode
-              ? 'text-teal-400 bg-teal-950/60 border border-teal-800'
-              : 'text-teal-600 bg-teal-50 border border-teal-200'
+            ? 'text-teal-400 bg-teal-950/60 border border-teal-800'
+            : 'text-teal-600 bg-teal-50 border border-teal-200'
             }`}>
             <Layers className="w-3.5 h-3.5" />
             <span>Proyek & Karya</span>
@@ -91,7 +82,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
           </h2>
           <p className={`text-xs sm:text-sm ${darkMode ? 'text-slate-300' : 'text-slate-600'
             }`}>
-            Proyek indie yang sudah dirilis dan tools internal yang dibangun untuk efisiensi kerja audit.
+            Proyek indie yang sudah dirilis dan web app internal untuk kebutuhan bisnis nyata — dari game, aplikasi edukasi, hingga sistem manajemen aset.
           </p>
         </div>
 
@@ -102,10 +93,10 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
               key={cat}
               onClick={() => setActiveFilter(cat)}
               className={`px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-colors ${activeFilter === cat
-                  ? 'bg-teal-600 text-white border-teal-600'
-                  : darkMode
-                    ? 'text-slate-300 border-slate-700 hover:text-white hover:bg-slate-800'
-                    : 'text-slate-600 border-slate-300 hover:text-slate-900 hover:bg-slate-100'
+                ? 'bg-teal-600 text-white border-teal-600'
+                : darkMode
+                  ? 'text-slate-300 border-slate-700 hover:text-white hover:bg-slate-800'
+                  : 'text-slate-600 border-slate-300 hover:text-slate-900 hover:bg-slate-100'
                 }`}
             >
               {cat}
@@ -125,8 +116,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
               >
                 <div
                   className={`h-full p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 cursor-pointer ${darkMode
-                      ? 'bg-slate-900 border-slate-700 hover:border-slate-600'
-                      : 'bg-white border-slate-200 shadow-sm hover:shadow-md'
+                    ? 'bg-slate-900 border-slate-700 hover:border-slate-600'
+                    : 'bg-white border-slate-200 shadow-sm hover:shadow-md'
                     }`}
                   onClick={() => setActiveModalProject(project)}
                 >
@@ -144,8 +135,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
 
                   {/* Title & Tagline */}
                   <h3 className={`text-lg sm:text-xl font-bold tracking-tight mb-2 transition-colors ${darkMode
-                      ? 'text-white group-hover:text-teal-400'
-                      : 'text-slate-900 group-hover:text-teal-600'
+                    ? 'text-white group-hover:text-teal-400'
+                    : 'text-slate-900 group-hover:text-teal-600'
                     }`}>
                     {project.title}
                   </h3>
@@ -175,8 +166,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                       <span
                         key={tech}
                         className={`text-[10px] font-medium px-2 py-0.5 rounded-md border ${darkMode
-                            ? 'bg-slate-800 border-slate-700 text-slate-300'
-                            : 'bg-slate-50 border-slate-200 text-slate-600'
+                          ? 'bg-slate-800 border-slate-700 text-slate-300'
+                          : 'bg-slate-50 border-slate-200 text-slate-600'
                           }`}
                       >
                         {tech}
@@ -193,42 +184,6 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
               </div>
             );
           })}
-        </div>
-
-        {/* Tech Stack Groups */}
-        <div className={`p-6 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
-          }`}>
-          <h3 className={`text-sm font-bold uppercase tracking-wider mb-4 flex items-center gap-2 ${darkMode ? 'text-white' : 'text-slate-900'
-            }`}>
-            <Sparkles className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
-            Tech Stack & Tools
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {TECH_STACK_GROUPS.map((group) => (
-              <div key={group.category} className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-teal-500"></span>
-                  <h4 className={`text-xs font-bold uppercase tracking-wider ${darkMode ? 'text-white' : 'text-slate-900'
-                    }`}>
-                    {group.category}
-                  </h4>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {group.items.map((tool) => (
-                    <span
-                      key={tool}
-                      className={`text-[11px] px-2 py-0.5 rounded-md border font-medium ${darkMode
-                          ? 'bg-slate-800 border-slate-700 text-slate-300'
-                          : 'bg-slate-50 border-slate-200 text-slate-600'
-                        }`}
-                    >
-                      {tool}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
@@ -297,8 +252,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     <span
                       key={tech}
                       className={`text-[11px] font-medium px-2.5 py-1 rounded-md border ${darkMode
-                          ? 'bg-slate-800 border-slate-700 text-slate-300'
-                          : 'bg-slate-50 border-slate-200 text-slate-600'
+                        ? 'bg-slate-800 border-slate-700 text-slate-300'
+                        : 'bg-slate-50 border-slate-200 text-slate-600'
                         }`}
                     >
                       {tech}
@@ -333,8 +288,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
               <button
                 onClick={() => setActiveModalProject(null)}
                 className={`px-4 py-2 rounded-lg text-xs font-semibold border transition-colors ${darkMode
-                    ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
-                    : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                  ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                  : 'border-slate-300 text-slate-700 hover:bg-slate-100'
                   }`}
               >
                 Tutup
@@ -346,8 +301,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     target="_blank"
                     rel="noreferrer"
                     className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold border transition-colors ${darkMode
-                        ? 'border-slate-700 text-slate-200 hover:bg-slate-800'
-                        : 'border-slate-300 text-slate-800 hover:bg-slate-100'
+                      ? 'border-slate-700 text-slate-200 hover:bg-slate-800'
+                      : 'border-slate-300 text-slate-800 hover:bg-slate-100'
                       }`}
                   >
                     <Github className="w-3.5 h-3.5" />

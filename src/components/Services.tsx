@@ -145,8 +145,8 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                 <div className="text-center max-w-3xl mx-auto mb-12">
                     <div
                         className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3 ${darkMode
-                                ? 'text-teal-400 bg-teal-950/60 border border-teal-800'
-                                : 'text-teal-600 bg-teal-50 border border-teal-200'
+                            ? 'text-teal-400 bg-teal-950/60 border border-teal-800'
+                            : 'text-teal-600 bg-teal-50 border border-teal-200'
                             }`}
                     >
                         <Code2 className="w-3.5 h-3.5" />
@@ -173,8 +173,8 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             <div
                                 key={idx}
                                 className={`p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 ${darkMode
-                                        ? 'bg-slate-900 border-slate-700 hover:border-slate-600'
-                                        : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
+                                    ? 'bg-slate-900 border-slate-700 hover:border-slate-600'
+                                    : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
                                     }`}
                             >
                                 <div
@@ -205,8 +205,8 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
 
                 {/* Promo Peluncuran Banner */}
                 <div className={`relative overflow-hidden p-5 sm:p-6 rounded-2xl border mb-6 ${darkMode
-                        ? 'bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-amber-800/40'
-                        : 'bg-gradient-to-r from-amber-50 via-white to-white border-amber-200'
+                    ? 'bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border-amber-800/40'
+                    : 'bg-gradient-to-r from-amber-50 via-white to-white border-amber-200'
                     }`}>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${darkMode ? 'bg-amber-500/20 text-amber-400' : 'bg-amber-500/15 text-amber-600'
@@ -308,8 +308,8 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                         {[
                             {
                                 icon: <Zap className="w-4 h-4" />,
-                                title: 'Solo Developer End-to-End',
-                                desc: 'Dari ide, desain, coding, hingga deployment — dikerjakan satu tangan, komunikasi langsung tanpa perantara.'
+                                title: 'End-to-End, Tanpa Perantara',
+                                desc: 'Dari ide, desain, coding, hingga deployment ditangani langsung oleh saya — tanpa estafet antar tim yang sering bikin miskomunikasi atau delay.'
                             },
                             {
                                 icon: <Shield className="w-4 h-4" />,
@@ -343,8 +343,8 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                 {/* Workflow / Process */}
                 <div
                     className={`p-6 sm:p-8 rounded-2xl border ${darkMode
-                            ? 'bg-slate-900/50 border-slate-700'
-                            : 'bg-teal-50/50 border-teal-200'
+                        ? 'bg-slate-900/50 border-slate-700'
+                        : 'bg-teal-50/50 border-teal-200'
                         }`}
                 >
                     <h3 className={`text-sm font-bold uppercase tracking-wider mb-6 text-center ${darkMode ? 'text-white' : 'text-slate-900'

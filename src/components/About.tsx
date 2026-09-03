@@ -8,12 +8,24 @@ import {
   Clock,
   Code2
 } from 'lucide-react';
-import { PERSONAL_INFO, STATS } from '../data/portfolioData';
+import { PERSONAL_INFO } from '../data/portfolioData';
 import { CountUp } from './CountUp';
 
 interface AboutProps {
   darkMode: boolean;
 }
+
+// Stats khusus halaman JASA — sengaja TIDAK pakai array STATS dari
+// portfolioData.ts, karena 2 dari 4 angka di sana ('Akurasi Rekonsiliasi',
+// 'Siklus Audit Terselesaikan') murni konteks audit dan nggak relevan di
+// sini. Untuk versi CV yang memang butuh angka-angka itu, lihat
+// AboutCV.tsx yang tetap memakai STATS asli.
+const JASA_STATS = [
+  { value: '7+', label: 'Tahun Pengalaman', desc: 'Termasuk disiplin kerja korporat' },
+  { value: '3', label: 'Proyek Dirilis', desc: 'Web, mobile & game — live & dipakai user' },
+  { value: '15+', label: 'Tech Stack Dikuasai', desc: 'Frontend, backend, hingga deployment' },
+  { value: '4', label: 'Tahap Kerja Transparan', desc: 'Dari konsultasi sampai rilis' },
+];
 
 // Versi About untuk halaman JASA — fokus ke kredibilitas developer.
 // Untuk versi formal/rekrutmen, lihat AboutCV.tsx (dipakai di CVPage).
@@ -94,7 +106,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
           </h2>
           <p className={`text-xs sm:text-sm ${darkMode ? 'text-slate-300' : 'text-slate-600'
             }`}>
-            Solo developer dengan latar belakang korporat, membawa kedisiplinan kerja profesional ke setiap proyek yang dikerjakan.
+            Membangun aplikasi dari konsep sampai rilis, dengan komunikasi langsung tanpa perantara dan kedisiplinan kerja profesional di setiap proyek.
           </p>
         </div>
 
@@ -201,7 +213,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
 
         {/* Highlight Stats Row */}
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {STATS.map((stat, i) => (
+          {JASA_STATS.map((stat, i) => (
             <div
               key={i}
               className={`p-4 text-center rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
