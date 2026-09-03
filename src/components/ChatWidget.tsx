@@ -1,8 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, User } from 'lucide-react';
+import Fuse from 'fuse.js';
+import { CONTACT_INFO } from '../data/portfolioData';
 
 interface ChatWidgetProps {
   darkMode: boolean;
+}
+
+interface QuickOption {
+  id: string;
+  label: string;
 }
 
 interface Message {
@@ -10,74 +17,260 @@ interface Message {
   sender: 'user' | 'bot';
   text: string;
   timestamp: string;
+  options?: QuickOption[];
 }
 
-const quickQuestions = [
-  'Pengalaman kerja?',
-  'Skill teknis?',
-  'Jasa development?',
-  'Kontak & WhatsApp?',
+interface Category {
+  id: string;
+  label: string;
+}
+
+interface FAQItem {
+  id: string;
+  categoryId: string;
+  quickLabel: string;
+  keywords: string[];
+  answer: string;
+}
+
+// Widget ini khusus halaman JASA — semua isi FAQ fokus ke pertanyaan
+// calon klien (harga, proses, tech stack), bukan pertanyaan rekrutmen
+// (itu porsi ChatWidgetCV).
+const CATEGORIES: Category[] = [
+  { id: 'harga', label: '💰 Harga & Paket' },
+  { id: 'proses', label: '⏱️ Proses & Durasi' },
+  { id: 'tech', label: '🛠️ Skill & Tech Stack' },
+  { id: 'portfolio', label: '📂 Portfolio' },
+  { id: 'kontak', label: '📞 Kontak & Ketersediaan' },
 ];
 
-// Catatan: widget ini khusus halaman JASA — jawabannya sengaja fokus ke
-// development, bukan cerita audit korporat (itu porsi ChatWidgetCV).
-const botResponses: Record<string, string> = {
-  'Pengalaman kerja?':
-    'Saya sudah merilis beberapa proyek nyata: platform game multiplayer (B-Games), aplikasi edukasi anak (Rajendra Pintar), dan sistem manajemen aset (Assets GMP). Development jadi fokus utama saya sekarang, didukung latar belakang 7+ tahun bekerja di lingkungan korporat yang menuntut ketelitian tinggi.',
-  'Skill teknis?':
-    'Stack utama saya: React, TypeScript, Expo, Supabase, Node.js, dan Tailwind CSS — untuk membangun web, mobile, dan game. Saya juga terbiasa bekerja dengan data dan sistem yang butuh akurasi tinggi, hasil dari pengalaman korporat sebelumnya.',
-  'Jasa development?':
-    'Ya, saya menerima proyek freelance untuk pembuatan aplikasi web, mobile, dan game. Contoh proyek yang sudah rilis: B-Games (board game multiplayer), Rajendra Pintar (edukasi anak), dan Assets GMP (manajemen aset).',
-  'Kontak & WhatsApp?':
-    'Anda bisa menghubungi saya via WhatsApp di 0823-1231-2734 atau email ke Jarzha@gmail.com. Saya juga tersedia untuk diskusi langsung melalui formulir di bagian Kontak.',
-};
+const FAQ_ITEMS: FAQItem[] = [
+  {
+    id: 'harga-landing', categoryId: 'harga', quickLabel: 'Harga landing page?',
+    keywords: ['harga landing page', 'biaya landing page', 'landing page berapa', 'halaman tunggal', 'company profile 1 halaman'],
+    answer: 'Landing page (1 halaman) mulai dari Rp800rb. Harga final tergantung kompleksitas desain & fitur — konsultasi awal gratis buat estimasi pasti.',
+  },
+  {
+    id: 'harga-webapp', categoryId: 'harga', quickLabel: 'Harga web app custom?',
+    keywords: ['harga web app', 'biaya dashboard', 'harga sistem internal', 'harga aplikasi web', 'web app berapa'],
+    answer: 'Web app custom (dashboard, sistem internal, tools bisnis) mulai dari Rp6 juta, tergantung kompleksitas fitur yang dibutuhkan.',
+  },
+  {
+    id: 'harga-mobile', categoryId: 'harga', quickLabel: 'Harga aplikasi mobile?',
+    keywords: ['harga aplikasi mobile', 'biaya bikin app', 'harga app android', 'harga aplikasi ios', 'mobile app berapa'],
+    answer: 'Aplikasi mobile custom mulai dari Rp6 juta, tergantung fitur & platform (Android/iOS).',
+  },
+  {
+    id: 'harga-game', categoryId: 'harga', quickLabel: 'Harga bikin game?',
+    keywords: ['harga game', 'biaya bikin game', 'harga platform multiplayer', 'game berapa', 'harga board game'],
+    answer: 'Game / platform multiplayer mulai dari Rp12 juta — realtime multiplayer & backend butuh effort lebih dari web app biasa.',
+  },
+  {
+    id: 'harga-promo', categoryId: 'harga', quickLabel: 'Ada promo?',
+    keywords: ['promo', 'diskon', 'harga spesial', 'promo peluncuran'],
+    answer: 'Ada! Promo peluncuran buat 5 klien pertama: gratis technical support 1 bulan pasca rilis, tambahan 2x revisi mayor, dan diskon tambahan 15% kalau bersedia proyeknya dijadikan studi kasus portofolio. Cek detail lengkapnya di bagian Layanan ya.',
+  },
+  {
+    id: 'proses-durasi', categoryId: 'proses', quickLabel: 'Berapa lama pengerjaan?',
+    keywords: ['berapa lama', 'durasi pengerjaan', 'estimasi waktu', 'lama proyek', 'timeline'],
+    answer: 'Tergantung kompleksitas — landing page biasanya 1-2 minggu, web app/mobile app 3-6 minggu, game 6-10 minggu tergantung fitur. Timeline pasti dibahas di awal konsultasi.',
+  },
+  {
+    id: 'proses-alur', categoryId: 'proses', quickLabel: 'Gimana alur kerjanya?',
+    keywords: ['alur kerja', 'proses kerja', 'tahapan proyek', 'cara kerja', 'workflow'],
+    answer: '4 tahap: Konsultasi Kebutuhan → Desain & Prototipe → Development & Testing → Deployment & Rilis. Transparan, update progres berkala via WhatsApp.',
+  },
+  {
+    id: 'proses-revisi', categoryId: 'proses', quickLabel: 'Ada revisi?',
+    keywords: ['revisi', 'ganti desain', 'ubah fitur', 'koreksi'],
+    answer: 'Setiap paket termasuk revisi standar. Klien promo peluncuran malah dapat tambahan 2x revisi mayor gratis di luar itu.',
+  },
+  {
+    id: 'proses-pembayaran', categoryId: 'proses', quickLabel: 'Sistem pembayaran?',
+    keywords: ['pembayaran', 'dp', 'cicilan', 'bayar gimana', 'termin'],
+    answer: 'Skema pembayaran (DP & termin) disesuaikan sama skala proyek — dibahas langsung pas konsultasi di WhatsApp biar jelas & fair buat dua belah pihak.',
+  },
+  {
+    id: 'tech-stack', categoryId: 'tech', quickLabel: 'Teknologi apa yang dipakai?',
+    keywords: ['teknologi', 'tech stack', 'pakai bahasa apa', 'framework', 'react node'],
+    answer: 'React, TypeScript, Node.js, Supabase buat web app. React Native & Expo buat mobile. Khusus game pakai boardgame.io + WebSockets buat realtime multiplayer.',
+  },
+  {
+    id: 'tech-custom', categoryId: 'tech', quickLabel: 'Bisa bikin sesuai kebutuhan khusus?',
+    keywords: ['bisa bikin seperti', 'custom request', 'fitur khusus', 'bisa nggak'],
+    answer: 'Bisa! Ceritain detail kebutuhannya langsung di WhatsApp, nanti kita diskusiin feasibility & estimasinya bareng.',
+  },
+  {
+    id: 'portfolio-proyek', categoryId: 'portfolio', quickLabel: 'Ada contoh kerjaan?',
+    keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo'],
+    answer: 'Ada 3 proyek yang udah rilis: B-Games (game multiplayer), Rajendra Pintar (app edukasi anak), Assets GMP (sistem manajemen aset). Scroll ke bagian Proyek di halaman ini buat lihat detail & demo live-nya.',
+  },
+  {
+    id: 'portfolio-pengalaman', categoryId: 'portfolio', quickLabel: 'Pengalaman development berapa lama?',
+    keywords: ['pengalaman kerja', 'sudah berapa lama', 'pengalaman development'],
+    answer: 'Development jadi fokus utama sekarang, dengan 3 proyek nyata yang udah rilis. Didukung juga 7+ tahun latar belakang korporat yang ngebentuk kedisiplinan kerja.',
+  },
+  {
+    id: 'kontak-wa', categoryId: 'kontak', quickLabel: 'Kontak & WhatsApp?',
+    keywords: ['kontak', 'whatsapp', 'nomor hp', 'email', 'hubungi'],
+    answer: 'Bisa langsung chat WhatsApp atau email lewat tombol di bawah, atau isi form di bagian Kontak halaman ini.',
+  },
+  {
+    id: 'kontak-availability', categoryId: 'kontak', quickLabel: 'Masih terima proyek baru?',
+    keywords: ['masih buka', 'terima proyek', 'available', 'slot kosong'],
+    answer: 'Masih buka untuk proyek baru! Apalagi lagi ada promo peluncuran buat klien-klien awal — cek bagian Layanan buat detailnya.',
+  },
+];
+
+const fuse = new Fuse(FAQ_ITEMS, {
+  keys: ['keywords', 'quickLabel'],
+  threshold: 0.4,
+  ignoreLocation: true,
+});
+
+const nowStr = () => new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 
 export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 'welcome',
       sender: 'bot',
-      text: 'Halo! Saya asisten virtual Arzha. Ada yang ingin ditanyakan tentang keahlian, atau jasa development?',
-      timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      text: 'Halo! Saya asisten virtual Arzha 👋 Mau tanya soal apa?',
+      timestamp: nowStr(),
+      options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
     },
   ]);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const lastQueryRef = useRef<string>('');
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isTyping]);
+
+  const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
+
+  const openWhatsApp = () => {
+    const context = lastQueryRef.current
+      ? `Halo, saya ingin tanya soal: ${lastQueryRef.current}`
+      : 'Halo, saya tertarik dengan jasa development Anda.';
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(context)}`, '_blank');
+  };
+
+  const showCategoryMenu = () => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: 'Mau tanya soal apa lagi?',
+          timestamp: nowStr(),
+          options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+        },
+      ]);
+    }, 400);
+  };
+
+  const showCategoryQuestions = (category: Category) => {
+    const items = FAQ_ITEMS.filter((f) => f.categoryId === category.id);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: `Pilih pertanyaan seputar ${category.label.replace(/^\S+\s/, '')}:`,
+          timestamp: nowStr(),
+          options: [...items.map((f) => ({ id: f.id, label: f.quickLabel })), { id: 'menu', label: '⬅️ Menu Utama' }],
+        },
+      ]);
+    }, 400);
+  };
+
+  const respondWithFAQ = (faq: FAQItem) => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: faq.answer,
+          timestamp: nowStr(),
+          options: [
+            { id: 'menu', label: '⬅️ Menu Utama' },
+            { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+          ],
+        },
+      ]);
+    }, 600);
+  };
+
+  const respondWithFallback = () => {
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `bot-${Date.now()}`,
+          sender: 'bot',
+          text: 'Hmm, aku belum punya jawaban pasti soal itu. Tapi bisa langsung tanya lewat WhatsApp, nanti dijawab langsung 👇',
+          timestamp: nowStr(),
+          options: [
+            { id: 'menu', label: '⬅️ Menu Utama' },
+            { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+          ],
+        },
+      ]);
+    }, 600);
+  };
+
+  const handleOptionClick = (id: string, label: string) => {
+    if (id === 'whatsapp') {
+      openWhatsApp();
+      return;
+    }
+    if (id === 'menu') {
+      showCategoryMenu();
+      return;
+    }
+    const category = CATEGORIES.find((c) => c.id === id);
+    if (category) {
+      setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() }]);
+      showCategoryQuestions(category);
+      return;
+    }
+    const faq = FAQ_ITEMS.find((f) => f.id === id);
+    if (faq) {
+      setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() }]);
+      lastQueryRef.current = faq.quickLabel;
+      respondWithFAQ(faq);
+    }
+  };
 
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
-
-    const userMsg: Message = {
-      id: `user-${Date.now()}`,
-      sender: 'user',
-      text: text.trim(),
-      timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
+    const trimmed = text.trim();
+    setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: trimmed, timestamp: nowStr() }]);
     setInputValue('');
 
-    setTimeout(() => {
-      let reply = 'Terima kasih atas pertanyaannya! Untuk informasi lebih detail, silakan hubungi langsung via WhatsApp atau email yang tertera di bagian Kontak.';
-      for (const [key, val] of Object.entries(botResponses)) {
-        if (text.toLowerCase().includes(key.toLowerCase().replace('?', '').slice(0, 8))) {
-          reply = val;
-          break;
-        }
-      }
-      const botMsg: Message = {
-        id: `bot-${Date.now()}`,
-        sender: 'bot',
-        text: reply,
-        timestamp: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
-      };
-      setMessages((prev) => [...prev, botMsg]);
-    }, 600);
+    const results = fuse.search(trimmed);
+    if (results.length > 0) {
+      lastQueryRef.current = trimmed;
+      respondWithFAQ(results[0].item);
+    } else {
+      lastQueryRef.current = trimmed;
+      respondWithFallback();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -89,12 +282,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   return (
     <div className="fixed bottom-6 left-6 z-50 no-print">
-      {/* Chat Panel */}
       {isOpen && (
         <div
-          className={`w-80 sm:w-96 h-[420px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden ${darkMode
-            ? 'bg-slate-900 border-slate-700'
-            : 'bg-white border-slate-200'
+          className={`w-80 sm:w-96 h-[460px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
             }`}
         >
           {/* Header */}
@@ -126,27 +316,48 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           <div className={`flex-1 p-3.5 overflow-y-auto space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
             }`}>
             {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`flex gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+              <div key={m.id} className={`flex gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {m.sender === 'bot' && (
                   <div className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
                     KA
                   </div>
                 )}
-                <div
-                  className={`max-w-[80%] px-3 py-2 rounded-xl ${m.sender === 'user'
-                    ? 'bg-teal-600 text-white rounded-br-none'
-                    : darkMode
-                      ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
-                      : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
-                    }`}
-                >
-                  <p>{m.text}</p>
-                  <span className="block text-[9px] opacity-60 text-right mt-1">
-                    {m.timestamp}
-                  </span>
+                <div className="max-w-[85%] flex flex-col gap-1.5">
+                  <div
+                    className={`px-3 py-2 rounded-xl ${m.sender === 'user'
+                      ? 'bg-teal-600 text-white rounded-br-none ml-auto'
+                      : darkMode
+                        ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                        : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                      }`}
+                  >
+                    <p>{m.text}</p>
+                    <span className="block text-[9px] opacity-60 text-right mt-1">{m.timestamp}</span>
+                  </div>
+                  {m.options && m.options.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {m.options.map((opt) => (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleOptionClick(opt.id, opt.label)}
+                          className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-colors ${opt.id === 'whatsapp'
+                            ? darkMode
+                              ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
+                              : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                            : opt.id === 'menu'
+                              ? darkMode
+                                ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
+                                : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                              : darkMode
+                                ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
+                                : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
+                            }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 {m.sender === 'user' && (
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
@@ -156,24 +367,21 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 )}
               </div>
             ))}
-            <div ref={messagesEndRef} />
-          </div>
 
-          {/* Suggested Quick Questions */}
-          <div className={`p-2 border-t flex flex-wrap gap-1.5 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
-            }`}>
-            {quickQuestions.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => sendMessage(q)}
-                className={`text-[10px] px-2 py-1 rounded-full border font-medium transition-colors ${darkMode
-                  ? 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white'
-                  : 'border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-                  }`}
-              >
-                {q}
-              </button>
-            ))}
+            {isTyping && (
+              <div className="flex gap-2 justify-start">
+                <div className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
+                  KA
+                </div>
+                <div className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-1 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200 shadow-sm'
+                  }`}>
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
 
           {/* Input Area */}
@@ -204,7 +412,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 border-2 border-slate-900"
-        title="Tanya Asisten AI / Chat"
+        title="Tanya Asisten / Chat"
       >
         {isOpen ? <X className="w-5 h-5" /> : <MessageSquare className="w-5 h-5 font-bold" />}
       </button>
