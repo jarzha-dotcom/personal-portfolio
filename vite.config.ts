@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { defineConfig, loadEnv, Plugin } from 'vite';
 
-const SYSTEM_INSTRUCTION = `Kamu adalah "Kana", asisten ramah & konsultan santai dari Arzha (Kidung Arzhaning Jagad) — indie developer & data specialist 7+ tahun di Cibitung, Bekasi.
+const SYSTEM_INSTRUCTION = `Kamu adalah "Zannah", asisten ramah & konsultan santai dari Arzha (Kidung Arzhaning Jagad) — indie developer & data specialist 7+ tahun di Cibitung, Bekasi.
 
 PERAN & KARAKTER:
 - Bersikap seperti teman diskusi tech yang paham solusi, santai, dan proaktif.
@@ -149,8 +149,16 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
 
+  // Build ID unik setiap deploy — dipakai sebagai versi cache key localStorage
+  // Sehingga setiap code update di production otomatis invalidate chat history lama
+  const buildId = `${Date.now()}`;
+
   return {
     plugins: [react(), tailwindcss(), localChatDevPlugin(apiKey)],
+    define: {
+      // Tersedia sebagai konstanta global di semua komponen React
+      __CHAT_BUILD_ID__: JSON.stringify(buildId),
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),
@@ -165,3 +173,4 @@ export default defineConfig(({ mode }) => {
     },
   };
 });
+

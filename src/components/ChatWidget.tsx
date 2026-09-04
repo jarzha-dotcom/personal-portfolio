@@ -3,6 +3,7 @@ import { MessageSquare, X, Send, User, Wifi, WifiOff } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
+import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
 
 interface ChatWidgetProps {
   darkMode: boolean;
@@ -251,16 +252,23 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'welcome',
-      sender: 'bot',
-      text: 'Halo! Saya Zannah, asisten Arzha 👋 Mau nanya soal apa? Pilih kategori atau langsung ketik aja!',
-      timestamp: nowStr(),
-      options: WELCOME_OPTIONS,
-      isAI: true,
-    },
-  ]);
+  const [activeModel, setActiveModel] = useState<string>('');
+
+  // Inisialisasi messages dari localStorage (atau welcome msg jika belum ada)
+  const [messages, setMessages] = useState<Message[]>(() => {
+    const saved = loadMessages<Message>('zannah');
+    if (saved && saved.length > 0) return saved;
+    return [
+      {
+        id: 'welcome',
+        sender: 'bot',
+        text: 'Halo! Saya Zannah, asisten Arzha 👋 Mau nanya soal apa? Pilih kategori atau langsung ketik aja!',
+        timestamp: nowStr(),
+        options: WELCOME_OPTIONS,
+        isAI: true,
+      },
+    ];
+  });
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastQueryRef = useRef<string>('');
@@ -270,7 +278,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const REQUEST_COOLDOWN = 12000; // 12 seconds between requests (safe for 5 RPM limit)
 
   // Gemini conversation history (exclude welcome msg)
-  const geminiHistoryRef = useRef<ChatMessage[]>([]);
+  // Diinisialisasi dari sessionStorage agar konteks AI bertahan selama tab terbuka
+  const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('zannah'));
 
   // ⚠️ Cleanup setTimeout untuk mencegah memory leak saat unmount
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -278,6 +287,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
+
+  // Auto-save messages ke localStorage setiap kali berubah
+  useEffect(() => {
+    saveMessages('zannah', messages);
+  }, [messages]);
 
   useEffect(() => {
     return () => {
@@ -371,6 +385,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       const result = await sendMessageToGemini(geminiHistoryRef.current, userText);
       const replyText = result.reply;
 
+      // Simpan model yang aktif untuk ditampilkan di UI
+      if (result.model) setActiveModel(result.model);
+
       // Update history with successful exchange
       geminiHistoryRef.current = [
         ...geminiHistoryRef.current,
@@ -378,6 +395,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         { role: 'model', parts: [{ text: replyText }] },
       ].slice(-12); // keep last 6 exchanges
 
+      // Persist Gemini history ke sessionStorage (bertahan selama tab terbuka)
+      saveGeminiHistory('zannah', geminiHistoryRef.current);
       setAiMode('ai');
       const delay = typingDelay(replyText);
       const id = setTimeout(() => {
@@ -574,7 +593,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       Model Direktori • Backup Zannah
                     </>
                   ) : (
-                    'Asisten Arzha • AI Live'
+                    activeModel ? `${activeModel} • AI Live` : 'Asisten Arzha • AI Live'
                   )}
                 </p>
               </div>

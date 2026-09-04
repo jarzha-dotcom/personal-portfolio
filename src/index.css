@@ -1,70 +1,324 @@
 @import "tailwindcss";
 
-@layer base {
-  body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+/*
+ * Theme tokens (inlined directly here instead of a separate @import —
+ * some Tailwind v4 + Vite setups don't reliably bundle a second local
+ * @import alongside `@import "tailwindcss"`, so this avoids that class of
+ * bug entirely). Components reference these via Tailwind arbitrary
+ * values, e.g. `bg-[var(--t-primary-soft)]`, instead of hardcoded color
+ * classes like `bg-amber-100`. Adding a new theme = adding one more
+ * `[data-theme="..."]` block below + one entry in ThemeContext's THEMES
+ * array — no component files need to change.
+ */
+:root,
+[data-theme='ceria'] {
+  /* Primary: warm amber — stars, main CTAs */
+  --t-primary: #fbbf24;
+  --t-primary-soft: #fef3c7;
+  --t-primary-border: #fcd34d;
+  --t-primary-text: #92400e;
+
+  /* Secondary: sky blue — scoreboard / informational */
+  --t-secondary: #38bdf8;
+  --t-secondary-soft: #e0f2fe;
+  --t-secondary-border: #7dd3fc;
+  --t-secondary-text: #075985;
+  --t-secondary-solid: #38bdf8;
+  --t-secondary-solid-border: #0ea5e9;
+
+  /* Accent: violet — settings / narration */
+  --t-accent: #a78bfa;
+  --t-accent-soft: #ede9fe;
+  --t-accent-border: #c4b5fd;
+  --t-accent-text: #5b21b6;
+
+  /* Warm highlight: orange — streaks */
+  --t-warm-soft: #ffedd5;
+  --t-warm-border: #fdba74;
+  --t-warm-text: #9a3412;
+
+  /* Page background gradient (top -> middle -> bottom) */
+  --t-bg-from: #fffbeb;
+  --t-bg-via: #f0f9ff;
+  --t-bg-to: #ecfdf5;
+
+  --t-header-border: #fde68a;
+
+  /* Surfaces & text — header, modal cards, and their body text/labels.
+     Ceria keeps the original light-card-on-light-page look. */
+  --t-surface: #ffffff;
+  --t-surface-alt: #f8fafc;
+  --t-surface-border: #e2e8f0;
+  --t-header-bg: rgba(255, 255, 255, 0.9);
+  --t-bottombar-bg: rgba(255, 255, 255, 0.95);
+  --t-text: #1e293b;
+  --t-text-muted: #64748b;
+  --t-text-faint: #94a3b8;
+}
+
+[data-theme='luar-angkasa'] {
+  /* Primary: rocket-flame gold — kept warm so it still pops against a
+     dark sky instead of disappearing into it */
+  --t-primary: #facc15;
+  --t-primary-soft: #fef9c3;
+  --t-primary-border: #fde047;
+  --t-primary-text: #713f12;
+
+  /* Secondary: nebula cyan */
+  --t-secondary: #22d3ee;
+  --t-secondary-soft: #cffafe;
+  --t-secondary-border: #67e8f9;
+  --t-secondary-text: #164e63;
+  --t-secondary-solid: #22d3ee;
+  --t-secondary-solid-border: #06b6d4;
+
+  /* Accent: cosmic purple */
+  --t-accent: #c084fc;
+  --t-accent-soft: #f3e8ff;
+  --t-accent-border: #d8b4fe;
+  --t-accent-text: #6b21a8;
+
+  /* Warm highlight: pink nebula glow — kept for streaks */
+  --t-warm-soft: #ffe4e6;
+  --t-warm-border: #fda4af;
+  --t-warm-text: #9f1239;
+
+  /* Deep indigo night sky instead of the pastel daylight gradient. Cards
+     inside stay dark-surfaced too now (see --t-surface below) with light
+     text, so everything actually reads as "space" rather than white
+     panels floating on a dark page. */
+  --t-bg-from: #1e1b4b;
+  --t-bg-via: #312e81;
+  --t-bg-to: #0f172a;
+
+  --t-header-border: #4338ca;
+
+  /* Surfaces & text — dark indigo cards with light text, so contrast
+     holds against the dark sky instead of white panels breaking the mood
+     (and instead of dark text disappearing on a dark page). */
+  --t-surface: #262363;
+  --t-surface-alt: #322f78;
+  --t-surface-border: #55519e;
+  --t-header-bg: rgba(30, 27, 75, 0.88);
+  --t-bottombar-bg: rgba(15, 23, 42, 0.92);
+  --t-text: #f1f5f9;
+  --t-text-muted: #c7d2fe;
+  --t-text-faint: #a5b4fc;
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Poppins', 'Plus Jakarta Sans', sans-serif;
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
+  .rotate-y-180 {
+    transform: rotateY(180deg);
   }
 }
 
-/* Custom smooth scrollbar */
+.font-fredoka {
+  font-family: 'Fredoka', 'Nunito', cursive, sans-serif;
+}
+
+/* index.html hardcodes bg-amber-50/50 + text-slate-800 directly on <body>
+   as a splash-screen fallback (so there's no flash of blank white before
+   React mounts). That's fine pre-mount, but it was still winning visually
+   over our themed background afterward. Once ThemeProvider has set
+   data-theme on <html> (meaning React has mounted), force body transparent
+   so the real themed layer underneath shows instead — this selector
+   outweighs a single utility class without needing !important tricks. */
+html[data-theme] body {
+  background-color: transparent;
+  color: var(--t-text);
+}
+
+/* Kid-friendly bounce animations & button styles */
+@keyframes softBounce {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes gentleWobble {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.animate-soft-bounce {
+  animation: softBounce 2s ease-in-out infinite;
+}
+
+.animate-wobble {
+  animation: gentleWobble 0.4s ease-in-out;
+}
+
+/* Referenced across the app (step transitions, modals, badges) but not
+   previously defined here — without these, .animate-fade-in / .animate-scale
+   were silently no-ops. */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale {
+  animation: scaleIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Mascot idle: gentle bob with two quick "blink" squashes per cycle, so the
+   owl feels alive even when nobody's interacting with it. */
+@keyframes mascotIdle {
+
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+
+  8% {
+    transform: translateY(-2px) scaleY(0.85);
+  }
+
+  12% {
+    transform: translateY(-2px) scaleY(1);
+  }
+
+  50% {
+    transform: translateY(-6px) scaleY(1);
+  }
+
+  58% {
+    transform: translateY(-6px) scaleY(0.85);
+  }
+
+  62% {
+    transform: translateY(-6px) scaleY(1);
+  }
+
+  75% {
+    transform: translateY(-3px) scaleY(1);
+  }
+}
+
+.animate-mascot-idle {
+  animation: mascotIdle 4s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+@keyframes mascotBubblePop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-mascot-bubble {
+  animation: mascotBubblePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .animate-soft-bounce,
+  .animate-wobble,
+  .animate-pop-in,
+  .animate-fade-in,
+  .animate-scale,
+  .animate-mascot-idle,
+  .animate-mascot-bubble {
+    animation: none !important;
+  }
+}
+
+/* One-shot entrance for floating PWA cards (install prompt / update toast) —
+   deliberately not infinite like animate-soft-bounce, since a card that
+   keeps bobbing forever would be distracting rather than a nice reveal. */
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-pop-in {
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* Custom scrollbar for pleasant kids look — tied to the active theme's
+   primary color so it doesn't stay amber under e.g. Luar Angkasa. */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.dark ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--t-primary-soft);
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0d9488;
+  background: var(--t-primary-border);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0f766e;
-}
-
-/* Print Friendly Styles for CV */
-@media print {
-  body {
-    background: #ffffff !important;
-    color: #1e293b !important;
-    font-size: 11pt !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .print-only {
-    display: block !important;
-  }
-
-  .page-break {
-    page-break-before: always;
-  }
-
-  nav, footer, .back-to-top, .theme-toggle, .contact-form, #kontak-form-wrapper {
-    display: none !important;
-  }
-
-  section {
-    padding-top: 1.5rem !important;
-    padding-bottom: 1.5rem !important;
-    break-inside: avoid;
-  }
-
-  .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl {
-    box-shadow: none !important;
-    border: 1px solid #e2e8f0 !important;
-  }
+  background: var(--t-primary);
 }

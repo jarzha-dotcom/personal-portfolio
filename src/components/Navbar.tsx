@@ -28,7 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const navLinks = [
     { name: 'Beranda', href: '#beranda', id: 'beranda' },
     { name: 'Tentang', href: '#tentang', id: 'tentang' },
-    { name: 'Pengalaman', href: '#pengalaman', id: 'pengalaman' },
+    { name: 'Portofolio', href: '#proyek', id: 'proyek' },
     { name: 'Layanan', href: '#layanan', id: 'layanan' },
     { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
     { name: 'Kontak', href: '#kontak', id: 'kontak' },

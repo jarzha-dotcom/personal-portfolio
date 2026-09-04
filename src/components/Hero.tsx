@@ -7,7 +7,8 @@ import {
   FileCheck2,
   Database,
   Code2,
-  Gamepad2
+  Gamepad2,
+  FolderGit2
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 
@@ -72,10 +73,11 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <button
-                  onClick={() => scrollTo('pengalaman')}
+                  onClick={() => scrollTo('proyek')}
                   className="bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30 px-4 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-2"
                 >
-                  <span>Lihat Rekam Jejak</span>
+                  <FolderGit2 className="w-3.5 h-3.5" />
+                  <span>Lihat Portofolio Proyek</span>
                 </button>
                 <button
                   onClick={() => scrollTo('kontak')}
@@ -100,7 +102,7 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
                   <div className="absolute bottom-2 left-2 right-2 text-center">
                     <p className="text-white text-xs font-bold truncate">{PERSONAL_INFO.name}</p>
-                    <p className="text-emerald-300 text-[10px] truncate">{PERSONAL_INFO.title}</p>
+                    <p className="text-emerald-300 text-[10px] truncate">{PERSONAL_INFO.titleJasa}</p>
                   </div>
                 </div>
               </div>

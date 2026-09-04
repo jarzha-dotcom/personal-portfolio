@@ -2,11 +2,16 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Multi-model priority: dari yang paling canggih ke yang lebih hemat
+// Multi-model priority: dari yang paling canggih ke yang paling hemat/stabil
+// Urutan: Flash terbaru (cepat) → Flash lama → Lite (hemat kuota) → Pro (reasoning) → last resort
 const MODELS = [
-    { name: 'gemini-3.8-flash', priority: 1 },  // Primary - PALING CANGGIH
-    { name: 'gemini-3.6-flash', priority: 2 },  // Secondary - advanced
-    { name: 'gemini-3.5-flash', priority: 3 },  // Tertiary - backup
+    { name: 'gemini-3.8-flash',      priority: 1 },  // Primary   — paling modern & cepat
+    { name: 'gemini-3.7-flash',      priority: 2 },  // Secondary — sangat advanced, latensi rendah
+    { name: 'gemini-3.6-flash',      priority: 3 },  // Tertiary  — balanced speed & kualitas
+    { name: 'gemini-3.5-flash',      priority: 4 },  // Fallback  — efisien, stabil
+    { name: 'gemini-3.5-flash-lite', priority: 5 },  // Lite      — ultra hemat kuota, volume tinggi
+    { name: 'gemini-3.1-pro',        priority: 6 },  // Pro       — reasoning mendalam, context panjang
+    { name: 'gemini-3.1-flash',      priority: 7 },  // Last resort — versi lama tapi paling stabil
 ] as const;
 
 type ModelName = typeof MODELS[number]['name'];

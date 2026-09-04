@@ -21,3 +21,7 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
+
+// Build-time constant injected by vite.config.ts via `define`
+// Berubah setiap deploy baru → otomatis invalidate localStorage chat cache di production
+declare const __CHAT_BUILD_ID__: string;

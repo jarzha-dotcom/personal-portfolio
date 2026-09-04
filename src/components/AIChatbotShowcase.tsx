@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Sparkles, AlertCircle, Loader2, Trash2, Clock, RefreshCw } from 'lucide-react';
 import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
+import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory, clearChatStorage } from '../utils/chatStorage';
 
 interface AIChatbotShowcaseProps {
     darkMode: boolean;
@@ -69,21 +70,36 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [lastUserMessage, setLastUserMessage] = useState<string>('');
-    const [messages, setMessages] = useState<DisplayMessage[]>([
-        {
-            id: 'welcome',
-            role: 'assistant',
-            content:
-                'Halo! 👋 Saya asisten AI. Coba tanyakan apa saja tentang developer, proyek, atau skill-nya. Ini demo live — powered by Gemini API!',
-        },
-    ]);
-    const [history, setHistory] = useState<ChatMessage[]>([]);
+    const [activeModel, setActiveModel] = useState<string>('gemini-3.8-flash');
+    const [messages, setMessages] = useState<DisplayMessage[]>(() => {
+        const saved = loadMessages<DisplayMessage>('showcase');
+        if (saved && saved.length > 0) return saved;
+        return [
+            {
+                id: 'welcome',
+                role: 'assistant',
+                content:
+                    'Halo! 👋 Saya asisten AI. Coba tanyakan apa saja tentang developer, proyek, atau skill-nya. Ini demo live — powered by Gemini API!',
+            },
+        ];
+    });
+    const [history, setHistory] = useState<ChatMessage[]>(() => loadGeminiHistory<ChatMessage>('showcase'));
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
+
+    // Auto-save messages ke localStorage
+    useEffect(() => {
+        saveMessages('showcase', messages);
+    }, [messages]);
+
+    // Auto-save Gemini context history ke sessionStorage
+    useEffect(() => {
+        saveGeminiHistory('showcase', history);
+    }, [history]);
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -106,6 +122,9 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         try {
             const result = await sendMessageToGemini(history, text);
             const replyText = result.reply;
+
+            // Update model label sesuai model yang aktif dipilih server
+            if (result.model) setActiveModel(result.model);
 
             const assistantMsg: DisplayMessage = {
                 id: `assistant-${Date.now()}`,
@@ -168,6 +187,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     };
 
     const handleReset = () => {
+        clearChatStorage('showcase');
         setMessages([
             {
                 id: 'welcome-reset',
@@ -199,7 +219,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             AI Assistant Demo
                         </h4>
                         <p className={`text-[10px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                            Gemini 3.5 Flash • Live
+                            {activeModel} • Live
                         </p>
                     </div>
                 </div>
@@ -345,7 +365,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             >
                 <Sparkles className="w-3 h-3 flex-shrink-0" />
                 <span>
-                    <b className={darkMode ? 'text-slate-300' : 'text-slate-700'}>Gemini Free Tier</b> — untuk AI lebih pintar (Claude/GPT-4), tersedia versi berbayar
+                    <b className={darkMode ? 'text-slate-300' : 'text-slate-700'}>Multi-model AI</b> — otomatis pakai model terbaik yang tersedia ({activeModel})
                 </span>
             </div>
 

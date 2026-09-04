@@ -9,8 +9,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
-import { ArrowUp, MessageCircle } from 'lucide-react';
-import { CONTACT_INFO } from './data/portfolioData';
+import { ArrowUp } from 'lucide-react';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
 // benar-benar dipakai kalau tombolnya diklik, dan CVPage (berat — isinya
@@ -83,7 +82,7 @@ export default function App() {
       'font-size:16px;font-weight:bold;color:#0d9488;'
     );
     console.log(
-      '%cCoba klik logo di navbar 5x cepat-cepat...',
+      '%c"Buka console log itu mirip ngintip ke balik panggung: kamu bakal tahu mana efek megah yang memang disusun rapi, dan mana yang cuma ditahan pakai isolasi "try...catch."',
       'font-size:12px;color:#64748b;'
     );
   }, []);
@@ -99,8 +98,6 @@ export default function App() {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
   return (
     // id="app-root" dipakai oleh print CSS di CVPage.tsx untuk menyembunyikan
@@ -123,11 +120,21 @@ export default function App() {
           Experience sekarang eksklusif dipakai di dalam CVPage. */}
       <main id="main-content">
         <Hero darkMode={darkMode} />
-        <Reveal><About darkMode={darkMode} /></Reveal>
-        <Reveal><Projects darkMode={darkMode} /></Reveal>
-        <Reveal><Services darkMode={darkMode} /></Reveal>
-        <Reveal><Skills darkMode={darkMode} /></Reveal>
-        <Reveal><Contact darkMode={darkMode} /></Reveal>
+        <Reveal>
+          <About darkMode={darkMode} />
+        </Reveal>
+        <Reveal>
+          <Projects darkMode={darkMode} />
+        </Reveal>
+        <Reveal>
+          <Services darkMode={darkMode} />
+        </Reveal>
+        <Reveal>
+          <Skills darkMode={darkMode} />
+        </Reveal>
+        <Reveal>
+          <Contact darkMode={darkMode} />
+        </Reveal>
       </main>
 
       {/* Footer */}
@@ -138,23 +145,8 @@ export default function App() {
         <ChatWidget darkMode={darkMode} />
       </Suspense>
 
-      {/* Floating Action Buttons (Back to Top & Quick WhatsApp) */}
-      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-center gap-3 no-print">
-        {/* WhatsApp Quick Chat Floating Pill */}
-        <a
-          id="floating-wa-btn"
-          href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
-            'Halo Pak Arzha, saya melihat portofolio Anda dan ingin berdiskusi...'
-          )}`}
-          target="_blank"
-          rel="noreferrer"
-          title="Hubungi via WhatsApp"
-          className="w-12 h-12 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/30 transition-all hover:scale-110 active:scale-95"
-        >
-          <MessageCircle className="w-6 h-6" />
-        </a>
-
-        {/* Back To Top Floating Button */}
+      {/* Floating Action Button (Back to Top) */}
+      <div className="fixed bottom-6 right-6 z-40 no-print">
         {showBackToTop && (
           <button
             id="floating-back-to-top"
@@ -188,6 +180,7 @@ export default function App() {
           />
         )}
       </Suspense>
+
       <EasterEggToast show={showUnlockToast} />
     </div>
   );

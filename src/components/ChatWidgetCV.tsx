@@ -1,7 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, Send, User } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CONTACT_INFO } from '../data/portfolioData';
+import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
+import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
 
 interface ChatWidgetCVProps {
     darkMode: boolean;
@@ -18,7 +20,36 @@ interface Message {
     text: string;
     timestamp: string;
     options?: QuickOption[];
+    isAI?: boolean;
 }
+
+// System prompt khusus halaman CV — audiens: HRD / rekruter profesional
+const CV_SYSTEM_PROMPT = `Kamu adalah "Kania", asisten virtual profesional Arzha (Kidung Arzhaning Jagad) yang dirancang khusus untuk menjawab pertanyaan HRD dan rekruter.
+
+PROFIL ARZHA:
+- Nama Lengkap: Kidung Arzhaning Jagad (akrab dipanggil Arzha)
+- Domisili: Cibitung, Bekasi — siap kerja di Jabodetabek & Hybrid
+- Pengalaman: 7+ tahun korporat, saat ini Staff Audit Internal di PT Global Multipart (Agustus 2019 - sekarang)
+- Background sebelumnya: Admin & Kasir, Sales Promotion Boy, Operator Finishing PT Bintang Sempurna (2014-2019)
+
+KOMPETENSI UTAMA:
+- Audit Internal: SOP compliance, risk assessment, laporan audit, verifikasi aset
+- ERP: SAP Business One (inventory, purchasing, sales order, verifikasi jurnal)
+- Office: Excel expert (VLOOKUP, XLOOKUP, Pivot, IF-nested), Word, PowerPoint
+- Tech (Side Project): React, TypeScript, Node.js, React Native — 3 proyek live
+- Soft Skill: Teliti, detail-oriented, problem solving, komunikasi efektif, bekerja under pressure
+
+KETERSEDIAAN:
+- Terbuka untuk posisi audit internal, administrasi bisnis, atau peran yang memanfaatkan kombinasi skill korporat + teknologi
+- Siap penempatan Jabodetabek & Hybrid/Remote
+
+PEDOMAN JAWABAN:
+- Jawab dengan singkat, padat, profesional namun ramah (1-3 kalimat cukup)
+- Gunakan bahasa Indonesia formal-santai
+- Jika rekruter butuh detail lebih, arahkan ke tombol WhatsApp
+- JANGAN sebut kontak kecuali ditanya cara menghubungi
+- Jangan membuat klaim yang tidak ada di knowledge base
+- Tutup dengan 1 kalimat tawaran bantuan singkat`;
 
 interface Category {
     id: string;
@@ -109,35 +140,69 @@ const fuse = new Fuse(FAQ_ITEMS, {
 });
 
 const nowStr = () => new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+const CV_WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label: c.label }));
 
 export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
-    const [messages, setMessages] = useState<Message[]>([
-        {
-            id: 'welcome',
-            sender: 'bot',
-            text: 'Halo! Saya asisten virtual Arzha 👋 Ada yang ingin ditanyakan soal pengalaman kerja, skill, atau ketersediaan?',
-            timestamp: nowStr(),
-            options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
-        },
-    ]);
+    const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
+    const [messages, setMessages] = useState<Message[]>(() => {
+        const saved = loadMessages<Message>('cv_kania');
+        if (saved && saved.length > 0) return saved;
+        return [
+            {
+                id: 'welcome',
+                sender: 'bot',
+                text: 'Halo! Saya Kania, asisten Arzha untuk halaman CV 👋\nSilakan tanyakan soal pengalaman kerja, skill, ketersediaan, atau profil profesionalnya.',
+                timestamp: nowStr(),
+                options: CV_WELCOME_OPTIONS,
+                isAI: true,
+            },
+        ];
+    });
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const lastQueryRef = useRef<string>('');
+    const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania'));
+    const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+    // Rate limiting — 12 detik antar request (safe untuk free tier)
+    const lastRequestTimeRef = useRef<number>(0);
+    const REQUEST_COOLDOWN = 12000;
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
+    // Auto-save messages ke localStorage setiap kali ada pesan baru
+    useEffect(() => {
+        saveMessages('cv_kania', messages);
+    }, [messages]);
+
+    useEffect(() => {
+        return () => { timeoutsRef.current.forEach(clearTimeout); };
+    }, []);
+
     const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
-    const openWhatsApp = () => {
+    const appendBotMessage = (text: string, options?: QuickOption[], isAI = false) => {
+        setMessages((prev) => [
+            ...prev,
+            { id: `bot-${Date.now()}`, sender: 'bot', text, timestamp: nowStr(), options, isAI },
+        ]);
+    };
+
+    const standardCTA: QuickOption[] = [
+        { id: 'menu', label: '⬅️ Menu Utama' },
+        { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+    ];
+
+    const openWhatsApp = useCallback(() => {
         const context = lastQueryRef.current
             ? `Halo, saya ingin tanya soal: ${lastQueryRef.current}`
             : 'Halo, saya tertarik mendiskusikan peluang kerja.';
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(context)}`, '_blank');
-    };
+    }, [cleanPhone]);
 
     const showCategoryMenu = () => {
         setIsTyping(true);
@@ -196,22 +261,79 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
 
     const respondWithFallback = () => {
         setIsTyping(true);
-        setTimeout(() => {
+        const text = 'Hmm, saya belum punya data pasti untuk pertanyaan ini. Silakan pilih topik di bawah atau langsung hubungi via WhatsApp ya 👇';
+        const id = setTimeout(() => {
             setIsTyping(false);
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: `bot-${Date.now()}`,
-                    sender: 'bot',
-                    text: 'Hmm, aku belum punya jawaban pasti soal itu. Tapi bisa langsung tanya lewat WhatsApp, nanti dijawab langsung 👇',
-                    timestamp: nowStr(),
-                    options: [
-                        { id: 'menu', label: '⬅️ Menu Utama' },
-                        { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
-                    ],
-                },
-            ]);
+            appendBotMessage(text, standardCTA, false);
         }, 600);
+        timeoutsRef.current.push(id);
+    };
+
+    // ── AI (Gemini) response — khusus pertanyaan rekruter ──────────────────
+    const respondWithAI = async (userText: string) => {
+        setIsTyping(true);
+
+        // Cooldown check
+        const now = Date.now();
+        if (now - lastRequestTimeRef.current < REQUEST_COOLDOWN) {
+            // Fallback ke Fuse.js saat cooldown
+            const results = fuse.search(userText);
+            const id = setTimeout(() => {
+                setIsTyping(false);
+                if (results.length > 0) {
+                    appendBotMessage(`📋 ${results[0].item.answer}`, standardCTA, false);
+                } else {
+                    respondWithFallback();
+                }
+            }, 600);
+            timeoutsRef.current.push(id);
+            return;
+        }
+        lastRequestTimeRef.current = now;
+
+        const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
+        try {
+            const result = await sendMessageToGemini(
+                [
+                    // Inject system prompt sebagai pesan pertama dari model
+                    { role: 'user', parts: [{ text: CV_SYSTEM_PROMPT }] },
+                    { role: 'model', parts: [{ text: 'Siap! Saya Kania, asisten CV Arzha. Silakan tanyakan apa saja kepada saya.' }] },
+                    ...geminiHistoryRef.current,
+                ],
+                userText
+            );
+            const replyText = result.reply;
+
+            geminiHistoryRef.current = [
+                ...geminiHistoryRef.current,
+                userMsg,
+                { role: 'model', parts: [{ text: replyText }] },
+            ].slice(-10); // simpan 5 exchange terakhir
+
+            // Persist Gemini history ke sessionStorage (bertahan selama tab terbuka)
+            saveGeminiHistory('cv_kania', geminiHistoryRef.current);
+
+            setAiMode('ai');
+            const id = setTimeout(() => {
+                setIsTyping(false);
+                appendBotMessage(replyText, standardCTA, true);
+            }, Math.min(2000, Math.max(600, replyText.length * 6)));
+            timeoutsRef.current.push(id);
+
+        } catch {
+            // Graceful degradation ke Fuse.js
+            setAiMode('fallback');
+            const results = fuse.search(userText);
+            if (results.length > 0) {
+                const id = setTimeout(() => {
+                    setIsTyping(false);
+                    appendBotMessage(`📋 ${results[0].item.answer}`, standardCTA, false);
+                }, 600);
+                timeoutsRef.current.push(id);
+            } else {
+                respondWithFallback();
+            }
+        }
     };
 
     const handleOptionClick = (id: string, label: string) => {
@@ -238,18 +360,23 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     };
 
     const sendMessage = (text: string) => {
-        if (!text.trim()) return;
+        if (!text.trim() || isTyping) return;
         const trimmed = text.trim();
         setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: trimmed, timestamp: nowStr() }]);
         setInputValue('');
+        lastQueryRef.current = trimmed;
 
-        const results = fuse.search(trimmed);
-        if (results.length > 0) {
-            lastQueryRef.current = trimmed;
-            respondWithFAQ(results[0].item);
+        // Jika AI sedang fallback, gunakan Fuse.js langsung
+        if (aiMode === 'fallback') {
+            const results = fuse.search(trimmed);
+            if (results.length > 0) {
+                respondWithFAQ(results[0].item);
+            } else {
+                respondWithFallback();
+            }
         } else {
-            lastQueryRef.current = trimmed;
-            respondWithFallback();
+            // Coba AI dulu, Fuse.js sebagai fallback otomatis di dalam respondWithAI
+            respondWithAI(trimmed);
         }
     };
 
@@ -271,15 +398,30 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                     <div className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
                         }`}>
                         <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">
-                                KA
+                            <div className="relative">
+                                <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
+                                    KA
+                                </div>
+                                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-800 ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                             </div>
                             <div>
-                                <p className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                    Asisten Mode CV
-                                </p>
-                                <p className={`text-[10px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Online • Siap menjawab
+                                <div className="flex items-center gap-1.5">
+                                    <p className={`text-xs font-bold leading-none ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                        Kania
+                                    </p>
+                                    {aiMode !== 'unknown' && (
+                                        <span className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${aiMode === 'ai'
+                                            ? darkMode ? 'bg-teal-900/60 text-teal-400' : 'bg-teal-50 text-teal-600'
+                                            : darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-50 text-amber-700'
+                                        }`}>
+                                            {aiMode === 'ai'
+                                                ? <><Wifi className="w-2.5 h-2.5" /> Kania (AI)</>  
+                                                : <><WifiOff className="w-2.5 h-2.5" /> Direktori</>}
+                                        </span>
+                                    )}
+                                </div>
+                                <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                    Asisten CV Arzha • {aiMode === 'fallback' ? 'Mode Direktori' : 'AI Live'}
                                 </p>
                             </div>
                         </div>
@@ -292,13 +434,24 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                         </button>
                     </div>
 
+                    {/* Fallback Notice Banner */}
+                    {aiMode === 'fallback' && (
+                        <div className={`px-3 py-1.5 flex items-center gap-1.5 text-[10px] border-b ${darkMode ? 'bg-amber-950/40 border-amber-900/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                            <span className="text-xs">📋</span>
+                            <span><b>Mode Direktori:</b> AI sedang istirahat, Kania menjawab via FAQ ya!</span>
+                        </div>
+                    )}
+
                     {/* Messages Body */}
                     <div className={`flex-1 p-3.5 overflow-y-auto space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
                         }`}>
                         {messages.map((m) => (
                             <div key={m.id} className={`flex gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 {m.sender === 'bot' && (
-                                    <div className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
+                                    <div
+                                        className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}
+                                        title={m.isAI === false ? 'Kania (Mode Direktori)' : 'Kania (AI)'}
+                                    >
                                         KA
                                     </div>
                                 )}
@@ -350,14 +503,14 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
 
                         {isTyping && (
                             <div className="flex gap-2 justify-start">
-                                <div className="w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold">
+                                <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
                                     KA
                                 </div>
                                 <div className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-1 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200 shadow-sm'
                                     }`}>
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '0ms' }} />
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '0ms' }} />
+                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '150ms' }} />
+                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '300ms' }} />
                                 </div>
                             </div>
                         )}
@@ -372,7 +525,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder="Ketik pertanyaan..."
+                            placeholder={aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'}
                             className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
                                 ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
                                 : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
@@ -380,7 +533,8 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                         />
                         <button
                             onClick={() => sendMessage(inputValue)}
-                            className="w-8 h-8 rounded-lg bg-teal-600 hover:bg-teal-700 text-white flex items-center justify-center transition-colors"
+                            disabled={!inputValue.trim() || isTyping}
+                            className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${aiMode === 'fallback' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'}`}
                         >
                             <Send className="w-3.5 h-3.5" />
                         </button>

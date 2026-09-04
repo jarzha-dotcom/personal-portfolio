@@ -367,8 +367,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
               {/* Modal Header */}
               <div
                 className={`flex-shrink-0 p-3.5 sm:p-4 border-b flex items-center justify-between ${darkMode
-                    ? 'bg-gradient-to-r from-teal-900/40 to-emerald-900/40 border-slate-700'
-                    : 'bg-gradient-to-r from-teal-50 to-emerald-50 border-slate-200'
+                  ? 'bg-gradient-to-r from-teal-900/40 to-emerald-900/40 border-slate-700'
+                  : 'bg-gradient-to-r from-teal-50 to-emerald-50 border-slate-200'
                   }`}
               >
                 <div className="flex items-center gap-2.5">
@@ -383,15 +383,15 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                       AI Chatbot Portfolio
                     </h3>
                     <p className={`text-[10px] sm:text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Demo live • Gemini 3.5 Flash • Serverless protected
+                      Demo live • Integrated 7 AI Models • Serverless protected
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setIsChatbotOpen(false)}
                   className={`p-1.5 rounded-lg transition-colors ${darkMode
-                      ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
                     }`}
                 >
                   <X className="w-5 h-5" />
