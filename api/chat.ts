@@ -129,14 +129,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(503).json({ error: 'AI_UNAVAILABLE', detail: 'API key not configured' });
     }
 
-    const { history, message } = req.body as {
+    const { history, message, model: requestedModel } = req.body as {
         history?: Array<{ role: string; parts: { text: string }[] }>;
         message?: string;
+        model?: string;
     };
 
     if (!message || typeof message !== 'string') {
         return res.status(400).json({ error: 'Pesan tidak valid' });
     }
+
+    // Kalau user memilih model tertentu dari frontend, coba model itu duluan,
+    // lalu tetap fallback ke model lain (urutan priority asli) kalau gagal/limit.
+    const requestedModelIsValid = MODELS.some((m) => m.name === requestedModel);
+    const orderedModels = requestedModelIsValid
+        ? [
+            MODELS.find((m) => m.name === requestedModel)!,
+            ...MODELS.filter((m) => m.name !== requestedModel),
+        ]
+        : MODELS;
 
     // Sanitasi input
     const sanitizedMessage = message.slice(0, 1000);
@@ -156,7 +167,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Try each model in priority order
     const errors: Array<{ model: string; error: string }> = [];
 
-    for (const modelConfig of MODELS) {
+    for (const modelConfig of orderedModels) {
         const model = modelConfig.name;
 
         // Check rate limit untuk model ini

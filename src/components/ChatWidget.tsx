@@ -29,6 +29,7 @@ interface Message {
   timestamp: string;
   options?: QuickOption[];
   isAI?: boolean;
+  isStreaming?: boolean;
 }
 
 // ─── FAQ Fallback Data (Fuse.js) ────────────────────────────────────────────
@@ -255,6 +256,15 @@ const typingDelay = (text: string) =>
 
 const WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label: c.label }));
 
+const generateMessageId = (prefix = 'msg'): string => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return `${prefix}-${crypto.randomUUID()}`;
+  }
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
+const MAX_DISPLAY_MESSAGES = 50;
+
 // ── Component ───────────────────────────────────────────────────────────────
 export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -265,7 +275,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Inisialisasi messages dari localStorage (atau welcome msg jika belum ada)
   const [messages, setMessages] = useState<Message[]>(() => {
     const saved = loadMessages<Message>('zannah');
-    if (saved && saved.length > 0) return saved;
+    if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
     return [
       {
         id: 'welcome',
@@ -294,7 +304,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   // Gemini conversation history (exclude welcome msg)
   // Diinisialisasi dari sessionStorage agar konteks AI bertahan selama tab terbuka
-  const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('zannah'));
+  const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('zannah').slice(-12));
 
   // ⚠️ Cleanup setTimeout untuk mencegah memory leak saat unmount
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -303,9 +313,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Auto-save messages ke localStorage setiap kali berubah
+  // Debounced auto-save messages ke localStorage setiap kali berubah
   useEffect(() => {
-    saveMessages('zannah', messages);
+    const timer = setTimeout(() => {
+      saveMessages('zannah', messages.slice(-MAX_DISPLAY_MESSAGES));
+    }, 400);
+    return () => clearTimeout(timer);
   }, [messages]);
 
   useEffect(() => {
@@ -328,9 +341,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   // ── Bot reply helpers ──────────────────────────────────────────────────────
   const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
-    const msgId = `bot-${Date.now()}`;
+    const msgId = generateMessageId('bot');
     setMessages((prev) => [
-      ...prev,
+      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
       {
         id: msgId,
         sender: 'bot',
@@ -343,6 +356,56 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     if (autoSpeak) {
       handleToggleSpeak(msgId, text, !isAI);
     }
+  };
+
+  const streamBotMessage = (
+    fullText: string,
+    options?: QuickOption[],
+    isAI = true,
+    autoSpeak = false
+  ) => {
+    const msgId = generateMessageId('bot');
+    setMessages((prev) => [
+      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+      {
+        id: msgId,
+        sender: 'bot',
+        text: '',
+        timestamp: nowStr(),
+        options: undefined,
+        isAI,
+        isStreaming: true,
+      },
+    ]);
+
+    let currentIndex = 0;
+    const totalLength = fullText.length;
+    const chunkSize = totalLength > 280 ? 3 : totalLength > 120 ? 2 : 1;
+    const speedMs = 18;
+
+    const intervalId = window.setInterval(() => {
+      currentIndex += chunkSize;
+      if (currentIndex >= totalLength) {
+        window.clearInterval(intervalId);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === msgId
+              ? { ...m, text: fullText, options, isStreaming: false }
+              : m
+          )
+        );
+        if (autoSpeak) {
+          handleToggleSpeak(msgId, fullText, !isAI);
+        }
+      } else {
+        const partial = fullText.slice(0, currentIndex);
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === msgId ? { ...m, text: partial, isStreaming: true } : m
+          )
+        );
+      }
+    }, speedMs);
   };
 
   const standardCTA: QuickOption[] = [
@@ -424,12 +487,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       // Persist Gemini history ke sessionStorage (bertahan selama tab terbuka)
       saveGeminiHistory('zannah', geminiHistoryRef.current);
       setAiMode('ai');
-      const delay = typingDelay(replyText);
-      const id = setTimeout(() => {
-        setIsTyping(false);
-        appendBotMessage(replyText, standardCTA, true, isFromVoice);
-      }, delay);
-      timeoutsRef.current.push(id);
+      setIsTyping(false);
+      streamBotMessage(replyText, standardCTA, true, isFromVoice);
     } catch (err: unknown) {
       // ── Graceful degradation: fall to Radit (Directory Model) ──────────
       console.warn('[ChatWidget] Zannah AI unavailable, falling back to Radit:', err);
@@ -495,9 +554,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       setAiMode('ai');
       if (lastQueryRef.current) {
         setMessages((prev) => [
-          ...prev,
+          ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
           {
-            id: `user-${Date.now()}`,
+            id: generateMessageId('user'),
             sender: 'user',
             text: `✨ Coba tanya Zannah: "${lastQueryRef.current}"`,
             timestamp: nowStr(),
@@ -520,8 +579,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const category = CATEGORIES.find((c) => c.id === id);
     if (category) {
       setMessages((prev) => [
-        ...prev,
-        { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() },
+        ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+        { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() },
       ]);
       showCategoryQuestions(category);
       return;
@@ -529,8 +588,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const faq = FAQ_ITEMS.find((f) => f.id === id);
     if (faq) {
       setMessages((prev) => [
-        ...prev,
-        { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() },
+        ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+        { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() },
       ]);
       respondWithFAQ(faq);
       return;
@@ -542,8 +601,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     if (!text.trim() || isTyping) return;
     const cleanText = text.trim();
     setMessages((prev) => [
-      ...prev,
-      { id: `user-${Date.now()}`, sender: 'user', text: cleanText, timestamp: nowStr() },
+      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+      { id: generateMessageId('user'), sender: 'user', text: cleanText, timestamp: nowStr() },
     ]);
     lastQueryRef.current = cleanText;
     setInputValue('');
@@ -714,9 +773,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     return tokens;
   };
 
-  const renderMessageBody = (text: string, isUser: boolean) => {
+  const renderMessageBody = (text: string, isUser: boolean, isStreaming?: boolean) => {
     if (isUser) {
       return <p className="whitespace-pre-wrap">{text}</p>;
+    }
+
+    if (!text && isStreaming) {
+      return (
+        <span className="inline-block w-1.5 h-3.5 align-middle bg-teal-400 animate-pulse" />
+      );
     }
 
     const lines = text.split('\n');
@@ -755,6 +820,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
           // Bullet points atau baris teks biasa
           const isBullet = line.startsWith('- ') || line.startsWith('* ');
+          const isLastLine = lineIdx === lines.length - 1;
           return (
             <p
               key={lineIdx}
@@ -765,6 +831,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               }
             >
               {formatInlineText(isBullet ? line.slice(2) : line)}
+              {isStreaming && isLastLine && (
+                <span className="inline-block w-1.5 h-3.5 ml-1 align-middle bg-teal-400 animate-pulse" />
+              )}
             </p>
           );
         })}
@@ -779,9 +848,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     <div className="fixed bottom-6 left-6 z-50 no-print">
       {isOpen && (
         <div
-          className={`w-[90vw] sm:w-96 rounded-2xl shadow-2xl border flex flex-col overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 h-[480px] sm:h-[540px] max-h-[85vh] ${darkMode
-            ? 'bg-slate-900 border-slate-700 shadow-slate-950/80 text-white'
-            : 'bg-white border-slate-200 shadow-slate-300/60 text-slate-800'
+          className={`w-80 sm:w-96 h-[460px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
             }`}
         >
           {/* Header */}
@@ -801,7 +868,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 >
                   {isRadit ? 'RD' : 'ZA'}
                 </div>
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full" />
+                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
@@ -820,7 +887,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               <button
                 aria-label="Tutup jendela chat"
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                className={`p-1.5 rounded-lg transition-colors ${darkMode
+                  ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                  }`}
               >
                 <X className="w-4 h-4" />
               </button>
@@ -855,13 +925,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
           {/* Messages Body */}
           <div
-            className={`flex-1 p-3.5 overflow-y-auto space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
+            className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
               }`}
           >
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={`flex gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {m.sender === 'bot' && (
                   <div
@@ -883,7 +953,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                         : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
                       }`}
                   >
-                    {renderMessageBody(m.text, m.sender === 'user')}
+                    {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
                     <div className="flex items-center justify-between gap-2 mt-1">
                       {m.sender === 'bot' ? (
                         <button

@@ -302,23 +302,65 @@ html[data-theme] body {
   animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-/* Custom scrollbar for pleasant kids look — tied to the active theme's
-   primary color so it doesn't stay amber under e.g. Luar Angkasa. */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+/* Sleek Chat Widget Scrollbar */
+.chat-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
 }
 
-::-webkit-scrollbar-track {
-  background: var(--t-primary-soft);
+.chat-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(148, 163, 184, 0.3);
   border-radius: 9999px;
 }
 
-::-webkit-scrollbar-thumb {
-  background: var(--t-primary-border);
-  border-radius: 9999px;
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.6);
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: var(--t-primary);
+/* Smooth message bubble fade-slide entrance */
+@keyframes messageEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-message-in {
+  animation: messageEntrance 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Soundwave equalizer bars animation */
+@keyframes soundwaveBar {
+  0%, 100% {
+    height: 4px;
+  }
+  50% {
+    height: 14px;
+  }
+}
+
+.animate-soundwave-1 {
+  animation: soundwaveBar 0.8s ease-in-out infinite;
+}
+.animate-soundwave-2 {
+  animation: soundwaveBar 0.8s ease-in-out infinite 0.2s;
+}
+.animate-soundwave-3 {
+  animation: soundwaveBar 0.8s ease-in-out infinite 0.4s;
+}
+.animate-soundwave-4 {
+  animation: soundwaveBar 0.8s ease-in-out infinite 0.15s;
 }

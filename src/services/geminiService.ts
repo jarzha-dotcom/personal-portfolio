@@ -11,7 +11,8 @@ export interface GeminiResponse {
 
 export async function sendMessageToGemini(
     history: ChatMessage[],
-    newUserMessage: string
+    newUserMessage: string,
+    model?: string
 ): Promise<GeminiResponse> {
     const response = await fetch('/api/chat', {
         method: 'POST',
@@ -19,6 +20,7 @@ export async function sendMessageToGemini(
         body: JSON.stringify({
             history,
             message: newUserMessage,
+            ...(model ? { model } : {}),
         }),
     });
 

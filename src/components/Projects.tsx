@@ -296,20 +296,20 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   </div>
                   <div>
                     <h4 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                      Jasa Chatbot AI
+                      Jasa AI Chatbot & Agent
                     </h4>
                     <p className={`text-[10px] ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                      Tersedia untuk project kamu
+                      Voice-enabled & Lead Generator
                     </p>
                   </div>
                 </div>
 
                 <ul className="space-y-1.5 mb-4">
                   {[
-                    'Custom AI chatbot untuk website/bisnis',
-                    'Integrasi Claude, GPT-4, atau Gemini',
-                    'Serverless + guardrail anti-jailbreak',
-                    'Bisa multi-bahasa & custom knowledge base',
+                    'Suara 2-Arah natural (Google Chirp3-HD)',
+                    'One-Click WhatsApp Lead & Brief generator',
+                    'Multi-LLM (Gemini, Claude, GPT-4) serverless',
+                    'Zero-downtime hybrid fallback & custom knowledge',
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-1.5">
                       <CheckCircle2
@@ -331,7 +331,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     </span>
                   </div>
                   <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                    Termasuk setup, deployment, dan 1x revisi
+                    Termasuk voice setup, serverless deployment & custom knowledge
                   </p>
                 </div>
 

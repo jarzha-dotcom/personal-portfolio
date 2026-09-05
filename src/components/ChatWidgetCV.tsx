@@ -32,6 +32,7 @@ interface Message {
     timestamp: string;
     options?: QuickOption[];
     isAI?: boolean;
+    isStreaming?: boolean;
 }
 
 // System prompt khusus halaman CV — audiens: HRD / rekruter profesional
@@ -150,6 +151,14 @@ const fuse = new Fuse(FAQ_ITEMS, {
     ignoreLocation: true,
 });
 
+const generateMessageId = (prefix = 'msg'): string => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+        return `${prefix}-${crypto.randomUUID()}`;
+    }
+    return `${prefix}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+};
+
+const MAX_DISPLAY_MESSAGES = 50;
 const nowStr = () => new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 const CV_WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label: c.label }));
 
@@ -159,7 +168,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
     const [messages, setMessages] = useState<Message[]>(() => {
         const saved = loadMessages<Message>('cv_kania');
-        if (saved && saved.length > 0) return saved;
+        if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
         return [
             {
                 id: 'welcome',
@@ -174,7 +183,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [inputValue, setInputValue] = useState('');
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const lastQueryRef = useRef<string>('');
-    const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania'));
+    const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania').slice(-10));
     const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
     // ── Voice Chat state ─────────────────────────────────────────────────────
@@ -192,9 +201,12 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    // Auto-save messages ke localStorage setiap kali ada pesan baru
+    // Debounced auto-save messages ke localStorage
     useEffect(() => {
-        saveMessages('cv_kania', messages);
+        const timer = setTimeout(() => {
+            saveMessages('cv_kania', messages.slice(-MAX_DISPLAY_MESSAGES));
+        }, 400);
+        return () => clearTimeout(timer);
     }, [messages]);
 
     useEffect(() => {
@@ -225,9 +237,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         setTimeout(() => {
             setIsTyping(false);
             setMessages((prev) => [
-                ...prev,
+                ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
                 {
-                    id: `bot-${Date.now()}`,
+                    id: generateMessageId('bot'),
                     sender: 'bot',
                     text: 'Mau tanya soal apa lagi?',
                     timestamp: nowStr(),
@@ -243,9 +255,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         setTimeout(() => {
             setIsTyping(false);
             setMessages((prev) => [
-                ...prev,
+                ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
                 {
-                    id: `bot-${Date.now()}`,
+                    id: generateMessageId('bot'),
                     sender: 'bot',
                     text: `Pilih pertanyaan seputar ${category.label.replace(/^\S+\s/, '')}:`,
                     timestamp: nowStr(),
@@ -257,9 +269,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
 
     // ── Bot reply helpers ──────────────────────────────────────────────────────
     const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
-        const msgId = `bot-${Date.now()}`;
+        const msgId = generateMessageId('bot');
         setMessages((prev) => [
-            ...prev,
+            ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
             {
                 id: msgId,
                 sender: 'bot',
@@ -272,6 +284,56 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         if (autoSpeak) {
             handleToggleSpeak(msgId, text);
         }
+    };
+
+    const streamBotMessage = (
+        fullText: string,
+        options?: QuickOption[],
+        isAI = true,
+        autoSpeak = false
+    ) => {
+        const msgId = generateMessageId('bot');
+        setMessages((prev) => [
+            ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+            {
+                id: msgId,
+                sender: 'bot',
+                text: '',
+                timestamp: nowStr(),
+                options: undefined,
+                isAI,
+                isStreaming: true,
+            },
+        ]);
+
+        let currentIndex = 0;
+        const totalLength = fullText.length;
+        const chunkSize = totalLength > 280 ? 3 : totalLength > 120 ? 2 : 1;
+        const speedMs = 18;
+
+        const intervalId = window.setInterval(() => {
+            currentIndex += chunkSize;
+            if (currentIndex >= totalLength) {
+                window.clearInterval(intervalId);
+                setMessages((prev) =>
+                    prev.map((m) =>
+                        m.id === msgId
+                            ? { ...m, text: fullText, options, isStreaming: false }
+                            : m
+                    )
+                );
+                if (autoSpeak) {
+                    handleToggleSpeak(msgId, fullText);
+                }
+            } else {
+                const partial = fullText.slice(0, currentIndex);
+                setMessages((prev) =>
+                    prev.map((m) =>
+                        m.id === msgId ? { ...m, text: partial, isStreaming: true } : m
+                    )
+                );
+            }
+        }, speedMs);
     };
 
     const fallbackCTA: QuickOption[] = [
@@ -348,11 +410,8 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             saveGeminiHistory('cv_kania', geminiHistoryRef.current);
 
             setAiMode('ai');
-            const id = setTimeout(() => {
-                setIsTyping(false);
-                appendBotMessage(replyText, standardCTA, true, isFromVoice);
-            }, Math.min(2000, Math.max(600, replyText.length * 6)));
-            timeoutsRef.current.push(id);
+            setIsTyping(false);
+            streamBotMessage(replyText, standardCTA, true, isFromVoice);
 
         } catch {
             // Graceful degradation ke Fuse.js
@@ -383,8 +442,8 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             setAiMode('ai');
             if (lastQueryRef.current) {
                 setMessages((prev) => [
-                    ...prev,
-                    { id: `user-${Date.now()}`, sender: 'user', text: `✨ Coba tanya Kania: "${lastQueryRef.current}"`, timestamp: nowStr() },
+                    ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
+                    { id: generateMessageId('user'), sender: 'user', text: `✨ Coba tanya Kania: "${lastQueryRef.current}"`, timestamp: nowStr() },
                 ]);
                 respondWithAI(lastQueryRef.current);
             } else {
@@ -398,13 +457,13 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }
         const category = CATEGORIES.find((c) => c.id === id);
         if (category) {
-            setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() }]);
+            setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() }]);
             showCategoryQuestions(category);
             return;
         }
         const faq = FAQ_ITEMS.find((f) => f.id === id);
         if (faq) {
-            setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: label, timestamp: nowStr() }]);
+            setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() }]);
             lastQueryRef.current = faq.quickLabel;
             respondWithFAQ(faq);
         }
@@ -413,7 +472,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const sendMessage = (text: string, isFromVoice = false) => {
         if (!text.trim() || isTyping) return;
         const trimmed = text.trim();
-        setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: trimmed, timestamp: nowStr() }]);
+        setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: trimmed, timestamp: nowStr() }]);
         setInputValue('');
         lastQueryRef.current = trimmed;
 
@@ -559,9 +618,15 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         return tokens;
     };
 
-    const renderMessageBody = (text: string, isUser: boolean) => {
+    const renderMessageBody = (text: string, isUser: boolean, isStreaming?: boolean) => {
         if (isUser) {
             return <p className="whitespace-pre-wrap">{text}</p>;
+        }
+
+        if (!text && isStreaming) {
+            return (
+                <span className="inline-block w-1.5 h-3.5 align-middle bg-teal-400 animate-pulse" />
+            );
         }
 
         const lines = text.split('\n');
@@ -598,6 +663,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                     }
 
                     const isBullet = line.startsWith('- ') || line.startsWith('* ');
+                    const isLastLine = lineIdx === lines.length - 1;
                     return (
                         <p
                             key={lineIdx}
@@ -608,6 +674,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                             }
                         >
                             {formatInlineText(isBullet ? line.slice(2) : line)}
+                            {isStreaming && isLastLine && (
+                                <span className="inline-block w-1.5 h-3.5 ml-1 align-middle bg-teal-400 animate-pulse" />
+                            )}
                         </p>
                     );
                 })}
@@ -630,7 +699,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                 <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
                                     KA
                                 </div>
-                                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-800 ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
+                                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${darkMode ? 'border-slate-800' : 'border-white'} ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                             </div>
                             <div>
                                 <div className="flex items-center gap-1.5">
@@ -689,10 +758,10 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                     )}
 
                     {/* Messages Body */}
-                    <div className={`flex-1 p-3.5 overflow-y-auto space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
+                    <div className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
                         }`}>
                         {messages.map((m) => (
-                            <div key={m.id} className={`flex gap-2 ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                            <div key={m.id} className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                                 {m.sender === 'bot' && (
                                     <div
                                         className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}
@@ -710,7 +779,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                                 : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
                                             }`}
                                     >
-                                        {renderMessageBody(m.text, m.sender === 'user')}
+                                        {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
                                         <div className="flex items-center justify-between gap-2 mt-1">
                                             {m.sender === 'bot' ? (
                                                 <button

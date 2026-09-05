@@ -58,10 +58,10 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
         },
         {
             icon: <Bot className="w-6 h-6" />,
-            title: 'AI Chatbot Custom',
+            title: 'AI Chatbot & Voice Assistant',
             description:
-                'Chatbot AI siap pakai untuk website/bisnis — terintegrasi Claude, GPT-4, atau Gemini. Serverless, aman (API key terlindungi), dan dilengkapi guardrail anti-jailbreak.',
-            features: ['Multi-LLM (Claude/GPT/Gemini)', 'Serverless + Guardrail', 'Custom Knowledge Base', 'Multi-bahasa'],
+                'Chatbot AI interaktif 2-arah (Teks & Suara) untuk website/bisnis. Dilengkapi lead generator WhatsApp otomatis, guardrail serverless aman, dan hybrid fallback zero-downtime.',
+            features: ['Suara 2-Arah (STT + TTS)', 'Lead Generator WhatsApp', 'Multi-LLM (Gemini/GPT/Claude)', 'Hybrid Fallback Zero-Downtime'],
             color: 'purple',
         },
     ];
@@ -83,9 +83,9 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
         },
         {
             icon: <Bot className="w-5 h-5" />,
-            title: 'AI Chatbot',
+            title: 'AI Chatbot & Virtual Agent',
             price: 'Rp 1,5jt',
-            desc: 'Chatbot AI custom (Claude/GPT/Gemini) + setup serverless + guardrail.',
+            desc: 'Chatbot AI cerdas + Suara 2-arah Chirp3-HD + WhatsApp lead generator + guardrail serverless.',
         },
         {
             icon: <FileSpreadsheet className="w-5 h-5" />,
