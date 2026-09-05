@@ -2,7 +2,7 @@ import { ExperienceItem, HardSkill, SoftSkill, EducationItem, ContactInfo, Proje
 import profileImage from '../assets/images/profile_photo_1788181262553.jpg';
 
 export const PERSONAL_INFO = {
-  name: 'Kidung Arzhaning Jagad',
+  name: 'K. Arzhaning Jagad',
   nickname: 'Arzha',
   initials: 'KAJ',
   title: 'Audit Internal & Data Specialist',

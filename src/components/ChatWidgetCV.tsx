@@ -1,9 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
 import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
+import {
+    speak,
+    stopSpeaking,
+    startListening,
+    stopListening,
+    isSpeechSupported,
+    BOT_VOICES,
+} from '../services/voiceService';
+
+// Voice Kania: Cewek (Google DeepMind Chirp3 HD Gacrux - Hangat, Ramah, Detail)
+const KANIA_VOICE = BOT_VOICES.KANIA;
 
 interface ChatWidgetCVProps {
     darkMode: boolean;
@@ -24,10 +35,10 @@ interface Message {
 }
 
 // System prompt khusus halaman CV — audiens: HRD / rekruter profesional
-const CV_SYSTEM_PROMPT = `Kamu adalah "Kania", asisten virtual profesional Arzha (Kidung Arzhaning Jagad) yang dirancang khusus untuk menjawab pertanyaan HRD dan rekruter.
+const CV_SYSTEM_PROMPT = `Kamu adalah "Kania", asisten virtual profesional Arzha (K. Arzhaning Jagad) yang dirancang khusus untuk menjawab pertanyaan HRD dan rekruter.
 
 PROFIL ARZHA:
-- Nama Lengkap: Kidung Arzhaning Jagad (akrab dipanggil Arzha)
+- Nama Lengkap: K. Arzhaning Jagad (akrab dipanggil Arzha)
 - Domisili: Cibitung, Bekasi — siap kerja di Jabodetabek & Hybrid
 - Pengalaman: 7+ tahun korporat, saat ini Staff Audit Internal di PT Global Multipart (Agustus 2019 - sekarang)
 - Background sebelumnya: Admin & Kasir, Sales Promotion Boy, Operator Finishing PT Bintang Sempurna (2014-2019)
@@ -166,6 +177,13 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania'));
     const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+    // ── Voice Chat state ─────────────────────────────────────────────────────
+    const [isListening, setIsListening] = useState(false);
+    const [speakingId, setSpeakingId] = useState<string | null>(null);
+    const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
+    const [voiceSupport] = useState(() => isSpeechSupported());
+    const stopListenRef = useRef<(() => void) | null>(null);
+
     // Rate limiting — 12 detik antar request (safe untuk free tier)
     const lastRequestTimeRef = useRef<number>(0);
     const REQUEST_COOLDOWN = 12000;
@@ -180,17 +198,15 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     }, [messages]);
 
     useEffect(() => {
-        return () => { timeoutsRef.current.forEach(clearTimeout); };
+        return () => {
+            timeoutsRef.current.forEach(clearTimeout);
+            // ⚠️ Hentikan mic & audio TTS yang mungkin masih aktif saat widget unmount
+            stopListening();
+            stopSpeaking();
+        };
     }, []);
 
     const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
-
-    const appendBotMessage = (text: string, options?: QuickOption[], isAI = false) => {
-        setMessages((prev) => [
-            ...prev,
-            { id: `bot-${Date.now()}`, sender: 'bot', text, timestamp: nowStr(), options, isAI },
-        ]);
-    };
 
     const standardCTA: QuickOption[] = [
         { id: 'menu', label: '⬅️ Menu Utama' },
@@ -239,38 +255,56 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }, 400);
     };
 
-    const respondWithFAQ = (faq: FAQItem) => {
+    // ── Bot reply helpers ──────────────────────────────────────────────────────
+    const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
+        const msgId = `bot-${Date.now()}`;
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: msgId,
+                sender: 'bot',
+                text,
+                timestamp: nowStr(),
+                options,
+                isAI,
+            },
+        ]);
+        if (autoSpeak) {
+            handleToggleSpeak(msgId, text);
+        }
+    };
+
+    const fallbackCTA: QuickOption[] = [
+        { id: 'retry_kania', label: '✨ Coba Panggil Kania Lagi' },
+        { id: 'menu', label: '⬅️ Menu Utama' },
+        { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+    ];
+
+    const respondWithFAQ = (faq: FAQItem, isFromVoice = false) => {
         setIsTyping(true);
         setTimeout(() => {
             setIsTyping(false);
-            setMessages((prev) => [
-                ...prev,
-                {
-                    id: `bot-${Date.now()}`,
-                    sender: 'bot',
-                    text: faq.answer,
-                    timestamp: nowStr(),
-                    options: [
-                        { id: 'menu', label: '⬅️ Menu Utama' },
-                        { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
-                    ],
-                },
-            ]);
+            appendBotMessage(
+                faq.answer,
+                fallbackCTA,
+                false,
+                isFromVoice
+            );
         }, 600);
     };
 
-    const respondWithFallback = () => {
+    const respondWithFallback = (isFromVoice = false) => {
         setIsTyping(true);
-        const text = 'Hmm, saya belum punya data pasti untuk pertanyaan ini. Silakan pilih topik di bawah atau langsung hubungi via WhatsApp ya 👇';
+        const text = 'Hmm, saya belum punya data pasti untuk pertanyaan ini. Silakan coba panggil Kania lagi atau langsung hubungi via WhatsApp ya 👇';
         const id = setTimeout(() => {
             setIsTyping(false);
-            appendBotMessage(text, standardCTA, false);
+            appendBotMessage(text, fallbackCTA, false, isFromVoice);
         }, 600);
         timeoutsRef.current.push(id);
     };
 
     // ── AI (Gemini) response — khusus pertanyaan rekruter ──────────────────
-    const respondWithAI = async (userText: string) => {
+    const respondWithAI = async (userText: string, isFromVoice = false) => {
         setIsTyping(true);
 
         // Cooldown check
@@ -281,9 +315,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             const id = setTimeout(() => {
                 setIsTyping(false);
                 if (results.length > 0) {
-                    appendBotMessage(`📋 ${results[0].item.answer}`, standardCTA, false);
+                    appendBotMessage(`📋 ${results[0].item.answer}`, fallbackCTA, false, isFromVoice);
                 } else {
-                    respondWithFallback();
+                    respondWithFallback(isFromVoice);
                 }
             }, 600);
             timeoutsRef.current.push(id);
@@ -316,7 +350,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             setAiMode('ai');
             const id = setTimeout(() => {
                 setIsTyping(false);
-                appendBotMessage(replyText, standardCTA, true);
+                appendBotMessage(replyText, standardCTA, true, isFromVoice);
             }, Math.min(2000, Math.max(600, replyText.length * 6)));
             timeoutsRef.current.push(id);
 
@@ -327,11 +361,11 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             if (results.length > 0) {
                 const id = setTimeout(() => {
                     setIsTyping(false);
-                    appendBotMessage(`📋 ${results[0].item.answer}`, standardCTA, false);
+                    appendBotMessage(`📋 ${results[0].item.answer}`, fallbackCTA, false, isFromVoice);
                 }, 600);
                 timeoutsRef.current.push(id);
             } else {
-                respondWithFallback();
+                respondWithFallback(isFromVoice);
             }
         }
     };
@@ -343,6 +377,23 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }
         if (id === 'menu') {
             showCategoryMenu();
+            return;
+        }
+        if (id === 'retry_kania') {
+            setAiMode('ai');
+            if (lastQueryRef.current) {
+                setMessages((prev) => [
+                    ...prev,
+                    { id: `user-${Date.now()}`, sender: 'user', text: `✨ Coba tanya Kania: "${lastQueryRef.current}"`, timestamp: nowStr() },
+                ]);
+                respondWithAI(lastQueryRef.current);
+            } else {
+                setIsTyping(true);
+                setTimeout(() => {
+                    setIsTyping(false);
+                    appendBotMessage('Hai! Kania sudah siap bantu jawab pertanyaan seputar CV dan pengalaman Mas Arzha lagi 😊', standardCTA, true);
+                }, 400);
+            }
             return;
         }
         const category = CATEGORIES.find((c) => c.id === id);
@@ -359,24 +410,32 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }
     };
 
-    const sendMessage = (text: string) => {
+    const sendMessage = (text: string, isFromVoice = false) => {
         if (!text.trim() || isTyping) return;
         const trimmed = text.trim();
         setMessages((prev) => [...prev, { id: `user-${Date.now()}`, sender: 'user', text: trimmed, timestamp: nowStr() }]);
         setInputValue('');
         lastQueryRef.current = trimmed;
 
+        // Deteksi intent alami jika user meminta kembali ke Kania
+        const wantsKania = /kania|panggil kania|coba kania|coba lagi|mode ai|connect ai/i.test(trimmed);
+        if (wantsKania && aiMode === 'fallback') {
+            setAiMode('ai');
+            respondWithAI(trimmed, isFromVoice);
+            return;
+        }
+
         // Jika AI sedang fallback, gunakan Fuse.js langsung
         if (aiMode === 'fallback') {
             const results = fuse.search(trimmed);
             if (results.length > 0) {
-                respondWithFAQ(results[0].item);
+                respondWithFAQ(results[0].item, isFromVoice);
             } else {
-                respondWithFallback();
+                respondWithFallback(isFromVoice);
             }
         } else {
             // Coba AI dulu, Fuse.js sebagai fallback otomatis di dalam respondWithAI
-            respondWithAI(trimmed);
+            respondWithAI(trimmed, isFromVoice);
         }
     };
 
@@ -385,6 +444,175 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             e.preventDefault();
             sendMessage(inputValue);
         }
+    };
+
+    // ── Voice Chat: mic (STT) ────────────────────────────────────────────────
+    const handleMicClick = () => {
+        if (isListening) {
+            stopListenRef.current?.();
+            stopListenRef.current = null;
+            setIsListening(false);
+            return;
+        }
+        if (!voiceSupport.stt) return;
+
+        stopSpeaking();
+        setSpeakingId(null);
+
+        const cleanup = startListening({
+            lang: 'id-ID',
+            onStart: () => setIsListening(true),
+            onResult: (text, isFinal) => {
+                setInputValue(text);
+                if (isFinal && text.trim()) {
+                    sendMessage(text, true);
+                    setInputValue('');
+                }
+            },
+            onEnd: () => {
+                setIsListening(false);
+                stopListenRef.current = null;
+            },
+            onError: (err) => {
+                console.warn('[ChatWidgetCV] STT error:', err);
+                setIsListening(false);
+                stopListenRef.current = null;
+            },
+        });
+        stopListenRef.current = cleanup;
+    };
+
+    // ── Voice Chat: play bot reply (TTS) ─────────────────────────────────────
+    const handleToggleSpeak = async (messageId: string, text: string) => {
+        if (speakingId === messageId) {
+            stopSpeaking();
+            setSpeakingId(null);
+            return;
+        }
+        setLoadingSpeakId(messageId);
+        await speak(text, {
+            voice: KANIA_VOICE,
+            onStart: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId(messageId);
+            },
+            onEnd: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId((current) => (current === messageId ? null : current));
+            },
+            onError: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId(null);
+            },
+        });
+    };
+
+    // ── Smart Message Content Parser (Markdown + WhatsApp CTA) ────────────────
+    const parseBold = (str: string) => {
+        const parts = str.split(/(\*\*[^*]+\*\*)/g);
+        return parts.map((part, i) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return (
+                    <strong
+                        key={i}
+                        className={`font-semibold ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}
+                    >
+                        {part.slice(2, -2)}
+                    </strong>
+                );
+            }
+            return part;
+        });
+    };
+
+    const formatInlineText = (str: string): React.ReactNode[] => {
+        const tokens: React.ReactNode[] = [];
+        const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+        let lastIndex = 0;
+        let match: RegExpExecArray | null;
+
+        while ((match = linkRegex.exec(str)) !== null) {
+            if (match.index > lastIndex) {
+                tokens.push(...parseBold(str.substring(lastIndex, match.index)));
+            }
+            const label = match[1];
+            const url = match[2];
+            tokens.push(
+                <a
+                    key={`link-${match.index}`}
+                    href={url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-teal-500 hover:text-teal-400 underline font-medium inline-flex items-center gap-0.5"
+                >
+                    <span>{label}</span>
+                    <ExternalLink className="w-2.5 h-2.5 inline ml-0.5 opacity-70" />
+                </a>
+            );
+            lastIndex = match.index + match[0].length;
+        }
+
+        if (lastIndex < str.length) {
+            tokens.push(...parseBold(str.substring(lastIndex)));
+        }
+
+        return tokens;
+    };
+
+    const renderMessageBody = (text: string, isUser: boolean) => {
+        if (isUser) {
+            return <p className="whitespace-pre-wrap">{text}</p>;
+        }
+
+        const lines = text.split('\n');
+
+        return (
+            <div className="space-y-1.5 leading-relaxed text-xs">
+                {lines.map((line, lineIdx) => {
+                    if (!line.trim()) {
+                        return <div key={lineIdx} className="h-1" />;
+                    }
+
+                    const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/[^\s)]+)\)/);
+                    if (waMatch) {
+                        const [fullMatch, label, url] = waMatch;
+                        const before = line.substring(0, line.indexOf(fullMatch));
+                        const after = line.substring(line.indexOf(fullMatch) + fullMatch.length);
+
+                        return (
+                            <div key={lineIdx} className="my-2">
+                                {before && <p className="mb-1.5">{formatInlineText(before)}</p>}
+                                <a
+                                    href={url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                                >
+                                    <MessageCircle className="w-4 h-4 shrink-0 fill-current" />
+                                    <span>{label}</span>
+                                    <ExternalLink className="w-3 h-3 ml-1 opacity-80" />
+                                </a>
+                                {after && <p className="mt-1.5">{formatInlineText(after)}</p>}
+                            </div>
+                        );
+                    }
+
+                    const isBullet = line.startsWith('- ') || line.startsWith('* ');
+                    return (
+                        <p
+                            key={lineIdx}
+                            className={
+                                isBullet
+                                    ? `pl-2 border-l-2 ${darkMode ? 'border-teal-500/50' : 'border-teal-400'} my-0.5`
+                                    : ''
+                            }
+                        >
+                            {formatInlineText(isBullet ? line.slice(2) : line)}
+                        </p>
+                    );
+                })}
+            </div>
+        );
     };
 
     return (
@@ -413,9 +641,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                         <span className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${aiMode === 'ai'
                                             ? darkMode ? 'bg-teal-900/60 text-teal-400' : 'bg-teal-50 text-teal-600'
                                             : darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-50 text-amber-700'
-                                        }`}>
+                                            }`}>
                                             {aiMode === 'ai'
-                                                ? <><Wifi className="w-2.5 h-2.5" /> Kania (AI)</>  
+                                                ? <><Wifi className="w-2.5 h-2.5" /> Kania (AI)</>
                                                 : <><WifiOff className="w-2.5 h-2.5" /> Direktori</>}
                                         </span>
                                     )}
@@ -426,7 +654,14 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                             </div>
                         </div>
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={() => {
+                                stopListenRef.current?.();
+                                stopListenRef.current = null;
+                                setIsListening(false);
+                                stopSpeaking();
+                                setSpeakingId(null);
+                                setIsOpen(false);
+                            }}
                             className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-slate-400 hover:text-white hover:bg-slate-700' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
                                 }`}
                         >
@@ -436,9 +671,20 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
 
                     {/* Fallback Notice Banner */}
                     {aiMode === 'fallback' && (
-                        <div className={`px-3 py-1.5 flex items-center gap-1.5 text-[10px] border-b ${darkMode ? 'bg-amber-950/40 border-amber-900/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
-                            <span className="text-xs">📋</span>
-                            <span><b>Mode Direktori:</b> AI sedang istirahat, Kania menjawab via FAQ ya!</span>
+                        <div className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b ${darkMode ? 'bg-amber-950/40 border-amber-900/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                            <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                                <span className="text-xs shrink-0">📋</span>
+                                <span className="truncate"><b>Mode Direktori:</b> AI sedang istirahat</span>
+                            </div>
+                            <button
+                                onClick={() => handleOptionClick('retry_kania', 'Coba Kania')}
+                                className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
+                                    ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                                    : 'bg-amber-500 hover:bg-amber-600 text-white'
+                                    }`}
+                            >
+                                ✨ Coba Kania
+                            </button>
                         </div>
                     )}
 
@@ -464,8 +710,27 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                                 : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
                                             }`}
                                     >
-                                        <p>{m.text}</p>
-                                        <span className="block text-[9px] opacity-60 text-right mt-1">{m.timestamp}</span>
+                                        {renderMessageBody(m.text, m.sender === 'user')}
+                                        <div className="flex items-center justify-between gap-2 mt-1">
+                                            {m.sender === 'bot' ? (
+                                                <button
+                                                    aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
+                                                    onClick={() => handleToggleSpeak(m.id, m.text)}
+                                                    className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60' : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'}`}
+                                                >
+                                                    {loadingSpeakId === m.id ? (
+                                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                                    ) : speakingId === m.id ? (
+                                                        <Square className="w-2.5 h-2.5 fill-current" />
+                                                    ) : (
+                                                        <Volume2 className="w-3.5 h-3.5" />
+                                                    )}
+                                                </button>
+                                            ) : (
+                                                <span />
+                                            )}
+                                            <span className="block text-[9px] opacity-60 text-right">{m.timestamp}</span>
+                                        </div>
                                     </div>
                                     {m.options && m.options.length > 0 && (
                                         <div className="flex flex-wrap gap-1.5">
@@ -525,12 +790,30 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                             value={inputValue}
                             onChange={(e) => setInputValue(e.target.value)}
                             onKeyDown={handleKeyDown}
-                            placeholder={aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'}
+                            placeholder={
+                                isListening
+                                    ? 'Mendengarkan... bicara sekarang'
+                                    : aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'
+                            }
                             className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
                                 ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
                                 : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                                 }`}
                         />
+                        {voiceSupport.stt && (
+                            <button
+                                aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                onClick={handleMicClick}
+                                disabled={isTyping}
+                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
+                                    ? 'bg-red-500 text-white animate-pulse'
+                                    : darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                    }`}
+                            >
+                                <Mic className="w-3.5 h-3.5" />
+                            </button>
+                        )}
                         <button
                             onClick={() => sendMessage(inputValue)}
                             disabled={!inputValue.trim() || isTyping}

@@ -1,9 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
 import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
+import {
+  speak,
+  stopSpeaking,
+  startListening,
+  stopListening,
+  isSpeechSupported,
+  BOT_VOICES,
+} from '../services/voiceService';
 
 interface ChatWidgetProps {
   darkMode: boolean;
@@ -273,6 +281,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastQueryRef = useRef<string>('');
 
+  // ── Voice Chat state ─────────────────────────────────────────────────────
+  const [isListening, setIsListening] = useState(false);
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
+  const [voiceSupport] = useState(() => isSpeechSupported());
+  const stopListenRef = useRef<(() => void) | null>(null);
+
   // Rate limiting refs
   const lastRequestTimeRef = useRef<number>(0);
   const REQUEST_COOLDOWN = 12000; // 12 seconds between requests (safe for 5 RPM limit)
@@ -296,6 +311,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   useEffect(() => {
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
+      // ⚠️ Hentikan mic & audio TTS yang mungkin masih aktif saat widget unmount
+      stopListening();
+      stopSpeaking();
     };
   }, []);
 
@@ -309,11 +327,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   }, [cleanPhone]);
 
   // ── Bot reply helpers ──────────────────────────────────────────────────────
-  const appendBotMessage = (text: string, options?: QuickOption[], isAI = false) => {
+  const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
+    const msgId = `bot-${Date.now()}`;
     setMessages((prev) => [
       ...prev,
       {
-        id: `bot-${Date.now()}`,
+        id: msgId,
         sender: 'bot',
         text,
         timestamp: nowStr(),
@@ -321,6 +340,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         isAI,
       },
     ]);
+    if (autoSpeak) {
+      handleToggleSpeak(msgId, text, !isAI);
+    }
   };
 
   const standardCTA: QuickOption[] = [
@@ -328,36 +350,40 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
   ];
 
+  const raditCTA: QuickOption[] = [
+    { id: 'retry_zannah', label: '✨ Coba Panggil Zannah Lagi' },
+    { id: 'menu', label: '📂 Buka Menu Topik' },
+    { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+  ];
+
   // FAQ fallback response
-  const respondWithFAQ = (faq: FAQItem) => {
+  const respondWithFAQ = (faq: FAQItem, isFromVoice = false) => {
     setIsTyping(true);
     const id = setTimeout(() => {
       setIsTyping(false);
-      appendBotMessage(faq.answer, standardCTA, false);
+      appendBotMessage(faq.answer, raditCTA, false, isFromVoice);
     }, typingDelay(faq.answer));
     timeoutsRef.current.push(id);
   };
 
-  const respondWithFallback = () => {
+  const respondWithFallback = (isFromVoice = false) => {
     setIsTyping(true);
     const text =
-      '📋 [Radit - Standby Bot]\nHalo kak! Saya Radit (asisten direktori cepat pengganti Zannah). Karena saya model sederhana non-AI, saya belum punya data persis untuk pertanyaan ini. Tapi Kakak bisa klik topik di bawah atau langsung tanya santai ke WhatsApp Arzha ya 👇';
+      '📋 [Radit - Standby Bot]\nHalo kak! Saya Radit (asisten direktori cepat pengganti Zannah). Karena saya model sederhana non-AI, saya belum punya data persis untuk pertanyaan ini. Tapi Kakak bisa coba panggil Zannah lagi atau langsung tanya santai ke WhatsApp Arzha ya 👇';
     const id = setTimeout(() => {
       setIsTyping(false);
       appendBotMessage(
         text,
-        [
-          { id: 'menu', label: '📂 Buka Menu Topik' },
-          { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
-        ],
+        raditCTA,
         false,
+        isFromVoice,
       );
     }, typingDelay(text));
     timeoutsRef.current.push(id);
   };
 
   // AI (Gemini) response — with automatic Radit fallback & Cooldown
-  const respondWithAI = async (userText: string) => {
+  const respondWithAI = async (userText: string, isFromVoice = false) => {
     setIsTyping(true);
 
     // ── Cooldown / Rate Limiting Check ──
@@ -369,9 +395,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       const id = setTimeout(() => {
         setIsTyping(false);
         if (results.length > 0) {
-          appendBotMessage(`📋 [Radit - Standby Bot]\n${results[0].item.answer}`, standardCTA, false);
+          appendBotMessage(`📋 [Radit - Standby Bot]\n${results[0].item.answer}`, raditCTA, false, isFromVoice);
         } else {
-          respondWithFallback();
+          respondWithFallback(isFromVoice);
         }
       }, 600);
       timeoutsRef.current.push(id);
@@ -401,7 +427,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       const delay = typingDelay(replyText);
       const id = setTimeout(() => {
         setIsTyping(false);
-        appendBotMessage(replyText, standardCTA, true);
+        appendBotMessage(replyText, standardCTA, true, isFromVoice);
       }, delay);
       timeoutsRef.current.push(id);
     } catch (err: unknown) {
@@ -414,15 +440,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           setIsTyping(false);
           appendBotMessage(
             `📋 [Radit - Standby Bot]\n${results[0].item.answer}`,
-            standardCTA,
+            raditCTA,
             false,
+            isFromVoice,
           );
         }, typingDelay(results[0].item.answer));
         timeoutsRef.current.push(id);
       } else {
         const id = setTimeout(() => {
           setIsTyping(false);
-          respondWithFallback();
+          respondWithFallback(isFromVoice);
         }, 600);
         timeoutsRef.current.push(id);
       }
@@ -464,6 +491,32 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       showCategoryMenu();
       return;
     }
+    if (id === 'retry_zannah') {
+      setAiMode('ai');
+      if (lastQueryRef.current) {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `user-${Date.now()}`,
+            sender: 'user',
+            text: `✨ Coba tanya Zannah: "${lastQueryRef.current}"`,
+            timestamp: nowStr(),
+          },
+        ]);
+        respondWithAI(lastQueryRef.current);
+      } else {
+        setIsTyping(true);
+        setTimeout(() => {
+          setIsTyping(false);
+          appendBotMessage(
+            'Hai Kak! Zannah sudah siap bantu diskusi lagi nih 😊 Ada ide proyek atau hal yang mau ditanyakan?',
+            standardCTA,
+            true,
+          );
+        }, 400);
+      }
+      return;
+    }
     const category = CATEGORIES.find((c) => c.id === id);
     if (category) {
       setMessages((prev) => [
@@ -485,23 +538,33 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     respondWithAI(label);
   };
 
-  const sendMessage = (text: string) => {
+  const sendMessage = (text: string, isFromVoice = false) => {
     if (!text.trim() || isTyping) return;
+    const cleanText = text.trim();
     setMessages((prev) => [
       ...prev,
-      { id: `user-${Date.now()}`, sender: 'user', text, timestamp: nowStr() },
+      { id: `user-${Date.now()}`, sender: 'user', text: cleanText, timestamp: nowStr() },
     ]);
-    lastQueryRef.current = text;
+    lastQueryRef.current = cleanText;
     setInputValue('');
+
+    // Deteksi intent alami jika user meminta kembali ke Zannah
+    const wantsZannah = /zannah|panggil zannah|coba zannah|coba lagi|mode ai|connect ai/i.test(cleanText);
+    if (wantsZannah && aiMode === 'fallback') {
+      setAiMode('ai');
+      respondWithAI(cleanText, isFromVoice);
+      return;
+    }
+
     if (aiMode === 'fallback') {
-      const results = fuse.search(text);
+      const results = fuse.search(cleanText);
       if (results.length > 0) {
-        respondWithFAQ(results[0].item);
+        respondWithFAQ(results[0].item, isFromVoice);
       } else {
-        respondWithFallback();
+        respondWithFallback(isFromVoice);
       }
     } else {
-      respondWithAI(text);
+      respondWithAI(cleanText, isFromVoice);
     }
   };
 
@@ -514,6 +577,69 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     }
   };
 
+  // ── Voice Chat: mic (STT) ────────────────────────────────────────────────
+  const handleMicClick = () => {
+    if (isListening) {
+      stopListenRef.current?.();
+      stopListenRef.current = null;
+      setIsListening(false);
+      return;
+    }
+    if (!voiceSupport.stt) return; // tombol sudah disabled, ini jaga-jaga
+
+    stopSpeaking(); // jangan sampai TTS & mic aktif bersamaan
+    setSpeakingId(null);
+
+    const cleanup = startListening({
+      lang: 'id-ID',
+      onStart: () => setIsListening(true),
+      onResult: (text, isFinal) => {
+        setInputValue(text);
+        if (isFinal && text.trim()) {
+          // Ucapan final otomatis terkirim dan jawaban bot otomatis diputar via TTS
+          sendMessage(text, true);
+          setInputValue('');
+        }
+      },
+      onEnd: () => {
+        setIsListening(false);
+        stopListenRef.current = null;
+      },
+      onError: (err) => {
+        console.warn('[ChatWidget] STT error:', err);
+        setIsListening(false);
+        stopListenRef.current = null;
+      },
+    });
+    stopListenRef.current = cleanup;
+  };
+
+  // ── Voice Chat: play bot reply (TTS) ─────────────────────────────────────
+  const handleToggleSpeak = async (messageId: string, text: string, isRadit = false) => {
+    if (speakingId === messageId) {
+      stopSpeaking();
+      setSpeakingId(null);
+      return;
+    }
+    setLoadingSpeakId(messageId);
+    const selectedVoice = isRadit ? BOT_VOICES.RADIT : BOT_VOICES.ZANNAH;
+    await speak(text, {
+      voice: selectedVoice,
+      onStart: () => {
+        setLoadingSpeakId(null);
+        setSpeakingId(messageId);
+      },
+      onEnd: () => {
+        setLoadingSpeakId(null);
+        setSpeakingId((current) => (current === messageId ? null : current));
+      },
+      onError: () => {
+        setLoadingSpeakId(null);
+        setSpeakingId(null);
+      },
+    });
+  };
+
   // ── Mode badge ─────────────────────────────────────────────────────────────
   const ModeBadge = () => {
     if (aiMode === 'unknown') return null;
@@ -521,18 +647,128 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     return (
       <span
         className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${isAI
-            ? darkMode
-              ? 'bg-teal-900/60 text-teal-400'
-              : 'bg-teal-50 text-teal-600'
-            : darkMode
-              ? 'bg-amber-900/50 text-amber-300'
-              : 'bg-amber-50 text-amber-700'
+          ? darkMode
+            ? 'bg-teal-900/60 text-teal-400'
+            : 'bg-teal-50 text-teal-600'
+          : darkMode
+            ? 'bg-amber-900/50 text-amber-300'
+            : 'bg-amber-50 text-amber-700'
           }`}
         title={isAI ? 'Zannah AI aktif' : 'Radit standby (Model direktori non-AI)'}
       >
         {isAI ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
         {isAI ? ' Zannah (AI)' : '📋 Radit (Non-AI)'}
       </span>
+    );
+  };
+
+  // ── Smart Message Content Parser (Markdown + WhatsApp CTA) ────────────────
+  const parseBold = (str: string) => {
+    const parts = str.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <strong
+            key={i}
+            className={`font-semibold ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}
+          >
+            {part.slice(2, -2)}
+          </strong>
+        );
+      }
+      return part;
+    });
+  };
+
+  const formatInlineText = (str: string): React.ReactNode[] => {
+    const tokens: React.ReactNode[] = [];
+    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+    let lastIndex = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = linkRegex.exec(str)) !== null) {
+      if (match.index > lastIndex) {
+        tokens.push(...parseBold(str.substring(lastIndex, match.index)));
+      }
+      const label = match[1];
+      const url = match[2];
+      tokens.push(
+        <a
+          key={`link-${match.index}`}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-teal-500 hover:text-teal-400 underline font-medium inline-flex items-center gap-0.5"
+        >
+          <span>{label}</span>
+          <ExternalLink className="w-2.5 h-2.5 inline ml-0.5 opacity-70" />
+        </a>
+      );
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < str.length) {
+      tokens.push(...parseBold(str.substring(lastIndex)));
+    }
+
+    return tokens;
+  };
+
+  const renderMessageBody = (text: string, isUser: boolean) => {
+    if (isUser) {
+      return <p className="whitespace-pre-wrap">{text}</p>;
+    }
+
+    const lines = text.split('\n');
+
+    return (
+      <div className="space-y-1.5 leading-relaxed text-xs">
+        {lines.map((line, lineIdx) => {
+          if (!line.trim()) {
+            return <div key={lineIdx} className="h-1" />;
+          }
+
+          // Deteksi link WhatsApp khusus untuk diubah jadi CTA Button interaktif
+          const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/[^\s)]+)\)/);
+          if (waMatch) {
+            const [fullMatch, label, url] = waMatch;
+            const before = line.substring(0, line.indexOf(fullMatch));
+            const after = line.substring(line.indexOf(fullMatch) + fullMatch.length);
+
+            return (
+              <div key={lineIdx} className="my-2">
+                {before && <p className="mb-1.5">{formatInlineText(before)}</p>}
+                <a
+                  href={url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  <MessageCircle className="w-4 h-4 shrink-0 fill-current" />
+                  <span>{label}</span>
+                  <ExternalLink className="w-3 h-3 ml-1 opacity-80" />
+                </a>
+                {after && <p className="mt-1.5">{formatInlineText(after)}</p>}
+              </div>
+            );
+          }
+
+          // Bullet points atau baris teks biasa
+          const isBullet = line.startsWith('- ') || line.startsWith('* ');
+          return (
+            <p
+              key={lineIdx}
+              className={
+                isBullet
+                  ? `pl-2 border-l-2 ${darkMode ? 'border-teal-500/50' : 'border-teal-400'} my-0.5`
+                  : ''
+              }
+            >
+              {formatInlineText(isBullet ? line.slice(2) : line)}
+            </p>
+          );
+        })}
+      </div>
     );
   };
 
@@ -543,87 +779,77 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     <div className="fixed bottom-6 left-6 z-50 no-print">
       {isOpen && (
         <div
-          className={`w-80 sm:w-96 h-[480px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden transition-all ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+          className={`w-[90vw] sm:w-96 rounded-2xl shadow-2xl border flex flex-col overflow-hidden transition-all duration-300 animate-in fade-in slide-in-from-bottom-5 h-[480px] sm:h-[540px] max-h-[85vh] ${darkMode
+            ? 'bg-slate-900 border-slate-700 shadow-slate-950/80 text-white'
+            : 'bg-white border-slate-200 shadow-slate-300/60 text-slate-800'
             }`}
         >
           {/* Header */}
           <div
-            className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
+            className={`p-3.5 border-b flex items-center justify-between transition-colors ${darkMode
+              ? 'bg-slate-800/80 border-slate-700'
+              : 'bg-slate-50 border-slate-100'
               }`}
           >
             <div className="flex items-center gap-2.5">
               <div className="relative">
                 <div
-                  className={`w-9 h-9 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${isRadit
-                      ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-                      : 'bg-gradient-to-br from-teal-500 to-teal-700'
-                    }`}
+                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${isRadit
+                    ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/30'
+                    : 'bg-gradient-to-br from-teal-500 to-teal-700 shadow-teal-900/30'
+                    } shadow-md`}
                 >
                   {isRadit ? 'RD' : 'ZA'}
                 </div>
-                {/* Online dot */}
-                <span
-                  className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-800 ${isRadit ? 'bg-amber-400' : 'bg-emerald-400'
-                    }`}
-                />
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white dark:border-slate-800 rounded-full" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <p
-                    className={`text-xs font-bold leading-none ${darkMode ? 'text-white' : 'text-slate-900'
-                      }`}
-                  >
+                  <h3 className="font-bold text-xs">
                     {isRadit ? 'Radit' : 'Zannah'}
-                  </p>
+                  </h3>
                   <ModeBadge />
                 </div>
-                <p
-                  className={`text-[10px] mt-0.5 flex items-center gap-1 ${isRadit
-                      ? darkMode
-                        ? 'text-amber-400 font-medium'
-                        : 'text-amber-600 font-medium'
-                      : darkMode
-                        ? 'text-slate-400'
-                        : 'text-slate-500'
-                    }`}
-                >
-                  {isRadit ? (
-                    <>
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block animate-pulse" />
-                      Model Direktori • Backup Zannah
-                    </>
-                  ) : (
-                    activeModel ? `${activeModel} • AI Live` : 'Asisten Arzha • AI Live'
-                  )}
+                <p className="text-[10px] text-slate-400">
+                  {isRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
                 </p>
               </div>
             </div>
-            <button
-              aria-label="Tutup chat"
-              onClick={() => setIsOpen(false)}
-              className={`p-1.5 rounded-lg transition-colors ${darkMode
-                  ? 'text-slate-400 hover:text-white hover:bg-slate-700'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
-                }`}
-            >
-              <X className="w-4 h-4" />
-            </button>
+
+            <div className="flex items-center gap-1">
+              <button
+                aria-label="Tutup jendela chat"
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* Fallback Notice Banner */}
+          {/* Fallback Notice Banner with Quick Reconnect Button */}
           {isRadit && (
             <div
               className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b transition-all ${darkMode
-                  ? 'bg-amber-950/40 border-amber-900/50 text-amber-300'
-                  : 'bg-amber-50 border-amber-200 text-amber-800'
+                ? 'bg-amber-950/40 border-amber-900/50 text-amber-300'
+                : 'bg-amber-50 border-amber-200 text-amber-800'
                 }`}
             >
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs">📋</span>
-                <span>
-                  <b>Radit (Non-AI) standby:</b> Zannah lagi istirahat kuota, Radit bantu via direktori ya!
+              <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                <span className="text-xs shrink-0">📋</span>
+                <span className="truncate">
+                  <b>Radit (Non-AI):</b> Zannah lagi istirahat kuota
                 </span>
               </div>
+              <button
+                onClick={() => handleOptionClick('retry_zannah', 'Coba Zannah')}
+                className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
+                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                  : 'bg-amber-500 hover:bg-amber-600 text-white'
+                  }`}
+              >
+                ✨ Coba Zannah
+              </button>
             </div>
           )}
 
@@ -640,8 +866,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 {m.sender === 'bot' && (
                   <div
                     className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false
-                        ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-                        : 'bg-gradient-to-br from-teal-500 to-teal-700'
+                      ? 'bg-gradient-to-br from-amber-500 to-amber-700'
+                      : 'bg-gradient-to-br from-teal-500 to-teal-700'
                       }`}
                     title={m.isAI === false ? 'Radit (Model Direktori)' : 'Zannah (AI)'}
                   >
@@ -651,16 +877,38 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 <div className="max-w-[85%] flex flex-col gap-1.5">
                   <div
                     className={`px-3 py-2 rounded-xl leading-relaxed ${m.sender === 'user'
-                        ? 'bg-teal-600 text-white rounded-br-none ml-auto'
-                        : darkMode
-                          ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
-                          : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                      ? 'bg-teal-600 text-white rounded-br-none ml-auto'
+                      : darkMode
+                        ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                        : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
                       }`}
                   >
-                    <p className="whitespace-pre-wrap">{m.text}</p>
-                    <span className="block text-[9px] opacity-50 text-right mt-1">
-                      {m.timestamp}
-                    </span>
+                    {renderMessageBody(m.text, m.sender === 'user')}
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      {m.sender === 'bot' ? (
+                        <button
+                          aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
+                          onClick={() => handleToggleSpeak(m.id, m.text, m.isAI === false)}
+                          className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode
+                            ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60'
+                            : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'
+                            }`}
+                        >
+                          {loadingSpeakId === m.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : speakingId === m.id ? (
+                            <Square className="w-2.5 h-2.5 fill-current" />
+                          ) : (
+                            <Volume2 className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      ) : (
+                        <span />
+                      )}
+                      <span className="block text-[9px] opacity-50 text-right">
+                        {m.timestamp}
+                      </span>
+                    </div>
                   </div>
                   {m.options && m.options.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
@@ -669,16 +917,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                           key={opt.id}
                           onClick={() => handleOptionClick(opt.id, opt.label)}
                           className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-all active:scale-95 ${opt.id === 'whatsapp'
+                            ? darkMode
+                              ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
+                              : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                            : opt.id === 'menu'
                               ? darkMode
-                                ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
-                                : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                              : opt.id === 'menu'
-                                ? darkMode
-                                  ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
-                                  : 'border-slate-300 text-slate-600 hover:bg-slate-100'
-                                : darkMode
-                                  ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
-                                  : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
+                                ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
+                                : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                              : darkMode
+                                ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
+                                : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
                             }`}
                         >
                           {opt.label}
@@ -703,16 +951,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               <div className="flex gap-2 justify-start">
                 <div
                   className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${isRadit
-                      ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-                      : 'bg-gradient-to-br from-teal-500 to-teal-700'
+                    ? 'bg-gradient-to-br from-amber-500 to-amber-700'
+                    : 'bg-gradient-to-br from-teal-500 to-teal-700'
                     }`}
                 >
                   {isRadit ? 'RD' : 'ZA'}
                 </div>
                 <div
                   className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-1 ${darkMode
-                      ? 'bg-slate-800 border border-slate-700'
-                      : 'bg-white border border-slate-200 shadow-sm'
+                    ? 'bg-slate-800 border border-slate-700'
+                    : 'bg-white border border-slate-200 shadow-sm'
                     }`}
                 >
                   <span
@@ -746,12 +994,34 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isRadit ? 'Tanya Radit (katalog direktori)...' : 'Tanya Zannah sesuatu...'}
+              placeholder={
+                isListening
+                  ? 'Mendengarkan... bicara sekarang'
+                  : isRadit
+                    ? 'Tanya Radit (katalog direktori)...'
+                    : 'Tanya Zannah sesuatu...'
+              }
               className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
-                  ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
-                  : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
+                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                 }`}
             />
+            {voiceSupport.stt && (
+              <button
+                aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                onClick={handleMicClick}
+                disabled={isTyping}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
+                  ? 'bg-red-500 text-white animate-pulse'
+                  : darkMode
+                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+              >
+                <Mic className="w-3.5 h-3.5" />
+              </button>
+            )}
             <button
               aria-label="Kirim pesan"
               onClick={() => sendMessage(inputValue)}

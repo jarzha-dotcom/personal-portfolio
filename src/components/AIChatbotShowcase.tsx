@@ -1,7 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Sparkles, AlertCircle, Loader2, Trash2, Clock, RefreshCw } from 'lucide-react';
+import { Send, Bot, User, Sparkles, AlertCircle, Loader2, Trash2, Clock, RefreshCw, Mic, Volume2, Square } from 'lucide-react';
 import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
 import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory, clearChatStorage } from '../utils/chatStorage';
+import {
+    speak,
+    stopSpeaking,
+    startListening,
+    stopListening,
+    isSpeechSupported,
+} from '../services/voiceService';
+
+// Voice untuk demo showcase — beda dari Zannah/Kania supaya masing-masing unik
+const SHOWCASE_VOICE = 'id-ID-Wavenet-C';
 
 interface AIChatbotShowcaseProps {
     darkMode: boolean;
@@ -87,6 +97,13 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    // ── Voice Chat state ─────────────────────────────────────────────────────
+    const [isListening, setIsListening] = useState(false);
+    const [speakingId, setSpeakingId] = useState<string | null>(null);
+    const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
+    const [voiceSupport] = useState(() => isSpeechSupported());
+    const stopListenRef = useRef<(() => void) | null>(null);
+
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages]);
@@ -105,7 +122,15 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         inputRef.current?.focus();
     }, []);
 
-    const handleSend = async (textOverride?: string) => {
+    // ⚠️ Hentikan mic & audio TTS yang mungkin masih aktif saat komponen unmount
+    useEffect(() => {
+        return () => {
+            stopListening();
+            stopSpeaking();
+        };
+    }, []);
+
+    const handleSend = async (textOverride?: string, isFromVoice = false) => {
         const text = (textOverride ?? input).trim();
         if (!text || isLoading) return;
 
@@ -126,8 +151,9 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             // Update model label sesuai model yang aktif dipilih server
             if (result.model) setActiveModel(result.model);
 
+            const msgId = `assistant-${Date.now()}`;
             const assistantMsg: DisplayMessage = {
-                id: `assistant-${Date.now()}`,
+                id: msgId,
                 role: 'assistant',
                 content: replyText,
             };
@@ -137,6 +163,11 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                 { role: 'user', parts: [{ text }] },
                 { role: 'model', parts: [{ text: replyText }] },
             ]);
+
+            // Jika input berasal dari mic / STT, otomatis ucapkan balasan via TTS
+            if (isFromVoice) {
+                handleToggleSpeak(msgId, replyText);
+            }
         } catch (error) {
             const isLimit = isRateLimitError(error);
             const isUnavailable = isModelUnavailable(error);
@@ -187,6 +218,14 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     };
 
     const handleReset = () => {
+        if (isLoading) return;
+        
+        stopListenRef.current?.();
+        stopListenRef.current = null;
+        setIsListening(false);
+        stopSpeaking();
+        setSpeakingId(null);
+
         clearChatStorage('showcase');
         setMessages([
             {
@@ -197,6 +236,67 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         ]);
         setHistory([]);
         setLastUserMessage('');
+    };
+
+    // ── Voice Chat: mic (STT) ────────────────────────────────────────────────
+    const handleMicClick = () => {
+        if (isListening) {
+            stopListenRef.current?.();
+            stopListenRef.current = null;
+            setIsListening(false);
+            return;
+        }
+        if (!voiceSupport.stt) return;
+
+        stopSpeaking();
+        setSpeakingId(null);
+
+        const cleanup = startListening({
+            lang: 'id-ID',
+            onStart: () => setIsListening(true),
+            onResult: (text, isFinal) => {
+                setInput(text);
+                if (isFinal && text.trim()) {
+                    handleSend(text, true);
+                    setInput('');
+                }
+            },
+            onEnd: () => {
+                setIsListening(false);
+                stopListenRef.current = null;
+            },
+            onError: (err) => {
+                console.warn('[AIChatbotShowcase] STT error:', err);
+                setIsListening(false);
+                stopListenRef.current = null;
+            },
+        });
+        stopListenRef.current = cleanup;
+    };
+
+    // ── Voice Chat: play assistant reply (TTS) ───────────────────────────────
+    const handleToggleSpeak = async (messageId: string, text: string) => {
+        if (speakingId === messageId) {
+            stopSpeaking();
+            setSpeakingId(null);
+            return;
+        }
+        setLoadingSpeakId(messageId);
+        await speak(text, {
+            voice: SHOWCASE_VOICE,
+            onStart: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId(messageId);
+            },
+            onEnd: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId((current) => (current === messageId ? null : current));
+            },
+            onError: () => {
+                setLoadingSpeakId(null);
+                setSpeakingId(null);
+            },
+        });
     };
 
     return (
@@ -227,8 +327,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                     onClick={handleReset}
                     title="Reset percakapan"
                     className={`p-1.5 rounded-lg transition-colors ${darkMode
-                            ? 'text-slate-400 hover:text-white hover:bg-slate-700'
-                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                        ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
                         }`}
                 >
                     <Trash2 className="w-4 h-4" />
@@ -248,16 +348,16 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                         {msg.role === 'assistant' && (
                             <div
                                 className={`w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center ${msg.isRateLimit
+                                    ? darkMode
+                                        ? 'bg-amber-500/20'
+                                        : 'bg-amber-100'
+                                    : msg.isError
                                         ? darkMode
-                                            ? 'bg-amber-500/20'
-                                            : 'bg-amber-100'
-                                        : msg.isError
-                                            ? darkMode
-                                                ? 'bg-red-500/20'
-                                                : 'bg-red-100'
-                                            : darkMode
-                                                ? 'bg-teal-500/20'
-                                                : 'bg-teal-100'
+                                            ? 'bg-red-500/20'
+                                            : 'bg-red-100'
+                                        : darkMode
+                                            ? 'bg-teal-500/20'
+                                            : 'bg-teal-100'
                                     }`}
                             >
                                 {msg.isRateLimit ? (
@@ -271,29 +371,48 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                         )}
                         <div
                             className={`max-w-[75%] px-3 py-2 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap ${msg.role === 'user'
-                                    ? 'bg-teal-600 text-white rounded-br-sm'
-                                    : msg.isRateLimit
+                                ? 'bg-teal-600 text-white rounded-br-sm'
+                                : msg.isRateLimit
+                                    ? darkMode
+                                        ? 'bg-amber-500/10 text-amber-200 border border-amber-500/30 rounded-bl-sm'
+                                        : 'bg-amber-50 text-amber-800 border border-amber-200 rounded-bl-sm'
+                                    : msg.isError
                                         ? darkMode
-                                            ? 'bg-amber-500/10 text-amber-200 border border-amber-500/30 rounded-bl-sm'
-                                            : 'bg-amber-50 text-amber-800 border border-amber-200 rounded-bl-sm'
-                                        : msg.isError
-                                            ? darkMode
-                                                ? 'bg-red-500/10 text-red-300 border border-red-500/30'
-                                                : 'bg-red-50 text-red-700 border border-red-200'
-                                            : darkMode
-                                                ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-sm'
-                                                : 'bg-slate-100 text-slate-700 border border-slate-200 rounded-bl-sm'
+                                            ? 'bg-red-500/10 text-red-300 border border-red-500/30'
+                                            : 'bg-red-50 text-red-700 border border-red-200'
+                                        : darkMode
+                                            ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-sm'
+                                            : 'bg-slate-100 text-slate-700 border border-slate-200 rounded-bl-sm'
                                 }`}
                         >
                             {msg.content}
+
+                            {msg.role === 'assistant' && !msg.isError && !msg.isRateLimit && (
+                                <button
+                                    aria-label={speakingId === msg.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
+                                    onClick={() => handleToggleSpeak(msg.id, msg.content)}
+                                    className={`mt-1.5 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode
+                                        ? 'text-slate-500 hover:text-teal-400 hover:bg-slate-700/60'
+                                        : 'text-slate-400 hover:text-teal-600 hover:bg-slate-200/60'
+                                        }`}
+                                >
+                                    {loadingSpeakId === msg.id ? (
+                                        <Loader2 className="w-3 h-3 animate-spin" />
+                                    ) : speakingId === msg.id ? (
+                                        <Square className="w-2.5 h-2.5 fill-current" />
+                                    ) : (
+                                        <Volume2 className="w-3.5 h-3.5" />
+                                    )}
+                                </button>
+                            )}
 
                             {msg.isRateLimit && (
                                 <button
                                     onClick={handleRetry}
                                     disabled={isLoading || !lastUserMessage}
                                     className={`mt-2 inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${darkMode
-                                            ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40'
-                                            : 'bg-amber-500 text-white hover:bg-amber-600 border border-amber-600'
+                                        ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40'
+                                        : 'bg-amber-500 text-white hover:bg-amber-600 border border-amber-600'
                                         }`}
                                 >
                                     <RefreshCw className="w-3 h-3" />
@@ -324,8 +443,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                     onClick={() => handleSend(q)}
                                     disabled={isLoading}
                                     className={`text-[11px] px-2.5 py-1.5 rounded-full border transition-colors ${darkMode
-                                            ? 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-teal-500/50'
-                                            : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-teal-500/50'
+                                        ? 'border-slate-700 text-slate-300 hover:bg-slate-800 hover:border-teal-500/50'
+                                        : 'border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-teal-500/50'
                                         } disabled:opacity-50`}
                                 >
                                     {q}
@@ -345,8 +464,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                         </div>
                         <div
                             className={`px-3 py-2 rounded-2xl rounded-bl-sm ${darkMode
-                                    ? 'bg-slate-800 border border-slate-700'
-                                    : 'bg-slate-100 border border-slate-200'
+                                ? 'bg-slate-800 border border-slate-700'
+                                : 'bg-slate-100 border border-slate-200'
                                 }`}
                         >
                             <Loader2 className={`w-4 h-4 animate-spin ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
@@ -359,8 +478,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             {/* Disclaimer */}
             <div
                 className={`px-4 py-1.5 border-t flex-shrink-0 flex items-center gap-1.5 text-[10px] ${darkMode
-                        ? 'bg-slate-900 border-slate-800 text-slate-500'
-                        : 'bg-slate-50 border-slate-200 text-slate-500'
+                    ? 'bg-slate-900 border-slate-800 text-slate-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                     }`}
             >
                 <Sparkles className="w-3 h-3 flex-shrink-0" />
@@ -376,8 +495,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             >
                 <div
                     className={`flex items-center gap-2 rounded-xl border px-3 py-2 ${darkMode
-                            ? 'bg-slate-800 border-slate-700 focus-within:border-teal-500'
-                            : 'bg-white border-slate-300 focus-within:border-teal-500'
+                        ? 'bg-slate-800 border-slate-700 focus-within:border-teal-500'
+                        : 'bg-white border-slate-300 focus-within:border-teal-500'
                         }`}
                 >
                     <input
@@ -386,17 +505,33 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ketik pertanyaan..."
+                        placeholder={isListening ? 'Mendengarkan... bicara sekarang' : 'Ketik pertanyaan...'}
                         disabled={isLoading}
                         className={`flex-1 bg-transparent outline-none text-xs placeholder:text-slate-400 ${darkMode ? 'text-white' : 'text-slate-900'
                             } disabled:opacity-50`}
                     />
+                    {voiceSupport.stt && (
+                        <button
+                            aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                            title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                            onClick={handleMicClick}
+                            disabled={isLoading}
+                            className={`p-1.5 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${isListening
+                                ? 'bg-red-500 text-white animate-pulse'
+                                : darkMode
+                                    ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                                }`}
+                        >
+                            <Mic className="w-3.5 h-3.5" />
+                        </button>
+                    )}
                     <button
                         onClick={() => handleSend()}
                         disabled={!input.trim() || isLoading}
                         className={`p-1.5 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${darkMode
-                                ? 'bg-teal-500 text-white hover:bg-teal-600'
-                                : 'bg-teal-600 text-white hover:bg-teal-700'
+                            ? 'bg-teal-500 text-white hover:bg-teal-600'
+                            : 'bg-teal-600 text-white hover:bg-teal-700'
                             }`}
                         aria-label="Kirim pesan"
                     >
