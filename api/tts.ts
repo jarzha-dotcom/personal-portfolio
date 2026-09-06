@@ -84,14 +84,20 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 
 function cleanupOldRateLimits() {
   const now = Date.now();
-  for (const [key, record] of rateLimitMap.entries()) {
+  for (const [ip, record] of rateLimitMap.entries()) {
     if (now > record.resetAt) {
-      rateLimitMap.delete(key);
+      rateLimitMap.delete(ip);
     }
   }
 }
 
-setInterval(cleanupOldRateLimits, 5 * 60 * 1000);
+// Cleanup berkala tanpa menahan proses Node.js / build exit
+if (typeof setInterval !== 'undefined') {
+  const timer = setInterval(cleanupOldRateLimits, 5 * 60 * 1000);
+  if (typeof timer.unref === 'function') {
+    timer.unref();
+  }
+}
 
 function normalizeIndonesianForSpeech(text: string): string {
   let s = text;

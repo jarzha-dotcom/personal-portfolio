@@ -237,8 +237,13 @@ function cleanupOldRateLimits() {
     }
 }
 
-// Cleanup setiap 5 menit
-setInterval(cleanupOldRateLimits, 5 * 60 * 1000);
+// Cleanup berkala tanpa menahan proses Node.js / build exit
+if (typeof setInterval !== 'undefined') {
+    const timer = setInterval(cleanupOldRateLimits, 5 * 60 * 1000);
+    if (typeof timer.unref === 'function') {
+        timer.unref();
+    }
+}
 
 // ── Deteksi kapan pertanyaan butuh Antigravity Agent ─────────────────────────
 // Sebelumnya Antigravity dicoba untuk SEMUA chat (boros kuota 100 RPD & bikin

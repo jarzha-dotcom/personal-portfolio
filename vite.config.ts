@@ -4,14 +4,14 @@ import path from 'path';
 import fs from 'fs';
 import { defineConfig, loadEnv, Plugin } from 'vite';
 
-import chatHandler from './api/chat';
-
 function localChatDevPlugin(): Plugin {
   return {
     name: 'local-chat-dev-middleware',
+    apply: 'serve', // HANYA aktif saat dev server (vite dev), tidak dipanggil saat build
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (req.url?.startsWith('/api/chat') && req.method === 'POST') {
+          const { default: chatHandler } = await import('./api/chat');
           let rawBody = '';
           req.on('data', (chunk) => {
             rawBody += chunk;
@@ -304,6 +304,7 @@ function sanitizeForSpeechDev(raw: string): string {
 function localTtsDevPlugin(envGcpApiKey: string): Plugin {
   return {
     name: 'local-tts-dev-middleware',
+    apply: 'serve', // HANYA aktif saat dev server (vite dev), tidak dipanggil saat build
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
         if (req.url?.startsWith('/api/tts') && req.method === 'POST') {
