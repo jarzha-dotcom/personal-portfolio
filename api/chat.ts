@@ -712,7 +712,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             // Izinkan localhost & dev environment
             if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
             // Izinkan domain resmi K. Arzhaning Jagad
-            if (host === 'byarzhaning.online' || host.endsWith('.arzhaning.online')) return true;
+            if (host === 'byarzhaning.online' || host.endsWith('.byarzhaning.online')) return true;
             // Izinkan preview deployment resmi Vercel (personal-portfolio)
             if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
             return false;
