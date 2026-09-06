@@ -116,7 +116,17 @@ STRATEGI SALES CERDAS & HALUS (SMART SOFT-SELLING):
    Format: [💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/6282312312734?text=Halo%20Mas%20Arzha,%20saya%20tadi%20diskusi%20dengan%20Zannah%20tentang%20proyek%20<NAMA_PROYEK>.<DETAIL_SINGKAT_URL_ENCODED>)
 3. Jika user meminta rangkuman obrolan/file/resume diskusi atau ingin lanjut ngobrol langsung ke Mas Arzha:
    Informasikan bahwa sistem telah menyiapkan file rangkuman yang siap diunduh di bawah pesan ini (atau tombol "Unduh Rangkuman" di header widget) untuk langsung dibawa ke WhatsApp Mas Arzha.
-4. Panjang respon ideal: 2-4 kalimat padat, to-the-point, dan berbobot.`;
+4. Panjang respon ideal: 2-4 kalimat padat, to-the-point, dan berbobot.
+
+5. POSITIONING VS ALTERNATIF LAIN (kompetitor, freelancer, template siap pakai, website builder seperti Wix/WordPress, dst):
+   - Kalau user menyebut nama vendor/platform lain, atau kelihatan lagi membandingkan pilihan (mis. "kenapa gak pake Wix aja", "temen gue harganya lebih murah"), JANGAN PERNAH menjelekkan nama kompetitor secara langsung — validasi dulu pilihan mereka dengan jujur (kalau memang opsi itu valid untuk kasus sederhana, akui saja), baru arahkan secara natural ke diferensiator konkret Mas Arzha yang relevan dengan concern spesifik mereka: komunikasi LANGSUNG ke developer yang ngerjain (bukan lapis-lapis account manager/agency), harga transparan tanpa biaya tersembunyi, garansi maintenance 1 bulan gratis, source code sepenuhnya milik klien, dan ketelitian audit korporat 7+ tahun yang bikin logic bisnis rapi & minim bug — bukan sekadar "cantik doang".
+   - Framing selalu "kenapa solusi custom lebih PAS buat kebutuhan spesifik Kakak", bukan "opsi lain jelek". Soft-selling, bukan menakut-nakuti.
+   - Bahkan tanpa disebut kompetitornya sama sekali, tetap proaktif selipkan value proposition Mas Arzha tiap kali momennya pas — jangan tunggu diminta baru menonjolkan keunggulan.
+   - Tone WAJIB tetap ramah & supel (bukan "jualan garang"): dengarkan/validasi kebutuhan atau keresahan user dulu sebelum masuk pitch, dan jangan pernah terkesan memaksa atau pakai taktik high-pressure sales.
+
+ATURAN TEKNIS PENTING (JANGAN DILANGGAR):
+- JANGAN PERNAH menulis/menyisipkan link file mentah berformat "data:..." (data URI, base64, atau HTML lengkap) langsung di teks balasan untuk menawarkan file download. Sistem backend akan OTOMATIS melampirkan file yang valid (rangkuman obrolan, atau hasil kerja Antigravity Agent) sebagai tombol download resmi di bawah pesan — kamu tidak perlu dan tidak boleh membuat link file sendiri di teks.
+- Kalau user minta dibuatkan file/halaman/galeri custom yang di luar cakupan rangkuman obrolan (mis. "buatkan file HTML galeri seni", "bikinin landing page saya sekarang"), jangan coba generate isi file itu di teks balasan. Jelaskan dengan ramah bahwa kebutuhan seperti itu paling pas dikerjakan langsung sebagai proyek bareng Mas Arzha, lalu arahkan ke WhatsApp (format link di atas) — ini juga jadi peluang bagus buat soft-selling, bukan cuma penolakan.`;
 
 // ── Persona 2: Rajendra (AIChatbotShowcase - Asisten Portofolio & Tech Demo) ───
 const SYSTEM_INSTRUCTION_RAJENDRA = `Kamu adalah "Rajendra", AI Portfolio Assistant & Tech Demonstrator pribadi dari K. Arzhaning Jagad (Arzha) — Indie Developer & Data Specialist berpengalaman 7+ tahun di Cibitung, Bekasi.
@@ -155,7 +165,22 @@ STRATEGI KOMUNIKASI RAJENDRA:
   Format: [💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/6282312312734?text=Halo%20Mas%20Arzha,%20saya%20tadi%20diskusi%20dengan%20Rajendra%20tentang%20proyek%20<NAMA_PROYEK>.<DETAIL_SINGKAT_URL_ENCODED>)
 - Jika user meminta rangkuman obrolan/file atau ingin lanjut diskusi langsung dengan Mas Arzha:
   Informasikan bahwa sistem melampirkan file rangkuman yang bisa langsung diunduh lewat tombol attachment hijau di bawah atau tombol "Unduh Rangkuman Diskusi" di atas, yang bisa diteruskan ke WhatsApp Mas Arzha.
-- Format respon: 2-4 kalimat padat, to-the-point, dan berbobot.`;
+- Format respon: 2-4 kalimat padat, to-the-point, dan berbobot.
+
+MODE LIVE DEMO (khusus saat kamu berjalan sebagai Antigravity Agent dengan akses eksekusi kode):
+- Kalau user menanyakan feasibility suatu fitur/ide (mis. "bisa gak dibikin integrasi WhatsApp otomatis?", "mampu gak realtime notification?"), JANGAN cuma jelaskan secara teori — coba tulis dan JALANKAN contoh kode kecil (proof-of-concept sederhana, bukan implementasi penuh) yang membuktikan idenya secara konkret di sandbox kamu, sejauh itu masuk akal untuk dibuktikan cepat.
+- Kalau idenya terlalu besar/kompleks untuk dibuktikan dalam satu demo singkat, jujur saja: jelaskan pendekatan teknisnya secara ringkas, lalu tegaskan bahwa implementasi penuh adalah proyek yang lebih pas dikerjakan bareng Mas Arzha.
+- Setelah demo (berhasil atau tidak), selalu kaitkan balik ke value proposition Mas Arzha: ini bukti nyata kecepatan & ketelitian eksekusi teknis Arzha, bukan sekadar klaim di CV — lalu ajak lanjut diskusi proyek.
+- Tetap ringkas dan hindari jargon berlebihan; fokus ke "ini bisa, dan begini buktinya" atau "ini butuh riset lebih dalam, dan Arzha yang paling pas ngerjain".
+
+POSITIONING VS ALTERNATIF LAIN (kompetitor, freelancer, template siap pakai, no-code builder, dst):
+- Kalau user menyebut vendor/platform lain, atau kelihatan lagi membandingkan pilihan, JANGAN PERNAH menjelekkan nama kompetitor secara langsung — validasi dulu pilihan mereka dengan jujur kalau memang valid untuk kasus sederhana, baru arahkan secara natural ke diferensiator konkret Mas Arzha: komunikasi LANGSUNG ke developer yang ngerjain (bukan lapis-lapis agency), harga transparan tanpa biaya tersembunyi, garansi maintenance 1 bulan gratis, source code sepenuhnya milik klien, dan arsitektur AI/produksi yang sudah terbukti live (bukan sekadar teori).
+- Framing selalu "kenapa solusi custom lebih PAS", bukan "opsi lain jelek". Bahkan tanpa disebut kompetitornya, tetap proaktif selipkan value proposition tiap kali momennya pas.
+- Tone WAJIB tetap hangat & antusias khas Rajendra, jangan sampai terkesan memaksa atau high-pressure sales — validasi dulu apa yang dicari user, baru pitch.
+
+ATURAN TEKNIS PENTING (JANGAN DILANGGAR):
+- JANGAN PERNAH menulis/menyisipkan link file mentah berformat "data:..." (data URI, base64, atau HTML lengkap) langsung di teks balasan. File download hanya boleh muncul lewat mekanisme attachment resmi dari backend (rangkuman obrolan atau hasil kerja Antigravity Agent).
+- Kalau user minta dibuatkan file/halaman custom di luar cakupan rangkuman obrolan, jangan generate isi file itu di teks balasan — jelaskan dengan hangat bahwa itu paling pas didiskusikan sebagai proyek bareng Mas Arzha, lalu arahkan ke WhatsApp.`;
 
 // ── Persona 3: Kania (ChatWidgetCV - Asisten Virtual Halaman CV untuk HRD) ──────
 const SYSTEM_INSTRUCTION_KANIA = `Kamu adalah "Kania", asisten virtual profesional Arzha (K. Arzhaning Jagad) yang dirancang khusus untuk menjawab pertanyaan HRD, rekruter, dan pewawancara.
@@ -253,19 +278,50 @@ if (typeof setInterval !== 'undefined') {
 //      "Live Demo" di frontend → agentMode: true di body request)
 //   2. Pesan user mengandung pola yang jelas butuh riset web / eksekusi kode /
 //      generate konten — bukan sekadar tanya-jawab biasa.
-const AGENT_TRIGGER_PATTERNS: RegExp[] = [
-    /\b(cari|riset|research)\b.{0,20}\b(terbaru|kompetitor|tren|data|harga\s*pasar)\b/i,
-    /\b(jalankan|eksekusi|run|coba)\b.{0,20}\b(kode|code|script|fungsi)\b/i,
-    /\b(buatkan|generate|bikin)\b.{0,20}\b(kode|fungsi|function|script)\b.{0,20}\b(jalankan|run|eksekusi)\b/i,
-    /\bbandingkan\b|\bcompare\b/i,
-    /\bhitung(kan)?\b.{0,20}\b(data|angka|statistik)\b/i,
-    // Minta file downloadable (RAB, invoice, laporan, dst) — ini butuh sandbox
-    // Antigravity buat bikin file beneran (xlsx/pdf/dst), bukan sekadar teks.
-    /\b(buatkan|generate|bikin|susun|export)\b.{0,25}\b(rab|anggaran|invoice|proposal|laporan|excel|spreadsheet|pdf|dokumen)\b/i,
+// PERUBAHAN PENTING (lihat catatan di LAYER 1 pada handler di bawah):
+// Heuristic ini DULU langsung meng-auto-invoke Antigravity begitu polanya
+// cocok — meski frontend sudah punya tombol opt-in eksplisit (agent_estimate/
+// agent_research/agent_file_analysis), jalur heuristic ini tetap bisa boros
+// kuota 100 RPD secara diam-diam kalau user kebetulan ngetik kata kunci yang
+// cocok di kolom chat biasa, tanpa klik tombol apa pun.
+// Sekarang heuristic ini HANYA dipakai untuk mendeteksi *niat* user (estimate/
+// research/file_analysis) dan niat itu dikirim balik ke frontend sebagai
+// `suggestedAgentAction` supaya tombol yang relevan bisa di-highlight/
+// didahulukan — bukan buat langsung memanggil Antigravity. Antigravity HANYA
+// jalan kalau agentMode dikirim eksplisit dari tombol (agentTriggeredByUser).
+export type AgentIntentAction = 'estimate' | 'research' | 'file_analysis' | 'live_demo';
+
+const AGENT_INTENT_PATTERNS: Array<{ action: AgentIntentAction; pattern: RegExp }> = [
+    // Pertanyaan feasibility ("bisa gak bikin fitur X?") → khusus Rajendra
+    // (showcase), karena cuma di situ ada mode "Live Demo" Antigravity yang
+    // bisa nulis & menjalankan contoh kode kecil buat buktiin feasibility
+    // on-the-spot. Diletakkan di urutan awal supaya gak "ketutup" pola lain
+    // yang kebetulan overlap kata kerjanya (mis. "bikin").
+    { action: 'live_demo', pattern: /\b(bisa|mampu|feasible)\b.{0,15}(gak|ga|nggak|kah)?\b.{0,25}\b(bikin|buat|develop|implementasi|realisasi|dibikin|dibuat)\b/i },
+    { action: 'live_demo', pattern: /\bprototype\b|\bproof\s*of\s*concept\b|\bpoc\b/i },
+    // Riset kompetitor/tren/harga pasar → cocok sama tombol "Riset Kompetitor/Pasar"
+    { action: 'research', pattern: /\b(cari|riset|research)\b.{0,20}\b(terbaru|kompetitor|tren|data|harga\s*pasar)\b/i },
+    { action: 'research', pattern: /\bbandingkan\b|\bcompare\b/i },
+    // Minta file downloadable (RAB, invoice, laporan, dst) → cocok sama tombol "Estimasi Biaya & Timeline"
+    { action: 'estimate', pattern: /\b(buatkan|generate|bikin|susun|export)\b.{0,25}\b(rab|anggaran|invoice|proposal|laporan|excel|spreadsheet|pdf|dokumen)\b/i },
+    { action: 'estimate', pattern: /\bhitung(kan)?\b.{0,20}\b(data|angka|statistik)\b/i },
 ];
 
-function shouldUseAgent(message: string): boolean {
-    return AGENT_TRIGGER_PATTERNS.some((pattern) => pattern.test(message));
+/**
+ * Deteksi niat agent dari pesan user, TANPA memanggil Antigravity sama sekali.
+ * Kalau ada file yang baru diupload di giliran ini, prioritaskan 'file_analysis'
+ * (paling relevan — user kemungkinan besar mau file itu diolah).
+ * `allowLiveDemo` dikontrol dari persona aktif di handler: 'live_demo' cuma
+ * masuk akal buat Rajendra (showcase), karena Zannah/Kania gak punya tombol
+ * atau mode Live Demo di UI-nya.
+ */
+function detectAgentIntent(message: string, hasFilesThisTurn: boolean, allowLiveDemo: boolean): AgentIntentAction | null {
+    if (hasFilesThisTurn) return 'file_analysis';
+    for (const { action, pattern } of AGENT_INTENT_PATTERNS) {
+        if (action === 'live_demo' && !allowLiveDemo) continue;
+        if (pattern.test(message)) return action;
+    }
+    return null;
 }
 
 // Label ramah untuk tiap tipe step yang dikembalikan Antigravity, dipakai
@@ -825,20 +881,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     // ═══════════════════════════════════════════════════════════════════════
-    // LAYER 1: Antigravity Agent — dipicu untuk Rajendra (showcase) & Zannah
-    // (ChatWidget) kalau ada trigger manual ATAU heuristic (riset/kode/bikin
-    // file downloadable). Kania (CV/HRD) sengaja TIDAK diikutkan: konteksnya
-    // wawancara/HR yang butuh respons cepat, dan gak ada use-case realistis
-    // buat generate file di situ — jadi biar tetap ringan & gak makan kuota
-    // 100 RPD bareng-bareng dari persona yang gak butuh-butuh amat.
+    // LAYER 1: Antigravity Agent — HANYA dipicu oleh opt-in eksplisit (tombol
+    // aksi agent di frontend → agentMode: true di body request). Kania
+    // (CV/HRD) sengaja TIDAK diikutkan: konteksnya wawancara/HR yang butuh
+    // respons cepat, dan gak ada use-case realistis buat generate file di
+    // situ — jadi biar tetap ringan & gak makan kuota 100 RPD dari persona
+    // yang gak butuh-butuh amat.
+    //
+    // CATATAN: heuristic (AGENT_INTENT_PATTERNS) SENGAJA tidak lagi dipakai
+    // untuk auto-invoke di sini — itu dulu bikin Antigravity bisa kepanggil
+    // diam-diam cuma karena user ngetik kata kunci tertentu di kolom chat
+    // biasa, boros kuota buat percakapan yang belum tentu butuh file/riset.
+    // Heuristic-nya sekarang cuma dipakai di LAYER 2/3 buat kasih *saran*
+    // (suggestedAgentAction) supaya tombol yang relevan di-highlight — bukan
+    // buat mengeksekusi Antigravity sendiri. User tetap yang mutusin lewat
+    // klik tombol, konsisten sama pola opt-in yang udah diterapkan di UI.
     // ═══════════════════════════════════════════════════════════════════════
     const agentTriggeredByUser = agentMode === true;
-    const agentTriggeredByHeuristic = shouldUseAgent(sanitizedMessage);
     const agentEligiblePersona = activePersona === 'rajendra' || activePersona === 'zannah';
-    const wantsAgent = agentEligiblePersona && (agentTriggeredByUser || agentTriggeredByHeuristic);
+    const wantsAgent = agentEligiblePersona && agentTriggeredByUser;
     const isAntigravityTarget = wantsAgent && (!requestedModel || requestedModel === ANTIGRAVITY_MODEL);
+
+    // Niat user (kalau ada) buat disarankan lewat tombol yang relevan di
+    // frontend — dihitung sekali di sini, dipakai di LAYER 2 & 3 di bawah.
+    // Kalau agent sudah eksplisit dipicu user (agentTriggeredByUser), gak
+    // perlu saran lagi karena dia lagi otomatis diarahkan ke Antigravity.
+    const detectedAgentIntent: AgentIntentAction | null =
+        agentEligiblePersona && !agentTriggeredByUser
+            ? detectAgentIntent(sanitizedMessage, sanitizedFiles.length > 0, activePersona === 'rajendra')
+            : null;
+
+    const attachAgentSuggestion = (resData: any) => {
+        if (!resData || !detectedAgentIntent) return resData;
+        return { ...resData, suggestedAgentAction: detectedAgentIntent };
+    };
+
     if (aiStudioKey && isAntigravityTarget) {
-        console.log(`[chat.ts] Agent mode triggered (${agentTriggeredByUser ? 'manual' : 'heuristic'}) — trying Antigravity as ${botName}...`);
+        console.log(`[chat.ts] Agent mode triggered (manual) — trying Antigravity as ${botName}...`);
         const antigravityResult = await callAntigravity(
             aiStudioKey,
             sanitizedMessage,
@@ -854,7 +933,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 ...antigravityResult,
                 apiSource: 'aistudio',
                 usedAgent: true,
-                agentTriggerReason: agentTriggeredByUser ? 'manual' : 'heuristic',
+                agentTriggerReason: 'manual',
             }));
         }
 
@@ -875,7 +954,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 systemInstruction,
             );
             if (result) {
-                return res.status(200).json(enrichWithSummaryAttachment(result));
+                return res.status(200).json(enrichWithSummaryAttachment(attachAgentSuggestion(result)));
             }
         }
 
@@ -898,7 +977,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 systemInstruction,
             );
             if (result) {
-                return res.status(200).json(enrichWithSummaryAttachment(result));
+                return res.status(200).json(enrichWithSummaryAttachment(attachAgentSuggestion(result)));
             }
         }
 

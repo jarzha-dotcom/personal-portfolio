@@ -22,6 +22,8 @@ export interface OutgoingFile {
     name?: string;
 }
 
+export type AgentIntentAction = 'estimate' | 'research' | 'file_analysis' | 'live_demo';
+
 export interface GeminiResponse {
     reply: string;
     model: string;
@@ -30,9 +32,19 @@ export interface GeminiResponse {
     /** True kalau balasan ini dijawab lewat Antigravity Agent, bukan Gemini biasa */
     usedAgent?: boolean;
     agentSteps?: AgentStep[];
-    agentTriggerReason?: 'manual' | 'heuristic';
+    /** Antigravity sekarang HANYA dipicu lewat tombol opt-in eksplisit
+     * (agentMode: true), jadi nilainya selalu 'manual' kalau usedAgent true —
+     * heuristic tidak lagi bisa jadi alasan Antigravity kepanggil sendiri. */
+    agentTriggerReason?: 'manual';
     /** File hasil kerja Antigravity yang bisa didownload (mis. RAB.xlsx, laporan.pdf) */
     attachments?: Attachment[];
+    /** Niat agent yang disarankan backend dari heuristic pesan user (lihat
+     * detectAgentIntent di chat.ts) — hanya dipakai frontend untuk
+     * highlight/dahulukan tombol aksi agent yang relevan (agent_estimate/
+     * agent_research/agent_file_analysis). TIDAK memicu Antigravity sendiri;
+     * hanya muncul pada balasan Gemini biasa (usedAgent falsy), dan cuma
+     * saat backend belum baru saja menjalankan Antigravity secara manual. */
+    suggestedAgentAction?: AgentIntentAction | null;
 }
 
 export type BotPersona = 'zannah' | 'rajendra' | 'kania';

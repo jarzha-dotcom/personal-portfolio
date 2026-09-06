@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
 import { ShowcaseBanner } from './components/ShowcaseBanner';
+import { PWAManager } from './components/PWAManager';
 import { ArrowUp } from 'lucide-react';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
@@ -117,6 +118,9 @@ export default function App() {
         setDarkMode={setDarkMode}
         onEasterEgg={handleEasterEgg}
       />
+
+      {/* PWA: service worker registration + install prompt / update toast */}
+      <PWAManager darkMode={darkMode} />
 
       {/* Main Sections Content — fokus penuh ke jasa development.
           Catatan: Experience (rekam jejak kerja) sengaja TIDAK ditampilkan

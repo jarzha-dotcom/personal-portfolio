@@ -15,6 +15,7 @@ import {
   MessageSquare,
   CheckCircle2,
   Zap,
+  ArrowRight,
 } from 'lucide-react';
 import { PROJECTS } from '../data/portfolioData';
 import { ProjectItem } from '../types';
@@ -26,10 +27,37 @@ interface ProjectsProps {
   darkMode: boolean;
 }
 
+// Cuplikan tanya-jawab yang dipakai buat mini-preview chat di card sidebar —
+// tujuannya kasih bukti visual "chatbot ini beneran hidup" sebelum diklik,
+// bukan cuma daftar fitur dalam teks.
+const CHAT_PREVIEW_PAIRS: { q: string; a: string }[] = [
+  { q: 'Skill utamanya apa?', a: 'React, TypeScript, dan integrasi Multi-LLM (Gemini + Antigravity).' },
+  { q: 'Berapa biaya bikin chatbot?', a: 'Mulai dari Rp 1,5 juta, termasuk voice & deployment.' },
+  { q: 'Bisa pakai suara?', a: 'Bisa — voice AI dua arah dengan STT + TTS.' },
+];
+const CHAT_PREVIEW_INTERVAL_MS = 3400;
+const CHAT_PREVIEW_FADE_MS = 300;
+
 export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeFilter, setActiveFilter] = useState<string>('Semua');
   const [activeModalProject, setActiveModalProject] = useState<ProjectItem | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
+  const [previewVisible, setPreviewVisible] = useState(true);
+
+  // Siklus mini-preview chat di card sidebar. Dijeda kalau modal chatbot lagi
+  // kebuka, biar nggak kerja sia-sia di belakang layar.
+  useEffect(() => {
+    if (isChatbotOpen) return;
+    const cycle = setInterval(() => {
+      setPreviewVisible(false);
+      window.setTimeout(() => {
+        setPreviewIndex((i) => (i + 1) % CHAT_PREVIEW_PAIRS.length);
+        setPreviewVisible(true);
+      }, CHAT_PREVIEW_FADE_MS);
+    }, CHAT_PREVIEW_INTERVAL_MS);
+    return () => clearInterval(cycle);
+  }, [isChatbotOpen]);
 
   const categories = ['Semua', ...Array.from(new Set(PROJECTS.map((p) => p.category)))];
   const filteredProjects =
@@ -214,13 +242,16 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
           {/* RIGHT: Sidebar (Chatbot + Jasa) — sticky di desktop */}
           <div className="md:col-span-4 order-last mt-5 md:mt-0">
             <div className="md:sticky md:top-24 space-y-4">
-              {/* 🤖 AI Chatbot Card */}
-              <div
-                className={`p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 cursor-pointer relative overflow-hidden ${darkMode
-                  ? 'bg-gradient-to-br from-slate-900 via-teal-950/40 to-slate-900 border-teal-700/50 hover:border-teal-500'
-                  : 'bg-gradient-to-br from-white via-teal-50 to-white border-teal-200 shadow-sm hover:shadow-md'
-                  }`}
+              {/* 🤖 AI Chatbot Card — <button> asli biar bisa difokus & dipicu keyboard, bukan div onClick */}
+              <button
+                type="button"
                 onClick={() => setIsChatbotOpen(true)}
+                aria-haspopup="dialog"
+                aria-label="Buka demo langsung AI Chatbot Portfolio"
+                className={`w-full text-left p-5 rounded-2xl border transition-all duration-200 hover:-translate-y-1 relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 ${darkMode
+                  ? 'bg-gradient-to-br from-slate-900 via-teal-950/40 to-slate-900 border-teal-700/50 hover:border-teal-500 focus-visible:ring-offset-slate-950'
+                  : 'bg-gradient-to-br from-white via-teal-50 to-white border-teal-200 shadow-sm hover:shadow-md focus-visible:ring-offset-slate-50'
+                  }`}
               >
                 <div className="absolute -top-16 -right-16 w-40 h-40 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -247,15 +278,49 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                 </div>
 
                 <h3
-                  className={`text-lg sm:text-xl font-bold tracking-tight mb-2 transition-colors ${darkMode ? 'text-white group-hover:text-teal-400' : 'text-slate-900 group-hover:text-teal-600'
-                    }`}
+                  className={`text-lg sm:text-xl font-bold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}
                 >
                   AI Chatbot Portfolio
                 </h3>
 
-                <p className={`text-xs sm:text-sm leading-relaxed mb-4 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                  Chatbot AI beneran yang ngerti konteks portofolio, didukung {AVAILABLE_MODELS.length} model AI dengan auto-failover. Terintegrasi serverless, aman, dan bisa dipilih modelnya langsung dari chat.
+                <p className={`text-xs sm:text-sm leading-relaxed mb-3 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                  Chatbot AI beneran yang ngerti konteks portofolio, didukung {AVAILABLE_MODELS.length} model AI dengan auto-failover. Coba tanya langsung, bukan cuma baca-baca.
                 </p>
+
+                {/* Mini preview chat yang bergantian — bukti visual chatbot ini "hidup", bukan sekadar daftar fitur */}
+                <div
+                  aria-hidden="true"
+                  className={`rounded-xl border p-2.5 mb-3 min-h-[76px] ${darkMode ? 'bg-slate-950/60 border-slate-700/70' : 'bg-white/70 border-teal-100'
+                    }`}
+                >
+                  <div
+                    className={`space-y-1.5 transition-opacity duration-300 ${previewVisible ? 'opacity-100' : 'opacity-0'
+                      }`}
+                  >
+                    <div className="flex justify-end">
+                      <span
+                        className={`text-[10.5px] px-2.5 py-1 rounded-lg rounded-tr-sm max-w-[85%] ${darkMode ? 'bg-slate-700 text-slate-100' : 'bg-slate-200 text-slate-800'
+                          }`}
+                      >
+                        {CHAT_PREVIEW_PAIRS[previewIndex].q}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-1.5">
+                      <div
+                        className={`w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${darkMode ? 'bg-teal-500/30' : 'bg-teal-200'
+                          }`}
+                      >
+                        <Bot className={`w-2.5 h-2.5 ${darkMode ? 'text-teal-300' : 'text-teal-700'}`} />
+                      </div>
+                      <span
+                        className={`text-[10.5px] px-2.5 py-1 rounded-lg rounded-tl-sm max-w-[85%] ${darkMode ? 'bg-teal-950/60 text-teal-100 border border-teal-800/60' : 'bg-teal-50 text-teal-900 border border-teal-100'
+                          }`}
+                      >
+                        {CHAT_PREVIEW_PAIRS[previewIndex].a}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                 <ul className="space-y-1 mb-4">
                   {[
@@ -274,7 +339,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   ))}
                 </ul>
 
-                <div className={`flex flex-wrap gap-1.5 pt-2 border-t ${darkMode ? 'border-slate-700' : 'border-slate-100'}`}>
+                <div className={`flex flex-wrap gap-1.5 pt-2 border-t mb-3 ${darkMode ? 'border-slate-700' : 'border-slate-100'}`}>
                   {['Multi-LLM', 'Vercel Serverless', 'React', 'TypeScript'].map((tech) => (
                     <span
                       key={tech}
@@ -290,7 +355,18 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     +1
                   </span>
                 </div>
-              </div>
+
+                {/* CTA eksplisit — sebelumnya cuma "klik card ini aja", sekarang jelas kelihatan sebagai ajakan bertindak */}
+                <div
+                  className={`flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold ${darkMode
+                    ? 'bg-teal-500/15 text-teal-300'
+                    : 'bg-teal-600/10 text-teal-700'
+                    }`}
+                >
+                  <span>Coba Sekarang</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </button>
 
               {/* 💼 Jasa Chatbot Card (manfaatkan space kosong) */}
               <div

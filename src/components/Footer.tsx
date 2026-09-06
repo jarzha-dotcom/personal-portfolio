@@ -28,9 +28,11 @@ export const Footer: React.FC = () => {
           {/* Col 1: Brand & Bio */}
           <div className="md:col-span-5 space-y-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center text-slate-950 font-black text-sm">
-                {PERSONAL_INFO.initials}
-              </div>
+              <img
+                src="/icons/icon-512.png"
+                alt={PERSONAL_INFO.name}
+                className="w-8 h-8 rounded-lg object-cover"
+              />
               <div>
                 <h3 className="font-bold text-sm text-white">
                   {PERSONAL_INFO.name}

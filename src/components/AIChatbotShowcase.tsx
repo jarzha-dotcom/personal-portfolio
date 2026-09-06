@@ -22,9 +22,21 @@ import {
     Paperclip,
     X,
     FileText,
+    Plus,
+    History,
 } from 'lucide-react';
 import { sendMessageToGemini, ChatMessage, AgentStep } from '../services/geminiService';
-import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory, clearChatStorage } from '../utils/chatStorage';
+import {
+    createConversation,
+    getActiveConversationId,
+    setActiveConversationId,
+    loadConversation,
+    saveConversation,
+    listConversations,
+    deleteConversation,
+    deriveConversationTitleFromRoleContent,
+    StoredConversation,
+} from '../utils/chatStorage';
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
 import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
@@ -45,10 +57,11 @@ const LOADING_STATUSES = [
     'Menyempurnakan detail...',
 ];
 
-// Mirror kasar dari heuristic backend (shouldUseAgent di chat.ts) — dipakai
-// CUMA untuk memutuskan copy loading indicator ("mungkin agak lama...") saat
-// mengirim, bukan keputusan final. Backend tetap yang menentukan apakah
-// Antigravity beneran dipanggil.
+// Mirror kasar dari heuristic backend (AGENT_INTENT_PATTERNS di chat.ts) —
+// dipakai CUMA untuk memutuskan copy loading indicator ("mungkin agak
+// lama...") saat mengirim. Ini murni kosmetik lokal, TIDAK menentukan apakah
+// Antigravity beneran dipanggil — backend sekarang hanya memanggil Antigravity
+// kalau agentMode dikirim eksplisit (forceAgent, lihat handleSend).
 const AGENT_HINT_PATTERNS: RegExp[] = [
     /\b(cari|riset|research)\b.{0,20}\b(terbaru|kompetitor|tren|data|harga\s*pasar)\b/i,
     /\b(jalankan|eksekusi|run|coba)\b.{0,20}\b(kode|code|script|fungsi)\b/i,
@@ -67,11 +80,11 @@ interface ModelOption {
     desc: string;
 }
 
-// Antigravity BUKAN default lagi (lihat chat.ts: backend cuma memicunya untuk
-// heuristic riset/kode, atau kalau agentMode dikirim eksplisit). Memilihnya di
-// sini otomatis mengirim agentMode: true (lihat handleSend) — jadi pilihan ini
-// beneran memaksa Antigravity dipakai, bukan sekadar label yang diabaikan
-// backend seperti sebelumnya.
+// Antigravity BUKAN default (lihat chat.ts: backend HANYA memicunya kalau
+// agentMode dikirim eksplisit — baik dari memilih model ini di dropdown,
+// maupun dari tombol "🧪 Buktikan Sekarang" yang muncul saat backend
+// menyarankan mode Live Demo lewat suggestedAgentAction). Backend tidak
+// pernah lagi meng-auto-invoke Antigravity dari heuristic semata.
 const ANTIGRAVITY_MODEL_ID = 'antigravity-preview-05-2026';
 
 export const AVAILABLE_MODELS: ModelOption[] = [
@@ -82,7 +95,7 @@ export const AVAILABLE_MODELS: ModelOption[] = [
     { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
     { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Reasoning mendalam' },
     { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
-    { id: ANTIGRAVITY_MODEL_ID, label: 'Antigravity Agent 🧪', desc: 'Paksa mode riset/eksekusi kode (lebih lambat, ~10-15 detik)' },
+    { id: ANTIGRAVITY_MODEL_ID, label: 'Antigravity Agent 🧪', desc: 'Live Demo — tulis & jalankan kode kecil buat buktikan ide (lebih lambat, ~10-15 detik)' },
 ];
 
 interface AIChatbotShowcaseProps {
@@ -126,6 +139,10 @@ interface DisplayMessage {
     uploadedFiles?: PendingFile[];
     /** File hasil kerja Antigravity yang bisa didownload (mis. RAB.xlsx, laporan.pdf) */
     attachments?: Attachment[];
+    /** True kalau backend mendeteksi pertanyaan ini feasibility-check ("bisa
+     * gak bikin X?") dan menyarankan (BUKAN memaksa) mode Live Demo Antigravity
+     * — dipakai buat nampilin tombol "🧪 Buktikan Sekarang" di bawah balasan ini. */
+    suggestedLiveDemo?: boolean;
 }
 
 interface StarterCard {
@@ -332,12 +349,21 @@ const renderRichMarkdown = (content: string, darkMode: boolean) => {
     });
 };
 
+// Karakter penutup umum (tanda kurung/kutip/tanda baca) yang sering nempel di
+// akhir URL mentah dalam kalimat, mis. "(https://wa.me/xxx)" atau "cek: https://x.com."
+// — ini bukan bagian dari URL, jadi dipisah lagi setelah match.
+const stripTrailingPunctuation = (url: string): { clean: string; trailing: string } => {
+    const match = /[).,;:!?\]'"]+$/.exec(url);
+    if (!match) return { clean: url, trailing: '' };
+    return { clean: url.slice(0, match.index), trailing: match[0] };
+};
+
 const renderInlineFormattedText = (text: string, darkMode: boolean): React.ReactNode => {
     if (!text) return null;
 
-    // Tokenize bold (**...**), code (`...`), and italic (*...*)
+    // Tokenize bold (**...**), code (`...`), italic (*...*), dan URL mentah (https://...)
     const parts: React.ReactNode[] = [];
-    const regex = /(\*\*.*?\*\*|`.*?`|\*.*?\*)/g;
+    const regex = /(\*\*.*?\*\*|`.*?`|\*.*?\*|https?:\/\/[^\s<>"')\]]+)/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
@@ -365,6 +391,21 @@ const renderInlineFormattedText = (text: string, darkMode: boolean): React.React
                     {raw.slice(1, -1)}
                 </code>
             );
+        } else if (raw.startsWith('http://') || raw.startsWith('https://')) {
+            const { clean, trailing } = stripTrailingPunctuation(raw);
+            parts.push(
+                <a
+                    key={match.index}
+                    href={clean}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`underline break-all font-medium ${darkMode ? 'text-teal-300 hover:text-teal-200' : 'text-teal-600 hover:text-teal-700'
+                        }`}
+                >
+                    {clean}
+                </a>
+            );
+            if (trailing) parts.push(trailing);
         } else if (raw.startsWith('*') && raw.endsWith('*')) {
             parts.push(
                 <em key={match.index} className="italic opacity-90">
@@ -425,23 +466,28 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     const [uploadError, setUploadError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const [messages, setMessages] = useState<DisplayMessage[]>(() => {
-        const saved = loadMessages<DisplayMessage>('showcase');
-        if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
-        return [
-            {
-                id: 'welcome',
-                role: 'assistant',
-                content:
-                    `Hai! 👋 Nama saya **Rajendra**, AI Portfolio Assistant. Saya siap menjawab pertanyaan seputar developer ini — skill, proyek, jasa, hingga cara kerjasama. Ini demo live, langsung dijawab AI! 🚀`,
-                timestamp: nowTimeStr(),
-            },
-        ];
+    const buildWelcomeMessage = (): DisplayMessage => ({
+        id: 'welcome',
+        role: 'assistant',
+        content:
+            `Hai! 👋 Nama saya **Rajendra**, AI Portfolio Assistant. Saya siap menjawab pertanyaan seputar developer ini — skill, proyek, jasa, hingga cara kerjasama. Ini demo live, langsung dijawab AI! 🚀`,
+        timestamp: nowTimeStr(),
     });
 
-    const [history, setHistory] = useState<ChatMessage[]>(() =>
-        loadGeminiHistory<ChatMessage>('showcase').slice(-MAX_HISTORY_TURNS)
-    );
+    // Messages & history diisi welcome/kosong dulu (sinkron); isi asli
+    // percakapan yang tersimpan dimuat belakangan dari IndexedDB (async)
+    // lewat effect di bawah, karena IndexedDB nggak bisa dibaca secara sinkron.
+    const [messages, setMessages] = useState<DisplayMessage[]>(() => [buildWelcomeMessage()]);
+    const [history, setHistory] = useState<ChatMessage[]>([]);
+    // id percakapan yang lagi aktif di IndexedDB. Auto-save ditahan sampai
+    // isStorageReady true, biar nggak menimpa data tersimpan dengan welcome
+    // msg kosong sebelum load awal selesai.
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const [isStorageReady, setIsStorageReady] = useState(false);
+    // Jendela riwayat percakapan (dibuka lewat klik avatar Rajendra)
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [historyList, setHistoryList] = useState<StoredConversation<DisplayMessage>[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -470,27 +516,120 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     // client-side, keputusan final tetap di backend).
     const [loadingHint, setLoadingHint] = useState<'normal' | 'maybe-agent'>('normal');
 
+    // ── Muat percakapan aktif dari IndexedDB sekali saat komponen pertama mount ──
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const id = await getActiveConversationId('showcase');
+            const conv = await loadConversation<DisplayMessage, ChatMessage>(id);
+            if (cancelled) return;
+
+            if (conv && conv.messages.length > 0) {
+                setMessages(conv.messages.slice(-MAX_DISPLAY_MESSAGES));
+                // Penting: history Gemini di-slice(-MAX_HISTORY_TURNS) lagi di
+                // sini — sama seperti batas yang dipakai tiap kirim pesan — jadi
+                // begitu percakapan lama dibuka lagi, AI tetap "ingat" konteksnya.
+                setHistory((conv.geminiHistory ?? []).slice(-MAX_HISTORY_TURNS));
+            } else {
+                setMessages([buildWelcomeMessage()]);
+                setHistory([]);
+            }
+            setConversationId(id);
+            setIsStorageReady(true);
+        })();
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    /** Mulai percakapan baru: bikin record IndexedDB baru & jadikan aktif. */
+    const startNewChat = useCallback(async () => {
+        if (isLoading || isStreaming) return;
+        stopAll();
+        const welcome: DisplayMessage = {
+            id: generateMessageId('welcome-reset'),
+            role: 'assistant',
+            content: `Percakapan direset. Saya **Rajendra** siap lagi! Pilih topik atau ketik pertanyaanmu 😊`,
+            timestamp: nowTimeStr(),
+        };
+        const created = await createConversation<DisplayMessage>('showcase', [welcome]);
+        setMessages([welcome]);
+        setHistory([]);
+        setConversationId(created.id);
+        setLastUserMessage('');
+        setIsHistoryOpen(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isLoading, isStreaming]);
+
+    /** Buka salah satu percakapan lama dari daftar riwayat. */
+    const openConversationById = useCallback(async (id: string) => {
+        const conv = await loadConversation<DisplayMessage, ChatMessage>(id);
+        if (!conv) return;
+        setMessages(conv.messages.length > 0 ? conv.messages.slice(-MAX_DISPLAY_MESSAGES) : [buildWelcomeMessage()]);
+        // Sama seperti saat load awal: slice ulang supaya AI tetap ingat
+        // konteks obrolan lama ini, bukan dianggap chat baru.
+        setHistory((conv.geminiHistory ?? []).slice(-MAX_HISTORY_TURNS));
+        setConversationId(id);
+        await setActiveConversationId('showcase', id);
+        setLastUserMessage('');
+        setIsHistoryOpen(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    /** Buka jendela riwayat & muat daftar percakapan tersimpan. */
+    const openHistoryPanel = useCallback(async () => {
+        setIsHistoryOpen(true);
+        setIsHistoryLoading(true);
+        const list = await listConversations<DisplayMessage>('showcase');
+        setHistoryList(list);
+        setIsHistoryLoading(false);
+    }, []);
+
+    /** Hapus satu percakapan dari riwayat (tanpa membuka percakapan itu dulu). */
+    const handleDeleteConversation = useCallback(
+        async (id: string, e: React.MouseEvent) => {
+            e.stopPropagation();
+            await deleteConversation(id);
+            setHistoryList((prev) => prev.filter((c) => c.id !== id));
+            if (id === conversationId) {
+                await startNewChat();
+            }
+        },
+        [conversationId, startNewChat]
+    );
+
     // Auto-scroll ke pesan terbaru
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isLoading, isStreaming]);
 
-    // Debounced auto-save messages ke localStorage
+    // Debounced auto-save messages ke IndexedDB. Ditahan sampai
+    // isStorageReady true, biar nggak menimpa percakapan tersimpan dengan
+    // welcome msg kosong sebelum load awal (async) selesai.
     useEffect(() => {
-        if (isStreaming) return;
+        if (isStreaming || !isStorageReady || !conversationId) return;
         const timer = setTimeout(() => {
-            saveMessages('showcase', messages.slice(-MAX_DISPLAY_MESSAGES));
+            const trimmed = messages.slice(-MAX_DISPLAY_MESSAGES);
+            saveConversation<DisplayMessage, ChatMessage>(conversationId, 'showcase', {
+                messages: trimmed,
+                title: deriveConversationTitleFromRoleContent(trimmed),
+            });
         }, 400);
         return () => clearTimeout(timer);
-    }, [messages, isStreaming]);
+    }, [messages, isStreaming, isStorageReady, conversationId]);
 
-    // Debounced auto-save Gemini history ke sessionStorage
+    // Debounced auto-save Gemini history ke IndexedDB, terikat ke percakapan
+    // yang lagi aktif — jadi kalau percakapan ini dibuka lagi nanti, AI tetap ingat.
     useEffect(() => {
+        if (!isStorageReady || !conversationId) return;
         const timer = setTimeout(() => {
-            saveGeminiHistory('showcase', history.slice(-MAX_HISTORY_TURNS));
+            saveConversation<DisplayMessage, ChatMessage>(conversationId, 'showcase', {
+                geminiHistory: history.slice(-MAX_HISTORY_TURNS),
+            });
         }, 400);
         return () => clearTimeout(timer);
-    }, [history]);
+    }, [history, isStorageReady, conversationId]);
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -627,7 +766,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         }
     };
 
-    const handleSend = async (textOverride?: string, isFromVoice = false) => {
+    const handleSend = async (textOverride?: string, isFromVoice = false, forceAgentOverride?: boolean) => {
         const rawText = (textOverride ?? input).trim();
         if ((!rawText && pendingFiles.length === 0) || isLoading || isStreaming) return;
         // Kalau user cuma lampirin file tanpa nulis apa-apa, kasih caption default
@@ -655,12 +794,13 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         try {
             const currentHistory = history.slice(-MAX_HISTORY_TURNS);
             const t0 = performance.now();
-            // Kalau user pilih "Antigravity Agent" secara eksplisit di dropdown,
-            // itu bukan nama model buat cascade Gemini biasa — kirim sebagai
-            // agentMode: true supaya backend beneran memaksa panggil Antigravity
-            // (lihat gating wantsAgent di chat.ts), bukan model biasa yang
-            // parameternya akan diabaikan.
-            const forceAgent = selectedModel === ANTIGRAVITY_MODEL_ID;
+            // Kalau user pilih "Antigravity Agent" secara eksplisit di dropdown
+            // ATAU klik tombol "🧪 Buktikan Sekarang" (forceAgentOverride, lihat
+            // handleTryLiveDemo), itu bukan nama model buat cascade Gemini biasa
+            // — kirim sebagai agentMode: true supaya backend beneran memaksa
+            // panggil Antigravity (lihat gating wantsAgent di chat.ts), bukan
+            // model biasa yang parameternya akan diabaikan.
+            const forceAgent = forceAgentOverride ?? (selectedModel === ANTIGRAVITY_MODEL_ID);
             const result = await sendMessageToGemini(
                 currentHistory,
                 text,
@@ -723,6 +863,11 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                     timestamp: nowTimeStr(),
                     isStreaming: true,
                     attachments: result.attachments && result.attachments.length > 0 ? result.attachments : undefined,
+                    // Backend cuma nempelin suggestedAgentAction di balasan Gemini
+                    // biasa (bukan pas usedAgent true) — jadi ini aman dibaca di
+                    // cabang else ini. Tombol "🧪 Buktikan Sekarang" muncul di
+                    // JSX kalau flag ini true (lihat handleTryLiveDemo).
+                    suggestedLiveDemo: result.suggestedAgentAction === 'live_demo',
                 };
                 setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), assistantMsg]);
                 setIsLoading(false);
@@ -771,6 +916,22 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         }
     };
 
+    // ── Live Demo opt-in (ide "proof-of-concept on-the-spot") ────────────────
+    // Dipicu HANYA lewat klik tombol "🧪 Buktikan Sekarang" yang muncul saat
+    // backend menyarankan suggestedAgentAction === 'live_demo' (pertanyaan
+    // feasibility, mis. "bisa gak bikin fitur X?"). Backend TIDAK PERNAH
+    // memanggil Antigravity sendiri dari saran ini — user yang mutusin,
+    // persis pola opt-in yang sama dengan tombol agent di ChatWidget (Zannah).
+    // Kirim ulang pertanyaan terakhir user APA ADANYA (gak ditempeli instruksi
+    // tambahan di bubble-nya) — cukup forceAgent: true, karena system prompt
+    // Rajendra (bagian "MODE LIVE DEMO" di chat.ts) sudah mengarahkan
+    // Antigravity buat coba tulis & jalankan proof-of-concept begitu dia aktif.
+    const handleTryLiveDemo = () => {
+        if (!lastUserMessage || isLoading || isStreaming) return;
+        setSelectedModel(ANTIGRAVITY_MODEL_ID); // dropdown ikut nunjukin mode yang lagi aktif
+        handleSend(lastUserMessage, false, true);
+    };
+
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -778,23 +939,10 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         }
     };
 
-    const handleReset = () => {
-        if (isLoading || isStreaming) return;
-
-        stopAll();
-
-        clearChatStorage('showcase');
-        setMessages([
-            {
-                id: generateMessageId('welcome-reset'),
-                role: 'assistant',
-                content: `Percakapan direset. Saya **Rajendra** siap lagi! Pilih topik atau ketik pertanyaanmu 😊`,
-                timestamp: nowTimeStr(),
-            },
-        ]);
-        setHistory([]);
-        setLastUserMessage('');
-    };
+    // Catatan: "Reset percakapan" lama (handleReset) sudah digantikan
+    // startNewChat() di atas — sekarang bikin record percakapan BARU di
+    // IndexedDB (bukan menghapus satu-satunya record), jadi obrolan lama
+    // tetap bisa dibuka lagi lewat jendela Riwayat.
 
     // ── Copy Message Action ──────────────────────────────────────────────────
     const handleCopy = (messageId: string, text: string) => {
@@ -835,7 +983,13 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                     }`}
             >
                 <div className="flex items-center gap-2.5">
-                    <div className="relative">
+                    <button
+                        type="button"
+                        onClick={openHistoryPanel}
+                        aria-label="Lihat riwayat obrolan tersimpan"
+                        title="Lihat riwayat obrolan tersimpan"
+                        className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-teal-400 shrink-0"
+                    >
                         {/* Avatar Rajendra — gradien biru-teal, inisial RJ */}
                         <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-extrabold bg-gradient-to-br from-blue-500 via-teal-500 to-emerald-500 shadow-md shadow-teal-900/30 ring-2 ring-teal-500/20 tracking-tight">
                             {SHOWCASE_BOT_INITIALS}
@@ -844,7 +998,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 ${darkMode ? 'border-slate-800' : 'border-white'
                                 }`}
                         />
-                    </div>
+                    </button>
                     <div>
                         <div className="flex items-center gap-1.5">
                             <h4 className={`text-sm font-bold leading-tight ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -895,17 +1049,115 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                     </button>
 
                     <button
-                        onClick={handleReset}
-                        title="Reset percakapan"
+                        onClick={startNewChat}
+                        title="Mulai obrolan baru"
                         className={`p-1.5 rounded-lg transition-colors ${darkMode
                             ? 'text-slate-400 hover:text-white hover:bg-slate-700/60'
                             : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
                             }`}
                     >
-                        <Trash2 className="w-4 h-4" />
+                        <Plus className="w-4 h-4" />
                     </button>
                 </div>
             </div>
+
+            {/* Jendela Riwayat Percakapan — overlay penuh di dalam kartu chat,
+                dibuka lewat klik avatar Rajendra di header. */}
+            {isHistoryOpen && (
+                <div className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                    <div
+                        className={`px-4 py-2.5 border-b flex items-center justify-between flex-shrink-0 ${darkMode ? 'border-slate-700/80 bg-slate-800/80' : 'border-slate-200 bg-slate-50/90'
+                            }`}
+                    >
+                        <div className="flex items-center gap-1.5">
+                            <History className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
+                            <h4 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                Riwayat Obrolan
+                            </h4>
+                        </div>
+                        <button
+                            type="button"
+                            aria-label="Tutup riwayat obrolan"
+                            onClick={() => setIsHistoryOpen(false)}
+                            className={`p-1.5 rounded-lg transition-colors ${darkMode
+                                ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                                }`}
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+
+                    <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                        {isHistoryLoading && (
+                            <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Memuat riwayat...
+                            </p>
+                        )}
+                        {!isHistoryLoading && historyList.length === 0 && (
+                            <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                Belum ada obrolan tersimpan.
+                            </p>
+                        )}
+                        {!isHistoryLoading &&
+                            historyList.map((conv) => (
+                                <button
+                                    key={conv.id}
+                                    type="button"
+                                    onClick={() => openConversationById(conv.id)}
+                                    className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${conv.id === conversationId
+                                        ? darkMode
+                                            ? 'border-teal-500 bg-teal-950/30'
+                                            : 'border-teal-400 bg-teal-50'
+                                        : darkMode
+                                            ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                                            : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                                        }`}
+                                >
+                                    <div className="min-w-0">
+                                        <p className={`text-xs font-semibold truncate ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                            {conv.title || 'Obrolan Baru'}
+                                        </p>
+                                        <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                            {new Date(conv.updatedAt).toLocaleString('id-ID', {
+                                                day: '2-digit',
+                                                month: 'short',
+                                                hour: '2-digit',
+                                                minute: '2-digit',
+                                            })}
+                                        </p>
+                                    </div>
+                                    <span
+                                        role="button"
+                                        tabIndex={0}
+                                        onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') handleDeleteConversation(conv.id, e as unknown as React.MouseEvent);
+                                        }}
+                                        aria-label="Hapus obrolan ini"
+                                        title="Hapus obrolan ini"
+                                        className={`shrink-0 p-1 rounded-lg transition-colors ${darkMode
+                                            ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
+                                            : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+                                            }`}
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                    </span>
+                                </button>
+                            ))}
+                    </div>
+
+                    <div className={`p-2.5 border-t ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                        <button
+                            type="button"
+                            onClick={startNewChat}
+                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors bg-teal-600 hover:bg-teal-700"
+                        >
+                            <Plus className="w-3.5 h-3.5" /> Obrolan Baru
+                        </button>
+                    </div>
+                </div>
+            )}
 
             {/* Messages Area */}
             <div
@@ -977,7 +1229,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                     <>
                                         {msg.role === 'assistant' && !msg.isError && !msg.isRateLimit
                                             ? renderRichMarkdown(msg.content, darkMode)
-                                            : <span>{msg.content}</span>}
+                                            : <span>{renderInlineFormattedText(msg.content, darkMode)}</span>}
 
                                         {msg.isStreaming && (
                                             <span className="inline-block w-1.5 h-3.5 ml-0.5 align-middle bg-teal-400 animate-pulse" />
@@ -1027,6 +1279,25 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                             {att.name}
                                         </button>
                                     ))}
+                                </div>
+                            )}
+
+                            {/* Saran opt-in "Live Demo" — HANYA tombol, backend gak pernah
+                                auto-invoke Antigravity dari saran ini. Muncul di balasan Gemini
+                                biasa saat backend mendeteksi pertanyaan feasibility. */}
+                            {msg.suggestedLiveDemo && !isLoading && !isStreaming && (
+                                <div className="mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={handleTryLiveDemo}
+                                        className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${darkMode
+                                            ? 'bg-purple-500/10 border-purple-500/30 text-purple-300 hover:bg-purple-500/20'
+                                            : 'bg-purple-50 border-purple-300 text-purple-700 hover:bg-purple-100'
+                                            }`}
+                                    >
+                                        <Sparkles className="w-3 h-3" />
+                                        🧪 Buktikan Sekarang — Live Demo
+                                    </button>
                                 </div>
                             )}
 
@@ -1282,22 +1553,22 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             </div>
                         )}
                     </div>
-                    {/* Dua indikator terpisah:
-                        (a) Antigravity ke-trigger otomatis oleh heuristic walau user pilih
-                            model Gemini biasa — bukan fallback, tapi upgrade sementara,
-                            jadi dropdown TIDAK ikut pindah ke Antigravity.
-                        (b) Model pilihan user gagal/limit → backend fallback ke Gemini lain.
-                            Untuk kasus ini dropdown-nya SENDIRI ikut pindah (lihat handleSend,
-                            setSelectedModel(result.model)) supaya user gak nyoba model yang
-                            lagi limit berulang-ulang tiap kirim pesan baru. Badge di sini
-                            cuma nunjukin ALASANNYA kenapa dropdown tiba-tiba beda dari yang
-                            terakhir dipilih user. */}
-                    {activeModel === ANTIGRAVITY_MODEL_ID && activeModel !== selectedModel && (
+                    {/* Catatan: badge "auto-agent" yang dulu ada di sini (untuk kasus
+                        Antigravity ke-trigger otomatis oleh heuristic walau dropdown
+                        masih di model Gemini biasa) sudah dihapus — backend sekarang
+                        TIDAK PERNAH lagi memanggil Antigravity dari heuristik semata
+                        (lihat chat.ts: detectAgentIntent cuma dipakai buat saran
+                        suggestedAgentAction / tombol "🧪 Buktikan Sekarang", bukan
+                        buat auto-invoke). Diganti badge konfirmasi yang jujur: cuma
+                        tampil kalau Live Demo BENERAN lagi aktif (activeModel sudah
+                        dikonfirmasi backend, bukan cuma pilihan dropdown yang belum
+                        tentu berhasil). */}
+                    {activeModel === ANTIGRAVITY_MODEL_ID && (
                         <span
-                            title="Pertanyaan ini terdeteksi butuh riset/eksekusi kode, jadi otomatis dijawab Antigravity Agent"
+                            title="Balasan berikutnya dijawab lewat Antigravity Agent (Live Demo)"
                             className={`text-[9px] italic ${darkMode ? 'text-purple-300/80' : 'text-purple-600'}`}
                         >
-                            🧪 auto-agent
+                            🧪 Live Demo aktif
                         </span>
                     )}
                     {fallbackFrom && fallbackFrom !== selectedModel && (

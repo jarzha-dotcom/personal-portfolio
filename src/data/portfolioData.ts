@@ -28,7 +28,7 @@ export const CONTACT_INFO: ContactInfo = {
 export const EXPERIENCES: ExperienceItem[] = [
   {
     id: 'exp-1',
-    company: 'PT Global Multipart',
+    company: 'PT Global Multiparts',
     period: 'Agustus 2019 - Sekarang',
     location: 'Kab. Bekasi, Jawa Barat',
     type: 'Full-time / Korporat',

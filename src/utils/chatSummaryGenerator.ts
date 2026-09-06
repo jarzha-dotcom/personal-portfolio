@@ -129,6 +129,61 @@ export function downloadChatSummaryFile(
 }
 
 /**
+ * Cek apakah browser saat ini bisa share file lewat native share-sheet
+ * (Web Share API Level 2 — didukung mayoritas browser mobile: Chrome/Samsung
+ * Internet di Android sejak lama, Safari di iOS sejak versi 12.2+. Desktop
+ * masih inkonsisten, jadi ini dipakai sebagai enhancement, BUKAN pengganti
+ * tombol download biasa).
+ */
+export function canShareChatSummary(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  if (typeof navigator.share !== 'function' || typeof navigator.canShare !== 'function') return false;
+  try {
+    const testFile = new File(['test'], 'test.txt', { type: 'text/plain' });
+    return navigator.canShare({ files: [testFile] });
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Bagikan file rangkuman lewat native share-sheet device (Web Share API),
+ * supaya user bisa langsung pilih WhatsApp dan filenya otomatis nempel di
+ * draft pesan — dibanding harus download dulu lalu attach manual satu-satu.
+ * Fallback ke `downloadChatSummaryFile` di pemanggil kalau ini return
+ * 'unsupported' (mis. di desktop browser yang belum dukung file sharing).
+ */
+export async function shareChatSummaryFile(
+  messages: ChatSummaryMessage[],
+  botName: string = 'Rajendra'
+): Promise<'shared' | 'unsupported' | 'cancelled' | 'error'> {
+  if (typeof window === 'undefined' || !messages || messages.length === 0) return 'error';
+
+  if (!canShareChatSummary()) return 'unsupported';
+
+  try {
+    const summaryText = buildChatSummaryText(messages, botName);
+    const dateSlug = new Date().toISOString().slice(0, 10);
+    const filename = `Rangkuman-Diskusi-${botName}-${dateSlug}.txt`;
+    const file = new File([summaryText], filename, { type: 'text/plain;charset=utf-8' });
+
+    if (!navigator.canShare({ files: [file] })) return 'unsupported';
+
+    await navigator.share({
+      files: [file],
+      title: `Rangkuman Diskusi - ${botName}`,
+      text: 'Rangkuman diskusi proyek dari website portofolio K. Arzhaning Jagad (Arzha).',
+    });
+    return 'shared';
+  } catch (error: unknown) {
+    // AbortError = user nutup share-sheet tanpa milih target, ini bukan error
+    if (error instanceof Error && error.name === 'AbortError') return 'cancelled';
+    console.error('Gagal membagikan file rangkuman chat:', error);
+    return 'error';
+  }
+}
+
+/**
  * Buat URL WhatsApp langsung dengan ringkasan singkat dari percakapan
  */
 export function createWhatsAppSummaryUrl(

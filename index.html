@@ -50,6 +50,16 @@
   <link rel="manifest" href="/manifest.json" />
 
   <!--
+      iOS PWA support — Safari tidak membaca manifest.json sepenuhnya (nggak
+      ada beforeinstallprompt, status bar diatur terpisah), jadi butuh meta
+      tag manual ini supaya "Add to Home Screen" hasilnya rapi seperti app.
+  -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Arzhaning Jagad" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!--
       Preload gambar profil (LCP kandidat utama di Hero). GANTI src di
       bawah dengan path asli file gambar profil setelah build (contoh:
       /assets/profile-abc123.webp) — path bergantung nama file hasil

@@ -1,20 +1,40 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2 } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
-import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile } from '../services/geminiService';
-import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
+import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile, AgentIntentAction } from '../services/geminiService';
+import {
+  createConversation,
+  getActiveConversationId,
+  setActiveConversationId,
+  loadConversation,
+  saveConversation,
+  listConversations,
+  deleteConversation,
+  deriveConversationTitle,
+  StoredConversation,
+} from '../utils/chatStorage';
 import { BOT_VOICES } from '../services/voiceService';
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
-import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
+import { downloadChatSummaryFile, shareChatSummaryFile, canShareChatSummary } from '../utils/chatSummaryGenerator';
 
 const ZANNAH_LOADING_STATUSES = [
   'Menyiapkan respon...',
   'Menganalisis kebutuhan Kakak...',
   'Menyusun rekomendasi solutif...',
   'Menyempurnakan detail jawaban...',
+];
+
+// Status khusus saat Antigravity Agent lagi jalan (dipicu opt-in lewat tombol
+// aksi agent — estimasi biaya, riset pasar, analisis file). Lebih jujur soal
+// prosesnya lebih berat & makan waktu lebih lama dari balasan teks biasa.
+const AGENT_LOADING_STATUSES = [
+  '🤖 Menjalankan AI Agent...',
+  '🔎 Mengumpulkan & menyusun data...',
+  '📊 Menyiapkan file hasil kerja...',
+  '✍️ Merangkum hasil analisis...',
 ];
 
 interface ChatWidgetProps {
@@ -277,6 +297,15 @@ const typingDelay = (text: string) =>
 
 const WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label: c.label }));
 
+const buildWelcomeMessage = (): Message => ({
+  id: 'welcome',
+  sender: 'bot',
+  text: 'Halo! Saya Zannah, asisten Arzha 👋 Mau nanya soal apa? Pilih kategori atau langsung ketik aja!',
+  timestamp: nowStr(),
+  options: WELCOME_OPTIONS,
+  isAI: true,
+});
+
 const generateMessageId = (prefix = 'msg'): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return `${prefix}-${crypto.randomUUID()}`;
@@ -319,7 +348,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  // True selama request yang sedang berjalan dipicu lewat tombol aksi AI
+  // Agent (opt-in) — dipakai buat nunjukkin status loading yang lebih jujur
+  // ("menjalankan agent...") dibanding status generik balasan teks biasa.
+  const [isAgentBusy, setIsAgentBusy] = useState(false);
   const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
+  const [shareSummaryState, setShareSummaryState] = useState<'idle' | 'sharing' | 'shared' | 'error'>('idle');
+  // Dicek sekali per mount (bukan tiap render) — kapabilitas Web Share API
+  // (File sharing) gak berubah selama sesi browser berjalan.
+  const [canShareSummary] = useState<boolean>(() => canShareChatSummary());
   const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
   const [activeModel, setActiveModel] = useState<string>('');
   const isRadit = aiMode === 'fallback';
@@ -329,33 +366,36 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       setLoadingTextIndex(0);
       return;
     }
+    const statusCount = isAgentBusy ? AGENT_LOADING_STATUSES.length : ZANNAH_LOADING_STATUSES.length;
     const interval = setInterval(() => {
-      setLoadingTextIndex((prev) => (prev + 1) % ZANNAH_LOADING_STATUSES.length);
+      setLoadingTextIndex((prev) => (prev + 1) % statusCount);
     }, 2200);
     return () => clearInterval(interval);
-  }, [isTyping]);
+  }, [isTyping, isAgentBusy]);
 
-  // Inisialisasi messages dari localStorage (atau welcome msg jika belum ada)
-  const [messages, setMessages] = useState<Message[]>(() => {
-    const saved = loadMessages<Message>('zannah');
-    if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
-    return [
-      {
-        id: 'welcome',
-        sender: 'bot',
-        text: 'Halo! Saya Zannah, asisten Arzha 👋 Mau nanya soal apa? Pilih kategori atau langsung ketik aja!',
-        timestamp: nowStr(),
-        options: WELCOME_OPTIONS,
-        isAI: true,
-      },
-    ];
-  });
+  // Inisialisasi messages dengan welcome msg dulu (sinkron); isi asli
+  // percakapan yang tersimpan dimuat belakangan dari IndexedDB (async) lewat
+  // effect di bawah, karena IndexedDB nggak bisa dibaca secara sinkron.
+  const [messages, setMessages] = useState<Message[]>(() => [buildWelcomeMessage()]);
+  // id percakapan yang lagi aktif di IndexedDB. null selama proses load awal
+  // berlangsung — dipakai buat menahan auto-save biar nggak menimpa data
+  // tersimpan dengan welcome msg kosong sebelum load selesai.
+  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [isStorageReady, setIsStorageReady] = useState(false);
+  // Jendela riwayat percakapan (dibuka lewat klik avatar bot)
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [historyList, setHistoryList] = useState<StoredConversation<Message>[]>([]);
+  const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastQueryRef = useRef<string>('');
+  // File terakhir yang diupload user (kalau ada) — dipakai buat tombol aksi
+  // "Analisis Lebih Dalam pakai AI Agent" yang perlu ngirim ulang file yang
+  // sama tanpa user harus upload lagi.
+  const lastFilesRef = useRef<OutgoingFile[] | undefined>(undefined);
 
   // Helper terpusat untuk menambah pesan baru ke state, sekaligus menjaga
   // batas MAX_DISPLAY_MESSAGES. Sebelumnya pola
@@ -371,6 +411,27 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     if (ok) {
       setDownloadSummarySuccess(true);
       setTimeout(() => setDownloadSummarySuccess(false), 3000);
+    }
+  };
+
+  // Share rangkuman langsung ke WhatsApp (atau target lain) lewat native
+  // share-sheet HP — cuma tersedia kalau browser dukung File di Web Share API
+  // (lihat canShareChatSummary()). Kalau ternyata gagal/unsupported pas
+  // dipanggil (mis. env berubah), fallback diam-diam ke download biasa.
+  const handleShareSummary = async () => {
+    const botName = isRadit ? 'Radit' : 'Zannah';
+    setShareSummaryState('sharing');
+    const result = await shareChatSummaryFile(messages, botName);
+    if (result === 'shared') {
+      setShareSummaryState('shared');
+      setTimeout(() => setShareSummaryState('idle'), 3000);
+    } else if (result === 'cancelled') {
+      setShareSummaryState('idle');
+    } else {
+      // 'unsupported' atau 'error' — fallback ke download manual biar user
+      // tetap dapet filenya walau share-sheet gagal/gak didukung.
+      setShareSummaryState('idle');
+      handleDownloadSummary();
     }
   };
 
@@ -465,6 +526,70 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     }
   };
 
+  // Tipe file yang diizinkan didownload lewat data: URI di teks pesan AI.
+  // Dibatasi ke tipe "aman" (bukan executable/script) — konten dari backend
+  // sendiri, tapi tetap dijaga in case suatu saat model ngasih mime aneh.
+  const ALLOWED_DATA_URI_MIME_TYPES = ['text/html', 'text/plain', 'text/csv', 'application/json', 'image/svg+xml', 'application/pdf'];
+
+  const extensionForMime = (mime: string): string => {
+    const map: Record<string, string> = {
+      'text/html': 'html',
+      'text/plain': 'txt',
+      'text/csv': 'csv',
+      'application/json': 'json',
+      'image/svg+xml': 'svg',
+      'application/pdf': 'pdf',
+    };
+    return map[mime] || 'txt';
+  };
+
+  const parseDataUri = (uri: string): { mimeType: string; isBase64: boolean; content: string } | null => {
+    const m = uri.match(/^data:([^,]*),([\s\S]*)$/);
+    if (!m) return null;
+    const meta = m[1] || '';
+    const content = m[2] || '';
+    const isBase64 = /;base64$/i.test(meta);
+    const mimeType = (meta.replace(/;base64$/i, '').split(';')[0] || 'text/plain').trim() || 'text/plain';
+    return { mimeType, isBase64, content };
+  };
+
+  // Trigger download dari data: URI yang muncul di teks balasan AI (mis.
+  // '[Klik di Sini](data:text/html;charset=utf-8,...)'). Didekode & dibikin
+  // Blob asli, bukan langsung href=data:..., karena banyak browser mobile
+  // nggak konsisten nge-download data: URI raw yang panjang lewat klik link.
+  const downloadFromDataUri = (label: string, dataUri: string) => {
+    try {
+      const parsed = parseDataUri(dataUri);
+      if (!parsed) throw new Error('Format data URI tidak valid');
+      if (!ALLOWED_DATA_URI_MIME_TYPES.includes(parsed.mimeType)) {
+        console.warn('[ChatWidget] Tipe file dari data URI tidak diizinkan:', parsed.mimeType);
+        return;
+      }
+      let blob: Blob;
+      if (parsed.isBase64) {
+        const byteChars = atob(parsed.content);
+        const byteNumbers = new Array(byteChars.length);
+        for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+        blob = new Blob([new Uint8Array(byteNumbers)], { type: parsed.mimeType });
+      } else {
+        blob = new Blob([decodeURIComponent(parsed.content)], { type: parsed.mimeType });
+      }
+      const cleanLabel = label.replace(/[\\/:*?"<>|]/g, '').trim() || 'file';
+      const hasExt = /\.[a-zA-Z0-9]{1,5}$/.test(cleanLabel);
+      const filename = hasExt ? cleanLabel : `${cleanLabel}.${extensionForMime(parsed.mimeType)}`;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (err) {
+      console.error('Gagal download file dari data URI:', err);
+    }
+  };
+
   // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
   const { isListening, speakingId, loadingSpeakId, voiceSupport, handleMicClick: micToggle, handleToggleSpeak } =
     useVoiceChat({ logLabel: 'ChatWidget' });
@@ -477,9 +602,96 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const lastRequestTimeRef = useRef<number>(0);
   const REQUEST_COOLDOWN = 12000; // 12 seconds between requests (safe for 5 RPM limit)
 
-  // Gemini conversation history (exclude welcome msg)
-  // Diinisialisasi dari sessionStorage agar konteks AI bertahan selama tab terbuka
-  const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('zannah').slice(-12));
+  // Gemini conversation history (exclude welcome msg). Mulai kosong lalu
+  // diisi oleh effect pemuatan awal dari IndexedDB (lihat effect di bawah)
+  // begitu percakapan aktif berhasil dimuat.
+  const geminiHistoryRef = useRef<ChatMessage[]>([]);
+
+  // ── Reset komposer (input teks + file pending) ──────────────────────────
+  const resetComposer = useCallback(() => {
+    setInputValue('');
+    setPendingFiles((prev) => {
+      prev.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
+      return [];
+    });
+    setUploadError(null);
+  }, []);
+
+  // ── Muat percakapan aktif dari IndexedDB sekali saat widget pertama mount ──
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const id = await getActiveConversationId('zannah');
+      const conv = await loadConversation<Message, ChatMessage>(id);
+      if (cancelled) return;
+
+      if (conv && conv.messages.length > 0) {
+        setMessages(conv.messages.slice(-MAX_DISPLAY_MESSAGES));
+        // Penting: history Gemini di-slice(-12) lagi di sini, sama seperti
+        // batas yang dipakai tiap kali kirim pesan — jadi begitu percakapan
+        // lama dibuka lagi, AI tetap "ingat" konteksnya, bukan mulai kosong.
+        geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-12);
+      } else {
+        setMessages([buildWelcomeMessage()]);
+        geminiHistoryRef.current = [];
+      }
+      setConversationId(id);
+      setIsStorageReady(true);
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /** Mulai percakapan baru: bikin record IndexedDB baru & jadikan aktif. */
+  const startNewChat = useCallback(async () => {
+    const welcome = buildWelcomeMessage();
+    const created = await createConversation<Message>('zannah', [welcome]);
+    geminiHistoryRef.current = [];
+    setMessages([welcome]);
+    setConversationId(created.id);
+    setAiMode('unknown');
+    resetComposer();
+    setIsHistoryOpen(false);
+  }, [resetComposer]);
+
+  /** Buka salah satu percakapan lama dari daftar riwayat. */
+  const openConversationById = useCallback(async (id: string) => {
+    const conv = await loadConversation<Message, ChatMessage>(id);
+    if (!conv) return;
+    setMessages(conv.messages.length > 0 ? conv.messages.slice(-MAX_DISPLAY_MESSAGES) : [buildWelcomeMessage()]);
+    // Sama seperti saat load awal: slice(-12) supaya AI tetap ingat konteks
+    // obrolan lama ini, bukan dianggap chat baru.
+    geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-12);
+    setConversationId(id);
+    await setActiveConversationId('zannah', id);
+    resetComposer();
+    setIsHistoryOpen(false);
+  }, [resetComposer]);
+
+  /** Buka jendela riwayat & muat daftar percakapan tersimpan. */
+  const openHistoryPanel = useCallback(async () => {
+    setIsHistoryOpen(true);
+    setIsHistoryLoading(true);
+    const list = await listConversations<Message>('zannah');
+    setHistoryList(list);
+    setIsHistoryLoading(false);
+  }, []);
+
+  /** Hapus satu percakapan dari riwayat (tanpa membuka percakapan itu dulu). */
+  const handleDeleteConversation = useCallback(
+    async (id: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      await deleteConversation(id);
+      setHistoryList((prev) => prev.filter((c) => c.id !== id));
+      if (id === conversationId) {
+        // Kalau yang dihapus adalah percakapan yang lagi aktif, mulai baru.
+        await startNewChat();
+      }
+    },
+    [conversationId, startNewChat]
+  );
 
   // ⚠️ Cleanup setTimeout untuk mencegah memory leak saat unmount
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -489,13 +701,20 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  // Debounced auto-save messages ke localStorage setiap kali berubah
+  // Debounced auto-save messages ke IndexedDB setiap kali berubah.
+  // Ditahan sampai isStorageReady true, biar nggak menimpa percakapan
+  // tersimpan dengan welcome msg kosong sebelum load awal selesai.
   useEffect(() => {
+    if (!isStorageReady || !conversationId) return;
     const timer = setTimeout(() => {
-      saveMessages('zannah', messages.slice(-MAX_DISPLAY_MESSAGES));
+      const trimmed = messages.slice(-MAX_DISPLAY_MESSAGES);
+      saveConversation<Message, ChatMessage>(conversationId, 'zannah', {
+        messages: trimmed,
+        title: deriveConversationTitle(trimmed),
+      });
     }, 400);
     return () => clearTimeout(timer);
-  }, [messages]);
+  }, [messages, isStorageReady, conversationId]);
 
   useEffect(() => {
     return () => {
@@ -577,7 +796,42 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     });
   };
 
-  const standardCTA: QuickOption[] = [
+  // `AgentIntentAction` diimpor dari geminiService.ts — dipakai buat
+  // highlight/dahulukan tombol yang relevan berdasarkan saran heuristic
+  // backend (suggestedAgentAction), BUKAN buat auto-invoke Antigravity.
+  // Backend sudah tidak pernah memanggil Antigravity sendiri berdasar
+  // heuristic ini; user tetap yang klik tombol.
+  const buildAgentCTA = (hasRecentFiles: boolean, highlight?: AgentIntentAction | null): QuickOption[] => {
+    const opts: QuickOption[] = [
+      { id: 'agent_estimate', label: '📊 Buatkan Estimasi Biaya & Timeline' },
+      { id: 'agent_research', label: '🔎 Riset Kompetitor/Pasar Singkat' },
+    ];
+    if (hasRecentFiles) {
+      opts.push({ id: 'agent_file_analysis', label: '📈 Analisis Lebih Dalam pakai AI Agent' });
+    }
+    if (!highlight) return opts;
+
+    // Zannah cuma punya 3 tombol agent (estimate/research/file_analysis) —
+    // 'live_demo' itu saran khusus buat Rajendra (showcase) yang gak punya
+    // padanan tombol di sini, jadi diabaikan aja kalau kebetulan muncul.
+    const highlightId =
+      highlight === 'estimate' ? 'agent_estimate' : highlight === 'research' ? 'agent_research' : highlight === 'file_analysis' ? 'agent_file_analysis' : null;
+    if (!highlightId) return opts;
+
+    // Tandai & dahulukan tombol yang paling relevan sama konteks obrolan
+    // barusan — ini bagian "wow, AI-nya ngerti" tanpa perlu bakar kuota
+    // Antigravity secara diam-diam buat ngedeteksinya.
+    return [...opts]
+      .sort((a, b) => (a.id === highlightId ? -1 : b.id === highlightId ? 1 : 0))
+      .map((o) => (o.id === highlightId ? { ...o, label: `⭐ ${o.label}` } : o));
+  };
+
+  // Opsi cepat (quick reply) yang ditampilkan di bawah tiap balasan Zannah AI.
+  // Aksi AI Agent SENGAJA berupa tombol opt-in (bukan auto-trigger) — biar
+  // user yang memutuskan kapan mau pakai kemampuan yang lebih "berat" & makan
+  // kuota Antigravity (100 RPD), bukan heuristic yang nebak-nebak sendiri.
+  const standardCTA = (hasRecentFiles: boolean, highlight?: AgentIntentAction | null): QuickOption[] => [
+    ...buildAgentCTA(hasRecentFiles, highlight),
     { id: 'menu', label: '⬅️ Menu Utama' },
     { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
   ];
@@ -614,15 +868,19 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     timeoutsRef.current.push(id);
   };
 
-  // AI (Gemini) response — with automatic Radit fallback & Cooldown
-  const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[]) => {
+  // AI (Gemini) response — with automatic Radit fallback & Cooldown.
+  // `agentMode = true` dipakai KHUSUS oleh tombol aksi AI Agent opt-in
+  // (estimasi biaya, riset pasar, analisis file) — bukan trigger otomatis.
+  const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[], agentMode = false) => {
     setIsTyping(true);
+    setIsAgentBusy(agentMode);
 
     // ── Cooldown / Rate Limiting Check ──
     const now = Date.now();
     if (now - lastRequestTimeRef.current < REQUEST_COOLDOWN) {
       console.warn('[ChatWidget] Cooldown active, falling back to Radit.');
       setAiMode('fallback');
+      setIsAgentBusy(false);
       const results = fuse.search(userText);
       const id = setTimeout(() => {
         setIsTyping(false);
@@ -644,7 +902,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
     const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
     try {
-      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, undefined, files);
+      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, agentMode || undefined, files);
       const replyText = result.reply;
 
       // Simpan model yang aktif untuk ditampilkan di UI
@@ -657,15 +915,33 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         { role: 'model', parts: [{ text: replyText }] },
       ].slice(-12); // keep last 6 exchanges
 
-      // Persist Gemini history ke sessionStorage (bertahan selama tab terbuka)
-      saveGeminiHistory('zannah', geminiHistoryRef.current);
+      // Persist Gemini history ke IndexedDB, terikat ke percakapan yang lagi
+      // aktif — jadi kalau percakapan ini dibuka lagi nanti, AI tetap ingat.
+      if (conversationId) {
+        saveConversation<Message, ChatMessage>(conversationId, 'zannah', {
+          geminiHistory: geminiHistoryRef.current,
+        });
+      }
       setAiMode('ai');
       setIsTyping(false);
-      streamBotMessage(replyText, standardCTA, true, isFromVoice, result.attachments);
+      setIsAgentBusy(false);
+      // `result.suggestedAgentAction` datang dari heuristic backend (lihat
+      // detectAgentIntent di chat.ts) — dipakai buat highlight tombol agent
+      // yang relevan, TANPA memanggil Antigravity secara otomatis. Kalau
+      // balasan ini justru hasil Antigravity (agentMode manual), backend
+      // tidak pernah menyertakan field ini, jadi tombol tampil normal.
+      streamBotMessage(
+        replyText,
+        standardCTA(!!lastFilesRef.current, result.suggestedAgentAction),
+        true,
+        isFromVoice,
+        result.attachments
+      );
     } catch (err: unknown) {
       // ── Graceful degradation: fall to Radit (Directory Model) ──────────
       console.warn('[ChatWidget] Zannah AI unavailable, falling back to Radit:', err);
       setAiMode('fallback');
+      setIsAgentBusy(false);
       const results = fuse.search(userText);
       if (results.length > 0) {
         const id = setTimeout(() => {
@@ -742,13 +1018,49 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           setIsTyping(false);
           appendBotMessage(
             'Hai Kak! Zannah sudah siap bantu diskusi lagi nih 😊 Ada ide proyek atau hal yang mau ditanyakan?',
-            standardCTA,
+            standardCTA(!!lastFilesRef.current),
             true,
           );
         }, 400);
       }
       return;
     }
+
+    // ── Aksi AI Agent (opt-in, dipicu tombol) ────────────────────────────
+    // Ketiganya sengaja pakai agentMode=true secara EKSPLISIT (bukan
+    // mengandalkan heuristic AGENT_TRIGGER_PATTERNS di backend) — user yang
+    // memilih kapan mau pakai kemampuan Antigravity yang lebih berat & makan
+    // kuota (100 RPD), bukan sistem yang nebak sendiri.
+    if (id === 'agent_estimate') {
+      const prompt =
+        'Tolong buatkan estimasi biaya, breakdown item pekerjaan, dan timeline pengerjaan yang realistis untuk proyek yang barusan kita diskusikan, dalam bentuk file yang bisa saya unduh.';
+      pushUserMessage(label);
+      respondWithAI(prompt, false, undefined, true);
+      return;
+    }
+    if (id === 'agent_research') {
+      const prompt =
+        'Tolong lakukan riset singkat mengenai kompetitor atau tren pasar yang relevan dengan topik/ide proyek yang barusan kita diskusikan, lalu rangkum insight pentingnya buat saya.';
+      pushUserMessage(label);
+      respondWithAI(prompt, false, undefined, true);
+      return;
+    }
+    if (id === 'agent_file_analysis') {
+      if (!lastFilesRef.current || lastFilesRef.current.length === 0) {
+        appendBotMessage(
+          'Hmm, sepertinya belum ada file yang bisa dianalisis lebih dalam nih, Kak. Coba lampirkan filenya dulu ya 😊',
+          standardCTA(false),
+          true,
+        );
+        return;
+      }
+      const prompt =
+        'Tolong analisis lebih dalam file yang saya lampirkan sebelumnya (data, angka, atau insight bisnis yang relevan) menggunakan kemampuan AI Agent, lalu rangkum temuannya buat saya.';
+      pushUserMessage(label);
+      respondWithAI(prompt, false, lastFilesRef.current, true);
+      return;
+    }
+
     const category = CATEGORIES.find((c) => c.id === id);
     if (category) {
       pushUserMessage(label);
@@ -780,6 +1092,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const outgoingFiles: OutgoingFile[] | undefined = filesForThisMessage.length > 0
       ? filesForThisMessage.map((f) => ({ mimeType: f.mimeType, data: f.data, name: f.name }))
       : undefined;
+    // Simpan file ini buat opsi "Analisis Lebih Dalam pakai AI Agent" nanti —
+    // sengaja di-overwrite tiap kirim pesan baru (termasuk balik ke undefined
+    // kalau pesan berikutnya nggak ada file), jadi tombol itu selalu ngerujuk
+    // ke lampiran PALING BARU, bukan numpuk dari upload lama.
+    lastFilesRef.current = outgoingFiles;
 
     // Deteksi intent alami jika user meminta kembali ke Zannah
     const wantsZannah = /zannah|panggil zannah|coba zannah|coba lagi|mode ai|connect ai/i.test(cleanText);
@@ -905,6 +1222,35 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
             return <div key={lineIdx} className="h-1" />;
           }
 
+          // Deteksi link file data: URI (mis. hasil generate galeri/laporan
+          // HTML) & ubah jadi tombol download asli, bukan <a href> mentah —
+          // link http(s) biasa di formatInlineText nggak nangkep data: URI,
+          // makanya sebelumnya cuma nongol sebagai teks markdown polos.
+          const dataUriMatch = line.match(/\[([^\]]+)\]\((data:[^\s)]+)\)/);
+          if (dataUriMatch) {
+            const [fullMatch, label, dataUri] = dataUriMatch;
+            const before = line.substring(0, line.indexOf(fullMatch));
+            const after = line.substring(line.indexOf(fullMatch) + fullMatch.length);
+
+            return (
+              <div key={lineIdx} className="my-2">
+                {before && <p className="mb-1.5">{formatInlineText(before)}</p>}
+                <button
+                  type="button"
+                  onClick={() => downloadFromDataUri(label, dataUri)}
+                  className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${darkMode
+                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                    : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                    }`}
+                >
+                  <Download className="w-3 h-3" />
+                  {label}
+                </button>
+                {after && <p className="mt-1.5">{formatInlineText(after)}</p>}
+              </div>
+            );
+          }
+
           // Deteksi link WhatsApp khusus untuk diubah jadi CTA Button interaktif
           const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/[^\s)]+)\)/);
           if (waMatch) {
@@ -974,7 +1320,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           >
             <div
               onClick={(e) => e.stopPropagation()}
-              className={`w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
+              className={`relative w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
                 }`}
             >
               {/* Header */}
@@ -985,7 +1331,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                   }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <div className="relative">
+                  <button
+                    type="button"
+                    onClick={openHistoryPanel}
+                    aria-label="Lihat riwayat obrolan tersimpan"
+                    title="Lihat riwayat obrolan tersimpan"
+                    className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-teal-400 shrink-0"
+                  >
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition-all ${isHeaderRadit
                         ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/30'
@@ -995,7 +1347,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       {isHeaderRadit ? 'RD' : 'ZA'}
                     </div>
                     <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
-                  </div>
+                  </button>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -1010,6 +1362,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 </div>
 
                 <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-label="Mulai obrolan baru"
+                    title="Mulai obrolan baru"
+                    onClick={startNewChat}
+                    className={`p-1.5 rounded-lg transition-colors ${darkMode
+                      ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                      }`}
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
                   {messages.length > 1 && (
                     <button
                       type="button"
@@ -1027,6 +1391,30 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       <span className="hidden sm:inline">{downloadSummarySuccess ? 'Tersimpan!' : 'Rangkuman'}</span>
                     </button>
                   )}
+                  {messages.length > 1 && canShareSummary && (
+                    <button
+                      type="button"
+                      aria-label="Bagikan rangkuman obrolan ke WhatsApp"
+                      title="Bagikan rangkuman obrolan langsung ke WhatsApp Mas Arzha"
+                      onClick={handleShareSummary}
+                      disabled={shareSummaryState === 'sharing'}
+                      className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-[10px] font-medium disabled:opacity-60 ${shareSummaryState === 'shared'
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                        : darkMode
+                          ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                        }`}
+                    >
+                      {shareSummaryState === 'sharing' ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Share2 className="w-3.5 h-3.5" />
+                      )}
+                      <span className="hidden sm:inline">
+                        {shareSummaryState === 'shared' ? 'Terkirim!' : shareSummaryState === 'sharing' ? 'Membuka...' : 'Bagikan'}
+                      </span>
+                    </button>
+                  )}
                   <button
                     aria-label="Tutup jendela chat"
                     onClick={() => setIsOpen(false)}
@@ -1039,6 +1427,107 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                   </button>
                 </div>
               </div>
+
+              {/* Jendela Riwayat Percakapan — overlay penuh di dalam kartu chat,
+                  dibuka lewat klik avatar bot di header. */}
+              {isHistoryOpen && (
+                <div className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                  <div
+                    className={`p-3.5 border-b flex items-center justify-between ${darkMode
+                      ? 'bg-slate-800/80 border-slate-700'
+                      : 'bg-slate-50 border-slate-100'
+                      }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <History className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
+                      <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        Riwayat Obrolan
+                      </h3>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label="Tutup riwayat obrolan"
+                      onClick={() => setIsHistoryOpen(false)}
+                      className={`p-1.5 rounded-lg transition-colors ${darkMode
+                        ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                        }`}
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                    {isHistoryLoading && (
+                      <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Memuat riwayat...
+                      </p>
+                    )}
+                    {!isHistoryLoading && historyList.length === 0 && (
+                      <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        Belum ada obrolan tersimpan.
+                      </p>
+                    )}
+                    {!isHistoryLoading &&
+                      historyList.map((conv) => (
+                        <button
+                          key={conv.id}
+                          type="button"
+                          onClick={() => openConversationById(conv.id)}
+                          className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${conv.id === conversationId
+                            ? darkMode
+                              ? 'border-teal-500 bg-teal-950/30'
+                              : 'border-teal-400 bg-teal-50'
+                            : darkMode
+                              ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                              : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                            }`}
+                        >
+                          <div className="min-w-0">
+                            <p className={`text-xs font-semibold truncate ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                              {conv.title || 'Obrolan Baru'}
+                            </p>
+                            <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                              {new Date(conv.updatedAt).toLocaleString('id-ID', {
+                                day: '2-digit',
+                                month: 'short',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </p>
+                          </div>
+                          <span
+                            role="button"
+                            tabIndex={0}
+                            onClick={(e) => handleDeleteConversation(conv.id, e)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter' || e.key === ' ') handleDeleteConversation(conv.id, e as unknown as React.MouseEvent);
+                            }}
+                            aria-label="Hapus obrolan ini"
+                            title="Hapus obrolan ini"
+                            className={`shrink-0 p-1 rounded-lg transition-colors ${darkMode
+                              ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
+                              : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+                              }`}
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </span>
+                        </button>
+                      ))}
+                  </div>
+
+                  <div className={`p-2.5 border-t ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                    <button
+                      type="button"
+                      onClick={startNewChat}
+                      className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors ${isRadit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'
+                        }`}
+                    >
+                      <Plus className="w-3.5 h-3.5" /> Obrolan Baru
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Region tersembunyi khusus screen reader: umumkan status mengetik
                   dan balasan bot yang sudah final, terpisah dari bubble visual
@@ -1254,7 +1743,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                         ? darkMode ? 'text-amber-300/90' : 'text-amber-700/90'
                         : darkMode ? 'text-teal-300/90' : 'text-teal-700/90'
                         }`}>
-                        {isHeaderRadit ? 'Mencari jawaban FAQ...' : ZANNAH_LOADING_STATUSES[loadingTextIndex]}
+                        {isHeaderRadit
+                          ? 'Mencari jawaban FAQ...'
+                          : isAgentBusy
+                            ? AGENT_LOADING_STATUSES[loadingTextIndex]
+                            : ZANNAH_LOADING_STATUSES[loadingTextIndex]}
                       </span>
                     </div>
                   </div>

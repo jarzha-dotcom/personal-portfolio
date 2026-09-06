@@ -1,10 +1,20 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2 } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile } from '../services/geminiService';
-import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
+import {
+    createConversation,
+    getActiveConversationId,
+    setActiveConversationId,
+    loadConversation,
+    saveConversation,
+    listConversations,
+    deleteConversation,
+    deriveConversationTitle,
+    StoredConversation,
+} from '../utils/chatStorage';
 import { BOT_VOICES } from '../services/voiceService';
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
@@ -184,6 +194,15 @@ const MAX_DISPLAY_MESSAGES = 50;
 const nowStr = () => new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 const CV_WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label: c.label }));
 
+const buildWelcomeMessage = (): Message => ({
+    id: 'welcome',
+    sender: 'bot',
+    text: 'Halo! Saya Kania, asisten Arzha untuk halaman CV 👋\nSilakan tanyakan soal pengalaman kerja, skill, ketersediaan, atau profil profesionalnya.',
+    timestamp: nowStr(),
+    options: CV_WELCOME_OPTIONS,
+    isAI: true,
+});
+
 export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
@@ -209,20 +228,19 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             setTimeout(() => setDownloadSummarySuccess(false), 3000);
         }
     };
-    const [messages, setMessages] = useState<Message[]>(() => {
-        const saved = loadMessages<Message>('cv_kania');
-        if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
-        return [
-            {
-                id: 'welcome',
-                sender: 'bot',
-                text: 'Halo! Saya Kania, asisten Arzha untuk halaman CV 👋\nSilakan tanyakan soal pengalaman kerja, skill, ketersediaan, atau profil profesionalnya.',
-                timestamp: nowStr(),
-                options: CV_WELCOME_OPTIONS,
-                isAI: true,
-            },
-        ];
-    });
+    // Inisialisasi messages dengan welcome msg dulu (sinkron); isi asli
+    // percakapan yang tersimpan dimuat belakangan dari IndexedDB (async) lewat
+    // effect di bawah, karena IndexedDB nggak bisa dibaca secara sinkron.
+    const [messages, setMessages] = useState<Message[]>(() => [buildWelcomeMessage()]);
+    // id percakapan yang lagi aktif di IndexedDB. Auto-save ditahan sampai
+    // isStorageReady true, biar nggak menimpa data tersimpan dengan welcome
+    // msg kosong sebelum load awal selesai.
+    const [conversationId, setConversationId] = useState<string | null>(null);
+    const [isStorageReady, setIsStorageReady] = useState(false);
+    // Jendela riwayat percakapan (dibuka lewat klik avatar Kania)
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const [historyList, setHistoryList] = useState<StoredConversation<Message>[]>([]);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
     const [uploadError, setUploadError] = useState<string | null>(null);
@@ -327,7 +345,94 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             console.error('Gagal download attachment:', err);
         }
     };
-    const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania').slice(-10));
+    // Gemini conversation history. Mulai kosong lalu diisi oleh effect
+    // pemuatan awal dari IndexedDB (lihat effect di bawah) begitu percakapan
+    // aktif berhasil dimuat.
+    const geminiHistoryRef = useRef<ChatMessage[]>([]);
+
+    // ── Reset komposer (input teks + file pending) ──────────────────────────
+    const resetComposer = useCallback(() => {
+        setInputValue('');
+        setPendingFiles((prev) => {
+            prev.forEach((f) => f.previewUrl && URL.revokeObjectURL(f.previewUrl));
+            return [];
+        });
+        setUploadError(null);
+    }, []);
+
+    // ── Muat percakapan aktif dari IndexedDB sekali saat widget pertama mount ──
+    useEffect(() => {
+        let cancelled = false;
+        (async () => {
+            const id = await getActiveConversationId('cv_kania');
+            const conv = await loadConversation<Message, ChatMessage>(id);
+            if (cancelled) return;
+
+            if (conv && conv.messages.length > 0) {
+                setMessages(conv.messages.slice(-MAX_DISPLAY_MESSAGES));
+                // Penting: history Gemini di-slice(-10) lagi di sini, sama
+                // seperti batas yang dipakai tiap kirim pesan — jadi begitu
+                // percakapan lama dibuka lagi, AI tetap "ingat" konteksnya.
+                geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-10);
+            } else {
+                setMessages([buildWelcomeMessage()]);
+                geminiHistoryRef.current = [];
+            }
+            setConversationId(id);
+            setIsStorageReady(true);
+        })();
+        return () => {
+            cancelled = true;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    /** Mulai percakapan baru: bikin record IndexedDB baru & jadikan aktif. */
+    const startNewChat = useCallback(async () => {
+        const welcome = buildWelcomeMessage();
+        const created = await createConversation<Message>('cv_kania', [welcome]);
+        geminiHistoryRef.current = [];
+        setMessages([welcome]);
+        setConversationId(created.id);
+        resetComposer();
+        setIsHistoryOpen(false);
+    }, [resetComposer]);
+
+    /** Buka salah satu percakapan lama dari daftar riwayat. */
+    const openConversationById = useCallback(async (id: string) => {
+        const conv = await loadConversation<Message, ChatMessage>(id);
+        if (!conv) return;
+        setMessages(conv.messages.length > 0 ? conv.messages.slice(-MAX_DISPLAY_MESSAGES) : [buildWelcomeMessage()]);
+        // Sama seperti saat load awal: slice(-10) supaya AI tetap ingat
+        // konteks obrolan lama ini, bukan dianggap chat baru.
+        geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-10);
+        setConversationId(id);
+        await setActiveConversationId('cv_kania', id);
+        resetComposer();
+        setIsHistoryOpen(false);
+    }, [resetComposer]);
+
+    /** Buka jendela riwayat & muat daftar percakapan tersimpan. */
+    const openHistoryPanel = useCallback(async () => {
+        setIsHistoryOpen(true);
+        setIsHistoryLoading(true);
+        const list = await listConversations<Message>('cv_kania');
+        setHistoryList(list);
+        setIsHistoryLoading(false);
+    }, []);
+
+    /** Hapus satu percakapan dari riwayat (tanpa membuka percakapan itu dulu). */
+    const handleDeleteConversation = useCallback(
+        async (id: string, e: React.MouseEvent) => {
+            e.stopPropagation();
+            await deleteConversation(id);
+            setHistoryList((prev) => prev.filter((c) => c.id !== id));
+            if (id === conversationId) {
+                await startNewChat();
+            }
+        },
+        [conversationId, startNewChat]
+    );
     const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
     // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
     const { isListening, speakingId, loadingSpeakId, voiceSupport, handleMicClick: micToggle, handleToggleSpeak, stopAll } =
@@ -345,13 +450,20 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, [messages, isTyping]);
 
-    // Debounced auto-save messages ke localStorage
+    // Debounced auto-save messages ke IndexedDB setiap kali berubah.
+    // Ditahan sampai isStorageReady true, biar nggak menimpa percakapan
+    // tersimpan dengan welcome msg kosong sebelum load awal selesai.
     useEffect(() => {
+        if (!isStorageReady || !conversationId) return;
         const timer = setTimeout(() => {
-            saveMessages('cv_kania', messages.slice(-MAX_DISPLAY_MESSAGES));
+            const trimmed = messages.slice(-MAX_DISPLAY_MESSAGES);
+            saveConversation<Message, ChatMessage>(conversationId, 'cv_kania', {
+                messages: trimmed,
+                title: deriveConversationTitle(trimmed),
+            });
         }, 400);
         return () => clearTimeout(timer);
-    }, [messages]);
+    }, [messages, isStorageReady, conversationId]);
 
     useEffect(() => {
         return () => {
@@ -539,8 +651,13 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                 { role: 'model', parts: [{ text: replyText }] },
             ].slice(-10); // simpan 5 exchange terakhir
 
-            // Persist Gemini history ke sessionStorage (bertahan selama tab terbuka)
-            saveGeminiHistory('cv_kania', geminiHistoryRef.current);
+            // Persist Gemini history ke IndexedDB, terikat ke percakapan yang
+            // lagi aktif — jadi kalau percakapan ini dibuka lagi nanti, AI tetap ingat.
+            if (conversationId) {
+                saveConversation<Message, ChatMessage>(conversationId, 'cv_kania', {
+                    geminiHistory: geminiHistoryRef.current,
+                });
+            }
 
             setAiMode('ai');
             setIsTyping(false);
@@ -802,19 +919,25 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                     >
                         <div
                             onClick={(e) => e.stopPropagation()}
-                            className={`w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
+                            className={`relative w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
                                 }`}
                         >
                             {/* Header */}
                             <div className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
                                 }`}>
                                 <div className="flex items-center gap-2.5">
-                                    <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={openHistoryPanel}
+                                        aria-label="Lihat riwayat obrolan tersimpan"
+                                        title="Lihat riwayat obrolan tersimpan"
+                                        className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-teal-400 shrink-0"
+                                    >
                                         <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
                                             KA
                                         </div>
                                         <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${darkMode ? 'border-slate-800' : 'border-white'} ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-                                    </div>
+                                    </button>
                                     <div>
                                         <div className="flex items-center gap-1.5">
                                             <p className={`text-xs font-bold leading-none ${darkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -837,6 +960,18 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-1">
+                                    <button
+                                        type="button"
+                                        aria-label="Mulai obrolan baru"
+                                        title="Mulai obrolan baru"
+                                        onClick={startNewChat}
+                                        className={`p-1.5 rounded-lg transition-colors ${darkMode
+                                            ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
                                     {messages.length > 1 && (
                                         <button
                                             type="button"
@@ -867,6 +1002,104 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                     </button>
                                 </div>
                             </div>
+
+                            {/* Jendela Riwayat Percakapan — overlay penuh di dalam kartu chat,
+                                dibuka lewat klik avatar Kania di header. */}
+                            {isHistoryOpen && (
+                                <div className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                                    <div
+                                        className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                            }`}
+                                    >
+                                        <div className="flex items-center gap-1.5">
+                                            <History className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
+                                            <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                                Riwayat Obrolan
+                                            </h3>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            aria-label="Tutup riwayat obrolan"
+                                            onClick={() => setIsHistoryOpen(false)}
+                                            className={`p-1.5 rounded-lg transition-colors ${darkMode
+                                                ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                                                }`}
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </button>
+                                    </div>
+
+                                    <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                                        {isHistoryLoading && (
+                                            <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                                Memuat riwayat...
+                                            </p>
+                                        )}
+                                        {!isHistoryLoading && historyList.length === 0 && (
+                                            <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                                Belum ada obrolan tersimpan.
+                                            </p>
+                                        )}
+                                        {!isHistoryLoading &&
+                                            historyList.map((conv) => (
+                                                <button
+                                                    key={conv.id}
+                                                    type="button"
+                                                    onClick={() => openConversationById(conv.id)}
+                                                    className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${conv.id === conversationId
+                                                        ? darkMode
+                                                            ? 'border-teal-500 bg-teal-950/30'
+                                                            : 'border-teal-400 bg-teal-50'
+                                                        : darkMode
+                                                            ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                                                            : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                                                        }`}
+                                                >
+                                                    <div className="min-w-0">
+                                                        <p className={`text-xs font-semibold truncate ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                                            {conv.title || 'Obrolan Baru'}
+                                                        </p>
+                                                        <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                                            {new Date(conv.updatedAt).toLocaleString('id-ID', {
+                                                                day: '2-digit',
+                                                                month: 'short',
+                                                                hour: '2-digit',
+                                                                minute: '2-digit',
+                                                            })}
+                                                        </p>
+                                                    </div>
+                                                    <span
+                                                        role="button"
+                                                        tabIndex={0}
+                                                        onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter' || e.key === ' ') handleDeleteConversation(conv.id, e as unknown as React.MouseEvent);
+                                                        }}
+                                                        aria-label="Hapus obrolan ini"
+                                                        title="Hapus obrolan ini"
+                                                        className={`shrink-0 p-1 rounded-lg transition-colors ${darkMode
+                                                            ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
+                                                            : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+                                                            }`}
+                                                    >
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                    </span>
+                                                </button>
+                                            ))}
+                                    </div>
+
+                                    <div className={`p-2.5 border-t ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'}`}>
+                                        <button
+                                            type="button"
+                                            onClick={startNewChat}
+                                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors bg-teal-600 hover:bg-teal-700"
+                                        >
+                                            <Plus className="w-3.5 h-3.5" /> Obrolan Baru
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Region tersembunyi khusus screen reader: umumkan status mengetik
                                 dan balasan bot yang sudah final, terpisah dari bubble visual
