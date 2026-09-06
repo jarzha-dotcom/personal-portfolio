@@ -11,6 +11,9 @@ import {
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
 
+// Access Key dari https://web3forms.com, diset di .env.local sebagai VITE_WEB3FORMS_ACCESS_KEY
+const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+
 interface ContactProps {
   darkMode: boolean;
 }
@@ -18,25 +21,52 @@ interface ContactProps {
 export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) {
+      setErrorMessage('Harap lengkapi semua kolom wajib.');
       setFormStatus('error');
       return;
     }
+
+    if (!WEB3FORMS_ACCESS_KEY) {
+      setErrorMessage('Konfigurasi form belum lengkap (access key tidak ditemukan). Hubungi admin situs.');
+      setFormStatus('error');
+      return;
+    }
+
     setFormStatus('submitting');
-    setTimeout(() => {
-      setFormStatus('success');
-      const mailtoUrl = `mailto:${CONTACT_INFO.email}?subject=${encodeURIComponent(
-        formData.subject || `Pesan dari ${formData.name}`
-      )}&body=${encodeURIComponent(
-        `Nama: ${formData.name}\nEmail: ${formData.email}\n\nPesan:\n${formData.message}`
-      )}`;
-      window.location.href = mailtoUrl;
-    }, 800);
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_ACCESS_KEY,
+          subject: formData.subject || `Pesan dari ${formData.name}`,
+          from_name: formData.name,
+          replyto: formData.email,
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setFormStatus('success');
+      } else {
+        setErrorMessage(result.message || 'Gagal mengirim pesan. Silakan coba lagi.');
+        setFormStatus('error');
+      }
+    } catch (err) {
+      setErrorMessage('Terjadi kesalahan jaringan. Silakan coba lagi atau hubungi lewat email/WhatsApp.');
+      setFormStatus('error');
+    }
   };
 
   const copyToClipboard = (text: string, type: 'email' | 'phone') => {
@@ -169,10 +199,10 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
                 <CheckCircle className="w-5 h-5" />
               </div>
               <h4 className={`text-sm font-bold ${darkMode ? 'text-emerald-200' : 'text-emerald-900'}`}>
-                Pesan Telah Disiapkan!
+                Pesan Berhasil Terkirim!
               </h4>
               <p className={`text-xs ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>
-                Aplikasi email Anda akan otomatis terbuka.
+                Terima kasih, saya akan segera membalas ke email Anda.
               </p>
               <button
                 onClick={() => { setFormStatus('idle'); setFormData({ name: '', email: '', subject: '', message: '' }); }}
@@ -199,7 +229,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`} />
-              {formStatus === 'error' && <p className="text-xs text-rose-500 font-medium">Harap lengkapi semua kolom wajib.</p>}
+              {formStatus === 'error' && <p className="text-xs text-rose-500 font-medium">{errorMessage}</p>}
               <div className="pt-1 flex items-center justify-between">
                 <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Data dijaga kerahasiaannya.</span>
                 <button type="submit" disabled={formStatus === 'submitting'}

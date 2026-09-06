@@ -433,7 +433,8 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         fullText: string,
         options?: QuickOption[],
         isAI = true,
-        autoSpeak = false
+        autoSpeak = false,
+        attachments?: Attachment[]
     ) => {
         const msgId = generateMessageId('bot');
         pushMessage({
@@ -444,6 +445,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             options: undefined,
             isAI,
             isStreaming: true,
+            attachments: attachments && attachments.length > 0 ? attachments : undefined,
         });
 
         streamText(fullText, {
@@ -495,7 +497,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     };
 
     // ── AI (Gemini) response — khusus pertanyaan rekruter ──────────────────
-    const respondWithAI = async (userText: string, isFromVoice = false) => {
+    const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[]) => {
         setIsTyping(true);
 
         // Cooldown check
@@ -525,7 +527,9 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                 geminiHistoryRef.current,
                 userText,
                 undefined,
-                'kania'
+                'kania',
+                undefined,
+                files
             );
             const replyText = result.reply;
 
@@ -540,7 +544,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
 
             setAiMode('ai');
             setIsTyping(false);
-            streamBotMessage(replyText, standardCTA, true, isFromVoice);
+            streamBotMessage(replyText, standardCTA, true, isFromVoice, result.attachments);
 
         } catch {
             // Graceful degradation ke Fuse.js
@@ -596,23 +600,34 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     };
 
     const sendMessage = (text: string, isFromVoice = false) => {
-        if (!text.trim() || isTyping) return;
         const trimmed = text.trim();
-        pushUserMessage(trimmed);
+        if ((!trimmed && pendingFiles.length === 0) || isTyping) return;
+        // Kalau user cuma lampirin file (mis. CV/portofolio) tanpa nulis apa-apa,
+        // kasih caption default biar backend tetap punya instruksi jelas.
+        const cleanText = trimmed || 'Tolong tinjau file yang saya lampirkan ini.';
+        const filesForThisMessage = pendingFiles;
+        pushUserMessage(cleanText, filesForThisMessage);
         setInputValue('');
-        lastQueryRef.current = trimmed;
+        setPendingFiles([]); // preview di-clear, objectURL-nya masih dipakai bubble di atas
+        setUploadError(null);
+        lastQueryRef.current = cleanText;
+
+        const outgoingFiles: OutgoingFile[] | undefined = filesForThisMessage.length > 0
+            ? filesForThisMessage.map((f) => ({ mimeType: f.mimeType, data: f.data, name: f.name }))
+            : undefined;
 
         // Deteksi intent alami jika user meminta kembali ke Kania
-        const wantsKania = /kania|panggil kania|coba kania|coba lagi|mode ai|connect ai/i.test(trimmed);
+        const wantsKania = /kania|panggil kania|coba kania|coba lagi|mode ai|connect ai/i.test(cleanText);
         if (wantsKania && aiMode === 'fallback') {
             setAiMode('ai');
-            respondWithAI(trimmed, isFromVoice);
+            respondWithAI(cleanText, isFromVoice, outgoingFiles);
             return;
         }
 
-        // Jika AI sedang fallback, gunakan Fuse.js langsung
-        if (aiMode === 'fallback') {
-            const results = fuse.search(trimmed);
+        // Jika AI sedang fallback, gunakan Fuse.js langsung — kecuali ada file
+        // dilampirkan, karena FAQ lokal (Fuse.js) tidak bisa memproses file.
+        if (aiMode === 'fallback' && !outgoingFiles) {
+            const results = fuse.search(cleanText);
             if (results.length > 0) {
                 respondWithFAQ(results[0].item, isFromVoice);
             } else {
@@ -620,7 +635,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             }
         } else {
             // Coba AI dulu, Fuse.js sebagai fallback otomatis di dalam respondWithAI
-            respondWithAI(trimmed, isFromVoice);
+            respondWithAI(cleanText, isFromVoice, outgoingFiles);
         }
     };
 
@@ -928,6 +943,53 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                                     <span className="block text-[9px] opacity-60 text-right">{m.timestamp}</span>
                                                 </div>
                                             </div>
+
+                                            {/* Thumbnail file yang diupload user bareng pesan ini */}
+                                            {m.uploadedFiles && m.uploadedFiles.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {m.uploadedFiles.map((f) => (
+                                                        f.previewUrl ? (
+                                                            <img
+                                                                key={f.id}
+                                                                src={f.previewUrl}
+                                                                alt={f.name}
+                                                                className="w-12 h-12 object-cover rounded-lg border border-slate-300 dark:border-slate-600"
+                                                            />
+                                                        ) : (
+                                                            <span
+                                                                key={f.id}
+                                                                className={`inline-flex items-center gap-1 text-[9.5px] px-2 py-1 rounded-md border ${darkMode ? 'bg-slate-800 border-slate-600 text-slate-300' : 'bg-slate-100 border-slate-300 text-slate-600'}`}
+                                                                title={f.name}
+                                                            >
+                                                                <FileText className="w-3 h-3" />
+                                                                {f.name.length > 16 ? f.name.slice(0, 16) + '…' : f.name}
+                                                            </span>
+                                                        )
+                                                    ))}
+                                                </div>
+                                            )}
+
+                                            {/* File hasil kerja Kania (jarang muncul — Antigravity Agent tidak
+                                                diaktifkan untuk persona ini, tapi tetap disediakan biar konsisten) */}
+                                            {m.attachments && m.attachments.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {m.attachments.map((att, i) => (
+                                                        <button
+                                                            key={`${m.id}-att-${i}`}
+                                                            type="button"
+                                                            onClick={() => downloadAttachment(att)}
+                                                            className={`inline-flex items-center gap-1.5 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                                                                : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                                                }`}
+                                                        >
+                                                            <Download className="w-3 h-3" />
+                                                            {att.name}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+
                                             {m.options && m.options.length > 0 && (
                                                 <div className="flex flex-wrap gap-1.5">
                                                     {m.options.map((opt) => (
@@ -987,44 +1049,97 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                             </div>
 
                             {/* Input Area */}
-                            <div className={`p-2.5 border-t flex items-center gap-2 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
+                            <div className={`p-2.5 border-t ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
                                 }`}>
-                                <input
-                                    type="text"
-                                    value={inputValue}
-                                    onChange={(e) => setInputValue(e.target.value)}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={
-                                        isListening
-                                            ? 'Mendengarkan... bicara sekarang'
-                                            : aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'
-                                    }
-                                    className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
-                                        ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
-                                        : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                                        }`}
-                                />
-                                {voiceSupport.stt && (
+                                {/* Preview file yang lagi disiapkan buat dikirim */}
+                                {pendingFiles.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 mb-2">
+                                        {pendingFiles.map((f) => (
+                                            <div key={f.id} className="relative group">
+                                                {f.previewUrl ? (
+                                                    <img src={f.previewUrl} alt={f.name} className="w-11 h-11 object-cover rounded-lg border border-slate-300 dark:border-slate-600" />
+                                                ) : (
+                                                    <div className={`w-11 h-11 flex items-center justify-center rounded-lg border ${darkMode ? 'bg-slate-700 border-slate-600 text-slate-300' : 'bg-slate-100 border-slate-300 text-slate-600'}`}>
+                                                        <FileText className="w-4 h-4" />
+                                                    </div>
+                                                )}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removePendingFile(f.id)}
+                                                    aria-label={`Hapus ${f.name}`}
+                                                    className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                                                >
+                                                    <X className="w-2.5 h-2.5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                {uploadError && (
+                                    <p className="text-[10px] text-red-500 mb-1.5">{uploadError}</p>
+                                )}
+
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept={ALLOWED_UPLOAD_MIME_TYPES.join(',')}
+                                        multiple
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            handleFilesSelected(e.target.files);
+                                            e.target.value = ''; // biar bisa pilih file yang sama lagi kalau dihapus
+                                        }}
+                                    />
                                     <button
-                                        aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                                        title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                                        onClick={handleMicClick}
+                                        aria-label="Lampirkan file"
+                                        title="Lampirkan CV, portofolio, atau dokumen (foto/PDF/CSV)"
+                                        onClick={() => fileInputRef.current?.click()}
                                         disabled={isTyping}
-                                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
-                                            ? 'bg-red-500 text-white animate-pulse'
-                                            : darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${darkMode
+                                            ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                                             }`}
                                     >
-                                        <Mic className="w-3.5 h-3.5" />
+                                        <Paperclip className="w-3.5 h-3.5" />
                                     </button>
-                                )}
-                                <button
-                                    onClick={() => sendMessage(inputValue)}
-                                    disabled={!inputValue.trim() || isTyping}
-                                    className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${aiMode === 'fallback' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'}`}
-                                >
-                                    <Send className="w-3.5 h-3.5" />
-                                </button>
+                                    <input
+                                        type="text"
+                                        value={inputValue}
+                                        onChange={(e) => setInputValue(e.target.value)}
+                                        onKeyDown={handleKeyDown}
+                                        placeholder={
+                                            isListening
+                                                ? 'Mendengarkan... bicara sekarang'
+                                                : aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'
+                                        }
+                                        className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
+                                            ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
+                                            : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                                            }`}
+                                    />
+                                    {voiceSupport.stt && (
+                                        <button
+                                            aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                            title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                            onClick={handleMicClick}
+                                            disabled={isTyping}
+                                            className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
+                                                ? 'bg-red-500 text-white animate-pulse'
+                                                : darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                                }`}
+                                        >
+                                            <Mic className="w-3.5 h-3.5" />
+                                        </button>
+                                    )}
+                                    <button
+                                        onClick={() => sendMessage(inputValue)}
+                                        disabled={(!inputValue.trim() && pendingFiles.length === 0) || isTyping}
+                                        className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${aiMode === 'fallback' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'}`}
+                                    >
+                                        <Send className="w-3.5 h-3.5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
