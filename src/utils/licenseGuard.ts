@@ -41,7 +41,7 @@ export async function isAppLicensed(): Promise<boolean> {
   if (typeof window === 'undefined') return true;
 
   try {
-    const userKey = (import.meta as any).env?.APP_LICENSE_KEY;
+    const userKey = (import.meta as any).env?.VITE_APP_LICENSE_KEY;
     if (!userKey || String(userKey).trim() === '') return false;
 
     const userHash = await sha256(String(userKey).trim());
