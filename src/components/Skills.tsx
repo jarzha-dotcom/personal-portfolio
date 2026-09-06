@@ -84,6 +84,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
   return (
     <section
       id="keahlian"
+      aria-labelledby="keahlian-heading"
       className={`py-12 md:py-16 transition-colors duration-200 ${darkMode ? 'bg-slate-900/60' : 'bg-slate-100/70'}`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,7 +94,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
             <Code2 className="w-3.5 h-3.5" />
             <span>Tech Stack & Cara Kerja</span>
           </div>
-          <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 id="keahlian-heading" className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
             Teknologi yang Saya Kuasai
           </h2>
           <p className={`text-xs sm:text-sm ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>

@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer id="main-footer" className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-10 pb-8 transition-colors">
+    <footer id="main-footer" aria-label="Footer situs" className="bg-slate-950 text-slate-300 border-t border-slate-800 pt-10 pb-8 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pb-8 border-b border-slate-800/80">
@@ -53,9 +53,9 @@ export const Footer: React.FC = () => {
 
           {/* Col 2: Quick Links */}
           <div className="md:col-span-3 space-y-2">
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-white">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-white">
               Navigasi Halaman
-            </h4>
+            </h3>
             <ul className="space-y-1.5 text-xs text-slate-400">
               <li>
                 <a href="#beranda" className="hover:text-teal-400 transition-colors">Beranda Utama</a>
@@ -77,9 +77,9 @@ export const Footer: React.FC = () => {
 
           {/* Col 3: Direct Connect & Socials */}
           <div className="md:col-span-4 space-y-3">
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-white">
+            <h3 className="text-[11px] font-bold uppercase tracking-wider text-white">
               Koneksi Profesional
-            </h4>
+            </h3>
             <p className="text-xs text-slate-400 leading-relaxed">
               Terhubung melalui email atau platform jejaring:
             </p>

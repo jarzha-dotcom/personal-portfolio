@@ -87,6 +87,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
   return (
     <section
       id="tentang"
+      aria-labelledby="tentang-heading"
       className={`py-12 md:py-16 transition-colors duration-200 ${darkMode ? 'bg-slate-900/60' : 'bg-slate-100/70'
         }`}
     >
@@ -100,7 +101,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
             <Sparkles className="w-3.5 h-3.5" />
             <span>Tentang Saya</span>
           </div>
-          <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'
+          <h2 id="tentang-heading" className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'
             }`}>
             Developer di Balik Layanan Ini
           </h2>

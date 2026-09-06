@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
     Code2,
     Gamepad2,
@@ -18,6 +18,7 @@ import {
     Bot,
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
+import { injectJsonLd, removeJsonLd, buildServicesJsonLd } from '../utils/seoHelpers';
 
 interface ServicesProps {
     darkMode: boolean;
@@ -156,9 +157,19 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
 
     const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
+    // Inject skema ItemList of Service — dijalankan sekali, memakai data
+    // `services` yang sama dengan yang dirender di grid di bawah supaya
+    // tidak ada duplikasi/ketidaksinkronan data.
+    useEffect(() => {
+        injectJsonLd('services-jsonld', buildServicesJsonLd(services));
+        return () => removeJsonLd('services-jsonld');
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     return (
         <section
             id="layanan"
+            aria-labelledby="layanan-heading"
             className={`py-14 md:py-20 transition-colors duration-200 ${darkMode ? 'bg-slate-950 border-t border-slate-800' : 'bg-white border-t border-slate-200'
                 }`}
         >
@@ -175,6 +186,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                         <span>Jasa Pengembangan</span>
                     </div>
                     <h2
+                        id="layanan-heading"
                         className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-3 ${darkMode ? 'text-white' : 'text-slate-900'
                             }`}
                     >

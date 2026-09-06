@@ -80,6 +80,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
   return (
     <section
       id="kontak"
+      aria-labelledby="kontak-heading"
       className={`py-12 md:py-16 transition-colors duration-200 relative overflow-hidden ${darkMode ? 'bg-slate-900/80' : 'bg-slate-50'
         }`}
     >
@@ -93,7 +94,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Kontak & Kolaborasi</span>
           </div>
-          <h2 className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'
+          <h2 id="kontak-heading" className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'
             }`}>
             Mari Terhubung & Berkolaborasi
           </h2>

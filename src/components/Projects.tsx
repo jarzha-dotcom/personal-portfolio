@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Code2,
   ExternalLink,
@@ -20,6 +20,7 @@ import { PROJECTS } from '../data/portfolioData';
 import { ProjectItem } from '../types';
 import { Portal } from './Portal';
 import { AIChatbotShowcase, AVAILABLE_MODELS } from './AIChatbotShowcase';
+import { injectJsonLd, removeJsonLd, buildProjectsJsonLd } from '../utils/seoHelpers';
 
 interface ProjectsProps {
   darkMode: boolean;
@@ -35,6 +36,15 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
     activeFilter === 'Semua'
       ? PROJECTS
       : PROJECTS.filter((p) => p.category === activeFilter);
+
+  // Skema selalu memakai daftar PROJECTS penuh (bukan filteredProjects) —
+  // structured data merepresentasikan seluruh portofolio, terlepas dari
+  // filter kategori yang sedang aktif di UI.
+  useEffect(() => {
+    injectJsonLd('projects-jsonld', buildProjectsJsonLd(PROJECTS));
+    return () => removeJsonLd('projects-jsonld');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const getIcon = (iconType: string) => {
     switch (iconType) {
@@ -75,6 +85,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   return (
     <section
       id="proyek"
+      aria-labelledby="proyek-heading"
       className={`py-14 md:py-20 transition-colors duration-200 ${darkMode ? 'bg-slate-950 border-t border-slate-800' : 'bg-slate-50 border-t border-slate-200'
         }`}
     >
@@ -91,6 +102,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
             <span>Proyek & Karya</span>
           </div>
           <h2
+            id="proyek-heading"
             className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'
               }`}
           >
