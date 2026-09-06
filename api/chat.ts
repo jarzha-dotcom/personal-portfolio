@@ -693,13 +693,44 @@ async function callGeminiModel(
 
 // ── Main handler ────────────────────────────────────────────────────────────
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    // CORS & method check
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    // ── Origin & Domain Security Guard ──────────────────────────────────────────
+    // Mengunci endpoint agar hanya melayani domain resmi K. Arzhaning Jagad dan localhost
+    const originHeader = (req.headers.origin as string) || '';
+    const refererHeader = (req.headers.referer as string) || '';
+    const clientSource = originHeader || refererHeader;
+
+    const isOriginAllowed = () => {
+        if (!clientSource) return true; // Server-to-server / curl testing
+        try {
+            const parsed = new URL(clientSource);
+            const host = parsed.hostname.toLowerCase();
+            // Izinkan localhost & dev environment
+            if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
+            // Izinkan domain resmi K. Arzhaning Jagad
+            if (host === 'arzhaning.online' || host.endsWith('.arzhaning.online')) return true;
+            // Izinkan preview deployment resmi Vercel (personal-portfolio)
+            if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
+            return false;
+        } catch {
+            return false;
+        }
+    };
+
+    const isAllowed = isOriginAllowed();
+    res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://arzhaning.online');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+    if (!isAllowed) {
+        console.warn(`[chat.ts] 🛑 Unauthorized origin blocked: ${clientSource}`);
+        return res.status(403).json({
+            error: 'UNAUTHORIZED_DOMAIN',
+            detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://arzhaning.online).',
+        });
+    }
 
     // API keys dinamis dari environment
     const aiStudioKey = process.env.GEMINI_API_KEY || AISTUDIO_API_KEY;

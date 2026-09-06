@@ -9,6 +9,7 @@ import { FooterCV } from './FooterCV';
 import { ChatWidgetCV } from './ChatWidgetCV';
 import { CVDocumentModal } from './CVDocumentModal';
 import { Reveal } from './Reveal';
+import { ShowcaseBanner } from './ShowcaseBanner';
 
 interface CVPageProps {
   darkMode: boolean;
@@ -39,6 +40,7 @@ export const CVPage: React.FC<CVPageProps> = ({ darkMode, setDarkMode, onExit })
       className={`fixed inset-0 z-[70] overflow-y-auto animate-in fade-in duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-white text-slate-900'
         }`}
     >
+      <ShowcaseBanner />
       {/*
         PRINT: saat CVDocumentModal terbuka dan user menekan cetak, kita
         HANYA ingin modal itu yang tercetak — bukan halaman jasa di

@@ -9,6 +9,7 @@ import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
+import { ShowcaseBanner } from './components/ShowcaseBanner';
 import { ArrowUp } from 'lucide-react';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
@@ -107,6 +108,9 @@ export default function App() {
       className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-white text-slate-900'
         }`}
     >
+      {/* License / Showcase Evaluation Banner */}
+      <ShowcaseBanner />
+
       {/* Fixed Navigation Bar */}
       <Navbar
         darkMode={darkMode}

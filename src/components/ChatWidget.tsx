@@ -322,6 +322,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
   const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
   const [activeModel, setActiveModel] = useState<string>('');
+  const isRadit = aiMode === 'fallback';
 
   useEffect(() => {
     if (!isTyping) {
@@ -690,7 +691,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // ── Category / quick-option flow ──────────────────────────────────────────
   const showCategoryMenu = () => {
     setIsTyping(true);
-    setTimeout(() => {
+    const id = setTimeout(() => {
       setIsTyping(false);
       pushMessage({
         id: generateMessageId('bot'),
@@ -698,8 +699,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         text: 'Lanjut ke topik berikutnya? Pilih di bawah ya! 👇',
         timestamp: nowStr(),
         options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+        isAI: false,
       });
     }, 400);
+    timeoutsRef.current.push(id);
   };
 
 
@@ -951,7 +954,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   };
 
   // ─ Render ─────────────────────────────────────────────────────────────────
-  const isRadit = aiMode === 'fallback';
+  // Cek bot mana yang membalas pesan terakhir agar avatar dan nama di header sinkron
+  const lastBotMessage = [...messages].reverse().find((m) => m.sender === 'bot' && !m.isStreaming);
+  const isHeaderRadit = lastBotMessage ? lastBotMessage.isAI === false : (aiMode === 'fallback');
 
   // Untuk aria-live: cuma umumkan pesan bot yang SUDAH final (bukan yang lagi
   // di-stream karakter-per-karakter), supaya screen reader tidak membaca
@@ -982,24 +987,24 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 <div className="flex items-center gap-2.5">
                   <div className="relative">
                     <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${isRadit
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold transition-all ${isHeaderRadit
                         ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/30'
                         : 'bg-gradient-to-br from-teal-500 to-teal-700 shadow-teal-900/30'
                         } shadow-md`}
                     >
-                      {isRadit ? 'RD' : 'ZA'}
+                      {isHeaderRadit ? 'RD' : 'ZA'}
                     </div>
                     <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <h3 className="font-bold text-xs">
-                        {isRadit ? 'Radit' : 'Zannah'}
+                      <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                        {isHeaderRadit ? 'Radit' : 'Zannah'}
                       </h3>
-                      <ModeBadge aiMode={aiMode} darkMode={darkMode} />
+                      <ModeBadge aiMode={isHeaderRadit ? 'fallback' : (aiMode === 'unknown' ? 'ai' : aiMode)} darkMode={darkMode} />
                     </div>
-                    <p className="text-[10px] text-slate-400">
-                      {isRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
+                    <p className={`text-[10px] ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>
+                      {isHeaderRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
                     </p>
                   </div>
                 </div>
@@ -1215,12 +1220,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 {isTyping && (
                   <div className="flex gap-2 justify-start">
                     <div
-                      className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${isRadit
+                      className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${isHeaderRadit
                         ? 'bg-gradient-to-br from-amber-500 to-amber-700'
                         : 'bg-gradient-to-br from-teal-500 to-teal-700'
                         }`}
                     >
-                      {isRadit ? 'RD' : 'ZA'}
+                      {isHeaderRadit ? 'RD' : 'ZA'}
                     </div>
                     <div
                       className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-2 ${darkMode
@@ -1230,26 +1235,26 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                     >
                       <div className="flex items-center gap-1">
                         <span
-                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isHeaderRadit ? 'bg-amber-400' : 'bg-teal-400'
                             }`}
                           style={{ animationDelay: '0ms' }}
                         />
                         <span
-                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isHeaderRadit ? 'bg-amber-400' : 'bg-teal-400'
                             }`}
                           style={{ animationDelay: '150ms' }}
                         />
                         <span
-                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isHeaderRadit ? 'bg-amber-400' : 'bg-teal-400'
                             }`}
                           style={{ animationDelay: '300ms' }}
                         />
                       </div>
-                      <span className={`text-[11px] font-medium transition-all duration-300 ${isRadit
+                      <span className={`text-[11px] font-medium transition-all duration-300 ${isHeaderRadit
                         ? darkMode ? 'text-amber-300/90' : 'text-amber-700/90'
                         : darkMode ? 'text-teal-300/90' : 'text-teal-700/90'
                         }`}>
-                        {isRadit ? 'Mencari jawaban FAQ...' : ZANNAH_LOADING_STATUSES[loadingTextIndex]}
+                        {isHeaderRadit ? 'Mencari jawaban FAQ...' : ZANNAH_LOADING_STATUSES[loadingTextIndex]}
                       </span>
                     </div>
                   </div>
