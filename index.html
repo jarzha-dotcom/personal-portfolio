@@ -10,19 +10,34 @@
   <meta name="keywords"
     content="jasa pembuatan website, jasa aplikasi mobile, jasa pembuatan game, React developer, TypeScript, Node.js, freelance developer Indonesia, Cibitung, Bekasi" />
   <meta name="author" content="K. Arzhaning Jagad" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#0d9488" />
+
+  <!-- Geo targeting — freelance client lokal Bekasi/Jabodetabek -->
+  <meta name="geo.region" content="ID-JB" />
+  <meta name="geo.placename" content="Cibitung, Bekasi" />
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://byarzhaning.online/" />
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://byarzhaning.online/" />
   <meta property="og:title" content="K. Arzhaning Jagad | Jasa Web, Mobile App & Game Development" />
   <meta property="og:description"
     content="Jasa pembuatan aplikasi web, mobile, dan game — dari konsep sampai rilis. Komunikasi langsung tanpa perantara, standar kerja rapi dan tepat waktu." />
   <meta property="og:site_name" content="K. Arzhaning Jagad — Jasa Development" />
+  <meta property="og:image" content="https://byarzhaning.online/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="id_ID" />
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="K. Arzhaning Jagad | Jasa Web, Mobile App & Game Development" />
   <meta name="twitter:description"
     content="Jasa pembuatan aplikasi web, mobile, dan game — dari konsep sampai rilis. Komunikasi langsung tanpa perantara, standar kerja rapi dan tepat waktu." />
+  <meta name="twitter:image" content="https://byarzhaning.online/og-image.png" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,6 +45,17 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&family=Poppins:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!--
+      Preload gambar profil (LCP kandidat utama di Hero). GANTI src di
+      bawah dengan path asli file gambar profil setelah build (contoh:
+      /assets/profile-abc123.webp) — path bergantung nama file hasil
+      Vite, jadi tidak bisa di-hardcode generik di sini.
+  -->
+  <!-- <link rel="preload" as="image" href="/path/ke/foto-profil.webp" fetchpriority="high" /> -->
 
   <!--
       Structured Data (Schema.org JSON-LD)
@@ -58,9 +84,53 @@
     }
     </script>
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml"
-    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%230d9488'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='42' fill='white'>KAJ</text></svg>" />
+  <!-- WebSite — membantu Google mengenali identitas & bahasa situs -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "K. Arzhaning Jagad — Jasa Development",
+      "url": "https://byarzhaning.online",
+      "inLanguage": "id"
+    }
+    </script>
+
+  <!--
+      ProfessionalService — sinyal "jasa lokal" untuk pencarian seperti
+      "jasa developer Bekasi". Catatan keamanan yang sama seperti Person
+      di atas berlaku: tanpa telepon/email mentah, hanya arahkan ke
+      halaman kontak.
+    -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "K. Arzhaning Jagad — Jasa Development",
+      "url": "https://byarzhaning.online",
+      "image": "https://byarzhaning.online/og-image.png",
+      "priceRange": "Rp 800rb - Rp 12jt",
+      "areaServed": {
+        "@type": "AdministrativeArea",
+        "name": "Jabodetabek"
+      },
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Cibitung, Bekasi",
+        "addressRegion": "Jawa Barat",
+        "addressCountry": "ID"
+      }
+    }
+    </script>
+
+  <!--
+      Favicon — memakai file PNG hasil crop logo asli di public/.
+      SVG placeholder generik ("KAJ" teks putih di kotak teal) sudah
+      dihapus supaya tidak bersaing prioritas dengan browser yang kadang
+      mengutamakan format vektor walau isinya bukan logo final.
+    -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 </head>
 
 <body
