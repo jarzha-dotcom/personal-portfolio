@@ -123,9 +123,11 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             className="flex items-center gap-2.5 group focus:outline-none select-none"
             id="nav-logo-link"
           >
-            <div className="w-9 h-9 bg-teal-600 rounded-lg flex items-center justify-center text-white font-bold text-base shadow-sm group-hover:bg-teal-700 transition-colors">
-              {PERSONAL_INFO.initials}
-            </div>
+            <img
+              src="/icons/icon-512.png"
+              alt={PERSONAL_INFO.nickname}
+              className="w-9 h-9 rounded-lg object-cover shadow-sm"
+            />
             <div className="flex items-baseline gap-2">
               <span className={`font-bold text-lg tracking-tight transition-colors ${darkMode ? 'text-white group-hover:text-teal-400' : 'text-slate-800 group-hover:text-teal-600'
                 }`}>
