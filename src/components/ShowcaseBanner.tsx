@@ -16,7 +16,7 @@ export const ShowcaseBanner: React.FC = () => {
           <b className="tracking-wide">SHOWCASE / REVIEW MODE:</b> Hak Cipta © 2026 <b>K. Arzhaning Jagad (Arzha)</b>. Repositori ini hanya untuk evaluasi skill & review teknis. Kunci lisensi deployment tidak ditemukan.
         </span>
         <a
-          href="https://arzhaning.online"
+          href="https://byarzhaning.online"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 font-bold underline text-amber-200 hover:text-white transition-colors ml-1"

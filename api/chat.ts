@@ -362,7 +362,7 @@ function generateSummaryAttachment(
         '================================================================',
         `Waktu Sesi    : ${dateStr}, ${timeStr} WIB`,
         `Asisten AI    : ${botName} (AI Tech Consultant & Portfolio Assistant)`,
-        'Situs Web     : https://arzhaning.online',
+        'Situs Web     : https://',
         '',
         '----------------------------------------------------------------',
         '1. RINGKASAN DISKUSI & TRANSKRIP:',
@@ -712,7 +712,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             // Izinkan localhost & dev environment
             if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
             // Izinkan domain resmi K. Arzhaning Jagad
-            if (host === 'arzhaning.online' || host.endsWith('.arzhaning.online')) return true;
+            if (host === 'byarzhaning.online' || host.endsWith('.arzhaning.online')) return true;
             // Izinkan preview deployment resmi Vercel (personal-portfolio)
             if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
             return false;
@@ -722,7 +722,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
 
     const isAllowed = isOriginAllowed();
-    res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://arzhaning.online');
+    res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://byarzhaning.online');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -733,7 +733,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.warn(`[chat.ts] 🛑 Unauthorized origin blocked: ${clientSource}`);
         return res.status(403).json({
             error: 'UNAUTHORIZED_DOMAIN',
-            detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://arzhaning.online).',
+            detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://byarzhaning.online).',
         });
     }
 
