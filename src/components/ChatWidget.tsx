@@ -1,17 +1,21 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download } from 'lucide-react';
 import Fuse from 'fuse.js';
+import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
-import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
+import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile } from '../services/geminiService';
 import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
-import {
-  speak,
-  stopSpeaking,
-  startListening,
-  stopListening,
-  isSpeechSupported,
-  BOT_VOICES,
-} from '../services/voiceService';
+import { BOT_VOICES } from '../services/voiceService';
+import { useVoiceChat } from '../hooks/useVoiceChat';
+import { useStreamingText } from '../hooks/useStreamingText';
+import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
+
+const ZANNAH_LOADING_STATUSES = [
+  'Menyiapkan respon...',
+  'Menganalisis kebutuhan Kakak...',
+  'Menyusun rekomendasi solutif...',
+  'Menyempurnakan detail jawaban...',
+];
 
 interface ChatWidgetProps {
   darkMode: boolean;
@@ -22,6 +26,19 @@ interface QuickOption {
   label: string;
 }
 
+/** File yang lagi disiapkan user buat diupload (preview sebelum dikirim) */
+interface PendingFile {
+  id: string;
+  name: string;
+  mimeType: string;
+  data: string; // base64 tanpa prefix data:...;base64,
+  previewUrl?: string; // cuma ada kalau image, buat thumbnail
+}
+
+const ALLOWED_UPLOAD_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf', 'text/csv'];
+const MAX_UPLOAD_FILES = 3;
+const MAX_UPLOAD_FILE_BYTES = 6 * 1024 * 1024; // cocokkan dengan limit di chat.ts
+
 interface Message {
   id: string;
   sender: 'user' | 'bot';
@@ -30,6 +47,10 @@ interface Message {
   options?: QuickOption[];
   isAI?: boolean;
   isStreaming?: boolean;
+  /** File yang di-upload user bareng pesan ini (buat ditampilkan sbg thumbnail) */
+  uploadedFiles?: PendingFile[];
+  /** File hasil kerja Antigravity yang bisa didownload (mis. RAB.xlsx, laporan.pdf) */
+  attachments?: Attachment[];
 }
 
 // ─── FAQ Fallback Data (Fuse.js) ────────────────────────────────────────────
@@ -265,12 +286,53 @@ const generateMessageId = (prefix = 'msg'): string => {
 
 const MAX_DISPLAY_MESSAGES = 50;
 
+// Dipindah ke luar ChatWidget: sebelumnya didefinisikan ulang di setiap
+// render sebagai komponen baru, yang membuat React selalu remount elemen
+// ini alih-alih update biasa (nggak fatal karena tidak ada state internal,
+// tapi tetap bukan best practice).
+const ModeBadge: React.FC<{ aiMode: 'ai' | 'fallback' | 'unknown'; darkMode: boolean }> = ({
+  aiMode,
+  darkMode,
+}) => {
+  if (aiMode === 'unknown') return null;
+  const isAI = aiMode === 'ai';
+  return (
+    <span
+      className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${isAI
+        ? darkMode
+          ? 'bg-teal-900/60 text-teal-400'
+          : 'bg-teal-50 text-teal-600'
+        : darkMode
+          ? 'bg-amber-900/50 text-amber-300'
+          : 'bg-amber-50 text-amber-700'
+        }`}
+      title={isAI ? 'Zannah AI aktif' : 'Radit standby (Model direktori non-AI)'}
+    >
+      {isAI ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
+      {isAI ? ' Zannah (AI)' : '📋 Radit (Non-AI)'}
+    </span>
+  );
+};
+
 // ── Component ───────────────────────────────────────────────────────────────
 export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+  const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
   const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
   const [activeModel, setActiveModel] = useState<string>('');
+
+  useEffect(() => {
+    if (!isTyping) {
+      setLoadingTextIndex(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setLoadingTextIndex((prev) => (prev + 1) % ZANNAH_LOADING_STATUSES.length);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, [isTyping]);
 
   // Inisialisasi messages dari localStorage (atau welcome msg jika belum ada)
   const [messages, setMessages] = useState<Message[]>(() => {
@@ -288,15 +350,127 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     ];
   });
   const [inputValue, setInputValue] = useState('');
+  const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const lastQueryRef = useRef<string>('');
 
-  // ── Voice Chat state ─────────────────────────────────────────────────────
-  const [isListening, setIsListening] = useState(false);
-  const [speakingId, setSpeakingId] = useState<string | null>(null);
-  const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
-  const [voiceSupport] = useState(() => isSpeechSupported());
-  const stopListenRef = useRef<(() => void) | null>(null);
+  // Helper terpusat untuk menambah pesan baru ke state, sekaligus menjaga
+  // batas MAX_DISPLAY_MESSAGES. Sebelumnya pola
+  // `prev.slice(-(MAX_DISPLAY_MESSAGES - 1))` diulang manual di banyak
+  // tempat — riskan lupa di-trim kalau ada penambahan fitur baru nanti.
+  const pushMessage = (message: Message) => {
+    setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), message]);
+  };
+
+  const handleDownloadSummary = () => {
+    const botName = isRadit ? 'Radit' : 'Zannah';
+    const ok = downloadChatSummaryFile(messages, botName);
+    if (ok) {
+      setDownloadSummarySuccess(true);
+      setTimeout(() => setDownloadSummarySuccess(false), 3000);
+    }
+  };
+
+  const pushUserMessage = (text: string, uploadedFiles?: PendingFile[]) => {
+    pushMessage({
+      id: generateMessageId('user'),
+      sender: 'user',
+      text,
+      timestamp: nowStr(),
+      uploadedFiles: uploadedFiles && uploadedFiles.length > 0 ? uploadedFiles : undefined,
+    });
+  };
+
+  // Baca file jadi base64 murni (tanpa prefix "data:...;base64,")
+  const readFileAsBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result.split(',')[1] ?? '');
+      };
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(file);
+    });
+
+  const handleFilesSelected = async (fileList: FileList | null) => {
+    if (!fileList || fileList.length === 0) return;
+    setUploadError(null);
+
+    const incoming = Array.from(fileList);
+    const room = MAX_UPLOAD_FILES - pendingFiles.length;
+    if (room <= 0) {
+      setUploadError(`Maksimal ${MAX_UPLOAD_FILES} file per pesan.`);
+      return;
+    }
+
+    const accepted: PendingFile[] = [];
+    for (const file of incoming.slice(0, room)) {
+      if (!ALLOWED_UPLOAD_MIME_TYPES.includes(file.type)) {
+        setUploadError('Format belum didukung. Pakai JPG/PNG/WebP, PDF, atau CSV ya.');
+        continue;
+      }
+      if (file.size > MAX_UPLOAD_FILE_BYTES) {
+        setUploadError(`"${file.name}" kegedean (maks ${Math.round(MAX_UPLOAD_FILE_BYTES / (1024 * 1024))}MB).`);
+        continue;
+      }
+      try {
+        const base64 = await readFileAsBase64(file);
+        accepted.push({
+          id: generateMessageId('file'),
+          name: file.name,
+          mimeType: file.type,
+          data: base64,
+          previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+        });
+      } catch {
+        setUploadError(`Gagal membaca file "${file.name}".`);
+      }
+    }
+    if (accepted.length > 0) {
+      setPendingFiles((prev) => [...prev, ...accepted]);
+    }
+  };
+
+  const removePendingFile = (id: string) => {
+    setPendingFiles((prev) => {
+      const target = prev.find((f) => f.id === id);
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((f) => f.id !== id);
+    });
+  };
+
+  // Trigger download langsung dari base64 (gak butuh storage eksternal sama
+  // sekali — file dari sandbox Antigravity dikirim base64 lewat chat.ts,
+  // browser yang bikin file-nya jadi nyata lewat Blob + <a download>).
+  const downloadAttachment = (att: Attachment) => {
+    try {
+      const byteChars = atob(att.base64);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+      const blob = new Blob([new Uint8Array(byteNumbers)], { type: att.mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = att.name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    } catch (err) {
+      console.error('Gagal download attachment:', err);
+    }
+  };
+
+  // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
+  const { isListening, speakingId, loadingSpeakId, voiceSupport, handleMicClick: micToggle, handleToggleSpeak } =
+    useVoiceChat({ logLabel: 'ChatWidget' });
+  // Kalau hasil final STT datang saat bot masih mengetik, teks ditampung di
+  // sini dulu dan otomatis dikirim begitu bot selesai (lihat effect di bawah),
+  // bukan langsung dibuang diam-diam seperti sebelumnya.
+  const pendingVoiceTextRef = useRef<string | null>(null);
 
   // Rate limiting refs
   const lastRequestTimeRef = useRef<number>(0);
@@ -308,6 +482,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   // ⚠️ Cleanup setTimeout untuk mencegah memory leak saat unmount
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const streamText = useStreamingText();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -324,11 +499,19 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   useEffect(() => {
     return () => {
       timeoutsRef.current.forEach(clearTimeout);
-      // ⚠️ Hentikan mic & audio TTS yang mungkin masih aktif saat widget unmount
-      stopListening();
-      stopSpeaking();
+      // mic/TTS & interval animasi dibersihkan masing-masing oleh
+      // useVoiceChat & useStreamingText.
     };
   }, []);
+
+  // Kirim otomatis hasil STT yang sempat tertunda begitu bot selesai mengetik.
+  useEffect(() => {
+    if (!isTyping && pendingVoiceTextRef.current) {
+      const pending = pendingVoiceTextRef.current;
+      pendingVoiceTextRef.current = null;
+      sendMessage(pending, true);
+    }
+  }, [isTyping]);
 
   const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
@@ -342,19 +525,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // ── Bot reply helpers ──────────────────────────────────────────────────────
   const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
     const msgId = generateMessageId('bot');
-    setMessages((prev) => [
-      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-      {
-        id: msgId,
-        sender: 'bot',
-        text,
-        timestamp: nowStr(),
-        options,
-        isAI,
-      },
-    ]);
+    pushMessage({
+      id: msgId,
+      sender: 'bot',
+      text,
+      timestamp: nowStr(),
+      options,
+      isAI,
+    });
     if (autoSpeak) {
-      handleToggleSpeak(msgId, text, !isAI);
+      handleToggleSpeak(msgId, text, !isAI ? BOT_VOICES.RADIT : BOT_VOICES.ZANNAH);
     }
   };
 
@@ -362,50 +542,38 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     fullText: string,
     options?: QuickOption[],
     isAI = true,
-    autoSpeak = false
+    autoSpeak = false,
+    attachments?: Attachment[]
   ) => {
     const msgId = generateMessageId('bot');
-    setMessages((prev) => [
-      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-      {
-        id: msgId,
-        sender: 'bot',
-        text: '',
-        timestamp: nowStr(),
-        options: undefined,
-        isAI,
-        isStreaming: true,
-      },
-    ]);
+    pushMessage({
+      id: msgId,
+      sender: 'bot',
+      text: '',
+      timestamp: nowStr(),
+      options: undefined,
+      isAI,
+      isStreaming: true,
+      attachments: attachments && attachments.length > 0 ? attachments : undefined,
+    });
 
-    let currentIndex = 0;
-    const totalLength = fullText.length;
-    const chunkSize = totalLength > 280 ? 3 : totalLength > 120 ? 2 : 1;
-    const speedMs = 18;
-
-    const intervalId = window.setInterval(() => {
-      currentIndex += chunkSize;
-      if (currentIndex >= totalLength) {
-        window.clearInterval(intervalId);
+    streamText(fullText, {
+      isVoice: autoSpeak,
+      // Opsi A: TTS dipicu paralel begitu animasi mulai, tidak menunggu
+      // animasi ketik selesai — menghilangkan delay bertumpuk sebelum suara keluar.
+      onStart: autoSpeak ? () => handleToggleSpeak(msgId, fullText, !isAI ? BOT_VOICES.RADIT : BOT_VOICES.ZANNAH) : undefined,
+      onTick: (partial, isDone) => {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === msgId
-              ? { ...m, text: fullText, options, isStreaming: false }
+              ? isDone
+                ? { ...m, text: fullText, options, isStreaming: false }
+                : { ...m, text: partial, isStreaming: true }
               : m
           )
         );
-        if (autoSpeak) {
-          handleToggleSpeak(msgId, fullText, !isAI);
-        }
-      } else {
-        const partial = fullText.slice(0, currentIndex);
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === msgId ? { ...m, text: partial, isStreaming: true } : m
-          )
-        );
-      }
-    }, speedMs);
+      },
+    });
   };
 
   const standardCTA: QuickOption[] = [
@@ -446,7 +614,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   };
 
   // AI (Gemini) response — with automatic Radit fallback & Cooldown
-  const respondWithAI = async (userText: string, isFromVoice = false) => {
+  const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[]) => {
     setIsTyping(true);
 
     // ── Cooldown / Rate Limiting Check ──
@@ -467,11 +635,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       return;
     }
     lastRequestTimeRef.current = now;
+    // Catatan: cooldown sengaja "direservasi" di sini, SEBELUM await ke API,
+    // bukan cuma setelah sukses. Ini disengaja — tujuannya menahan laju
+    // permintaan (anti-hammering) terlepas dari hasil request itu nanti
+    // sukses atau gagal, bukan cuma membatasi request yang berhasil saja.
     // ──────────────────────────────────
 
     const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
     try {
-      const result = await sendMessageToGemini(geminiHistoryRef.current, userText);
+      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, undefined, files);
       const replyText = result.reply;
 
       // Simpan model yang aktif untuk ditampilkan di UI
@@ -488,7 +660,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       saveGeminiHistory('zannah', geminiHistoryRef.current);
       setAiMode('ai');
       setIsTyping(false);
-      streamBotMessage(replyText, standardCTA, true, isFromVoice);
+      streamBotMessage(replyText, standardCTA, true, isFromVoice, result.attachments);
     } catch (err: unknown) {
       // ── Graceful degradation: fall to Radit (Directory Model) ──────────
       console.warn('[ChatWidget] Zannah AI unavailable, falling back to Radit:', err);
@@ -518,12 +690,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // ── Category / quick-option flow ──────────────────────────────────────────
   const showCategoryMenu = () => {
     setIsTyping(true);
-    const id = setTimeout(() => {
+    setTimeout(() => {
       setIsTyping(false);
-      appendBotMessage('Mau tanya soal apa lagi?', WELCOME_OPTIONS);
+      pushMessage({
+        id: generateMessageId('bot'),
+        sender: 'bot',
+        text: 'Lanjut ke topik berikutnya? Pilih di bawah ya! 👇',
+        timestamp: nowStr(),
+        options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+      });
     }, 400);
-    timeoutsRef.current.push(id);
   };
+
 
   const showCategoryQuestions = (category: Category) => {
     const items = FAQ_ITEMS.filter((f) => f.categoryId === category.id);
@@ -553,15 +731,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     if (id === 'retry_zannah') {
       setAiMode('ai');
       if (lastQueryRef.current) {
-        setMessages((prev) => [
-          ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-          {
-            id: generateMessageId('user'),
-            sender: 'user',
-            text: `✨ Coba tanya Zannah: "${lastQueryRef.current}"`,
-            timestamp: nowStr(),
-          },
-        ]);
+        pushUserMessage(`✨ Coba tanya Zannah: "${lastQueryRef.current}"`);
         respondWithAI(lastQueryRef.current);
       } else {
         setIsTyping(true);
@@ -578,19 +748,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     }
     const category = CATEGORIES.find((c) => c.id === id);
     if (category) {
-      setMessages((prev) => [
-        ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-        { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() },
-      ]);
+      pushUserMessage(label);
       showCategoryQuestions(category);
       return;
     }
     const faq = FAQ_ITEMS.find((f) => f.id === id);
     if (faq) {
-      setMessages((prev) => [
-        ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-        { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() },
-      ]);
+      pushUserMessage(label);
       respondWithFAQ(faq);
       return;
     }
@@ -598,24 +762,32 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   };
 
   const sendMessage = (text: string, isFromVoice = false) => {
-    if (!text.trim() || isTyping) return;
-    const cleanText = text.trim();
-    setMessages((prev) => [
-      ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-      { id: generateMessageId('user'), sender: 'user', text: cleanText, timestamp: nowStr() },
-    ]);
+    const trimmed = text.trim();
+    if ((!trimmed && pendingFiles.length === 0) || isTyping) return;
+    // Kalau user cuma lampirin file tanpa nulis apa-apa, kasih caption default
+    // biar backend tetap punya instruksi jelas.
+    const cleanText = trimmed || 'Tolong analisis file yang saya lampirkan ini.';
+    const filesForThisMessage = pendingFiles;
+    pushUserMessage(cleanText, filesForThisMessage);
     lastQueryRef.current = cleanText;
     setInputValue('');
+    setPendingFiles([]); // preview di-clear, tapi objectURL-nya masih dipakai bubble di atas
+    setUploadError(null);
+
+    const outgoingFiles: OutgoingFile[] | undefined = filesForThisMessage.length > 0
+      ? filesForThisMessage.map((f) => ({ mimeType: f.mimeType, data: f.data, name: f.name }))
+      : undefined;
 
     // Deteksi intent alami jika user meminta kembali ke Zannah
     const wantsZannah = /zannah|panggil zannah|coba zannah|coba lagi|mode ai|connect ai/i.test(cleanText);
     if (wantsZannah && aiMode === 'fallback') {
       setAiMode('ai');
-      respondWithAI(cleanText, isFromVoice);
+      respondWithAI(cleanText, isFromVoice, outgoingFiles);
       return;
     }
 
-    if (aiMode === 'fallback') {
+    // Kalau ada file dilampirkan, selalu pakai AI (FAQ fallback gak bisa proses file).
+    if (aiMode === 'fallback' && !outgoingFiles) {
       const results = fuse.search(cleanText);
       if (results.length > 0) {
         respondWithFAQ(results[0].item, isFromVoice);
@@ -623,7 +795,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         respondWithFallback(isFromVoice);
       }
     } else {
-      respondWithAI(cleanText, isFromVoice);
+      respondWithAI(cleanText, isFromVoice, outgoingFiles);
     }
   };
 
@@ -636,90 +808,27 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     }
   };
 
-  // ── Voice Chat: mic (STT) ────────────────────────────────────────────────
+  // ── Voice Chat: mic (STT) — wrapper tipis di atas hook, karena logika
+  // "tampilkan transkrip sementara di input & kirim saat final" itu spesifik
+  // ke komponen ini (beda struktur pesan di tiap file).
   const handleMicClick = () => {
-    if (isListening) {
-      stopListenRef.current?.();
-      stopListenRef.current = null;
-      setIsListening(false);
-      return;
-    }
-    if (!voiceSupport.stt) return; // tombol sudah disabled, ini jaga-jaga
-
-    stopSpeaking(); // jangan sampai TTS & mic aktif bersamaan
-    setSpeakingId(null);
-
-    const cleanup = startListening({
-      lang: 'id-ID',
-      onStart: () => setIsListening(true),
-      onResult: (text, isFinal) => {
-        setInputValue(text);
-        if (isFinal && text.trim()) {
-          // Ucapan final otomatis terkirim dan jawaban bot otomatis diputar via TTS
+    micToggle((text, isFinal) => {
+      setInputValue(text);
+      if (isFinal && text.trim()) {
+        // Kalau bot masih mengetik, tunda dulu — dikirim otomatis oleh
+        // effect isTyping di atas begitu bot selesai, bukan dibuang diam-diam.
+        if (isTyping) {
+          pendingVoiceTextRef.current = text.trim();
+        } else {
           sendMessage(text, true);
-          setInputValue('');
         }
-      },
-      onEnd: () => {
-        setIsListening(false);
-        stopListenRef.current = null;
-      },
-      onError: (err) => {
-        console.warn('[ChatWidget] STT error:', err);
-        setIsListening(false);
-        stopListenRef.current = null;
-      },
+        setInputValue('');
+      }
     });
-    stopListenRef.current = cleanup;
   };
 
   // ── Voice Chat: play bot reply (TTS) ─────────────────────────────────────
-  const handleToggleSpeak = async (messageId: string, text: string, isRadit = false) => {
-    if (speakingId === messageId) {
-      stopSpeaking();
-      setSpeakingId(null);
-      return;
-    }
-    setLoadingSpeakId(messageId);
-    const selectedVoice = isRadit ? BOT_VOICES.RADIT : BOT_VOICES.ZANNAH;
-    await speak(text, {
-      voice: selectedVoice,
-      onStart: () => {
-        setLoadingSpeakId(null);
-        setSpeakingId(messageId);
-      },
-      onEnd: () => {
-        setLoadingSpeakId(null);
-        setSpeakingId((current) => (current === messageId ? null : current));
-      },
-      onError: () => {
-        setLoadingSpeakId(null);
-        setSpeakingId(null);
-      },
-    });
-  };
-
-  // ── Mode badge ─────────────────────────────────────────────────────────────
-  const ModeBadge = () => {
-    if (aiMode === 'unknown') return null;
-    const isAI = aiMode === 'ai';
-    return (
-      <span
-        className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${isAI
-          ? darkMode
-            ? 'bg-teal-900/60 text-teal-400'
-            : 'bg-teal-50 text-teal-600'
-          : darkMode
-            ? 'bg-amber-900/50 text-amber-300'
-            : 'bg-amber-50 text-amber-700'
-          }`}
-        title={isAI ? 'Zannah AI aktif' : 'Radit standby (Model direktori non-AI)'}
-      >
-        {isAI ? <Wifi className="w-2.5 h-2.5" /> : <WifiOff className="w-2.5 h-2.5" />}
-        {isAI ? ' Zannah (AI)' : '📋 Radit (Non-AI)'}
-      </span>
-    );
-  };
+  // handleToggleSpeak sekarang datang langsung dari hook useVoiceChat di atas.
 
   // ── Smart Message Content Parser (Markdown + WhatsApp CTA) ────────────────
   const parseBold = (str: string) => {
@@ -844,265 +953,414 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // ─ Render ─────────────────────────────────────────────────────────────────
   const isRadit = aiMode === 'fallback';
 
+  // Untuk aria-live: cuma umumkan pesan bot yang SUDAH final (bukan yang lagi
+  // di-stream karakter-per-karakter), supaya screen reader tidak membaca
+  // bubble kosong di awal animasi ketik atau berulang kali di tiap tick.
+  const lastFinalizedBotMessage = [...messages].reverse().find((m) => m.sender === 'bot' && !m.isStreaming);
+
   return (
     <div className="fixed bottom-6 left-6 z-50 no-print">
       {isOpen && (
-        <div
-          className={`w-80 sm:w-96 h-[460px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
-            }`}
-        >
-          {/* Header */}
+        <Portal>
+          {/* Backdrop — full overlay on mobile (layar sempit) so user fokus ke chat; invisible & click-through on desktop */}
           <div
-            className={`p-3.5 border-b flex items-center justify-between transition-colors ${darkMode
-              ? 'bg-slate-800/80 border-slate-700'
-              : 'bg-slate-50 border-slate-100'
-              }`}
+            className="fixed inset-0 z-[9999] flex items-end justify-start p-0 sm:pb-24 sm:pl-6 bg-black/60 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none sm:pointer-events-none"
+            onClick={() => setIsOpen(false)}
           >
-            <div className="flex items-center gap-2.5">
-              <div className="relative">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${isRadit
-                    ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/30'
-                    : 'bg-gradient-to-br from-teal-500 to-teal-700 shadow-teal-900/30'
-                    } shadow-md`}
-                >
-                  {isRadit ? 'RD' : 'ZA'}
-                </div>
-                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-bold text-xs">
-                    {isRadit ? 'Radit' : 'Zannah'}
-                  </h3>
-                  <ModeBadge />
-                </div>
-                <p className="text-[10px] text-slate-400">
-                  {isRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1">
-              <button
-                aria-label="Tutup jendela chat"
-                onClick={() => setIsOpen(false)}
-                className={`p-1.5 rounded-lg transition-colors ${darkMode
-                  ? 'text-slate-400 hover:text-white hover:bg-slate-700'
-                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
-                  }`}
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Fallback Notice Banner with Quick Reconnect Button */}
-          {isRadit && (
             <div
-              className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b transition-all ${darkMode
-                ? 'bg-amber-950/40 border-amber-900/50 text-amber-300'
-                : 'bg-amber-50 border-amber-200 text-amber-800'
+              onClick={(e) => e.stopPropagation()}
+              className={`w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
                 }`}
             >
-              <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                <span className="text-xs shrink-0">📋</span>
-                <span className="truncate">
-                  <b>Radit (Non-AI):</b> Zannah lagi istirahat kuota
-                </span>
-              </div>
-              <button
-                onClick={() => handleOptionClick('retry_zannah', 'Coba Zannah')}
-                className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
-                  ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-                  : 'bg-amber-500 hover:bg-amber-600 text-white'
+              {/* Header */}
+              <div
+                className={`p-3.5 border-b flex items-center justify-between transition-colors ${darkMode
+                  ? 'bg-slate-800/80 border-slate-700'
+                  : 'bg-slate-50 border-slate-100'
                   }`}
               >
-                ✨ Coba Zannah
-              </button>
-            </div>
-          )}
-
-          {/* Messages Body */}
-          <div
-            className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
-              }`}
-          >
-            {messages.map((m) => (
-              <div
-                key={m.id}
-                className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                {m.sender === 'bot' && (
-                  <div
-                    className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false
-                      ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-                      : 'bg-gradient-to-br from-teal-500 to-teal-700'
-                      }`}
-                    title={m.isAI === false ? 'Radit (Model Direktori)' : 'Zannah (AI)'}
-                  >
-                    {m.isAI === false ? 'RD' : 'ZA'}
+                <div className="flex items-center gap-2.5">
+                  <div className="relative">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${isRadit
+                        ? 'bg-gradient-to-br from-amber-500 to-amber-700 shadow-amber-900/30'
+                        : 'bg-gradient-to-br from-teal-500 to-teal-700 shadow-teal-900/30'
+                        } shadow-md`}
+                    >
+                      {isRadit ? 'RD' : 'ZA'}
+                    </div>
+                    <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
                   </div>
-                )}
-                <div className="max-w-[85%] flex flex-col gap-1.5">
-                  <div
-                    className={`px-3 py-2 rounded-xl leading-relaxed ${m.sender === 'user'
-                      ? 'bg-teal-600 text-white rounded-br-none ml-auto'
-                      : darkMode
-                        ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
-                        : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <h3 className="font-bold text-xs">
+                        {isRadit ? 'Radit' : 'Zannah'}
+                      </h3>
+                      <ModeBadge aiMode={aiMode} darkMode={darkMode} />
+                    </div>
+                    <p className="text-[10px] text-slate-400">
+                      {isRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1">
+                  {messages.length > 1 && (
+                    <button
+                      type="button"
+                      aria-label="Unduh rangkuman obrolan"
+                      title="Unduh rangkuman obrolan (.txt) untuk lanjut ke WhatsApp Mas Arzha"
+                      onClick={handleDownloadSummary}
+                      className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-[10px] font-medium ${downloadSummarySuccess
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                        : darkMode
+                          ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                        }`}
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">{downloadSummarySuccess ? 'Tersimpan!' : 'Rangkuman'}</span>
+                    </button>
+                  )}
+                  <button
+                    aria-label="Tutup jendela chat"
+                    onClick={() => setIsOpen(false)}
+                    className={`p-1.5 rounded-lg transition-colors ${darkMode
+                      ? 'text-slate-400 hover:text-white hover:bg-slate-700'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
                       }`}
                   >
-                    {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
-                    <div className="flex items-center justify-between gap-2 mt-1">
-                      {m.sender === 'bot' ? (
-                        <button
-                          aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
-                          onClick={() => handleToggleSpeak(m.id, m.text, m.isAI === false)}
-                          className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode
-                            ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60'
-                            : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'
-                            }`}
-                        >
-                          {loadingSpeakId === m.id ? (
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                          ) : speakingId === m.id ? (
-                            <Square className="w-2.5 h-2.5 fill-current" />
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Region tersembunyi khusus screen reader: umumkan status mengetik
+                  dan balasan bot yang sudah final, terpisah dari bubble visual
+                  supaya tidak ikut ke-baca ulang tiap tick animasi streaming. */}
+              <div className="sr-only" aria-live="polite" aria-atomic="true">
+                {isTyping
+                  ? `${isRadit ? 'Radit' : 'Zannah'} sedang mengetik…`
+                  : lastFinalizedBotMessage?.text ?? ''}
+              </div>
+
+              {/* Fallback Notice Banner with Quick Reconnect Button */}
+              {isRadit && (
+                <div
+                  className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b transition-all ${darkMode
+                    ? 'bg-amber-950/40 border-amber-900/50 text-amber-300'
+                    : 'bg-amber-50 border-amber-200 text-amber-800'
+                    }`}
+                >
+                  <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                    <span className="text-xs shrink-0">📋</span>
+                    <span className="truncate">
+                      <b>Radit (Non-AI):</b> Zannah lagi istirahat kuota
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleOptionClick('retry_zannah', 'Coba Zannah')}
+                    className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
+                      ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                      : 'bg-amber-500 hover:bg-amber-600 text-white'
+                      }`}
+                  >
+                    ✨ Coba Zannah
+                  </button>
+                </div>
+              )}
+
+              {/* Messages Body */}
+              <div
+                role="log"
+                aria-relevant="additions"
+                className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
+                  }`}
+              >
+                {messages.map((m) => (
+                  <div
+                    key={m.id}
+                    className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    {m.sender === 'bot' && (
+                      <div
+                        className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false
+                          ? 'bg-gradient-to-br from-amber-500 to-amber-700'
+                          : 'bg-gradient-to-br from-teal-500 to-teal-700'
+                          }`}
+                        title={m.isAI === false ? 'Radit (Model Direktori)' : 'Zannah (AI)'}
+                      >
+                        {m.isAI === false ? 'RD' : 'ZA'}
+                      </div>
+                    )}
+                    <div className="max-w-[85%] flex flex-col gap-1.5">
+                      <div
+                        className={`px-3 py-2 rounded-xl leading-relaxed ${m.sender === 'user'
+                          ? 'bg-teal-600 text-white rounded-br-none ml-auto'
+                          : darkMode
+                            ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                            : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                          }`}
+                      >
+                        {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
+                        <div className="flex items-center justify-between gap-2 mt-1">
+                          {m.sender === 'bot' ? (
+                            <button
+                              aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
+                              onClick={() => handleToggleSpeak(m.id, m.text, m.isAI === false ? BOT_VOICES.RADIT : BOT_VOICES.ZANNAH)}
+                              className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode
+                                ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60'
+                                : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'
+                                }`}
+                            >
+                              {loadingSpeakId === m.id ? (
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                              ) : speakingId === m.id ? (
+                                <Square className="w-2.5 h-2.5 fill-current" />
+                              ) : (
+                                <Volume2 className="w-3.5 h-3.5" />
+                              )}
+                            </button>
                           ) : (
-                            <Volume2 className="w-3.5 h-3.5" />
+                            <span />
                           )}
-                        </button>
-                      ) : (
-                        <span />
+                          <span className="block text-[9px] opacity-50 text-right">
+                            {m.timestamp}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Thumbnail file yang diupload user bareng pesan ini */}
+                      {m.uploadedFiles && m.uploadedFiles.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.uploadedFiles.map((f) => (
+                            f.previewUrl ? (
+                              <img
+                                key={f.id}
+                                src={f.previewUrl}
+                                alt={f.name}
+                                className="w-12 h-12 object-cover rounded-lg border border-slate-300 dark:border-slate-600"
+                              />
+                            ) : (
+                              <span
+                                key={f.id}
+                                className={`inline-flex items-center gap-1 text-[9.5px] px-2 py-1 rounded-md border ${darkMode ? 'bg-slate-800 border-slate-600 text-slate-300' : 'bg-slate-100 border-slate-300 text-slate-600'}`}
+                                title={f.name}
+                              >
+                                <FileText className="w-3 h-3" />
+                                {f.name.length > 16 ? f.name.slice(0, 16) + '…' : f.name}
+                              </span>
+                            )
+                          ))}
+                        </div>
                       )}
-                      <span className="block text-[9px] opacity-50 text-right">
-                        {m.timestamp}
+
+                      {/* File hasil kerja Zannah (mis. RAB.xlsx, laporan.pdf) — siap didownload */}
+                      {m.attachments && m.attachments.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.attachments.map((att, i) => (
+                            <button
+                              key={`${m.id}-att-${i}`}
+                              type="button"
+                              onClick={() => downloadAttachment(att)}
+                              className={`inline-flex items-center gap-1.5 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                                : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                }`}
+                            >
+                              <Download className="w-3 h-3" />
+                              {att.name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+
+                      {m.options && m.options.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {m.options.map((opt) => (
+                            <button
+                              key={opt.id}
+                              onClick={() => handleOptionClick(opt.id, opt.label)}
+                              className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-all active:scale-95 ${opt.id === 'whatsapp'
+                                ? darkMode
+                                  ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
+                                  : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                                : opt.id === 'menu'
+                                  ? darkMode
+                                    ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
+                                    : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                                  : darkMode
+                                    ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
+                                    : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
+                                }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    {m.sender === 'user' && (
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
+                          }`}
+                      >
+                        <User className="w-3 h-3" />
+                      </div>
+                    )}
+                  </div>
+                ))}
+
+                {/* Typing indicator with Progressive Status Text */}
+                {isTyping && (
+                  <div className="flex gap-2 justify-start">
+                    <div
+                      className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${isRadit
+                        ? 'bg-gradient-to-br from-amber-500 to-amber-700'
+                        : 'bg-gradient-to-br from-teal-500 to-teal-700'
+                        }`}
+                    >
+                      {isRadit ? 'RD' : 'ZA'}
+                    </div>
+                    <div
+                      className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-2 ${darkMode
+                        ? 'bg-slate-800 border border-slate-700'
+                        : 'bg-white border border-slate-200 shadow-sm'
+                        }`}
+                    >
+                      <div className="flex items-center gap-1">
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                            }`}
+                          style={{ animationDelay: '0ms' }}
+                        />
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                            }`}
+                          style={{ animationDelay: '150ms' }}
+                        />
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
+                            }`}
+                          style={{ animationDelay: '300ms' }}
+                        />
+                      </div>
+                      <span className={`text-[11px] font-medium transition-all duration-300 ${isRadit
+                        ? darkMode ? 'text-amber-300/90' : 'text-amber-700/90'
+                        : darkMode ? 'text-teal-300/90' : 'text-teal-700/90'
+                        }`}>
+                        {isRadit ? 'Mencari jawaban FAQ...' : ZANNAH_LOADING_STATUSES[loadingTextIndex]}
                       </span>
                     </div>
                   </div>
-                  {m.options && m.options.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {m.options.map((opt) => (
-                        <button
-                          key={opt.id}
-                          onClick={() => handleOptionClick(opt.id, opt.label)}
-                          className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-all active:scale-95 ${opt.id === 'whatsapp'
-                            ? darkMode
-                              ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
-                              : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                            : opt.id === 'menu'
-                              ? darkMode
-                                ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
-                                : 'border-slate-300 text-slate-600 hover:bg-slate-100'
-                              : darkMode
-                                ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
-                                : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
-                            }`}
-                        >
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-                {m.sender === 'user' && (
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
-                      }`}
-                  >
-                    <User className="w-3 h-3" />
-                  </div>
                 )}
+                <div ref={messagesEndRef} />
               </div>
-            ))}
 
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex gap-2 justify-start">
-                <div
-                  className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${isRadit
-                    ? 'bg-gradient-to-br from-amber-500 to-amber-700'
-                    : 'bg-gradient-to-br from-teal-500 to-teal-700'
-                    }`}
-                >
-                  {isRadit ? 'RD' : 'ZA'}
-                </div>
-                <div
-                  className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-1 ${darkMode
-                    ? 'bg-slate-800 border border-slate-700'
-                    : 'bg-white border border-slate-200 shadow-sm'
-                    }`}
-                >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
-                      }`}
-                    style={{ animationDelay: '0ms' }}
-                  />
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
-                      }`}
-                    style={{ animationDelay: '150ms' }}
-                  />
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full animate-bounce ${isRadit ? 'bg-amber-400' : 'bg-teal-400'
-                      }`}
-                    style={{ animationDelay: '300ms' }}
-                  />
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-
-          {/* Input Area */}
-          <div
-            className={`p-2.5 border-t flex items-center gap-2 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
-              }`}
-          >
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={
-                isListening
-                  ? 'Mendengarkan... bicara sekarang'
-                  : isRadit
-                    ? 'Tanya Radit (katalog direktori)...'
-                    : 'Tanya Zannah sesuatu...'
-              }
-              className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
-                ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
-                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                }`}
-            />
-            {voiceSupport.stt && (
-              <button
-                aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                onClick={handleMicClick}
-                disabled={isTyping}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
-                  ? 'bg-red-500 text-white animate-pulse'
-                  : darkMode
-                    ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              {/* Input Area */}
+              <div
+                className={`p-2.5 border-t ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
                   }`}
               >
-                <Mic className="w-3.5 h-3.5" />
-              </button>
-            )}
-            <button
-              aria-label="Kirim pesan"
-              onClick={() => sendMessage(inputValue)}
-              disabled={!inputValue.trim() || isTyping}
-              className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isRadit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'
-                }`}
-            >
-              <Send className="w-3.5 h-3.5" />
-            </button>
+                {/* Preview file yang lagi disiapkan buat dikirim */}
+                {pendingFiles.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    {pendingFiles.map((f) => (
+                      <div key={f.id} className="relative group">
+                        {f.previewUrl ? (
+                          <img src={f.previewUrl} alt={f.name} className="w-11 h-11 object-cover rounded-lg border border-slate-300 dark:border-slate-600" />
+                        ) : (
+                          <div className={`w-11 h-11 flex items-center justify-center rounded-lg border ${darkMode ? 'bg-slate-700 border-slate-600 text-slate-300' : 'bg-slate-100 border-slate-300 text-slate-600'}`}>
+                            <FileText className="w-4 h-4" />
+                          </div>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removePendingFile(f.id)}
+                          aria-label={`Hapus ${f.name}`}
+                          className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center hover:bg-red-600"
+                        >
+                          <X className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {uploadError && (
+                  <p className="text-[10px] text-red-500 mb-1.5">{uploadError}</p>
+                )}
+
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept={ALLOWED_UPLOAD_MIME_TYPES.join(',')}
+                    multiple
+                    className="hidden"
+                    onChange={(e) => {
+                      handleFilesSelected(e.target.files);
+                      e.target.value = ''; // biar bisa pilih file yang sama lagi kalau dihapus
+                    }}
+                  />
+                  <button
+                    aria-label="Lampirkan file"
+                    title="Lampirkan foto, PDF, atau CSV"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isTyping}
+                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${darkMode
+                      ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                  >
+                    <Paperclip className="w-3.5 h-3.5" />
+                  </button>
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder={
+                      isListening
+                        ? 'Mendengarkan... bicara sekarang'
+                        : isRadit
+                          ? 'Tanya Radit (katalog direktori)...'
+                          : 'Tanya Zannah sesuatu...'
+                    }
+                    className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
+                      ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
+                      : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                      }`}
+                  />
+                  {voiceSupport.stt && (
+                    <button
+                      aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                      title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                      onClick={handleMicClick}
+                      disabled={isTyping}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
+                        ? 'bg-red-500 text-white animate-pulse'
+                        : darkMode
+                          ? 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        }`}
+                    >
+                      <Mic className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                  <button
+                    aria-label="Kirim pesan"
+                    onClick={() => sendMessage(inputValue)}
+                    disabled={(!inputValue.trim() && pendingFiles.length === 0) || isTyping}
+                    className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isRadit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'
+                      }`}
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+        </Portal>
       )}
 
       {/* Toggle Button */}

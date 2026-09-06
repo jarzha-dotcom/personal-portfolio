@@ -4,63 +4,9 @@ import path from 'path';
 import fs from 'fs';
 import { defineConfig, loadEnv, Plugin } from 'vite';
 
-const SYSTEM_INSTRUCTION = `Kamu adalah "Zannah", AI Tech Consultant & Business Assistant pribadi dari K. Arzhaning Jagad (Arzha) — Indie Developer & Data Specialist berpengalaman 7+ tahun di Cibitung, Bekasi.
+import chatHandler from './api/chat';
 
-PERAN & KARAKTER UTAMA:
-- Kamu adalah konsultan teknologi yang ramah, santai (panggil "Kak"), cerdas, dan punya insting sales konsultatif (consultative selling) tingkat tinggi.
-- Gaya bicaramu luwes seperti teman ngobrol tech yang solutif: hangat, solutif, transparan, dan tidak kaku/robotik.
-- Misimu: Membantu pengunjung memahami solusi teknis terbaik untuk ide/bisnis mereka, sekaligus secara halus & elegan mengarahkan mereka untuk menggunakan jasa pengembangan dari Mas Arzha.
-
-KEAHLIAN & PRODUCT KNOWLEDGE LENGKAP:
-1. Profil & Keunikan Arzha (USP):
-   - Menggabungkan ketelitian audit korporat 7+ tahun (data akurat 99%, 100+ audit SOP terselesaikan) dengan kapabilitas modern software engineering.
-   - Keuntungan Klien: Aplikasi tidak cuma cantik, tapi logic bisnis rapi, minim bug, data aman, dan arsitektur scalable.
-
-2. Portofolio Live & Bukti Nyata:
-   - Zannah AI (Living Proof) → Chatbot AI interaktif di website ini adalah bukti langsung kemampuan Mas Arzha membangun sistem AI cerdas, serverless, responsif, hemat kuota, dan aman dari jailbreak.
-   - B-Games (https://bgames.byarzhaning.online/) → Platform multiplayer board game realtime (Ludo, Ular Tangga, Tic Tac Toe) dengan lobby room, state sync, haptic audio. Stack: React Native/Expo, boardgame.io, Node.js/Koa, Supabase, WebSockets. (Rujukan proyek interaktif/realtime/game).
-   - Rajendra Pintar (https://rajendrapintar.byarzhaning.online/) → App edukasi anak dwibahasa (ID/EN) dengan fitur Text-to-Speech (TTS), quiz interaktif, PWA offline & Android Capacitor. (Rujukan app edukasi, konten suara, atau mobile ramah anak).
-   - Assets GMP (https://assets-gmp.vercel.app/) → Sistem manajemen & audit inventaris aset internal perusahaan, pelacakan mutasi, audit log, export report Excel/PDF. (Rujukan dashboard internal, POS, mini ERP, atau manajemen data perusahaan).
-
-3. Layanan, Estimasi Pengerjaan & Harga:
-   - AI Chatbot Custom (Web / Bisnis): Mulai Rp1.500.000 (1-2 minggu) — Integrasi LLM (Gemini, GPT, Claude), custom knowledge base bisnis, arsitektur serverless aman (API key terlindungi), guardrail anti-jailbreak, multi-bahasa, plus opsi Voice/TTS.
-   - Landing Page / Web Profil Bisnis: Mulai Rp800.000 (1-2 minggu) — Desain modern, ultra responsif, SEO-ready, conversion-focused.
-   - Company Profile / Web App Sederhana: Mulai Rp2.500.000 (2-3 minggu) — Desain multi-halaman custom & form interaktif.
-   - Web App Custom / Dashboard Operasional: Mulai Rp6.000.000 (3-6 minggu) — Custom workflow, role permission, manajemen database, integrasi report/export.
-   - Mobile App (Android / Cross-platform): Mulai Rp6.000.000 (3-6 minggu) — Performa cepat, offline capability, UI/UX intuitif.
-   - Realtime Game / Platform Interaktif: Mulai Rp12.000.000 (4-8 minggu) — Sistem room code, multiplayer sinkron, backend socket stabil.
-   - Otomatisasi Data & Sistem Audit Internal: Berdasarkan kompleksitas kebutuhan data.
-
-4. Value & Jaminan Keamanan Klien (Risk Reversal):
-   - Pembayaran Bertahap (Milestone-based): Klien bayar sesuai progress — hasil kelihatan dulu baru bayar tahap berikutnya.
-   - Garansi Penuh: Gratis maintenance & technical support selama 1 bulan pasca-launching.
-   - Promo Peluncuran Terbatas: Diskon khusus 15% + free konsultasi arsitektur untuk 5 klien pertama bulan ini!
-
-STRATEGI SALES CERDAS & HALUS (SMART SOFT-SELLING):
-1. Formula Jawaban (Value First -> Bridge -> Call to Curiosity):
-   - Berikan jawaban / saran teknis yang bernilai dan mencerahkan terlebih dahulu (1-3 kalimat).
-   - Kaitkan secara natural (bridge) dengan pengalaman Arzha atau portofolio yang relevan (misal: "Kebetulan sistem chatbot seperti saya ini dibuat Mas Arzha mulai dari 1,5jt dengan custom knowledge base...").
-   - Akhiri SELALU dengan 1 pertanyaan pancingan santai atau ajakan diskusi fitur spesifik.
-
-2. Cerdas Memanfaatkan Buying Signals:
-   - Jika tanya CHATBOT / CS OTOMATIS / TANYA TENTANG ZANNAH: Banggakan secara santai bahwa Zannah sendiri adalah contoh hidup (*live proof*) AI bot buatan Mas Arzha. Jelaskan manfaat chatbot AI untuk otomatisasi CS 24/7 dan konversi leads, lalu tanyakan kebutuhan bisnis user.
-   - Jika tanya HARGA/BIAYA: Berikan range harga awal yang transparan, sebutkan promo diskon 15%, lalu tanyakan fitur inti yang ingin dibuat agar bisa kasih estimasi lebih presisi.
-   - Jika tanya TEKNOLOGI/STACK: Jelaskan stack modern yang dipakai (React, Supabase, Node.js, AI APIs, dll.) beserta alasannya (cepat, hemat biaya server, mudah dikembangkan), lalu tanyakan platform target mereka.
-   - Jika tanya BIKIN APLIKASI/IDE TERTENTU: Validasi idenya ("Wah menarik banget idenya kak!"), berikan gambaran alur arsitekturnya secara simpel, lalu tawarkan pembuatan rancangan kasarnya bersama Mas Arzha.
-   - Jika SKEPTIS / RAGU: Tanggapi dengan santai dan empati ("Hehe wajar banget kok kak 😊"). Tunjukkan bukti nyata dengan merekomendasikan coba link demo live portofolio dan ingatkan sistem pembayaran termin per progress tanpa risiko.
-
-3. Fitur Cerdas: One-Click WhatsApp Brief Generator (+6282312312734):
-   - Jangan buru-buru lempar nomor WA di awal obrolan sapaan.
-   - KETIKA user sudah menceritakan proyek/fitur spesifik atau meminta estimasi/kontak, buatkan link WhatsApp yang sudah terisi otomatis (URL encoded) sehingga user tinggal klik:
-     Format: [💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/6282312312734?text=Halo%20Mas%20Arzha,%20saya%20tadi%20diskusi%20dengan%20Zannah%20tentang%20proyek%20<NAMA_PROYEK>.<DETAIL_SINGKAT_URL_ENCODED>)
-   - Ini membuat calon klien sangat nyaman karena tidak perlu mengetik ulang idenya di WhatsApp.
-
-FORMAT & BATASAN KOMUNIKASI:
-- Panjang respon ideal: 2-4 kalimat padat, to-the-point, dan berbobot. Jika memberikan estimasi kasar proyek, gunakan format poin-poin yang rapi dan ringkas.
-- Pastikan kalimat selalu tuntas sampai tanda baca akhir (jangan menggantung).
-- Selalu bawa suasana obrolan yang menyenangkan, solutif, dan profesional.`;
-
-function localChatDevPlugin(envApiKey: string): Plugin {
+function localChatDevPlugin(): Plugin {
   return {
     name: 'local-chat-dev-middleware',
     configureServer(server) {
@@ -73,80 +19,44 @@ function localChatDevPlugin(envApiKey: string): Plugin {
 
           req.on('end', async () => {
             try {
-              let apiKey = envApiKey || process.env.GEMINI_API_KEY;
-              if (!apiKey) {
+              let body = {};
+              try {
+                body = JSON.parse(rawBody || '{}');
+              } catch (_) {}
+
+              (req as any).body = body;
+
+              // Pastikan process.env memiliki key dari .env.local jika belum ada
+              if (!process.env.GEMINI_API_KEY || !process.env.GOOGLE_CLOUD_GEMINI_API_KEY) {
                 try {
                   const envLocalPath = path.resolve(__dirname, '.env.local');
                   if (fs.existsSync(envLocalPath)) {
                     const content = fs.readFileSync(envLocalPath, 'utf8');
-                    const match = content.match(/GEMINI_API_KEY=(.+)/);
-                    if (match) apiKey = match[1].trim();
+                    content.split(/\r?\n/).forEach((line) => {
+                      const match = line.match(/^([^=]+)=(.*)$/);
+                      if (match) {
+                        const k = match[1].trim();
+                        const v = match[2].trim();
+                        if (!process.env[k]) process.env[k] = v;
+                      }
+                    });
                   }
-                } catch (_) { }
+                } catch (_) {}
               }
 
-              if (!apiKey) {
-                res.statusCode = 503;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'AI_UNAVAILABLE' }));
-                return;
-              }
+              // Adapt Node ServerResponse ke interface VercelResponse
+              const vercelRes = res as any;
+              vercelRes.status = function (statusCode: number) {
+                this.statusCode = statusCode;
+                return this;
+              };
+              vercelRes.json = function (data: any) {
+                this.setHeader('Content-Type', 'application/json');
+                this.end(JSON.stringify(data));
+                return this;
+              };
 
-              const { history, message } = JSON.parse(rawBody || '{}');
-              if (!message) {
-                res.statusCode = 400;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'Pesan tidak valid' }));
-                return;
-              }
-
-              const sanitizedHistory = (history || []).slice(-12).map((h: any) => ({
-                role: h.role === 'user' ? 'user' : 'model',
-                parts: [{ text: String(h.parts?.[0]?.text || '').slice(0, 1000) }],
-              }));
-
-              const contents = [
-                ...sanitizedHistory,
-                { role: 'user', parts: [{ text: String(message).slice(0, 1000) }] },
-              ];
-
-              const targetModel = 'gemini-3.5-flash';
-              const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
-
-              const geminiRes = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  contents,
-                  systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-                  generationConfig: {
-                    temperature: 0.85,
-                    maxOutputTokens: 2048,
-                  },
-                }),
-              });
-
-              if (!geminiRes.ok) {
-                const errData = await geminiRes.json().catch(() => ({}));
-                res.statusCode = geminiRes.status === 429 ? 429 : 502;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'AI_UNAVAILABLE', detail: errData }));
-                return;
-              }
-
-              const data = await geminiRes.json();
-              const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-              if (!reply) {
-                res.statusCode = 502;
-                res.setHeader('Content-Type', 'application/json');
-                res.end(JSON.stringify({ error: 'AI_UNAVAILABLE' }));
-                return;
-              }
-
-              res.statusCode = 200;
-              res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ reply: reply.trim() }));
+              await chatHandler(req as any, vercelRes);
             } catch (err: any) {
               console.error('[Local Dev Chat API] Error:', err);
               res.statusCode = 500;
@@ -494,7 +404,9 @@ function localTtsDevPlugin(envGcpApiKey: string): Plugin {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
-  const apiKey = env.GEMINI_API_KEY || process.env.GEMINI_API_KEY || '';
+  if (env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
+  if (env.GOOGLE_CLOUD_GEMINI_API_KEY) process.env.GOOGLE_CLOUD_GEMINI_API_KEY = env.GOOGLE_CLOUD_GEMINI_API_KEY;
+  if (env.GCP_API_KEY) process.env.GCP_API_KEY = env.GCP_API_KEY;
   const gcpApiKey = env.GCP_API_KEY || process.env.GCP_API_KEY || '';
 
   // Build ID unik setiap deploy — dipakai sebagai versi cache key localStorage
@@ -502,7 +414,7 @@ export default defineConfig(({ mode }) => {
   const buildId = `${Date.now()}`;
 
   return {
-    plugins: [react(), tailwindcss(), localChatDevPlugin(apiKey), localTtsDevPlugin(gcpApiKey)],
+    plugins: [react(), tailwindcss(), localChatDevPlugin(), localTtsDevPlugin(gcpApiKey)],
     define: {
       // Tersedia sebagai konstanta global di semua komponen React
       __CHAT_BUILD_ID__: JSON.stringify(buildId),

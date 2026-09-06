@@ -1,17 +1,21 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download } from 'lucide-react';
 import Fuse from 'fuse.js';
+import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
-import { sendMessageToGemini, ChatMessage } from '../services/geminiService';
+import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile } from '../services/geminiService';
 import { saveMessages, loadMessages, saveGeminiHistory, loadGeminiHistory } from '../utils/chatStorage';
-import {
-    speak,
-    stopSpeaking,
-    startListening,
-    stopListening,
-    isSpeechSupported,
-    BOT_VOICES,
-} from '../services/voiceService';
+import { BOT_VOICES } from '../services/voiceService';
+import { useVoiceChat } from '../hooks/useVoiceChat';
+import { useStreamingText } from '../hooks/useStreamingText';
+import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
+
+const KANIA_LOADING_STATUSES = [
+    'Menyiapkan informasi...',
+    'Mengecek portofolio & data CV...',
+    'Menyusun jawaban profesional...',
+    'Menyempurnakan detail jawaban...',
+];
 
 // Voice Kania: Cewek (Google DeepMind Chirp3 HD Gacrux - Hangat, Ramah, Detail)
 const KANIA_VOICE = BOT_VOICES.KANIA;
@@ -25,6 +29,19 @@ interface QuickOption {
     label: string;
 }
 
+/** File yang lagi disiapkan user buat diupload (preview sebelum dikirim) */
+interface PendingFile {
+    id: string;
+    name: string;
+    mimeType: string;
+    data: string; // base64 tanpa prefix data:...;base64,
+    previewUrl?: string; // cuma ada kalau image, buat thumbnail
+}
+
+const ALLOWED_UPLOAD_MIME_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'application/pdf', 'text/csv'];
+const MAX_UPLOAD_FILES = 3;
+const MAX_UPLOAD_FILE_BYTES = 6 * 1024 * 1024; // cocokkan dengan limit di chat.ts
+
 interface Message {
     id: string;
     sender: 'user' | 'bot';
@@ -33,6 +50,11 @@ interface Message {
     options?: QuickOption[];
     isAI?: boolean;
     isStreaming?: boolean;
+    /** File yang di-upload user bareng pesan ini (mis. CV/portofolio buat direview) */
+    uploadedFiles?: PendingFile[];
+    /** Kania tidak lewat Antigravity Agent, jadi field ini praktis selalu kosong —
+     * tetap disediakan biar tipe & pola render konsisten dengan widget lain. */
+    attachments?: Attachment[];
 }
 
 // System prompt khusus halaman CV — audiens: HRD / rekruter profesional
@@ -165,7 +187,28 @@ const CV_WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, lab
 export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
+    const [loadingTextIndex, setLoadingTextIndex] = useState(0);
+    const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
     const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
+
+    useEffect(() => {
+        if (!isTyping) {
+            setLoadingTextIndex(0);
+            return;
+        }
+        const interval = setInterval(() => {
+            setLoadingTextIndex((prev) => (prev + 1) % KANIA_LOADING_STATUSES.length);
+        }, 2200);
+        return () => clearInterval(interval);
+    }, [isTyping]);
+
+    const handleDownloadSummary = () => {
+        const ok = downloadChatSummaryFile(messages, 'Kania');
+        if (ok) {
+            setDownloadSummarySuccess(true);
+            setTimeout(() => setDownloadSummarySuccess(false), 3000);
+        }
+    };
     const [messages, setMessages] = useState<Message[]>(() => {
         const saved = loadMessages<Message>('cv_kania');
         if (saved && saved.length > 0) return saved.slice(-MAX_DISPLAY_MESSAGES);
@@ -181,17 +224,118 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         ];
     });
     const [inputValue, setInputValue] = useState('');
+    const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([]);
+    const [uploadError, setUploadError] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const lastQueryRef = useRef<string>('');
+
+    // Helper terpusat untuk menambah pesan baru ke state, sekaligus menjaga
+    // batas MAX_DISPLAY_MESSAGES, biar pola trim manual tidak diulang di
+    // banyak tempat (riskan lupa di-trim kalau ada fitur baru nanti).
+    const pushMessage = (message: Message) => {
+        setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), message]);
+    };
+
+    const pushUserMessage = (text: string, uploadedFiles?: PendingFile[]) => {
+        pushMessage({
+            id: generateMessageId('user'),
+            sender: 'user',
+            text,
+            timestamp: nowStr(),
+            uploadedFiles: uploadedFiles && uploadedFiles.length > 0 ? uploadedFiles : undefined,
+        });
+    };
+
+    // Baca file jadi base64 murni (tanpa prefix "data:...;base64,")
+    const readFileAsBase64 = (file: File): Promise<string> =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                const result = reader.result as string;
+                resolve(result.split(',')[1] ?? '');
+            };
+            reader.onerror = () => reject(reader.error);
+            reader.readAsDataURL(file);
+        });
+
+    const handleFilesSelected = async (fileList: FileList | null) => {
+        if (!fileList || fileList.length === 0) return;
+        setUploadError(null);
+
+        const incoming = Array.from(fileList);
+        const room = MAX_UPLOAD_FILES - pendingFiles.length;
+        if (room <= 0) {
+            setUploadError(`Maksimal ${MAX_UPLOAD_FILES} file per pesan.`);
+            return;
+        }
+
+        const accepted: PendingFile[] = [];
+        for (const file of incoming.slice(0, room)) {
+            if (!ALLOWED_UPLOAD_MIME_TYPES.includes(file.type)) {
+                setUploadError('Format belum didukung. Pakai JPG/PNG/WebP, PDF, atau CSV ya.');
+                continue;
+            }
+            if (file.size > MAX_UPLOAD_FILE_BYTES) {
+                setUploadError(`"${file.name}" kegedean (maks ${Math.round(MAX_UPLOAD_FILE_BYTES / (1024 * 1024))}MB).`);
+                continue;
+            }
+            try {
+                const base64 = await readFileAsBase64(file);
+                accepted.push({
+                    id: generateMessageId('file'),
+                    name: file.name,
+                    mimeType: file.type,
+                    data: base64,
+                    previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : undefined,
+                });
+            } catch {
+                setUploadError(`Gagal membaca file "${file.name}".`);
+            }
+        }
+        if (accepted.length > 0) {
+            setPendingFiles((prev) => [...prev, ...accepted]);
+        }
+    };
+
+    const removePendingFile = (id: string) => {
+        setPendingFiles((prev) => {
+            const target = prev.find((f) => f.id === id);
+            if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+            return prev.filter((f) => f.id !== id);
+        });
+    };
+
+    // Trigger download langsung dari base64 (praktis tidak pernah dipakai untuk
+    // Kania karena Antigravity Agent sengaja tidak diaktifkan di persona ini —
+    // tetap disediakan biar polanya konsisten dengan ChatWidget/AIChatbotShowcase).
+    const downloadAttachment = (att: Attachment) => {
+        try {
+            const byteChars = atob(att.base64);
+            const byteNumbers = new Array(byteChars.length);
+            for (let i = 0; i < byteChars.length; i++) byteNumbers[i] = byteChars.charCodeAt(i);
+            const blob = new Blob([new Uint8Array(byteNumbers)], { type: att.mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = att.name;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        } catch (err) {
+            console.error('Gagal download attachment:', err);
+        }
+    };
     const geminiHistoryRef = useRef<ChatMessage[]>(loadGeminiHistory<ChatMessage>('cv_kania').slice(-10));
     const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-    // ── Voice Chat state ─────────────────────────────────────────────────────
-    const [isListening, setIsListening] = useState(false);
-    const [speakingId, setSpeakingId] = useState<string | null>(null);
-    const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
-    const [voiceSupport] = useState(() => isSpeechSupported());
-    const stopListenRef = useRef<(() => void) | null>(null);
+    // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
+    const { isListening, speakingId, loadingSpeakId, voiceSupport, handleMicClick: micToggle, handleToggleSpeak, stopAll } =
+        useVoiceChat({ logLabel: 'ChatWidgetCV' });
+    // Kalau hasil final STT datang saat bot masih mengetik, teks ditampung di
+    // sini dulu dan otomatis dikirim begitu bot selesai (lihat effect di bawah).
+    const pendingVoiceTextRef = useRef<string | null>(null);
+    const streamText = useStreamingText();
 
     // Rate limiting — 12 detik antar request (safe untuk free tier)
     const lastRequestTimeRef = useRef<number>(0);
@@ -212,11 +356,19 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     useEffect(() => {
         return () => {
             timeoutsRef.current.forEach(clearTimeout);
-            // ⚠️ Hentikan mic & audio TTS yang mungkin masih aktif saat widget unmount
-            stopListening();
-            stopSpeaking();
+            // mic/TTS & interval animasi dibersihkan masing-masing oleh
+            // useVoiceChat & useStreamingText.
         };
     }, []);
+
+    // Kirim otomatis hasil STT yang sempat tertunda begitu bot selesai mengetik.
+    useEffect(() => {
+        if (!isTyping && pendingVoiceTextRef.current) {
+            const pending = pendingVoiceTextRef.current;
+            pendingVoiceTextRef.current = null;
+            sendMessage(pending, true);
+        }
+    }, [isTyping]);
 
     const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
@@ -236,16 +388,13 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         setIsTyping(true);
         setTimeout(() => {
             setIsTyping(false);
-            setMessages((prev) => [
-                ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-                {
-                    id: generateMessageId('bot'),
-                    sender: 'bot',
-                    text: 'Mau tanya soal apa lagi?',
-                    timestamp: nowStr(),
-                    options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
-                },
-            ]);
+            pushMessage({
+                id: generateMessageId('bot'),
+                sender: 'bot',
+                text: 'Lanjut ke topik berikutnya? Pilih di bawah ya! 👇',
+                timestamp: nowStr(),
+                options: CATEGORIES.map((c) => ({ id: c.id, label: c.label })),
+            });
         }, 400);
     };
 
@@ -254,35 +403,29 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         setIsTyping(true);
         setTimeout(() => {
             setIsTyping(false);
-            setMessages((prev) => [
-                ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-                {
-                    id: generateMessageId('bot'),
-                    sender: 'bot',
-                    text: `Pilih pertanyaan seputar ${category.label.replace(/^\S+\s/, '')}:`,
-                    timestamp: nowStr(),
-                    options: [...items.map((f) => ({ id: f.id, label: f.quickLabel })), { id: 'menu', label: '⬅️ Menu Utama' }],
-                },
-            ]);
+            pushMessage({
+                id: generateMessageId('bot'),
+                sender: 'bot',
+                text: `Pilih pertanyaan seputar ${category.label.replace(/^\S+\s/, '')}:`,
+                timestamp: nowStr(),
+                options: [...items.map((f) => ({ id: f.id, label: f.quickLabel })), { id: 'menu', label: '⬅️ Menu Utama' }],
+            });
         }, 400);
     };
 
     // ── Bot reply helpers ──────────────────────────────────────────────────────
     const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
         const msgId = generateMessageId('bot');
-        setMessages((prev) => [
-            ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-            {
-                id: msgId,
-                sender: 'bot',
-                text,
-                timestamp: nowStr(),
-                options,
-                isAI,
-            },
-        ]);
+        pushMessage({
+            id: msgId,
+            sender: 'bot',
+            text,
+            timestamp: nowStr(),
+            options,
+            isAI,
+        });
         if (autoSpeak) {
-            handleToggleSpeak(msgId, text);
+            handleToggleSpeak(msgId, text, KANIA_VOICE);
         }
     };
 
@@ -293,47 +436,33 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         autoSpeak = false
     ) => {
         const msgId = generateMessageId('bot');
-        setMessages((prev) => [
-            ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-            {
-                id: msgId,
-                sender: 'bot',
-                text: '',
-                timestamp: nowStr(),
-                options: undefined,
-                isAI,
-                isStreaming: true,
-            },
-        ]);
+        pushMessage({
+            id: msgId,
+            sender: 'bot',
+            text: '',
+            timestamp: nowStr(),
+            options: undefined,
+            isAI,
+            isStreaming: true,
+        });
 
-        let currentIndex = 0;
-        const totalLength = fullText.length;
-        const chunkSize = totalLength > 280 ? 3 : totalLength > 120 ? 2 : 1;
-        const speedMs = 18;
-
-        const intervalId = window.setInterval(() => {
-            currentIndex += chunkSize;
-            if (currentIndex >= totalLength) {
-                window.clearInterval(intervalId);
+        streamText(fullText, {
+            isVoice: autoSpeak,
+            // Opsi A: TTS dipicu paralel begitu animasi mulai, tidak menunggu
+            // animasi ketik selesai — menghilangkan delay bertumpuk sebelum suara keluar.
+            onStart: autoSpeak ? () => handleToggleSpeak(msgId, fullText, KANIA_VOICE) : undefined,
+            onTick: (partial, isDone) => {
                 setMessages((prev) =>
                     prev.map((m) =>
                         m.id === msgId
-                            ? { ...m, text: fullText, options, isStreaming: false }
+                            ? isDone
+                                ? { ...m, text: fullText, options, isStreaming: false }
+                                : { ...m, text: partial, isStreaming: true }
                             : m
                     )
                 );
-                if (autoSpeak) {
-                    handleToggleSpeak(msgId, fullText);
-                }
-            } else {
-                const partial = fullText.slice(0, currentIndex);
-                setMessages((prev) =>
-                    prev.map((m) =>
-                        m.id === msgId ? { ...m, text: partial, isStreaming: true } : m
-                    )
-                );
-            }
-        }, speedMs);
+            },
+        });
     };
 
     const fallbackCTA: QuickOption[] = [
@@ -386,17 +515,17 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             return;
         }
         lastRequestTimeRef.current = now;
+        // Catatan: cooldown sengaja "direservasi" di sini, SEBELUM await ke API,
+        // bukan cuma setelah sukses — biar laju request tertahan (anti-hammering)
+        // terlepas dari hasilnya nanti sukses atau gagal.
 
         const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
         try {
             const result = await sendMessageToGemini(
-                [
-                    // Inject system prompt sebagai pesan pertama dari model
-                    { role: 'user', parts: [{ text: CV_SYSTEM_PROMPT }] },
-                    { role: 'model', parts: [{ text: 'Siap! Saya Kania, asisten CV Arzha. Silakan tanyakan apa saja kepada saya.' }] },
-                    ...geminiHistoryRef.current,
-                ],
-                userText
+                geminiHistoryRef.current,
+                userText,
+                undefined,
+                'kania'
             );
             const replyText = result.reply;
 
@@ -441,10 +570,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         if (id === 'retry_kania') {
             setAiMode('ai');
             if (lastQueryRef.current) {
-                setMessages((prev) => [
-                    ...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)),
-                    { id: generateMessageId('user'), sender: 'user', text: `✨ Coba tanya Kania: "${lastQueryRef.current}"`, timestamp: nowStr() },
-                ]);
+                pushUserMessage(`✨ Coba tanya Kania: "${lastQueryRef.current}"`);
                 respondWithAI(lastQueryRef.current);
             } else {
                 setIsTyping(true);
@@ -457,13 +583,13 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }
         const category = CATEGORIES.find((c) => c.id === id);
         if (category) {
-            setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() }]);
+            pushUserMessage(label);
             showCategoryQuestions(category);
             return;
         }
         const faq = FAQ_ITEMS.find((f) => f.id === id);
         if (faq) {
-            setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: label, timestamp: nowStr() }]);
+            pushUserMessage(label);
             lastQueryRef.current = faq.quickLabel;
             respondWithFAQ(faq);
         }
@@ -472,7 +598,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const sendMessage = (text: string, isFromVoice = false) => {
         if (!text.trim() || isTyping) return;
         const trimmed = text.trim();
-        setMessages((prev) => [...prev.slice(-(MAX_DISPLAY_MESSAGES - 1)), { id: generateMessageId('user'), sender: 'user', text: trimmed, timestamp: nowStr() }]);
+        pushUserMessage(trimmed);
         setInputValue('');
         lastQueryRef.current = trimmed;
 
@@ -505,66 +631,27 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         }
     };
 
-    // ── Voice Chat: mic (STT) ────────────────────────────────────────────────
+    // ── Voice Chat: mic (STT) — wrapper tipis di atas hook, karena logika
+    // "tampilkan transkrip sementara di input & kirim saat final" spesifik
+    // ke komponen ini.
     const handleMicClick = () => {
-        if (isListening) {
-            stopListenRef.current?.();
-            stopListenRef.current = null;
-            setIsListening(false);
-            return;
-        }
-        if (!voiceSupport.stt) return;
-
-        stopSpeaking();
-        setSpeakingId(null);
-
-        const cleanup = startListening({
-            lang: 'id-ID',
-            onStart: () => setIsListening(true),
-            onResult: (text, isFinal) => {
-                setInputValue(text);
-                if (isFinal && text.trim()) {
+        micToggle((text, isFinal) => {
+            setInputValue(text);
+            if (isFinal && text.trim()) {
+                // Kalau bot masih mengetik, tunda dulu — dikirim otomatis oleh
+                // effect isTyping di atas begitu bot selesai.
+                if (isTyping) {
+                    pendingVoiceTextRef.current = text.trim();
+                } else {
                     sendMessage(text, true);
-                    setInputValue('');
                 }
-            },
-            onEnd: () => {
-                setIsListening(false);
-                stopListenRef.current = null;
-            },
-            onError: (err) => {
-                console.warn('[ChatWidgetCV] STT error:', err);
-                setIsListening(false);
-                stopListenRef.current = null;
-            },
+                setInputValue('');
+            }
         });
-        stopListenRef.current = cleanup;
     };
 
     // ── Voice Chat: play bot reply (TTS) ─────────────────────────────────────
-    const handleToggleSpeak = async (messageId: string, text: string) => {
-        if (speakingId === messageId) {
-            stopSpeaking();
-            setSpeakingId(null);
-            return;
-        }
-        setLoadingSpeakId(messageId);
-        await speak(text, {
-            voice: KANIA_VOICE,
-            onStart: () => {
-                setLoadingSpeakId(null);
-                setSpeakingId(messageId);
-            },
-            onEnd: () => {
-                setLoadingSpeakId(null);
-                setSpeakingId((current) => (current === messageId ? null : current));
-            },
-            onError: () => {
-                setLoadingSpeakId(null);
-                setSpeakingId(null);
-            },
-        });
-    };
+    // handleToggleSpeak sekarang datang langsung dari hook useVoiceChat di atas.
 
     // ── Smart Message Content Parser (Markdown + WhatsApp CTA) ────────────────
     const parseBold = (str: string) => {
@@ -684,218 +771,269 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
         );
     };
 
+    // Untuk aria-live: cuma umumkan pesan bot yang SUDAH final (bukan yang lagi
+    // di-stream karakter-per-karakter), supaya screen reader tidak membaca
+    // bubble kosong di awal animasi ketik atau berulang kali di tiap tick.
+    const lastFinalizedBotMessage = [...messages].reverse().find((m) => m.sender === 'bot' && !m.isStreaming);
+
     return (
         <div className="fixed bottom-6 left-6 z-50 no-print">
             {isOpen && (
-                <div
-                    className={`w-80 sm:w-96 h-[460px] rounded-2xl shadow-2xl border flex flex-col mb-3 overflow-hidden ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
-                        }`}
-                >
-                    {/* Header */}
-                    <div className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
-                        }`}>
-                        <div className="flex items-center gap-2.5">
-                            <div className="relative">
-                                <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
-                                    KA
-                                </div>
-                                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${darkMode ? 'border-slate-800' : 'border-white'} ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-1.5">
-                                    <p className={`text-xs font-bold leading-none ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-                                        Kania
-                                    </p>
-                                    {aiMode !== 'unknown' && (
-                                        <span className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${aiMode === 'ai'
-                                            ? darkMode ? 'bg-teal-900/60 text-teal-400' : 'bg-teal-50 text-teal-600'
-                                            : darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-50 text-amber-700'
-                                            }`}>
-                                            {aiMode === 'ai'
-                                                ? <><Wifi className="w-2.5 h-2.5" /> Kania (AI)</>
-                                                : <><WifiOff className="w-2.5 h-2.5" /> Direktori</>}
-                                        </span>
-                                    )}
-                                </div>
-                                <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                                    Asisten CV Arzha • {aiMode === 'fallback' ? 'Mode Direktori' : 'AI Live'}
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => {
-                                stopListenRef.current?.();
-                                stopListenRef.current = null;
-                                setIsListening(false);
-                                stopSpeaking();
-                                setSpeakingId(null);
-                                setIsOpen(false);
-                            }}
-                            className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-slate-400 hover:text-white hover:bg-slate-700' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
+                <Portal>
+                    {/* Backdrop — full overlay on mobile (layar sempit) so user fokus ke chat; invisible & click-through on desktop */}
+                    <div
+                        className="fixed inset-0 z-[9999] flex items-end justify-start p-0 sm:pb-24 sm:pl-6 bg-black/60 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none sm:pointer-events-none"
+                        onClick={() => setIsOpen(false)}
+                    >
+                        <div
+                            onClick={(e) => e.stopPropagation()}
+                            className={`w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
                                 }`}
                         >
-                            <X className="w-4 h-4" />
-                        </button>
-                    </div>
-
-                    {/* Fallback Notice Banner */}
-                    {aiMode === 'fallback' && (
-                        <div className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b ${darkMode ? 'bg-amber-950/40 border-amber-900/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
-                            <div className="flex items-center gap-1.5 min-w-0 pr-2">
-                                <span className="text-xs shrink-0">📋</span>
-                                <span className="truncate"><b>Mode Direktori:</b> AI sedang istirahat</span>
-                            </div>
-                            <button
-                                onClick={() => handleOptionClick('retry_kania', 'Coba Kania')}
-                                className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
-                                    ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
-                                    : 'bg-amber-500 hover:bg-amber-600 text-white'
-                                    }`}
-                            >
-                                ✨ Coba Kania
-                            </button>
-                        </div>
-                    )}
-
-                    {/* Messages Body */}
-                    <div className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
-                        }`}>
-                        {messages.map((m) => (
-                            <div key={m.id} className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                {m.sender === 'bot' && (
-                                    <div
-                                        className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}
-                                        title={m.isAI === false ? 'Kania (Mode Direktori)' : 'Kania (AI)'}
-                                    >
-                                        KA
+                            {/* Header */}
+                            <div className={`p-3.5 flex items-center justify-between border-b ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                }`}>
+                                <div className="flex items-center gap-2.5">
+                                    <div className="relative">
+                                        <div className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-xs font-bold shadow-md transition-all ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
+                                            KA
+                                        </div>
+                                        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 ${darkMode ? 'border-slate-800' : 'border-white'} ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-emerald-400'}`} />
                                     </div>
-                                )}
-                                <div className="max-w-[85%] flex flex-col gap-1.5">
-                                    <div
-                                        className={`px-3 py-2 rounded-xl ${m.sender === 'user'
-                                            ? 'bg-teal-600 text-white rounded-br-none ml-auto'
-                                            : darkMode
-                                                ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
-                                                : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                                    <div>
+                                        <div className="flex items-center gap-1.5">
+                                            <p className={`text-xs font-bold leading-none ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                                                Kania
+                                            </p>
+                                            {aiMode !== 'unknown' && (
+                                                <span className={`flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${aiMode === 'ai'
+                                                    ? darkMode ? 'bg-teal-900/60 text-teal-400' : 'bg-teal-50 text-teal-600'
+                                                    : darkMode ? 'bg-amber-900/50 text-amber-300' : 'bg-amber-50 text-amber-700'
+                                                    }`}>
+                                                    {aiMode === 'ai'
+                                                        ? <><Wifi className="w-2.5 h-2.5" /> Kania (AI)</>
+                                                        : <><WifiOff className="w-2.5 h-2.5" /> Direktori</>}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <p className={`text-[10px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                                            Asisten CV Arzha • {aiMode === 'fallback' ? 'Mode Direktori' : 'AI Live'}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                    {messages.length > 1 && (
+                                        <button
+                                            type="button"
+                                            aria-label="Unduh rangkuman obrolan"
+                                            title="Unduh rangkuman obrolan (.txt) untuk lanjut ke WhatsApp Mas Arzha"
+                                            onClick={handleDownloadSummary}
+                                            className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-[10px] font-medium ${downloadSummarySuccess
+                                                ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                                : darkMode
+                                                    ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                                                }`}
+                                        >
+                                            <FileText className="w-3.5 h-3.5" />
+                                            <span className="hidden sm:inline">{downloadSummarySuccess ? 'Tersimpan!' : 'Rangkuman'}</span>
+                                        </button>
+                                    )}
+                                    <button
+                                        aria-label="Tutup jendela chat"
+                                        onClick={() => {
+                                            stopAll();
+                                            setIsOpen(false);
+                                        }}
+                                        className={`p-1.5 rounded-lg transition-colors ${darkMode ? 'text-slate-400 hover:text-white hover:bg-slate-700' : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200'
                                             }`}
                                     >
-                                        {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
-                                        <div className="flex items-center justify-between gap-2 mt-1">
-                                            {m.sender === 'bot' ? (
-                                                <button
-                                                    aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
-                                                    onClick={() => handleToggleSpeak(m.id, m.text)}
-                                                    className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60' : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'}`}
-                                                >
-                                                    {loadingSpeakId === m.id ? (
-                                                        <Loader2 className="w-3 h-3 animate-spin" />
-                                                    ) : speakingId === m.id ? (
-                                                        <Square className="w-2.5 h-2.5 fill-current" />
-                                                    ) : (
-                                                        <Volume2 className="w-3.5 h-3.5" />
-                                                    )}
-                                                </button>
-                                            ) : (
-                                                <span />
-                                            )}
-                                            <span className="block text-[9px] opacity-60 text-right">{m.timestamp}</span>
-                                        </div>
-                                    </div>
-                                    {m.options && m.options.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5">
-                                            {m.options.map((opt) => (
-                                                <button
-                                                    key={opt.id}
-                                                    onClick={() => handleOptionClick(opt.id, opt.label)}
-                                                    className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-colors ${opt.id === 'whatsapp'
-                                                        ? darkMode
-                                                            ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
-                                                            : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                                                        : opt.id === 'menu'
-                                                            ? darkMode
-                                                                ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
-                                                                : 'border-slate-300 text-slate-600 hover:bg-slate-100'
-                                                            : darkMode
-                                                                ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
-                                                                : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
-                                                        }`}
-                                                >
-                                                    {opt.label}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
+                                        <X className="w-4 h-4" />
+                                    </button>
                                 </div>
-                                {m.sender === 'user' && (
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
-                                        }`}>
-                                        <User className="w-3 h-3" />
+                            </div>
+
+                            {/* Region tersembunyi khusus screen reader: umumkan status mengetik
+                                dan balasan bot yang sudah final, terpisah dari bubble visual
+                                supaya tidak ikut ke-baca ulang tiap tick animasi streaming. */}
+                            <div className="sr-only" aria-live="polite" aria-atomic="true">
+                                {isTyping
+                                    ? 'Kania sedang mengetik…'
+                                    : lastFinalizedBotMessage?.text ?? ''}
+                            </div>
+
+                            {/* Fallback Notice Banner */}
+                            {aiMode === 'fallback' && (
+                                <div className={`px-3 py-1.5 flex items-center justify-between text-[10px] border-b ${darkMode ? 'bg-amber-950/40 border-amber-900/50 text-amber-300' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                                    <div className="flex items-center gap-1.5 min-w-0 pr-2">
+                                        <span className="text-xs shrink-0">📋</span>
+                                        <span className="truncate"><b>Mode Direktori:</b> AI sedang istirahat</span>
+                                    </div>
+                                    <button
+                                        onClick={() => handleOptionClick('retry_kania', 'Coba Kania')}
+                                        className={`shrink-0 px-2 py-0.5 rounded-md font-bold text-[9.5px] transition-all hover:scale-105 active:scale-95 shadow-sm ${darkMode
+                                            ? 'bg-amber-500 hover:bg-amber-400 text-slate-950'
+                                            : 'bg-amber-500 hover:bg-amber-600 text-white'
+                                            }`}
+                                    >
+                                        ✨ Coba Kania
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Messages Body */}
+                            <div
+                                role="log"
+                                aria-relevant="additions"
+                                className={`flex-1 p-3.5 overflow-y-auto chat-scrollbar space-y-3 text-xs ${darkMode ? 'bg-slate-900' : 'bg-slate-50'
+                                    }`}>
+                                {messages.map((m) => (
+                                    <div key={m.id} className={`flex gap-2 animate-message-in ${m.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                        {m.sender === 'bot' && (
+                                            <div
+                                                className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${m.isAI === false ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}
+                                                title={m.isAI === false ? 'Kania (Mode Direktori)' : 'Kania (AI)'}
+                                            >
+                                                KA
+                                            </div>
+                                        )}
+                                        <div className="max-w-[85%] flex flex-col gap-1.5">
+                                            <div
+                                                className={`px-3 py-2 rounded-xl ${m.sender === 'user'
+                                                    ? 'bg-teal-600 text-white rounded-br-none ml-auto'
+                                                    : darkMode
+                                                        ? 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                                                        : 'bg-white text-slate-700 border border-slate-200 shadow-sm rounded-bl-none'
+                                                    }`}
+                                            >
+                                                {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
+                                                <div className="flex items-center justify-between gap-2 mt-1">
+                                                    {m.sender === 'bot' ? (
+                                                        <button
+                                                            aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
+                                                            onClick={() => handleToggleSpeak(m.id, m.text, KANIA_VOICE)}
+                                                            className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60' : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'}`}
+                                                        >
+                                                            {loadingSpeakId === m.id ? (
+                                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                            ) : speakingId === m.id ? (
+                                                                <Square className="w-2.5 h-2.5 fill-current" />
+                                                            ) : (
+                                                                <Volume2 className="w-3.5 h-3.5" />
+                                                            )}
+                                                        </button>
+                                                    ) : (
+                                                        <span />
+                                                    )}
+                                                    <span className="block text-[9px] opacity-60 text-right">{m.timestamp}</span>
+                                                </div>
+                                            </div>
+                                            {m.options && m.options.length > 0 && (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {m.options.map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            onClick={() => handleOptionClick(opt.id, opt.label)}
+                                                            className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-colors ${opt.id === 'whatsapp'
+                                                                ? darkMode
+                                                                    ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
+                                                                    : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+                                                                : opt.id === 'menu'
+                                                                    ? darkMode
+                                                                        ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
+                                                                        : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+                                                                    : darkMode
+                                                                        ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
+                                                                        : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
+                                                                }`}
+                                                        >
+                                                            {opt.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        {m.sender === 'user' && (
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${darkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
+                                                }`}>
+                                                <User className="w-3 h-3" />
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+
+                                {isTyping && (
+                                    <div className="flex gap-2 justify-start">
+                                        <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
+                                            KA
+                                        </div>
+                                        <div className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-2 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200 shadow-sm'
+                                            }`}>
+                                            <div className="flex items-center gap-1">
+                                                <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '0ms' }} />
+                                                <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '150ms' }} />
+                                                <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '300ms' }} />
+                                            </div>
+                                            <span className={`text-[11px] font-medium transition-all duration-300 ${aiMode === 'fallback'
+                                                ? darkMode ? 'text-amber-300/90' : 'text-amber-700/90'
+                                                : darkMode ? 'text-teal-300/90' : 'text-teal-700/90'
+                                                }`}>
+                                                {aiMode === 'fallback' ? 'Mencari jawaban...' : KANIA_LOADING_STATUSES[loadingTextIndex]}
+                                            </span>
+                                        </div>
                                     </div>
                                 )}
+                                <div ref={messagesEndRef} />
                             </div>
-                        ))}
 
-                        {isTyping && (
-                            <div className="flex gap-2 justify-start">
-                                <div className={`w-6 h-6 rounded-full text-white flex items-center justify-center shrink-0 mt-0.5 text-[10px] font-bold ${aiMode === 'fallback' ? 'bg-gradient-to-br from-amber-500 to-amber-700' : 'bg-gradient-to-br from-teal-500 to-teal-700'}`}>
-                                    KA
-                                </div>
-                                <div className={`px-3.5 py-2.5 rounded-xl rounded-bl-none flex items-center gap-1 ${darkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200 shadow-sm'
-                                    }`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '0ms' }} />
-                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '150ms' }} />
-                                    <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${aiMode === 'fallback' ? 'bg-amber-400' : 'bg-teal-400'}`} style={{ animationDelay: '300ms' }} />
-                                </div>
+                            {/* Input Area */}
+                            <div className={`p-2.5 border-t flex items-center gap-2 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
+                                }`}>
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    placeholder={
+                                        isListening
+                                            ? 'Mendengarkan... bicara sekarang'
+                                            : aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'
+                                    }
+                                    className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
+                                        ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
+                                        : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                                        }`}
+                                />
+                                {voiceSupport.stt && (
+                                    <button
+                                        aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                        title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
+                                        onClick={handleMicClick}
+                                        disabled={isTyping}
+                                        className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
+                                            ? 'bg-red-500 text-white animate-pulse'
+                                            : darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                            }`}
+                                    >
+                                        <Mic className="w-3.5 h-3.5" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={() => sendMessage(inputValue)}
+                                    disabled={!inputValue.trim() || isTyping}
+                                    className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${aiMode === 'fallback' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'}`}
+                                >
+                                    <Send className="w-3.5 h-3.5" />
+                                </button>
                             </div>
-                        )}
-                        <div ref={messagesEndRef} />
+                        </div>
                     </div>
-
-                    {/* Input Area */}
-                    <div className={`p-2.5 border-t flex items-center gap-2 ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-100'
-                        }`}>
-                        <input
-                            type="text"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            placeholder={
-                                isListening
-                                    ? 'Mendengarkan... bicara sekarang'
-                                    : aiMode === 'fallback' ? 'Tanya Kania (direktori)...' : 'Tanya Kania soal pengalaman Arzha...'
-                            }
-                            className={`flex-1 px-3 py-2 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode
-                                ? 'bg-slate-700 border-slate-600 text-white placeholder-slate-400'
-                                : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
-                                }`}
-                        />
-                        {voiceSupport.stt && (
-                            <button
-                                aria-label={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                                title={isListening ? 'Berhenti merekam' : 'Bicara dengan mikrofon'}
-                                onClick={handleMicClick}
-                                disabled={isTyping}
-                                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${isListening
-                                    ? 'bg-red-500 text-white animate-pulse'
-                                    : darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                                    }`}
-                            >
-                                <Mic className="w-3.5 h-3.5" />
-                            </button>
-                        )}
-                        <button
-                            onClick={() => sendMessage(inputValue)}
-                            disabled={!inputValue.trim() || isTyping}
-                            className={`w-8 h-8 rounded-lg text-white flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${aiMode === 'fallback' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'}`}
-                        >
-                            <Send className="w-3.5 h-3.5" />
-                        </button>
-                    </div>
-                </div>
+                </Portal>
             )}
 
             {/* Toggle Button */}
             <button
+                aria-label={isOpen ? 'Tutup chat widget' : 'Buka chat widget'}
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 border-2 border-slate-900"
                 title="Tanya Asisten Mode CV"

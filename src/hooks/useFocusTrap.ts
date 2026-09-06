@@ -10,7 +10,10 @@ const FOCUSABLE_SELECTOR =
  * (misalnya modal/drawer ditutup). Dipakai oleh CVDocumentModal dan
  * drawer navigasi mobile (Navbar & NavbarCV).
  */
-export function useFocusTrap(containerRef: React.RefObject<HTMLElement>, active: boolean) {
+export function useFocusTrap(
+  containerRef: { current: HTMLElement | null },
+  active: boolean
+) {
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -21,13 +24,13 @@ export function useFocusTrap(containerRef: React.RefObject<HTMLElement>, active:
     const container = containerRef.current;
     if (container) {
       const focusable = container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
-      (focusable[0] || container).focus();
+      ((focusable[0] as HTMLElement | undefined) || container).focus();
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || !container) return;
-      const focusable = Array.from(
-        container.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const focusable = (
+        Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)) as HTMLElement[]
       ).filter((el) => el.offsetParent !== null);
       if (focusable.length === 0) return;
 
