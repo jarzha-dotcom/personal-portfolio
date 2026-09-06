@@ -9,7 +9,7 @@
  *
  * PENGAMANAN:
  * Jika seseorang meng-clone repositori ini tanpa file kunci rahasia (.env.local)
- * yang memiliki VITE_APP_LICENSE_KEY yang valid:
+ * yang memiliki APP_LICENSE_KEY yang valid:
  * 1. Aplikasi otomatis berjalan dalam mode "Showcase / Evaluation Only".
  * 2. Banner watermark keamanan permanen akan ditampilkan di bagian atas web.
  * 3. Pemilik asli (K. Arzhaning Jagad) memiliki lisensi penuh dengan memasang
@@ -23,7 +23,7 @@ export function isAppLicensed(): boolean {
   if (typeof window === 'undefined') return true;
 
   try {
-    const userKey = (import.meta as any).env?.VITE_APP_LICENSE_KEY;
+    const userKey = (import.meta as any).env?.APP_LICENSE_KEY;
     if (userKey && String(userKey).trim() === VALID_LICENSE_KEY) {
       return true;
     }
