@@ -1,9 +1,16 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShieldAlert, ExternalLink } from 'lucide-react';
 import { isAppLicensed } from '../utils/licenseGuard';
 
 export const ShowcaseBanner: React.FC = () => {
-  if (isAppLicensed()) return null;
+  const [licensed, setLicensed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    isAppLicensed().then(setLicensed);
+  }, []);
+
+  // Belum selesai verifikasi → jangan render apapun (hindari flash)
+  if (licensed === null || licensed === true) return null;
 
   return (
     <aside
@@ -13,7 +20,7 @@ export const ShowcaseBanner: React.FC = () => {
       <div className="flex items-center gap-2 mx-auto text-center sm:text-left">
         <ShieldAlert className="w-4 h-4 text-amber-200 shrink-0" />
         <span>
-          <b className="tracking-wide">SHOWCASE / REVIEW MODE:</b> Hak Cipta © 2026 <b>K. Arzhaning Jagad (Arzha)</b>. Repositori ini hanya untuk evaluasi skill & review teknis. Kunci lisensi deployment tidak ditemukan.
+          <b className="tracking-wide">SHOWCASE / REVIEW MODE:</b> Hak Cipta © 2026 <b>K. Arzhaning Jagad (Arzha)</b>. Repositori ini hanya untuk evaluasi skill &amp; review teknis. Kunci lisensi deployment tidak ditemukan.
         </span>
         <a
           href="https://byarzhaning.online"
