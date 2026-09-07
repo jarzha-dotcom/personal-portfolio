@@ -25,7 +25,7 @@ import {
     Plus,
     History,
 } from 'lucide-react';
-import { sendMessageToGemini, ChatMessage, AgentStep } from '../services/geminiService';
+import { sendMessageToGemini, ChatMessage, AgentStep, sendAgentAnalyticsEvent } from '../services/geminiService';
 import {
     createConversation,
     getActiveConversationId,
@@ -80,11 +80,15 @@ interface ModelOption {
     desc: string;
 }
 
-// Antigravity BUKAN default (lihat chat.ts: backend HANYA memicunya kalau
-// agentMode dikirim eksplisit — baik dari memilih model ini di dropdown,
-// maupun dari tombol "🧪 Buktikan Sekarang" yang muncul saat backend
-// menyarankan mode Live Demo lewat suggestedAgentAction). Backend tidak
-// pernah lagi meng-auto-invoke Antigravity dari heuristic semata.
+// Antigravity SENGAJA TIDAK dimasukkan ke AVAILABLE_MODELS (dropdown) — dia
+// gak boleh bisa dipilih manual sama sekali, biar kuota 100 RPD-nya gak
+// boncos kepakai buat obrolan biasa. Satu-satunya jalan Antigravity aktif
+// adalah lewat tombol opt-in "🧪 Buktikan Sekarang" (lihat handleTryLiveDemo)
+// yang forceAgent-nya dikirim langsung ke backend TANPA pernah mengubah
+// pilihan dropdown (selectedModel) sama sekali. Selama dia aktif, dropdown-nya
+// sementara nampilin "Antigravity Agent" (state isAgentTurnActive di bawah),
+// lalu otomatis balik nampilin model biasa begitu tugasnya selesai — gak
+// pernah "nyangkut" ke Antigravity.
 const ANTIGRAVITY_MODEL_ID = 'antigravity-preview-05-2026';
 
 export const AVAILABLE_MODELS: ModelOption[] = [
@@ -95,7 +99,6 @@ export const AVAILABLE_MODELS: ModelOption[] = [
     { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
     { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Reasoning mendalam' },
     { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
-    { id: ANTIGRAVITY_MODEL_ID, label: 'Antigravity Agent 🧪', desc: 'Live Demo — tulis & jalankan kode kecil buat buktikan ide (lebih lambat, ~10-15 detik)' },
 ];
 
 interface AIChatbotShowcaseProps {
@@ -450,7 +453,24 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         }
     };
     const [lastUserMessage, setLastUserMessage] = useState<string>('');
-    const [activeModel, setActiveModel] = useState<string>('gemini-3.8-flash');
+    // Transient — TRUE cuma selama satu giliran Antigravity beneran diproses
+    // (dari mulai kirim sampai trace+ketikan selesai tampil), lalu otomatis
+    // balik false sendiri (lihat useEffect di bawah dekat modelMenuRef) begitu
+    // isLoading & isStreaming sama-sama selesai. Ini yang bikin dropdown model
+    // "ngumpet lagi" begitu tugasnya kelar, tanpa perlu nunggu pesan berikutnya.
+    const [isAgentTurnActive, setIsAgentTurnActive] = useState(false);
+    // Cap PER PERCAKAPAN buat tombol "🧪 Buktikan Sekarang" — proteksi
+    // tambahan di atas cap harian global backend, biar satu percakapan gak
+    // bisa ngabisin jatah kuota harian sendirian. Direset tiap ganti/mulai
+    // percakapan (lihat useEffect yang watch conversationId). Zannah
+    // (ChatWidget.tsx) pakai pola identik karena sama-sama punya
+    // multi-percakapan tersimpan (chatStorage).
+    const AGENT_SESSION_CAP = 20;
+    const [agentUsageCount, setAgentUsageCount] = useState(0);
+    // Sisa kuota harian GLOBAL Antigravity dari backend — dipakai buat
+    // nyembunyiin tombol "Buktikan Sekarang" lebih awal kalau kuota hari ini
+    // beneran udah abis, bukan nunggu user klik dulu baru gagal.
+    const [antigravityRemainingToday, setAntigravityRemainingToday] = useState<number | null>(null);
     const [lastLatencyMs, setLastLatencyMs] = useState<number | null>(null);
     const [copiedId, setCopiedId] = useState<string | null>(null);
     const [selectedModel, setSelectedModel] = useState<string>('gemini-3.8-flash');
@@ -644,6 +664,23 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         }
     }, [isLoading, isStreaming]);
 
+    // Antigravity "ngumpet lagi" otomatis: begitu satu giliran (request +
+    // trace + ketikan) benar-benar kelar, matiin flag isAgentTurnActive apa
+    // pun yang terjadi — gak perlu nunggu pesan berikutnya dikirim. Dropdown
+    // model di footer langsung balik nampilin model biasa lagi.
+    useEffect(() => {
+        if (!isLoading && !isStreaming) {
+            setIsAgentTurnActive(false);
+        }
+    }, [isLoading, isStreaming]);
+
+    // Cap sesi AI Agent itu PER PERCAKAPAN — reset tiap kali pindah/mulai
+    // percakapan baru (startNewChat & openConversationById sama-sama ganti
+    // conversationId).
+    useEffect(() => {
+        setAgentUsageCount(0);
+    }, [conversationId]);
+
     // Tutup dropdown model saat klik di luar area-nya
     useEffect(() => {
         if (!isModelMenuOpen) return;
@@ -800,7 +837,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             // — kirim sebagai agentMode: true supaya backend beneran memaksa
             // panggil Antigravity (lihat gating wantsAgent di chat.ts), bukan
             // model biasa yang parameternya akan diabaikan.
-            const forceAgent = forceAgentOverride ?? (selectedModel === ANTIGRAVITY_MODEL_ID);
+            const forceAgent = forceAgentOverride ?? false; // selectedModel gak pernah lagi bisa jadi Antigravity — lihat AVAILABLE_MODELS
+            if (forceAgent) setIsAgentTurnActive(true); // dropdown footer nampilin "Antigravity Agent" sampai giliran ini kelar
             const result = await sendMessageToGemini(
                 currentHistory,
                 text,
@@ -816,16 +854,29 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             const replyText = result.reply;
 
             if (result.model) {
-                // Dropdown ikut pindah kalau ini fallback Gemini→Gemini beneran
-                // (bukan auto-upgrade ke Antigravity, yang tetap ditampilkan
-                // sebagai badge terpisah — lihat render dropdown di bawah).
+                // Dropdown ikut pindah kalau ini fallback Gemini→Gemini beneran.
+                // Antigravity (result.model === ANTIGRAVITY_MODEL_ID) sengaja
+                // TIDAK PERNAH bikin dropdown pindah — itu ditampilkan sementara
+                // lewat isAgentTurnActive, bukan lewat selectedModel, supaya dia
+                // otomatis "ngumpet lagi" begitu giliran ini selesai (lihat effect
+                // di atas), bukan nyangkut jadi pilihan permanen.
                 if (result.model !== selectedModel && result.model !== ANTIGRAVITY_MODEL_ID) {
                     setFallbackFrom(selectedModel);
                     setSelectedModel(result.model);
                 } else if (result.model === selectedModel) {
                     setFallbackFrom(null);
                 }
-                setActiveModel(result.model);
+            }
+            // Sisa kuota harian global Antigravity — dipakai buat nyembunyiin
+            // tombol "Buktikan Sekarang" lebih awal kalau kuota hari ini abis.
+            if (typeof result.antigravityDailyRemaining === 'number') {
+                setAntigravityRemainingToday(result.antigravityDailyRemaining);
+            }
+            // Analytics: catet tiap kali backend beneran nyaranin Live Demo
+            // lewat suggestedAgentAction (bukan tiap balasan biasa) — sinyal
+            // buat ngukur seberapa sering saran ini "kena" konteksnya.
+            if (result.suggestedAgentAction === 'live_demo') {
+                sendAgentAnalyticsEvent('agent_cta_shown', 'live_demo', 'rajendra');
             }
 
             const assistantMsgId = generateMessageId('assistant');
@@ -928,7 +979,18 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     // Antigravity buat coba tulis & jalankan proof-of-concept begitu dia aktif.
     const handleTryLiveDemo = () => {
         if (!lastUserMessage || isLoading || isStreaming) return;
-        setSelectedModel(ANTIGRAVITY_MODEL_ID); // dropdown ikut nunjukin mode yang lagi aktif
+        // Cap sesi per-percakapan ATAU kuota harian global backend abis →
+        // jangan kirim sama sekali. Tombolnya sendiri udah disembunyiin
+        // duluan di JSX (lihat kondisi render di bawah) begitu salah satu
+        // limit ini kesentuh — ini cuma guard defensif kalau somehow masih
+        // ke-klik dari render yang belum sempat update.
+        if (agentUsageCount >= AGENT_SESSION_CAP || antigravityRemainingToday === 0) return;
+        sendAgentAnalyticsEvent('agent_cta_clicked', 'live_demo', 'rajendra');
+        setAgentUsageCount((prev) => prev + 1);
+        // Sengaja TIDAK setSelectedModel(ANTIGRAVITY_MODEL_ID) — dropdown gak
+        // boleh "nyangkut" pilih Antigravity secara permanen. forceAgent-nya
+        // dikirim langsung ke handleSend, dan tampilan sementaranya dihandle
+        // isAgentTurnActive (lihat useEffect di atas).
         handleSend(lastUserMessage, false, true);
     };
 
@@ -1050,10 +1112,13 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
 
                     <button
                         onClick={startNewChat}
-                        title="Mulai obrolan baru"
-                        className={`p-1.5 rounded-lg transition-colors ${darkMode
-                            ? 'text-slate-400 hover:text-white hover:bg-slate-700/60'
-                            : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
+                        disabled={isLoading || isStreaming}
+                        title={(isLoading || isStreaming) ? 'Tunggu balasan chat selesai dulu ya' : 'Mulai obrolan baru'}
+                        className={`p-1.5 rounded-lg transition-colors ${(isLoading || isStreaming)
+                            ? 'opacity-40 cursor-not-allowed'
+                            : darkMode
+                                ? 'text-slate-400 hover:text-white hover:bg-slate-700/60'
+                                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/70'
                             }`}
                     >
                         <Plus className="w-4 h-4" />
@@ -1089,6 +1154,11 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                     </div>
 
                     <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                        {(isLoading || isStreaming) && (
+                            <p className={`text-[10.5px] text-center py-2 px-2 rounded-lg font-medium ${darkMode ? 'bg-amber-950/40 text-amber-300 border border-amber-800/50' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                                ⏳ Rajendra lagi balas pesan — tunggu balasannya selesai dulu ya sebelum ganti/mulai obrolan lain, biar balasannya gak nyasar ke jendela yang salah.
+                            </p>
+                        )}
                         {isHistoryLoading && (
                             <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                                 Memuat riwayat...
@@ -1105,13 +1175,17 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                     key={conv.id}
                                     type="button"
                                     onClick={() => openConversationById(conv.id)}
-                                    className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${conv.id === conversationId
-                                        ? darkMode
-                                            ? 'border-teal-500 bg-teal-950/30'
-                                            : 'border-teal-400 bg-teal-50'
-                                        : darkMode
-                                            ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
-                                            : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                                    disabled={isLoading || isStreaming}
+                                    title={(isLoading || isStreaming) ? 'Tunggu balasan chat selesai dulu ya' : undefined}
+                                    className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${(isLoading || isStreaming)
+                                        ? 'opacity-40 cursor-not-allowed'
+                                        : conv.id === conversationId
+                                            ? darkMode
+                                                ? 'border-teal-500 bg-teal-950/30'
+                                                : 'border-teal-400 bg-teal-50'
+                                            : darkMode
+                                                ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                                                : 'border-slate-200 hover:border-slate-300 bg-slate-50'
                                         }`}
                                 >
                                     <div className="min-w-0">
@@ -1129,16 +1203,24 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                     </div>
                                     <span
                                         role="button"
-                                        tabIndex={0}
-                                        onClick={(e) => handleDeleteConversation(conv.id, e)}
+                                        tabIndex={(isLoading || isStreaming) ? -1 : 0}
+                                        aria-disabled={isLoading || isStreaming}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (isLoading || isStreaming) return;
+                                            handleDeleteConversation(conv.id, e);
+                                        }}
                                         onKeyDown={(e) => {
+                                            if (isLoading || isStreaming) return;
                                             if (e.key === 'Enter' || e.key === ' ') handleDeleteConversation(conv.id, e as unknown as React.MouseEvent);
                                         }}
                                         aria-label="Hapus obrolan ini"
-                                        title="Hapus obrolan ini"
-                                        className={`shrink-0 p-1 rounded-lg transition-colors ${darkMode
-                                            ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
-                                            : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+                                        title={(isLoading || isStreaming) ? 'Tunggu balasan chat selesai dulu ya' : 'Hapus obrolan ini'}
+                                        className={`shrink-0 p-1 rounded-lg transition-colors ${(isLoading || isStreaming)
+                                            ? 'opacity-40 cursor-not-allowed'
+                                            : darkMode
+                                                ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
+                                                : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
                                             }`}
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
@@ -1151,7 +1233,9 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                         <button
                             type="button"
                             onClick={startNewChat}
-                            className="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors bg-teal-600 hover:bg-teal-700"
+                            disabled={isLoading || isStreaming}
+                            title={(isLoading || isStreaming) ? 'Tunggu balasan chat selesai dulu ya' : undefined}
+                            className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors ${(isLoading || isStreaming) ? 'opacity-40 cursor-not-allowed bg-slate-500' : 'bg-teal-600 hover:bg-teal-700'}`}
                         >
                             <Plus className="w-3.5 h-3.5" /> Obrolan Baru
                         </button>
@@ -1284,8 +1368,9 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
 
                             {/* Saran opt-in "Live Demo" — HANYA tombol, backend gak pernah
                                 auto-invoke Antigravity dari saran ini. Muncul di balasan Gemini
-                                biasa saat backend mendeteksi pertanyaan feasibility. */}
-                            {msg.suggestedLiveDemo && !isLoading && !isStreaming && (
+                                biasa saat backend mendeteksi pertanyaan feasibility. Disembunyikan
+                                begitu cap sesi per-percakapan ATAU kuota harian global abis. */}
+                            {msg.suggestedLiveDemo && !isLoading && !isStreaming && agentUsageCount < AGENT_SESSION_CAP && antigravityRemainingToday !== 0 && (
                                 <div className="mt-2">
                                     <button
                                         type="button"
@@ -1506,13 +1591,23 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             disabled={isLoading || isStreaming}
                             aria-haspopup="listbox"
                             aria-expanded={isModelMenuOpen}
-                            className={`inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-md border transition-colors disabled:opacity-50 ${darkMode
-                                ? 'bg-teal-500/10 border-teal-500/30 text-teal-300 hover:bg-teal-500/20'
-                                : 'bg-teal-50 border-teal-300 text-teal-700 hover:bg-teal-100'
+                            title={isAgentTurnActive ? 'Antigravity Agent sedang memproses giliran ini' : undefined}
+                            className={`inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded-md border transition-colors disabled:opacity-50 ${isAgentTurnActive
+                                ? darkMode
+                                    ? 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+                                    : 'bg-purple-50 border-purple-300 text-purple-700'
+                                : darkMode
+                                    ? 'bg-teal-500/10 border-teal-500/30 text-teal-300 hover:bg-teal-500/20'
+                                    : 'bg-teal-50 border-teal-300 text-teal-700 hover:bg-teal-100'
                                 }`}
                         >
                             <Sparkles className="w-2.5 h-2.5" />
-                            {AVAILABLE_MODELS.find((m) => m.id === selectedModel)?.label ?? selectedModel}
+                            {/* Selama isAgentTurnActive, tampilkan "Antigravity Agent" apa
+                                pun isi selectedModel — begitu giliran ini selesai (effect di
+                                atas), otomatis balik nampilin model biasa lagi. selectedModel
+                                sendiri gak akan pernah jadi Antigravity (lihat AVAILABLE_MODELS
+                                & handleTryLiveDemo), jadi ini murni tampilan sementara. */}
+                            {isAgentTurnActive ? 'Antigravity Agent 🧪' : (AVAILABLE_MODELS.find((m) => m.id === selectedModel)?.label ?? selectedModel)}
                             <ChevronDown className={`w-2.5 h-2.5 transition-transform ${isModelMenuOpen ? 'rotate-180' : ''}`} />
                         </button>
 
@@ -1553,24 +1648,15 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             </div>
                         )}
                     </div>
-                    {/* Catatan: badge "auto-agent" yang dulu ada di sini (untuk kasus
-                        Antigravity ke-trigger otomatis oleh heuristic walau dropdown
-                        masih di model Gemini biasa) sudah dihapus — backend sekarang
-                        TIDAK PERNAH lagi memanggil Antigravity dari heuristik semata
-                        (lihat chat.ts: detectAgentIntent cuma dipakai buat saran
-                        suggestedAgentAction / tombol "🧪 Buktikan Sekarang", bukan
-                        buat auto-invoke). Diganti badge konfirmasi yang jujur: cuma
-                        tampil kalau Live Demo BENERAN lagi aktif (activeModel sudah
-                        dikonfirmasi backend, bukan cuma pilihan dropdown yang belum
-                        tentu berhasil). */}
-                    {activeModel === ANTIGRAVITY_MODEL_ID && (
-                        <span
-                            title="Balasan berikutnya dijawab lewat Antigravity Agent (Live Demo)"
-                            className={`text-[9px] italic ${darkMode ? 'text-purple-300/80' : 'text-purple-600'}`}
-                        >
-                            🧪 Live Demo aktif
-                        </span>
-                    )}
+                    {/* Catatan: badge "auto-agent"/"Live Demo aktif" yang dulu ada di
+                        sini sudah dihapus. Backend sekarang TIDAK PERNAH lagi memanggil
+                        Antigravity dari heuristik semata (lihat chat.ts: detectAgentIntent
+                        cuma dipakai buat saran suggestedAgentAction / tombol "🧪 Buktikan
+                        Sekarang"), dan status "lagi aktif"-nya sekarang ditampilkan
+                        LANGSUNG di tombol dropdown model itu sendiri lewat isAgentTurnActive
+                        (lihat render tombol dropdown di atas) — supaya otomatis "ngumpet
+                        lagi" begitu giliran itu selesai, bukan nyangkut sebagai badge
+                        terpisah yang baru hilang pas pesan berikutnya dikirim. */}
                     {fallbackFrom && fallbackFrom !== selectedModel && (
                         <span
                             title={`Otomatis dipindah dari ${AVAILABLE_MODELS.find((m) => m.id === fallbackFrom)?.label ?? fallbackFrom} karena kuota/limit model itu mungkin habis`}

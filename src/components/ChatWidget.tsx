@@ -3,7 +3,8 @@ import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Load
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
-import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile, AgentIntentAction } from '../services/geminiService';
+import { CATEGORIES, FAQ_ITEMS, Category, FAQItem } from '../data/faqData';
+import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile, AgentIntentAction, sendAgentAnalyticsEvent, searchFaqSemantic } from '../services/geminiService';
 import {
   createConversation,
   getActiveConversationId,
@@ -71,212 +72,18 @@ interface Message {
   uploadedFiles?: PendingFile[];
   /** File hasil kerja Antigravity yang bisa didownload (mis. RAB.xlsx, laporan.pdf) */
   attachments?: Attachment[];
+  /** Diisi kalau balasan ini adalah HASIL sukses dari aksi AI Agent tertentu
+   * (bukan cuma "disarankan" — beneran dieksekusi & berhasil). Dipakai buat
+   * ngederivasi `hasGeneratedEstimate`/dst dari riwayat pesan, biar tombol
+   * "Buatkan Estimasi" gak nawarin generate ulang dari nol kalau udah pernah
+   * berhasil di percakapan yang sama — lihat komentar di dekat pemakaiannya. */
+  agentResultType?: AgentIntentAction;
 }
 
 // ─── FAQ Fallback Data (Fuse.js) ────────────────────────────────────────────
-interface Category {
-  id: string;
-  label: string;
-}
-
-interface FAQItem {
-  id: string;
-  categoryId: string;
-  quickLabel: string;
-  keywords: string[];
-  answer: string;
-}
-
-const CATEGORIES: Category[] = [
-  { id: 'harga', label: '💰 Harga & Paket' },
-  { id: 'proses', label: '⏱️ Alur & Garansi' },
-  { id: 'tech', label: '🛠️ Skill & Teknis' },
-  { id: 'portfolio', label: '📂 Bukti Proyek' },
-  { id: 'kontak', label: '📞 Kontak & Konsultasi' },
-];
-
-const FAQ_ITEMS: FAQItem[] = [
-  // ── 💰 Harga & Paket ──
-  {
-    id: 'harga-landing',
-    categoryId: 'harga',
-    quickLabel: 'Harga landing page / profil?',
-    keywords: ['harga landing page', 'biaya landing page', 'landing page berapa', 'halaman tunggal', 'company profile 1 halaman', 'web profil'],
-    answer: 'Landing page (1 halaman responsif) mulai dari Rp800rb. Cocok buat UMKM, event, atau portofolio bisnis. Desain custom, cepat, dan mobile-friendly! 🎯',
-  },
-  {
-    id: 'harga-webapp',
-    categoryId: 'harga',
-    quickLabel: 'Harga web app / dashboard?',
-    keywords: ['harga web app', 'biaya dashboard', 'harga sistem internal', 'harga aplikasi web', 'web app berapa', 'sistem kasir', 'crm'],
-    answer: 'Web app custom (dashboard admin, sistem manajemen inventaris, portal internal) mulai dari Rp6 juta, tergantung kompleksitas fitur dan database yang dibutuhkan.',
-  },
-  {
-    id: 'harga-mobile',
-    categoryId: 'harga',
-    quickLabel: 'Harga aplikasi mobile?',
-    keywords: ['harga aplikasi mobile', 'biaya bikin app', 'harga app android', 'harga aplikasi ios', 'mobile app berapa', 'bikin aplikasi hp'],
-    answer: 'Aplikasi mobile custom (Android & iOS) mulai dari Rp6 juta. Dibangun pakai React Native / Expo sehingga performa kencang dan bisa langsung dua platform sekaligus.',
-  },
-  {
-    id: 'harga-game',
-    categoryId: 'harga',
-    quickLabel: 'Harga pembuatan game?',
-    keywords: ['harga game', 'biaya bikin game', 'harga platform multiplayer', 'game berapa', 'harga board game'],
-    answer: 'Game / platform multiplayer realtime online mulai dari Rp12 juta. Backend menggunakan boardgame.io + WebSockets untuk sinkronisasi antar pemain tanpa lag.',
-  },
-  {
-    id: 'harga-ecommerce',
-    categoryId: 'harga',
-    quickLabel: 'Bisa bikin toko online?',
-    keywords: ['toko online', 'ecommerce', 'e-commerce', 'olshop', 'jual beli online', 'katalog produk'],
-    answer: 'Bisa banget! Toko online custom tanpa potongan komisi marketplace. Bisa integrasi checkout via WhatsApp otomatis atau Payment Gateway otomatis (QRIS, VA, Kartu Kredit).',
-  },
-  {
-    id: 'harga-promo',
-    categoryId: 'harga',
-    quickLabel: 'Ada promo apa sekarang?',
-    keywords: ['promo', 'diskon', 'harga spesial', 'promo peluncuran', 'potongan harga'],
-    answer: '🔥 Ada promo peluncuran khusus 5 klien pertama: Diskon 15% (jika bersedia jadi studi kasus portofolio), GRATIS technical support 1 bulan, dan tambahan 2x revisi mayor gratis!',
-  },
-  {
-    id: 'objection-mahal',
-    categoryId: 'harga',
-    quickLabel: 'Budget terbatas, bisa nego?',
-    keywords: ['mahal', 'kemahalan', 'kurang murah', 'bisa nego', 'budget minim', 'diskon dong', 'ada potongan', 'bisa cicil', 'uang pas-pasan'],
-    answer: 'Bisa banget diobrolin kok kak! Fitur dan budget bisa kita sesuaikan. Kita bisa mulai dari versi MVP (fitur inti dulu) biar hemat biaya tapi bisnis kakak langsung bisa jalan 😊',
-  },
-  // ── ⏱️ Alur & Garansi ──
-  {
-    id: 'proses-durasi',
-    categoryId: 'proses',
-    quickLabel: 'Berapa lama pengerjaan?',
-    keywords: ['berapa lama', 'durasi pengerjaan', 'estimasi waktu', 'lama proyek', 'timeline', 'bisa cepat'],
-    answer: 'Estimasi standar: Landing page 1-2 minggu, Web App / Mobile App 3-6 minggu, Game 6-10 minggu. Kalau butuh timeline ekspres/mepet, bisa disepakati di awal konsultasi.',
-  },
-  {
-    id: 'proses-alur',
-    categoryId: 'proses',
-    quickLabel: 'Gimana tahapan alur kerjanya?',
-    keywords: ['alur kerja', 'proses kerja', 'tahapan proyek', 'cara kerja', 'workflow', 'step by step'],
-    answer: 'Ada 4 tahap transparan: 1) Diskusi Kebutuhan & Desain, 2) Development & Coding, 3) Testing bareng klien, 4) Deployment & Serah Terima. Progres di-update rutin via WhatsApp.',
-  },
-  {
-    id: 'proses-pembayaran',
-    categoryId: 'proses',
-    quickLabel: 'Sistem pembayarannya gimana?',
-    keywords: ['pembayaran', 'dp', 'cicilan', 'bayar gimana', 'termin', 'sistem bayar', 'skema pembayaran'],
-    answer: 'Sistemnya bertahap per milestone (DP awal, termin tengah saat fitur jadi, pelunasan saat rilis). Jadi Kakak lihat progres nyata dulu baru bayar. Aman & nol risiko!',
-  },
-  {
-    id: 'proses-garansi',
-    categoryId: 'proses',
-    quickLabel: 'Ada garansi kalau ada bug?',
-    keywords: ['garansi', 'bug', 'error', 'rusak', 'maintenance', 'support', 'after sales'],
-    answer: 'Pasti ada! Setiap proyek dapat garansi technical support gratis 1 bulan pasca rilis. Kalau ada bug atau kendala teknis, Arzha beresin tuntas tanpa biaya tambahan.',
-  },
-  {
-    id: 'proses-sourcecode',
-    categoryId: 'proses',
-    quickLabel: 'Source code dikasih ke klien?',
-    keywords: ['source code', 'kodingan', 'repo', 'github', 'hak milik', 'milik siapa', 'dapet kodingan'],
-    answer: '100% dikasih! Seluruh source code, repositori GitHub, dan aset project diserahkan penuh jadi hak milik Kakak tanpa biaya lisensi tersembunyi.',
-  },
-  {
-    id: 'proses-hosting',
-    categoryId: 'proses',
-    quickLabel: 'Hosting & domain gimana?',
-    keywords: ['hosting', 'domain', 'server', 'pasang web', 'deploy', 'cloud'],
-    answer: 'Bisa dibantu setup sampai live! Mau pakai cloud modern hemat biaya (Vercel, Cloudflare, Supabase) atau server/hosting milik Kakak sendiri, semuanya siap dikonfigurasi.',
-  },
-  {
-    id: 'objection-trust',
-    categoryId: 'proses',
-    quickLabel: 'Kenapa bisa percaya sama Arzha?',
-    keywords: ['ga percaya', 'tidak percaya', 'ragu', 'takut ditipu', 'penipuan', 'aman ga', 'terpercaya', 'bukti kerja', 'ga mau', 'kabur'],
-    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat 7+ tahun yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 3 proyek live nyata yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
-  },
-  // ── 🛠️ Skill & Teknis ──
-  {
-    id: 'tech-stack',
-    categoryId: 'tech',
-    quickLabel: 'Teknologi yang dipakai apa saja?',
-    keywords: ['teknologi', 'tech stack', 'pakai bahasa apa', 'framework', 'react node', 'koding pake apa'],
-    answer: 'Frontend: React, TypeScript, Tailwind CSS, Vite. Backend: Node.js, Supabase, PostgreSQL. Mobile: React Native, Expo. Game: boardgame.io, WebSockets. Cepat, modern, dan scalable!',
-  },
-  {
-    id: 'tech-custom',
-    categoryId: 'tech',
-    quickLabel: 'Bisa request fitur khusus/custom?',
-    keywords: ['bisa bikin seperti', 'custom request', 'fitur khusus', 'bisa nggak', 'request fitur'],
-    answer: 'Sangat bisa! Mau integrasi API pihak ketiga, upload file, ekspor laporan Excel/PDF, sistem notifikasi WhatsApp, sampai dashboard analitik bisa dibuat sesuai kebutuhan.',
-  },
-  {
-    id: 'tech-payment',
-    categoryId: 'tech',
-    quickLabel: 'Bisa pasang payment gateway?',
-    keywords: ['payment gateway', 'midtrans', 'xendit', 'qris', 'bayar otomatis', 'transfer bank otomatis'],
-    answer: 'Bisa banget! Arzha bisa integrasikan sistem pembayaran otomatis seperti Midtrans atau Xendit untuk terima QRIS, Virtual Account, dan kartu kredit secara realtime.',
-  },
-  {
-    id: 'objection-keunggulan',
-    categoryId: 'tech',
-    quickLabel: 'Apa keunggulan jasa Arzha?',
-    keywords: ['keunggulan', 'kelebihan', 'kenapa harus arzha', 'bedanya apa', 'keistimewaan'],
-    answer: '3 poin unggulan: 1) Ketelitian & kedisiplinan audit korporat 7+ tahun (anti-ngilang), 2) Tech stack modern & kencang tanpa bloatware, 3) Pendampingan teknis ramah & garansi support 1 bulan.',
-  },
-  // ── 📂 Bukti Proyek ──
-  {
-    id: 'portfolio-proyek',
-    categoryId: 'portfolio',
-    quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
-    keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 3 proyek live yang bisa dicoba langsung: 1) B-Games (game board multiplayer online), 2) Rajendra Pintar (app edukasi anak dwibahasa + suara TTS), 3) Assets GMP (sistem inventaris aset perusahaan). Cek demonya di bagian Proyek ya!',
-  },
-  {
-    id: 'portfolio-bgames',
-    categoryId: 'portfolio',
-    quickLabel: 'Tentang proyek B-Games?',
-    keywords: ['bgames', 'b-games', 'game multiplayer', 'ludo', 'ular tangga'],
-    answer: 'B-Games adalah platform board game online realtime (Ludo, Ular Tangga, Tic Tac Toe) dengan room code multiplayer, chat room, dan matchmaking otomatis. Demo: bgames.byarzhaning.online',
-  },
-  {
-    id: 'portfolio-rajendra',
-    categoryId: 'portfolio',
-    quickLabel: 'Tentang proyek Rajendra Pintar?',
-    keywords: ['rajendra', 'rajendra pintar', 'edukasi anak', 'aplikasi anak', 'tts'],
-    answer: 'Aplikasi belajar anak interaktif usia 4-8 tahun dengan suara Text-to-Speech dwibahasa (ID/EN), kuis tebak suara, dan animasi menarik. Demo: rajendrapintar.byarzhaning.online',
-  },
-  {
-    id: 'portfolio-assets',
-    categoryId: 'portfolio',
-    quickLabel: 'Tentang proyek Assets GMP?',
-    keywords: ['assets', 'assets gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
-    answer: 'Aplikasi internal perusahaan untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Demo: assets-gmp.vercel.app',
-  },
-  // ── 📞 Kontak & Konsultasi ──
-  {
-    id: 'kontak-wa',
-    categoryId: 'kontak',
-    quickLabel: 'Kontak WhatsApp & Email?',
-    keywords: ['kontak', 'whatsapp', 'nomor hp', 'email', 'hubungi', 'wa'],
-    answer: 'Bisa langsung hubungi WhatsApp di +6282312312734 atau email ke Jarzha@gmail.com. Mau tanya-tanya santai dulu atau langsung konsultasi ide proyek, siap dilayani!',
-  },
-  {
-    id: 'kontak-konsultasi',
-    categoryId: 'kontak',
-    quickLabel: 'Konsultasi awal gratis gak?',
-    keywords: ['konsultasi gratis', 'biaya konsultasi', 'tanya dulu', 'ngobrol dulu', 'bayar ga'],
-    answer: '100% GRATIS! Kakak bisa curhat kebutuhan sistem, minta estimasi timeline, atau tanya-tanya budget tanpa ada kewajiban order apa pun kok',
-  },
-  {
-    id: 'kontak-availability',
-    categoryId: 'kontak',
-    quickLabel: 'Masih buka untuk proyek baru?',
-    keywords: ['masih buka', 'terima proyek', 'available', 'slot kosong', 'lagi kosong gak'],
-    answer: 'Masih buka untuk proyek baru! Apalagi ada promo peluncuran potongan 15% buat klien awal. Yuk amankan slot kakak sebelum kuotanya habis!',
-  },
-];
+// Data & tipe CATEGORIES/FAQ_ITEMS dipindah ke ../data/faqData supaya bisa
+// dipakai bareng oleh api/chat.ts (buat semantic search embedding) tanpa
+// duplikasi & risiko drift antara yang ditampilkan ke user vs yang di-embed.
 
 const fuse = new Fuse(FAQ_ITEMS, {
   keys: [
@@ -287,6 +94,23 @@ const fuse = new Fuse(FAQ_ITEMS, {
   threshold: 0.45,
   ignoreLocation: true,
 });
+
+/**
+ * Cari FAQ paling relevan buat Radit: coba semantic search dulu (Gemini
+ * Embedding di backend, lewat `searchFaqSemantic`), baru fallback ke Fuse.js
+ * keyword-match kalau semantic search gak ketemu/gagal/timeout. Radit gak
+ * pernah lebih "bodoh" dari sebelumnya — paling jelek ya balik ke perilaku
+ * Fuse.js yang sudah ada.
+ */
+async function findFaqAnswer(text: string): Promise<FAQItem | null> {
+  const matchedId = await searchFaqSemantic(text);
+  if (matchedId) {
+    const matched = FAQ_ITEMS.find((f) => f.id === matchedId);
+    if (matched) return matched;
+  }
+  const results = fuse.search(text);
+  return results.length > 0 ? results[0].item : null;
+}
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const nowStr = () => new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
@@ -352,6 +176,28 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Agent (opt-in) — dipakai buat nunjukkin status loading yang lebih jujur
   // ("menjalankan agent...") dibanding status generik balasan teks biasa.
   const [isAgentBusy, setIsAgentBusy] = useState(false);
+  // True selama animasi "ngetik" balasan bot lagi jalan (streamBotMessage →
+  // useStreamingText), TERPISAH dari `isTyping` yang cuma nutupin durasi
+  // nunggu network/API. Dipakai bareng `isTyping` buat nentuin kapan
+  // tombol ganti/mulai obrolan boleh diklik — supaya user gak bisa pindah
+  // jendela di TENGAH animasi balasan lagi jalan juga (bukan cuma pas nunggu
+  // API), yang kalau dibiarkan bisa bikin teks nyasar ke obrolan lain.
+  const [isStreamingReply, setIsStreamingReply] = useState(false);
+  // Cap sesi PER PERCAKAPAN buat tombol AI Agent (opt-in) — proteksi TAMBAHAN
+  // di atas cap harian global backend (lihat ANTIGRAVITY_DAILY_CAP di
+  // chat.ts), biar SATU percakapan gak bisa ngabisin jatah kuota harian
+  // sendirian cuma dengan klik-klik tombol ini berkali-kali. Direset tiap
+  // ganti/mulai percakapan baru (lihat useEffect yang watch conversationId
+  // di bawah, dekat deklarasi conversationId) — konsisten sama Rajendra
+  // (AIChatbotShowcase.tsx), karena Zannah sekarang juga punya multi-riwayat
+  // percakapan tersimpan (chatStorage), jadi gak ada alasan lagi buat beda.
+  const AGENT_SESSION_CAP = 20;
+  const [agentUsageCount, setAgentUsageCount] = useState(0);
+  // Sisa kuota harian GLOBAL Antigravity dari backend (antigravityDailyRemaining
+  // di response) — null berarti belum pernah dapet info. Dipakai buat
+  // nonaktifin tombol agent LEBIH AWAL kalau kuota hari ini beneran udah abis
+  // (bukan cuma cap sesi lokal di atas), biar user gak nunggu gagal dulu.
+  const [antigravityRemainingToday, setAntigravityRemainingToday] = useState<number | null>(null);
   const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
   const [shareSummaryState, setShareSummaryState] = useState<'idle' | 'sharing' | 'shared' | 'error'>('idle');
   // Dicek sekali per mount (bukan tiap render) — kapabilitas Web Share API
@@ -381,6 +227,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // berlangsung — dipakai buat menahan auto-save biar nggak menimpa data
   // tersimpan dengan welcome msg kosong sebelum load selesai.
   const [conversationId, setConversationId] = useState<string | null>(null);
+  // Cap sesi AI Agent itu PER PERCAKAPAN — reset tiap kali pindah/mulai
+  // percakapan baru (startNewChat & openConversationById sama-sama ganti
+  // conversationId). Aman dijalankan dari awal (nilainya emang udah 0 saat
+  // mount), dan konsisten sama pola yang sama di AIChatbotShowcase.tsx.
+  useEffect(() => {
+    setAgentUsageCount(0);
+  }, [conversationId]);
   const [isStorageReady, setIsStorageReady] = useState(false);
   // Jendela riwayat percakapan (dibuka lewat klik avatar bot)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -396,6 +249,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // "Analisis Lebih Dalam pakai AI Agent" yang perlu ngirim ulang file yang
   // sama tanpa user harus upload lagi.
   const lastFilesRef = useRef<OutgoingFile[] | undefined>(undefined);
+  // True begitu user klik "✏️ Update Estimasi" (RAB sudah pernah dibuat
+  // sebelumnya di percakapan ini) — menandakan pesan BERIKUTNYA yang diketik
+  // user harus dibaca sebagai deskripsi perubahan fitur, bukan chat biasa.
+  // Di-reset ke false begitu pesan revisi itu kekirim, ATAU begitu user
+  // pindah/mulai obrolan lain (lihat startNewChat & openConversationById) —
+  // supaya gak ke-bawa nyasar ke percakapan yang beda topik sama sekali.
+  const pendingEstimateRevisionRef = useRef<boolean>(false);
 
   // Helper terpusat untuk menambah pesan baru ke state, sekaligus menjaga
   // batas MAX_DISPLAY_MESSAGES. Sebelumnya pola
@@ -649,6 +509,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const welcome = buildWelcomeMessage();
     const created = await createConversation<Message>('zannah', [welcome]);
     geminiHistoryRef.current = [];
+    pendingEstimateRevisionRef.current = false;
     setMessages([welcome]);
     setConversationId(created.id);
     setAiMode('unknown');
@@ -664,6 +525,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     // Sama seperti saat load awal: slice(-12) supaya AI tetap ingat konteks
     // obrolan lama ini, bukan dianggap chat baru.
     geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-12);
+    pendingEstimateRevisionRef.current = false;
     setConversationId(id);
     await setActiveConversationId('zannah', id);
     resetComposer();
@@ -763,7 +625,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     options?: QuickOption[],
     isAI = true,
     autoSpeak = false,
-    attachments?: Attachment[]
+    attachments?: Attachment[],
+    agentResultType?: AgentIntentAction
   ) => {
     const msgId = generateMessageId('bot');
     pushMessage({
@@ -775,8 +638,10 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       isAI,
       isStreaming: true,
       attachments: attachments && attachments.length > 0 ? attachments : undefined,
+      agentResultType,
     });
 
+    setIsStreamingReply(true);
     streamText(fullText, {
       isVoice: autoSpeak,
       // Opsi A: TTS dipicu paralel begitu animasi mulai, tidak menunggu
@@ -792,6 +657,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               : m
           )
         );
+        if (isDone) setIsStreamingReply(false);
       },
     });
   };
@@ -801,29 +667,61 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // backend (suggestedAgentAction), BUKAN buat auto-invoke Antigravity.
   // Backend sudah tidak pernah memanggil Antigravity sendiri berdasar
   // heuristic ini; user tetap yang klik tombol.
+  //
+  // Dicek dari riwayat pesan percakapan yang lagi aktif — begitu ada 1 aja
+  // balasan yang `agentResultType === 'estimate'` (RAB udah pernah SUKSES
+  // dibikin), tombol "Buatkan Estimasi" versi awal gak ditawarkan lagi;
+  // diganti tombol "Update Estimasi" (lihat buildAgentCTA). Otomatis reset
+  // ke false begitu pindah/mulai obrolan baru, karena `messages` sendiri
+  // ikut berganti isi (lihat startNewChat & openConversationById).
+  const hasGeneratedEstimate = messages.some((m) => m.agentResultType === 'estimate');
+
   const buildAgentCTA = (hasRecentFiles: boolean, highlight?: AgentIntentAction | null): QuickOption[] => {
-    const opts: QuickOption[] = [
-      { id: 'agent_estimate', label: '📊 Buatkan Estimasi Biaya & Timeline' },
-      { id: 'agent_research', label: '🔎 Riset Kompetitor/Pasar Singkat' },
-    ];
+    // Cap sesi lokal ATAU kuota harian global backend abis → jangan tampilin
+    // tombol agent sama sekali, biar user gak nyoba klik yang bakal ditolak.
+    const agentCapReached = agentUsageCount >= AGENT_SESSION_CAP || antigravityRemainingToday === 0;
+    if (agentCapReached) return [];
+
+    const opts: QuickOption[] = [];
+
+    // Tombol estimasi/riset SENGAJA cuma muncul di balasan yang MEMANG lagi
+    // disarankan backend lewat `highlight` (result.suggestedAgentAction) —
+    // BUKAN nempel permanen di semua balasan seperti sebelumnya. Sebelumnya
+    // kedua tombol ini selalu ada di SETIAP balasan Zannah dari awal
+    // percakapan, jadi user bisa klik "Buatkan Estimasi" atau "Riset
+    // Kompetitor" di tengah topik yang gak nyambung sama sekali — padahal
+    // prompt yang dikirim ke Antigravity eksplisit bilang "proyek yang
+    // barusan kita diskusikan", yang jadi ambigu/salah sasaran kalau dipicu
+    // sembarang waktu. Sekarang tombolnya cuma nempel di balasan spesifik
+    // tempat backend beneran mendeteksi konteksnya cocok DAN readiness-nya
+    // lolos (lihat detectAgentIntent + assessAgentReadiness di chat.ts) —
+    // begitu topik obrolan pindah ke balasan berikutnya yang gak match
+    // pattern manapun / belum cukup detail, tombolnya otomatis hilang lagi
+    // karena `highlight` bakal null di balasan itu.
+    if (highlight === 'estimate') {
+      // RAB udah pernah sukses dibikin sebelumnya di percakapan ini → jangan
+      // tawarin generate ulang dari nol (bisa bikin file baru yang gak
+      // konsisten / boros Antigravity Agent tanpa perlu). Tawarin jalur
+      // revisi: tombol ini cuma nanya dulu apa ada perubahan fitur, BUKAN
+      // langsung manggil Antigravity lagi (lihat handleOptionClick).
+      if (hasGeneratedEstimate) {
+        opts.push({ id: 'agent_estimate_revise', label: '✏️ Update Estimasi (Ada Fitur Berubah?)' });
+      } else {
+        opts.push({ id: 'agent_estimate', label: '⭐ 📊 Buatkan Estimasi Biaya & Timeline' });
+      }
+    } else if (highlight === 'research') {
+      opts.push({ id: 'agent_research', label: '⭐ 🔎 Riset Kompetitor/Pasar Singkat' });
+    }
+
     if (hasRecentFiles) {
+      // Analisis file tetap selalu ditawarkan selama masih ada file yang
+      // baru diunggah di request terakhir — konteksnya jelas & gak ambigu
+      // (filenya ada di depan mata), beda kasus dari estimate/research yang
+      // butuh acuan "topik obrolan barusan" yang bisa basi/gak relevan lagi.
       opts.push({ id: 'agent_file_analysis', label: '📈 Analisis Lebih Dalam pakai AI Agent' });
     }
-    if (!highlight) return opts;
 
-    // Zannah cuma punya 3 tombol agent (estimate/research/file_analysis) —
-    // 'live_demo' itu saran khusus buat Rajendra (showcase) yang gak punya
-    // padanan tombol di sini, jadi diabaikan aja kalau kebetulan muncul.
-    const highlightId =
-      highlight === 'estimate' ? 'agent_estimate' : highlight === 'research' ? 'agent_research' : highlight === 'file_analysis' ? 'agent_file_analysis' : null;
-    if (!highlightId) return opts;
-
-    // Tandai & dahulukan tombol yang paling relevan sama konteks obrolan
-    // barusan — ini bagian "wow, AI-nya ngerti" tanpa perlu bakar kuota
-    // Antigravity secara diam-diam buat ngedeteksinya.
-    return [...opts]
-      .sort((a, b) => (a.id === highlightId ? -1 : b.id === highlightId ? 1 : 0))
-      .map((o) => (o.id === highlightId ? { ...o, label: `⭐ ${o.label}` } : o));
+    return opts;
   };
 
   // Opsi cepat (quick reply) yang ditampilkan di bawah tiap balasan Zannah AI.
@@ -871,7 +769,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // AI (Gemini) response — with automatic Radit fallback & Cooldown.
   // `agentMode = true` dipakai KHUSUS oleh tombol aksi AI Agent opt-in
   // (estimasi biaya, riset pasar, analisis file) — bukan trigger otomatis.
-  const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[], agentMode = false) => {
+  const respondWithAI = async (userText: string, isFromVoice = false, files?: OutgoingFile[], agentMode = false, agentAction?: AgentIntentAction) => {
     setIsTyping(true);
     setIsAgentBusy(agentMode);
 
@@ -881,11 +779,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       console.warn('[ChatWidget] Cooldown active, falling back to Radit.');
       setAiMode('fallback');
       setIsAgentBusy(false);
-      const results = fuse.search(userText);
+      const matched = await findFaqAnswer(userText);
       const id = setTimeout(() => {
         setIsTyping(false);
-        if (results.length > 0) {
-          appendBotMessage(`📋 [Radit - Standby Bot]\n${results[0].item.answer}`, raditCTA, false, isFromVoice);
+        if (matched) {
+          appendBotMessage(`📋 [Radit - Standby Bot]\n${matched.answer}`, raditCTA, false, isFromVoice);
         } else {
           respondWithFallback(isFromVoice);
         }
@@ -902,11 +800,22 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
     const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
     try {
-      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, agentMode || undefined, files);
+      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, agentMode || undefined, files, agentAction);
       const replyText = result.reply;
 
       // Simpan model yang aktif untuk ditampilkan di UI
       if (result.model) setActiveModel(result.model);
+      // Sisa kuota harian global Antigravity — dipakai buat nonaktifin tombol
+      // agent lebih awal kalau kuota hari ini abis (lihat standardCTA di bawah).
+      if (typeof result.antigravityDailyRemaining === 'number') {
+        setAntigravityRemainingToday(result.antigravityDailyRemaining);
+      }
+      // Analytics: catet tiap kali backend beneran nyaranin tombol tertentu
+      // lewat highlight (bukan tiap balasan biasa) — ini sinyal paling
+      // berguna buat ngukur seberapa sering saran ini "kena" konteksnya.
+      if (result.suggestedAgentAction) {
+        sendAgentAnalyticsEvent('agent_cta_shown', result.suggestedAgentAction, 'zannah');
+      }
 
       // Update history with successful exchange
       geminiHistoryRef.current = [
@@ -935,24 +844,28 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         standardCTA(!!lastFilesRef.current, result.suggestedAgentAction),
         true,
         isFromVoice,
-        result.attachments
+        result.attachments,
+        // Tandai balasan ini sebagai hasil sukses aksi agent tertentu (kalau
+        // ini memang balasan dari klik tombol agent, bukan chat biasa) —
+        // dipakai buat `hasGeneratedEstimate` dkk di bawah.
+        agentMode ? agentAction : undefined
       );
     } catch (err: unknown) {
       // ── Graceful degradation: fall to Radit (Directory Model) ──────────
       console.warn('[ChatWidget] Zannah AI unavailable, falling back to Radit:', err);
       setAiMode('fallback');
       setIsAgentBusy(false);
-      const results = fuse.search(userText);
-      if (results.length > 0) {
+      const matched = await findFaqAnswer(userText);
+      if (matched) {
         const id = setTimeout(() => {
           setIsTyping(false);
           appendBotMessage(
-            `📋 [Radit - Standby Bot]\n${results[0].item.answer}`,
+            `📋 [Radit - Standby Bot]\n${matched.answer}`,
             raditCTA,
             false,
             isFromVoice,
           );
-        }, typingDelay(results[0].item.answer));
+        }, typingDelay(matched.answer));
         timeoutsRef.current.push(id);
       } else {
         const id = setTimeout(() => {
@@ -963,6 +876,45 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       }
     }
   };
+
+  /**
+   * Jalanin satu aksi AI Agent (opt-in, dipicu tombol ATAU jalur revisi RAB
+   * di `sendMessage`). Cap sesi + analytics dicek/dicatat TEPAT di sini —
+   * satu tempat, dipakai oleh semua pemicu — supaya klik yang gagal validasi
+   * (mis. "agent_file_analysis" tapi belum ada file, dicek oleh caller
+   * SEBELUM manggil ini) TIDAK ikut makan jatah cap sesi ataupun tercatat
+   * sebagai "clicked" di analytics, karena requestnya sendiri gak jadi
+   * terkirim ke backend.
+   * `displayLabel` opsional: isi kalau caller BELUM nampilin bubble user
+   * sendiri (mis. tombol di chat) — dilewatin (undefined) kalau user punya
+   * pesan asli sendiri yang udah ditampilkan duluan (mis. jalur revisi RAB,
+   * di mana yang ditampilkan adalah ketikan asli user, bukan label tombol).
+   */
+  function runAgentAction(action: AgentIntentAction, prompt: string, filesForThis?: OutgoingFile[], displayLabel?: string) {
+    const agentCapReached = agentUsageCount >= AGENT_SESSION_CAP || antigravityRemainingToday === 0;
+    if (agentCapReached) {
+      // Guard defensif — tombolnya udah disembunyiin di buildAgentCTA begitu
+      // cap kesentuh, tapi kalau somehow masih ke-klik (mis. render lama
+      // yang belum sempat re-render), tolak dengan sopan.
+      appendBotMessage(
+        'Wah, fitur AI Agent buat obrolan ini udah kepakai maksimal, Kak 😊 Coba mulai obrolan baru ya, atau lanjut ngobrol biasa dulu di sini.',
+        standardCTA(!!lastFilesRef.current),
+        true,
+      );
+      return;
+    }
+    sendAgentAnalyticsEvent('agent_cta_clicked', action, 'zannah');
+    setAgentUsageCount((prev) => prev + 1);
+    if (displayLabel) pushUserMessage(displayLabel);
+    respondWithAI(prompt, false, filesForThis, true, action);
+  }
+
+  /** Prompt yang dikirim ke Antigravity waktu user klik "Update Estimasi"
+   * dan sudah menjelaskan perubahan yang diinginkan (lihat pendingEstimateRevisionRef
+   * di `sendMessage`). Beda dari prompt RAB pertama — ini eksplisit minta
+   * REVISI dari RAB sebelumnya, bukan bikin dari nol lagi. */
+  const buildEstimateRevisionPrompt = (userDescribedChanges: string): string =>
+    `User ingin merevisi RAB (estimasi biaya & timeline) yang sudah kamu buatkan sebelumnya di percakapan ini. Perubahan yang diminta: "${userDescribedChanges}". Tolong UPDATE breakdown biaya & estimasi waktu PER FITUR berdasarkan perubahan itu (fitur yang ditambah/dikurangi/diubah) — bukan bikin ulang dari nol yang gak nyambung sama RAB sebelumnya — lalu berikan versi baru file estimasinya yang bisa diunduh, plus total & timeline gabungan yang sudah disesuaikan.`;
 
   // ── Category / quick-option flow ──────────────────────────────────────────
   const showCategoryMenu = () => {
@@ -1027,22 +979,49 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     }
 
     // ── Aksi AI Agent (opt-in, dipicu tombol) ────────────────────────────
-    // Ketiganya sengaja pakai agentMode=true secara EKSPLISIT (bukan
+    // Semuanya sengaja pakai agentMode=true secara EKSPLISIT (bukan
     // mengandalkan heuristic AGENT_TRIGGER_PATTERNS di backend) — user yang
     // memilih kapan mau pakai kemampuan Antigravity yang lebih berat & makan
-    // kuota (100 RPD), bukan sistem yang nebak sendiri.
+    // kuota (100 RPD), bukan sistem yang nebak sendiri. Logic cap sesi +
+    // analytics-nya sekarang ada di `runAgentAction` (component-level, lihat
+    // dekat respondWithAI) — dipakai bareng oleh tombol-tombol di sini DAN
+    // jalur revisi RAB otomatis di `sendMessage`.
+
     if (id === 'agent_estimate') {
-      const prompt =
-        'Tolong buatkan estimasi biaya, breakdown item pekerjaan, dan timeline pengerjaan yang realistis untuk proyek yang barusan kita diskusikan, dalam bentuk file yang bisa saya unduh.';
+      runAgentAction(
+        'estimate',
+        'Tolong susun RAB (Rencana Anggaran Biaya) yang DETAIL untuk proyek yang barusan kita diskusikan. Rangkum dulu secara singkat fitur-fitur utama yang sudah disebutkan sepanjang percakapan ini, lalu buatkan breakdown biaya & estimasi waktu pengerjaan PER FITUR (bukan cuma satu angka total generik) — kalau ada fitur yang belum jelas detailnya, pakai asumsi yang wajar & sebutkan asumsinya. Tutup dengan total keseluruhan biaya & timeline gabungan. Sajikan dalam bentuk file yang bisa saya unduh.',
+        undefined,
+        label
+      );
+      return;
+    }
+    if (id === 'agent_estimate_revise') {
+      // BUKAN manggil Antigravity langsung — RAB udah pernah dibuat, jadi
+      // tanya dulu apa ada perubahan sebelum generate ulang (lihat komentar
+      // di buildAgentCTA & pendingEstimateRevisionRef). Klik ini gratis, gak
+      // makan cap sesi ataupun kuota Antigravity sama sekali.
       pushUserMessage(label);
-      respondWithAI(prompt, false, undefined, true);
+      setIsTyping(true);
+      const tid = setTimeout(() => {
+        setIsTyping(false);
+        pendingEstimateRevisionRef.current = true;
+        appendBotMessage(
+          'Sebelum saya update, ada fitur yang mau ditambah atau dikurangi dari estimasi sebelumnya, Kak? Ceritain aja detailnya di sini, nanti langsung saya sesuaikan RAB-nya 😊',
+          undefined,
+          true,
+        );
+      }, 500);
+      timeoutsRef.current.push(tid);
       return;
     }
     if (id === 'agent_research') {
-      const prompt =
-        'Tolong lakukan riset singkat mengenai kompetitor atau tren pasar yang relevan dengan topik/ide proyek yang barusan kita diskusikan, lalu rangkum insight pentingnya buat saya.';
-      pushUserMessage(label);
-      respondWithAI(prompt, false, undefined, true);
+      runAgentAction(
+        'research',
+        'Tolong lakukan riset singkat mengenai kompetitor atau tren pasar yang relevan dengan topik/ide proyek yang barusan kita diskusikan, lalu rangkum insight pentingnya buat saya.',
+        undefined,
+        label
+      );
       return;
     }
     if (id === 'agent_file_analysis') {
@@ -1054,10 +1033,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         );
         return;
       }
-      const prompt =
-        'Tolong analisis lebih dalam file yang saya lampirkan sebelumnya (data, angka, atau insight bisnis yang relevan) menggunakan kemampuan AI Agent, lalu rangkum temuannya buat saya.';
-      pushUserMessage(label);
-      respondWithAI(prompt, false, lastFilesRef.current, true);
+      runAgentAction(
+        'file_analysis',
+        'Tolong analisis lebih dalam file yang saya lampirkan sebelumnya (data, angka, atau insight bisnis yang relevan) menggunakan kemampuan AI Agent, lalu rangkum temuannya buat saya.',
+        lastFilesRef.current,
+        label
+      );
       return;
     }
 
@@ -1076,7 +1057,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     respondWithAI(label);
   };
 
-  const sendMessage = (text: string, isFromVoice = false) => {
+  const sendMessage = async (text: string, isFromVoice = false) => {
     const trimmed = text.trim();
     if ((!trimmed && pendingFiles.length === 0) || isTyping) return;
     // Kalau user cuma lampirin file tanpa nulis apa-apa, kasih caption default
@@ -1098,6 +1079,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     // ke lampiran PALING BARU, bukan numpuk dari upload lama.
     lastFilesRef.current = outgoingFiles;
 
+    // Jalur revisi RAB: user barusan klik "✏️ Update Estimasi" dan pesan ini
+    // adalah jawaban mereka soal fitur yang mau ditambah/dikurangi — reroute
+    // ke Antigravity dengan prompt revisi (bukan chat biasa), TANPA nunggu
+    // heuristic/readiness gate lagi (user sendiri yang eksplisit minta lewat
+    // tombol sebelumnya). Bubble user di atas (pushUserMessage) tetap nampilin
+    // ketikan asli mereka apa adanya — cuma prompt ke API-nya yang dibungkus.
+    if (pendingEstimateRevisionRef.current) {
+      pendingEstimateRevisionRef.current = false;
+      runAgentAction('estimate', buildEstimateRevisionPrompt(cleanText));
+      return;
+    }
+
     // Deteksi intent alami jika user meminta kembali ke Zannah
     const wantsZannah = /zannah|panggil zannah|coba zannah|coba lagi|mode ai|connect ai/i.test(cleanText);
     if (wantsZannah && aiMode === 'fallback') {
@@ -1108,9 +1101,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
     // Kalau ada file dilampirkan, selalu pakai AI (FAQ fallback gak bisa proses file).
     if (aiMode === 'fallback' && !outgoingFiles) {
-      const results = fuse.search(cleanText);
-      if (results.length > 0) {
-        respondWithFAQ(results[0].item, isFromVoice);
+      const matched = await findFaqAnswer(cleanText);
+      if (matched) {
+        respondWithFAQ(matched, isFromVoice);
       } else {
         respondWithFallback(isFromVoice);
       }
@@ -1365,11 +1358,14 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                   <button
                     type="button"
                     aria-label="Mulai obrolan baru"
-                    title="Mulai obrolan baru"
+                    title={(isTyping || isStreamingReply) ? 'Tunggu balasan chat selesai dulu ya' : 'Mulai obrolan baru'}
                     onClick={startNewChat}
-                    className={`p-1.5 rounded-lg transition-colors ${darkMode
-                      ? 'text-slate-300 hover:text-white hover:bg-slate-700'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                    disabled={(isTyping || isStreamingReply)}
+                    className={`p-1.5 rounded-lg transition-colors ${(isTyping || isStreamingReply)
+                      ? 'opacity-40 cursor-not-allowed'
+                      : darkMode
+                        ? 'text-slate-300 hover:text-white hover:bg-slate-700'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
                       }`}
                   >
                     <Plus className="w-4 h-4" />
@@ -1458,6 +1454,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                   </div>
 
                   <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                    {(isTyping || isStreamingReply) && (
+                      <p className={`text-[10.5px] text-center py-2 px-2 rounded-lg font-medium ${darkMode ? 'bg-amber-950/40 text-amber-300 border border-amber-800/50' : 'bg-amber-50 text-amber-700 border border-amber-200'}`}>
+                        ⏳ Zannah lagi balas pesan — tunggu balasannya selesai dulu ya sebelum ganti/mulai obrolan lain, biar balasannya gak nyasar ke jendela yang salah.
+                      </p>
+                    )}
                     {isHistoryLoading && (
                       <p className={`text-xs text-center py-6 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                         Memuat riwayat...
@@ -1474,13 +1475,17 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                           key={conv.id}
                           type="button"
                           onClick={() => openConversationById(conv.id)}
-                          className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${conv.id === conversationId
-                            ? darkMode
-                              ? 'border-teal-500 bg-teal-950/30'
-                              : 'border-teal-400 bg-teal-50'
-                            : darkMode
-                              ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
-                              : 'border-slate-200 hover:border-slate-300 bg-slate-50'
+                          disabled={(isTyping || isStreamingReply)}
+                          title={(isTyping || isStreamingReply) ? 'Tunggu balasan chat selesai dulu ya' : undefined}
+                          className={`w-full text-left p-2.5 rounded-xl border transition-colors flex items-start justify-between gap-2 ${(isTyping || isStreamingReply)
+                            ? 'opacity-40 cursor-not-allowed'
+                            : conv.id === conversationId
+                              ? darkMode
+                                ? 'border-teal-500 bg-teal-950/30'
+                                : 'border-teal-400 bg-teal-50'
+                              : darkMode
+                                ? 'border-slate-700 hover:border-slate-600 bg-slate-800/50'
+                                : 'border-slate-200 hover:border-slate-300 bg-slate-50'
                             }`}
                         >
                           <div className="min-w-0">
@@ -1498,16 +1503,24 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                           </div>
                           <span
                             role="button"
-                            tabIndex={0}
-                            onClick={(e) => handleDeleteConversation(conv.id, e)}
+                            tabIndex={(isTyping || isStreamingReply) ? -1 : 0}
+                            aria-disabled={(isTyping || isStreamingReply)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if ((isTyping || isStreamingReply)) return;
+                              handleDeleteConversation(conv.id, e);
+                            }}
                             onKeyDown={(e) => {
+                              if ((isTyping || isStreamingReply)) return;
                               if (e.key === 'Enter' || e.key === ' ') handleDeleteConversation(conv.id, e as unknown as React.MouseEvent);
                             }}
                             aria-label="Hapus obrolan ini"
-                            title="Hapus obrolan ini"
-                            className={`shrink-0 p-1 rounded-lg transition-colors ${darkMode
-                              ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
-                              : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
+                            title={(isTyping || isStreamingReply) ? 'Tunggu balasan chat selesai dulu ya' : 'Hapus obrolan ini'}
+                            className={`shrink-0 p-1 rounded-lg transition-colors ${(isTyping || isStreamingReply)
+                              ? 'opacity-40 cursor-not-allowed'
+                              : darkMode
+                                ? 'text-slate-500 hover:text-red-400 hover:bg-red-950/40'
+                                : 'text-slate-400 hover:text-red-500 hover:bg-red-50'
                               }`}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -1520,7 +1533,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                     <button
                       type="button"
                       onClick={startNewChat}
-                      className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors ${isRadit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'
+                      disabled={(isTyping || isStreamingReply)}
+                      title={(isTyping || isStreamingReply) ? 'Tunggu balasan chat selesai dulu ya' : undefined}
+                      className={`w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold text-white transition-colors ${(isTyping || isStreamingReply)
+                        ? 'opacity-40 cursor-not-allowed bg-slate-500'
+                        : isRadit ? 'bg-amber-600 hover:bg-amber-700' : 'bg-teal-600 hover:bg-teal-700'
                         }`}
                     >
                       <Plus className="w-3.5 h-3.5" /> Obrolan Baru
