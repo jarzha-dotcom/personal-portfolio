@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 // beda, sesuaikan path relatif di bawah ke lokasi src/data/faqData.ts yang
 // benar — TypeScript bakal langsung error saat build kalau path-nya salah,
 // jadi gagalnya kelihatan jelas, bukan diam-diam.
-import { FAQ_ITEMS } from '../src/data/faqData';
+import { FAQ_ITEMS } from '../src/data/faqData.js';
 
 // ── API Keys ────────────────────────────────────────────────────────────────
 // Primary  : AI Studio key (GEMINI_API_KEY)
