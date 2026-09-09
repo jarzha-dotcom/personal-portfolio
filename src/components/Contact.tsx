@@ -7,7 +7,8 @@ import {
   CheckCircle,
   Copy,
   MessageSquare,
-  MessageCircle
+  MessageCircle,
+  Loader2,
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
 
@@ -214,30 +215,43 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
             <form onSubmit={handleSubmit} className="space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <input type="text" required placeholder="Nama Anda" value={formData.name}
+                  disabled={formStatus === 'submitting'}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                     }`} />
                 <input type="email" required placeholder="Alamat Email" value={formData.email}
+                  disabled={formStatus === 'submitting'}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                     }`} />
               </div>
               <input type="text" placeholder="Subjek / Proyek Development / Konsultasi..." value={formData.subject}
+                disabled={formStatus === 'submitting'}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`} />
               <textarea required rows={3} placeholder="Pesan Anda..." value={formData.message}
+                disabled={formStatus === 'submitting'}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`} />
               {formStatus === 'error' && <p className="text-xs text-rose-500 font-medium">{errorMessage}</p>}
               <div className="pt-1 flex items-center justify-between">
                 <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Data dijaga kerahasiaannya.</span>
                 <button type="submit" disabled={formStatus === 'submitting'}
-                  className={`py-2 px-5 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 transition-colors ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800'
+                  className={`py-2 px-5 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 transition-colors disabled:opacity-75 disabled:cursor-not-allowed ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800'
                     }`}>
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Kirim Pesan</span>
+                  {formStatus === 'submitting' ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Mengirim Pesan...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-3.5 h-3.5" />
+                      <span>Kirim Pesan</span>
+                    </>
+                  )}
                 </button>
               </div>
             </form>

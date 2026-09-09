@@ -97,7 +97,6 @@ export const AVAILABLE_MODELS: ModelOption[] = [
     { id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', desc: 'Seimbang speed & kualitas' },
     { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', desc: 'Stabil & efisien' },
     { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
-    { id: 'gemini-3.1-pro-preview', label: 'Gemini 3.1 Pro', desc: 'Reasoning mendalam' },
     { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
 ];
 

@@ -184,28 +184,28 @@ export const SOFT_SKILLS: SoftSkill[] = [
 ];
 
 export const STATS = [
-  { label: 'Tahun Pengalaman', value: '7+', suffix: 'Tahun', desc: 'Di berbagai sektor industri' },
+  { label: 'Tahun Pengalaman', value: '7+', suffix: 'Tahun', desc: 'Di berbagai sektor industri & korporat' },
   { label: 'Akurasi Rekonsiliasi', value: '99%', suffix: '', desc: 'Dalam audit stok & data finansial' },
   { label: 'Siklus Audit Terselesaikan', value: '100+', suffix: 'Laporan', desc: 'Dokumentasi kepatuhan SOP' },
-  { label: 'Aplikasi / Game Dirilis', value: '3', suffix: 'Proyek', desc: 'Web, Mobile & Audit Tools' },
+  { label: 'Aplikasi & Game Dirilis', value: '4+', suffix: 'Proyek', desc: 'Web, Mobile, AI Agent & Realtime Game' },
 ];
 
 export const PROJECTS: ProjectItem[] = [
   {
     id: 'proj-bgames',
     title: 'B-Games — Multiplayer Board Game Platform',
-    tagline: 'Pusat game papan klasik digital multiplayer online bebas iklan untuk keluarga & teman.',
+    tagline: 'Pusat game papan klasik digital multiplayer online bebas iklan dengan arsitektur event-driven realtime.',
     category: 'Game & App',
     badge: 'Board Game Platform',
-    description: 'Platform multiplayer interaktif gratis yang menghadirkan 4 game klasik: Ludo Classic, Ludo Hexagon, Ular Tangga, dan Tic Tac Toe — dimainkan langsung dari browser tanpa iklan & tanpa perlu download.',
-    longDescription: 'B-Games menghadirkan pengalaman bermain game papan klasik yang dapat dimainkan bersama teman dan keluarga secara gratis dan bebas iklan. Pemain bisa langsung bermain cukup dengan memasukkan nama tanpa perlu mendaftar akun. Tersedia pilihan Login Google opsional untuk menyimpan progres permainan dan statistik antar perangkat. Dibangun menggunakan arsitektur realtime event-driven dengan opsi kustomisasi tema papan (Wood, Grass, Sand, Marble), roll dadu interaktif, serta bot AI cadangan.',
+    description: 'Platform multiplayer interaktif gratis yang menghadirkan 4 game klasik: Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga Interaktif, dan Tic Tac Toe — dimainkan langsung dari browser atau mobile PWA tanpa iklan.',
+    longDescription: 'B-Games menghadirkan pengalaman bermain game papan klasik yang dapat dimainkan bersama teman dan keluarga secara gratis dan bebas iklan. Menggunakan arsitektur event-driven realtime dengan sinkronisasi state WebSockets tanpa jeda, sistem reconnect recovery saat koneksi terputus, dan fallback bot AI adaptif. Mendukung Guest Play instan (cukup masukkan nama) serta Google Cloud Auth untuk sinkronisasi riwayat kemenangan, statistik pertandingan, dan kustomisasi tema visual papan (Wood, Grass, Sand, Marble) dengan efek haptic Web Audio.',
     highlights: [
-      '4 Pilihan Game: Ludo Classic, Ludo Hexagon, Ular Tangga, dan Tic Tac Toe',
-      'Langsung Main Tanpa Login (Cukup Nama) + Login Google Opsional untuk Cloud Sync',
-      'Multiplayer real-time online dengan room code unik & kustomisasi tema papan (Wood/Grass/Sand/Marble)',
-      'Aplikasi Web PWA responsif, bebas iklan & animasi token 3D haptic'
+      '4 Game Papan Klasik: Ludo Classic, Ludo Hexagon (6 Pemain), Ular Tangga Interaktif & Tic Tac Toe',
+      'Arsitektur Realtime Event-Driven: WebSockets + boardgame.io dengan state sync instan & reconnect recovery',
+      'Sistem Akun Hybrid: Guest Play (tanpa daftar) + Google Cloud Sync untuk statistik & progres antar perangkat',
+      'Kustomisasi Papan & Audio: Tema 3D (Wood/Grass/Sand/Marble), efek suara synthesizer Web Audio, dan bot AI adaptif'
     ],
-    techStack: ['React Native', 'Expo', 'boardgame.io', 'Node.js/Koa', 'Supabase', 'TypeScript', 'WebSockets', 'PWA'],
+    techStack: ['React Native', 'Expo', 'boardgame.io', 'Node.js/Koa', 'Supabase', 'TypeScript', 'WebSockets', 'PWA', 'Web Audio API'],
     role: 'Solo Creator (Game Logic, UI/UX, Realtime Backend, Deployment)',
     year: '2024 - 2025',
     demoUrl: 'https://bgames.byarzhaning.online/',
@@ -216,20 +216,20 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'proj-rajendra',
     title: 'Rajendra Pintar — Aplikasi Belajar Flashcard 3D & Kuis Interaktif',
-    tagline: 'Aplikasi edukasi anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard 3D & Suara Maskot.',
+    tagline: 'Aplikasi edukasi anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard 3D, Suara Maskot & Full Offline PWA.',
     category: 'Edukasi',
     badge: 'Edukasi Anak (PAUD - SD)',
-    description: 'Aplikasi belajar interaktif anak usia 4–8 tahun dengan Flashcard 3D, kuis membaca, berhitung, mengenal hewan, bentuk, warna, dan kosa kata dwibahasa (ID/EN) dilengkapi audio pelafalan ramah anak.',
-    longDescription: 'Rajendra Pintar dirancang khusus sebagai ruang belajar digital yang aman, ramah visual, dan bebas iklan untuk anak PAUD, TK, dan SD kelas 1-2. Menggunakan media Flashcard 3D interaktif, kuis tebak suara & gambar, serta modul materi lengkap (angka, matematika dasar, bentuk & warna, buah & sayuran, hewan, anggota tubuh). Dilengkapi splash screen instan dan dukungan offline PWA.',
+    description: 'Aplikasi belajar interaktif anak usia 4–8 tahun dengan Flashcard 3D, kuis membaca, berhitung, mengenal hewan, bentuk, warna, dan kosa kata dwibahasa (ID/EN) dilengkapi audio pelafalan ramah anak dan mode offline penuh.',
+    longDescription: 'Rajendra Pintar dirancang khusus sebagai ruang belajar digital yang aman, ramah visual, dan 100% bebas iklan untuk anak PAUD, TK, dan SD kelas 1-2. Menggunakan media Flashcard 3D interaktif, kuis tebak suara & gambar, sistem gamifikasi bintang reward, serta modul materi lengkap (angka, matematika dasar, bentuk & warna, buah & sayuran, hewan, anggota tubuh, dan kosakata dwibahasa ID/EN). Dilengkapi arsitektur zero-internet cache PWA dan instalasi native Android via Capacitor.',
     highlights: [
-      'Flashcard 3D Interaktif & Kuis Ceria (Membaca, Berhitung, Hewan, Bentuk & Warna)',
-      'Suara Maskot & Text-to-Speech (TTS) Dwibahasa (Indonesia - Inggris)',
-      'Dukungan PWA Offline & Instalasi Mobile via Capacitor tanpa Iklan',
-      'UI/UX khusus anak usia 4–8 tahun dengan kontras tinggi & font ramah anak'
+      'Flashcard 3D Interaktif & Kuis Ceria (Membaca, Berhitung, Hewan, Buah/Sayur, Bentuk & Warna, Anggota Tubuh)',
+      'Suara Maskot & Text-to-Speech (TTS) Dwibahasa (Indonesia - Inggris) dengan pelafalan natural',
+      'Gamifikasi Bintang & Audio Apresiasi: Memacu semangat eksplorasi belajar mandiri anak',
+      'Dukungan Full Offline PWA & Android Capacitor: Belajar lancar tanpa kuota internet di berbagai perangkat'
     ],
-    techStack: ['Vite React', 'TypeScript', 'Tailwind CSS', 'Capacitor', 'Web Audio API', 'PWA', 'Lucide Icons'],
+    techStack: ['Vite React', 'TypeScript', 'Tailwind CSS', 'Capacitor', 'Web Audio API', 'PWA Offline Cache', 'Lucide Icons'],
     role: 'Full-stack Indie Developer & Voice Content Designer',
-    year: '2024',
+    year: '2024 - 2025',
     demoUrl: 'https://rajendrapintar.byarzhaning.online/',
     isFeatured: true,
     colorScheme: 'teal',
@@ -261,19 +261,23 @@ export const PROJECTS: ProjectItem[] = [
 
 export const TECH_STACK_GROUPS: TechStackGroup[] = [
   {
+    category: 'AI & Multi-Agent Systems',
+    items: ['Google Antigravity Agent (Interactions API)', 'Gemini 3.8/3.7/3.5 Flash', 'Gemma 4 Fallback', 'Vector Embeddings (Semantic FAQ)', 'SSE Realtime Streaming', 'Audio STT & TTS Normalization']
+  },
+  {
     category: 'Game & Mobile Development',
-    items: ['React Native', 'Expo', 'boardgame.io', 'Capacitor', 'WebSockets', 'Canvas 2D / Haptic Audio']
+    items: ['React Native', 'Expo', 'boardgame.io', 'Capacitor', 'WebSockets', 'Canvas 2D / Haptic Audio', 'PWA Offline Cache']
   },
   {
     category: 'Frontend & UI Engineering',
-    items: ['React / Vite', 'TypeScript', 'Tailwind CSS', 'Lucide Icons', 'Recharts', 'HTML5 / Semantic Web']
+    items: ['React 19 / Vite 6', 'TypeScript', 'Tailwind CSS v4', 'Motion', 'Lucide Icons', 'Recharts', 'HTML5 Semantic Web']
   },
   {
     category: 'Backend & Data Persistence',
-    items: ['Node.js', 'Koa / Express', 'Supabase', 'PostgreSQL', 'RESTful APIs', 'Cloudflare Pages / Vercel']
+    items: ['Vercel Serverless', 'Node.js', 'Koa / Express', 'Supabase', 'PostgreSQL', 'IndexedDB StorageManager', 'RESTful APIs']
   },
   {
     category: 'Audit & Enterprise Tools',
-    items: ['SAP Business One', 'Microsoft Excel (Advanced)', 'SheetJS / Data Parsing', 'POS Systems', 'Working Paper Generation']
+    items: ['SAP Business One', 'Microsoft Excel (Advanced Formulas, XLOOKUP, Pivot)', 'SheetJS / Data Parsing', 'POS Systems', 'Working Paper & Audit Reporting']
   }
 ];

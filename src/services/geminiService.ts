@@ -150,3 +150,80 @@ export async function sendMessageToGemini(
 
     return data;
 }
+
+/**
+ * Streaming message helper menggunakan Server-Sent Events (SSE).
+ * Memanggil callback onChunk setiap kali ada delta teks baru, dan mengembalikan GeminiResponse utuh di akhir.
+ */
+export async function streamMessageFromGemini(
+    history: ChatMessage[],
+    newUserMessage: string,
+    onChunk: (chunkText: string) => void,
+    model?: string,
+    persona?: BotPersona,
+    agentMode?: boolean,
+    files?: OutgoingFile[],
+    agentAction?: AgentIntentAction
+): Promise<GeminiResponse> {
+    const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            history,
+            message: newUserMessage,
+            stream: true,
+            ...(model ? { model } : {}),
+            ...(persona ? { persona } : {}),
+            ...(agentMode ? { agentMode: true } : {}),
+            ...(files && files.length > 0 ? { files } : {}),
+            ...(agentMode && agentAction ? { agentAction } : {}),
+        }),
+    });
+
+    if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `Server error: ${response.status}`);
+    }
+
+    const contentType = response.headers.get('content-type') || '';
+    if (contentType.includes('text/event-stream') && response.body) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let fullData: GeminiResponse | null = null;
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('data: ')) {
+                    const payload = trimmed.slice(6);
+                    if (payload === '[DONE]') continue;
+                    try {
+                        const parsed = JSON.parse(payload);
+                        if (parsed.reply) {
+                            fullData = parsed;
+                            onChunk(parsed.reply);
+                        }
+                    } catch {
+                        // ignore malformed line
+                    }
+                }
+            }
+        }
+
+        if (fullData) return fullData;
+    }
+
+    // Fallback if returned standard JSON
+    const data: GeminiResponse = await response.json();
+    if (!data.reply) throw new Error('Respons kosong dari server');
+    onChunk(data.reply);
+    return data;
+}

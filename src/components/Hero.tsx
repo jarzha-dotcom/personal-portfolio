@@ -96,6 +96,10 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
                   <img
                     src={PERSONAL_INFO.avatar}
                     alt={PERSONAL_INFO.name}
+                    width={176}
+                    height={176}
+                    fetchPriority="high"
+                    decoding="async"
                     className="w-full h-full object-cover object-top"
                     referrerPolicy="no-referrer"
                   />
@@ -113,28 +117,40 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
         {/* Metric Bar */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
-            { icon: Briefcase, label: 'Pengalaman', value: PERSONAL_INFO.yearsOfExperience, color: 'emerald' },
-            { icon: FileCheck2, label: 'Spesialisasi', value: 'Web, Mobile & Game', color: 'indigo' },
-            { icon: Database, label: 'Latar Belakang', value: 'Disiplin Kerja Korporat', color: 'emerald' },
-            { icon: Gamepad2, label: 'Rilis Terakhir', value: 'Game & App Edukasi', color: 'amber' },
+            {
+              icon: Briefcase,
+              label: 'Pengalaman',
+              value: PERSONAL_INFO.yearsOfExperience,
+              lightBg: 'bg-emerald-500/15 text-emerald-600',
+              darkBg: 'bg-emerald-500/20 text-emerald-400'
+            },
+            {
+              icon: FileCheck2,
+              label: 'Spesialisasi',
+              value: 'Web, Mobile & Game',
+              lightBg: 'bg-indigo-500/15 text-indigo-600',
+              darkBg: 'bg-indigo-500/20 text-indigo-400'
+            },
+            {
+              icon: Database,
+              label: 'Latar Belakang',
+              value: 'Disiplin Kerja Korporat',
+              lightBg: 'bg-emerald-500/15 text-emerald-600',
+              darkBg: 'bg-emerald-500/20 text-emerald-400'
+            },
+            {
+              icon: Gamepad2,
+              label: 'Rilis Terakhir',
+              value: 'Game & App Edukasi',
+              lightBg: 'bg-amber-500/15 text-amber-600',
+              darkBg: 'bg-amber-500/20 text-amber-400'
+            },
           ].map((item, i) => {
             const Icon = item.icon;
             return (
               <div key={i} className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
                 }`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${darkMode
-                  ? `bg-${item.color}-500/20 text-${item.color}-400`
-                  : `bg-${item.color}-500/15 text-${item.color}-600`
-                  }`}
-                  style={{
-                    backgroundColor: item.color === 'emerald' ? (darkMode ? 'rgba(16,185,129,0.2)' : 'rgba(16,185,129,0.15)')
-                      : item.color === 'indigo' ? (darkMode ? 'rgba(99,102,241,0.2)' : 'rgba(99,102,241,0.15)')
-                        : (darkMode ? 'rgba(245,158,11,0.2)' : 'rgba(245,158,11,0.15)'),
-                    color: item.color === 'emerald' ? (darkMode ? '#34d399' : '#059669')
-                      : item.color === 'indigo' ? (darkMode ? '#818cf8' : '#4f46e5')
-                        : (darkMode ? '#fbbf24' : '#d97706'),
-                  }}
-                >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${darkMode ? item.darkBg : item.lightBg}`}>
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
