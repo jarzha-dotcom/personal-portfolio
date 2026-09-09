@@ -124,7 +124,7 @@ const WELCOME_OPTIONS: QuickOption[] = CATEGORIES.map((c) => ({ id: c.id, label:
 const buildWelcomeMessage = (): Message => ({
   id: 'welcome',
   sender: 'bot',
-  text: 'Halo! Saya Zannah, asisten Arzha 👋 Mau nanya soal apa? Pilih kategori atau langsung ketik aja!',
+  text: 'Halo Kak! Saya Zannah, asisten teknologi Mas Arzha 👋 Saya bisa bantu jelaskan arsitektur teknis, bedah fitur aplikasi (B-Games, Rajendra Pintar, Assets GMP), hingga hitung estimasi biaya & timeline proyek secara mandiri tanpa perlu tunggu chat Mas Arzha langsung. Ada yang ingin didiskusikan?',
   timestamp: nowStr(),
   options: WELCOME_OPTIONS,
   isAI: true,
