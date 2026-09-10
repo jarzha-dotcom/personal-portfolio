@@ -760,6 +760,14 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
 
                 <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
                   <div className="flex flex-wrap justify-between gap-3 text-xs sm:text-sm">
+                    {activeModalProject.client && (
+                      <div>
+                        <span className={`font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Klien / Pengguna: </span>
+                        <span className={`font-semibold ${darkMode ? 'text-teal-400' : 'text-teal-700'}`}>
+                          {activeModalProject.client}
+                        </span>
+                      </div>
+                    )}
                     <div>
                       <span className={`font-bold ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Peran / Perancangan: </span>
                       <span className={`font-semibold ${darkMode ? 'text-white' : 'text-slate-900'}`}>

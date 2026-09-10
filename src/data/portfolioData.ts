@@ -236,23 +236,25 @@ export const PROJECTS: ProjectItem[] = [
     iconType: 'GraduationCap'
   },
   {
-    id: 'proj-assets-gmp',
-    title: 'Assets GMP — Internal Asset Management',
-    tagline: 'Sistem manajemen dan pelacakan aset internal perusahaan secara terpusat.',
+    id: 'proj-assets',
+    title: 'Assets — Enterprise Asset Management',
+    tagline: 'Sistem manajemen & audit inventaris aset internal (Klien: PT Global Multiparts).',
     category: 'Web App',
-    badge: 'Corporate Web App',
-    description: 'Aplikasi web untuk mendata, melacak, dan mengelola aset perusahaan secara terpusat, memudahkan proses audit dan inventarisasi di berbagai lokasi.',
-    longDescription: 'Dibangun untuk mengatasi tantangan pendataan aset fisik yang tersebar. Menyediakan dashboard real-time, riwayat perpindahan aset, penempelan label/QR code, dan fitur ekspor laporan untuk kebutuhan audit internal yang lebih efisien.',
+    badge: 'Client Project',
+    client: 'PT Global Multiparts',
+    description: 'Aplikasi web kustom pesanan klien korporat (PT Global Multiparts) untuk mendata, melacak mutasi, dan mempermudah audit inventaris fisik lintas lokasi.',
+    longDescription: 'Dibangun khusus untuk menjawab tantangan audit dan pencatatan aset fisik di PT Global Multiparts yang tersebar di berbagai unit/cabang. Sistem ini mendigitalisasi pelacakan kondisi barang, penempelan label QR/barcode, pencatatan mutasi antar lokasi dengan audit log lengkap, hingga ekspor laporan otomatis format Excel/PDF untuk kebutuhan audit berkala. Versi publik yang dapat dicoba adalah "Assets Demo" dengan data simulasi demi menjaga kerahasiaan data internal klien.',
     highlights: [
-      'Dashboard pelacakan kondisi dan lokasi aset secara real-time',
-      'Riwayat mutasi dan perpindahan aset terdigitalisasi dengan log audit',
-      'Ekspor laporan inventarisasi otomatis dalam format Excel/PDF',
-      'Antarmuka responsif untuk kemudahan akses mobile di lapangan'
+      'Client Case: Didevelop khusus mengikuti alur SOP & kebutuhan audit internal PT Global Multiparts',
+      'Dashboard pelacakan kondisi dan lokasi aset fisik multi-lokasi secara real-time',
+      'Audit trail & riwayat mutasi terdigitalisasi untuk mencegah selisih inventaris',
+      'Ekspor laporan inventarisasi otomatis dalam format Excel/PDF untuk kebutuhan audit berkala',
+      'Akses demo publik aman via Assets Demo dengan data simulasi'
     ],
     techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Vercel', 'Supabase'],
     role: 'Full-stack Developer',
     year: '2024',
-    demoUrl: 'https://assets-gmp.vercel.app/',
+    demoUrl: 'https://assets.byarzhaning.online/',
     isFeatured: true,
     colorScheme: 'indigo',
     iconType: 'FileSpreadsheet'

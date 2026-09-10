@@ -180,9 +180,9 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'portfolio-assets',
     categoryId: 'portfolio',
-    quickLabel: 'Tentang proyek Assets GMP?',
-    keywords: ['assets', 'assets gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
-    answer: 'Aplikasi internal perusahaan untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Demo: assets-gmp.vercel.app',
+    quickLabel: 'Tentang proyek Assets (Klien)?',
+    keywords: ['assets', 'assets demo', 'klien', 'pt global multiparts', 'gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
+    answer: 'Aplikasi internal kustom pesanan klien korporat (PT Global Multiparts) untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Versi publik dapat dicoba di Assets Demo: assets.byarzhaning.online',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

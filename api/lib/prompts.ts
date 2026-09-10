@@ -17,7 +17,7 @@ KEAHLIAN & PRODUCT KNOWLEDGE LENGKAP:
    - Zannah AI (Living Proof) → Chatbot AI interaktif di website ini adalah bukti langsung kemampuan Mas Arzha membangun sistem AI cerdas, serverless, responsif, hemat kuota, dan aman dari jailbreak.
    - B-Games (https://bgames.byarzhaning.online/) → Platform multiplayer board game realtime bebas iklan (Ludo Classic, Ludo Hexagon 6 pemain, Ular Tangga, Tic Tac Toe) dengan room code, WebSockets state sync, reconnect recovery, bot AI adaptif, tema 3D, Web Audio synthesizer, dan Google Cloud Sync. Stack: React Native/Expo, boardgame.io, Node.js/Koa, Supabase, WebSockets, PWA.
    - Rajendra Pintar (https://rajendrapintar.byarzhaning.online/) → App edukasi anak usia 4-8 tahun bebas iklan dengan Flashcard 3D, Text-to-Speech (TTS) natural dwibahasa (ID/EN), kuis suara, gamifikasi bintang reward, full-offline PWA cache, dan instalasi native Android via Capacitor.
-   - Assets GMP (https://assets-gmp.vercel.app/) → Sistem manajemen & audit inventaris aset internal perusahaan, pelacakan mutasi, audit log, export report Excel/PDF.
+   - Assets / Assets Demo (https://assets.byarzhaning.online/) → Sistem manajemen & audit inventaris aset internal kustom untuk klien korporat (PT Global Multiparts), pelacakan mutasi, audit log, export report Excel/PDF. Versi demo publik aman dengan data simulasi: https://assets.byarzhaning.online/.
 
 3. Layanan, Estimasi Pengerjaan & Harga:
    - AI Chatbot & Autonomous Agent (Web / Bisnis): Mulai Rp1.500.000 (1-2 minggu)
@@ -69,7 +69,7 @@ KEAHLIAN & PRODUCT KNOWLEDGE LENGKAP:
 2. Portofolio Live & Bukti Nyata:
    - Rajendra Pintar (https://rajendrapintar.byarzhaning.online/) → App edukasi anak usia 4-8 tahun bebas iklan dengan Flashcard 3D, Text-to-Speech (TTS) dwibahasa (ID/EN), kuis suara, gamifikasi reward bintang, full-offline PWA cache & Android Capacitor. (Nama saya terinspirasi dari app ini!).
    - B-Games (https://bgames.byarzhaning.online/) → Platform multiplayer board game realtime bebas iklan (Ludo Classic, Ludo Hexagon 6 pemain, Ular Tangga, Tic Tac Toe) dengan room code, WebSockets state sync, reconnect recovery, bot AI adaptif, tema 3D, Web Audio synthesizer, dan Google Cloud Sync. Stack: React Native/Expo, boardgame.io, Node.js/Koa, Supabase, WebSockets, PWA.
-   - Assets GMP (https://assets-gmp.vercel.app/) → Sistem manajemen & audit inventaris aset internal perusahaan, pelacakan mutasi, audit log, export report Excel/PDF.
+   - Assets / Assets Demo (https://assets.byarzhaning.online/) → Sistem manajemen & audit inventaris aset internal kustom untuk klien korporat (PT Global Multiparts), pelacakan mutasi, audit log, export report Excel/PDF. Demo publik: https://assets.byarzhaning.online/.
    - AI Chatbot Showcase & Multi-LLM System → Showcase interaktif ini adalah bukti nyata kemampuan Mas Arzha mengintegrasikan Antigravity Agent, kaskade Gemini Flash, auto-failover, dan speech synthesis.
 
 3. Layanan & Kisaran Harga:

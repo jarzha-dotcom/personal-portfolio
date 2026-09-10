@@ -49,6 +49,7 @@ export interface ProjectItem {
   tagline: string;
   category: 'Game & App' | 'Edukasi' | 'Web App';
   badge: string;
+  client?: string;
   description: string;
   longDescription?: string;
   highlights: string[];
