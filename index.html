@@ -132,15 +132,108 @@
     }
     </script>
 
-  <!--
-      Favicon — memakai file PNG hasil crop logo asli di public/.
-      SVG placeholder generik ("KAJ" teks putih di kotak teal) sudah
-      dihapus supaya tidak bersaing prioritas dengan browser yang kadang
-      mengutamakan format vektor walau isinya bukan logo final.
-    -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+  <!-- FAQPage Schema — untuk Google Rich Results / Snippet FAQ di hasil pencarian -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "Berapa biaya pembuatan website atau landing page?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Landing page 1 halaman mulai dari Rp800.000. Untuk Web Application custom atau dashboard admin mulai dari Rp6.000.000, tergantung kompleksitas fitur dan database."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa biaya pembuatan aplikasi mobile Android dan iOS?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Pembuatan aplikasi mobile custom (Android & iOS) mulai dari Rp6.000.000 menggunakan React Native & Expo untuk performa optimal di kedua platform."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Berapa lama estimasi waktu pengerjaan proyek?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Landing page memakan waktu 1-2 minggu, Web App / Mobile App 3-6 minggu, dan Game multiplayer 6-10 minggu."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah ada garansi maintenance setelah website/aplikasi rilis?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, setiap proyek mendapatkan garansi technical support gratis selama 1 bulan penuh pasca rilis untuk penanganan bug atau kendala teknis."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Apakah source code diserahkan 100% ke klien?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Ya, seluruh source code repositori GitHub dan aset proyek diserahkan penuh menjadi hak milik klien tanpa biaya lisensi tersembunyi."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Portofolio Proyek Live — SoftwareApplication Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Portofolio Proyek K. Arzhaning Jagad",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "B-Games",
+          "applicationCategory": "GameApplication",
+          "operatingSystem": "Web",
+          "url": "https://bgames.byarzhaning.online",
+          "description": "Platform board game online realtime bebas iklan (Ludo Classic, Ludo Hexagon 6 pemain, Ular Tangga, Tic Tac Toe)."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "Rajendra Pintar",
+          "applicationCategory": "EducationalApplication",
+          "operatingSystem": "Web, Android",
+          "url": "https://rajendrapintar.byarzhaning.online",
+          "description": "Aplikasi edukasi anak 4-8 tahun bebas iklan dengan Flashcard 3D interaktif dan Text-to-Speech dwibahasa."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "SoftwareApplication",
+          "name": "Assets GMP",
+          "applicationCategory": "BusinessApplication",
+          "operatingSystem": "Web",
+          "url": "https://assets-gmp.vercel.app",
+          "description": "Aplikasi enterprise tracking inventaris fisik dan audit aset perusahaan dengan ekspor otomatis ke Excel."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
 </head>
 
 <body
