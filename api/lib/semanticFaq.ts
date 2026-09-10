@@ -1,4 +1,4 @@
-import { FAQ_ITEMS } from '../../src/data/faqData.js';
+import { FAQ_ITEMS } from './faqData.js';
 import { checkRateLimit } from './rateLimiter.js';
 
 export const EMBEDDING_MODEL = 'gemini-embedding-001';
