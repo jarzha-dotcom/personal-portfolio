@@ -1,4 +1,4 @@
-import { UploadedFile } from './antigravity';
+import { UploadedFile } from './antigravity.js';
 
 export type AgentIntentAction = 'estimate' | 'research' | 'file_analysis' | 'live_demo';
 

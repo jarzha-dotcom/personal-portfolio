@@ -1,5 +1,5 @@
-import { Attachment } from './documentGenerator';
-import { checkRateLimit } from './rateLimiter';
+import { Attachment } from './documentGenerator.js';
+import { checkRateLimit } from './rateLimiter.js';
 
 export const ANTIGRAVITY_MODEL = 'antigravity-preview-05-2026';
 export const ANTIGRAVITY_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions';

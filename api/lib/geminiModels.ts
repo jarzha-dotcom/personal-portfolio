@@ -1,4 +1,4 @@
-import { checkRateLimit } from './rateLimiter';
+import { checkRateLimit } from './rateLimiter.js';
 
 export const GEMINI_MODELS = [
     { name: 'gemini-3.8-flash', priority: 1 },
