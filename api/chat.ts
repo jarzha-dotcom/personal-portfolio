@@ -45,71 +45,82 @@ if (typeof setInterval !== 'undefined') {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    // ── Origin & Domain Security Guard ──────────────────────────────────────────
-    const originHeader = (req.headers.origin as string) || '';
-    const refererHeader = (req.headers.referer as string) || '';
-    const clientSource = originHeader || refererHeader;
+    try {
+        // ── Origin & Domain Security Guard ──────────────────────────────────────────
+        const originHeader = (req.headers.origin as string) || '';
+        const refererHeader = (req.headers.referer as string) || '';
+        const clientSource = originHeader || refererHeader;
 
-    const isOriginAllowed = () => {
-        if (!clientSource) return true;
-        try {
-            const parsed = new URL(clientSource);
-            const host = parsed.hostname.toLowerCase();
-            if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
-            if (host === 'byarzhaning.online' || host.endsWith('.byarzhaning.online')) return true;
-            if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
-            return false;
-        } catch {
-            return false;
+        const isOriginAllowed = () => {
+            if (!clientSource) return true;
+            try {
+                const parsed = new URL(clientSource);
+                const host = parsed.hostname.toLowerCase();
+                if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
+                if (host === 'byarzhaning.online' || host.endsWith('.byarzhaning.online')) return true;
+                if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
+                return false;
+            } catch {
+                return false;
+            }
+        };
+
+        const isAllowed = isOriginAllowed();
+        res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://byarzhaning.online');
+        res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+        if (req.method === 'OPTIONS') return res.status(200).end();
+        if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+        if (!isAllowed) {
+            console.warn(`[chat.ts] 🛑 Unauthorized origin blocked: ${clientSource}`);
+            return res.status(403).json({
+                error: 'UNAUTHORIZED_DOMAIN',
+                detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://byarzhaning.online).',
+            });
         }
-    };
 
-    const isAllowed = isOriginAllowed();
-    res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://byarzhaning.online');
-    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        const aiStudioKey = process.env.GEMINI_API_KEY || AISTUDIO_API_KEY;
+        const gcpKey = process.env.GOOGLE_CLOUD_GEMINI_API_KEY || GCP_GEMINI_API_KEY;
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+        if (!aiStudioKey && !gcpKey) {
+            return res.status(503).json({ error: 'AI_UNAVAILABLE', detail: 'No API keys configured on Vercel Environment Variables' });
+        }
 
-    if (!isAllowed) {
-        console.warn(`[chat.ts] 🛑 Unauthorized origin blocked: ${clientSource}`);
-        return res.status(403).json({
-            error: 'UNAUTHORIZED_DOMAIN',
-            detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://byarzhaning.online).',
-        });
-    }
+        let body = req.body;
+        if (typeof body === 'string') {
+            try {
+                body = JSON.parse(body);
+            } catch {
+                body = {};
+            }
+        }
+        body = body || {};
 
-    const aiStudioKey = process.env.GEMINI_API_KEY || AISTUDIO_API_KEY;
-    const gcpKey = process.env.GOOGLE_CLOUD_GEMINI_API_KEY || GCP_GEMINI_API_KEY;
-
-    if (!aiStudioKey && !gcpKey) {
-        return res.status(503).json({ error: 'AI_UNAVAILABLE', detail: 'No API keys configured' });
-    }
-
-    const {
-        history,
-        message,
-        model: requestedModel,
-        persona = 'zannah',
-        agentMode,
-        agentAction,
-        files: rawFiles,
-        analyticsEvent,
-        faqSemanticSearch,
-        stream: requestStream = false,
-    } = req.body as {
-        history?: Array<{ role: string; parts: { text: string }[] }>;
-        message?: string;
-        model?: string;
-        persona?: BotPersona;
-        agentMode?: boolean;
-        agentAction?: AgentIntentAction;
-        files?: unknown;
-        analyticsEvent?: { type: string; action?: string; persona?: string };
-        faqSemanticSearch?: { query: string };
-        stream?: boolean;
-    };
+        const {
+            history,
+            message,
+            model: requestedModel,
+            persona = 'zannah',
+            agentMode,
+            agentAction,
+            files: rawFiles,
+            analyticsEvent,
+            faqSemanticSearch,
+            stream: requestStream = false,
+        } = body as {
+            history?: Array<{ role: string; parts: { text: string }[] }>;
+            message?: string;
+            model?: string;
+            persona?: BotPersona;
+            agentMode?: boolean;
+            agentAction?: AgentIntentAction;
+            files?: unknown;
+            analyticsEvent?: { type: string; action?: string; persona?: string };
+            faqSemanticSearch?: { query: string };
+            stream?: boolean;
+        };
 
     // ── FAQ semantic search (Radit) ──────────────────────────────────────────
     if (faqSemanticSearch && typeof faqSemanticSearch.query === 'string') {
@@ -334,4 +345,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         error: 'ALL_MODELS_FAILED',
         detail: 'Semua model AI tidak tersedia. Silakan coba lagi beberapa saat.',
     });
+    } catch (err: any) {
+        console.error('[chat.ts] 💥 Unhandled handler error:', err);
+        return res.status(500).json({
+            error: 'INTERNAL_SERVER_ERROR',
+            detail: err?.message || String(err),
+        });
+    }
 }
