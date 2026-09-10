@@ -1,5 +1,4 @@
 ﻿{
-  "version": 2,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -34,15 +33,7 @@
   ],
   "rewrites": [
     {
-      "source": "/api/chat",
-      "destination": "/api/chat"
-    },
-    {
-      "source": "/cv",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/((?!api/|assets/|icons/|.*\\..*).*)",
+      "source": "/((?!api/.*).*)",
       "destination": "/index.html"
     }
   ]
