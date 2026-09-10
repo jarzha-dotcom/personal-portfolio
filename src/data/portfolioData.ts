@@ -283,3 +283,18 @@ export const TECH_STACK_GROUPS: TechStackGroup[] = [
     items: ['SAP Business One', 'Microsoft Excel (Advanced Formulas, XLOOKUP, Pivot)', 'SheetJS / Data Parsing', 'POS Systems', 'Working Paper & Audit Reporting']
   }
 ];
+
+export interface ModelOption {
+  id: string;
+  label: string;
+  desc: string;
+}
+
+export const AVAILABLE_MODELS: ModelOption[] = [
+  { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', desc: 'Default • paling modern & cepat' },
+  { id: 'gemini-3.7-flash', label: 'Gemini 3.7 Flash', desc: 'Advanced, latensi rendah' },
+  { id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', desc: 'Seimbang speed & kualitas' },
+  { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', desc: 'Stabil & efisien' },
+  { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
+  { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
+];

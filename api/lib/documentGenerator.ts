@@ -1,7 +1,12 @@
+import { callDevRABEngine, renderDevRABProposalHtml } from './devrabClient.js';
+
 export interface Attachment {
     name: string;
     mimeType: string;
     base64: string;
+    previewUrl?: string;
+    pdfUrl?: string;
+    proposalId?: string;
 }
 
 export interface RabFeature {
@@ -181,7 +186,8 @@ export async function extractStructuredDocument<T>(
 export async function buildAgentDocumentAttachment(
     apiKey: string,
     replyText: string,
-    action: 'estimate' | 'research'
+    action: 'estimate' | 'research',
+    userMessage?: string
 ): Promise<Attachment> {
     const dateSlug = new Date().toISOString().slice(0, 10);
 
@@ -196,6 +202,38 @@ ${replyText.slice(0, 6000)}
 --- SELESAI ---`;
 
         const doc = await extractStructuredDocument<RabDocumentData>(apiKey, prompt);
+
+        // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
+        try {
+            const projectTitle = doc?.projectName || 'Pengembangan Aplikasi Web / Mobile';
+            const features = doc && Array.isArray(doc.features) && doc.features.length > 0
+                ? doc.features.map((f) => `${f.name}: ${f.description || ''}`.trim())
+                : [userMessage || 'Sistem aplikasi terintegrasi'];
+
+            const devrabResult = await callDevRABEngine({
+                clientName: 'Calon Klien Portofolio',
+                projectType: 'web_app',
+                projectTitle,
+                projectDescription: doc?.notes || userMessage || replyText.slice(0, 300),
+                features,
+                estimatedTimeline: doc?.totalDuration || '4-6 minggu',
+                budgetPreference: 'standard',
+            });
+
+            if (devrabResult && devrabResult.proposalId && devrabResult.previewUrl) {
+                return {
+                    name: `RAB-${devrabResult.proposalId}.html`,
+                    mimeType: 'text/html;charset=utf-8',
+                    base64: Buffer.from(renderDevRABProposalHtml(devrabResult), 'utf-8').toString('base64'),
+                    previewUrl: devrabResult.previewUrl,
+                    pdfUrl: devrabResult.pdfDownloadUrl,
+                    proposalId: devrabResult.proposalId,
+                };
+            }
+        } catch (err) {
+            console.warn('[documentGenerator] DevRAB call error, falling back to local HTML:', err);
+        }
+
         if (doc && Array.isArray(doc.features) && doc.features.length > 0) {
             return {
                 name: `RAB-Estimasi-${dateSlug}.html`,

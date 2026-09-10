@@ -13,6 +13,9 @@ export interface Attachment {
     name: string;
     mimeType: string;
     base64: string;
+    previewUrl?: string;
+    pdfUrl?: string;
+    proposalId?: string;
 }
 
 /** File yang dikirim user bareng pesan (foto/PDF/CSV) */

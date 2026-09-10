@@ -1666,22 +1666,50 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                         </div>
                       )}
 
-                      {/* File hasil kerja Zannah (mis. RAB.xlsx, laporan.pdf) — siap didownload */}
+                      {/* File hasil kerja Zannah (mis. RAB DevRAB, laporan.pdf) — siap didownload / dibuka */}
                       {m.attachments && m.attachments.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="space-y-2 mt-2">
                           {m.attachments.map((att, i) => (
-                            <button
-                              key={`${m.id}-att-${i}`}
-                              type="button"
-                              onClick={() => downloadAttachment(att)}
-                              className={`inline-flex items-center gap-1.5 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
-                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
-                                : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
-                                }`}
-                            >
-                              <Download className="w-3 h-3" />
-                              {att.name}
-                            </button>
+                            <div key={`${m.id}-att-${i}`} className="flex flex-wrap items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => downloadAttachment(att)}
+                                className={`inline-flex items-center gap-1.5 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                                  : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                  }`}
+                              >
+                                <Download className="w-3 h-3" />
+                                {att.name}
+                              </button>
+
+                              {att.previewUrl && (
+                                <a
+                                  href={att.previewUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  Portal &amp; Pembayaran
+                                </a>
+                              )}
+
+                              {att.pdfUrl && (
+                                <a
+                                  href={att.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                    }`}
+                                >
+                                  <FileText className="w-3 h-3 text-indigo-500" />
+                                  PDF Resmi
+                                </a>
+                              )}
+                            </div>
                           ))}
                         </div>
                       )}

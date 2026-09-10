@@ -24,6 +24,7 @@ import {
     FileText,
     Plus,
     History,
+    ExternalLink,
 } from 'lucide-react';
 import { sendMessageToGemini, ChatMessage, AgentStep, sendAgentAnalyticsEvent } from '../services/geminiService';
 import {
@@ -72,13 +73,8 @@ const AGENT_HINT_PATTERNS: RegExp[] = [
 const clientMightUseAgent = (text: string): boolean =>
     AGENT_HINT_PATTERNS.some((pattern) => pattern.test(text));
 
-// ── Daftar model AI yang bisa dipilih user ───────────────────────────────────
-// Sesuaikan id dengan yang benar-benar didukung backend (geminiService.ts / API route).
-interface ModelOption {
-    id: string;
-    label: string;
-    desc: string;
-}
+import { AVAILABLE_MODELS, ModelOption } from '../data/portfolioData';
+export { AVAILABLE_MODELS, type ModelOption };
 
 // Antigravity SENGAJA TIDAK dimasukkan ke AVAILABLE_MODELS (dropdown) — dia
 // gak boleh bisa dipilih manual sama sekali, biar kuota 100 RPD-nya gak
@@ -90,15 +86,6 @@ interface ModelOption {
 // lalu otomatis balik nampilin model biasa begitu tugasnya selesai — gak
 // pernah "nyangkut" ke Antigravity.
 const ANTIGRAVITY_MODEL_ID = 'antigravity-preview-05-2026';
-
-export const AVAILABLE_MODELS: ModelOption[] = [
-    { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', desc: 'Default • paling modern & cepat' },
-    { id: 'gemini-3.7-flash', label: 'Gemini 3.7 Flash', desc: 'Advanced, latensi rendah' },
-    { id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', desc: 'Seimbang speed & kualitas' },
-    { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', desc: 'Stabil & efisien' },
-    { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
-    { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
-];
 
 interface AIChatbotShowcaseProps {
     darkMode: boolean;
@@ -1345,22 +1332,50 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                 </div>
                             )}
 
-                            {/* File hasil kerja Antigravity Agent (mis. RAB.xlsx, laporan.pdf) — siap didownload */}
+                            {/* File hasil kerja Zannah / DevRAB — siap didownload / dibuka */}
                             {msg.attachments && msg.attachments.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5 mt-2">
+                                <div className="space-y-2 mt-2">
                                     {msg.attachments.map((att, i) => (
-                                        <button
-                                            key={`${msg.id}-att-${i}`}
-                                            type="button"
-                                            onClick={() => downloadAttachment(att)}
-                                            className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${darkMode
-                                                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
-                                                : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
-                                                }`}
-                                        >
-                                            <Download className="w-3 h-3" />
-                                            {att.name}
-                                        </button>
+                                        <div key={`${msg.id}-att-${i}`} className="flex flex-wrap items-center gap-1.5">
+                                            <button
+                                                type="button"
+                                                onClick={() => downloadAttachment(att)}
+                                                className={`inline-flex items-center gap-1.5 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${darkMode
+                                                    ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/20'
+                                                    : 'bg-emerald-50 border-emerald-300 text-emerald-700 hover:bg-emerald-100'
+                                                    }`}
+                                            >
+                                                <Download className="w-3 h-3" />
+                                                {att.name}
+                                            </button>
+
+                                            {att.previewUrl && (
+                                                <a
+                                                    href={att.previewUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-1 text-[10px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                                                >
+                                                    <ExternalLink className="w-3 h-3" />
+                                                    Portal &amp; Pembayaran
+                                                </a>
+                                            )}
+
+                                            {att.pdfUrl && (
+                                                <a
+                                                    href={att.pdfUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className={`inline-flex items-center gap-1 text-[10px] font-semibold px-2.5 py-1.5 rounded-lg border transition-colors ${darkMode
+                                                        ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                                        : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                                        }`}
+                                                >
+                                                    <FileText className="w-3 h-3 text-indigo-500" />
+                                                    PDF Resmi
+                                                </a>
+                                            )}
+                                        </div>
                                     ))}
                                 </div>
                             )}

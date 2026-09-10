@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, memo } from 'react';
+import React, { useState, useEffect, useMemo, memo, lazy, Suspense } from 'react';
 import {
   Code2,
   ExternalLink,
@@ -18,12 +18,18 @@ import {
   ArrowRight,
   Play,
   Info,
+  Building2,
+  ShieldCheck,
+  Loader2,
 } from 'lucide-react';
-import { PROJECTS } from '../data/portfolioData';
+import { PROJECTS, AVAILABLE_MODELS } from '../data/portfolioData';
 import { ProjectItem } from '../types';
 import { Portal } from './Portal';
-import { AIChatbotShowcase, AVAILABLE_MODELS } from './AIChatbotShowcase';
 import { injectJsonLd, removeJsonLd, buildProjectsJsonLd } from '../utils/seoHelpers';
+
+const AIChatbotShowcase = lazy(() =>
+  import('./AIChatbotShowcase').then((m) => ({ default: m.AIChatbotShowcase }))
+);
 
 interface ProjectsProps {
   darkMode: boolean;
@@ -286,16 +292,31 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     {/* Card Content Container */}
                     <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between">
                       <div>
-                        {/* Header: Badge & Year */}
-                        <div className="flex items-center justify-between mb-3.5">
-                          <span
-                            className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border shadow-xs ${getBadgeClasses(
-                              project.colorScheme
-                            )}`}
-                          >
-                            {getIcon(project.iconType)}
-                            {project.badge}
-                          </span>
+                        {/* Header: Badge, Client Pill & Year */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 mb-3.5">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span
+                              className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border shadow-xs ${getBadgeClasses(
+                                project.colorScheme
+                              )}`}
+                            >
+                              {getIcon(project.iconType)}
+                              {project.badge}
+                            </span>
+                            {project.client && (
+                              <span
+                                className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border ${
+                                  darkMode
+                                    ? 'bg-indigo-950/80 text-indigo-300 border-indigo-700/60 shadow-xs'
+                                    : 'bg-indigo-50 text-indigo-800 border-indigo-200 shadow-xs'
+                                }`}
+                                title={`Proyek pesanan khusus untuk ${project.client}`}
+                              >
+                                <Building2 className="w-3 h-3 text-indigo-500" />
+                                <span>Klien: {project.client}</span>
+                              </span>
+                            )}
+                          </div>
                           <span
                             className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
                               darkMode ? 'text-slate-400 bg-slate-800/60' : 'text-slate-500 bg-slate-100'
@@ -389,10 +410,10 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                               rel="noreferrer"
                               className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold transition-colors shadow-sm"
                               onClick={(e) => e.stopPropagation()}
-                              title="Buka Demo Aplikasi di tab baru"
+                              title={project.client ? 'Buka Assets Demo (lingkungan simulasi aman)' : 'Buka Demo Aplikasi di tab baru'}
                             >
                               <Play className="w-3 h-3 fill-current" />
-                              <span>Live Demo</span>
+                              <span>{project.client ? 'Assets Demo' : 'Live Demo'}</span>
                             </a>
                           )}
                           <button
@@ -643,9 +664,20 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                 </button>
               </div>
 
-              {/* Chatbot Content */}
+              {/* Chatbot Content — Lazy Loaded */}
               <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-                <AIChatbotShowcase darkMode={darkMode} />
+                <Suspense
+                  fallback={
+                    <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                      <Loader2 className="w-8 h-8 animate-spin text-teal-500 mb-3" />
+                      <p className={`text-xs font-semibold ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Memuat AI Chatbot Showcase...
+                      </p>
+                    </div>
+                  }
+                >
+                  <AIChatbotShowcase darkMode={darkMode} />
+                </Suspense>
               </div>
 
               {/* Modal Footer */}
@@ -758,6 +790,25 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   </div>
                 </div>
 
+                {/* Client Case & Data Privacy Transparency Callout */}
+                {activeModalProject.client && (
+                  <div className={`p-4 rounded-xl border flex items-start gap-3.5 ${
+                    darkMode
+                      ? 'bg-indigo-950/30 border-indigo-800/60 text-indigo-200'
+                      : 'bg-indigo-50/80 border-indigo-200 text-indigo-950'
+                  }`}>
+                    <ShieldCheck className="w-5 h-5 text-indigo-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-xs leading-relaxed space-y-1">
+                      <p className="font-bold text-sm text-indigo-400 dark:text-indigo-300">
+                        Status Deployment & Perlindungan Data Klien
+                      </p>
+                      <p className={darkMode ? 'text-slate-300' : 'text-slate-700'}>
+                        Sistem asli telah di-deploy dan aktif digunakan untuk operasional internal <b>{activeModalProject.client}</b>. Demi mematuhi standar privasi data korporat, akses demo publik yang disediakan (<b>Assets Demo</b>) menggunakan data simulasi aman <i>(dummy data)</i>.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className={`p-4 rounded-xl border ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>
                   <div className="flex flex-wrap justify-between gap-3 text-xs sm:text-sm">
                     {activeModalProject.client && (
@@ -823,7 +874,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-extrabold shadow-md transition-all duration-200 scale-100 hover:scale-105"
                     >
-                      <span>Buka Live Demo</span>
+                      <span>{activeModalProject.client ? 'Buka Assets Demo' : 'Buka Live Demo'}</span>
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   )}

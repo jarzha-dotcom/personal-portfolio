@@ -195,7 +195,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!aiStudioKey) return resData;
         if (resData.attachments && resData.attachments.length > 0) return resData;
 
-        const doc = await buildAgentDocumentAttachment(aiStudioKey, resData.reply || '', agentAction);
+        const doc = await buildAgentDocumentAttachment(aiStudioKey, resData.reply || '', agentAction, sanitizedMessage);
         return { ...resData, attachments: [doc] };
     };
 
