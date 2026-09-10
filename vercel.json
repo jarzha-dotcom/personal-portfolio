@@ -1,4 +1,4 @@
-﻿{
+{
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -33,7 +33,7 @@
   ],
   "rewrites": [
     {
-      "source": "/((?!api/.*).*)",
+      "source": "/(.*)",
       "destination": "/index.html"
     }
   ]
