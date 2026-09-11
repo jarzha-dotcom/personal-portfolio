@@ -1,7 +1,6 @@
-// Service worker untuk offline support dasar (app shell + runtime cache).
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -78,12 +77,29 @@ self.addEventListener('fetch', (event) => {
             const networkFetch = fetch(request)
                 .then((response) => {
                     if (response.ok) {
-                        const clone = response.clone();
-                        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                        const contentType = response.headers.get('content-type') || '';
+                        // Cegah caching jika server merespon dengan text/html (misal fallback SPA 404) untuk file JS/CSS
+                        const isInvalidAsset =
+                            (url.pathname.endsWith('.js') && !contentType.includes('javascript')) ||
+                            (url.pathname.endsWith('.css') && !contentType.includes('css'));
+
+                        if (!isInvalidAsset) {
+                            const clone = response.clone();
+                            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                        }
                     }
                     return response;
                 })
                 .catch(() => cached);
+
+            // Validasi file cached: jika file .js di cache bertipe text/html, hapus dan paksa fetch dari network
+            if (cached) {
+                const cachedType = cached.headers.get('content-type') || '';
+                if (url.pathname.endsWith('.js') && !cachedType.includes('javascript')) {
+                    caches.open(RUNTIME_CACHE).then((cache) => cache.delete(request));
+                    return networkFetch;
+                }
+            }
 
             return cached || networkFetch;
         })
