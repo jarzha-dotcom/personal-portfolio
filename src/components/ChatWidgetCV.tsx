@@ -19,6 +19,7 @@ import { BOT_VOICES } from '../services/voiceService';
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
 import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 const KANIA_LOADING_STATUSES = [
     'Menyiapkan informasi...',
@@ -205,6 +206,10 @@ const buildWelcomeMessage = (): Message => ({
 
 export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     const [isOpen, setIsOpen] = useState(false);
+
+    // Hubungkan tombol kembali browser agar menutup popup chat widget di mode CV
+    useRegisterModal('chat-widget-cv-drawer', isOpen, () => setIsOpen(false));
+
     const [isTyping, setIsTyping] = useState(false);
     const [loadingTextIndex, setLoadingTextIndex] = useState(0);
     const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);

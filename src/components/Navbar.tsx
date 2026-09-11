@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -19,6 +20,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
+
+  // Hubungkan tombol kembali browser agar menutup menu navigasi mobile
+  useRegisterModal('mobile-nav-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
 
   // Menyimpan timestamp klik logo untuk deteksi easter egg
   const logoClickTimestamps = useRef<number[]>([]);

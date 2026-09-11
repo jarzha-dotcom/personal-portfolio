@@ -23,6 +23,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { PROJECTS, AVAILABLE_MODELS } from '../data/portfolioData';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 import { ProjectItem } from '../types';
 import { Portal } from './Portal';
 import { injectJsonLd, removeJsonLd, buildProjectsJsonLd } from '../utils/seoHelpers';
@@ -111,6 +112,10 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeFilter, setActiveFilter] = useState<string>('Semua');
   const [activeModalProject, setActiveModalProject] = useState<ProjectItem | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+
+  // Hubungkan tombol Back browser agar menutup modal yang aktif secara bertahap
+  useRegisterModal('project-detail-modal', !!activeModalProject, () => setActiveModalProject(null));
+  useRegisterModal('chatbot-showcase-modal', isChatbotOpen, () => setIsChatbotOpen(false));
 
   // Filter Categories & Projects Memoized untuk efisiensi render
   const categories = useMemo(

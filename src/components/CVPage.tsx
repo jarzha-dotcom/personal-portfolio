@@ -10,6 +10,7 @@ import { ChatWidgetCV } from './ChatWidgetCV';
 import { CVDocumentModal } from './CVDocumentModal';
 import { Reveal } from './Reveal';
 import { ShowcaseBanner } from './ShowcaseBanner';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 interface CVPageProps {
   darkMode: boolean;
@@ -25,6 +26,9 @@ interface CVPageProps {
 // CVDocumentModal, dokumen CV bersih yang memang didesain untuk print/PDF.
 export const CVPage: React.FC<CVPageProps> = ({ darkMode, setDarkMode, onExit }) => {
   const [showDocModal, setShowDocModal] = useState(false);
+
+  // Hubungkan tombol kembali browser agar menutup modal dokumen CV
+  useRegisterModal('cv-document-modal', showDocModal, () => setShowDocModal(false));
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

@@ -20,6 +20,7 @@ import { BOT_VOICES } from '../services/voiceService';
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
 import { downloadChatSummaryFile, shareChatSummaryFile, canShareChatSummary } from '../utils/chatSummaryGenerator';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 const ZANNAH_LOADING_STATUSES = [
   'Menyiapkan respon...',
@@ -170,6 +171,10 @@ const ModeBadge: React.FC<{ aiMode: 'ai' | 'fallback' | 'unknown'; darkMode: boo
 // ── Component ───────────────────────────────────────────────────────────────
 export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
+
+  // Hubungkan tombol kembali browser agar menutup popup chat widget
+  useRegisterModal('chat-widget-drawer', isOpen, () => setIsOpen(false));
+
   const [isTyping, setIsTyping] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   // True selama request yang sedang berjalan dipicu lewat tombol aksi AI

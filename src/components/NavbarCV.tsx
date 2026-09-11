@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Menu, X, Sun, Moon, Printer, LogOut } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 interface NavbarCVProps {
     darkMode: boolean;
@@ -16,7 +17,7 @@ const scrollCvTo = (id: string) => {
     const container = document.getElementById('cv-easter-egg-page');
     const target = document.getElementById(id);
     if (container && target) {
-        const offset = 72;
+        const offset = 80;
         const top = target.offsetTop - offset;
         container.scrollTo({ top, behavior: 'smooth' });
     }
@@ -26,6 +27,9 @@ export const NavbarCV: React.FC<NavbarCVProps> = ({ darkMode, setDarkMode, onExi
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeSection, setActiveSection] = useState('cv-beranda');
+
+    // Hubungkan tombol kembali browser agar menutup menu drawer mobile di mode CV
+    useRegisterModal('mobile-nav-cv-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
     const drawerRef = useRef<HTMLDivElement>(null);
     useFocusTrap(drawerRef, mobileMenuOpen);
 

@@ -12,6 +12,12 @@ import { Reveal } from './components/Reveal';
 import { ShowcaseBanner } from './components/ShowcaseBanner';
 import { PWAManager } from './components/PWAManager';
 import { ArrowUp } from 'lucide-react';
+import {
+  NavigationHistoryProvider,
+  useNavigationHistory,
+  useRegisterModal,
+} from './context/NavigationHistoryContext';
+import { ExitConfirmModal } from './components/ExitConfirmModal';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
 // benar-benar dipakai kalau tombolnya diklik, dan CVPage (berat — isinya
@@ -25,7 +31,8 @@ const CVPage = lazy(() =>
   import('./components/CVPage').then((m) => ({ default: m.CVPage }))
 );
 
-export default function App() {
+function MainPortfolio() {
+  const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
@@ -45,6 +52,9 @@ export default function App() {
     setCvEggUnlocked(true);
     setShowUnlockToast(true);
   };
+
+  // Sinkronkan tombol kembali di browser dengan Mode CV
+  useRegisterModal('cv-mode-page', cvEggUnlocked, () => setCvEggUnlocked(false));
 
   useEffect(() => {
     if (!showUnlockToast) return;
@@ -190,6 +200,22 @@ export default function App() {
       </Suspense>
 
       <EasterEggToast show={showUnlockToast} />
+
+      {/* Modal Peringatan/Konfirmasi saat Tombol Back di browser ditekan di halaman utama */}
+      <ExitConfirmModal
+        isOpen={showExitConfirm}
+        onStay={handleStay}
+        onLeave={handleLeave}
+        darkMode={darkMode}
+      />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <NavigationHistoryProvider>
+      <MainPortfolio />
+    </NavigationHistoryProvider>
   );
 }
