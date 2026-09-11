@@ -57,11 +57,10 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
         <div
           ref={modalRef}
           onClick={(e) => e.stopPropagation()}
-          className={`w-full max-w-lg rounded-2xl border p-6 sm:p-7 shadow-2xl transition-all animate-in zoom-in-95 duration-200 relative overflow-hidden ${
-            darkMode
-              ? 'bg-slate-900 border-teal-500/30 text-white shadow-teal-500/10'
-              : 'bg-white border-teal-200 text-slate-900 shadow-slate-300/60'
-          }`}
+          className={`w-full max-w-lg rounded-2xl border p-6 sm:p-7 shadow-2xl transition-all animate-in zoom-in-95 duration-200 relative overflow-hidden ${darkMode
+            ? 'bg-slate-900 border-teal-500/30 text-white shadow-teal-500/10'
+            : 'bg-white border-teal-200 text-slate-900 shadow-slate-300/60'
+            }`}
         >
           {/* Subtle Ambient Glow */}
           <div className="absolute -top-12 -right-12 w-36 h-36 bg-teal-500/15 rounded-full blur-2xl pointer-events-none" />
@@ -71,11 +70,10 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
             type="button"
             onClick={onStay}
             aria-label="Tutup dan tetap di situs"
-            className={`absolute top-4 right-4 p-1.5 rounded-lg transition-colors z-10 ${
-              darkMode
-                ? 'text-slate-400 hover:text-white hover:bg-slate-800'
-                : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-            }`}
+            className={`absolute top-4 right-4 p-1.5 rounded-lg transition-colors z-10 ${darkMode
+              ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+              : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              }`}
           >
             <X className="w-4 h-4" />
           </button>
@@ -108,15 +106,14 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
 
           {/* Speech Bubble Card */}
           <div
-            className={`rounded-xl p-4 sm:p-4.5 border mb-5 text-xs sm:text-sm leading-relaxed relative ${
-              darkMode
-                ? 'bg-slate-800/70 border-slate-700/80 text-slate-200'
-                : 'bg-teal-50/60 border-teal-100 text-slate-700'
-            }`}
+            className={`rounded-xl p-4 sm:p-4.5 border mb-5 text-xs sm:text-sm leading-relaxed relative ${darkMode
+              ? 'bg-slate-800/70 border-slate-700/80 text-slate-200'
+              : 'bg-teal-50/60 border-teal-100 text-slate-700'
+              }`}
           >
             <p className="mb-2.5">
               Zannah lihat Kakak menekan tombol kembali di browser. Sayang banget kalau terlewat, Kakak sudah sempat coba{' '}
-              <b className={darkMode ? 'text-teal-300' : 'text-teal-700'}>Assets Demo</b> (aplikasi manajemen aset klien PT Global Multiparts) atau cek demo interaktif lainnya?
+              <b className={darkMode ? 'text-teal-300' : 'text-teal-700'}>B-Games</b>  atau cek demo interaktif lainnya?
             </p>
             <p>
               Kalau Kakak lagi butuh <span className="underline decoration-teal-400 font-semibold">estimasi biaya & timeline proyek</span>, Zannah bisa bantu hitungin langsung tanpa perlu tunggu Mas Arzha online lho! Mau ngobrol sebentar?
@@ -126,21 +123,19 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
           {/* Feature Highlights Chips */}
           <div className="grid grid-cols-2 gap-2 mb-6">
             <div
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium border ${
-                darkMode
-                  ? 'bg-slate-800/40 border-slate-700/60 text-slate-300'
-                  : 'bg-slate-50 border-slate-200 text-slate-600'
-              }`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium border ${darkMode
+                ? 'bg-slate-800/40 border-slate-700/60 text-slate-300'
+                : 'bg-slate-50 border-slate-200 text-slate-600'
+                }`}
             >
               <span className="text-amber-500">⚡</span>
               <span>Hitung Estimasi Proyek</span>
             </div>
             <div
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium border ${
-                darkMode
-                  ? 'bg-slate-800/40 border-slate-700/60 text-slate-300'
-                  : 'bg-slate-50 border-slate-200 text-slate-600'
-              }`}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-[11px] font-medium border ${darkMode
+                ? 'bg-slate-800/40 border-slate-700/60 text-slate-300'
+                : 'bg-slate-50 border-slate-200 text-slate-600'
+                }`}
             >
               <span className="text-teal-500">🏢</span>
               <span>Demo Web App Klien</span>
@@ -152,11 +147,10 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
             <button
               type="button"
               onClick={onLeave}
-              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors order-3 sm:order-1 ${
-                darkMode
-                  ? 'text-slate-400 hover:text-slate-200'
-                  : 'text-slate-500 hover:text-slate-800'
-              }`}
+              className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-colors order-3 sm:order-1 ${darkMode
+                ? 'text-slate-400 hover:text-slate-200'
+                : 'text-slate-500 hover:text-slate-800'
+                }`}
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Tetap ingin keluar</span>
@@ -166,11 +160,10 @@ export const ExitConfirmModal: React.FC<ExitConfirmModalProps> = ({
               <button
                 type="button"
                 onClick={onStay}
-                className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-colors ${
-                  darkMode
-                    ? 'border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
-                    : 'border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
-                }`}
+                className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-semibold transition-colors ${darkMode
+                  ? 'border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'
+                  : 'border-slate-300 text-slate-700 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
               >
                 <Sparkles className="w-4 h-4 text-teal-500" />
                 <span>Tetap di Sini</span>
