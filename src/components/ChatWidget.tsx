@@ -175,6 +175,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Hubungkan tombol kembali browser agar menutup popup chat widget
   useRegisterModal('chat-widget-drawer', isOpen, () => setIsOpen(false));
 
+  // Tangani event eksternal untuk membuka chat Zannah (misalnya dari modal tahan keluar Zannah)
+  useEffect(() => {
+    const handleOpenZannah = () => {
+      setIsOpen(true);
+    };
+    window.addEventListener('open-zannah-chat', handleOpenZannah);
+    return () => window.removeEventListener('open-zannah-chat', handleOpenZannah);
+  }, []);
+
   const [isTyping, setIsTyping] = useState(false);
   const [loadingTextIndex, setLoadingTextIndex] = useState(0);
   // True selama request yang sedang berjalan dipicu lewat tombol aksi AI
