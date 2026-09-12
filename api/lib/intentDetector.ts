@@ -101,16 +101,17 @@ export async function assessAgentReadiness(
 ): Promise<boolean> {
     const criteria =
         action === 'estimate'
-            ? `- Sudah jelas jenis aplikasi/proyek yang diinginkan (web app, mobile app, sistem internal, landing page, dst) — bukan cuma "mau bikin aplikasi" doang.
-- Sudah disebutkan MINIMAL beberapa fitur/kebutuhan utama secara konkret (bukan sekadar ide samar tanpa detail apa pun).`
+            ? `- Sudah jelas jenis platform/proyek (web app, mobile app, dashboard, sistem internal, dst).
+- Sudah disebutkan minimal 2-3 fitur/kebutuhan utama secara konkret.
+- Sudah ada preferensi target waktu (timeline) atau kisaran budget/skala yang telah dibahas/ditentukan.`
             : `- Ada topik, kompetitor, atau segmen pasar yang SPESIFIK disebut user (bukan permintaan generik "riset dong" tanpa arah).
 - Ada indikasi user beneran serius mau pakai hasil riset ini buat proyeknya (bukan sekadar nanya iseng/hipotetis).`;
 
     const transcript = contents
-        .slice(-10)
+        .slice(-16)
         .map((c) => `${c.role === 'user' ? 'USER' : 'ZANNAH'}: ${c.parts.map((p) => p.text || '').join(' ')}`)
         .join('\n')
-        .slice(0, 4000);
+        .slice(0, 5000);
 
     const prompt = `Kamu adalah pemeriksa kesiapan (readiness checker) internal untuk fitur AI Agent di sebuah chatbot konsultan tech bernama Zannah. Berdasarkan potongan percakapan di bawah, nilai APAKAH kedua kriteria berikut sudah terpenuhi:
 ${criteria}

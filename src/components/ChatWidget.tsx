@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2 } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2, RotateCw } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
@@ -1697,32 +1697,47 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 {att.name}
                               </button>
 
-                              {att.previewUrl && (
-                                <a
-                                  href={att.previewUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
-                                >
-                                  <ExternalLink className="w-3 h-3" />
-                                  Portal &amp; Pembayaran
-                                </a>
-                              )}
+                                {att.name.includes('Kasar') && (
+                                  <button
+                                    type="button"
+                                    onClick={() => runAgentAction('estimate', 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.', undefined, '🔄 Coba Hubungkan ke DevRAB')}
+                                    className={`inline-flex items-center gap-1.5 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
+                                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
+                                      : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+                                      }`}
+                                    title="Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi"
+                                  >
+                                    <RotateCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                    Coba Hubungkan Ulang ke DevRAB
+                                  </button>
+                                )}
 
-                              {att.pdfUrl && (
-                                <a
-                                  href={att.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
-                                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
-                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                                    }`}
-                                >
-                                  <FileText className="w-3 h-3 text-indigo-500" />
-                                  PDF Resmi
-                                </a>
-                              )}
+                                {att.previewUrl && (
+                                  <a
+                                    href={att.previewUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    Portal &amp; Pembayaran
+                                  </a>
+                                )}
+
+                                {att.pdfUrl && (
+                                  <a
+                                    href={att.pdfUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                      ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                      }`}
+                                  >
+                                    <FileText className="w-3 h-3 text-indigo-500" />
+                                    PDF Resmi
+                                  </a>
+                                )}
                             </div>
                           ))}
                         </div>

@@ -1349,6 +1349,21 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                                 {att.name}
                                             </button>
 
+                                            {att.name.includes('Kasar') && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSend('Coba generate ulang proposal ke DevRAB Cloud Engine untuk mendapatkan proposal resmi.', false, true)}
+                                                    className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
+                                                        ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
+                                                        : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+                                                        }`}
+                                                    title="Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi"
+                                                >
+                                                    <RefreshCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                                    Hubungkan Ulang DevRAB
+                                                </button>
+                                            )}
+
                                             {att.previewUrl && (
                                                 <a
                                                     href={att.previewUrl}

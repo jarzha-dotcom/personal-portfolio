@@ -37,46 +37,98 @@ export interface DevRABProposalResponse {
     message?: string;
 }
 
+/**
+ * Kirim 'silent ping' ke DevRAB Engine untuk membangunkan instance server (pre-warming cold start).
+ * Dipanggil di background saat user mulai membahas proyek/estimasi.
+ */
+export async function pingDevRABEngine(): Promise<void> {
+    const apiUrl = process.env.DEVRAB_API_URL || 'https://devrab.byarzhaning.online/api/v1/generate-proposal';
+    try {
+        const pingUrl = new URL(apiUrl).origin;
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+        await fetch(pingUrl, {
+            method: 'GET',
+            signal: controller.signal,
+        }).catch(() => {});
+        clearTimeout(timeoutId);
+        console.log('[devrabClient] Pre-warming ping sent to DevRAB host');
+    } catch {
+        // Abaikan error ping karena sifatnya hanya background warm-up
+    }
+}
+
 export async function callDevRABEngine(
     payload: DevRABProposalRequest,
-    timeoutMs = 15000
+    timeoutMs = 25000,
+    maxRetries = 2
 ): Promise<DevRABProposalResponse | null> {
     const apiUrl = process.env.DEVRAB_API_URL || 'https://devrab.byarzhaning.online/api/v1/generate-proposal';
     const apiKey = process.env.DEVRAB_API_KEY || 'devrab_m2m_sec_99a8b7c6d5e4';
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    // Normalisasi payload untuk keamanan skema
+    const cleanPayload: DevRABProposalRequest = {
+        clientName: payload.clientName || 'Calon Klien Portofolio',
+        projectType: payload.projectType || 'web_app',
+        projectTitle: payload.projectTitle || 'Pengembangan Aplikasi Web / Mobile',
+        projectDescription: payload.projectDescription || 'Sistem aplikasi terintegrasi',
+        features: Array.isArray(payload.features) && payload.features.length > 0
+            ? payload.features
+            : ['Sistem aplikasi terintegrasi'],
+        targetPlatform: payload.targetPlatform || ['Web'],
+        estimatedTimeline: payload.estimatedTimeline || '4-6 minggu',
+        budgetPreference: payload.budgetPreference || 'standard',
+        clientInfo: payload.clientInfo,
+    };
 
-        const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`,
-            },
-            body: JSON.stringify(payload),
-            signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (!res.ok) {
-            console.warn(`[devrabClient] HTTP ${res.status} dari DevRAB: ${res.statusText}`);
-            return null;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+        if (attempt > 0) {
+            const delay = attempt * 1500;
+            console.log(`[devrabClient] Percobaan ulang ke-${attempt} setelah ${delay}ms...`);
+            await new Promise((r) => setTimeout(r, delay));
         }
 
-        const data = (await res.json()) as DevRABProposalResponse;
-        if (data.status === 'success' && data.proposalId) {
-            console.log(`[devrabClient] Berhasil generate proposal DevRAB: ${data.proposalId}`);
-            return data;
-        }
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-        console.warn('[devrabClient] DevRAB mengembalikan status non-success:', data);
-        return null;
-    } catch (err: any) {
-        console.error('[devrabClient] Gagal menghubungi DevRAB Engine:', err?.name === 'AbortError' ? 'Timeout 15s' : err?.message || err);
-        return null;
+            const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`,
+                },
+                body: JSON.stringify(cleanPayload),
+                signal: controller.signal,
+            });
+
+            clearTimeout(timeoutId);
+
+            if (!res.ok) {
+                console.warn(`[devrabClient][attempt ${attempt + 1}] HTTP ${res.status} dari DevRAB: ${res.statusText}`);
+                if (res.status >= 500 && attempt < maxRetries) {
+                    continue; // Retry on 5xx server errors
+                }
+                if (attempt === maxRetries) return null;
+                continue;
+            }
+
+            const data = (await res.json()) as DevRABProposalResponse;
+            if (data.status === 'success' && data.proposalId) {
+                console.log(`[devrabClient] Berhasil generate proposal DevRAB (attempt ${attempt + 1}): ${data.proposalId}`);
+                return data;
+            }
+
+            console.warn(`[devrabClient][attempt ${attempt + 1}] DevRAB mengembalikan non-success:`, data);
+            if (attempt === maxRetries) return null;
+        } catch (err: any) {
+            const isTimeout = err?.name === 'AbortError';
+            console.error(`[devrabClient][attempt ${attempt + 1}] Gagal menghubungi DevRAB:`, isTimeout ? `Timeout ${timeoutMs}ms` : err?.message || err);
+            if (attempt === maxRetries) return null;
+        }
     }
+
+    return null;
 }
 
 function formatRupiah(n: number): string {

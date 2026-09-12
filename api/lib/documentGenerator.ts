@@ -72,7 +72,7 @@ export function documentFooterHtml(): string {
   </div>`;
 }
 
-export function renderRabHtml(doc: RabDocumentData): string {
+export function renderRabHtml(doc: RabDocumentData, isFallback = false): string {
     const rows = doc.features
         .map(
             (f) => `
@@ -85,12 +85,30 @@ export function renderRabHtml(doc: RabDocumentData): string {
         )
         .join('');
 
+    const fallbackBanner = isFallback
+        ? `
+  <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 16px 20px; margin: 18px 0 24px; color: #92400e; font-size: 13px; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+      <span>⚠️</span> <span>DRAF ESTIMASI KASAR (MODE OFFLINE LOKAL)</span>
+    </div>
+    <p style="margin: 0 0 10px 0;">
+      Server <strong>DevRAB Cloud Engine</strong> sedang mengalami antrean tinggi atau kendala koneksi sementara. Dokumen ini disusun menggunakan mesin ekstraksi lokal sebagai estimasi awal/kasar.
+    </p>
+    <div style="background: rgba(254, 243, 199, 0.7); border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #78350f;">
+      💡 <strong>Cara Mendapatkan Proposal Resmi DevRAB:</strong><br/>
+      Silakan kembali ke chatbot Zannah dan ketik: <em>"Coba generate ulang proposal ke DevRAB"</em> untuk mendapatkan proposal interaktif resmi dengan breakdown termin, link verifikasi, dan simulasi fitur online.
+    </div>
+  </div>`
+        : '';
+
     return `<!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><title>RAB - ${escapeHtml(doc.projectName)}</title>
 <style>${DOCUMENT_HTML_STYLE}</style></head>
 <body>
-  <h1>📊 Rencana Anggaran Biaya (RAB)</h1>
+  <h1>📊 Rencana Anggaran Biaya (RAB)${isFallback ? ' &mdash; Draf Kasar' : ''}</h1>
   <div class="subtitle">Proyek: ${escapeHtml(doc.projectName)} &middot; Dibuat: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+
+  ${fallbackBanner}
 
   <div class="section-title">Breakdown Biaya per Fitur</div>
   <table>
@@ -133,17 +151,35 @@ export function renderResearchHtml(doc: ResearchDocumentData): string {
 </body></html>`;
 }
 
-export function renderPlainFallbackHtml(title: string, rawText: string): string {
+export function renderPlainFallbackHtml(title: string, rawText: string, isFallback = false): string {
     const paragraphs = rawText
         .split(/\n{2,}/)
         .map((p) => `<p>${escapeHtml(p.trim()).replace(/\n/g, '<br/>')}</p>`)
         .join('');
+
+    const fallbackBanner = isFallback
+        ? `
+  <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 16px 20px; margin: 18px 0 24px; color: #92400e; font-size: 13px; line-height: 1.6; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+    <div style="font-weight: 800; font-size: 14px; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+      <span>⚠️</span> <span>DRAF ESTIMASI KASAR (MODE OFFLINE LOKAL)</span>
+    </div>
+    <p style="margin: 0 0 10px 0;">
+      Server <strong>DevRAB Cloud Engine</strong> sedang mengalami antrean tinggi atau kendala koneksi sementara. Dokumen ini disusun menggunakan mesin ekstraksi lokal sebagai estimasi awal/kasar.
+    </p>
+    <div style="background: rgba(254, 243, 199, 0.7); border-radius: 6px; padding: 10px 12px; font-size: 12px; color: #78350f;">
+      💡 <strong>Cara Mendapatkan Proposal Resmi DevRAB:</strong><br/>
+      Silakan kembali ke chatbot Zannah dan ketik: <em>"Coba generate ulang proposal ke DevRAB"</em> untuk mendapatkan proposal interaktif resmi dengan breakdown termin, link verifikasi, dan simulasi fitur online.
+    </div>
+  </div>`
+        : '';
+
     return `<!DOCTYPE html>
 <html lang="id"><head><meta charset="UTF-8"><title>${escapeHtml(title)}</title>
 <style>${DOCUMENT_HTML_STYLE}</style></head>
 <body>
   <h1>${escapeHtml(title)}</h1>
   <div class="subtitle">Dibuat: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+  ${fallbackBanner}
   ${paragraphs}
   ${documentFooterHtml()}
 </body></html>`;
@@ -187,17 +223,25 @@ export async function buildAgentDocumentAttachment(
     apiKey: string,
     replyText: string,
     action: 'estimate' | 'research',
-    userMessage?: string
+    userMessage?: string,
+    fullTranscript?: string
 ): Promise<Attachment> {
     const dateSlug = new Date().toISOString().slice(0, 10);
 
     if (action === 'estimate') {
-        const prompt = `Ekstrak teks RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur. Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
+        // Gabungkan seluruh konteks transkrip sesi dari awal agar tidak ada fitur/spesifikasi yang hilang akibat 12 slice
+        const transcriptSection = fullTranscript && fullTranscript.trim()
+            ? `--- RANGKUMAN DISKUSI LENGKAP DARI AWAL SESI ---\n${fullTranscript.slice(0, 6000)}\n\n`
+            : '';
+
+        const prompt = `Ekstrak rincian kebutuhan proyek dan RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur.
+Gunakan informasi dari rangkuman diskusi lengkap dan jawaban asisten untuk mengidentifikasi nama proyek, fitur-fitur utama, dan estimasi waktu/biaya secara akurat.
+Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
 {"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>"}
 
-Kalau teks di bawah gak menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan konteks yang ada & sebutkan itu di "notes".
+Kalau teks di bawah belum menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan fitur-fitur yang dibahas & sebutkan itu di "notes".
 
---- TEKS RAB ---
+${transcriptSection}--- TEKS KESIMPULAN RAB ASISTEN ---
 ${replyText.slice(0, 6000)}
 --- SELESAI ---`;
 
@@ -234,18 +278,19 @@ ${replyText.slice(0, 6000)}
             console.warn('[documentGenerator] DevRAB call error, falling back to local HTML:', err);
         }
 
+        // Fallback: Generate Draf Kasar Lokal dengan banner peringatan transparan
         if (doc && Array.isArray(doc.features) && doc.features.length > 0) {
             return {
-                name: `RAB-Estimasi-${dateSlug}.html`,
+                name: `RAB-Estimasi-Kasar-${dateSlug}.html`,
                 mimeType: 'text/html;charset=utf-8',
-                base64: Buffer.from(renderRabHtml(doc), 'utf-8').toString('base64'),
+                base64: Buffer.from(renderRabHtml(doc, true), 'utf-8').toString('base64'),
             };
         }
         console.warn('[documentGenerator] Ekstraksi RAB gagal/kosong, fallback ke plain HTML.');
         return {
-            name: `RAB-Estimasi-${dateSlug}.html`,
+            name: `RAB-Estimasi-Kasar-${dateSlug}.html`,
             mimeType: 'text/html;charset=utf-8',
-            base64: Buffer.from(renderPlainFallbackHtml('📊 Rencana Anggaran Biaya (RAB)', replyText), 'utf-8').toString('base64'),
+            base64: Buffer.from(renderPlainFallbackHtml('📊 Rencana Anggaran Biaya (Draf Kasar Lokal)', replyText, true), 'utf-8').toString('base64'),
         };
     }
 

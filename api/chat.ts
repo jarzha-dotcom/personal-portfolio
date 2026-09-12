@@ -12,6 +12,9 @@ import {
     generateSummaryAttachment,
 } from './lib/documentGenerator.js';
 import {
+    pingDevRABEngine,
+} from './lib/devrabClient.js';
+import {
     callAntigravity,
     ANTIGRAVITY_MODEL,
 } from './lib/antigravity.js';
@@ -189,15 +192,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const wantsAgent = agentEligiblePersona && agentTriggeredByUser;
     const isAntigravityTarget = wantsAgent && (!requestedModel || requestedModel === ANTIGRAVITY_MODEL);
 
+    // Susun riwayat lengkap percakapan dari awal agar kebutuhan/fitur proyek tidak terputus akibat 12 slice
+    const fullSessionTranscript = (history || [])
+        .map((h) => {
+            const sender = h.role === 'user' ? 'Klien' : botName;
+            const text = String(h.parts?.[0]?.text || '').trim();
+            return text ? `[${sender}]: ${text}` : '';
+        })
+        .filter(Boolean)
+        .join('\n');
+
     const enrichWithAgentDocument = async (resData: any) => {
         if (!resData || !agentTriggeredByUser) return resData;
         if (agentAction !== 'estimate' && agentAction !== 'research') return resData;
         if (!aiStudioKey) return resData;
         if (resData.attachments && resData.attachments.length > 0) return resData;
 
-        const doc = await buildAgentDocumentAttachment(aiStudioKey, resData.reply || '', agentAction, sanitizedMessage);
+        const doc = await buildAgentDocumentAttachment(
+            aiStudioKey,
+            resData.reply || '',
+            agentAction,
+            sanitizedMessage,
+            fullSessionTranscript
+        );
+
+        // Jika dokumen adalah draf kasar lokal (karena DevRAB offline/antre), tambahkan catatan transparan jika belum ada di teks
+        if (doc && doc.name && doc.name.includes('Kasar')) {
+            const warningNote = '\n\n*(Catatan: Server DevRAB Cloud Engine sedang mengalami antrean teknis, sehingga Zannah lampirkan draf estimasi kasar lokal terlebih dahulu. Kakak bisa meminta Zannah "Coba generate ulang ke DevRAB" kapan saja untuk mendapatkan proposal interaktif resminya.)*';
+            if (!resData.reply?.includes('antrean teknis') && !resData.reply?.includes('DevRAB')) {
+                resData.reply = (resData.reply || '') + warningNote;
+            }
+        }
+
         return { ...resData, attachments: [doc] };
     };
+
+    // Pre-warming silent ping ke DevRAB Engine saat topik proyek/estimasi/budget disentuh
+    if (
+        agentAction === 'estimate' ||
+        /\b(rab|estimasi|biaya|budget|proyek|project|proposal|harga|bikin web|buat aplikasi)\b/i.test(sanitizedMessage)
+    ) {
+        pingDevRABEngine().catch(() => {});
+    }
 
     const rawDetectedIntent: AgentIntentAction | null =
         agentEligiblePersona && !agentTriggeredByUser
