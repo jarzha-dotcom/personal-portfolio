@@ -5,6 +5,11 @@ import {
     getAntigravityDailyStatus,
     consumeAntigravityDailyQuota,
     ANTIGRAVITY_DAILY_CAP,
+    checkDevRABRateLimit,
+    getDevRABDailyStatus,
+    consumeDevRABDailyQuota,
+    DEVRAB_RATE_LIMIT_PER_HOUR,
+    DEVRAB_DAILY_CAP,
 } from '../lib/rateLimiter';
 
 describe('rateLimiter', () => {
@@ -46,5 +51,29 @@ describe('rateLimiter', () => {
         consumeAntigravityDailyQuota();
         const afterStatus = getAntigravityDailyStatus();
         expect(afterStatus.remaining).toBe(status.remaining - 1);
+    });
+
+    it('tracks DevRAB rate limit per IP and daily quota consumption', () => {
+        const ip = `devrab-ip-${Date.now()}`;
+        const first = checkDevRABRateLimit(ip);
+        expect(first.allowed).toBe(true);
+        expect(first.remaining).toBe(DEVRAB_RATE_LIMIT_PER_HOUR - 1);
+
+        for (let i = 1; i < DEVRAB_RATE_LIMIT_PER_HOUR; i++) {
+            const res = checkDevRABRateLimit(ip);
+            expect(res.allowed).toBe(true);
+        }
+
+        const exceeded = checkDevRABRateLimit(ip);
+        expect(exceeded.allowed).toBe(false);
+        expect(exceeded.remaining).toBe(0);
+
+        const dailyStatus = getDevRABDailyStatus();
+        expect(dailyStatus.allowed).toBe(true);
+        expect(dailyStatus.remaining).toBeLessThanOrEqual(DEVRAB_DAILY_CAP);
+
+        consumeDevRABDailyQuota();
+        const afterDaily = getDevRABDailyStatus();
+        expect(afterDaily.remaining).toBe(dailyStatus.remaining - 1);
     });
 });

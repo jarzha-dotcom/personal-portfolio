@@ -1,4 +1,9 @@
 import { callDevRABEngine, renderDevRABProposalHtml } from './devrabClient.js';
+import {
+    checkDevRABRateLimit,
+    getDevRABDailyStatus,
+    consumeDevRABDailyQuota,
+} from './rateLimiter.js';
 
 export interface Attachment {
     name: string;
@@ -26,6 +31,19 @@ export interface RabDocumentData {
      * Diekstrak dari transkrip percakapan (lihat prompt di buildAgentDocumentAttachment). */
     clientName?: string;
     clientEmail?: string;
+    /**
+     * Jenis proyek yang diekstrak dari checklist poin #1.
+     * Valid values yang diterima DevRAB: 'web_app' | 'mobile_app' | 'web_mobile' |
+     * 'landing_page' | 'internal_system' | 'game' | 'ai_chatbot' | 'other'.
+     * Default fallback: 'web_app'.
+     */
+    projectType?: string;
+    /**
+     * Preferensi budget yang diekstrak dari checklist poin #5.
+     * Valid values yang diterima DevRAB: 'mvp' | 'standard' | 'enterprise'.
+     * Default fallback: 'standard'.
+     */
+    budgetPreference?: string;
 }
 
 const CLIENT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -268,26 +286,29 @@ export async function buildAgentDocumentAttachment(
     replyText: string,
     action: 'estimate' | 'research',
     userMessage?: string,
-    fullTranscript?: string
+    fullTranscript?: string,
+    clientIp?: string
 ): Promise<Attachment> {
     const dateSlug = new Date().toISOString().slice(0, 10);
 
     if (action === 'estimate') {
-        // Gabungkan seluruh konteks transkrip sesi dari awal agar tidak ada fitur/spesifikasi yang hilang akibat 12 slice
+        // Gabungkan seluruh konteks transkrip sesi dari awal agar tidak ada fitur/spesifikasi/checklist yang hilang akibat 12 slice
         const transcriptSection = fullTranscript && fullTranscript.trim()
-            ? `--- RANGKUMAN DISKUSI LENGKAP DARI AWAL SESI ---\n${fullTranscript.slice(0, 6000)}\n\n`
+            ? `--- RANGKUMAN DISKUSI LENGKAP DARI AWAL HINGGA AKHIR SESI ---\n${fullTranscript.slice(0, 30000)}\n\n`
             : '';
 
         const prompt = `Ekstrak rincian kebutuhan proyek dan RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur.
 Gunakan informasi dari rangkuman diskusi lengkap dan jawaban asisten untuk mengidentifikasi nama proyek, fitur-fitur utama, dan estimasi waktu/biaya secara akurat.
 Cari juga NAMA LENGKAP dan EMAIL AKTIF milik klien/user (BUKAN nama/email Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
+Tentukan JENIS PROYEK (projectType) berdasarkan checklist poin #1 Platform/Jenis Aplikasi yang dibahas. Pilih salah satu: 'web_app' | 'mobile_app' | 'web_mobile' | 'landing_page' | 'internal_system' | 'game' | 'ai_chatbot' | 'other'. Panduan: web app/sistem/dashboard → 'web_app', mobile/Android/iOS → 'mobile_app', keduanya → 'web_mobile', halaman promo/company profile → 'landing_page', sistem internal kantor → 'internal_system', game → 'game', chatbot AI → 'ai_chatbot'. Default 'web_app' kalau tidak jelas.
+Tentukan PREFERENSI BUDGET (budgetPreference) berdasarkan checklist poin #5 yang dibahas. Pilih salah satu: 'mvp' | 'standard' | 'enterprise'. Panduan: MVP/hemat/murah/minimalis → 'mvp', standar/profesional/normal → 'standard', custom/enterprise/besar/komplex → 'enterprise'. Default 'standard' kalau tidak jelas.
 Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
-{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>"}
+{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>", "projectType": "<salah satu nilai valid di atas>", "budgetPreference": "<mvp|standard|enterprise>"}
 
 Kalau teks di bawah belum menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan fitur-fitur yang dibahas & sebutkan itu di "notes".
 
 ${transcriptSection}--- TEKS KESIMPULAN RAB ASISTEN ---
-${replyText.slice(0, 6000)}
+${replyText.slice(0, 10000)}
 --- SELESAI ---`;
 
         const doc = await extractStructuredDocument<RabDocumentData>(apiKey, prompt);
@@ -306,41 +327,72 @@ ${replyText.slice(0, 6000)}
             };
         }
 
-        // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
-        try {
-            const projectTitle = doc?.projectName || 'Pengembangan Aplikasi Web / Mobile';
-            const features = doc && Array.isArray(doc.features) && doc.features.length > 0
-                ? doc.features.map((f) => `${f.name}: ${f.description || ''}`.trim())
-                : [userMessage || 'Sistem aplikasi terintegrasi'];
+        // ── DevRAB rate limit check (per-IP + global daily cap) ──────────────────
+        // Melindungi DevRAB Engine dari lonjakan kuota dan abuse
+        const devrabDailyStatus = getDevRABDailyStatus();
+        let shouldCallDevRab = true;
 
-            const devrabResult = await callDevRABEngine({
-                clientName: doc?.clientName?.trim() || 'Calon Klien Portofolio',
-                projectType: 'web_app',
-                projectTitle,
-                projectDescription: doc?.notes || userMessage || replyText.slice(0, 300),
-                features,
-                estimatedTimeline: doc?.totalDuration || '4-6 minggu',
-                budgetPreference: 'standard',
-                // Checklist sudah dipastikan lengkap di atas (hasCompleteClientChecklist),
-                // jadi doc.clientName/clientEmail di titik ini sudah pasti valid & terisi.
-                clientInfo: {
-                    name: doc?.clientName?.trim(),
-                    email: doc?.clientEmail?.trim(),
-                },
-            });
-
-            if (devrabResult && devrabResult.proposalId && devrabResult.previewUrl) {
-                return {
-                    name: `RAB-${devrabResult.proposalId}.html`,
-                    mimeType: 'text/html;charset=utf-8',
-                    base64: Buffer.from(renderDevRABProposalHtml(devrabResult), 'utf-8').toString('base64'),
-                    previewUrl: devrabResult.previewUrl,
-                    pdfUrl: devrabResult.pdfDownloadUrl,
-                    proposalId: devrabResult.proposalId,
-                };
+        if (!devrabDailyStatus.allowed) {
+            console.warn('[documentGenerator] DevRAB daily cap tercapai, fallback ke draf kasar lokal.');
+            shouldCallDevRab = false;
+        } else if (clientIp) {
+            const devrabIpStatus = checkDevRABRateLimit(clientIp);
+            if (!devrabIpStatus.allowed) {
+                console.warn(`[documentGenerator] DevRAB IP rate limit tercapai untuk IP: ${clientIp}, fallback ke draf kasar lokal.`);
+                shouldCallDevRab = false;
             }
-        } catch (err) {
-            console.warn('[documentGenerator] DevRAB call error, falling back to local HTML:', err);
+        }
+
+        if (shouldCallDevRab) {
+            // Normalisasi projectType & budgetPreference ke nilai yang dikenali DevRAB Engine
+            const VALID_PROJECT_TYPES = ['web_app', 'mobile_app', 'web_mobile', 'landing_page', 'internal_system', 'game', 'ai_chatbot', 'other'];
+            const VALID_BUDGET_PREFS = ['mvp', 'standard', 'enterprise'];
+
+            const projectType = VALID_PROJECT_TYPES.includes(doc?.projectType || '')
+                ? doc!.projectType!
+                : 'web_app';
+
+            const budgetPreference = VALID_BUDGET_PREFS.includes(doc?.budgetPreference || '')
+                ? doc!.budgetPreference!
+                : 'standard';
+
+            // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
+            try {
+                const projectTitle = doc?.projectName || 'Pengembangan Aplikasi Web / Mobile';
+                const features = doc && Array.isArray(doc.features) && doc.features.length > 0
+                    ? doc.features.map((f) => `${f.name}: ${f.description || ''}`.trim())
+                    : [userMessage || 'Sistem aplikasi terintegrasi'];
+
+                const devrabResult = await callDevRABEngine({
+                    clientName: doc?.clientName?.trim() || 'Calon Klien Portofolio',
+                    projectType,
+                    projectTitle,
+                    projectDescription: doc?.notes || userMessage || replyText.slice(0, 300),
+                    features,
+                    estimatedTimeline: doc?.totalDuration || '4-6 minggu',
+                    budgetPreference,
+                    // Checklist sudah dipastikan lengkap di atas (hasCompleteClientChecklist),
+                    // jadi doc.clientName/clientEmail di titik ini sudah pasti valid & terisi.
+                    clientInfo: {
+                        name: doc?.clientName?.trim(),
+                        email: doc?.clientEmail?.trim(),
+                    },
+                });
+
+                if (devrabResult && devrabResult.proposalId && devrabResult.previewUrl) {
+                    consumeDevRABDailyQuota();
+                    return {
+                        name: `RAB-${devrabResult.proposalId}.html`,
+                        mimeType: 'text/html;charset=utf-8',
+                        base64: Buffer.from(renderDevRABProposalHtml(devrabResult), 'utf-8').toString('base64'),
+                        previewUrl: devrabResult.previewUrl,
+                        pdfUrl: devrabResult.pdfDownloadUrl,
+                        proposalId: devrabResult.proposalId,
+                    };
+                }
+            } catch (err) {
+                console.warn('[documentGenerator] DevRAB call error, falling back to local HTML:', err);
+            }
         }
 
         // Fallback: Generate Draf Kasar Lokal dengan banner peringatan transparan

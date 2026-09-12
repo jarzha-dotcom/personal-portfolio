@@ -181,7 +181,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             if (!isSummaryRequested || !resData) return resData;
             const existingAtts = resData.attachments || [];
             if (existingAtts.length === 0) {
-                const summaryAtt = generateSummaryAttachment(sanitizedHistory, sanitizedMessage, resData.reply || '', botName);
+                // Gunakan seluruh riwayat sesi dari awal jika ada, bukan hanya 12 slice
+                const fullHistoryForSummary = (history && history.length > 0) ? history : sanitizedHistory;
+                const summaryAtt = generateSummaryAttachment(fullHistoryForSummary, sanitizedMessage, resData.reply || '', botName);
                 return { ...resData, attachments: [summaryAtt] };
             }
             return resData;
@@ -192,7 +194,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const wantsAgent = agentEligiblePersona && agentTriggeredByUser;
         const isAntigravityTarget = wantsAgent && (!requestedModel || requestedModel === ANTIGRAVITY_MODEL);
 
-        // Susun riwayat lengkap percakapan dari awal agar kebutuhan/fitur proyek tidak terputus akibat 12 slice
+        // ── fullSessionTranscript: riwayat lengkap dari awal hingga akhir ──
+        // Sengaja disusun dari `history` RAW (sebelum dipotong 12 slice untuk memori chat model),
+        // agar ekstraksi kebutuhan RAB & DevRAB Engine dapat membaca seluruh transkrip percakapan
+        // dari awal sampai akhir: checklist nama/email klien, platform aplikasi, timeline, dan budget.
         const fullSessionTranscript = (history || [])
             .map((h) => {
                 const sender = h.role === 'user' ? 'Klien' : botName;
@@ -213,7 +218,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 resData.reply || '',
                 agentAction,
                 sanitizedMessage,
-                fullSessionTranscript
+                fullSessionTranscript,
+                ip
             );
 
             // Jika dokumen adalah draf kasar lokal (karena DevRAB offline/antre), tambahkan catatan transparan jika belum ada di teks

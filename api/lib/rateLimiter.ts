@@ -61,3 +61,54 @@ export function getAntigravityDailyStatus(): { allowed: boolean; remaining: numb
 export function consumeAntigravityDailyQuota(): void {
     antigravityDayCount += 1;
 }
+
+// ── Rate limit & Cap harian khusus DevRAB Engine ──────────────────────────────
+// DevRAB adalah infra terpisah (bukan Google) yang bisa punya cost nyata per-hit,
+// jadi perlu double-layer protection:
+//   1. Per-IP per-jam: mencegah 1 user spam tombol Generate RAB berulang-ulang
+//      (hanya 3 generate/jam/IP cukup karena 1 RAB biasanya sudah final/hampir final)
+//   2. Global daily cap: lindungi total budget/kuota DevRAB dari lonjakan trafik
+//      showcase ramai (seluruh visitor berbagi 1 pool)
+
+const devrabRateLimitMap = new Map<string, RateLimitRecord>();
+export const DEVRAB_RATE_LIMIT_PER_HOUR = 3;   // max 3 generate per IP per jam
+export const DEVRAB_RATE_WINDOW = 60 * 60 * 1000; // 1 jam
+export const DEVRAB_DAILY_CAP = 20; // max 20 generate/hari global (konservatif, bisa dinaikan)
+
+let devrabDayKey = '';
+let devrabDayCount = 0;
+
+export function checkDevRABRateLimit(ip: string): { allowed: boolean; remaining: number } {
+    const key = `devrab:${ip}`;
+    const now = Date.now();
+    const record = devrabRateLimitMap.get(key);
+
+    if (!record || now > record.resetAt) {
+        devrabRateLimitMap.set(key, { count: 1, resetAt: now + DEVRAB_RATE_WINDOW });
+        return { allowed: true, remaining: DEVRAB_RATE_LIMIT_PER_HOUR - 1 };
+    }
+
+    if (record.count >= DEVRAB_RATE_LIMIT_PER_HOUR) {
+        return { allowed: false, remaining: 0 };
+    }
+
+    record.count += 1;
+    return { allowed: true, remaining: DEVRAB_RATE_LIMIT_PER_HOUR - record.count };
+}
+
+export function getDevRABDailyStatus(): { allowed: boolean; remaining: number } {
+    const todayKey = new Date().toISOString().slice(0, 10); // YYYY-MM-DD (UTC)
+    if (todayKey !== devrabDayKey) {
+        devrabDayKey = todayKey;
+        devrabDayCount = 0;
+    }
+    return {
+        allowed: devrabDayCount < DEVRAB_DAILY_CAP,
+        remaining: Math.max(0, DEVRAB_DAILY_CAP - devrabDayCount),
+    };
+}
+
+/** Dipanggil HANYA setelah DevRAB beneran sukses dipanggil (bukan pas gagal). */
+export function consumeDevRABDailyQuota(): void {
+    devrabDayCount += 1;
+}
