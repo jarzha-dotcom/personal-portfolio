@@ -131,6 +131,18 @@ const buildWelcomeMessage = (): Message => ({
   isAI: true,
 });
 
+/**
+ * `encodeURIComponent` bawaan JS SENGAJA tidak meng-encode karakter
+ * `( ) ! ~ * '` (itu bagian dari "unreserved characters" di RFC 3986).
+ * Masalahnya, tanda kurung `)` mentah di dalam query string bikin parser
+ * markdown link kita (`formatInlineText`/`waMatch` di bawah) salah kira itu
+ * penutup `(...)` link, sehingga URL terpotong & sisa teks encoded nongol
+ * mentah di chat (bug yang bikin teks "...langkah%20selanjutnya!)" leak
+ * keluar dari tombol WhatsApp). Makanya kita escape manual kurungnya di sini.
+ */
+const encodeUriComponentSafe = (str: string): string =>
+  encodeURIComponent(str).replace(/\(/g, '%28').replace(/\)/g, '%29');
+
 const generateMessageId = (prefix = 'msg'): string => {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return `${prefix}-${crypto.randomUUID()}`;
@@ -615,7 +627,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const context = lastQueryRef.current
       ? `Halo Arzha, saya ingin tanya soal: ${lastQueryRef.current}`
       : 'Halo Arzha, saya tertarik dengan jasa development kamu.';
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(context)}`, '_blank');
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(context)}`, '_blank');
   }, [cleanPhone]);
 
   // ── Bot reply helpers ──────────────────────────────────────────────────────
@@ -1177,7 +1189,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   const formatInlineText = (str: string): React.ReactNode[] => {
     const tokens: React.ReactNode[] = [];
-    const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g;
+    // Catatan: dulu pola URL-nya `[^\s)]+`, yang berhenti di tanda kurung
+    // tutup PERTAMA yang ditemui. Karena `encodeURIComponent` tidak meng-encode
+    // `(`/`)`, sebuah query text yang kebetulan mengandung `)` (mis. hasil
+    // generate teks AI) bisa memotong URL di tengah & meninggalkan sisanya
+    // sebagai teks mentah di chat. Sekarang kita ambil sampai `)` TERAKHIR
+    // sebelum spasi/akhir string, baru mundur cari `)` penutup link.
+    const linkRegex = /\[([^\]]+)\]\((https?:\/\/\S+?)\)(?=\s|$)/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
@@ -1259,7 +1277,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           }
 
           // Deteksi link WhatsApp khusus untuk diubah jadi CTA Button interaktif
-          const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/[^\s)]+)\)/);
+          const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/\S+?)\)(?=\s|$)/);
           if (waMatch) {
             const [fullMatch, label, url] = waMatch;
             const before = line.substring(0, line.indexOf(fullMatch));
@@ -1697,47 +1715,47 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 {att.name}
                               </button>
 
-                                {att.name.includes('Kasar') && (
-                                  <button
-                                    type="button"
-                                    onClick={() => runAgentAction('estimate', 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.', undefined, '🔄 Coba Hubungkan ke DevRAB')}
-                                    className={`inline-flex items-center gap-1.5 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
-                                      ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
-                                      : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
-                                      }`}
-                                    title="Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi"
-                                  >
-                                    <RotateCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                    Coba Hubungkan Ulang ke DevRAB
-                                  </button>
-                                )}
+                              {att.name.includes('Kasar') && (
+                                <button
+                                  type="button"
+                                  onClick={() => runAgentAction('estimate', 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.', undefined, '🔄 Coba Hubungkan ke DevRAB')}
+                                  className={`inline-flex items-center gap-1.5 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
+                                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
+                                    : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
+                                    }`}
+                                  title="Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi"
+                                >
+                                  <RotateCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                                  Coba Hubungkan Ulang ke DevRAB
+                                </button>
+                              )}
 
-                                {att.previewUrl && (
-                                  <a
-                                    href={att.previewUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
-                                  >
-                                    <ExternalLink className="w-3 h-3" />
-                                    Portal &amp; Pembayaran
-                                  </a>
-                                )}
+                              {att.previewUrl && (
+                                <a
+                                  href={att.previewUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
+                                >
+                                  <ExternalLink className="w-3 h-3" />
+                                  Portal &amp; Pembayaran
+                                </a>
+                              )}
 
-                                {att.pdfUrl && (
-                                  <a
-                                    href={att.pdfUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
-                                      ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
-                                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                                      }`}
-                                  >
-                                    <FileText className="w-3 h-3 text-indigo-500" />
-                                    PDF Resmi
-                                  </a>
-                                )}
+                              {att.pdfUrl && (
+                                <a
+                                  href={att.pdfUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
+                                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
+                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                                    }`}
+                                >
+                                  <FileText className="w-3 h-3 text-indigo-500" />
+                                  PDF Resmi
+                                </a>
+                              )}
                             </div>
                           ))}
                         </div>

@@ -22,6 +22,32 @@ export interface RabDocumentData {
     totalCost: number;
     totalDuration: string;
     notes?: string;
+    /** Nama & email klien — WAJIB terisi sebelum RAB resmi boleh diproses.
+     * Diekstrak dari transkrip percakapan (lihat prompt di buildAgentDocumentAttachment). */
+    clientName?: string;
+    clientEmail?: string;
+}
+
+const CLIENT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Validasi checklist Nama & Email di level KODE, bukan cuma dipercayakan ke
+ * kepatuhan system prompt LLM. Ini benteng terakhir: walau Zannah "kelewatan"
+ * atau dibujuk user untuk langsung generate RAB tanpa nama/email lengkap,
+ * fungsi ini yang menentukan apakah dokumen RAB resmi boleh benar-benar keluar.
+ */
+export function hasCompleteClientChecklist(doc: RabDocumentData | null): boolean {
+    if (!doc) return false;
+    const nameOk = typeof doc.clientName === 'string' && doc.clientName.trim().length >= 2;
+    const emailOk = typeof doc.clientEmail === 'string' && CLIENT_EMAIL_PATTERN.test(doc.clientEmail.trim());
+    return nameOk && emailOk;
+}
+
+export function getMissingChecklistFields(doc: RabDocumentData | null): string[] {
+    const missing: string[] = [];
+    if (!doc || typeof doc.clientName !== 'string' || doc.clientName.trim().length < 2) missing.push('Nama Lengkap');
+    if (!doc || typeof doc.clientEmail !== 'string' || !CLIENT_EMAIL_PATTERN.test(doc.clientEmail.trim())) missing.push('Email Aktif');
+    return missing;
 }
 
 export interface ResearchFinding {
@@ -107,6 +133,7 @@ export function renderRabHtml(doc: RabDocumentData, isFallback = false): string 
 <body>
   <h1>📊 Rencana Anggaran Biaya (RAB)${isFallback ? ' &mdash; Draf Kasar' : ''}</h1>
   <div class="subtitle">Proyek: ${escapeHtml(doc.projectName)} &middot; Dibuat: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+  ${doc.clientName ? `<div class="subtitle">Untuk: ${escapeHtml(doc.clientName)}${doc.clientEmail ? ` &middot; ${escapeHtml(doc.clientEmail)}` : ''}</div>` : ''}
 
   ${fallbackBanner}
 
@@ -185,6 +212,23 @@ export function renderPlainFallbackHtml(title: string, rawText: string, isFallba
 </body></html>`;
 }
 
+export function renderChecklistIncompleteHtml(missing: string[]): string {
+    const missingList = missing.map((m) => `<li>${escapeHtml(m)}</li>`).join('');
+    return `<!DOCTYPE html>
+<html lang="id"><head><meta charset="UTF-8"><title>RAB Belum Bisa Diproses</title>
+<style>${DOCUMENT_HTML_STYLE}</style></head>
+<body>
+  <h1>⏳ RAB Belum Bisa Diproses</h1>
+  <div class="subtitle">Dibuat: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+  <div class="notes">
+    <strong>Checklist berikut masih perlu dilengkapi dulu sebelum RAB resmi bisa disusun:</strong>
+    <ul>${missingList}</ul>
+    <p style="margin-top:10px;">Silakan lengkapi data ini di chat bareng Zannah, lalu minta lagi untuk digenerate ulang ya.</p>
+  </div>
+  ${documentFooterHtml()}
+</body></html>`;
+}
+
 export async function extractStructuredDocument<T>(
     apiKey: string,
     extractionPrompt: string
@@ -236,8 +280,9 @@ export async function buildAgentDocumentAttachment(
 
         const prompt = `Ekstrak rincian kebutuhan proyek dan RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur.
 Gunakan informasi dari rangkuman diskusi lengkap dan jawaban asisten untuk mengidentifikasi nama proyek, fitur-fitur utama, dan estimasi waktu/biaya secara akurat.
+Cari juga NAMA LENGKAP dan EMAIL AKTIF milik klien/user (BUKAN nama/email Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
 Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
-{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>"}
+{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>"}
 
 Kalau teks di bawah belum menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan fitur-fitur yang dibahas & sebutkan itu di "notes".
 
@@ -247,6 +292,20 @@ ${replyText.slice(0, 6000)}
 
         const doc = await extractStructuredDocument<RabDocumentData>(apiKey, prompt);
 
+        // ── Gerbang checklist WAJIB (hard guard di kode, bukan cuma prompt) ──
+        // Kalau nama/email klien belum lengkap/valid, JANGAN PERNAH lanjut ke
+        // DevRAB Engine ataupun bikin draf RAB apa pun — walau fitur & budget
+        // sudah lengkap. Balikin dokumen "checklist belum lengkap" saja.
+        if (!hasCompleteClientChecklist(doc)) {
+            const missing = getMissingChecklistFields(doc);
+            console.warn('[documentGenerator] RAB ditahan, checklist belum lengkap:', missing);
+            return {
+                name: `RAB-Checklist-Belum-Lengkap-${dateSlug}.html`,
+                mimeType: 'text/html;charset=utf-8',
+                base64: Buffer.from(renderChecklistIncompleteHtml(missing), 'utf-8').toString('base64'),
+            };
+        }
+
         // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
         try {
             const projectTitle = doc?.projectName || 'Pengembangan Aplikasi Web / Mobile';
@@ -255,13 +314,19 @@ ${replyText.slice(0, 6000)}
                 : [userMessage || 'Sistem aplikasi terintegrasi'];
 
             const devrabResult = await callDevRABEngine({
-                clientName: 'Calon Klien Portofolio',
+                clientName: doc?.clientName?.trim() || 'Calon Klien Portofolio',
                 projectType: 'web_app',
                 projectTitle,
                 projectDescription: doc?.notes || userMessage || replyText.slice(0, 300),
                 features,
                 estimatedTimeline: doc?.totalDuration || '4-6 minggu',
                 budgetPreference: 'standard',
+                // Checklist sudah dipastikan lengkap di atas (hasCompleteClientChecklist),
+                // jadi doc.clientName/clientEmail di titik ini sudah pasti valid & terisi.
+                clientInfo: {
+                    name: doc?.clientName?.trim(),
+                    email: doc?.clientEmail?.trim(),
+                },
             });
 
             if (devrabResult && devrabResult.proposalId && devrabResult.previewUrl) {
