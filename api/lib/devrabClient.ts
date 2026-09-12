@@ -42,7 +42,7 @@ export interface DevRABProposalResponse {
  * Dipanggil di background saat user mulai membahas proyek/estimasi.
  */
 export async function pingDevRABEngine(): Promise<void> {
-  const apiUrl = process.env.DEVRAB_API_URL || 'https://devrab.byarzhaning.online/api/v1/generate-proposal';
+  const apiUrl = process.env.DEVRAB_API_URL;
   try {
     const pingUrl = new URL(apiUrl).origin;
     const controller = new AbortController();
@@ -78,10 +78,10 @@ export async function callDevRABEngine(
     payload.projectType === 'mobile_app'
       ? ['Android', 'iOS']
       : payload.projectType === 'web_mobile'
-      ? ['Web', 'Android', 'iOS']
-      : payload.projectType === 'game'
-      ? ['Web', 'Mobile']
-      : ['Web'];
+        ? ['Web', 'Android', 'iOS']
+        : payload.projectType === 'game'
+          ? ['Web', 'Mobile']
+          : ['Web'];
 
   // Normalisasi payload untuk keamanan skema
   const cleanPayload: DevRABProposalRequest = {
