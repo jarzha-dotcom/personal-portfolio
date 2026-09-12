@@ -31,6 +31,8 @@ export interface RabDocumentData {
      * Diekstrak dari transkrip percakapan (lihat prompt di buildAgentDocumentAttachment). */
     clientName?: string;
     clientEmail?: string;
+    /** Nomor WhatsApp / Telepon klien (opsional, jika disebutkan di chat). */
+    clientPhone?: string;
     /**
      * Jenis proyek yang diekstrak dari checklist poin #1.
      * Valid values yang diterima DevRAB: 'web_app' | 'mobile_app' | 'web_mobile' |
@@ -299,11 +301,11 @@ export async function buildAgentDocumentAttachment(
 
         const prompt = `Ekstrak rincian kebutuhan proyek dan RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur.
 Gunakan informasi dari rangkuman diskusi lengkap dan jawaban asisten untuk mengidentifikasi nama proyek, fitur-fitur utama, dan estimasi waktu/biaya secara akurat.
-Cari juga NAMA LENGKAP dan EMAIL AKTIF milik klien/user (BUKAN nama/email Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
+Cari juga NAMA LENGKAP, EMAIL AKTIF, dan NOMOR WHATSAPP/TELEPON milik klien/user (BUKAN nama/email/nomor Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
 Tentukan JENIS PROYEK (projectType) berdasarkan checklist poin #1 Platform/Jenis Aplikasi yang dibahas. Pilih salah satu: 'web_app' | 'mobile_app' | 'web_mobile' | 'landing_page' | 'internal_system' | 'game' | 'ai_chatbot' | 'other'. Panduan: web app/sistem/dashboard → 'web_app', mobile/Android/iOS → 'mobile_app', keduanya → 'web_mobile', halaman promo/company profile → 'landing_page', sistem internal kantor → 'internal_system', game → 'game', chatbot AI → 'ai_chatbot'. Default 'web_app' kalau tidak jelas.
 Tentukan PREFERENSI BUDGET (budgetPreference) berdasarkan checklist poin #5 yang dibahas. Pilih salah satu: 'mvp' | 'standard' | 'enterprise'. Panduan: MVP/hemat/murah/minimalis → 'mvp', standar/profesional/normal → 'standard', custom/enterprise/besar/komplex → 'enterprise'. Default 'standard' kalau tidak jelas.
 Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
-{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>", "projectType": "<salah satu nilai valid di atas>", "budgetPreference": "<mvp|standard|enterprise>"}
+{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>", "clientPhone": "<nomor WhatsApp/telepon klien, atau string kosong kalau tidak ditemukan>", "projectType": "<salah satu nilai valid di atas>", "budgetPreference": "<mvp|standard|enterprise>"}
 
 Kalau teks di bawah belum menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan fitur-fitur yang dibahas & sebutkan itu di "notes".
 
@@ -356,6 +358,15 @@ ${replyText.slice(0, 10000)}
                 ? doc!.budgetPreference!
                 : 'standard';
 
+            const targetPlatform =
+                projectType === 'mobile_app'
+                    ? ['Android', 'iOS']
+                    : projectType === 'web_mobile'
+                    ? ['Web', 'Android', 'iOS']
+                    : projectType === 'game'
+                    ? ['Web', 'Mobile']
+                    : ['Web'];
+
             // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
             try {
                 const projectTitle = doc?.projectName || 'Pengembangan Aplikasi Web / Mobile';
@@ -369,6 +380,7 @@ ${replyText.slice(0, 10000)}
                     projectTitle,
                     projectDescription: doc?.notes || userMessage || replyText.slice(0, 300),
                     features,
+                    targetPlatform,
                     estimatedTimeline: doc?.totalDuration || '4-6 minggu',
                     budgetPreference,
                     // Checklist sudah dipastikan lengkap di atas (hasCompleteClientChecklist),
@@ -376,6 +388,7 @@ ${replyText.slice(0, 10000)}
                     clientInfo: {
                         name: doc?.clientName?.trim(),
                         email: doc?.clientEmail?.trim(),
+                        phone: doc?.clientPhone?.trim() || undefined,
                     },
                 });
 

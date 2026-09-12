@@ -66,6 +66,23 @@ export async function callDevRABEngine(
   const apiUrl = process.env.DEVRAB_API_URL;
   const apiKey = process.env.DEVRAB_API_KEY;
 
+  // Fast-fail: jika URL atau API Key DevRAB belum disetel di environment,
+  // langsung kembalikan null agar sistem fallback ke draf lokal tanpa delay/exception.
+  if (!apiUrl || !apiKey) {
+    console.warn('[devrabClient] DEVRAB_API_URL atau DEVRAB_API_KEY belum dikonfigurasi, beralih ke draf lokal.');
+    return null;
+  }
+
+  // Tentukan targetPlatform otomatis berdasarkan projectType jika belum diberikan secara eksplisit
+  const defaultPlatforms =
+    payload.projectType === 'mobile_app'
+      ? ['Android', 'iOS']
+      : payload.projectType === 'web_mobile'
+      ? ['Web', 'Android', 'iOS']
+      : payload.projectType === 'game'
+      ? ['Web', 'Mobile']
+      : ['Web'];
+
   // Normalisasi payload untuk keamanan skema
   const cleanPayload: DevRABProposalRequest = {
     clientName: payload.clientName || 'Calon Klien Portofolio',
@@ -75,7 +92,9 @@ export async function callDevRABEngine(
     features: Array.isArray(payload.features) && payload.features.length > 0
       ? payload.features
       : ['Sistem aplikasi terintegrasi'],
-    targetPlatform: payload.targetPlatform || ['Web'],
+    targetPlatform: (Array.isArray(payload.targetPlatform) && payload.targetPlatform.length > 0)
+      ? payload.targetPlatform
+      : defaultPlatforms,
     estimatedTimeline: payload.estimatedTimeline || '4-6 minggu',
     budgetPreference: payload.budgetPreference || 'standard',
     clientInfo: payload.clientInfo,
@@ -106,11 +125,12 @@ export async function callDevRABEngine(
 
       if (!res.ok) {
         console.warn(`[devrabClient][attempt ${attempt + 1}] HTTP ${res.status} dari DevRAB: ${res.statusText}`);
-        if (res.status >= 500 && attempt < maxRetries) {
-          continue; // Retry on 5xx server errors
+        // 5xx (server error) atau 429 (rate limit) layak di-retry jika masih ada sisa percobaan
+        if ((res.status >= 500 || res.status === 429) && attempt < maxRetries) {
+          continue;
         }
-        if (attempt === maxRetries) return null;
-        continue;
+        // 4xx lainnya (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404) pasti gagal permanen -> fail fast
+        return null;
       }
 
       const data = (await res.json()) as DevRABProposalResponse;
