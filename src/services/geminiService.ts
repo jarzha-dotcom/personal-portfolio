@@ -132,7 +132,13 @@ export async function sendMessageToGemini(
     persona?: BotPersona,
     agentMode?: boolean,
     files?: OutgoingFile[],
-    agentAction?: AgentIntentAction
+    agentAction?: AgentIntentAction,
+    // Riwayat percakapan LENGKAP tidak dipotong, terpisah dari `history` yang
+    // sengaja dibatasi ke 12 entri terakhir untuk memori chat model. Backend
+    // pakai ini khusus untuk ekstraksi checklist RAB (lihat rawFullHistory di
+    // chat.ts). Ditaruh sebagai parameter TERAKHIR (bukan disisipkan di
+    // tengah) supaya pemanggil lama yang belum diupdate tetap kompatibel.
+    fullTranscript?: ChatMessage[]
 ): Promise<GeminiResponse> {
     const response = await fetch('/api/chat', {
         method: 'POST',
@@ -148,6 +154,7 @@ export async function sendMessageToGemini(
             // backend tau pasti kapan perlu generate dokumen RAB/riset
             // deterministik (lihat buildAgentDocumentAttachment di chat.ts).
             ...(agentMode && agentAction ? { agentAction } : {}),
+            ...(fullTranscript && fullTranscript.length > 0 ? { fullTranscript } : {}),
         }),
     });
 
@@ -175,7 +182,8 @@ export async function streamMessageFromGemini(
     persona?: BotPersona,
     agentMode?: boolean,
     files?: OutgoingFile[],
-    agentAction?: AgentIntentAction
+    agentAction?: AgentIntentAction,
+    fullTranscript?: ChatMessage[]
 ): Promise<GeminiResponse> {
     const response = await fetch('/api/chat', {
         method: 'POST',
@@ -189,6 +197,7 @@ export async function streamMessageFromGemini(
             ...(agentMode ? { agentMode: true } : {}),
             ...(files && files.length > 0 ? { files } : {}),
             ...(agentMode && agentAction ? { agentAction } : {}),
+            ...(fullTranscript && fullTranscript.length > 0 ? { fullTranscript } : {}),
         }),
     });
 

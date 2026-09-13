@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { About } from './components/About';
@@ -11,6 +11,8 @@ import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
 import { ShowcaseBanner } from './components/ShowcaseBanner';
 import { PWAManager } from './components/PWAManager';
+import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
+import { ZannahWelcomeNudge } from './components/ZannahWelcomeNudge';
 import { ArrowUp } from 'lucide-react';
 import {
   NavigationHistoryProvider,
@@ -19,11 +21,16 @@ import {
 } from './context/NavigationHistoryContext';
 import { ExitConfirmModal } from './components/ExitConfirmModal';
 
-// Lazy-loaded: keduanya tidak perlu masuk bundle awal. ChatWidget baru
-// benar-benar dipakai kalau tombolnya diklik, dan CVPage (berat — isinya
+// Lazy-loaded: keduanya tidak perlu masuk bundle awal. CVPage (berat — isinya
 // 9 komponen: NavbarCV, HeroCV, AboutCV, Experience, SkillsCV, ContactCV,
 // FooterCV, ChatWidgetCV, CVDocumentModal) cuma dipakai kalau easter egg
 // (klik logo 5x) ditemukan — mayoritas pengunjung nggak pernah ke sana.
+//
+// ChatWidget import-nya SENGAJA tidak langsung dipicu oleh lazy() begitu
+// MainPortfolio pertama render — lihat `chatWidgetReady` di bawah. React.lazy
+// sendiri cuma menjamin code-splitting (chunk terpisah), bukan menunda kapan
+// import()-nya dipanggil; itu baru terjadi begitu komponennya benar-benar
+// dirender.
 const ChatWidget = lazy(() =>
   import('./components/ChatWidget').then((m) => ({ default: m.ChatWidget }))
 );
@@ -33,7 +40,18 @@ const CVPage = lazy(() =>
 
 function MainPortfolio() {
   const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
-  const [darkMode, setDarkMode] = useState<boolean>(() => {
+
+  // Menandai apakah tema saat ini adalah pilihan MANUAL user (lewat toggle di
+  // Navbar/CVPage) atau masih mengikuti preferensi OS. Dipakai supaya:
+  //  (a) kita tidak "mengunci" localStorage.theme di setiap render cuma
+  //      karena effect sinkronisasi class `dark` ikut jalan saat mount, dan
+  //  (b) listener live-sync ke OS di bawah tahu kapan boleh/tidak boleh
+  //      menimpa state.
+  const userSetThemeRef = useRef<boolean>(
+    typeof window !== 'undefined' && !!localStorage.getItem('theme')
+  );
+
+  const [darkMode, setDarkModeState] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme) return savedTheme === 'dark';
@@ -41,6 +59,14 @@ function MainPortfolio() {
     }
     return false;
   });
+
+  // Setter yang dipakai untuk toggle MANUAL (dari Navbar / CVPage). Berbeda
+  // dari setDarkModeState mentah karena ini juga menandai bahwa mulai
+  // sekarang preferensi OS tidak boleh menimpa pilihan user lagi.
+  const setDarkMode = useCallback((value: boolean) => {
+    userSetThemeRef.current = true;
+    setDarkModeState(value);
+  }, []);
 
   const [showBackToTop, setShowBackToTop] = useState(false);
 
@@ -62,16 +88,37 @@ function MainPortfolio() {
     return () => clearTimeout(timeout);
   }, [showUnlockToast]);
 
+  // Terapkan class `dark` di <html> setiap kali state berubah. localStorage
+  // HANYA ditulis kalau perubahan ini berasal dari pilihan manual user —
+  // kalau tidak, preferensi OS yang belum pernah di-override manual akan
+  // "terkunci" seolah-olah user sudah memilih sejak awal, dan listener
+  // live-sync di bawah jadi percuma.
   useEffect(() => {
     const root = document.documentElement;
     if (darkMode) {
       root.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
     } else {
       root.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    }
+    if (userSetThemeRef.current) {
+      localStorage.setItem('theme', darkMode ? 'dark' : 'light');
     }
   }, [darkMode]);
+
+  // Live-sync ke preferensi tema OS selama user belum pernah pilih manual.
+  // Begitu user toggle manual (userSetThemeRef.current jadi true), listener
+  // ini otomatis berhenti berefek tanpa perlu di-unsubscribe.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleOsThemeChange = (e: MediaQueryListEvent) => {
+      if (!userSetThemeRef.current) {
+        setDarkModeState(e.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handleOsThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleOsThemeChange);
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -107,6 +154,27 @@ function MainPortfolio() {
     };
   }, [cvEggUnlocked]);
 
+  // Tunda pemicu dynamic import() ChatWidget sampai browser idle (atau
+  // maksimal 3 detik, kalau browser tidak sempat idle). Tujuannya murni
+  // memprioritaskan First Contentful Paint — bukan menunda sampai user
+  // klik, karena tombol togglenya sendiri ada di dalam ChatWidget. Kalau
+  // suatu saat tombol togglenya dipindah keluar (ke App.tsx), ini bisa
+  // diganti gating penuh di balik state `isOpen`.
+  const [chatWidgetReady, setChatWidgetReady] = useState(false);
+  useEffect(() => {
+    const win = window as typeof window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (win.requestIdleCallback) {
+      const id = win.requestIdleCallback(() => setChatWidgetReady(true), { timeout: 3000 });
+      return () => win.cancelIdleCallback?.(id);
+    }
+    // Fallback untuk Safari (belum dukung requestIdleCallback)
+    const timeoutId = window.setTimeout(() => setChatWidgetReady(true), 1500);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -119,6 +187,14 @@ function MainPortfolio() {
       className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-white text-slate-900'
         }`}
     >
+      {/* Skip link untuk keyboard/screen-reader users — cuma kelihatan saat fokus */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:rounded-lg focus:bg-teal-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
+      >
+        Lewati ke konten utama
+      </a>
+
       {/* License / Showcase Evaluation Banner */}
       <ShowcaseBanner />
 
@@ -158,10 +234,20 @@ function MainPortfolio() {
       {/* Footer */}
       <Footer />
 
-      {/* Chat Widget — lazy loaded */}
-      <Suspense fallback={null}>
-        <ChatWidget darkMode={darkMode} />
-      </Suspense>
+      {/* Chat Widget — lazy loaded, ditunda sampai idle (lihat chatWidgetReady).
+          Dibungkus ErrorBoundary: kalau chunk-nya gagal di-fetch (mis. koneksi
+          mobile putus), user dapat kartu kecil dengan tombol "Coba lagi"
+          alih-alih Suspense fallback yang nyangkut diam-diam selamanya. */}
+      <ChunkErrorBoundary darkMode={darkMode} variant="corner">
+        <Suspense fallback={null}>
+          {chatWidgetReady && <ChatWidget darkMode={darkMode} />}
+        </Suspense>
+      </ChunkErrorBoundary>
+
+      {/* Sambutan satu-kali dari Zannah — bubble kecil dekat tombol chat,
+          bukan overlay coachmark yang maksa. Baru dijadwalkan muncul setelah
+          ChatWidget (dan tombol togglenya) siap. */}
+      <ZannahWelcomeNudge darkMode={darkMode} enabled={chatWidgetReady} />
 
       {/* Floating Action Button (Back to Top) */}
       <div className="fixed bottom-6 right-6 z-40 no-print">
@@ -182,22 +268,30 @@ function MainPortfolio() {
 
       {/* Easter Egg: Mode CV — full page transform, lazy loaded.
           Fallback spinner ini jarang kelihatan karena EasterEggToast
-          (di bawah) biasanya sudah menutupi jeda loading chunk-nya. */}
-      <Suspense
-        fallback={
-          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950">
-            <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-          </div>
-        }
+          (di bawah) biasanya sudah menutupi jeda loading chunk-nya. Juga
+          dibungkus ErrorBoundary (variant="center") untuk kasus chunk gagal
+          dimuat. */}
+      <ChunkErrorBoundary
+        darkMode={darkMode}
+        variant="center"
+        message="Gagal memuat Mode CV. Cek koneksi internet Kakak, lalu coba lagi."
       >
-        {cvEggUnlocked && (
-          <CVPage
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            onExit={() => setCvEggUnlocked(false)}
-          />
-        )}
-      </Suspense>
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-[70] flex items-center justify-center bg-slate-950">
+              <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+            </div>
+          }
+        >
+          {cvEggUnlocked && (
+            <CVPage
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+              onExit={() => setCvEggUnlocked(false)}
+            />
+          )}
+        </Suspense>
+      </ChunkErrorBoundary>
 
       <EasterEggToast show={showUnlockToast} />
 

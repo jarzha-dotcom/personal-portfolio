@@ -493,6 +493,17 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // begitu percakapan aktif berhasil dimuat.
   const geminiHistoryRef = useRef<ChatMessage[]>([]);
 
+  // ── fullTranscriptRef: riwayat percakapan LENGKAP, TIDAK PERNAH dipotong ──
+  // Bug lama: `geminiHistoryRef` (yang dikirim sebagai `history` ke backend)
+  // di-slice(-12) di setiap pengiriman pesan, jadi backend tidak pernah punya
+  // akses ke data lama (mis. nama/email klien yang disebut di awal obrolan)
+  // begitu percakapan lewat 6 pertukaran. `fullTranscriptRef` menyimpan SEMUA
+  // pesan sejak awal sesi dan dikirim terpisah sebagai field `fullTranscript`
+  // (lihat pemanggilan sendMessageToGemini di respondWithAI) -- dipakai
+  // backend khusus untuk ekstraksi kebutuhan RAB/checklist, BUKAN untuk memori
+  // model (yang tetap pakai geminiHistoryRef yang dibatasi demi context window).
+  const fullTranscriptRef = useRef<ChatMessage[]>([]);
+
   // ── Reset komposer (input teks + file pending) ──────────────────────────
   const resetComposer = useCallback(() => {
     setInputValue('');
@@ -517,9 +528,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         // batas yang dipakai tiap kali kirim pesan — jadi begitu percakapan
         // lama dibuka lagi, AI tetap "ingat" konteksnya, bukan mulai kosong.
         geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-12);
+        // fullTranscript TIDAK di-slice. Fallback ke geminiHistory kalau ini
+        // percakapan lama yang disimpan sebelum field fullTranscript ada.
+        fullTranscriptRef.current = conv.fullTranscript ?? conv.geminiHistory ?? [];
       } else {
         setMessages([buildWelcomeMessage()]);
         geminiHistoryRef.current = [];
+        fullTranscriptRef.current = [];
       }
       setConversationId(id);
       setIsStorageReady(true);
@@ -535,6 +550,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     const welcome = buildWelcomeMessage();
     const created = await createConversation<Message>('zannah', [welcome]);
     geminiHistoryRef.current = [];
+    fullTranscriptRef.current = [];
     pendingEstimateRevisionRef.current = false;
     setMessages([welcome]);
     setConversationId(created.id);
@@ -551,6 +567,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     // Sama seperti saat load awal: slice(-12) supaya AI tetap ingat konteks
     // obrolan lama ini, bukan dianggap chat baru.
     geminiHistoryRef.current = (conv.geminiHistory ?? []).slice(-12);
+    fullTranscriptRef.current = conv.fullTranscript ?? conv.geminiHistory ?? [];
     pendingEstimateRevisionRef.current = false;
     setConversationId(id);
     await setActiveConversationId('zannah', id);
@@ -826,7 +843,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
     const userMsg: ChatMessage = { role: 'user', parts: [{ text: userText }] };
     try {
-      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, agentMode || undefined, files, agentAction);
+      const result = await sendMessageToGemini(geminiHistoryRef.current, userText, undefined, undefined, agentMode || undefined, files, agentAction, fullTranscriptRef.current);
       const replyText = result.reply;
 
       // Simpan model yang aktif untuk ditampilkan di UI
@@ -844,18 +861,25 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       }
 
       // Update history with successful exchange
-      const updatedHistory: ChatMessage[] = [
-        ...geminiHistoryRef.current,
+      const newExchange: ChatMessage[] = [
         userMsg,
         { role: 'model', parts: [{ text: replyText }] },
       ];
+      const updatedHistory: ChatMessage[] = [...geminiHistoryRef.current, ...newExchange];
       geminiHistoryRef.current = updatedHistory.slice(-12); // keep last 6 exchanges
+      // fullTranscriptRef TIDAK di-slice -- ini yang jadi sumber kebenaran
+      // "riwayat penuh" yang dikirim ke backend lewat field fullTranscript.
+      fullTranscriptRef.current = [...fullTranscriptRef.current, ...newExchange];
 
       // Persist Gemini history ke IndexedDB, terikat ke percakapan yang lagi
       // aktif — jadi kalau percakapan ini dibuka lagi nanti, AI tetap ingat.
+      // fullTranscript ikut disimpan terpisah supaya kalau percakapan ini
+      // dibuka lagi nanti, riwayat lengkapnya (bukan cuma 6 pertukaran
+      // terakhir) tetap ada untuk dikirim ke backend.
       if (conversationId) {
         saveConversation<Message, ChatMessage>(conversationId, 'zannah', {
           geminiHistory: geminiHistoryRef.current,
+          fullTranscript: fullTranscriptRef.current,
         });
       }
       setAiMode('ai');
@@ -1711,6 +1735,15 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                             const isFallbackLocalDraft = att.outcome
                               ? att.outcome === 'fallback_local'
                               : att.name.includes('Kasar');
+                            // Bug lama: tombol retry cuma muncul untuk 'fallback_local'
+                            // (masalah koneksi ke DevRAB). Untuk 'checklist_incomplete'
+                            // (RAB ditahan karena ada data checklist yang kurang, mis.
+                            // nama/email), user sama sekali tidak dikasih jalan keluar
+                            // selain scroll ke tombol lama. Sekarang tombolnya tetap
+                            // muncul, tapi label & pesannya dibedakan supaya jujur —
+                            // ini bukan soal koneksi, tapi soal checklist yang belum lengkap.
+                            const isChecklistIncomplete = att.outcome === 'checklist_incomplete';
+                            const showRetryButton = isFallbackLocalDraft || isChecklistIncomplete;
 
                             return (
                             <div key={`${m.id}-att-${i}`} className="flex flex-wrap items-center gap-1.5">
@@ -1726,18 +1759,25 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 {att.name}
                               </button>
 
-                              {isFallbackLocalDraft && (
+                              {showRetryButton && (
                                 <button
                                   type="button"
-                                  onClick={() => runAgentAction('estimate', 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.', undefined, '🔄 Coba Hubungkan ke DevRAB')}
+                                  onClick={() => runAgentAction(
+                                    'estimate',
+                                    isChecklistIncomplete
+                                      ? 'Coba proses lagi RAB & proposal resmi dari kebutuhan proyek yang sudah dilengkapi.'
+                                      : 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.',
+                                    undefined,
+                                    isChecklistIncomplete ? '🔄 Coba Proses RAB Lagi' : '🔄 Coba Hubungkan ke DevRAB'
+                                  )}
                                   className={`inline-flex items-center gap-1.5 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
                                     ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
                                     : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
                                     }`}
-                                  title="Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi"
+                                  title={isChecklistIncomplete ? 'Coba proses ulang RAB sekarang' : 'Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi'}
                                 >
                                   <RotateCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                  Coba Hubungkan Ulang ke DevRAB
+                                  {isChecklistIncomplete ? 'Coba Proses Lagi' : 'Coba Hubungkan Ulang ke DevRAB'}
                                 </button>
                               )}
 

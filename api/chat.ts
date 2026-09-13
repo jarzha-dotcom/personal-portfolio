@@ -104,6 +104,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const {
             history,
+            fullTranscript,
             message,
             model: requestedModel,
             persona = 'zannah',
@@ -115,6 +116,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             stream: requestStream = false,
         } = body as {
             history?: Array<{ role: string; parts: { text: string }[] }>;
+            // Riwayat percakapan LENGKAP tidak dipotong, dikirim terpisah dari
+            // `history` (yang sengaja dibatasi frontend ke 12 entri terakhir demi
+            // ukuran context window model). Kalau frontend belum kirim field ini
+            // (versi lama), kita fallback ke `history` seperti sebelumnya -- lihat
+            // `rawFullHistory` di bawah.
+            fullTranscript?: Array<{ role: string; parts: { text: string }[] }>;
             message?: string;
             model?: string;
             persona?: BotPersona;
@@ -157,6 +164,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             parts: [{ text: String(h.parts?.[0]?.text || '').slice(0, 1000) }],
         }));
 
+        // ── rawFullHistory: riwayat LENGKAP tanpa potongan ──────────────────────
+        // Bug lama: `history` yang dikirim frontend (ChatWidget.tsx) sudah dipotong
+        // ke 6 pertukaran terakhir SEBELUM dikirim (`geminiHistoryRef.current` di-
+        // slice(-12) di sisi klien), jadi walau backend dulu "pura-pura" memakai
+        // `history` mentah untuk transkrip penuh, yang sampai memang sudah bolong --
+        // itu sebabnya data lama (mis. email klien) bisa hilang begitu percakapan
+        // lewat dari 6 pertukaran. `fullTranscript` adalah field baru yang HARUS
+        // dikirim frontend berisi seluruh riwayat sejak awal sesi (lihat catatan di
+        // ChatWidget.tsx). Selama frontend belum update, fallback ke `history` demi
+        // kompatibilitas mundur -- meski fallback itu tetap punya keterbatasan lama.
+        const rawFullHistory: Array<{ role: string; parts: { text: string }[] }> =
+            fullTranscript && fullTranscript.length > 0 ? fullTranscript : (history || []);
+
         const userParts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> = [
             { text: sanitizedMessage },
         ];
@@ -183,7 +203,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const existingAtts = resData.attachments || [];
             if (existingAtts.length === 0) {
                 // Gunakan seluruh riwayat sesi dari awal jika ada, bukan hanya 12 slice
-                const fullHistoryForSummary = (history && history.length > 0) ? history : sanitizedHistory;
+                const fullHistoryForSummary = rawFullHistory.length > 0 ? rawFullHistory : sanitizedHistory;
                 const summaryAtt = generateSummaryAttachment(fullHistoryForSummary, sanitizedMessage, resData.reply || '', botName);
                 return { ...resData, attachments: [summaryAtt] };
             }
@@ -196,10 +216,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const isAntigravityTarget = wantsAgent && (!requestedModel || requestedModel === ANTIGRAVITY_MODEL);
 
         // ── fullSessionTranscript: riwayat lengkap dari awal hingga akhir ──
-        // Sengaja disusun dari `history` RAW (sebelum dipotong 12 slice untuk memori chat model),
-        // agar ekstraksi kebutuhan RAB & DevRAB Engine dapat membaca seluruh transkrip percakapan
-        // dari awal sampai akhir: checklist nama/email klien, platform aplikasi, timeline, dan budget.
-        const fullSessionTranscript = (history || [])
+        // Disusun dari `rawFullHistory` (lihat definisinya di atas), yang sekarang
+        // sumbernya adalah `fullTranscript` yang benar-benar tidak pernah dipotong,
+        // bukan `history` yang bisa saja sudah bolong dari sisi frontend. Ini yang
+        // dipakai ekstraksi kebutuhan RAB & DevRAB Engine supaya bisa membaca
+        // seluruh transkrip: checklist nama/email klien, platform, timeline, budget.
+        const fullSessionTranscript = rawFullHistory
             .map((h) => {
                 const sender = h.role === 'user' ? 'Klien' : botName;
                 const text = String(h.parts?.[0]?.text || '').trim();
@@ -281,10 +303,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // (ditandai kalimat pembuka RAB_PROACTIVE_OFFER_MARKER persis di awal),
         // jangan diulang lagi supaya Zannah gak "ngotot" nawarin RAB tiap turn.
         const RAB_PROACTIVE_OFFER_MARKER = 'Ngomong-ngomong soal proyeknya';
-        const conversationIsLongEnough = activePersona === 'zannah' && (history || []).length >= 12;
+        const conversationIsLongEnough = activePersona === 'zannah' && rawFullHistory.length >= 12;
         const rabAlreadyOfferedBefore =
             conversationIsLongEnough &&
-            (history || []).some(
+            rawFullHistory.some(
                 (h) => h.role !== 'user' && String(h.parts?.[0]?.text || '').includes(RAB_PROACTIVE_OFFER_MARKER)
             );
         const userAlreadyOnRabTrack =
@@ -305,11 +327,54 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
+        // ── Sticky RAB intent ────────────────────────────────────────────────────
+        // Bug lama: `rawDetectedIntent` cuma dicek dari pesan TERBARU. Begitu user
+        // lewat dari 1 pesan yang match pola RAB ("Buatkan rab di devrab"), setiap
+        // balasan berikutnya ("Coba lagi", "Arzha@gmail.com", dst) otomatis dapat
+        // intent null -> tombol CTA hilang total, padahal user masih di tengah
+        // alur checklist RAB yang sama. Heuristiknya: kalau user PERNAH match pola
+        // RAB sebelumnya dalam sesi ini (rawFullHistory), dan belum ada tanda-tanda
+        // RAB itu sudah jadi (nomor dokumen RAB-YYYY-xxx muncul di balasan bot),
+        // anggap masih "in-progress" walau pesan terbaru tidak match apa pun.
+        const RAB_INTENT_PATTERN =
+            /\b(buatkan|generate|bikin|susun|export)\b.{0,25}\b(rab|anggaran|invoice|proposal|laporan|excel|spreadsheet|pdf|dokumen)\b|\b(rab|anggaran|sow|proposal|estimasi\s*(biaya|proyek)?)\b/i;
+        const RAB_DOCUMENT_ISSUED_PATTERN = /RAB[-\s]?\d{4}[-\s]?\d+/i;
+        const userPreviouslyOnRabTrack = rawFullHistory.some(
+            (h) => h.role === 'user' && RAB_INTENT_PATTERN.test(String(h.parts?.[0]?.text || ''))
+        );
+        const rabAlreadyIssued = rawFullHistory.some(
+            (h) => h.role !== 'user' && RAB_DOCUMENT_ISSUED_PATTERN.test(String(h.parts?.[0]?.text || ''))
+        );
+        const rabChecklistLikelyStillInProgress =
+            !rawDetectedIntent && userPreviouslyOnRabTrack && !rabAlreadyIssued;
+
         let detectedAgentIntent: AgentIntentAction | null = rawDetectedIntent;
         if ((rawDetectedIntent === 'estimate' || rawDetectedIntent === 'research') && aiStudioKey) {
             const ready = await assessAgentReadiness(aiStudioKey, contents, rawDetectedIntent);
             if (!ready) {
                 detectedAgentIntent = null;
+            }
+        } else if (rabChecklistLikelyStillInProgress) {
+            // Pertahankan intent supaya tombol CTA (suggestedAgentAction) tetap
+            // tampil, alih-alih hilang total hanya karena pesan terbaru tidak
+            // secara harfiah minta RAB lagi.
+            detectedAgentIntent = 'estimate';
+
+            // Jangan cuma diam-diam mempertahankan tombol -- Zannah juga diminta
+            // SECARA EKSPLISIT menanyakan balik ke user apakah masih mau lanjut,
+            // bukan berasumsi ya/tidak. Ini dilewati kalau tawaran proaktif RAB
+            // (`shouldProactivelyOfferRab`) sudah menyisipkan catatan sistemnya
+            // sendiri di atas, supaya tidak dobel instruksi dalam satu giliran.
+            if (!shouldProactivelyOfferRab) {
+                const lastTurn = contents[contents.length - 1] as {
+                    role: string;
+                    parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }>;
+                };
+                if (lastTurn?.role === 'user') {
+                    lastTurn.parts.push({
+                        text: '(Catatan sistem: pesan Kakak di atas tidak secara eksplisit menyebut RAB/estimasi lagi, tapi sepertinya Kakak masih di tengah alur pengisian checklist RAB yang belum selesai sebelumnya. Jangan diam-diam melanjutkan seolah topik RAB tidak pernah dibahas, dan jangan berasumsi Kakak sudah selesai atau berubah pikiran. Jawab pesan di atas seperti biasa, lalu di akhir jawaban tanya SECARA EKSPLISIT apakah Kakak masih mau lanjut menyusun RAB-nya.)',
+                    });
+                }
             }
         }
 

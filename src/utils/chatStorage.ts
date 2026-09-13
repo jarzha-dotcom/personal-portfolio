@@ -29,6 +29,16 @@ export interface StoredConversation<TMessage = unknown, THistory = unknown> {
   updatedAt: number;
   messages: TMessage[];
   geminiHistory: THistory[];
+  /**
+   * Riwayat percakapan LENGKAP, tidak pernah dipotong -- beda dari
+   * `geminiHistory` yang sengaja dibatasi ke 12 entri terakhir demi context
+   * window model. Dipakai backend khusus untuk ekstraksi kebutuhan RAB/
+   * checklist (lihat `fullTranscript` di chat.ts), supaya data lama (mis.
+   * nama/email klien yang disebut di awal obrolan panjang) tidak hilang.
+   * Opsional karena percakapan lama yang tersimpan sebelum field ini ada
+   * belum memilikinya -- pemanggil sebaiknya fallback ke `geminiHistory`.
+   */
+  fullTranscript?: THistory[];
 }
 
 let dbPromise: Promise<IDBDatabase | null> | null = null;
@@ -179,7 +189,7 @@ export async function loadConversation<TMessage = unknown, THistory = unknown>(
 export async function saveConversation<TMessage = unknown, THistory = unknown>(
   id: string,
   botKey: string,
-  patch: Partial<Pick<StoredConversation<TMessage, THistory>, 'messages' | 'geminiHistory' | 'title'>>
+  patch: Partial<Pick<StoredConversation<TMessage, THistory>, 'messages' | 'geminiHistory' | 'fullTranscript' | 'title'>>
 ): Promise<void> {
   const db = await openDB();
   if (!db) return;
