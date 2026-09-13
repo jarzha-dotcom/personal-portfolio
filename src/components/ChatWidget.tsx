@@ -844,11 +844,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       }
 
       // Update history with successful exchange
-      geminiHistoryRef.current = [
+      const updatedHistory: ChatMessage[] = [
         ...geminiHistoryRef.current,
         userMsg,
         { role: 'model', parts: [{ text: replyText }] },
-      ].slice(-12); // keep last 6 exchanges
+      ];
+      geminiHistoryRef.current = updatedHistory.slice(-12); // keep last 6 exchanges
 
       // Persist Gemini history ke IndexedDB, terikat ke percakapan yang lagi
       // aktif — jadi kalau percakapan ini dibuka lagi nanti, AI tetap ingat.
@@ -1701,7 +1702,17 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       {/* File hasil kerja Zannah (mis. RAB DevRAB, laporan.pdf) — siap didownload / dibuka */}
                       {m.attachments && m.attachments.length > 0 && (
                         <div className="space-y-2 mt-2">
-                          {m.attachments.map((att, i) => (
+                          {m.attachments.map((att, i) => {
+                            // `outcome` sekarang dideklarasikan resmi di tipe `Attachment`
+                            // (services/geminiService.ts), mengikuti AgentDocumentOutcome dari
+                            // backend (api/lib/documentGenerator.ts). Fallback ke heuristik nama
+                            // lama cuma sebagai jaring pengaman kalau ada deploy backend lama yang
+                            // belum sempat mengisi field ini.
+                            const isFallbackLocalDraft = att.outcome
+                              ? att.outcome === 'fallback_local'
+                              : att.name.includes('Kasar');
+
+                            return (
                             <div key={`${m.id}-att-${i}`} className="flex flex-wrap items-center gap-1.5">
                               <button
                                 type="button"
@@ -1715,7 +1726,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 {att.name}
                               </button>
 
-                              {att.name.includes('Kasar') && (
+                              {isFallbackLocalDraft && (
                                 <button
                                   type="button"
                                   onClick={() => runAgentAction('estimate', 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.', undefined, '🔄 Coba Hubungkan ke DevRAB')}
@@ -1757,7 +1768,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 </a>
                               )}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       )}
 

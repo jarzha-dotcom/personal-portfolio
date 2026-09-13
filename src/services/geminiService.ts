@@ -16,6 +16,15 @@ export interface Attachment {
     previewUrl?: string;
     pdfUrl?: string;
     proposalId?: string;
+    /**
+     * Status kebenaran dokumen ini, apa adanya dari backend (lihat AgentDocumentOutcome
+     * di api/lib/documentGenerator.ts) -- SUMBER KEBENARAN TERSTRUKTUR untuk membedakan
+     * hasil asli vs draf lokal vs ditahan checklist. Jangan pernah menebak status ini lagi
+     * dari substring `name` di kode frontend -- itu pola rapuh yang sudah pernah jadi bug.
+     * Opsional karena field ini baru ada di backend yang sudah diupdate; frontend yang
+     * membacanya sebaiknya tetap punya fallback yang aman kalau field ini belum terisi.
+     */
+    outcome?: 'success' | 'fallback_local' | 'checklist_incomplete';
 }
 
 /** File yang dikirim user bareng pesan (foto/PDF/CSV) */
@@ -229,4 +238,4 @@ export async function streamMessageFromGemini(
     if (!data.reply) throw new Error('Respons kosong dari server');
     onChunk(data.reply);
     return data;
-}
+}

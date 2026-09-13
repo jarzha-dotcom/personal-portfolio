@@ -5,6 +5,19 @@ import {
     consumeDevRABDailyQuota,
 } from './rateLimiter.js';
 
+/**
+ * Status kebenaran dari dokumen yang dihasilkan -- SUMBER KEBENARAN TUNGGAL untuk
+ * apakah reply chat perlu dikoreksi. Jangan pernah menebak status ini lagi dari
+ * substring nama file di kode pemanggil (chat.ts) -- itu yang menyebabkan bug
+ * "impersonate" sebelumnya (guard rapuh berbasis string match ke `resData.reply`
+ * DAN ke `doc.name`). Field ini diisi eksplisit persis di titik `return` yang
+ * relevan di `buildAgentDocumentAttachment`, jadi selalu akurat.
+ * - 'success': hasil asli dari layanan sungguhan (DevRAB Engine / ekstraksi riset berhasil).
+ * - 'fallback_local': layanan sungguhan gagal/tidak tersedia, ini draf lokal pengganti.
+ * - 'checklist_incomplete': RAB resmi sengaja ditahan karena data klien belum lengkap/valid.
+ */
+export type AgentDocumentOutcome = 'success' | 'fallback_local' | 'checklist_incomplete';
+
 export interface Attachment {
     name: string;
     mimeType: string;
@@ -12,6 +25,7 @@ export interface Attachment {
     previewUrl?: string;
     pdfUrl?: string;
     proposalId?: string;
+    outcome?: AgentDocumentOutcome;
 }
 
 export interface RabFeature {
@@ -283,6 +297,96 @@ export async function extractStructuredDocument<T>(
     }
 }
 
+const OUTCOME_DESCRIPTIONS: Record<'fallback_local' | 'checklist_incomplete', { estimate: string; research: string }> = {
+    fallback_local: {
+        estimate:
+            'Proposal resmi dari DevRAB Cloud Engine BELUM berhasil dibuat (server sedang antre/kendala teknis sementara). Yang benar-benar dilampirkan hanyalah draf estimasi KASAR hasil ekstraksi lokal, BUKAN proposal interaktif resmi. User bisa diminta untuk mencoba generate ulang nanti kalau mau versi resminya.',
+        research:
+            'Ekstraksi riset terstruktur otomatis gagal/kosong. Yang benar-benar dilampirkan hanyalah versi teks apa adanya dari balasan asisten (bukan hasil analisis riset terstruktur dengan temuan & rekomendasi).',
+    },
+    checklist_incomplete: {
+        estimate:
+            'RAB resmi BELUM bisa diproses sama sekali karena data Nama Lengkap dan/atau Email aktif klien masih belum lengkap/valid. Yang benar-benar dilampirkan hanyalah file penjelasan checklist yang belum lengkap, BUKAN RAB dalam bentuk apa pun (bukan draf, bukan proposal resmi).',
+        research:
+            'RAB resmi BELUM bisa diproses karena checklist data klien belum lengkap/valid.',
+    },
+};
+
+/**
+ * Menulis ulang KALIMAT PENUTUP soal status proses pada `originalReply` agar akurat
+ * terhadap `outcome` yang SUDAH DIKETAHUI (hasil nyata dari buildAgentDocumentAttachment),
+ * bukan menambahkan catatan terpisah di akhir. Ini menutup celah urutan proses: replyText
+ * asli ditulis SEBELUM hasil attachment diketahui, jadi bisa kadung terlalu percaya diri
+ * ("Zannah proseskan sekarang...") padahal hasil aslinya cuma draf lokal / ditahan checklist.
+ *
+ * Aman-gagal (fail-safe): kalau panggilan rewrite ini gagal/timeout/hasil kosong, JANGAN
+ * biarkan reply asli lolos tanpa koreksi -- selalu jatuhkan ke catatan tambahan sederhana
+ * di akhir teks (perilaku lama), supaya user tidak pernah menerima klaim yang salah tanpa
+ * ada koreksi apa pun, terlepas dari sukses/gagalnya rewrite ini.
+ */
+export async function reconcileReplyWithOutcome(
+    apiKey: string,
+    originalReply: string,
+    outcome: 'fallback_local' | 'checklist_incomplete',
+    action: 'estimate' | 'research',
+    botName: string
+): Promise<string> {
+    const fallbackNote =
+        outcome === 'fallback_local'
+            ? '\n\n*(Catatan: Layanan cloud resmi sedang mengalami kendala teknis sementara, sehingga yang dilampirkan adalah draf/versi lokal terlebih dahulu, bukan hasil resmi. Boleh diminta ulang nanti untuk coba dapat versi resminya.)*'
+            : '\n\n*(Catatan: Dokumen resmi belum bisa diproses karena checklist data klien (Nama Lengkap & Email aktif) masih belum lengkap/valid. Boleh dilengkapi dulu ya.)*';
+
+    if (!originalReply || !originalReply.trim()) {
+        return (originalReply || '') + fallbackNote;
+    }
+
+    const description = OUTCOME_DESCRIPTIONS[outcome][action];
+    const prompt = `Kamu sedang mengoreksi SATU balasan chat dari asisten AI bernama "${botName}" agar akurat, karena ternyata ada bagian yang terlalu percaya diri sebelum hasil sebenarnya diketahui.
+
+--- BALASAN ASLI ---
+${originalReply.slice(0, 4000)}
+--- SELESAI ---
+
+KENYATAAN SEBENARNYA (baru diketahui setelah balasan asli ditulis): ${description}
+
+Tulis ulang balasan itu APA ADANYA (bahasa, gaya, dan nada yang sama persis), TAPI perbaiki/ganti kalimat penutup yang menyinggung status proses/hasil dokumen supaya sesuai kenyataan sebenarnya di atas. JANGAN mengubah bagian lain yang tidak berkaitan dengan klaim status proses tersebut. JANGAN menambahkan penjelasan meta soal proses koreksi ini. Balas HANYA dengan teks balasan hasil koreksi, tanpa markdown/backtick tambahan.`;
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent?key=${apiKey}`;
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.2, maxOutputTokens: 1024 },
+            }),
+        });
+
+        clearTimeout(timeoutId);
+        if (!response.ok) {
+            console.warn(`[documentGenerator][reconcileReplyWithOutcome] HTTP ${response.status}, fallback ke catatan tambahan.`);
+            return originalReply + fallbackNote;
+        }
+
+        const data = await response.json();
+        const text: string | undefined = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        const cleaned = text?.trim();
+        if (!cleaned) {
+            console.warn('[documentGenerator][reconcileReplyWithOutcome] Hasil kosong, fallback ke catatan tambahan.');
+            return originalReply + fallbackNote;
+        }
+        return cleaned;
+    } catch (error) {
+        const isTimeout = error instanceof Error && error.name === 'AbortError';
+        console.warn('[documentGenerator][reconcileReplyWithOutcome] Gagal, fallback ke catatan tambahan:', isTimeout ? 'timeout' : error);
+        return originalReply + fallbackNote;
+    }
+}
+
 export async function buildAgentDocumentAttachment(
     apiKey: string,
     replyText: string,
@@ -326,6 +430,7 @@ ${replyText.slice(0, 10000)}
                 name: `RAB-Checklist-Belum-Lengkap-${dateSlug}.html`,
                 mimeType: 'text/html;charset=utf-8',
                 base64: Buffer.from(renderChecklistIncompleteHtml(missing), 'utf-8').toString('base64'),
+                outcome: 'checklist_incomplete',
             };
         }
 
@@ -401,6 +506,7 @@ ${replyText.slice(0, 10000)}
                         previewUrl: devrabResult.previewUrl,
                         pdfUrl: devrabResult.pdfDownloadUrl,
                         proposalId: devrabResult.proposalId,
+                        outcome: 'success',
                     };
                 }
             } catch (err) {
@@ -414,6 +520,7 @@ ${replyText.slice(0, 10000)}
                 name: `RAB-Estimasi-Kasar-${dateSlug}.html`,
                 mimeType: 'text/html;charset=utf-8',
                 base64: Buffer.from(renderRabHtml(doc, true), 'utf-8').toString('base64'),
+                outcome: 'fallback_local',
             };
         }
         console.warn('[documentGenerator] Ekstraksi RAB gagal/kosong, fallback ke plain HTML.');
@@ -421,6 +528,7 @@ ${replyText.slice(0, 10000)}
             name: `RAB-Estimasi-Kasar-${dateSlug}.html`,
             mimeType: 'text/html;charset=utf-8',
             base64: Buffer.from(renderPlainFallbackHtml('📊 Rencana Anggaran Biaya (Draf Kasar Lokal)', replyText, true), 'utf-8').toString('base64'),
+            outcome: 'fallback_local',
         };
     }
 
@@ -437,6 +545,7 @@ ${replyText.slice(0, 6000)}
             name: `Riset-Kompetitor-Pasar-${dateSlug}.html`,
             mimeType: 'text/html;charset=utf-8',
             base64: Buffer.from(renderResearchHtml(doc), 'utf-8').toString('base64'),
+            outcome: 'success',
         };
     }
     console.warn('[documentGenerator] Ekstraksi riset gagal/kosong, fallback ke plain HTML.');
@@ -444,6 +553,7 @@ ${replyText.slice(0, 6000)}
         name: `Riset-Kompetitor-Pasar-${dateSlug}.html`,
         mimeType: 'text/html;charset=utf-8',
         base64: Buffer.from(renderPlainFallbackHtml('🔎 Riset Kompetitor / Pasar', replyText), 'utf-8').toString('base64'),
+        outcome: 'fallback_local',
     };
 }
 

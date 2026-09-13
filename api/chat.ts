@@ -10,6 +10,7 @@ import {
 import {
     buildAgentDocumentAttachment,
     generateSummaryAttachment,
+    reconcileReplyWithOutcome,
 } from './lib/documentGenerator.js';
 import {
     pingDevRABEngine,
@@ -222,22 +223,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 ip
             );
 
-            // Jika dokumen adalah draf kasar lokal (karena DevRAB offline/antre), tambahkan catatan transparan jika belum ada di teks
-            if (doc && doc.name && doc.name.includes('Kasar')) {
-                const warningNote = '\n\n*(Catatan: Server DevRAB Cloud Engine sedang mengalami antrean teknis, sehingga Zannah lampirkan draf estimasi kasar lokal terlebih dahulu. Kakak bisa meminta Zannah "Coba generate ulang ke DevRAB" kapan saja untuk mendapatkan proposal interaktif resminya.)*';
-                if (!resData.reply?.includes('antrean teknis') && !resData.reply?.includes('DevRAB')) {
-                    resData.reply = (resData.reply || '') + warningNote;
-                }
-            }
-
-            // Checklist Nama/Email belum lengkap-valid → RAB resmi sengaja DITAHAN di kode
-            // (lihat hasCompleteClientChecklist di documentGenerator.ts). Kasih tahu user
-            // dengan sopan lewat balasan chat, jangan cuma diam-diam lampirkan file penjelasan.
-            if (doc && doc.name && doc.name.includes('Checklist-Belum-Lengkap')) {
-                const checklistNote = '\n\n*(Catatan: Zannah belum bisa memproses RAB resminya nih, Kak — checklist Nama Lengkap & Email aktif Kakak masih belum lengkap/valid. Boleh dilengkapi dulu, nanti Zannah langsung siapkan RAB-nya ya!)*';
-                if (!resData.reply?.toLowerCase().includes('checklist')) {
-                    resData.reply = (resData.reply || '') + checklistNote;
-                }
+            // `doc.outcome` adalah sumber kebenaran TERSTRUKTUR (diisi eksplisit di
+            // documentGenerator.ts) -- bukan ditebak dari substring `doc.name`/`resData.reply`
+            // seperti sebelumnya. Kalau hasil sebenarnya BUKAN 'success', reply yang sudah
+            // kadung ditulis duluan (sebelum `doc` ini diketahui) perlu direkonsiliasi supaya
+            // kalimat klaim status prosesnya jujur terhadap hasil sebenarnya -- bukan cuma
+            // ditempeli catatan tambahan di ujung teks.
+            if (doc && (doc.outcome === 'fallback_local' || doc.outcome === 'checklist_incomplete')) {
+                resData.reply = await reconcileReplyWithOutcome(
+                    aiStudioKey!,
+                    resData.reply || '',
+                    doc.outcome,
+                    agentAction as 'estimate' | 'research',
+                    botName
+                );
             }
 
             return { ...resData, attachments: [doc] };
