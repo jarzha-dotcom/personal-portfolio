@@ -43,18 +43,33 @@ export interface DevRABProposalResponse {
  */
 export async function pingDevRABEngine(): Promise<void> {
   const apiUrl = process.env.DEVRAB_API_URL;
+  if (!apiUrl) {
+    console.warn('[devrabClient][ping] DEVRAB_API_URL belum dikonfigurasi, ping dilewati.');
+    return;
+  }
   try {
     const pingUrl = new URL(apiUrl).origin;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 6000);
-    await fetch(pingUrl, {
+    const res = await fetch(pingUrl, {
       method: 'GET',
       signal: controller.signal,
-    }).catch(() => { });
+    }).catch((err) => {
+      // Tetap non-blocking (tidak throw ke pemanggil), tapi kegagalan ping WAJIB di-log --
+      // ini sinyal dini yang berguna: kalau ping ke origin gagal, request generate-proposal
+      // yang sebenarnya kemungkinan besar juga akan gagal dengan akar masalah yang sama
+      // (DNS/domain salah, origin down, jaringan diblokir, dsb). Sebelumnya ini diam total,
+      // jadi baru ketahuan gagal pas user sudah menunggu hasil RAB.
+      const isTimeout = err?.name === 'AbortError';
+      console.warn(`[devrabClient][ping] Gagal menghubungi origin DevRAB (${pingUrl}):`, isTimeout ? 'Timeout 6000ms' : err?.message || err);
+      return null;
+    });
     clearTimeout(timeoutId);
-    console.log('[devrabClient] Pre-warming ping sent to DevRAB host');
-  } catch {
-    // Abaikan error ping karena sifatnya hanya background warm-up
+    if (res) {
+      console.log(`[devrabClient][ping] Pre-warming ping terkirim ke DevRAB host (HTTP ${res.status})`);
+    }
+  } catch (err: any) {
+    console.warn('[devrabClient][ping] Gagal menyiapkan ping (URL tidak valid?):', err?.message || err);
   }
 }
 
@@ -124,12 +139,29 @@ export async function callDevRABEngine(
       clearTimeout(timeoutId);
 
       if (!res.ok) {
-        console.warn(`[devrabClient][attempt ${attempt + 1}] HTTP ${res.status} dari DevRAB: ${res.statusText}`);
+        // Coba baca body response-nya -- DevRAB selalu balas JSON dengan field "message"
+        // yang menjelaskan penyebab pastinya (mis. "GEMINI_API_KEY belum dikonfigurasi",
+        // "Unauthorized: Invalid DEVRAB_API_KEY", dst). Tanpa ini, log cuma nampilkan status
+        // code polos yang tidak cukup untuk diagnosis dari sisi Zannah.
+        let bodyDetail = '';
+        try {
+          const cloned = res.clone();
+          const bodyJson = await cloned.json();
+          bodyDetail = bodyJson?.message ? ` -- Pesan dari DevRAB: "${bodyJson.message}"` : ` -- Body: ${JSON.stringify(bodyJson).slice(0, 500)}`;
+        } catch {
+          try {
+            bodyDetail = ` -- Body (non-JSON): ${(await res.text()).slice(0, 500)}`;
+          } catch {
+            bodyDetail = ' -- Body tidak bisa dibaca';
+          }
+        }
+        console.warn(`[devrabClient][attempt ${attempt + 1}] HTTP ${res.status} dari DevRAB: ${res.statusText}${bodyDetail}`);
         // 5xx (server error) atau 429 (rate limit) layak di-retry jika masih ada sisa percobaan
         if ((res.status >= 500 || res.status === 429) && attempt < maxRetries) {
           continue;
         }
         // 4xx lainnya (400 Bad Request, 401 Unauthorized, 403 Forbidden, 404) pasti gagal permanen -> fail fast
+        console.error(`[devrabClient] Gagal permanen menghubungi DevRAB (HTTP ${res.status})${bodyDetail}. Beralih ke draf lokal.`);
         return null;
       }
 
@@ -140,14 +172,21 @@ export async function callDevRABEngine(
       }
 
       console.warn(`[devrabClient][attempt ${attempt + 1}] DevRAB mengembalikan non-success:`, data);
-      if (attempt === maxRetries) return null;
+      if (attempt === maxRetries) {
+        console.error(`[devrabClient] GAGAL TOTAL setelah ${maxRetries + 1} percobaan (respons non-success dari DevRAB). Beralih ke draf lokal. Pesan terakhir: "${data?.message || '(tidak ada)'}"`);
+        return null;
+      }
     } catch (err: any) {
       const isTimeout = err?.name === 'AbortError';
       console.error(`[devrabClient][attempt ${attempt + 1}] Gagal menghubungi DevRAB:`, isTimeout ? `Timeout ${timeoutMs}ms` : err?.message || err);
-      if (attempt === maxRetries) return null;
+      if (attempt === maxRetries) {
+        console.error(`[devrabClient] GAGAL TOTAL setelah ${maxRetries + 1} percobaan (network/timeout). Beralih ke draf lokal. URL: ${apiUrl}`);
+        return null;
+      }
     }
   }
 
+  console.error(`[devrabClient] GAGAL TOTAL menghubungi DevRAB setelah ${maxRetries + 1} percobaan. Beralih ke draf lokal.`);
   return null;
 }
 
