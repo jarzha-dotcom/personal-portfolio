@@ -187,6 +187,24 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Hubungkan tombol kembali browser agar menutup popup chat widget
   useRegisterModal('chat-widget-drawer', isOpen, () => setIsOpen(false));
 
+  // Fokus keyboard/screen-reader: simpan elemen yang fokus sebelum window
+  // dibuka, pindahkan fokus ke input pesan begitu window tampil, lalu
+  // kembalikan fokus semula saat ditutup — pola yang sama dengan
+  // ZannahWelcomeNudge & ExitConfirmModal di app ini.
+  const chatInputRef = useRef<HTMLInputElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (isOpen) {
+      previouslyFocusedRef.current = document.activeElement as HTMLElement | null;
+      // Delay sedikit supaya elemen sudah ter-mount & animasi masuk tidak
+      // "merebut" fokus sebelum transisi selesai.
+      const t = window.setTimeout(() => chatInputRef.current?.focus(), 50);
+      return () => window.clearTimeout(t);
+    } else {
+      previouslyFocusedRef.current?.focus();
+    }
+  }, [isOpen]);
+
   // Tangani event eksternal untuk membuka chat Zannah (misalnya dari modal tahan keluar Zannah)
   useEffect(() => {
     const handleOpenZannah = () => {
@@ -263,6 +281,25 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const [isStorageReady, setIsStorageReady] = useState(false);
   // Jendela riwayat percakapan (dibuka lewat klik avatar bot)
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  // Escape menutup panel riwayat dulu kalau lagi terbuka, baru menutup
+  // jendela chat — konsisten dengan pola dismiss ExitConfirmModal/
+  // ZannahWelcomeNudge yang sudah ada di app ini.
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleWindowKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        if (isHistoryOpen) {
+          setIsHistoryOpen(false);
+        } else {
+          setIsOpen(false);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleWindowKeyDown);
+    return () => window.removeEventListener('keydown', handleWindowKeyDown);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, isHistoryOpen]);
   const [historyList, setHistoryList] = useState<StoredConversation<Message>[]>([]);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
@@ -1370,6 +1407,9 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           >
             <div
               onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-label={isHeaderRadit ? 'Jendela chat Radit' : 'Jendela chat Zannah'}
               className={`relative w-full h-full sm:w-80 sm:h-[460px] md:w-96 rounded-none sm:rounded-2xl shadow-2xl border-0 sm:border flex flex-col overflow-hidden pointer-events-auto animate-in fade-in slide-in-from-bottom-5 duration-200 ${darkMode ? 'bg-slate-900 sm:border-slate-700' : 'bg-white sm:border-slate-200'
                 }`}
             >
@@ -1484,7 +1524,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
               {/* Jendela Riwayat Percakapan — overlay penuh di dalam kartu chat,
                   dibuka lewat klik avatar bot di header. */}
               {isHistoryOpen && (
-                <div className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                <div
+                  role="dialog"
+                  aria-modal="true"
+                  aria-labelledby="chat-history-panel-title"
+                  className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}
+                >
                   <div
                     className={`p-3.5 border-b flex items-center justify-between ${darkMode
                       ? 'bg-slate-800/80 border-slate-700'
@@ -1493,7 +1538,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                   >
                     <div className="flex items-center gap-1.5">
                       <History className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
-                      <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                      <h3 id="chat-history-panel-title" className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                         Riwayat Obrolan
                       </h3>
                     </div>
@@ -1957,6 +2002,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                     <Paperclip className="w-3.5 h-3.5" />
                   </button>
                   <input
+                    ref={chatInputRef}
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}

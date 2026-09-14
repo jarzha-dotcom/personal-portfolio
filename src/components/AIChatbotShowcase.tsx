@@ -96,6 +96,8 @@ interface Attachment {
     name: string;
     mimeType: string;
     base64: string;
+    previewUrl?: string;
+    pdfUrl?: string;
 }
 
 /** File yang lagi disiapkan user buat diupload (preview sebelum dikirim) */
@@ -496,6 +498,32 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
     const [isHistoryLoading, setIsHistoryLoading] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const historyPanelRef = useRef<HTMLDivElement>(null);
+    const previouslyFocusedBeforeHistoryRef = useRef<HTMLElement | null>(null);
+
+    // Fokus keyboard/screen-reader: simpan elemen yang fokus sebelum panel
+    // riwayat dibuka, pindahkan fokus ke dalam panel begitu tampil, lalu
+    // kembalikan fokus semula (ke input pesan) saat ditutup — pola yang
+    // sama dengan ExitConfirmModal/ZannahWelcomeNudge di app ini.
+    useEffect(() => {
+        if (isHistoryOpen) {
+            previouslyFocusedBeforeHistoryRef.current = document.activeElement as HTMLElement | null;
+            historyPanelRef.current?.focus();
+        } else {
+            previouslyFocusedBeforeHistoryRef.current?.focus();
+        }
+    }, [isHistoryOpen]);
+
+    // Escape menutup panel riwayat — konsisten dengan pola dismiss
+    // ExitConfirmModal/ZannahWelcomeNudge yang sudah ada di app ini.
+    useEffect(() => {
+        if (!isHistoryOpen) return;
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setIsHistoryOpen(false);
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isHistoryOpen]);
 
     // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
     const {
@@ -1115,14 +1143,21 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
             {/* Jendela Riwayat Percakapan — overlay penuh di dalam kartu chat,
                 dibuka lewat klik avatar Rajendra di header. */}
             {isHistoryOpen && (
-                <div className={`absolute inset-0 z-30 flex flex-col ${darkMode ? 'bg-slate-900' : 'bg-white'}`}>
+                <div
+                    ref={historyPanelRef}
+                    tabIndex={-1}
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="rajendra-history-panel-title"
+                    className={`absolute inset-0 z-30 flex flex-col outline-none ${darkMode ? 'bg-slate-900' : 'bg-white'}`}
+                >
                     <div
                         className={`px-4 py-2.5 border-b flex items-center justify-between flex-shrink-0 ${darkMode ? 'border-slate-700/80 bg-slate-800/80' : 'border-slate-200 bg-slate-50/90'
                             }`}
                     >
                         <div className="flex items-center gap-1.5">
                             <History className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
-                            <h4 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                            <h4 id="rajendra-history-panel-title" className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                                 Riwayat Obrolan
                             </h4>
                         </div>
