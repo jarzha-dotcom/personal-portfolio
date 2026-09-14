@@ -13,6 +13,7 @@ import { ShowcaseBanner } from './components/ShowcaseBanner';
 import { PWAManager } from './components/PWAManager';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { ZannahWelcomeNudge } from './components/ZannahWelcomeNudge';
+import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { ArrowUp } from 'lucide-react';
 import {
   NavigationHistoryProvider,
@@ -40,6 +41,7 @@ const CVPage = lazy(() =>
 
 function MainPortfolio() {
   const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Menandai apakah tema saat ini adalah pilihan MANUAL user (lewat toggle di
   // Navbar/CVPage) atau masih mengikuti preferensi OS. Dipakai supaya:
@@ -154,29 +156,52 @@ function MainPortfolio() {
     };
   }, [cvEggUnlocked]);
 
-  // Tunda pemicu dynamic import() ChatWidget sampai browser idle (atau
-  // maksimal 3 detik, kalau browser tidak sempat idle). Tujuannya murni
-  // memprioritaskan First Contentful Paint — bukan menunda sampai user
-  // klik, karena tombol togglenya sendiri ada di dalam ChatWidget. Kalau
-  // suatu saat tombol togglenya dipindah keluar (ke App.tsx), ini bisa
-  // diganti gating penuh di balik state `isOpen`.
+  // Tunda pemicu dynamic import() ChatWidget sampai browser idle (maksimal
+  // 3 detik) ATAU sampai user mulai berinteraksi duluan (scroll/gerak
+  // mouse/sentuh/tekan tombol) — mana yang lebih dulu menang. Tujuannya
+  // murni memprioritaskan First Contentful Paint di device lambat tanpa
+  // bikin tombol chat "hilang" kelamaan begitu user sudah mulai aktif di
+  // halaman (sinyal bahwa main thread sudah longgar buat kerja tambahan).
+  // Bukan menunda sampai user klik tombol chat itu sendiri, karena tombol
+  // togglenya ada di dalam chunk ChatWidget — kalau suatu saat tombolnya
+  // dipindah keluar (ke App.tsx), ini bisa diganti gating penuh di balik
+  // state `isOpen`.
   const [chatWidgetReady, setChatWidgetReady] = useState(false);
   useEffect(() => {
+    let settled = false;
+    const markReady = () => {
+      if (settled) return;
+      settled = true;
+      setChatWidgetReady(true);
+    };
+
+    const interactionEvents: Array<keyof WindowEventMap> = ['scroll', 'mousemove', 'touchstart', 'keydown'];
+    interactionEvents.forEach((evt) =>
+      window.addEventListener(evt, markReady, { passive: true, once: true })
+    );
+
     const win = window as typeof window & {
       requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
       cancelIdleCallback?: (id: number) => void;
     };
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
     if (win.requestIdleCallback) {
-      const id = win.requestIdleCallback(() => setChatWidgetReady(true), { timeout: 3000 });
-      return () => win.cancelIdleCallback?.(id);
+      idleId = win.requestIdleCallback(markReady, { timeout: 3000 });
+    } else {
+      // Fallback untuk Safari (belum dukung requestIdleCallback)
+      timeoutId = window.setTimeout(markReady, 1500);
     }
-    // Fallback untuk Safari (belum dukung requestIdleCallback)
-    const timeoutId = window.setTimeout(() => setChatWidgetReady(true), 1500);
-    return () => window.clearTimeout(timeoutId);
+
+    return () => {
+      interactionEvents.forEach((evt) => window.removeEventListener(evt, markReady));
+      if (idleId !== undefined) win.cancelIdleCallback?.(idleId);
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+    };
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   };
 
   return (
@@ -256,9 +281,10 @@ function MainPortfolio() {
             id="floating-back-to-top"
             onClick={scrollToTop}
             aria-label="Kembali ke atas"
-            className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg border transition-all duration-300 hover:scale-110 active:scale-95 ${darkMode
-              ? 'bg-slate-900/90 border-slate-700 text-teal-400 hover:bg-slate-800'
-              : 'bg-white/90 border-slate-200 text-teal-600 hover:bg-slate-100 shadow-slate-300/50'
+            className={`w-11 h-11 rounded-full flex items-center justify-center shadow-lg border transition-all duration-300 ${prefersReducedMotion ? '' : 'hover:scale-110 active:scale-95'
+              } ${darkMode
+                ? 'bg-slate-900/90 border-slate-700 text-teal-400 hover:bg-slate-800'
+                : 'bg-white/90 border-slate-200 text-teal-600 hover:bg-slate-100 shadow-slate-300/50'
               }`}
           >
             <ArrowUp className="w-5 h-5" />

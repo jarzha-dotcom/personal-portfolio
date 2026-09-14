@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Menu,
   X,
@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 interface NavbarProps {
@@ -16,10 +17,27 @@ interface NavbarProps {
   onEasterEgg: () => void;
 }
 
+const navLinks = [
+  { name: 'Beranda', href: '#beranda', id: 'beranda' },
+  { name: 'Tentang', href: '#tentang', id: 'tentang' },
+  { name: 'Portofolio', href: '#proyek', id: 'proyek' },
+  { name: 'Layanan', href: '#layanan', id: 'layanan' },
+  { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
+  { name: 'Kontak', href: '#kontak', id: 'kontak' },
+];
+
+// Class helper dipakai berulang di semua tombol/link interaktif supaya
+// keyboard user (Tab) selalu dapat indikasi fokus yang jelas — sebelumnya
+// cuma mengandalkan outline default browser (atau malah `focus:outline-none`
+// tanpa pengganti, seperti di logo).
+const FOCUS_RING =
+  'focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent';
+
 export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterEgg }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
+  const prefersReducedMotion = usePrefersReducedMotion();
 
   // Hubungkan tombol kembali browser agar menutup menu navigasi mobile
   useRegisterModal('mobile-nav-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
@@ -29,14 +47,29 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const drawerRef = useRef<HTMLDivElement>(null);
   useFocusTrap(drawerRef, mobileMenuOpen);
 
-  const navLinks = [
-    { name: 'Beranda', href: '#beranda', id: 'beranda' },
-    { name: 'Tentang', href: '#tentang', id: 'tentang' },
-    { name: 'Portofolio', href: '#proyek', id: 'proyek' },
-    { name: 'Layanan', href: '#layanan', id: 'layanan' },
-    { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
-    { name: 'Kontak', href: '#kontak', id: 'kontak' },
-  ];
+  // Ref ke tombol hamburger, dipakai untuk mengembalikan fokus ke situ
+  // setelah drawer ditutup lewat cara SELAIN klik tombol itu sendiri
+  // (Escape, klik link di dalam drawer) — lihat effect di bawah.
+  const mobileMenuBtnRef = useRef<HTMLButtonElement>(null);
+  const wasMenuOpenRef = useRef(false);
+
+  useEffect(() => {
+    if (wasMenuOpenRef.current && !mobileMenuOpen) {
+      // Drawer baru saja tertutup (transisi true -> false). Tanpa ini,
+      // fokus keyboard/screen-reader "hilang jejak" balik ke awal <body>
+      // alih-alih kembali logis ke tombol yang membuka drawer tadi.
+      mobileMenuBtnRef.current?.focus();
+    }
+    wasMenuOpenRef.current = mobileMenuOpen;
+  }, [mobileMenuOpen]);
+
+  // Cache elemen section sekali di mount — sebelumnya di-query ulang lewat
+  // `document.getElementById` di SETIAP tick scroll (lewat requestAnimationFrame),
+  // padahal elemen-elemen ini statis dan tidak pernah berpindah identity.
+  const sectionElementsRef = useRef<(HTMLElement | null)[]>([]);
+  useEffect(() => {
+    sectionElementsRef.current = navLinks.map((link) => document.getElementById(link.id));
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -46,8 +79,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
       window.requestAnimationFrame(() => {
         setIsScrolled(window.scrollY > 30);
 
-        // Active section calculation
-        const sections = navLinks.map(link => document.getElementById(link.id));
+        // Active section calculation — pakai cache, bukan query DOM lagi
+        const sections = sectionElementsRef.current;
         const scrollPosition = window.scrollY + 140;
 
         for (let i = sections.length - 1; i >= 0; i--) {
@@ -85,7 +118,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
       const offsetPosition = elementPosition + window.pageYOffset - navOffset;
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: prefersReducedMotion ? 'auto' : 'smooth'
       });
     }
   };
@@ -124,7 +157,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
           <a
             href="#beranda"
             onClick={handleLogoClick}
-            className="flex items-center gap-2.5 group focus:outline-none select-none"
+            className={`flex items-center gap-2.5 group select-none rounded-lg ${FOCUS_RING}`}
             id="nav-logo-link"
           >
             <img
@@ -153,7 +186,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                   id={`nav-link-${link.id}`}
                   href={link.href}
                   onClick={(e) => scrollToSection(e, link.href)}
-                  className={`text-xs uppercase tracking-wider font-semibold transition-colors ${isActive
+                  className={`text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${isActive
                     ? 'text-teal-600 dark:text-teal-400'
                     : darkMode
                       ? 'text-slate-400 hover:text-white'
@@ -173,7 +206,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
               id="theme-toggle-desktop"
               onClick={() => setDarkMode(!darkMode)}
               aria-label={darkMode ? 'Beralih ke mode terang' : 'Beralih ke mode gelap'}
-              className={`p-2 rounded-lg transition-colors focus:outline-none ${darkMode
+              className={`p-2 rounded-lg transition-colors ${FOCUS_RING} ${darkMode
                 ? 'bg-slate-900 text-amber-300 hover:bg-slate-800 border border-slate-800'
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                 }`}
@@ -188,7 +221,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
               id="theme-toggle-mobile"
               onClick={() => setDarkMode(!darkMode)}
               aria-label="Ganti mode gelap/terang"
-              className={`p-2 rounded-lg ${darkMode ? 'bg-slate-900 text-amber-300 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
+              className={`p-2 rounded-lg ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-amber-300 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
             >
               {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -196,11 +229,12 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
 
             <button
               id="mobile-menu-btn"
+              ref={mobileMenuBtnRef}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle menu navigasi"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-nav-drawer"
-              className={`p-2 rounded-lg ${darkMode ? 'bg-slate-900 text-slate-200 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
+              className={`p-2 rounded-lg ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-slate-200 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -217,9 +251,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
           role="dialog"
           aria-modal="true"
           aria-label="Menu navigasi"
-          className={`md:hidden px-4 pt-2 pb-6 border-b transition-all animate-in fade-in slide-in-from-top-4 duration-200 outline-none ${darkMode
-            ? 'bg-slate-900/98 border-slate-800 text-white'
-            : 'bg-white/98 border-slate-200 text-slate-900 shadow-xl'
+          className={`md:hidden px-4 pt-2 pb-6 border-b transition-all outline-none ${prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-4 duration-200'
+            } ${darkMode
+              ? 'bg-slate-900/98 border-slate-800 text-white'
+              : 'bg-white/98 border-slate-200 text-slate-900 shadow-xl'
             }`}
         >
           <div className="flex flex-col space-y-1">
@@ -230,7 +265,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                   key={link.id}
                   href={link.href}
                   onClick={(e) => scrollToSection(e, link.href)}
-                  className={`px-4 py-3 rounded-lg text-base font-medium flex items-center justify-between ${isActive
+                  className={`px-4 py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
                     ? darkMode
                       ? 'bg-teal-500/20 text-teal-400 font-semibold'
                       : 'bg-teal-50 text-teal-700 font-semibold'
@@ -250,7 +285,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             <a
               href="#kontak"
               onClick={(e) => scrollToSection(e, '#kontak')}
-              className="w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-gradient-to-r from-teal-600 to-indigo-600 text-white flex items-center justify-center gap-2 shadow-md"
+              className={`w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-gradient-to-r from-teal-600 to-indigo-600 text-white flex items-center justify-center gap-2 shadow-md ${FOCUS_RING}`}
             >
               <Send className="w-4 h-4" />
               <span>Hubungi Saya Sekarang</span>
