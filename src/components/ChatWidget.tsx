@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2, RotateCw } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
-import { ZannahWelcomeNudge, STORAGE_KEY as ZANNAH_WELCOME_STORAGE_KEY } from './ZannahWelcomeNudge';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { CATEGORIES, FAQ_ITEMS, Category, FAQItem } from '../data/faqData';
 import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile, AgentIntentAction, sendAgentAnalyticsEvent, searchFaqSemantic } from '../services/geminiService';
@@ -201,6 +200,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       // Delay sedikit supaya elemen sudah ter-mount & animasi masuk tidak
       // "merebut" fokus sebelum transisi selesai.
       const t = window.setTimeout(() => chatInputRef.current?.focus(), 50);
+      // Kabari sibling components (mis. ZannahWelcomeNudge) bahwa chat window
+      // sudah terbuka — dipakai supaya nudge tahu harus menyingkir/dismiss
+      // dirinya sendiri alih-alih tertimbun diam-diam di bawah backdrop modal
+      // ini (z-[9999] vs z-[60] milik nudge).
+      window.dispatchEvent(new Event('zannah-chat-opened'));
       return () => window.clearTimeout(t);
     } else {
       previouslyFocusedRef.current?.focus();
@@ -1408,7 +1412,6 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   return (
     <div className="fixed bottom-6 left-6 z-50 no-print">
-      {!isOpen && <ZannahWelcomeNudge darkMode={darkMode} enabled />}
       {isOpen && (
         <Portal>
           {/* Backdrop — full overlay on mobile (layar sempit) so user fokus ke chat; invisible & click-through on desktop */}
@@ -2079,19 +2082,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       {/* Toggle Button */}
       <button
         aria-label={isOpen ? 'Tutup chat widget' : 'Buka chat widget'}
-        onClick={() => {
-          setIsOpen((prev) => {
-            const next = !prev;
-            if (next) {
-              try {
-                window.localStorage.setItem(ZANNAH_WELCOME_STORAGE_KEY, '1');
-              } catch {
-                // localStorage nggak tersedia — nggak fatal, paling nudge muncul lagi
-              }
-            }
-            return next;
-          });
-        }}
+        onClick={() => setIsOpen((prev) => !prev)}
         className="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 border-2 border-slate-900"
         title={isRadit ? 'Chat dengan Radit (Standby Bot)' : 'Chat dengan Zannah (AI)'}
       >

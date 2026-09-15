@@ -54,6 +54,20 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
     return () => window.clearTimeout(timer);
   }, [enabled]);
 
+  // Begitu chat window terbuka — lewat cara APAPUN, bukan cuma tombol di
+  // bubble ini sendiri (mis. tombol toggle langsung, atau ExitConfirmModal)
+  // — anggap sambutan ini selesai tugasnya. Tanpa ini, bubble bisa saja
+  // baru dijadwalkan tampil (atau sudah tampil) tepat saat window chat
+  // terbuka, lalu berakhir tertimbun diam-diam di bawah backdrop modal
+  // (z-[9999]) karena z-index bubble ini jauh lebih rendah — kelihatan
+  // seperti "nggak pernah muncul" padahal sebenarnya nyangkut di belakang.
+  useEffect(() => {
+    const handleChatOpened = () => markAsSeen();
+    window.addEventListener('zannah-chat-opened', handleChatOpened);
+    return () => window.removeEventListener('zannah-chat-opened', handleChatOpened);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Kelola fokus keyboard/screen-reader saat bubble muncul & hilang: simpan
   // elemen yang lagi fokus sebelum bubble muncul, pindahkan fokus ke dialog
   // begitu muncul, lalu kembalikan lagi begitu ditutup — pola yang sama
@@ -110,24 +124,28 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
       }`}
     >
       <div
-        className={`relative rounded-3xl border p-5 ${
+        className={`relative overflow-hidden rounded-3xl border p-5 ring-1 ${
           darkMode
-            ? 'bg-slate-900 border-slate-700 text-slate-100 shadow-[0_25px_60px_-20px_rgba(45,212,191,0.25)]'
-            : 'bg-white border-slate-200 text-slate-900 shadow-[0_25px_60px_-20px_rgba(13,148,136,0.35)]'
+            ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_25px_60px_-20px_rgba(45,212,191,0.3)]'
+            : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_25px_60px_-20px_rgba(13,148,136,0.35)]'
         }`}
       >
+        {/* Aksen tipis di tepi atas — satu-satunya sentuhan gradien di kartu
+            ini, menegaskan identitas warna Zannah (teal → indigo) yang sama
+            dipakai di avatar, tanpa menambah gradien di tempat lain. */}
+        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-500" />
         <button
           type="button"
           aria-label="Tutup sambutan"
           onClick={markAsSeen}
-          className={`absolute top-3 right-3 flex h-7 w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
-            darkMode ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-400 hover:bg-slate-100'
+          className={`absolute top-4 right-3 flex h-7 w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
+            darkMode ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
           }`}
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="flex items-start gap-3 pr-5">
+        <div className="flex items-start gap-3 pr-5 pt-1">
           {/* Avatar: icon Sparkles (bukan inisial teks) supaya langsung kebaca
               "asisten AI", + badge titik hijau kecil buat kesan "siap merespons
               sekarang" — pola familiar dari widget live-chat. Ping di belakang
@@ -135,7 +153,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
               kecil & redup jadi nggak mengganggu fokus ke pesan utamanya, dan
               dimatikan sepenuhnya kalau user minta reduced motion. */}
           <div className="relative shrink-0">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-md">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-lg shadow-teal-500/30 ring-4 ${darkMode ? 'ring-slate-900' : 'ring-white'}`}>
               <Sparkles className="h-6 w-6 text-white" />
             </div>
             <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
@@ -162,10 +180,10 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
           <button
             type="button"
             onClick={markAsSeen}
-            className={`flex-1 rounded-xl py-2.5 text-sm font-medium transition-colors ${FOCUS_RING} ${
+            className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors ${FOCUS_RING} ${
               darkMode
-                ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                : 'border-slate-200 text-slate-600 hover:bg-slate-50'
             }`}
           >
             Nanti aja
@@ -173,7 +191,9 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
           <button
             type="button"
             onClick={handleOpenChat}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-teal-700 ${FOCUS_RING}`}
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white shadow-md shadow-teal-600/30 transition-all hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-600/40 ${
+              prefersReducedMotion ? '' : 'hover:-translate-y-0.5'
+            } ${FOCUS_RING}`}
           >
             <MessageCircle className="h-4 w-4" />
             Ngobrol yuk
@@ -181,7 +201,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
         </div>
       </div>
 
-      {/* Ekor kecil menunjuk ke arah tombol chat di pojok kanan bawah */}
+      {/* Ekor kecil menunjuk ke arah tombol chat di pojok kiri bawah */}
       <div
         className={`absolute -bottom-1.5 left-8 h-3.5 w-3.5 rotate-45 border-r border-b ${
           darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
