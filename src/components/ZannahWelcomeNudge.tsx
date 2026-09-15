@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Sparkles, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
-const STORAGE_KEY = 'zannahWelcomeShown';
+export const STORAGE_KEY = 'zannahWelcomeShown';
 const SHOW_AFTER_MS = 3500;
 
 interface ZannahWelcomeNudgeProps {
@@ -105,7 +105,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
       role="dialog"
       aria-label="Sambutan dari Zannah"
       aria-modal="false"
-      className={`fixed bottom-24 right-6 z-[60] w-80 max-w-[calc(100vw-2rem)] outline-none ${
+      className={`fixed bottom-24 left-6 z-[60] w-80 max-w-[calc(100vw-2rem)] outline-none ${
         prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-bottom-3 zoom-in-95 duration-300'
       }`}
     >
@@ -183,7 +183,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
 
       {/* Ekor kecil menunjuk ke arah tombol chat di pojok kanan bawah */}
       <div
-        className={`absolute -bottom-1.5 right-8 h-3.5 w-3.5 rotate-45 border-r border-b ${
+        className={`absolute -bottom-1.5 left-8 h-3.5 w-3.5 rotate-45 border-r border-b ${
           darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
         }`}
       />

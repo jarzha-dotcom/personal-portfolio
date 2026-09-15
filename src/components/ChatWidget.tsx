@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2, RotateCw } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
+import { ZannahWelcomeNudge, STORAGE_KEY as ZANNAH_WELCOME_STORAGE_KEY } from './ZannahWelcomeNudge';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { CATEGORIES, FAQ_ITEMS, Category, FAQItem } from '../data/faqData';
 import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile, AgentIntentAction, sendAgentAnalyticsEvent, searchFaqSemantic } from '../services/geminiService';
@@ -1407,6 +1408,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   return (
     <div className="fixed bottom-6 left-6 z-50 no-print">
+      {!isOpen && <ZannahWelcomeNudge darkMode={darkMode} enabled />}
       {isOpen && (
         <Portal>
           {/* Backdrop — full overlay on mobile (layar sempit) so user fokus ke chat; invisible & click-through on desktop */}
@@ -1424,12 +1426,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
             >
               {/* Header */}
               <div
-                className={`p-3.5 border-b flex items-center justify-between transition-colors ${darkMode
+                className={`p-3.5 border-b flex items-center justify-between gap-2 transition-colors ${darkMode
                   ? 'bg-slate-800/80 border-slate-700'
                   : 'bg-slate-50 border-slate-100'
                   }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
                   <button
                     type="button"
                     onClick={openHistoryPanel}
@@ -1447,20 +1449,20 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                     </div>
                     <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 rounded-full ${darkMode ? 'border-slate-800' : 'border-white'}`} />
                   </button>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <h3 className={`font-bold text-xs ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <h3 className={`font-bold text-xs truncate ${darkMode ? 'text-white' : 'text-slate-900'}`}>
                         {isHeaderRadit ? 'Radit' : 'Zannah'}
                       </h3>
                       <ModeBadge aiMode={isHeaderRadit ? 'fallback' : (aiMode === 'unknown' ? 'ai' : aiMode)} darkMode={darkMode} />
                     </div>
-                    <p className={`text-[10px] ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>
+                    <p className={`text-[10px] truncate ${darkMode ? 'text-slate-300' : 'text-slate-500'}`}>
                       {isHeaderRadit ? 'Model Direktori (FAQ)' : 'Konsultan & Asisten AI'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     type="button"
                     aria-label="Mulai obrolan baru"
@@ -1490,7 +1492,6 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                         }`}
                     >
                       <FileText className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">{downloadSummarySuccess ? 'Tersimpan!' : 'Rangkuman'}</span>
                     </button>
                   )}
                   {messages.length > 1 && canShareSummary && (
@@ -1512,9 +1513,6 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       ) : (
                         <Share2 className="w-3.5 h-3.5" />
                       )}
-                      <span className="hidden sm:inline">
-                        {shareSummaryState === 'shared' ? 'Terkirim!' : shareSummaryState === 'sharing' ? 'Membuka...' : 'Bagikan'}
-                      </span>
                     </button>
                   )}
                   <button
@@ -2081,7 +2079,19 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       {/* Toggle Button */}
       <button
         aria-label={isOpen ? 'Tutup chat widget' : 'Buka chat widget'}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          setIsOpen((prev) => {
+            const next = !prev;
+            if (next) {
+              try {
+                window.localStorage.setItem(ZANNAH_WELCOME_STORAGE_KEY, '1');
+              } catch {
+                // localStorage nggak tersedia — nggak fatal, paling nudge muncul lagi
+              }
+            }
+            return next;
+          });
+        }}
         className="w-12 h-12 rounded-full bg-amber-500 hover:bg-amber-600 text-white flex items-center justify-center shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 border-2 border-slate-900"
         title={isRadit ? 'Chat dengan Radit (Standby Bot)' : 'Chat dengan Zannah (AI)'}
       >
