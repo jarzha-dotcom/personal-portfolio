@@ -41,13 +41,17 @@ import {
 import { useVoiceChat } from '../hooks/useVoiceChat';
 import { useStreamingText } from '../hooks/useStreamingText';
 import { downloadChatSummaryFile } from '../utils/chatSummaryGenerator';
+import { BOT_VOICES } from '../services/voiceService';
 
 // ── Persona Showcase: Rajendra (cowok, portfolio AI assistant) ──────────────────
 // Zannah = ChatWidget (cewek), Kania = ChatWidgetCV (cewek) → Rajendra = Showcase (cowok)
 const SHOWCASE_BOT_NAME = 'Rajendra';
 const SHOWCASE_BOT_INITIALS = 'RJ';
 const SHOWCASE_BOT_ROLE = 'AI Portfolio Assistant';
-const SHOWCASE_VOICE = 'id-ID-Wavenet-B'; // Wavenet-B = male voice
+// Sebelumnya hardcode 'id-ID-Wavenet-B' di sini (terpisah dari BOT_VOICES,
+// jadi gampang ke-drift). Sekarang satu sumber kebenaran lewat BOT_VOICES.RAJENDRA
+// (Chirp3-HD Puck, male) di voiceService.ts — kualitas naik dari Wavenet ke Chirp3-HD juga.
+const SHOWCASE_VOICE = BOT_VOICES.RAJENDRA;
 const MAX_DISPLAY_MESSAGES = 50;
 const MAX_HISTORY_TURNS = 12; // 6 putaran percakapan terakhir
 

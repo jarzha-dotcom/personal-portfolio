@@ -2,6 +2,14 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 const GCP_API_KEY = process.env.GCP_API_KEY;
 
+// ── Saklar on/off GCP TTS lewat .env ─────────────────────────────────────────
+// Set GCP_TTS=true di .env / Vercel env vars untuk coba GCP TTS dulu (perilaku
+// normal). Kalau GCP_TTS=false, kosong, atau tidak di-set sama sekali — handler
+// langsung balas 503 tanpa memanggil GCP sama sekali, jadi frontend
+// (voiceService.ts) langsung pakai Web Speech API browser. Berguna kalau
+// billing GCP lagi nonaktif, jadi tidak buang waktu nunggu request GCP gagal.
+const GCP_TTS_ENABLED = (process.env.GCP_TTS || '').trim().toLowerCase() === 'true';
+
 // CATATAN PENTING: id-ID-Neural2-* kemungkinan besar TIDAK tersedia di GCP TTS —
 // Neural2 baru dirilis untuk sebagian bahasa. id-ID-Wavenet-A dipakai sebagai
 // default yang sudah lama tersedia & stabil. Cek daftar voice aktual via:
@@ -53,6 +61,53 @@ const ALLOWED_VOICES = new Set([
   'id-ID-Standard-D',
 ]);
 
+// ── Fallback berjenjang kualitas suara ───────────────────────────────────────
+// Kalau tier teratas (Chirp3-HD) gagal disintesis di akun/region ini (mis. 400
+// karena belum tersedia), otomatis coba tier di bawahnya, dst. Kalau semua
+// tier GCP gagal, baru handler balas error supaya frontend fallback ke Web
+// Speech API browser (lihat catatan di bagian bawah file / voiceService.ts).
+const VOICE_TIERS: string[][] = [
+  // Tier 1 — Chirp3-HD (paling natural)
+  [
+    'id-ID-Chirp3-HD-Zephyr',
+    'id-ID-Chirp3-HD-Kore',
+    'id-ID-Chirp3-HD-Puck',
+  ],
+  // Tier 2 — Wavenet (natural, sudah lama stabil)
+  [
+    'id-ID-Wavenet-A',
+    'id-ID-Wavenet-B',
+    'id-ID-Wavenet-C',
+    'id-ID-Wavenet-D',
+  ],
+  // Tier 3 — Standard (paling robotik, tapi paling murah & hampir pasti tersedia)
+  [
+    'id-ID-Standard-A',
+    'id-ID-Standard-B',
+    'id-ID-Standard-C',
+    'id-ID-Standard-D',
+  ],
+];
+
+function tierIndexOf(voiceName: string): number {
+  return VOICE_TIERS.findIndex((tier) => tier.includes(voiceName));
+}
+
+// Bangun urutan percobaan: mulai dari voice yang diminta/default, lalu turun
+// ke satu representasi dari tiap tier di bawahnya yang belum dicoba.
+function buildFallbackChain(startVoice: string): string[] {
+  const chain = [startVoice];
+  const startTier = tierIndexOf(startVoice);
+  const fromTier = startTier === -1 ? 0 : startTier + 1;
+
+  for (let t = fromTier; t < VOICE_TIERS.length; t++) {
+    const candidate = VOICE_TIERS[t].find((v) => v !== startVoice);
+    if (candidate) chain.push(candidate);
+  }
+
+  return chain;
+}
+
 const MAX_CHARS = 800; // batasi panjang teks per request TTS
 
 // ── Rate limiting per IP (pola sama seperti chat.ts) ────────────────────────────
@@ -80,6 +135,51 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 
   record.count += 1;
   return { allowed: true, remaining: RATE_LIMIT_PER_IP - record.count };
+}
+
+// ── Panggilan sintesis untuk satu voice tertentu ─────────────────────────────
+async function synthesizeWithVoice(
+  voiceName: string,
+  text: string,
+): Promise<string> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout per percobaan
+
+  try {
+    const response = await fetch(
+      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCP_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          input: { text },
+          voice: { languageCode: 'id-ID', name: voiceName },
+          audioConfig: {
+            audioEncoding: 'MP3',
+            speakingRate: 1.0,
+            pitch: 0,
+          },
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      throw new Error(err.error?.message || `HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const audioContent = data.audioContent as string | undefined;
+
+    if (!audioContent) {
+      throw new Error('Empty audio response from GCP TTS');
+    }
+
+    return audioContent;
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 function cleanupOldRateLimits() {
@@ -285,6 +385,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  if (!GCP_TTS_ENABLED) {
+    // GCP_TTS bukan 'true' di .env — sengaja di-skip (mis. billing GCP nonaktif).
+    // Frontend (voiceService.ts) otomatis fallback ke Web Speech API browser
+    // begitu terima 503, sama seperti kasus GCP_API_KEY kosong di bawah.
+    return res.status(503).json({
+      error: 'TTS_DISABLED',
+      detail: 'GCP TTS dinonaktifkan (GCP_TTS bukan "true" di .env)',
+    });
+  }
+
   if (!GCP_API_KEY) {
     // Bukan error fatal — frontend (voiceService.ts) otomatis fallback ke
     // Web Speech API browser kalau endpoint ini balas 503.
@@ -318,59 +428,40 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+  const fallbackChain = buildFallbackChain(selectedVoice);
+  const attemptErrors: { voice: string; error: string }[] = [];
 
-    const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCP_API_KEY}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          input: { text: cleanText },
-          voice: { languageCode: 'id-ID', name: selectedVoice },
-          audioConfig: {
-            audioEncoding: 'MP3',
-            speakingRate: 1.0,
-            pitch: 0,
-          },
-        }),
-      },
-    );
+  for (const voiceName of fallbackChain) {
+    try {
+      const audioContent = await synthesizeWithVoice(voiceName, cleanText);
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${response.status}`);
-    }
-
-    const data = await response.json();
-    const audioContent = data.audioContent as string | undefined;
-
-    if (!audioContent) {
-      throw new Error('Empty audio response from GCP TTS');
-    }
-
-    return res.status(200).json({
-      audioContent,
-      voice: selectedVoice,
-      remainingQuota: rateLimitStatus.remaining,
-    });
-  } catch (error: unknown) {
-    console.error('[tts.ts] GCP TTS error:', error);
-
-    const isTimeout = error instanceof Error && error.name === 'AbortError';
-
-    return res.status(502).json({
-      error: 'TTS_FAILED',
-      detail: isTimeout
+      return res.status(200).json({
+        audioContent,
+        voice: voiceName,
+        // true kalau yang akhirnya dipakai bukan pilihan/default awal, jadi
+        // frontend bisa kasih tau user kalau kualitasnya turun tier
+        degraded: voiceName !== selectedVoice,
+        remainingQuota: rateLimitStatus.remaining,
+      });
+    } catch (error: unknown) {
+      const isTimeout = error instanceof Error && error.name === 'AbortError';
+      const message = isTimeout
         ? 'Request timeout ke GCP TTS'
         : error instanceof Error
           ? error.message
-          : 'Unknown error',
-    });
+          : 'Unknown error';
+
+      console.error(`[tts.ts] GCP TTS gagal untuk voice "${voiceName}":`, message);
+      attemptErrors.push({ voice: voiceName, error: message });
+      // lanjut ke voice/tier berikutnya di fallbackChain
+    }
   }
+
+  // Semua tier GCP (Chirp3-HD -> Wavenet -> Standard) gagal.
+  // Balas 502 supaya frontend (voiceService.ts) fallback ke Web Speech API browser.
+  return res.status(502).json({
+    error: 'TTS_FAILED',
+    detail: 'Semua tier suara GCP TTS gagal disintesis.',
+    attempts: attemptErrors,
+  });
 }

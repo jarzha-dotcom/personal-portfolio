@@ -44,13 +44,17 @@ export interface SpeechSupport {
 }
 
 // Konfigurasi Suara berdasarkan Persona Bot (Google DeepMind Chirp3 HD):
-// - Zannah: Cewek (Ramah, Cerdas, Konsultatif)
-// - Radit:  Cowok (Tenang, Sigap, Direktori/Standby)
-// - Kania:  Cewek (Hangat, Detail, Asisten CV)
+// Gender di bawah ini mengikuti daftar resmi voice Chirp3-HD dari Google Cloud
+// (Fenrir/Puck/Charon/Orus dkk = Male, Zephyr/Gacrux/Kore dkk = Female).
+// - Zannah:   Cewek (Ramah, Cerdas, Konsultatif)
+// - Radit:    Cowok (Tenang, Sigap, Direktori/Standby)
+// - Kania:    Cewek (Hangat, Detail, Asisten CV)
+// - Rajendra: Cowok (persona baru — voice beda dari Radit biar tidak kembar)
 export const BOT_VOICES = {
-  ZANNAH: 'id-ID-Chirp3-HD-Zephyr', // Cewek
-  RADIT: 'id-ID-Chirp3-HD-Fenrir',   // Cowok
-  KANIA: 'id-ID-Chirp3-HD-Gacrux',  // Cewek
+  ZANNAH: 'id-ID-Chirp3-HD-Zephyr',    // Cewek
+  RADIT: 'id-ID-Chirp3-HD-Fenrir',     // Cowok
+  KANIA: 'id-ID-Chirp3-HD-Gacrux',     // Cewek
+  RAJENDRA: 'id-ID-Chirp3-HD-Puck',    // Cowok
 } as const;
 
 export const DEFAULT_GCP_VOICE = BOT_VOICES.ZANNAH;
