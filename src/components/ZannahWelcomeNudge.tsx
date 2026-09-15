@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Sparkles, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
-export const STORAGE_KEY = 'zannahWelcomeShown';
 const SHOW_AFTER_MS = 3500;
 
 interface ZannahWelcomeNudgeProps {
@@ -24,8 +23,15 @@ const FOCUS_RING =
  * Sengaja BUKAN coachmark step-by-step: tidak ada "Lanjut ➡️", tidak nunjuk-
  * nunjuk section lain di halaman, dan chat window tidak auto-terbuka. Cuma
  * bubble kecil di dekat tombol chat dengan dua pilihan: tutup, atau langsung
- * masuk ke percakapan dengan Zannah. Tampil sekali per browser (flag di
- * localStorage) lalu tidak pernah muncul otomatis lagi.
+ * masuk ke percakapan dengan Zannah.
+ *
+ * Muncul di SETIAP pageview (bukan sekali per browser) — sengaja begitu:
+ * refresh penuh jarang terjadi kecuali user memang baru mulai kunjungan
+ * (tab baru, balik lagi setelah lama, atau koneksi putus-nyambung), jadi
+ * tiap kemunculan pada dasarnya memang "kunjungan baru". Begitu di-dismiss
+ * (tombol X, "Nanti aja", buka chat, atau Escape), bubble diam untuk SISA
+ * kunjungan itu saja — tidak muncul berulang-ulang di halaman yang sama
+ * tanpa reload.
  */
 export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode, enabled }) => {
   const [visible, setVisible] = useState(false);
@@ -37,18 +43,6 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
   useEffect(() => {
     if (!enabled || alreadyHandledRef.current) return;
     if (typeof window === 'undefined') return;
-
-    let hasSeenBefore = false;
-    try {
-      hasSeenBefore = !!window.localStorage.getItem(STORAGE_KEY);
-    } catch {
-      // localStorage tidak tersedia (mis. private mode strict) — anggap saja
-      // belum pernah lihat, tidak fatal kalau nudge ini muncul lagi lain waktu.
-    }
-    if (hasSeenBefore) {
-      alreadyHandledRef.current = true;
-      return;
-    }
 
     const timer = window.setTimeout(() => setVisible(true), SHOW_AFTER_MS);
     return () => window.clearTimeout(timer);
@@ -84,11 +78,6 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
   const markAsSeen = () => {
     alreadyHandledRef.current = true;
     setVisible(false);
-    try {
-      window.localStorage.setItem(STORAGE_KEY, '1');
-    } catch {
-      // Nggak masalah kalau gagal disimpan — paling nudge muncul lagi di sesi berikut.
-    }
   };
 
   // Escape menutup bubble — konsisten dengan pola dismiss lain (drawer mobile,
