@@ -26,6 +26,18 @@ export interface SpeakOptions {
   onStart?: () => void;
   onEnd?: () => void;
   onError?: (err: unknown) => void;
+  /**
+   * Dipanggil sekali begitu source audio final (gcp/browser) diketahui —
+   * sebelum audio benar-benar mulai diputar. `degraded: true` artinya
+   * kualitas suara turun dari yang diminta (voice tier GCP turun, atau
+   * kepaksa fallback ke Web Speech browser). Berguna buat UI kasih
+   * indikator halus ("suara sederhana") tanpa perlu ubah SpeakOptions lain.
+   */
+  onSourceResolved?: (info: {
+    source: VoiceSource;
+    degraded: boolean;
+    remainingQuota?: number;
+  }) => void;
 }
 
 export interface ListenOptions {
@@ -64,10 +76,25 @@ const MAX_TTS_CHARS = 800;
 
 // ── State (module-level singleton) ────────────────────────────────────────────
 
-const audioCache = new Map<string, string>(); // key: `${voice}::${text}` -> data URL base64
+interface GCPAudioResult {
+  dataUrl: string;
+  degraded: boolean;
+  remainingQuota?: number;
+}
+
+// key: `${voice}::${text}` -> hasil GCP TTS (data URL + info degraded/kuota)
+const audioCache = new Map<string, GCPAudioResult>();
 let currentAudio: HTMLAudioElement | null = null;
 let currentUtterance: SpeechSynthesisUtterance | null = null;
 let recognitionInstance: SpeechRecognitionLike | null = null;
+// AbortController request TTS yang sedang berjalan (kalau ada) — dibatalkan
+// otomatis begitu speak()/stopSpeaking() baru dipanggil, biar gak ada race
+// condition audio lama nimpa audio baru pas user cepat ganti-ganti pesan.
+let currentAbortController: AbortController | null = null;
+// Dinaikkan tiap kali speak() dipanggil. Dipakai buat cek "apakah hasil
+// fetch ini masih relevan" begitu fetch selesai — kalau sudah ada speak()
+// yang lebih baru mulai selagi kita nunggu network, hasil yang lama dibuang.
+let requestSeq = 0;
 
 // Minimal type shim — Web Speech API belum punya tipe resmi di lib.dom.d.ts
 interface SpeechRecognitionLike extends EventTarget {
@@ -247,6 +274,35 @@ export function normalizeIndonesianForSpeech(text: string): string {
 }
 
 /**
+ * Potong teks ke maksimal `maxChars`, tapi coba cari batas kalimat terakhir
+ * (., !, ?) dalam batas itu dulu supaya gak kepotong di tengah kalimat.
+ * Kalau gak ketemu batas kalimat yang cukup jauh, fallback potong di batas
+ * kata terakhir (biar gak motong di tengah kata) dan kasih tanda "…".
+ */
+function truncateAtSentenceBoundary(text: string, maxChars: number): string {
+  if (text.length <= maxChars) return text;
+
+  const slice = text.slice(0, maxChars);
+  const lastSentenceEnd = Math.max(
+    slice.lastIndexOf('. '),
+    slice.lastIndexOf('! '),
+    slice.lastIndexOf('? '),
+    slice.lastIndexOf('.\n'),
+  );
+
+  // Cuma pakai batas kalimat itu kalau gak motong kebanyakan (masih di atas
+  // 40% dari maxChars) — kalau kalimat pertama aja udah lebih panjang dari
+  // maxChars, mending fallback ke batas kata daripada motong nyaris kosong.
+  if (lastSentenceEnd > maxChars * 0.4) {
+    return slice.slice(0, lastSentenceEnd + 1).trim();
+  }
+
+  const lastSpace = slice.lastIndexOf(' ');
+  const safeSlice = lastSpace > maxChars * 0.4 ? slice.slice(0, lastSpace) : slice;
+  return `${safeSlice.trim()}…`;
+}
+
+/**
  * Bersihkan markdown/simbol/URL dan normalisasi singkatan/mata uang sebelum
  * teks dikirim ke TTS agar dibaca natural (mis. "800 ribu rupiah", bukan "rupiah 800 rb").
  */
@@ -266,18 +322,19 @@ export function stripMarkdownForSpeech(raw: string): string {
 
   const normalized = normalizeIndonesianForSpeech(cleaned);
 
-  return normalized
-    .replace(/\s{2,}/g, ' ')
-    .trim()
-    .slice(0, MAX_TTS_CHARS);
+  const trimmed = normalized.replace(/\s{2,}/g, ' ').trim();
+  return truncateAtSentenceBoundary(trimmed, MAX_TTS_CHARS);
 }
 
 function cacheKey(text: string, voice: string): string {
   return `${voice}::${text}`;
 }
 
-function rememberInCache(key: string, dataUrl: string): void {
-  audioCache.set(key, dataUrl);
+/** Simpan hasil TTS di cache. LRU: kalau sudah ada, re-insert supaya posisinya
+ * "paling baru dipakai" (Map JS mempertahankan urutan insert). */
+function rememberInCache(key: string, result: GCPAudioResult): void {
+  if (audioCache.has(key)) audioCache.delete(key);
+  audioCache.set(key, result);
   if (audioCache.size > MAX_CACHE_ENTRIES) {
     const oldestKey = audioCache.keys().next().value;
     if (oldestKey) audioCache.delete(oldestKey);
@@ -302,8 +359,15 @@ export function isSpeechSupported(): SpeechSupport {
 
 // ── TTS: playback control ────────────────────────────────────────────────────
 
-/** Hentikan audio GCP yang sedang main DAN speech synthesis browser (siapa pun yang aktif). */
+/** Hentikan audio GCP yang sedang main DAN speech synthesis browser (siapa pun yang aktif).
+ * Juga membatalkan request /api/tts yang masih in-flight (kalau ada), supaya
+ * gak ada network call kebuang percuma & gak ada race condition audio lama
+ * nimpa audio baru. */
 export function stopSpeaking(): void {
+  if (currentAbortController) {
+    currentAbortController.abort();
+    currentAbortController = null;
+  }
   if (currentAudio) {
     currentAudio.pause();
     currentAudio.currentTime = 0;
@@ -324,15 +388,21 @@ export function isSpeakingNow(): boolean {
   return false;
 }
 
-async function fetchGCPAudio(text: string, voice: string): Promise<string> {
+async function fetchGCPAudio(text: string, voice: string, signal?: AbortSignal): Promise<GCPAudioResult> {
   const key = cacheKey(text, voice);
   const cached = audioCache.get(key);
-  if (cached) return cached;
+  if (cached) {
+    // LRU touch: pindahkan ke posisi "paling baru dipakai" biar gak gampang ke-evict.
+    audioCache.delete(key);
+    audioCache.set(key, cached);
+    return cached;
+  }
 
   const response = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text, voice }),
+    signal,
   });
 
   if (!response.ok) {
@@ -343,9 +413,13 @@ async function fetchGCPAudio(text: string, voice: string): Promise<string> {
   const data = await response.json();
   if (!data.audioContent) throw new Error('TTS_EMPTY_AUDIO');
 
-  const dataUrl = `data:audio/mp3;base64,${data.audioContent}`;
-  rememberInCache(key, dataUrl);
-  return dataUrl;
+  const result: GCPAudioResult = {
+    dataUrl: `data:audio/mp3;base64,${data.audioContent}`,
+    degraded: !!data.degraded,
+    remainingQuota: typeof data.remainingQuota === 'number' ? data.remainingQuota : undefined,
+  };
+  rememberInCache(key, result);
+  return result;
 }
 
 function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
@@ -383,8 +457,14 @@ function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
 
 /**
  * Ucapkan teks. Otomatis strip markdown, coba GCP TTS dulu, fallback ke
- * Web Speech Synthesis kalau GCP gagal/tidak tersedia. Menghentikan audio
- * sebelumnya (kalau ada) sebelum mulai yang baru.
+ * Web Speech Synthesis kalau GCP gagal/tidak tersedia/audio-nya diblok
+ * autoplay browser. Menghentikan audio sebelumnya (kalau ada) sebelum
+ * mulai yang baru.
+ *
+ * Aman dipanggil berturut-turut dengan cepat (mis. user klik pesan A lalu
+ * langsung klik pesan B sebelum fetch A selesai): panggilan yang lebih tua
+ * otomatis dibatalkan (fetch di-abort & hasilnya dibuang diam-diam tanpa
+ * memicu callback), jadi gak ada audio lama yang nimpa audio baru.
  */
 export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<VoiceSource> {
   const text = stripMarkdownForSpeech(rawText);
@@ -397,26 +477,70 @@ export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<V
 
   const voice = opts.voice || DEFAULT_GCP_VOICE;
 
+  // Token unik buat panggilan ini. Kalau ada speak() lain mulai duluan
+  // sebelum fetch kita selesai, requestSeq bakal berubah dan kita tau hasil
+  // kita udah "basi" — jangan sentuh currentAudio atau panggil callback.
+  const myToken = ++requestSeq;
+  const controller = new AbortController();
+  currentAbortController = controller;
+
+  let gcpResult: GCPAudioResult | null = null;
+
   try {
-    const dataUrl = await fetchGCPAudio(text, voice);
-    const audio = new Audio(dataUrl);
-    currentAudio = audio;
-    audio.onplay = () => opts.onStart?.();
-    audio.onended = () => {
-      currentAudio = null;
-      opts.onEnd?.();
-    };
-    audio.onerror = () => {
-      currentAudio = null;
-      opts.onError?.(new Error('AUDIO_PLAYBACK_ERROR'));
-      opts.onEnd?.();
-    };
-    await audio.play();
-    return 'gcp';
+    gcpResult = await fetchGCPAudio(text, voice, controller.signal);
   } catch (err) {
+    if (controller.signal.aborted) {
+      // Dibatalkan karena ada speak() baru — diam-diam berhenti di sini,
+      // request yang baru itu yang bakal urus onStart/onEnd-nya sendiri.
+      return 'none';
+    }
     console.warn('[voiceService] GCP TTS gagal, fallback ke browser speech:', err);
-    return speakWithBrowser(text, opts);
   }
+
+  // Selagi kita nunggu fetch (walau berhasil), bisa jadi ada speak() lain
+  // yang udah lebih dulu mulai & selesai. Kalau begitu, buang hasil ini.
+  if (myToken !== requestSeq) return 'none';
+
+  if (gcpResult) {
+    opts.onSourceResolved?.({
+      source: 'gcp',
+      degraded: gcpResult.degraded,
+      remainingQuota: gcpResult.remainingQuota,
+    });
+
+    try {
+      const audio = new Audio(gcpResult.dataUrl);
+      currentAudio = audio;
+      audio.onplay = () => opts.onStart?.();
+      audio.onended = () => {
+        currentAudio = null;
+        opts.onEnd?.();
+      };
+      audio.onerror = () => {
+        currentAudio = null;
+        opts.onError?.(new Error('AUDIO_PLAYBACK_ERROR'));
+        opts.onEnd?.();
+      };
+      await audio.play();
+      return 'gcp';
+    } catch (playErr) {
+      // Kemungkinan besar autoplay diblokir browser (NotAllowedError) karena
+      // play() dipanggil di luar user-gesture langsung (mis. auto-speak
+      // balasan bot), atau error decode lain. Bersihkan state audio yang
+      // gagal ini dulu supaya gak nyangkut, baru coba fallback browser.
+      console.warn('[voiceService] Audio GCP gagal diputar (mungkin autoplay diblokir), fallback ke browser speech:', playErr);
+      if (currentAudio) {
+        currentAudio.onended = null;
+        currentAudio.onerror = null;
+        currentAudio = null;
+      }
+    }
+  }
+
+  if (myToken !== requestSeq) return 'none';
+
+  opts.onSourceResolved?.({ source: 'browser', degraded: true });
+  return speakWithBrowser(text, opts);
 }
 
 // ── STT: Speech-to-Text ────────────────────────────────────────────────────────

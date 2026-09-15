@@ -27,6 +27,7 @@ import {
   startListening,
   stopListening,
   isSpeechSupported,
+  type VoiceSource,
 } from '../services/voiceService';
 
 interface UseVoiceChatOptions {
@@ -49,6 +50,12 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [loadingSpeakId, setLoadingSpeakId] = useState<string | null>(null);
   const [voiceSupport] = useState(() => isSpeechSupported());
+  // Info kualitas suara buat pesan yang lagi diputar sekarang (kalau ada).
+  // voiceDegraded true = fallback ke browser ATAU tier suara GCP turun dari
+  // yang diminta — dipakai UI buat kasih indikator halus soal kualitas suara.
+  const [voiceSource, setVoiceSource] = useState<VoiceSource | null>(null);
+  const [voiceDegraded, setVoiceDegraded] = useState(false);
+  const [remainingQuota, setRemainingQuota] = useState<number | null>(null);
   const stopListenRef = useRef<(() => void) | null>(null);
 
   // ⚠️ Cleanup mic & audio TTS yang mungkin masih aktif saat komponen unmount.
@@ -107,6 +114,8 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
       if (speakingId === messageId) {
         stopSpeaking();
         setSpeakingId(null);
+        setVoiceSource(null);
+        setVoiceDegraded(false);
         return;
       }
 
@@ -119,6 +128,11 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
       setLoadingSpeakId(messageId);
       await speak(text, {
         voice,
+        onSourceResolved: ({ source, degraded, remainingQuota: quota }) => {
+          setVoiceSource(source);
+          setVoiceDegraded(degraded);
+          if (typeof quota === 'number') setRemainingQuota(quota);
+        },
         onStart: () => {
           setLoadingSpeakId(null);
           setSpeakingId(messageId);
@@ -126,10 +140,14 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
         onEnd: () => {
           setLoadingSpeakId(null);
           setSpeakingId((current) => (current === messageId ? null : current));
+          setVoiceSource(null);
+          setVoiceDegraded(false);
         },
         onError: () => {
           setLoadingSpeakId(null);
           setSpeakingId(null);
+          setVoiceSource(null);
+          setVoiceDegraded(false);
         },
       });
     },
@@ -144,6 +162,8 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     stopSpeaking();
     setSpeakingId(null);
     setLoadingSpeakId(null);
+    setVoiceSource(null);
+    setVoiceDegraded(false);
   }, []);
 
   return {
@@ -151,6 +171,9 @@ export function useVoiceChat(options: UseVoiceChatOptions = {}) {
     speakingId,
     loadingSpeakId,
     voiceSupport,
+    voiceSource,
+    voiceDegraded,
+    remainingQuota,
     handleMicClick,
     handleToggleSpeak,
     stopAll,

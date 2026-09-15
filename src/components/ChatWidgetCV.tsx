@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Square, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2 } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2 } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
+import { VoiceSpeakingBars } from './VoiceSpeakingBars';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { sendMessageToGemini, ChatMessage, Attachment, OutgoingFile } from '../services/geminiService';
 import {
@@ -440,8 +441,17 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
     );
     const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
     // ── Voice Chat: STT + TTS lewat hook bersama (lihat hooks/useVoiceChat.ts) ──
-    const { isListening, speakingId, loadingSpeakId, voiceSupport, handleMicClick: micToggle, handleToggleSpeak, stopAll } =
-        useVoiceChat({ logLabel: 'ChatWidgetCV' });
+    const {
+        isListening,
+        speakingId,
+        loadingSpeakId,
+        voiceSupport,
+        voiceDegraded,
+        remainingQuota,
+        handleMicClick: micToggle,
+        handleToggleSpeak,
+        stopAll,
+    } = useVoiceChat({ logLabel: 'ChatWidgetCV' });
     // Kalau hasil final STT datang saat bot masih mengetik, teks ditampung di
     // sini dulu dan otomatis dikirim begitu bot selesai (lihat effect di bawah).
     const pendingVoiceTextRef = useRef<string | null>(null);
@@ -653,7 +663,7 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
             geminiHistoryRef.current = [
                 ...geminiHistoryRef.current,
                 userMsg,
-                { role: 'model', parts: [{ text: replyText }] },
+                { role: 'model' as const, parts: [{ text: replyText }] },
             ].slice(-10); // simpan 5 exchange terakhir
 
             // Persist Gemini history ke IndexedDB, terikat ke percakapan yang
@@ -1162,19 +1172,37 @@ export const ChatWidgetCV: React.FC<ChatWidgetCVProps> = ({ darkMode }) => {
                                                 {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
                                                 <div className="flex items-center justify-between gap-2 mt-1">
                                                     {m.sender === 'bot' ? (
-                                                        <button
-                                                            aria-label={speakingId === m.id ? 'Hentikan suara' : 'Dengarkan jawaban'}
-                                                            onClick={() => handleToggleSpeak(m.id, m.text, KANIA_VOICE)}
-                                                            className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60' : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'}`}
-                                                        >
-                                                            {loadingSpeakId === m.id ? (
-                                                                <Loader2 className="w-3 h-3 animate-spin" />
-                                                            ) : speakingId === m.id ? (
-                                                                <Square className="w-2.5 h-2.5 fill-current" />
-                                                            ) : (
-                                                                <Volume2 className="w-3.5 h-3.5" />
+                                                        <div className="flex items-center gap-1.5">
+                                                            <button
+                                                                aria-label={
+                                                                    speakingId === m.id
+                                                                        ? voiceDegraded
+                                                                            ? 'Suara sederhana (fallback) — klik untuk berhenti'
+                                                                            : 'Hentikan suara'
+                                                                        : 'Dengarkan jawaban'
+                                                                }
+                                                                title={
+                                                                    speakingId === m.id && voiceDegraded
+                                                                        ? 'Kualitas suara turun (fallback ke suara browser atau tier lebih sederhana)'
+                                                                        : undefined
+                                                                }
+                                                                onClick={() => handleToggleSpeak(m.id, m.text, KANIA_VOICE)}
+                                                                className={`shrink-0 flex items-center justify-center w-5 h-5 rounded-full transition-colors ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60' : 'text-slate-400 hover:text-teal-600 hover:bg-slate-100'} ${speakingId === m.id && voiceDegraded ? 'text-amber-500' : ''}`}
+                                                            >
+                                                                {loadingSpeakId === m.id ? (
+                                                                    <Loader2 className="w-3 h-3 animate-spin" />
+                                                                ) : speakingId === m.id ? (
+                                                                    <VoiceSpeakingBars degraded={voiceDegraded} />
+                                                                ) : (
+                                                                    <Volume2 className="w-3.5 h-3.5" />
+                                                                )}
+                                                            </button>
+                                                            {speakingId === m.id && remainingQuota !== null && remainingQuota <= 2 && (
+                                                                <span className="text-[9px] text-amber-500 whitespace-nowrap">
+                                                                    Kuota suara tersisa {remainingQuota}
+                                                                </span>
                                                             )}
-                                                        </button>
+                                                        </div>
                                                     ) : (
                                                         <span />
                                                     )}

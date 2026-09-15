@@ -535,6 +535,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
         speakingId,
         loadingSpeakId,
         voiceSupport,
+        voiceDegraded,
+        remainingQuota,
         handleMicClick: micToggle,
         handleToggleSpeak,
         stopAll,
@@ -901,8 +903,8 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
 
             setHistory((prev) => [
                 ...prev.slice(-(MAX_HISTORY_TURNS - 2)),
-                { role: 'user', parts: [{ text }] },
-                { role: 'model', parts: [{ text: replyText }] },
+                { role: 'user' as const, parts: [{ text }] },
+                { role: 'model' as const, parts: [{ text: replyText }] },
             ]);
 
             // Kalau backend beneran memicu Antigravity dan ada jejak langkah untuk
@@ -1464,14 +1466,28 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                             {/* Bottom Info Bar: Speech Soundwave + Copy + Timestamp */}
                             <div className="flex items-center justify-between gap-2 mt-2 pt-1 border-t border-slate-700/20">
                                 {msg.role === 'assistant' && !msg.isError && !msg.isRateLimit && !msg.isStreaming ? (
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1.5">
                                         {/* TTS Audio Button & Soundwave visualizer */}
                                         <button
-                                            aria-label={speakingId === msg.id ? 'Hentikan suara' : 'Dengarkan suara'}
-                                            title={speakingId === msg.id ? 'Hentikan suara' : 'Dengarkan suara'}
+                                            aria-label={
+                                                speakingId === msg.id
+                                                    ? voiceDegraded
+                                                        ? 'Suara sederhana (fallback) — klik untuk berhenti'
+                                                        : 'Hentikan suara'
+                                                    : 'Dengarkan suara'
+                                            }
+                                            title={
+                                                speakingId === msg.id
+                                                    ? voiceDegraded
+                                                        ? 'Kualitas suara turun (fallback ke suara browser atau tier lebih sederhana)'
+                                                        : 'Hentikan suara'
+                                                    : 'Dengarkan suara'
+                                            }
                                             onClick={() => handleToggleSpeak(msg.id, msg.content, SHOWCASE_VOICE)}
                                             className={`flex items-center gap-1.5 px-1.5 py-0.5 rounded-md text-[10px] font-medium transition-colors ${speakingId === msg.id
-                                                ? 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
+                                                ? voiceDegraded
+                                                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                                                    : 'bg-teal-500/20 text-teal-300 border border-teal-500/40'
                                                 : darkMode
                                                     ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-700/60'
                                                     : 'text-slate-500 hover:text-teal-600 hover:bg-slate-100'
@@ -1481,18 +1497,23 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }
                                                 <Loader2 className="w-3 h-3 animate-spin" />
                                             ) : speakingId === msg.id ? (
                                                 <>
-                                                    <Square className="w-2.5 h-2.5 fill-current text-teal-400" />
+                                                    <Square className={`w-2.5 h-2.5 fill-current ${voiceDegraded ? 'text-amber-400' : 'text-teal-400'}`} />
                                                     <div className="flex items-end gap-0.5 h-3 px-0.5">
-                                                        <span className="w-0.5 bg-teal-400 rounded-full animate-soundwave-1" />
-                                                        <span className="w-0.5 bg-teal-400 rounded-full animate-soundwave-2" />
-                                                        <span className="w-0.5 bg-teal-400 rounded-full animate-soundwave-3" />
-                                                        <span className="w-0.5 bg-teal-400 rounded-full animate-soundwave-4" />
+                                                        <span className={`w-0.5 rounded-full animate-soundwave-1 ${voiceDegraded ? 'bg-amber-400' : 'bg-teal-400'}`} />
+                                                        <span className={`w-0.5 rounded-full animate-soundwave-2 ${voiceDegraded ? 'bg-amber-400' : 'bg-teal-400'}`} />
+                                                        <span className={`w-0.5 rounded-full animate-soundwave-3 ${voiceDegraded ? 'bg-amber-400' : 'bg-teal-400'}`} />
+                                                        <span className={`w-0.5 rounded-full animate-soundwave-4 ${voiceDegraded ? 'bg-amber-400' : 'bg-teal-400'}`} />
                                                     </div>
                                                 </>
                                             ) : (
                                                 <Volume2 className="w-3.5 h-3.5" />
                                             )}
                                         </button>
+                                        {speakingId === msg.id && remainingQuota !== null && remainingQuota <= 2 && (
+                                            <span className="text-[9px] text-amber-500 whitespace-nowrap">
+                                                Kuota suara tersisa {remainingQuota}
+                                            </span>
+                                        )}
 
                                         {/* 1-Click Copy Button */}
                                         <button
