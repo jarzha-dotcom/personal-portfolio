@@ -210,13 +210,22 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
     <section
       id="proyek"
       aria-labelledby="proyek-heading"
-      className={`py-16 md:py-24 transition-colors duration-200 relative overflow-hidden ${
+      className={`py-16 md:py-24 transition-colors duration-200 relative ${
         darkMode ? 'bg-slate-950 border-t border-slate-800/80' : 'bg-slate-50 border-t border-slate-200'
       }`}
     >
-      {/* Subtle Background Accent Glows */}
-      <div className="absolute top-1/4 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
+      {/* Subtle Background Accent Glows — dibungkus wrapper overflow-hidden
+          sendiri (bukan di <section>) supaya nggak ikut mematahkan
+          position:sticky pada sidebar chatbot di bawah. overflow selain
+          `visible` pada ancestor manapun dari elemen sticky akan membuat
+          elemen itu nempel relatif ke ancestor tsb, bukan ke viewport —
+          karena ancestor ini sendiri tidak scroll independen, hasilnya
+          sidebar terlihat seperti "ikut kescroll" alih-alih nempel. */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-10 right-0 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+      </div>
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Section Header */}
