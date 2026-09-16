@@ -60,6 +60,26 @@ export interface RabDocumentData {
      * Default fallback: 'standard'.
      */
     budgetPreference?: string;
+
+    /**
+     * ── Sinyal "benar-benar dibahas eksplisit oleh user" untuk checklist poin #1-5 ──
+     * Field-field ini TERPISAH dari nilai hasil ekstraksi (projectType, features, dst).
+     * Alasannya: LLM ekstraksi diinstruksikan untuk mengisi projectType/budgetPreference
+     * dengan default ('web_app'/'standard') dan bahkan MENGARANG estimasi fitur kalau
+     * user belum membahasnya sama sekali, supaya JSON tetap valid untuk kasus draf lokal.
+     * Tanpa sinyal terpisah ini, kode tidak bisa membedakan "user benar-benar memilih
+     * web_app" vs "LLM asal isi default karena user tidak pernah bahas platform" --
+     * dan itulah celah yang membuat RAB resmi bisa lolos hanya dari nama+email saja.
+     * Nilai-nilai ini WAJIB diisi true HANYA kalau user benar-benar menyebutkan poin
+     * terkait di transkrip; lihat instruksi eksplisit di prompt ekstraksi.
+     */
+    platformExplicit?: boolean;
+    featuresExplicit?: boolean;
+    /** Checklist poin #3: Target Pengguna & Skala (internal/B2B/publik). Kosong = belum dibahas. */
+    targetScale?: string;
+    /** Checklist poin #4: Target Waktu / Deadline Pengerjaan. Kosong = belum dibahas. */
+    deadline?: string;
+    budgetExplicit?: boolean;
 }
 
 const CLIENT_EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -77,10 +97,46 @@ export function hasCompleteClientChecklist(doc: RabDocumentData | null): boolean
     return nameOk && emailOk;
 }
 
+/**
+ * Gerbang checklist LENGKAP (7 poin) -- sejajar dengan checklist yang dijanjikan
+ * ke user di system prompt (lihat PROTOKOL KONSULTATIF di prompts.ts). Sebelumnya
+ * hard guard di kode HANYA memvalidasi Nama & Email (`hasCompleteClientChecklist`),
+ * sedangkan 5 poin teknis (platform, fitur, target pengguna, deadline, budget)
+ * cuma dijaga oleh kepatuhan system prompt LLM -- yang BUKAN benteng, karena LLM
+ * ekstraksi (`extractStructuredDocument`) sendiri diinstruksikan mengisi default/
+ * mengarang nilai kalau user belum membahasnya, supaya JSON tetap valid untuk
+ * kasus draf lokal. Akibatnya: user yang cuma memberi nama+email tanpa konteks
+ * proyek apa pun tetap lolos ke DevRAB Engine dengan data proyek hasil karangan.
+ *
+ * Fungsi ini menutup celah itu dengan mewajibkan sinyal "benar-benar dibahas
+ * eksplisit" (`platformExplicit`, `featuresExplicit`, `targetScale`, `deadline`,
+ * `budgetExplicit`) selain Nama & Email, sebelum RAB resmi boleh diproses.
+ */
+export function hasCompleteProjectChecklist(doc: RabDocumentData | null): boolean {
+    if (!doc) return false;
+    const identityOk = hasCompleteClientChecklist(doc);
+    const platformOk = doc.platformExplicit === true;
+    const featuresOk =
+        doc.featuresExplicit === true && Array.isArray(doc.features) && doc.features.length >= 2;
+    const targetScaleOk = typeof doc.targetScale === 'string' && doc.targetScale.trim().length > 0;
+    const deadlineOk = typeof doc.deadline === 'string' && doc.deadline.trim().length > 0;
+    const budgetOk = doc.budgetExplicit === true;
+    return identityOk && platformOk && featuresOk && targetScaleOk && deadlineOk && budgetOk;
+}
+
 export function getMissingChecklistFields(doc: RabDocumentData | null): string[] {
     const missing: string[] = [];
+    if (!doc || doc.platformExplicit !== true) missing.push('Platform / Jenis Aplikasi');
+    if (!doc || doc.featuresExplicit !== true || !Array.isArray(doc.features) || doc.features.length < 2)
+        missing.push('Fitur Kunci & Alur Kerja (minimal 2-3 fitur spesifik)');
+    if (!doc || typeof doc.targetScale !== 'string' || doc.targetScale.trim().length === 0)
+        missing.push('Target Pengguna & Skala');
+    if (!doc || typeof doc.deadline !== 'string' || doc.deadline.trim().length === 0)
+        missing.push('Target Waktu / Deadline Pengerjaan');
+    if (!doc || doc.budgetExplicit !== true) missing.push('Preferensi Budget');
     if (!doc || typeof doc.clientName !== 'string' || doc.clientName.trim().length < 2) missing.push('Nama Lengkap');
-    if (!doc || typeof doc.clientEmail !== 'string' || !CLIENT_EMAIL_PATTERN.test(doc.clientEmail.trim())) missing.push('Email Aktif');
+    if (!doc || typeof doc.clientEmail !== 'string' || !CLIENT_EMAIL_PATTERN.test(doc.clientEmail.trim()))
+        missing.push('Email Aktif');
     return missing;
 }
 
@@ -405,13 +461,25 @@ export async function buildAgentDocumentAttachment(
 
         const prompt = `Ekstrak rincian kebutuhan proyek dan RAB (Rencana Anggaran Biaya) di bawah ini menjadi JSON terstruktur.
 Gunakan informasi dari rangkuman diskusi lengkap dan jawaban asisten untuk mengidentifikasi nama proyek, fitur-fitur utama, dan estimasi waktu/biaya secara akurat.
-Cari juga NAMA LENGKAP, EMAIL AKTIF, dan NOMOR WHATSAPP/TELEPON milik klien/user (BUKAN nama/email/nomor Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
-Tentukan JENIS PROYEK (projectType) berdasarkan checklist poin #1 Platform/Jenis Aplikasi yang dibahas. Pilih salah satu: 'web_app' | 'mobile_app' | 'web_mobile' | 'landing_page' | 'internal_system' | 'game' | 'ai_chatbot' | 'other'. Panduan: web app/sistem/dashboard → 'web_app', mobile/Android/iOS → 'mobile_app', keduanya → 'web_mobile', halaman promo/company profile → 'landing_page', sistem internal kantor → 'internal_system', game → 'game', chatbot AI → 'ai_chatbot'. Default 'web_app' kalau tidak jelas.
-Tentukan PREFERENSI BUDGET (budgetPreference) berdasarkan checklist poin #5 yang dibahas. Pilih salah satu: 'mvp' | 'standard' | 'enterprise'. Panduan: MVP/hemat/murah/minimalis → 'mvp', standar/profesional/normal → 'standard', custom/enterprise/besar/komplex → 'enterprise'. Default 'standard' kalau tidak jelas.
-Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
-{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>", "clientPhone": "<nomor WhatsApp/telepon klien, atau string kosong kalau tidak ditemukan>", "projectType": "<salah satu nilai valid di atas>", "budgetPreference": "<mvp|standard|enterprise>"}
 
-Kalau teks di bawah belum menyebutkan breakdown per fitur secara eksplisit, buat estimasi wajar berdasarkan fitur-fitur yang dibahas & sebutkan itu di "notes".
+PENTING -- JANGAN MENGARANG UNTUK FIELD "*Explicit" DAN "targetScale"/"deadline": field-field ini dipakai sistem sebagai GERBANG WAJIB sebelum RAB resmi diproses, jadi HARUS mencerminkan apa yang BENAR-BENAR dibahas/dipilih user di rangkuman diskusi, BUKAN asumsi/tebakan/default-mu. Kalau satu poin belum pernah dibahas user sama sekali, kosongkan/false-kan field terkait -- JANGAN diisi supaya "kelihatan lengkap".
+
+Cari juga NAMA LENGKAP, EMAIL AKTIF, dan NOMOR WHATSAPP/TELEPON milik klien/user (BUKAN nama/email/nomor Arzha/Zannah/Mas Arzha) yang disebutkan di sepanjang rangkuman diskusi — biasanya dijawab user saat ditanya checklist data diri. Kalau benar-benar tidak ada di rangkuman, kosongkan string-nya, JANGAN mengarang.
+
+Tentukan JENIS PROYEK (projectType) berdasarkan checklist poin #1 Platform/Jenis Aplikasi yang dibahas. Pilih salah satu: 'web_app' | 'mobile_app' | 'web_mobile' | 'landing_page' | 'internal_system' | 'game' | 'ai_chatbot' | 'other'. Panduan: web app/sistem/dashboard → 'web_app', mobile/Android/iOS → 'mobile_app', keduanya → 'web_mobile', halaman promo/company profile → 'landing_page', sistem internal kantor → 'internal_system', game → 'game', chatbot AI → 'ai_chatbot'. Set "platformExplicit": true HANYA kalau user benar-benar menyebutkan/memilih jenis platformnya secara eksplisit di rangkuman diskusi. Kalau kamu terpaksa menebak/pakai default karena tidak dibahas, isi "projectType" dengan 'web_app' TAPI set "platformExplicit": false.
+
+Tentukan FITUR-FITUR UTAMA (features) HANYA dari yang benar-benar disebutkan user secara eksplisit di rangkuman diskusi (checklist poin #2, idealnya 2-3 fitur spesifik seperti login, katalog produk, checkout, dsb). Set "featuresExplicit": true HANYA kalau minimal 2 fitur spesifik memang disebutkan eksplisit oleh user -- BUKAN hasil tebakan/asumsi asistem. Kalau user belum menyebutkan fitur spesifik sama sekali, kosongkan array "features" (boleh array kosong []) dan set "featuresExplicit": false. JANGAN mengarang daftar fitur generik seperti "Sistem aplikasi terintegrasi" hanya supaya field ini terisi.
+
+Tentukan TARGET PENGGUNA & SKALA ("targetScale", checklist poin #3: internal tim kantor / B2B / publik retail luas). Isi HANYA kalau benar-benar disebutkan user; kalau tidak, kosongkan string-nya ("").
+
+Tentukan TARGET WAKTU / DEADLINE ("deadline", checklist poin #4). Isi HANYA kalau benar-benar disebutkan user; kalau tidak, kosongkan string-nya ("").
+
+Tentukan PREFERENSI BUDGET (budgetPreference) berdasarkan checklist poin #5 yang dibahas. Pilih salah satu: 'mvp' | 'standard' | 'enterprise'. Panduan: MVP/hemat/murah/minimalis → 'mvp', standar/profesional/normal → 'standard', custom/enterprise/besar/komplex → 'enterprise'. Set "budgetExplicit": true HANYA kalau user benar-benar menyebutkan/memilih preferensi budgetnya secara eksplisit. Kalau kamu terpaksa menebak/pakai default karena tidak dibahas, isi "budgetPreference" dengan 'standard' TAPI set "budgetExplicit": false.
+
+Balas HANYA dengan JSON valid, tanpa markdown/backtick/penjelasan tambahan, PERSIS format ini:
+{"projectName": "<jenis/nama proyek singkat>", "features": [{"name": "<nama fitur>", "description": "<deskripsi singkat>", "estimatedCost": <angka rupiah tanpa simbol/titik>, "estimatedDuration": "<mis. '3-5 hari'>"}], "totalCost": <angka total rupiah>, "totalDuration": "<mis. '2-3 minggu'>", "notes": "<catatan/asumsi kalau ada, boleh string kosong>", "clientName": "<nama lengkap klien, atau string kosong kalau tidak ditemukan>", "clientEmail": "<email aktif klien, atau string kosong kalau tidak ditemukan>", "clientPhone": "<nomor WhatsApp/telepon klien, atau string kosong kalau tidak ditemukan>", "projectType": "<salah satu nilai valid di atas>", "platformExplicit": <true|false>, "featuresExplicit": <true|false>, "targetScale": "<atau string kosong>", "deadline": "<atau string kosong>", "budgetPreference": "<mvp|standard|enterprise>", "budgetExplicit": <true|false>}
+
+Kalau fitur SUDAH disebutkan user secara eksplisit tapi belum ada breakdown biaya/waktu per fitur, buat estimasi wajar untuk breakdown itu & sebutkan di "notes". JANGAN mengarang fitur baru yang tidak pernah disebutkan user.
 
 ${transcriptSection}--- TEKS KESIMPULAN RAB ASISTEN ---
 ${replyText.slice(0, 10000)}
@@ -420,10 +488,12 @@ ${replyText.slice(0, 10000)}
         const doc = await extractStructuredDocument<RabDocumentData>(apiKey, prompt);
 
         // ── Gerbang checklist WAJIB (hard guard di kode, bukan cuma prompt) ──
-        // Kalau nama/email klien belum lengkap/valid, JANGAN PERNAH lanjut ke
-        // DevRAB Engine ataupun bikin draf RAB apa pun — walau fitur & budget
-        // sudah lengkap. Balikin dokumen "checklist belum lengkap" saja.
-        if (!hasCompleteClientChecklist(doc)) {
+        // Memvalidasi SEMUA 7 poin checklist (platform, fitur, target pengguna,
+        // deadline, budget, nama, email) -- bukan cuma nama/email. Sebelumnya di
+        // sini hanya hasCompleteClientChecklist (2 poin) yang dipanggil, sehingga
+        // user yang cuma memberi nama+email tanpa konteks proyek apa pun tetap
+        // lolos ke DevRAB Engine dengan data proyek hasil karangan LLM ekstraksi.
+        if (!hasCompleteProjectChecklist(doc)) {
             const missing = getMissingChecklistFields(doc);
             console.warn('[documentGenerator] RAB ditahan, checklist belum lengkap:', missing);
             return {
