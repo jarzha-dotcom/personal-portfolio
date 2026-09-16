@@ -273,7 +273,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
         </div>
 
         {/* Layout: Projects Grid (kiri) + Sidebar (kanan) */}
-        <div className="md:grid md:grid-cols-12 md:gap-6 mb-14 items-start">
+        <div className="md:grid md:grid-cols-12 md:gap-6 mb-14">
           {/* LEFT: Projects Grid */}
           <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredProjects.map((project) => {
