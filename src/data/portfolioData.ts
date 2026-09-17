@@ -208,7 +208,7 @@ export const PROJECTS: ProjectItem[] = [
     techStack: ['React Native', 'Expo', 'boardgame.io', 'Node.js/Koa', 'Supabase', 'TypeScript', 'WebSockets', 'PWA', 'Web Audio API'],
     role: 'Solo Creator (Game Logic, UI/UX, Realtime Backend, Deployment)',
     year: '2024 - 2025',
-    demoUrl: 'https://bgames.byarzhaning.online/',
+    demoUrl: 'https://bgames.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'amber',
     iconType: 'Dice'
@@ -230,7 +230,7 @@ export const PROJECTS: ProjectItem[] = [
     techStack: ['Vite React', 'TypeScript', 'Tailwind CSS', 'Capacitor', 'Web Audio API', 'PWA Offline Cache', 'Lucide Icons'],
     role: 'Full-stack Indie Developer & Voice Content Designer',
     year: '2024 - 2025',
-    demoUrl: 'https://rajendrapintar.byarzhaning.online/',
+    demoUrl: 'https://rajendrapintar.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'teal',
     iconType: 'GraduationCap'
@@ -254,7 +254,7 @@ export const PROJECTS: ProjectItem[] = [
     techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Vercel', 'Supabase'],
     role: 'Full-stack Developer',
     year: '2024',
-    demoUrl: 'https://assets.byarzhaning.online/',
+    demoUrl: 'https://assets.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'indigo',
     iconType: 'FileSpreadsheet'

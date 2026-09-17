@@ -32,8 +32,8 @@ describe('devrabClient', () => {
             totalEstimate: 12500000,
             timelineEstimate: '3-4 Minggu',
             scopeOfWork: ['Manajemen Stok', 'Integrasi QRIS'],
-            previewUrl: 'https://devrab.byarzhaning.online/preview/123',
-            pdfDownloadUrl: 'https://devrab.byarzhaning.online/pdf/123',
+            previewUrl: 'https://devrab.arzhaning.my.id/preview/123',
+            pdfDownloadUrl: 'https://devrab.arzhaning.my.id/pdf/123',
         };
 
         const html = renderDevRABProposalHtml(proposal);
@@ -42,6 +42,6 @@ describe('devrabClient', () => {
         expect(html).toContain('Manajemen Stok');
         expect(html).not.toContain('<script>alert(1)</script>');
         expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
-        expect(html).toContain('https://devrab.byarzhaning.online/preview/123');
+        expect(html).toContain('https://devrab.arzhaning.my.id/preview/123');
     });
 });

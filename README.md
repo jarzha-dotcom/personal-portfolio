@@ -2,7 +2,7 @@
 
 > **Official Portfolio Website of K. Arzhaning Jagad (Arzha)**  
 > *Indie Developer & Corporate Audit Specialist (7+ Years of Experience)*  
-> 📍 Cibitung, Bekasi, Jawa Barat | 🌐 [byarzhaning.online](https://byarzhaning.online)
+> 📍 Cibitung, Bekasi, Jawa Barat | 🌐 [arzhaning.my.id](https://arzhaning.my.id)
 
 ---
 

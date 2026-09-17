@@ -66,7 +66,7 @@ export function buildChatSummaryText(
 ${separator}
 Waktu Sesi Diskusi : ${dateTimeStr}
 Platform / Bot      : ${botName} (AI Tech Consultant / Portfolio Assistant)
-Website             : https://byarzhaning.online
+Website             : https://arzhaning.my.id
 
 ${subSeparator}
 1. INTI KEBUTUHAN / PERTANYAAN KLIEN:

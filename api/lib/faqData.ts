@@ -168,21 +168,21 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek B-Games?',
     keywords: ['bgames', 'b-games', 'game multiplayer', 'ludo', 'ular tangga', 'hexagon'],
-    answer: 'B-Games adalah platform board game online realtime bebas iklan yang menghadirkan Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga, dan Tic Tac Toe dengan room code, bot AI adaptif, reconnect recovery, dan tema papan 3D. Demo: bgames.byarzhaning.online',
+    answer: 'B-Games adalah platform board game online realtime bebas iklan yang menghadirkan Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga, dan Tic Tac Toe dengan room code, bot AI adaptif, reconnect recovery, dan tema papan 3D. Demo: bgames.arzhaning.my.id',
   },
   {
     id: 'portfolio-rajendra',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek Rajendra Pintar?',
     keywords: ['rajendra', 'rajendra pintar', 'edukasi anak', 'aplikasi anak', 'tts', 'flashcard'],
-    answer: 'Aplikasi edukasi anak 4-8 tahun bebas iklan dengan Flashcard 3D, suara Text-to-Speech dwibahasa (ID/EN), kuis suara, gamifikasi reward bintang, serta dukungan full-offline PWA & Android Capacitor. Demo: rajendrapintar.byarzhaning.online',
+    answer: 'Aplikasi edukasi anak 4-8 tahun bebas iklan dengan Flashcard 3D, suara Text-to-Speech dwibahasa (ID/EN), kuis suara, gamifikasi reward bintang, serta dukungan full-offline PWA & Android Capacitor. Demo: rajendrapintar.arzhaning.my.id',
   },
   {
     id: 'portfolio-assets',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek Assets (Klien)?',
     keywords: ['assets', 'assets demo', 'klien', 'pt global multiparts', 'gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
-    answer: 'Aplikasi internal kustom pesanan klien korporat (PT Global Multiparts) untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Versi publik dapat dicoba di Assets Demo: assets.byarzhaning.online',
+    answer: 'Aplikasi internal kustom pesanan klien korporat (PT Global Multiparts) untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Versi publik dapat dicoba di Assets Demo: assets.arzhaning.my.id',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

@@ -648,7 +648,7 @@ export function generateSummaryAttachment(
         '================================================================',
         `Waktu Sesi    : ${dateStr}, ${timeStr} WIB`,
         `Asisten AI    : ${botName} (AI Tech Consultant & Portfolio Assistant)`,
-        'Situs Web     : https://byarzhaning.online',
+        'Situs Web     : https://arzhaning.my.id',
         '',
         '----------------------------------------------------------------',
         '1. RINGKASAN DISKUSI & TRANSKRIP:',

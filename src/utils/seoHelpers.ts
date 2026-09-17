@@ -12,7 +12,7 @@
  * yang tidak menjalankan JS masih bisa membacanya langsung dari HTML awal.
  */
 
-const SITE_URL = 'https://byarzhaning.online';
+const SITE_URL = 'https://arzhaning.my.id';
 
 type JsonLd = Record<string, unknown>;
 

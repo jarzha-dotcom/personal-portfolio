@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://byarzhaning.online/sitemap.xml
+Sitemap: https://arzhaning.my.id/sitemap.xml

@@ -228,7 +228,7 @@ export function renderDevRABProposalHtml(proposal: DevRABProposalResponse): stri
   const title = escapeHtml(rawTitle);
   const total = proposal.totalEstimate ? formatRupiah(proposal.totalEstimate) : 'Sesuai Diskusi';
   const timeline = escapeHtml(proposal.timelineEstimate || '4-6 Minggu');
-  const previewUrl = safeHref(proposal.previewUrl || 'https://devrab.byarzhaning.online', 'https://devrab.byarzhaning.online');
+  const previewUrl = safeHref(proposal.previewUrl || 'https://devrab.arzhaning.my.id', 'https://devrab.arzhaning.my.id');
   const pdfUrl = safeHref(proposal.pdfDownloadUrl || `${previewUrl}/print`, `${previewUrl}/print`);
   const proposalId = escapeHtml(rawProposalId);
 

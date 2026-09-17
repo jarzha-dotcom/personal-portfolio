@@ -61,7 +61,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 const parsed = new URL(clientSource);
                 const host = parsed.hostname.toLowerCase();
                 if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return true;
-                if (host === 'byarzhaning.online' || host.endsWith('.byarzhaning.online')) return true;
+                if (host === 'arzhaning.my.id' || host.endsWith('.arzhaning.my.id')) return true;
                 if (host.includes('personal-portfolio') && host.endsWith('.vercel.app')) return true;
                 return false;
             } catch {
@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         };
 
         const isAllowed = isOriginAllowed();
-        res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://byarzhaning.online');
+        res.setHeader('Access-Control-Allow-Origin', isAllowed && originHeader ? originHeader : 'https://arzhaning.my.id');
         res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
@@ -81,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             console.warn(`[chat.ts] 🛑 Unauthorized origin blocked: ${clientSource}`);
             return res.status(403).json({
                 error: 'UNAUTHORIZED_DOMAIN',
-                detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://byarzhaning.online).',
+                detail: 'Akses API Chatbot ditolak. Domain ini tidak memiliki lisensi resmi dari K. Arzhaning Jagad (https://arzhaning.my.id).',
             });
         }
 
