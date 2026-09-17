@@ -318,7 +318,7 @@ export function renderDevRABProposalHtml(proposal: DevRABProposalResponse): stri
 
     <div class="footer">
       <strong>K. Arzhaning Jagad (Arzha)</strong> &mdash; Full-Stack Developer &amp; Data Specialist<br/>
-      WhatsApp: 0823-1231-2734 &middot; Email: Jarzha@gmail.com &middot; Cibitung, Bekasi
+      WhatsApp: 0823-1231-2734 &middot; Email: admin@arzhaning.my.id &middot; Cibitung, Bekasi
     </div>
   </div>
 </body>

@@ -18,7 +18,7 @@ export const PERSONAL_INFO = {
 };
 
 export const CONTACT_INFO: ContactInfo = {
-  email: 'Jarzha@gmail.com',
+  email: 'admin@arzhaning.my.id',
   phone: '+6282312312734',
   displayPhone: '0823-1231-2734',
   location: 'Cibitung, Bekasi, Jawa Barat',
