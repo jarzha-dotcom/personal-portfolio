@@ -197,15 +197,16 @@ export const PROJECTS: ProjectItem[] = [
     tagline: 'Pusat game papan klasik digital multiplayer online bebas iklan dengan arsitektur event-driven realtime.',
     category: 'Game & App',
     badge: 'Board Game Platform',
-    description: 'Platform multiplayer interaktif gratis yang menghadirkan 4 game klasik: Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga Interaktif, dan Tic Tac Toe — dimainkan langsung dari browser atau mobile PWA tanpa iklan.',
-    longDescription: 'B-Games menghadirkan pengalaman bermain game papan klasik yang dapat dimainkan bersama teman dan keluarga secara gratis dan bebas iklan. Menggunakan arsitektur event-driven realtime dengan sinkronisasi state WebSockets tanpa jeda, sistem reconnect recovery saat koneksi terputus, dan fallback bot AI adaptif. Mendukung Guest Play instan (cukup masukkan nama) serta Google Cloud Auth untuk sinkronisasi riwayat kemenangan, statistik pertandingan, dan kustomisasi tema visual papan (Wood, Grass, Sand, Marble) dengan efek haptic Web Audio.',
+    description: 'Platform arena game papan klasik modern gratis & bebas iklan: Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga 3D, dan Tic-Tac-Toe — dimainkan instan via Web/PWA, Android, & iOS.',
+    longDescription: 'B-Games menghadirkan nostalgia permainan papan klasik keluarga ke dalam genggaman digital yang modern, kompetitif, dan bebas iklan. Menggunakan arsitektur event-driven realtime berbasis boardgame.io dan Koa.js WebSocket game server dengan latensi rendah (<50ms), reconnect recovery otomatis, serta Smart Bot AI Anti-AFK takeover jika pemain terputus koneksi. Mendukung Instant Guest Play (masukkan nama tanpa registrasi), sinkronisasi akun Google OAuth & Cloud Save via Supabase PostgreSQL, in-game reactions & emoticon, daftar teman & Friend Chat, leaderboard global, puluhan achievements, dompet koin harian, serta 4 kustomisasi tema visual papan (Wood, Marble, Grass, Sand) beranimasi Skia 60 FPS dan audio haptic realistis.',
     highlights: [
-      '4 Game Papan Klasik: Ludo Classic, Ludo Hexagon (6 Pemain), Ular Tangga Interaktif & Tic Tac Toe',
-      'Arsitektur Realtime Event-Driven: WebSockets + boardgame.io dengan state sync instan & reconnect recovery',
-      'Sistem Akun Hybrid: Guest Play (tanpa daftar) + Google Cloud Sync untuk statistik & progres antar perangkat',
-      'Kustomisasi Papan & Audio: Tema 3D (Wood/Grass/Sand/Marble), efek suara synthesizer Web Audio, dan bot AI adaptif'
+      '4 Game Papan Klasik: Ludo Classic (2-4 Pemain), Ludo Hexagon (Inovasi hingga 6 Pemain), Ular Tangga 3D & Tic-Tac-Toe Duel',
+      'Multiplayer Realtime & Smart Anti-AFK: Sinkronisasi WebSockets instan via Koa.js + boardgame.io dengan bot cerdas auto-takeover saat pemain AFK/disconnect',
+      'Sistem Akun Hybrid & Cloud Save: Instant Guest Play tanpa daftar + Google OAuth & Supabase PostgreSQL untuk rekor pertandingan',
+      'Visual Skia 60 FPS & Audio Haptic: Animasi dadu 3D, 4 tema papan (Wood/Marble/Grass/Sand), in-game reactions, dan efek getaran taktil',
+      'Multiplatform & PWA: Berjalan mulus di Web/PWA, Android & iOS dari basis kode terpadu dengan dukungan offline cache'
     ],
-    techStack: ['React Native', 'Expo', 'boardgame.io', 'Node.js/Koa', 'Supabase', 'TypeScript', 'WebSockets', 'PWA', 'Web Audio API'],
+    techStack: ['React Native', 'Expo (v57)', 'Expo Router', 'boardgame.io', 'Koa.js / Node.js', 'Supabase (PostgreSQL)', 'Skia & Reanimated', 'TypeScript', 'WebSockets', 'Expo Audio & Haptics', 'PWA'],
     role: 'Solo Creator (Game Logic, UI/UX, Realtime Backend, Deployment)',
     year: '2024 - 2025',
     demoUrl: 'https://bgames.arzhaning.my.id/',
@@ -215,44 +216,46 @@ export const PROJECTS: ProjectItem[] = [
   },
   {
     id: 'proj-rajendra',
-    title: 'Rajendra Pintar — Aplikasi Belajar Flashcard 3D & Kuis Interaktif',
-    tagline: 'Aplikasi edukasi anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard 3D, Suara Maskot & Full Offline PWA.',
+    title: 'Rajendra Pintar (Pintar Ceria Kids) — Platform Edukasi Interaktif & Kuis Ceria',
+    tagline: 'Platform edukasi ramah anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard dwibahasa, Kuis Suara, Gamifikasi & Full Offline PWA.',
     category: 'Edukasi',
     badge: 'Edukasi Anak (PAUD - SD)',
-    description: 'Aplikasi belajar interaktif anak usia 4–8 tahun dengan Flashcard 3D, kuis membaca, berhitung, mengenal hewan, bentuk, warna, dan kosa kata dwibahasa (ID/EN) dilengkapi audio pelafalan ramah anak dan mode offline penuh.',
-    longDescription: 'Rajendra Pintar dirancang khusus sebagai ruang belajar digital yang aman, ramah visual, dan 100% bebas iklan untuk anak PAUD, TK, dan SD kelas 1-2. Menggunakan media Flashcard 3D interaktif, kuis tebak suara & gambar, sistem gamifikasi bintang reward, serta modul materi lengkap (angka, matematika dasar, bentuk & warna, buah & sayuran, hewan, anggota tubuh, dan kosakata dwibahasa ID/EN). Dilengkapi arsitektur zero-internet cache PWA dan instalasi native Android via Capacitor.',
+    description: 'Aplikasi edukasi interaktif ramah anak usia 4–8 tahun dengan kurikulum adaptif 5 usia, 9 kategori tematik, 3 mode belajar (Flashcard TTS dwibahasa ID/EN, Kuis Ceria + Confetti, Petualangan Mini Game Memori), maskot interaktif, Parent Gate, dan 100% full offline.',
+    longDescription: 'Rajendra Pintar (Pintar Ceria Kids) dirancang khusus mendampingi masa emas tumbuh kembang anak usia 4 hingga 8 tahun (PAUD, TK, SD Kelas 1 & 2) secara aman, ceria, dan 100% bebas iklan. Dilengkapi kurikulum adaptif 5 tahapan usia dan 9 kategori pengetahuan tematik (Pendidikan Agama Islam, Satwa, Buah & Sayur Sehat, Angka & Matematika Ceria, English Vocab, Bentuk & Warna, Transportasi, Pakaian & Aksesori, Profesi & Cita-cita). Menyajikan 3 mode interaktif: Flashcard Mode dengan Text-to-Speech dwibahasa (ID/EN) & fakta seru, Mode Kuis Ceria dengan semburan Canvas Confetti apresiasi, serta Island Adventure Memory Game. Memiliki 6 maskot hidup penyemangat, toko hadiah kostum bintang, 7 tema visual, Parent Gate pelindung anak, serta arsitektur 100% Full Offline via Service Worker PWA dan APK Native Android via Capacitor 8.',
     highlights: [
-      'Flashcard 3D Interaktif & Kuis Ceria (Membaca, Berhitung, Hewan, Buah/Sayur, Bentuk & Warna, Anggota Tubuh)',
-      'Suara Maskot & Text-to-Speech (TTS) Dwibahasa (Indonesia - Inggris) dengan pelafalan natural',
-      'Gamifikasi Bintang & Audio Apresiasi: Memacu semangat eksplorasi belajar mandiri anak',
-      'Dukungan Full Offline PWA & Android Capacitor: Belajar lancar tanpa kuota internet di berbagai perangkat'
+      'Kurikulum Adaptif 5 Usia (4–8 Tahun) & 9 Kategori Tematik (PAI, Satwa, Buah/Sayur, Matematika, English Vocab, dll.)',
+      '3 Mode Belajar: Flashcard Interaktif (TTS dwibahasa ID/EN), Kuis Ceria bergambar + Canvas Confetti, & Island Memory Game',
+      '6 Maskot Interaktif & Personalisasi: Reaksi animasi ramah anak, toko kostum bintang prestasi, dan 7 tema suasana visual',
+      'Kid-Safe & Parent Gate: Proteksi verifikasi orang tua sebelum akses pengaturan, 100% bebas iklan berbahaya',
+      '100% Full Offline & Multi-Distribusi: Berjalan tanpa internet via PWA Service Worker Caching & instalasi native Android (.APK) via Capacitor 8'
     ],
-    techStack: ['Vite React', 'TypeScript', 'Tailwind CSS', 'Capacitor', 'Web Audio API', 'PWA Offline Cache', 'Lucide Icons'],
-    role: 'Full-stack Indie Developer & Voice Content Designer',
+    techStack: ['React 19', 'TypeScript', 'Vite 6', 'Tailwind CSS v4', 'Motion (v12)', 'Capacitor 8', 'Web Audio API', 'TTS Dwibahasa', 'Canvas Confetti', 'PWA Offline Cache', 'Supabase'],
+    role: 'Full-stack Indie Developer & Content Designer',
     year: '2024 - 2025',
-    demoUrl: 'https://rajendrapintar.arzhaning.my.id/',
+    demoUrl: 'https://rapin.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'teal',
     iconType: 'GraduationCap'
   },
   {
     id: 'proj-assets',
-    title: 'Assets — Enterprise Asset Management',
-    tagline: 'Sistem manajemen & audit inventaris aset internal (Klien: PT Global Multiparts).',
+    title: 'Assets DEMO — Sistem Manajemen & Inventaris Aset Modern',
+    tagline: 'Solusi all-in-one pelacakan aset, penyusutan depresiasi otomatis & audit inventaris multi-cabang (Klien: PT Global Multiparts).',
     category: 'Web App',
     badge: 'Client Project',
     client: 'PT Global Multiparts',
-    description: 'Aplikasi web kustom pesanan klien korporat (PT Global Multiparts) untuk mendata, melacak mutasi, dan mempermudah audit inventaris fisik lintas lokasi.',
-    longDescription: 'Dibangun khusus untuk menjawab tantangan audit dan pencatatan aset fisik di PT Global Multiparts yang tersebar di berbagai unit/cabang. Sistem ini mendigitalisasi pelacakan kondisi barang, penempelan label QR/barcode, pencatatan mutasi antar lokasi dengan audit log lengkap, hingga ekspor laporan otomatis format Excel/PDF untuk kebutuhan audit berkala. Versi publik yang dapat dicoba adalah "Assets Demo" dengan data simulasi demi menjaga kerahasiaan data internal klien.',
+    description: 'Sistem manajemen aset korporat multi-platform (Web/PWA, Android, iOS) berbiaya server nol dengan pemindai QR/Barcode, kalkulasi depresiasi garis lurus otomatis, multi-foto kompresi cerdas, offline queue, dan ekspor laporan Excel/PDF.',
+    longDescription: 'Assets DEMO dikembangkan untuk menjawab tantangan audit dan pelacakan siklus hidup aset fisik di PT Global Multiparts yang tersebar di berbagai unit/cabang. Mengusung arsitektur Serverless Zero Server Cost berbasis Google Apps Script, Google Sheets, dan Google Drive, sistem ini mendigitalisasi pelacakan kondisi barang, pemindaian label QR/Barcode kamera fisik via Expo Camera, kalkulasi depresiasi otomatis metode garis lurus (Straight-Line Depreciation) per bulan, dokumentasi multi-foto terkompresi otomatis, audit log mutasi wajib alasan, mode antrian offline (Offline Queue) anti-tindih, ekspor laporan resmi PDF & Excel (.xlsx) otomatis ke email pimpinan, reminder jatuh tempo servis/garansi berkala, serta keamanan role Admin/User dengan single active session dan enkripsi kata sandi bersalt. Versi publik yang dapat dicoba adalah "Assets Demo" dengan data simulasi aman demi privasi korporat.',
     highlights: [
-      'Client Case: Didevelop khusus mengikuti alur SOP & kebutuhan audit internal PT Global Multiparts',
-      'Dashboard pelacakan kondisi dan lokasi aset fisik multi-lokasi secara real-time',
-      'Audit trail & riwayat mutasi terdigitalisasi untuk mencegah selisih inventaris',
-      'Ekspor laporan inventarisasi otomatis dalam format Excel/PDF untuk kebutuhan audit berkala',
-      'Akses demo publik aman via Assets Demo dengan data simulasi'
+      'Client Case PT Global Multiparts: Didevelop presisi menjawab kebutuhan audit SOP, pelacakan mutasi & stock opname aset multi-cabang',
+      'Arsitektur Serverless Zero Server Cost: Ditenagai Google Apps Script, Google Sheets DB, & Google Drive Storage — 100% data milik perusahaan tanpa biaya sewa server bulanan',
+      'Scan QR & Barcode Kamera: Expo Camera membaca label fisik secara instan di lapangan dan membuka lembar detail tanpa ketik manual',
+      'Depresiasi Garis Lurus Otomatis: Nilai buku menyusut otomatis per bulan, auto-lock nilai residu saat disposed, dan sinkronisasi massal 1 klik',
+      'Offline Queue & Conflict Prevention: Bekerja lancar di area minim sinyal gudang, auto-sync saat online, dan proteksi anti-tindih data 2 lapis',
+      'Dokumentasi Multi-Foto Cerdas: 2 slot foto resolusi tinggi dengan kompresi otomatis hemat kuota, plus ekspor laporan resmi PDF/Excel kirim email'
     ],
-    techStack: ['React', 'TypeScript', 'Tailwind CSS', 'Vercel', 'Supabase'],
-    role: 'Full-stack Developer',
+    techStack: ['React Native', 'Expo Router', 'NativeWind', 'Tailwind CSS', 'Google Apps Script', 'Google Sheets DB', 'Google Drive Storage', 'Expo Camera', 'Shopify FlashList', 'OneSignal', 'PWA'],
+    role: 'Full-stack Developer & Solution Architect',
     year: '2024',
     demoUrl: 'https://assets.arzhaning.my.id/',
     isFeatured: true,
@@ -267,20 +270,20 @@ export const TECH_STACK_GROUPS: TechStackGroup[] = [
     items: ['Google Antigravity Agent (Interactions API)', 'Gemini 3.8/3.7/3.5 Flash', 'Gemma 4 Fallback', 'Vector Embeddings (Semantic FAQ)', 'SSE Realtime Streaming', 'Audio STT & TTS Normalization']
   },
   {
-    category: 'Game & Mobile Development',
-    items: ['React Native', 'Expo', 'boardgame.io', 'Capacitor', 'WebSockets', 'Canvas 2D / Haptic Audio', 'PWA Offline Cache']
+    category: 'Cross-Platform, Game & Mobile',
+    items: ['React Native & Expo (v57 / Router)', 'boardgame.io (Realtime State)', 'Capacitor 8 (Android Native)', 'WebSockets & Koa.js', 'Skia & Reanimated (60 FPS)', 'Shopify FlashList', 'PWA Offline Cache']
   },
   {
-    category: 'Frontend & UI Engineering',
-    items: ['React 19 / Vite 6', 'TypeScript', 'Tailwind CSS v4', 'Motion', 'Lucide Icons', 'Recharts', 'HTML5 Semantic Web']
+    category: 'Modern Frontend & UI Engineering',
+    items: ['React 19 / Vite 6', 'TypeScript', 'Tailwind CSS v4 & NativeWind', 'Motion (Framer Motion v12)', 'Canvas Confetti', 'Web Audio API & Speech TTS', 'Lucide React', 'Semantic HTML5 / SEO']
   },
   {
-    category: 'Backend & Data Persistence',
-    items: ['Vercel Serverless', 'Node.js', 'Koa / Express', 'Supabase', 'PostgreSQL', 'IndexedDB StorageManager', 'RESTful APIs']
+    category: 'Backend, Serverless & Databases',
+    items: ['Serverless Engine (Google Apps Script - Zero Server Cost)', 'Supabase (PostgreSQL Enterprise)', 'Node.js / Koa Server', 'Google Sheets DB & Drive Storage', 'Vercel Serverless & Cloudflare CDN', 'RESTful APIs & Offline Queue']
   },
   {
-    category: 'Audit & Enterprise Tools',
-    items: ['SAP Business One', 'Microsoft Excel (Advanced Formulas, XLOOKUP, Pivot)', 'SheetJS / Data Parsing', 'POS Systems', 'Working Paper & Audit Reporting']
+    category: 'Audit, Security & Enterprise Tools',
+    items: ['SAP Business One', 'Microsoft Excel (Advanced Formulas, XLOOKUP, Pivot)', 'Straight-Line Depreciation Engine', 'QR / Barcode Hardware Scanner', 'Audit Trail & SOP Compliance', 'Role-Based Access & Salted Hash Auth']
   }
 ];
 

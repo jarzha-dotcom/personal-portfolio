@@ -49,16 +49,16 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
       icon: Code2,
       accentBorder: 'hover:border-cyan-500/40',
       items: [
-        { name: 'React / Vite', dotColor: 'bg-cyan-400', projects: 'Assets Demo, B-Games, Portofolio' },
+        { name: 'React 19 / Vite 6', dotColor: 'bg-cyan-400', projects: 'Rajendra Pintar, Portofolio' },
         { name: 'TypeScript', dotColor: 'bg-blue-400', projects: 'Assets Demo, B-Games, Rajendra Pintar' },
-        { name: 'Tailwind CSS', dotColor: 'bg-teal-400', projects: 'Assets Demo, Portofolio' },
-        { name: 'Recharts', dotColor: 'bg-emerald-400', projects: 'Assets Demo (Grafik Analitik Stok)' },
-        { name: 'Lucide Icons', dotColor: 'bg-amber-400', projects: 'Assets Demo, Portofolio' },
-        { name: 'HTML5 / Semantic Web', dotColor: 'bg-orange-400', projects: 'Seluruh Web App & SEO' }
+        { name: 'Tailwind CSS v4 & NativeWind', dotColor: 'bg-teal-400', projects: 'Assets Demo (NativeWind), Rajendra Pintar, Portofolio' },
+        { name: 'Motion (Framer v12)', dotColor: 'bg-rose-400', projects: 'Rajendra Pintar (Animasi Kartu & Maskot)' },
+        { name: 'Lucide Icons', dotColor: 'bg-amber-400', projects: 'Assets Demo, Rajendra Pintar, Portofolio' },
+        { name: 'HTML5 / Semantic SEO', dotColor: 'bg-orange-400', projects: 'Seluruh Web App & PWA' }
       ]
     },
     {
-      title: 'Real-time & Cross-Platform',
+      title: 'Real-time, Mobile & Games',
       badge: 'Mobile & Games',
       badgeColor: darkMode
         ? 'bg-purple-950/70 text-purple-300 border-purple-800'
@@ -66,16 +66,16 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
       icon: Smartphone,
       accentBorder: 'hover:border-purple-500/40',
       items: [
-        { name: 'React Native', dotColor: 'bg-cyan-400', projects: 'Rajendra Pintar (Aplikasi Mobile Edukasi)' },
-        { name: 'Expo', dotColor: 'bg-indigo-400', projects: 'Rajendra Pintar (Build & Testing)' },
-        { name: 'Capacitor', dotColor: 'bg-sky-400', projects: 'B-Games (Mobile APK Android)' },
-        { name: 'WebSockets', dotColor: 'bg-emerald-400', projects: 'B-Games (Turn-based Realtime Match)' },
-        { name: 'boardgame.io', dotColor: 'bg-purple-400', projects: 'B-Games (Game State Engine)' },
-        { name: 'Canvas 2D', dotColor: 'bg-rose-400', projects: 'B-Games (Papan & Animasi Bidak)' }
+        { name: 'React Native & Expo', dotColor: 'bg-cyan-400', projects: 'Assets Demo, B-Games (Web, Android, iOS)' },
+        { name: 'Capacitor 8', dotColor: 'bg-sky-400', projects: 'Rajendra Pintar (Aplikasi Mobile Android Native)' },
+        { name: 'boardgame.io & WebSockets', dotColor: 'bg-emerald-400', projects: 'B-Games (Turn-based Realtime Match & Anti-AFK)' },
+        { name: 'Skia & Reanimated', dotColor: 'bg-purple-400', projects: 'B-Games (Grafis 60 FPS & Animasi Dadu 3D)' },
+        { name: 'Expo Camera & Barcode', dotColor: 'bg-indigo-400', projects: 'Assets Demo (Pemindai QR Code & Barcode Fisik)' },
+        { name: 'Web Audio & Speech TTS', dotColor: 'bg-pink-400', projects: 'Rajendra Pintar (TTS Dwibahasa), B-Games (Haptic Audio)' }
       ]
     },
     {
-      title: 'Backend & Database Systems',
+      title: 'Backend, Serverless & Data',
       badge: 'Production Ready',
       badgeColor: darkMode
         ? 'bg-emerald-950/70 text-emerald-300 border-emerald-800'
@@ -83,12 +83,12 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
       icon: Server,
       accentBorder: 'hover:border-emerald-500/40',
       items: [
-        { name: 'Node.js', dotColor: 'bg-emerald-400', projects: 'Assets Demo API, B-Games Server' },
-        { name: 'Koa / Express', dotColor: 'bg-emerald-500', projects: 'Microservices & REST API' },
-        { name: 'Supabase', dotColor: 'bg-emerald-400', projects: 'Rajendra Pintar, B-Games (Database)' },
-        { name: 'PostgreSQL', dotColor: 'bg-sky-400', projects: 'Assets Demo (Relasional Aset & Stok)' },
-        { name: 'RESTful APIs', dotColor: 'bg-amber-400', projects: 'Assets Demo, Zannah AI API' },
-        { name: 'Cloudflare / Vercel', dotColor: 'bg-orange-400', projects: 'Edge Caching, CDN & Serverless' }
+        { name: 'Google Apps Script (Serverless)', dotColor: 'bg-emerald-400', projects: 'Assets Demo (Zero Server Cost Engine)' },
+        { name: 'Google Sheets DB & Drive', dotColor: 'bg-emerald-500', projects: 'Assets Demo (Master Data, Audit Trail & Media Foto)' },
+        { name: 'Supabase (PostgreSQL)', dotColor: 'bg-teal-400', projects: 'B-Games (Profil, Peringkat, Koin), Rajendra Pintar' },
+        { name: 'Koa.js / Node.js', dotColor: 'bg-sky-400', projects: 'B-Games (Realtime Game Server & Room Lobby)' },
+        { name: 'Shopify FlashList', dotColor: 'bg-amber-400', projects: 'Assets Demo (Perenderan Kilat Ribuan Data Aset)' },
+        { name: 'Cloudflare / Vercel', dotColor: 'bg-orange-400', projects: 'Edge Caching, CDN & Serverless API' }
       ]
     },
     {
@@ -101,10 +101,10 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
       accentBorder: 'hover:border-fuchsia-500/40',
       items: [
         { name: 'Gemini API', dotColor: 'bg-fuchsia-400', projects: 'Zannah AI Chatbot & DevRAB Engine' },
-        { name: 'Vercel Serverless', dotColor: 'bg-teal-400', projects: 'API Proxy Edge & Streaming' },
-        { name: 'Prompt Engineering', dotColor: 'bg-pink-400', projects: 'Zannah Persona & Guardrails' },
+        { name: 'Google Antigravity', dotColor: 'bg-teal-400', projects: 'Showcase Rajendra AI & Tool Execution' },
+        { name: 'Prompt Engineering', dotColor: 'bg-pink-400', projects: 'Zannah, Rajendra & Kania Personas, Guardrails' },
         { name: 'DevRAB M2M Engine', dotColor: 'bg-amber-400', projects: 'Otomatisasi Proposal & RAB Online' },
-        { name: 'Guardrails & Security', dotColor: 'bg-indigo-400', projects: 'Anti-Jailbreak, Rate Limit, Throttling' }
+        { name: 'Guardrails & Security', dotColor: 'bg-indigo-400', projects: 'Anti-Jailbreak, Rate Limit, Single Active Session' }
       ]
     }
   ];
@@ -290,15 +290,15 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
             {[
               {
                 title: 'Fullstack Game & App',
-                desc: 'Membangun platform multiplayer (B-Games) dan aplikasi edukasi (Rajendra Pintar) dengan React, Expo, TypeScript, dan Supabase.'
+                desc: 'Membangun platform multiplayer (B-Games: React Native/Expo + boardgame.io + Koa + Supabase), sistem inventaris korporat (Assets Demo: React Native/Expo + Google Apps Script serverless zero-cost), dan platform edukasi anak (Rajendra Pintar: React 19 + Vite 6 + Tailwind v4 + Capacitor 8).'
               },
               {
                 title: 'Solo Product Management',
-                desc: 'Mengelola seluruh siklus hidup produk: riset, UI/UX, development, testing, hingga deployment (Web via Vercel & Mobile via Capacitor).'
+                desc: 'Mengelola seluruh siklus hidup produk: riset, UI/UX, arsitektur data, development, testing, hingga deployment (Web/PWA, Android APK native, & Cloud Serverless).'
               },
               {
                 title: 'Interaktivitas & UX',
-                desc: 'Fokus pada pengalaman pengguna yang menyenangkan: animasi custom, text-to-speech, dan sistem gamifikasi.'
+                desc: 'Fokus pada pengalaman pengguna yang memikat: animasi Skia 60 FPS, Text-to-Speech dwibahasa, efek haptic audio, dan sistem gamifikasi teruji.'
               }
             ].map((item, i) => (
               <div key={i} className={`p-3 rounded-xl border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'}`}>

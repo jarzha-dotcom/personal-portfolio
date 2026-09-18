@@ -127,10 +127,13 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
             </div>
             <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-400'
               }`}>Email Resmi</h3>
-            <a href={`mailto:${CONTACT_INFO.email}`} className={`text-sm font-bold block break-all transition-colors ${darkMode ? 'text-white hover:text-emerald-400' : 'text-slate-900 hover:text-emerald-600'
-              }`}>{CONTACT_INFO.email}</a>
+            <a
+              href={`mailto:${CONTACT_INFO.email}`}
+              onClick={() => copyToClipboard(CONTACT_INFO.email, 'email')}
+              className={`text-sm font-bold block break-all transition-colors ${darkMode ? 'text-white hover:text-emerald-400' : 'text-slate-900 hover:text-emerald-600'
+                }`}>{CONTACT_INFO.email}</a>
             <p className={`text-[11px] mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Respon cepat untuk pertanyaan proyek
+              {copiedEmail ? 'Email disalin ke clipboard!' : 'Respon cepat untuk pertanyaan proyek'}
             </p>
           </div>
 

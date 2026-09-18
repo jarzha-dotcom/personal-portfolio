@@ -170,7 +170,7 @@ const FAQ_ITEMS: FAQItem[] = [
     {
         id: 'dokumen-portfolio', categoryId: 'dokumen', quickLabel: 'Ada portofolio proyek dev juga?',
         keywords: ['portofolio developer', 'proyek coding', 'side project', 'indie developer'],
-        answer: 'Ya, di luar audit saya juga aktif sebagai indie developer — sudah merilis 3 proyek: B-Games, Rajendra Pintar, dan Assets GMP. Detailnya ada di bagian Keahlian halaman ini.',
+        answer: 'Ya, di luar audit saya juga aktif sebagai indie developer — sudah merilis 3 proyek: B-Games, Rajendra Pintar, dan Assets DEMO (PT Global Multiparts). Detailnya ada di bagian Keahlian halaman ini.',
     },
     {
         id: 'kontak-cv', categoryId: 'kontak', quickLabel: 'Kontak & email?',

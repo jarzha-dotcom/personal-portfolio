@@ -161,28 +161,28 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
     keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 4 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game), 2) Rajendra Pintar (app edukasi anak 3D + suara TTS offline), 3) Assets GMP (sistem inventaris aset perusahaan), 4) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
+    answer: 'Ada 4 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
   },
   {
     id: 'portfolio-bgames',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek B-Games?',
     keywords: ['bgames', 'b-games', 'game multiplayer', 'ludo', 'ular tangga', 'hexagon'],
-    answer: 'B-Games adalah platform board game online realtime bebas iklan yang menghadirkan Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga, dan Tic Tac Toe dengan room code, bot AI adaptif, reconnect recovery, dan tema papan 3D. Demo: bgames.arzhaning.my.id',
+    answer: 'B-Games adalah arena board game klasik digital realtime 100% bebas iklan: Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga 3D, dan Tic-Tac-Toe. Dilengkapi kode room instan, Smart Bot AI Anti-AFK takeover otomatis, 4 tema papan (Wood, Marble, Grass, Sand), akun Google OAuth & Supabase Cloud Save. Demo: bgames.arzhaning.my.id',
   },
   {
     id: 'portfolio-rajendra',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek Rajendra Pintar?',
     keywords: ['rajendra', 'rajendra pintar', 'edukasi anak', 'aplikasi anak', 'tts', 'flashcard'],
-    answer: 'Aplikasi edukasi anak 4-8 tahun bebas iklan dengan Flashcard 3D, suara Text-to-Speech dwibahasa (ID/EN), kuis suara, gamifikasi reward bintang, serta dukungan full-offline PWA & Android Capacitor. Demo: rajendrapintar.arzhaning.my.id',
+    answer: 'Rajendra Pintar (Pintar Ceria Kids) adalah platform edukasi anak usia 4-8 tahun 100% bebas iklan dengan kurikulum adaptif 5 usia, 9 kategori tematik, Flashcard TTS dwibahasa (ID/EN), kuis ceria + confetti, 6 maskot interaktif, Parent Gate, serta 100% full offline PWA & Android Capacitor. Demo: rapin.arzhaning.my.id',
   },
   {
     id: 'portfolio-assets',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek Assets (Klien)?',
     keywords: ['assets', 'assets demo', 'klien', 'pt global multiparts', 'gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
-    answer: 'Aplikasi internal kustom pesanan klien korporat (PT Global Multiparts) untuk tracking aset fisik, pencatatan mutasi barang, dan ekspor laporan inventaris otomatis ke Excel untuk audit. Versi publik dapat dicoba di Assets Demo: assets.arzhaning.my.id',
+    answer: 'Assets DEMO adalah sistem manajemen inventaris aset korporat multi-platform untuk klien PT Global Multiparts dengan arsitektur Serverless Zero-Cost (Google Apps Script + Google Sheets/Drive). Fitur: QR/Barcode scanner via kamera fisik, depresiasi garis lurus otomatis, multi-foto kompresi cerdas, offline queue, dan ekspor laporan resmi PDF/Excel otomatis ke email. Versi publik simulasi: assets.arzhaning.my.id',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

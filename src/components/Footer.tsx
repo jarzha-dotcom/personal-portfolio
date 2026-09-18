@@ -1,4 +1,5 @@
 import React from 'react';
+import { useState } from 'react';
 import {
   ArrowUp,
   Linkedin,
@@ -7,16 +8,25 @@ import {
   Mail,
   Phone,
   Code2,
-  MapPin
+  MapPin,
+  CheckCircle
 } from 'lucide-react';
 import { PERSONAL_INFO, CONTACT_INFO } from '../data/portfolioData';
 
 export const Footer: React.FC = () => {
+  const [copiedEmail, setCopiedEmail] = useState(false);
+
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
+  };
+
+  const handleEmailClick = () => {
+    navigator.clipboard.writeText(CONTACT_INFO.email);
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2000);
   };
 
   return (
@@ -89,10 +99,14 @@ export const Footer: React.FC = () => {
             <div className="flex items-center gap-2">
               <a
                 href={`mailto:${CONTACT_INFO.email}`}
-                title="Kirim Email"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-teal-500 hover:text-teal-400 flex items-center justify-center transition-colors text-slate-300"
+                onClick={handleEmailClick}
+                title={copiedEmail ? 'Email disalin!' : 'Kirim Email'}
+                className={`w-8 h-8 rounded-lg bg-slate-900 border flex items-center justify-center transition-colors ${copiedEmail
+                  ? 'border-teal-500 text-teal-400'
+                  : 'border-slate-800 hover:border-teal-500 hover:text-teal-400 text-slate-300'
+                  }`}
               >
-                <Mail className="w-3.5 h-3.5" />
+                {copiedEmail ? <CheckCircle className="w-3.5 h-3.5" /> : <Mail className="w-3.5 h-3.5" />}
               </a>
 
               <a
