@@ -93,6 +93,7 @@ const ANTIGRAVITY_MODEL_ID = 'antigravity-preview-05-2026';
 
 interface AIChatbotShowcaseProps {
     darkMode: boolean;
+    initialPrompt?: string;
 }
 
 /** File hasil kerja Antigravity Agent (mis. RAB.xlsx) yang siap didownload user */
@@ -419,12 +420,18 @@ const renderInlineFormattedText = (text: string, darkMode: boolean): React.React
     return parts.length > 0 ? parts : text;
 };
 
-export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode }) => {
-    const [input, setInput] = useState('');
+export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, initialPrompt }) => {
+    const [input, setInput] = useState(initialPrompt || '');
     const [isLoading, setIsLoading] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false);
     const [loadingTextIndex, setLoadingTextIndex] = useState(0);
     const [downloadSummarySuccess, setDownloadSummarySuccess] = useState(false);
+
+    useEffect(() => {
+        if (initialPrompt) {
+            setInput(initialPrompt);
+        }
+    }, [initialPrompt]);
 
     useEffect(() => {
         if (!isLoading) {

@@ -212,7 +212,19 @@ export const PROJECTS: ProjectItem[] = [
     demoUrl: 'https://bgames.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'amber',
-    iconType: 'Dice'
+    iconType: 'Dice',
+    businessCase: {
+      problem: 'Permainan papan multiplayer online kerap terganggu koneksi putus (pemain AFK membuat meja macet) dan banyaknya tayangan iklan yang merusak kenyamanan bermain bersama keluarga.',
+      solution: 'Arena game digital gratis dan bebas iklan dengan koneksi realtime berlatensi rendah (<50ms) serta Smart Bot AI Anti-AFK yang sigap mengambil alih giliran agar sesi game tetap berlanjut.',
+      impact: 'Pengalaman bermain lancar tanpa meja berhenti (zero freeze), latensi responsif, dan kenyamanan bermain murni 100% tanpa gangguan iklan.'
+    },
+    architectureFlow: [
+      'Pilih Meja / Buat Room',
+      'Sinkronisasi Realtime WebSocket',
+      'Smart Bot Anti-AFK Takeover',
+      'Cloud Save & Leaderboard',
+      'Animasi Skia 60 FPS & Haptic'
+    ]
   },
   {
     id: 'proj-rajendra',
@@ -235,7 +247,19 @@ export const PROJECTS: ProjectItem[] = [
     demoUrl: 'https://rapin.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'teal',
-    iconType: 'GraduationCap'
+    iconType: 'GraduationCap',
+    businessCase: {
+      problem: 'Anak usia dini rentan terhadap paparan iklan yang tidak aman di internet serta kendala kuota/sinyal saat belajar mandiri di perjalanan atau area minim jaringan.',
+      solution: 'Aplikasi edukasi ramah anak dengan kurikulum terarah, sistem suara dwibahasa, proteksi Parent Gate untuk rasa aman orang tua, dan kemampuan berjalan 100% offline.',
+      impact: 'Ruang belajar yang aman dan bebas risiko konten luar, hemat kuota internet 100% berkat mode offline, serta meningkatkan rasa percaya diri anak dalam belajar.'
+    },
+    architectureFlow: [
+      'Pilih Tingkat Usia & Materi',
+      'Flashcard TTS Dwibahasa',
+      'Kuis Ceria & Apresiasi Bintang',
+      'PWA Service Worker Offline Cache',
+      'Parent Gate & Pengaturan Aman'
+    ]
   },
   {
     id: 'proj-assets',
@@ -256,11 +280,23 @@ export const PROJECTS: ProjectItem[] = [
     ],
     techStack: ['React Native', 'Expo Router', 'NativeWind', 'Tailwind CSS', 'Google Apps Script', 'Google Sheets DB', 'Google Drive Storage', 'Expo Camera', 'Shopify FlashList', 'OneSignal', 'PWA'],
     role: 'Full-stack Developer & Solution Architect',
-    year: '2024',
+    year: '2026',
     demoUrl: 'https://assets.arzhaning.my.id/',
     isFeatured: true,
     colorScheme: 'indigo',
-    iconType: 'FileSpreadsheet'
+    iconType: 'FileSpreadsheet',
+    businessCase: {
+      problem: 'Proses stock opname manual dan kalkulasi penyusutan aset fisik multi-cabang rawan selisih data, serta biaya sewa server konvensional membebani anggaran operasional.',
+      solution: 'Platform manajemen aset terpadu berbasis scan QR/Barcode kamera, kalkulasi depresiasi otomatis per bulan, dan arsitektur Serverless memanfaatkan ekosistem cloud internal yang ada.',
+      impact: 'Audit aset lebih cepat dan transparan, nilai buku selalu akurat dan siap audit kapan saja, serta efisiensi anggaran dengan biaya sewa server Rp0/bulan.'
+    },
+    architectureFlow: [
+      'Scan QR / Barcode Kamera',
+      'Validasi Data & Offline Queue',
+      'Serverless Logic Engine',
+      'Google Sheets DB & Drive Storage',
+      'Ekspor Laporan PDF/Excel & Audit Trail'
+    ]
   },
 ];
 

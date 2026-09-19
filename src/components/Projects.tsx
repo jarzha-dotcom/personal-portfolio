@@ -112,10 +112,20 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeFilter, setActiveFilter] = useState<string>('Semua');
   const [activeModalProject, setActiveModalProject] = useState<ProjectItem | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
+  const [chatbotInitialPrompt, setChatbotInitialPrompt] = useState<string>('');
+
+  const handleAskAIAboutProject = (project: ProjectItem) => {
+    setActiveModalProject(null);
+    setChatbotInitialPrompt(`Ceritakan arsitektur, tantangan teknis, dan keunggulan dari proyek ${project.title}!`);
+    setIsChatbotOpen(true);
+  };
 
   // Hubungkan tombol Back browser agar menutup modal yang aktif secara bertahap
   useRegisterModal('project-detail-modal', !!activeModalProject, () => setActiveModalProject(null));
-  useRegisterModal('chatbot-showcase-modal', isChatbotOpen, () => setIsChatbotOpen(false));
+  useRegisterModal('chatbot-showcase-modal', isChatbotOpen, () => {
+    setIsChatbotOpen(false);
+    setChatbotInitialPrompt('');
+  });
 
   // Filter Categories & Projects Memoized untuk efisiensi render
   const categories = useMemo(
@@ -666,7 +676,10 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   </div>
                 </div>
                 <button
-                  onClick={() => setIsChatbotOpen(false)}
+                  onClick={() => {
+                    setIsChatbotOpen(false);
+                    setChatbotInitialPrompt('');
+                  }}
                   aria-label="Tutup modal chatbot"
                   className={`p-2 rounded-xl transition-colors ${
                     darkMode
@@ -690,7 +703,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     </div>
                   }
                 >
-                  <AIChatbotShowcase darkMode={darkMode} />
+                  <AIChatbotShowcase darkMode={darkMode} initialPrompt={chatbotInitialPrompt} />
                 </Suspense>
               </div>
 
@@ -766,6 +779,61 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   {activeModalProject.longDescription || activeModalProject.description}
                 </p>
 
+                {/* Studi Kasus Bisnis (Problem -> Solution -> Impact) */}
+                {activeModalProject.businessCase && (
+                  <div className="space-y-2.5">
+                    <h4 className={`text-xs font-extrabold uppercase tracking-wider ${darkMode ? 'text-teal-400' : 'text-teal-700'}`}>
+                      Studi Kasus & Solusi Nyata
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {/* Tantangan */}
+                      <div className={`p-3.5 rounded-xl border flex flex-col justify-start ${
+                        darkMode ? 'bg-slate-800/60 border-rose-500/30' : 'bg-rose-50/70 border-rose-200'
+                      }`}>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="w-2 h-2 rounded-full bg-rose-500 flex-shrink-0" />
+                          <span className={`text-[11px] font-bold uppercase tracking-wider ${darkMode ? 'text-rose-300' : 'text-rose-700'}`}>
+                            Tantangan
+                          </span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {activeModalProject.businessCase.problem}
+                        </p>
+                      </div>
+
+                      {/* Solusi */}
+                      <div className={`p-3.5 rounded-xl border flex flex-col justify-start ${
+                        darkMode ? 'bg-slate-800/60 border-teal-500/30' : 'bg-teal-50/70 border-teal-200'
+                      }`}>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="w-2 h-2 rounded-full bg-teal-500 flex-shrink-0" />
+                          <span className={`text-[11px] font-bold uppercase tracking-wider ${darkMode ? 'text-teal-300' : 'text-teal-700'}`}>
+                            Solusi
+                          </span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {activeModalProject.businessCase.solution}
+                        </p>
+                      </div>
+
+                      {/* Dampak */}
+                      <div className={`p-3.5 rounded-xl border flex flex-col justify-start ${
+                        darkMode ? 'bg-slate-800/60 border-emerald-500/30' : 'bg-emerald-50/70 border-emerald-200'
+                      }`}>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0" />
+                          <span className={`text-[11px] font-bold uppercase tracking-wider ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>
+                            Dampak
+                          </span>
+                        </div>
+                        <p className={`text-xs leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {activeModalProject.businessCase.impact}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h4 className={`text-xs font-extrabold uppercase tracking-wider mb-3 ${darkMode ? 'text-teal-400' : 'text-teal-700'}`}>
                     Fitur & Keunggulan Utama
@@ -803,6 +871,40 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                     ))}
                   </div>
                 </div>
+
+                {/* Alur Kerja Arsitektur Visual */}
+                {activeModalProject.architectureFlow && activeModalProject.architectureFlow.length > 0 && (
+                  <div>
+                    <h4 className={`text-xs font-extrabold uppercase tracking-wider mb-2.5 ${darkMode ? 'text-teal-400' : 'text-teal-700'}`}>
+                      Alur Kerja & Arsitektur
+                    </h4>
+                    <div className={`p-3.5 rounded-xl border overflow-x-auto ${
+                      darkMode ? 'bg-slate-800/40 border-slate-700/80' : 'bg-slate-50 border-slate-200'
+                    }`}>
+                      <div className="flex items-center gap-2 min-w-max py-0.5">
+                        {activeModalProject.architectureFlow.map((step, idx) => (
+                          <React.Fragment key={idx}>
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium shadow-xs ${
+                              darkMode
+                                ? 'bg-slate-900/90 border-slate-700 text-slate-200'
+                                : 'bg-white border-slate-200 text-slate-800'
+                            }`}>
+                              <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                                darkMode ? 'bg-teal-500/20 text-teal-300' : 'bg-teal-100 text-teal-800'
+                              }`}>
+                                {idx + 1}
+                              </span>
+                              <span>{step}</span>
+                            </div>
+                            {idx < activeModalProject.architectureFlow!.length - 1 && (
+                              <ArrowRight className={`w-3.5 h-3.5 flex-shrink-0 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Client Case & Data Privacy Transparency Callout */}
                 {activeModalProject.client && (
@@ -851,20 +953,35 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
 
               {/* Modal Footer */}
               <div
-                className={`sticky bottom-0 p-4 sm:p-5 border-t flex items-center justify-between gap-3 ${
+                className={`sticky bottom-0 p-4 sm:p-5 border-t flex flex-wrap items-center justify-between gap-3 ${
                   darkMode ? 'bg-slate-900/95 border-slate-700 backdrop-blur-md' : 'bg-white/95 border-slate-200 backdrop-blur-md'
                 }`}
               >
-                <button
-                  onClick={() => setActiveModalProject(null)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
-                    darkMode
-                      ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
-                      : 'border-slate-300 text-slate-700 hover:bg-slate-100'
-                  }`}
-                >
-                  Tutup
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveModalProject(null)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-colors ${
+                      darkMode
+                        ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
+                        : 'border-slate-300 text-slate-700 hover:bg-slate-100'
+                    }`}
+                  >
+                    Tutup
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleAskAIAboutProject(activeModalProject)}
+                    className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold border transition-all duration-200 ${
+                      darkMode
+                        ? 'border-teal-700/70 text-teal-300 bg-teal-950/40 hover:bg-teal-900/50 hover:border-teal-500'
+                        : 'border-teal-300 text-teal-800 bg-teal-50/80 hover:bg-teal-100 hover:border-teal-400'
+                    }`}
+                    title="Tanyakan arsitektur atau detail proyek ini ke AI Chatbot"
+                  >
+                    <Bot className="w-3.5 h-3.5 text-teal-500" />
+                    <span>Tanya ke AI</span>
+                  </button>
+                </div>
                 <div className="flex items-center gap-2">
                   {activeModalProject.githubUrl && (
                     <a

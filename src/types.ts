@@ -61,6 +61,12 @@ export interface ProjectItem {
   isFeatured?: boolean;
   colorScheme?: 'amber' | 'teal' | 'indigo' | 'emerald';
   iconType?: string;
+  businessCase?: {
+    problem: string;
+    solution: string;
+    impact: string;
+  };
+  architectureFlow?: string[];
 }
 
 export interface TechStackGroup {
