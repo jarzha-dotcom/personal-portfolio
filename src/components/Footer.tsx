@@ -162,9 +162,20 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
-          <p>
-            © 2026 K. Arzhaning Jagad. All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-x-4 gap-y-1.5">
+            <p>
+              © 2026 K. Arzhaning Jagad. All rights reserved.
+            </p>
+            <nav aria-label="Legal" className="flex items-center gap-3">
+              <a href="/privacy-policy/" className="hover:text-teal-400 transition-colors">
+                Kebijakan Privasi
+              </a>
+              <span aria-hidden="true" className="text-slate-700">•</span>
+              <a href="/terms/" className="hover:text-teal-400 transition-colors">
+                Syarat &amp; Ketentuan
+              </a>
+            </nav>
+          </div>
 
           <button
             onClick={scrollToTop}
