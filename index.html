@@ -251,10 +251,109 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+
+  <!-- Splash screen: mencegah flash konten statis SEO sebelum React & CSS
+       Tailwind selesai load. Konten SEO tetap ada di DOM (tidak dihapus,
+       cuma ditutup layer ini secara visual), jadi tidak berpengaruh ke
+       crawling/indexing. -->
+  <style>
+    #app-splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      background: #f8fafc;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+    }
+
+    #app-splash img {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      animation: app-splash-pulse 1.6s ease-in-out infinite;
+    }
+
+    #app-splash .app-splash-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    #app-splash .app-splash-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 9999px;
+      background: #0d9488;
+      animation: app-splash-dot 1s ease-in-out infinite;
+    }
+
+    #app-splash .app-splash-dots span:nth-child(2) {
+      animation-delay: 0.15s;
+    }
+
+    #app-splash .app-splash-dots span:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    #app-splash.app-splash-hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    @keyframes app-splash-pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.045);
+      }
+    }
+
+    @keyframes app-splash-dot {
+
+      0%,
+      80%,
+      100% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+
+      40% {
+        transform: translateY(-6px);
+        opacity: 1;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      #app-splash img,
+      #app-splash .app-splash-dots span {
+        animation: none !important;
+      }
+    }
+  </style>
 </head>
 
 <body
   class="bg-slate-50 text-slate-800 antialiased selection:bg-teal-500 selection:text-white transition-colors duration-300">
+  <!-- Splash: tampil instan, disembunyikan otomatis begitu React mount
+       (lihat skrip di akhir body). Konten SEO di bawahnya tetap utuh. -->
+  <div id="app-splash">
+    <img src="/icons/icon-maskable-512.png" alt="K. Arzhaning Jagad" />
+    <div class="app-splash-dots">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </div>
+
   <div id="root">
     <!-- Semantic Static Shell (Untuk Googlebot Crawler & Instant SEO Indexing) -->
     <header style="padding: 2rem 1rem; max-width: 1200px; margin: 0 auto; text-align: center;">
@@ -362,6 +461,38 @@
       <p>Jasa Pembuatan Website, Aplikasi Mobile, Game Multiplayer & Integrasi AI.</p>
     </footer>
   </div>
+
+  <!-- Menyembunyikan splash begitu React mengganti isi #root. Tidak perlu
+       ubah App.tsx: cukup amati perubahan childList di #root, plus
+       fallback timeout jika karena suatu hal React gagal mount. -->
+  <script>
+    (function () {
+      var splash = document.getElementById('app-splash');
+      var root = document.getElementById('root');
+      if (!splash || !root) return;
+      var hidden = false;
+
+      function hideSplash() {
+        if (hidden) return;
+        hidden = true;
+        splash.classList.add('app-splash-hidden');
+        setTimeout(function () { splash.remove(); }, 500);
+      }
+
+      var observer = new MutationObserver(function () {
+        hideSplash();
+        observer.disconnect();
+      });
+      observer.observe(root, { childList: true });
+
+      // Fallback: kalau React tidak kunjung mount, splash tetap hilang
+      // setelah 4 detik supaya tidak mengunci pengguna.
+      window.addEventListener('load', function () {
+        setTimeout(hideSplash, 4000);
+      });
+    })();
+  </script>
+
   <script type="module" src="/src/main.tsx"></script>
 </body>
 
