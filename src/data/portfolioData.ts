@@ -232,16 +232,16 @@ export const PROJECTS: ProjectItem[] = [
     tagline: 'Platform edukasi ramah anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard dwibahasa, Kuis Suara, Gamifikasi & Full Offline PWA.',
     category: 'Edukasi',
     badge: 'Edukasi Anak (PAUD - SD)',
-    description: 'Aplikasi edukasi interaktif ramah anak usia 4–8 tahun dengan kurikulum adaptif 5 usia, 9 kategori tematik, 3 mode belajar (Flashcard TTS dwibahasa ID/EN, Kuis Ceria + Confetti, Petualangan Mini Game Memori), maskot interaktif, Parent Gate, dan 100% full offline.',
-    longDescription: 'Rajendra Pintar (Pintar Ceria Kids) dirancang khusus mendampingi masa emas tumbuh kembang anak usia 4 hingga 8 tahun (PAUD, TK, SD Kelas 1 & 2) secara aman, ceria, dan 100% bebas iklan. Dilengkapi kurikulum adaptif 5 tahapan usia dan 9 kategori pengetahuan tematik (Pendidikan Agama Islam, Satwa, Buah & Sayur Sehat, Angka & Matematika Ceria, English Vocab, Bentuk & Warna, Transportasi, Pakaian & Aksesori, Profesi & Cita-cita). Menyajikan 3 mode interaktif: Flashcard Mode dengan Text-to-Speech dwibahasa (ID/EN) & fakta seru, Mode Kuis Ceria dengan semburan Canvas Confetti apresiasi, serta Island Adventure Memory Game. Memiliki 6 maskot hidup penyemangat, toko hadiah kostum bintang, 7 tema visual, Parent Gate pelindung anak, serta arsitektur 100% Full Offline via Service Worker PWA dan APK Native Android via Capacitor 8.',
+    description: 'Aplikasi edukasi interaktif ramah anak usia 4–8 tahun dengan kurikulum adaptif 5 usia, 9 kategori tematik, 3 mode belajar (Flashcard TTS dwibahasa ID/EN, Kuis Ceria + Confetti, Petualangan Mini Game Memori), maskot & toko kosmetik lengkap dengan VIP Lifetime via Xendit, sinkronisasi cloud Google, Parent Gate, dan 100% full offline.',
+    longDescription: 'Rajendra Pintar (Pintar Ceria Kids) dirancang khusus mendampingi masa emas tumbuh kembang anak usia 4 hingga 8 tahun (PAUD, TK, SD Kelas 1 & 2) secara aman, ceria, dan kid-safe. Dilengkapi kurikulum adaptif 5 tahapan usia dan 9 kategori pengetahuan tematik (Pendidikan Agama Islam, Satwa, Buah & Sayur Sehat, Angka & Matematika Ceria, English Vocab, Bentuk & Warna, Transportasi, Pakaian & Aksesori, Profesi & Cita-cita). Menyajikan 3 mode interaktif: Flashcard Mode dengan Text-to-Speech dwibahasa (ID/EN) & fakta seru, Mode Kuis Ceria dengan semburan Canvas Confetti apresiasi, serta Island Adventure Memory Game. Memiliki 6 maskot hidup penyemangat dan Toko Kosmetik lengkap (13 topi/aksesori, 11 tema visual, bingkai kartu, paket efek suara & sentuhan, musik latar) yang bisa dibuka gratis lewat Bintang harian & iklan reward, dengan opsi upgrade VIP Lifetime dan Bintang Premium via payment gateway lokal Xendit (QRIS/e-Wallet) berikut webhook auto-fulfillment. Login Google opsional (dilindungi Parent Gate) menyinkronkan progres, kosmetik, dan status VIP lintas perangkat via Supabase. Ditutup dengan arsitektur 100% Full Offline via Service Worker PWA dan APK Native Android via Capacitor 8.',
     highlights: [
       'Kurikulum Adaptif 5 Usia (4–8 Tahun) & 9 Kategori Tematik (PAI, Satwa, Buah/Sayur, Matematika, English Vocab, dll.)',
       '3 Mode Belajar: Flashcard Interaktif (TTS dwibahasa ID/EN), Kuis Ceria bergambar + Canvas Confetti, & Island Memory Game',
-      '6 Maskot Interaktif & Personalisasi: Reaksi animasi ramah anak, toko kostum bintang prestasi, dan 7 tema suasana visual',
-      'Kid-Safe & Parent Gate: Proteksi verifikasi orang tua sebelum akses pengaturan, 100% bebas iklan berbahaya',
-      '100% Full Offline & Multi-Distribusi: Berjalan tanpa internet via PWA Service Worker Caching & instalasi native Android (.APK) via Capacitor 8'
+      '6 Maskot Interaktif & Toko Kosmetik Lengkap: 13 topi/aksesori, 11 tema visual, bingkai kartu, efek suara & sentuhan — dibuka gratis via Bintang/iklan',
+      'Monetisasi Adil & Cloud Sync: VIP Lifetime & Bintang Premium via Xendit (QRIS/e-Wallet), sinkronisasi progres lintas perangkat via Google Sign-In & Supabase',
+      'Kid-Safe & 100% Full Offline: Parent Gate proteksi orang tua, berjalan tanpa internet via PWA Service Worker Caching & instalasi native Android (.APK) via Capacitor 8'
     ],
-    techStack: ['React 19', 'TypeScript', 'Vite 6', 'Tailwind CSS v4', 'Motion (v12)', 'Capacitor 8', 'Web Audio API', 'TTS Dwibahasa', 'Canvas Confetti', 'PWA Offline Cache', 'Supabase'],
+    techStack: ['React 19', 'TypeScript ~5.8', 'Vite 6', 'Tailwind CSS v4', 'Motion (v12)', 'Capacitor 8', 'Web Audio API', 'TTS Dwibahasa', 'Canvas Confetti', 'PWA Offline Cache', 'Supabase', 'Xendit', 'Cloudflare CDN'],
     role: 'Full-stack Indie Developer & Content Designer',
     year: '2024 - 2025',
     demoUrl: 'https://rapin.arzhaning.my.id/',
@@ -249,16 +249,16 @@ export const PROJECTS: ProjectItem[] = [
     colorScheme: 'teal',
     iconType: 'GraduationCap',
     businessCase: {
-      problem: 'Anak usia dini rentan terhadap paparan iklan yang tidak aman di internet serta kendala kuota/sinyal saat belajar mandiri di perjalanan atau area minim jaringan.',
-      solution: 'Aplikasi edukasi ramah anak dengan kurikulum terarah, sistem suara dwibahasa, proteksi Parent Gate untuk rasa aman orang tua, dan kemampuan berjalan 100% offline.',
-      impact: 'Ruang belajar yang aman dan bebas risiko konten luar, hemat kuota internet 100% berkat mode offline, serta meningkatkan rasa percaya diri anak dalam belajar.'
+      problem: 'Anak usia dini rentan terhadap paparan iklan yang tidak aman di internet serta kendala kuota/sinyal saat belajar mandiri di perjalanan atau area minim jaringan, sementara orang tua butuh kepastian transaksi mikro yang aman jika ingin membuka fitur tambahan.',
+      solution: 'Aplikasi edukasi ramah anak dengan kurikulum terarah, sistem suara dwibahasa, proteksi Parent Gate, kemampuan berjalan 100% offline, serta model monetisasi transparan (konten edukasi tetap gratis, kosmetik bisa dibuka gratis via Bintang/iklan, dan opsi VIP Lifetime/Bintang Premium lewat payment gateway lokal Xendit yang tepercaya).',
+      impact: 'Ruang belajar yang aman dan bebas risiko konten luar, hemat kuota internet 100% berkat mode offline, engagement anak meningkat lewat gamifikasi toko kosmetik, dan kepercayaan orang tua terjaga berkat transaksi Xendit yang jelas dan Parent Gate di setiap akses sensitif.'
     },
     architectureFlow: [
       'Pilih Tingkat Usia & Materi',
-      'Flashcard TTS Dwibahasa',
-      'Kuis Ceria & Apresiasi Bintang',
-      'PWA Service Worker Offline Cache',
-      'Parent Gate & Pengaturan Aman'
+      'Flashcard TTS Dwibahasa & Kuis Ceria',
+      'Toko Kosmetik, VIP & Xendit Checkout',
+      'Cloud Sync via Google Sign-In & Supabase',
+      'PWA Offline Cache & Parent Gate'
     ]
   },
   {
@@ -315,7 +315,7 @@ export const TECH_STACK_GROUPS: TechStackGroup[] = [
   },
   {
     category: 'Backend, Serverless & Databases',
-    items: ['Serverless Engine (Google Apps Script - Zero Server Cost)', 'Supabase (PostgreSQL Enterprise)', 'Node.js / Koa Server', 'Google Sheets DB & Drive Storage', 'Vercel Serverless & Cloudflare CDN', 'RESTful APIs & Offline Queue']
+    items: ['Serverless Engine (Google Apps Script - Zero Server Cost)', 'Supabase (PostgreSQL Enterprise)', 'Node.js / Koa Server', 'Google Sheets DB & Drive Storage', 'Xendit Payment Gateway', 'Vercel Serverless & Cloudflare CDN', 'RESTful APIs & Offline Queue']
   },
   {
     category: 'Audit, Security & Enterprise Tools',

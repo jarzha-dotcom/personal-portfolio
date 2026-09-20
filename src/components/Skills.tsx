@@ -87,6 +87,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
         { name: 'Google Sheets DB & Drive', dotColor: 'bg-emerald-500', projects: 'Assets Demo (Master Data, Audit Trail & Media Foto)' },
         { name: 'Supabase (PostgreSQL)', dotColor: 'bg-teal-400', projects: 'B-Games (Profil, Peringkat, Koin), Rajendra Pintar' },
         { name: 'Koa.js / Node.js', dotColor: 'bg-sky-400', projects: 'B-Games (Realtime Game Server & Room Lobby)' },
+        { name: 'Xendit Payment Gateway', dotColor: 'bg-lime-400', projects: 'Rajendra Pintar (VIP Lifetime & Bintang Premium via QRIS/e-Wallet)' },
         { name: 'Shopify FlashList', dotColor: 'bg-amber-400', projects: 'Assets Demo (Perenderan Kilat Ribuan Data Aset)' },
         { name: 'Cloudflare / Vercel', dotColor: 'bg-orange-400', projects: 'Edge Caching, CDN & Serverless API' }
       ]
@@ -290,7 +291,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
             {[
               {
                 title: 'Fullstack Game & App',
-                desc: 'Membangun platform multiplayer (B-Games: React Native/Expo + boardgame.io + Koa + Supabase), sistem inventaris korporat (Assets Demo: React Native/Expo + Google Apps Script serverless zero-cost), dan platform edukasi anak (Rajendra Pintar: React 19 + Vite 6 + Tailwind v4 + Capacitor 8).'
+                desc: 'Membangun platform multiplayer (B-Games: React Native/Expo + boardgame.io + Koa + Supabase), sistem inventaris korporat (Assets Demo: React Native/Expo + Google Apps Script serverless zero-cost), dan platform edukasi anak dengan shop & VIP (Rajendra Pintar: React 19 + Vite 6 + Tailwind v4 + Capacitor 8 + Supabase + Xendit).'
               },
               {
                 title: 'Solo Product Management',
