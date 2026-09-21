@@ -21,8 +21,14 @@ import {
   Building2,
   ShieldCheck,
   Loader2,
+  Mic,
+  MessageCircle,
+  Clock,
+  Database,
+  ChevronDown,
 } from 'lucide-react';
-import { PROJECTS, AVAILABLE_MODELS } from '../data/portfolioData';
+import type { LucideIcon } from 'lucide-react';
+import { PROJECTS, AVAILABLE_MODELS, CONTACT_INFO } from '../data/portfolioData';
 import { useRegisterModal } from '../context/NavigationHistoryContext';
 import { ProjectItem } from '../types';
 import { Portal } from './Portal';
@@ -44,6 +50,112 @@ const CHAT_PREVIEW_PAIRS: { q: string; a: string }[] = [
 ];
 const CHAT_PREVIEW_INTERVAL_MS = 3400;
 const CHAT_PREVIEW_FADE_MS = 300;
+
+// ---------------------------------------------------------------------------
+// Konten "Jasa AI Chatbot & Agent" — ubah teks, harga, dan estimasi waktu di
+// sini saja; card sidebar & modal detail otomatis mengikuti.
+// ---------------------------------------------------------------------------
+const SERVICE_PRICE_LABEL = 'Rp 1,5 jt';
+
+// Set ke null kalau kuota promo sudah habis; badge di card & banner di modal otomatis hilang.
+const SERVICE_PROMO: { short: string; long: string } | null = {
+  short: 'Diskon 15%',
+  long: 'Promo peluncuran: diskon 15% untuk 5 klien pertama (dengan kesediaan menjadi studi kasus portofolio).',
+};
+
+// Tombol WhatsApp di modal — nomor diambil dari CONTACT_INFO supaya satu sumber data.
+const SERVICE_WA_URL = `https://wa.me/${CONTACT_INFO.phone.replace(/\D/g, '')}?text=${encodeURIComponent(
+  'Halo Mas Arzha, saya tertarik dengan jasa AI Chatbot & Agent. Boleh konsultasi kebutuhan bisnis saya?'
+)}`;
+
+const SERVICE_TARGETS = ['Toko online', 'Jasa & klinik', 'UMKM'];
+
+// Versi ringkas untuk card sidebar (sticky, jadi harus tetap pendek)
+const SERVICE_BULLETS = [
+  'Jawab pertanyaan pelanggan sesuai produk & FAQ bisnismu',
+  'Bisa ngobrol pakai suara, dua arah dan natural',
+  'Calon pelanggan masuk ke WhatsApp lengkap dengan brief-nya',
+  'Tetap aktif walau satu model AI sedang gangguan',
+];
+
+// Versi lengkap untuk modal detail
+const SERVICE_BENEFITS: { icon: LucideIcon; title: string; desc: string }[] = [
+  {
+    icon: Clock,
+    title: 'Melayani 24 jam',
+    desc: 'Pertanyaan pelanggan di luar jam kerja tetap terjawab, tidak menumpuk sampai besok pagi.',
+  },
+  {
+    icon: Mic,
+    title: 'Bisa diajak bicara',
+    desc: 'Suara dua arah yang natural (Google Chirp3-HD). Pelanggan cukup bicara, chatbot menjawab dengan suara.',
+  },
+  {
+    icon: MessageCircle,
+    title: 'Calon pelanggan masuk ke WhatsApp',
+    desc: 'Sekali klik, percakapan dirangkum menjadi brief dan dikirim ke WhatsApp kamu.',
+  },
+  {
+    icon: Database,
+    title: 'Menjawab sesuai bisnismu',
+    desc: 'Berbekal produk, harga, dan FAQ milikmu, bukan jawaban generik yang bisa dipakai siapa saja.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Tetap aktif dan aman',
+    desc: 'Otomatis pindah ke model AI cadangan saat ada gangguan, dan API key tersimpan di server, bukan di browser pengunjung.',
+  },
+];
+
+const SERVICE_STEPS: { title: string; desc: string; duration: string }[] = [
+  {
+    title: 'Diskusi kebutuhan',
+    desc: 'Ceritakan bisnismu: siapa pelanggannya, pertanyaan apa yang paling sering masuk, dan apa yang ingin dicapai. Gratis, tanpa kewajiban order.',
+    duration: '1-2 hari',
+  },
+  {
+    title: 'Development',
+    desc: 'Produk, harga, dan FAQ dijadikan bekal chatbot, lalu suara dan alur WhatsApp disambungkan. Progres diperbarui rutin lewat WhatsApp.',
+    duration: '3-7 hari',
+  },
+  {
+    title: 'Testing bareng kamu',
+    desc: 'Chatbot dicoba dengan pertanyaan nyata dari pelangganmu, lalu disempurnakan sebelum rilis.',
+    duration: '2-3 hari',
+  },
+  {
+    title: 'Deployment & serah terima',
+    desc: 'Chatbot dipasang dan dipastikan berjalan. Kamu menerima source code dan panduan singkat cara menggunakannya.',
+    duration: '1 hari',
+  },
+];
+
+const SERVICE_FAQ: { q: string; a: string }[] = [
+  {
+    q: 'Chatbot tahu soal bisnis saya dari mana?',
+    a: 'Dari materi yang kamu berikan: daftar produk, harga, FAQ, dan info layanan. Semakin lengkap materinya, semakin akurat jawabannya.',
+  },
+  {
+    q: 'Model AI apa yang dipakai?',
+    a: 'Standarnya Gemini. Model lain seperti Claude atau GPT bisa disambungkan atas permintaan, dengan biaya API bulanan sesuai tarif masing-masing. Kalau satu model bermasalah, chatbot otomatis beralih ke model cadangan.',
+  },
+  {
+    q: 'Berapa biaya bulanan setelah live?',
+    a: 'Hosting memakai arsitektur serverless yang hemat biaya, sedangkan biaya API AI mengikuti pemakaian. Estimasinya dijelaskan di awal konsultasi supaya kamu bisa menghitung anggaran sejak awal.',
+  },
+  {
+    q: 'Bagaimana sistem pembayarannya?',
+    a: 'Bertahap per milestone: DP di awal, termin tengah saat fitur jadi, dan pelunasan saat rilis. Kamu melihat progres nyata dulu sebelum membayar tahap berikutnya.',
+  },
+  {
+    q: 'Ada garansi kalau terjadi masalah?',
+    a: 'Ada. Setiap proyek mendapat maintenance dan technical support gratis selama 1 bulan setelah rilis.',
+  },
+  {
+    q: 'Source code jadi milik saya?',
+    a: 'Ya. Seluruh source code, repositori, dan aset project diserahkan penuh tanpa biaya lisensi tersembunyi.',
+  },
+];
 
 // Sub-komponen Mini-Preview Chat yang di-memoize untuk mencegah re-render pada seluruh komponen Projects
 const ChatbotPreviewWidget: React.FC<{ darkMode: boolean; isChatbotOpen: boolean }> = memo(({ darkMode, isChatbotOpen }) => {
@@ -113,10 +225,17 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeModalProject, setActiveModalProject] = useState<ProjectItem | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [chatbotInitialPrompt, setChatbotInitialPrompt] = useState<string>('');
+  const [isServiceOpen, setIsServiceOpen] = useState(false);
 
   const handleAskAIAboutProject = (project: ProjectItem) => {
     setActiveModalProject(null);
     setChatbotInitialPrompt(`Ceritakan arsitektur, tantangan teknis, dan keunggulan dari proyek ${project.title}!`);
+    setIsChatbotOpen(true);
+  };
+
+  const handleTryChatbotFromService = () => {
+    setIsServiceOpen(false);
+    setChatbotInitialPrompt('Berapa biaya dan apa saja yang saya dapat kalau memesan chatbot untuk bisnis saya?');
     setIsChatbotOpen(true);
   };
 
@@ -126,6 +245,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
     setIsChatbotOpen(false);
     setChatbotInitialPrompt('');
   });
+  useRegisterModal('chatbot-service-modal', isServiceOpen, () => setIsServiceOpen(false));
 
   // Filter Categories & Projects Memoized untuk efisiensi render
   const categories = useMemo(
@@ -143,7 +263,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
 
   // Lock body scroll ketika modal aktif
   useEffect(() => {
-    if (activeModalProject || isChatbotOpen) {
+    if (activeModalProject || isChatbotOpen || isServiceOpen) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = '';
@@ -151,7 +271,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
     return () => {
       document.body.style.overflow = '';
     };
-  }, [activeModalProject, isChatbotOpen]);
+  }, [activeModalProject, isChatbotOpen, isServiceOpen]);
 
   // Inject Structured Data JSON-LD
   useEffect(() => {
@@ -563,15 +683,20 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
 
               {/* Jasa Chatbot Card */}
               <div
-                className={`p-5 sm:p-6 rounded-2xl border ${
+                className={`relative overflow-hidden p-5 sm:p-6 rounded-2xl border ${
                   darkMode
                     ? 'bg-slate-900/90 border-slate-800 shadow-lg'
                     : 'bg-white border-slate-200 shadow-md'
                 }`}
               >
-                <div className="flex items-center gap-3 mb-3.5">
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-amber-400"
+                />
+
+                <div className="flex items-center gap-3 mb-4 pt-1">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       darkMode ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-emerald-100'
                     }`}
                   >
@@ -582,18 +707,13 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                       Jasa AI Chatbot & Agent
                     </h4>
                     <p className={`text-[11px] font-medium ${darkMode ? 'text-emerald-400' : 'text-emerald-700'}`}>
-                      Voice-enabled & Lead Generator
+                      Balas pelanggan 24 jam, otomatis
                     </p>
                   </div>
                 </div>
 
                 <ul className="space-y-1.5 mb-4">
-                  {[
-                    'Suara 2-Arah natural (Google Chirp3-HD)',
-                    'One-Click WhatsApp Lead & Brief generator',
-                    'Multi-LLM (Gemini, Claude, GPT-4) serverless',
-                    'Zero-downtime hybrid fallback & custom knowledge',
-                  ].map((item, i) => (
+                  {SERVICE_BULLETS.map((item, i) => (
                     <li key={i} className="flex items-start gap-2">
                       <CheckCircle2
                         className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${
@@ -607,29 +727,82 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                   ))}
                 </ul>
 
-                <div className={`p-3 rounded-xl border mb-4 ${darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-emerald-50/50 border-emerald-100'}`}>
-                  <div className="flex items-center gap-1.5">
-                    <Zap className={`w-4 h-4 ${darkMode ? 'text-amber-400' : 'text-amber-600'}`} />
-                    <span className={`text-xs font-bold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>
-                      Mulai dari Rp 1.5jt
+                <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                  <span className={`text-[11px] font-medium mr-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Cocok untuk
+                  </span>
+                  {SERVICE_TARGETS.map((target) => (
+                    <span
+                      key={target}
+                      className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${
+                        darkMode
+                          ? 'bg-slate-800 border-slate-700 text-slate-300'
+                          : 'bg-slate-50 border-slate-200 text-slate-700'
+                      }`}
+                    >
+                      {target}
                     </span>
+                  ))}
+                </div>
+
+                <div
+                  className={`p-3 rounded-xl border mb-4 ${
+                    darkMode ? 'bg-amber-500/10 border-amber-500/25' : 'bg-amber-50 border-amber-200'
+                  }`}
+                >
+                  <div className="flex items-baseline gap-1.5">
+                    <Zap
+                      className={`w-4 h-4 self-center ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}
+                    />
+                    <span className={`text-[11px] font-medium ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                      Mulai dari
+                    </span>
+                    <span
+                      className={`text-base font-extrabold tracking-tight ${
+                        darkMode ? 'text-amber-300' : 'text-amber-700'
+                      }`}
+                    >
+                      {SERVICE_PRICE_LABEL}
+                    </span>
+                    {SERVICE_PROMO && (
+                      <span
+                        className={`ml-auto self-center text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                          darkMode ? 'bg-amber-500/20 text-amber-200' : 'bg-amber-200/70 text-amber-900'
+                        }`}
+                      >
+                        {SERVICE_PROMO.short}
+                      </span>
+                    )}
                   </div>
-                  <p className={`text-[11px] mt-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Termasuk voice setup, serverless deployment & custom knowledge.
+                  <p className={`text-[11px] mt-1 leading-snug ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Sudah termasuk setup suara, deployment & pengisian knowledge bisnis.
                   </p>
                 </div>
 
                 <a
                   href="#kontak"
-                  className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-sm ${
+                  className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 ${
                     darkMode
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50'
-                      : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-950/50 focus-visible:ring-offset-slate-900'
+                      : 'bg-emerald-600 hover:bg-emerald-700 text-white focus-visible:ring-offset-white'
                   }`}
                 >
+                  <MessageCircle className="w-3.5 h-3.5" />
                   <span>Konsultasi Gratis</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
                 </a>
+                <button
+                  type="button"
+                  onClick={() => setIsServiceOpen(true)}
+                  aria-haspopup="dialog"
+                  className={`mt-2 w-full inline-flex items-center justify-center gap-1 px-4 py-2 rounded-xl text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${
+                    darkMode
+                      ? 'text-emerald-300 hover:bg-emerald-500/10'
+                      : 'text-emerald-700 hover:bg-emerald-50'
+                  }`}
+                >
+                  <span>Lihat Detail & Cara Kerja</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           </div>
@@ -723,6 +896,331 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                 >
                   <span>Order Jasa Chatbot</span>
                   <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </Portal>
+      )}
+
+      {/* Jasa AI Chatbot & Agent — Modal Detail Layanan */}
+      {isServiceOpen && (
+        <Portal>
+          <div
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200 motion-reduce:animate-none"
+            onClick={() => setIsServiceOpen(false)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="jasa-chatbot-title"
+              className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
+                darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
+              }`}
+              style={{ maxHeight: 'calc(100vh - 2rem)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Header */}
+              <div
+                className={`flex-shrink-0 p-4 sm:p-5 border-b flex items-start justify-between gap-3 bg-gradient-to-r ${
+                  darkMode
+                    ? 'from-emerald-950 via-slate-900 to-teal-950 border-slate-700'
+                    : 'from-emerald-50 via-white to-teal-50 border-slate-200'
+                }`}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      darkMode ? 'bg-emerald-500/20 border border-emerald-500/30' : 'bg-emerald-100'
+                    }`}
+                  >
+                    <MessageSquare className={`w-5 h-5 ${darkMode ? 'text-emerald-300' : 'text-emerald-600'}`} />
+                  </div>
+                  <div>
+                    <h3
+                      id="jasa-chatbot-title"
+                      className={`text-base sm:text-lg font-bold tracking-tight ${
+                        darkMode ? 'text-white' : 'text-slate-900'
+                      }`}
+                    >
+                      Jasa AI Chatbot & Agent
+                    </h3>
+                    <p
+                      className={`text-xs sm:text-sm mt-0.5 leading-relaxed ${
+                        darkMode ? 'text-slate-300' : 'text-slate-600'
+                      }`}
+                    >
+                      Chatbot yang menjawab pelanggan, bisa diajak bicara, dan mengirim calon pelanggan langsung ke
+                      WhatsApp kamu.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsServiceOpen(false)}
+                  aria-label="Tutup detail jasa chatbot"
+                  className={`p-2 rounded-xl flex-shrink-0 transition-colors ${
+                    darkMode
+                      ? 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-5 sm:p-6 space-y-8">
+                {/* Harga */}
+                <div className="space-y-2">
+                  <div
+                    className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border ${
+                      darkMode ? 'bg-amber-500/10 border-amber-500/25' : 'bg-amber-50 border-amber-200'
+                    }`}
+                  >
+                    <div>
+                      <p className={`text-[11px] font-medium ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                        Mulai dari
+                      </p>
+                      <p
+                        className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+                          darkMode ? 'text-amber-300' : 'text-amber-700'
+                        }`}
+                      >
+                        {SERVICE_PRICE_LABEL}
+                      </p>
+                    </div>
+                    <p
+                      className={`text-xs sm:text-sm leading-relaxed sm:max-w-[18rem] ${
+                        darkMode ? 'text-slate-300' : 'text-slate-700'
+                      }`}
+                    >
+                      Sudah termasuk setup suara, deployment serverless, dan pengisian knowledge bisnis. Biaya
+                      operasional bulanan dijelaskan di awal konsultasi.
+                    </p>
+                  </div>
+                  {SERVICE_PROMO && (
+                    <div
+                      className={`flex items-start gap-2.5 px-4 py-3 rounded-xl border text-xs sm:text-sm leading-relaxed ${
+                        darkMode
+                          ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-100'
+                          : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                      }`}
+                    >
+                      <Sparkles
+                        className={`w-4 h-4 flex-shrink-0 mt-0.5 ${darkMode ? 'text-emerald-300' : 'text-emerald-600'}`}
+                      />
+                      <p>{SERVICE_PROMO.long}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Yang kamu dapat */}
+                <section aria-labelledby="jasa-benefit-heading">
+                  <h4
+                    id="jasa-benefit-heading"
+                    className={`text-sm font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    Yang kamu dapat
+                  </h4>
+                  <ul className={`divide-y ${darkMode ? 'divide-slate-800' : 'divide-slate-100'}`}>
+                    {SERVICE_BENEFITS.map(({ icon: Icon, title, desc }) => (
+                      <li key={title} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
+                        <div
+                          className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            darkMode ? 'bg-emerald-500/15 text-emerald-300' : 'bg-emerald-50 text-emerald-700'
+                          }`}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <p className={`text-sm font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                            {title}
+                          </p>
+                          <p
+                            className={`text-xs sm:text-sm leading-relaxed mt-0.5 ${
+                              darkMode ? 'text-slate-400' : 'text-slate-600'
+                            }`}
+                          >
+                            {desc}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+
+                {/* Contoh brief WhatsApp */}
+                <section aria-labelledby="jasa-brief-heading">
+                  <h4
+                    id="jasa-brief-heading"
+                    className={`text-sm font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    Begini calon pelanggan sampai ke kamu
+                  </h4>
+                  <p className={`text-xs sm:text-sm mb-3 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Tidak perlu membaca ulang seluruh percakapan. Chatbot merangkumnya jadi brief siap dibalas.
+                  </p>
+                  <div
+                    className={`rounded-2xl border overflow-hidden ${
+                      darkMode ? 'border-slate-700 bg-slate-950/60' : 'border-slate-200 bg-slate-50'
+                    }`}
+                  >
+                    <div
+                      className={`flex items-center justify-between gap-2 px-4 py-2.5 text-xs font-semibold ${
+                        darkMode ? 'bg-emerald-900/50 text-emerald-200' : 'bg-emerald-600 text-white'
+                      }`}
+                    >
+                      <span className="inline-flex items-center gap-1.5">
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Brief masuk ke WhatsApp
+                      </span>
+                      <span className="font-medium opacity-80">Contoh ilustrasi</span>
+                    </div>
+                    <div className="p-4">
+                      <div
+                        className={`max-w-[94%] sm:max-w-[85%] rounded-xl rounded-tl-sm px-3.5 py-3 text-xs leading-relaxed space-y-1 shadow-sm ${
+                          darkMode
+                            ? 'bg-slate-800 text-slate-100'
+                            : 'bg-white text-slate-800 border border-slate-200'
+                        }`}
+                      >
+                        <p className="font-bold">Lead baru dari chatbot</p>
+                        <p>Nama: Rina, Toko Batik Sari</p>
+                        <p>Kebutuhan: chatbot penjawab pertanyaan pelanggan + suara dua arah</p>
+                        <p>Kisaran anggaran: Rp 2 jt</p>
+                        <p>Pertanyaan terakhir: &quot;Bisa terhubung ke WhatsApp toko?&quot;</p>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                {/* Cara kerja */}
+                <section aria-labelledby="jasa-steps-heading">
+                  <h4
+                    id="jasa-steps-heading"
+                    className={`text-sm font-bold mb-4 ${darkMode ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    Cara kerjanya
+                  </h4>
+                  <ol className="space-y-5">
+                    {SERVICE_STEPS.map((step, i) => (
+                      <li key={step.title} className="relative flex gap-3.5">
+                        {i < SERVICE_STEPS.length - 1 && (
+                          <span
+                            aria-hidden="true"
+                            className={`absolute left-[13px] top-7 -bottom-5 w-px ${
+                              darkMode ? 'bg-slate-700' : 'bg-slate-200'
+                            }`}
+                          />
+                        )}
+                        <span
+                          className={`relative w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold ${
+                            darkMode
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          }`}
+                        >
+                          {i + 1}
+                        </span>
+                        <div className="flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className={`text-sm font-semibold ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>
+                              {step.title}
+                            </p>
+                            <span
+                              className={`text-[11px] font-medium px-2 py-0.5 rounded-md ${
+                                darkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'
+                              }`}
+                            >
+                              {step.duration}
+                            </span>
+                          </div>
+                          <p
+                            className={`text-xs sm:text-sm leading-relaxed mt-0.5 ${
+                              darkMode ? 'text-slate-400' : 'text-slate-600'
+                            }`}
+                          >
+                            {step.desc}
+                          </p>
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                  <p className="text-[11px] mt-4 text-slate-500">
+                    Total sekitar 1-2 minggu, tergantung kelengkapan materi dan kompleksitas fitur.
+                  </p>
+                </section>
+
+                {/* FAQ */}
+                <section aria-labelledby="jasa-faq-heading">
+                  <h4
+                    id="jasa-faq-heading"
+                    className={`text-sm font-bold mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}
+                  >
+                    Pertanyaan yang sering muncul
+                  </h4>
+                  <div className="space-y-2">
+                    {SERVICE_FAQ.map((item) => (
+                      <details
+                        key={item.q}
+                        className={`group rounded-xl border px-4 py-3 transition-colors ${
+                          darkMode
+                            ? 'border-slate-800 bg-slate-900 open:bg-slate-800/50'
+                            : 'border-slate-200 bg-white open:bg-slate-50'
+                        }`}
+                      >
+                        <summary
+                          className={`flex cursor-pointer list-none items-center justify-between gap-3 text-xs sm:text-sm font-semibold [&::-webkit-details-marker]:hidden ${
+                            darkMode ? 'text-slate-100' : 'text-slate-900'
+                          }`}
+                        >
+                          <span>{item.q}</span>
+                          <ChevronDown
+                            className={`w-4 h-4 flex-shrink-0 transition-transform group-open:rotate-180 ${
+                              darkMode ? 'text-slate-400' : 'text-slate-500'
+                            }`}
+                          />
+                        </summary>
+                        <p
+                          className={`mt-2 text-xs sm:text-sm leading-relaxed ${
+                            darkMode ? 'text-slate-300' : 'text-slate-600'
+                          }`}
+                        >
+                          {item.a}
+                        </p>
+                      </details>
+                    ))}
+                  </div>
+                </section>
+              </div>
+
+              {/* Footer */}
+              <div
+                className={`flex-shrink-0 p-4 border-t flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 ${
+                  darkMode ? 'bg-slate-900 border-slate-800' : 'bg-slate-50 border-slate-200'
+                }`}
+              >
+                <button
+                  type="button"
+                  onClick={handleTryChatbotFromService}
+                  className={`inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold border transition-colors ${
+                    darkMode
+                      ? 'border-teal-700/70 text-teal-300 bg-teal-950/40 hover:bg-teal-900/50'
+                      : 'border-teal-300 text-teal-800 bg-teal-50/80 hover:bg-teal-100'
+                  }`}
+                >
+                  <Bot className="w-3.5 h-3.5 text-teal-500" />
+                  <span>Coba Demo Chatbot Dulu</span>
+                </button>
+                <a
+                  href={SERVICE_WA_URL}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold shadow-md transition-colors"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  <span>Konsultasi via WhatsApp</span>
                 </a>
               </div>
             </div>

@@ -5,9 +5,220 @@
 
 ## 📖 Sekilas Tentang Aplikasi
 
-**Rajendra Pintar** adalah aplikasi edukasi ramah anak yang dirancang khusus untuk mendampingi masa emas tumbuh kembang anak usia **4 hingga 8 tahun** (PAUD, TK, hingga SD Kelas 1 & 2). 
+**Rajendra Pintar** adalah aplikasi edukasi ramah anak yang dirancang khusus untuk mendampingi masa emas tumbuh kembang anak usia **4 hingga 8 tahun** (PAUD, TK, hingga SD Kelas 1 & 2).
 
 Aplikasi ini menggabungkan visual ceria penuh warna, animasi interaktif, audio pelafalan suara dwibahasa (**Indonesia & Inggris**), serta metode belajar berbasis permainan (*gamifikasi*). Dengan kehadiran maskot yang ramah dan berbagai tantangan seru, anak-anak diajak belajar membaca, berhitung, mengenal alam sekitar, serta memperdalam nilai-nilai budi pekerti dengan gembira dan antusias tanpa rasa bosan.
+
+Aplikasi ini dapat diakses secara fleksibel melalui peramban web modern (**Progressive Web App / PWA**) maupun sebagai aplikasi **Android Native** yang ringan dan dapat dimainkan secara **100% Offline**.
+
+---
+
+## 🎯 Mengapa Rajendra Pintar Disukai Anak & Orang Tua?
+
+| Keunggulan | Manfaat Nyata untuk Anak & Orang Tua |
+| :--- | :--- |
+| 👶 **Kurikulum Adaptif 5 Usia** | Materi otomatis menyesuaikan usia anak (4, 5, 6, 7, dan 8 tahun). |
+| 🎴 **Metode Belajar Multi-Sensori** | Menstimulasi penglihatan, pendengaran, dan motorik. |
+| 🏆 **Gamifikasi & Hadiah Bintang** | Anak termotivasi mengumpulkan bintang dan membuka hadiah kostum maskot. |
+| 🔒 **Aman untuk Anak (Kid-Safe)** | Parent Gate sebelum pengaturan atau transaksi. |
+| ⚡ **Bisa Dimainkan Tanpa Internet** | Offline mode penuh, hemat kuota. |
+| ☁️ **Sinkronisasi Cloud (Google Sign-In)** | Progres, kosmetik, dan VIP tersimpan dan dipulihkan lintas perangkat. |
+
+---
+
+## ✨ Fitur-Fitur Unggulan Aplikasi
+
+### 1. 👶 Penyesuaian Materi Sesuai Tahapan Usia
+Setiap kelompok usia mendapatkan pendekatan materi yang berbeda:
+* 🧸 **Usia 4 Tahun:** Fokus pada pengenalan objek konkret di sekitar, kosakata sederhana, warna cerah, dan gambar besar.
+* 🌟 **Usia 5 Tahun:** Mengenal fungsi benda, nama-nama hewan beserta suaranya, serta pengucapan kata dwibahasa.
+* 🎈 **Usia 6 Tahun:** Melatih identifikasi ciri-ciri khusus, pengelompokan objek, dan hitungan visual sederhana.
+* 🚀 **Usia 7 Tahun:** Kosakata lanjutan, fakta sains unik, logika matematika, dan kemampuan membaca mandiri.
+* 🧠 **Usia 8 Tahun:** Tantangan pemecahan masalah, wawasan umum mendalam, dan eksplorasi pengetahuan lebih luas.
+
+---
+
+### 2. 📚 9 Kategori Edukasi Tematik Super Lengkap
+Ratusan *flashcards* terbagi dalam 9 bidang pengetahuan:
+1. 🕌 **Pendidikan Agama Islam** — rukun iman & Islam, nabi, shalat, puasa, doa, akhlak mulia.
+2. 🦁 **Dunia Satwa & Hewan** — satwa darat, laut, udara, suara khas, dan fakta unik.
+3. 🍎 **Buah & Sayur Sehat** — jenis makanan bergizi, warna, rasa, manfaat vitamin.
+4. 🔢 **Angka & Matematika Ceria** — simbol angka, menghitung visual, penjumlahan dasar.
+5. ⭐ **Kosakata Bahasa Inggris** — kosakata harian, ejaan fonetik, contoh kalimat.
+6. 🔷 **Bentuk & Warna** — bangun datar, bangun ruang 3D, perpaduan warna.
+7. 🚗 **Moda Transportasi** — kendaraan darat, rel, laut, udara, kendaraan darurat.
+8. 👕 **Pakaian & Aksesori** — pakaian harian, cuaca, seragam, busana adat nusantara.
+9. 🧑‍⚕️ **Profesi & Cita-cita** — berbagai pekerjaan mulia, tugas, dan alat yang digunakan.
+
+---
+
+### 3. 🎮 3 Mode Bermain & Belajar Interaktif
+* 🎴 **Flashcard Mode:** Ilustrasi HD, suara TTS bilingual, suku kata fonetik, kolom fakta seru.
+* ❓ **Quiz Mode:** Kuis bergambar interaktif, umpan balik langsung, konfeti kemenangan.
+* 🏝️ **Memory Matching Mini Game:** Peta pulau petualangan bertingkat, latih daya ingat, rekor langkah terbaik.
+
+---
+
+### 4. 🦉 Maskot Hidup & Personalisasi Karakter
+
+**6 Maskot Sahabat Belajar:**
+| Maskot | Nama | Cara Buka |
+| :---: | :--- | :--- |
+| 🦉 | **Owi** — Burung Hantu Pintar | Gratis (default) |
+| 🦊 | **Kiko** — Rubah Cerdik | 80 Bintang / 3 Iklan |
+| 🐼 | **Panda** — Jenius Cilik | 100 Bintang / 4 Iklan |
+| 🐰 | **Mimi** — Kelinci Ceria | 90 Bintang / 3 Iklan |
+| 🦁 | **Leo** — Singa Pemberani | 120 Bintang / 5 Iklan |
+| 🦕 | **Rexy** — Dino Petualang | 150 Bintang / 6 Iklan |
+
+**13 Topi & Aksesoris** untuk mempercantik maskot (Mahkota Emas, Topi Sarjana, Helm Astronot, dll.)
+
+**6 Efek Sentuhan:** Bintang, Hati, Gelembung, Kilauan Emas, Kembang Api, Sakura.
+
+**Musik Latar (Backsound):** 5 trek pilihan tersinkron sebagai kosmetik di shop.
+
+---
+
+### 5. 🛍️ Toko Kosmetik (Shop)
+
+| Kategori | Jumlah Item | Cara Buka |
+| :--- | :---: | :--- |
+| Maskot Karakter | 6 | Gratis / Bintang / Iklan |
+| Topi & Aksesori Maskot | 13 | Bintang / Iklan |
+| Tema Visual Aplikasi | 11 | **Gratis** (2), Iklan + Bintang + Tunai |
+| Bingkai Kartu Belajar | 5 | Bintang / Iklan |
+| Paket Efek Suara | 5 | Gratis / Bintang / Iklan |
+| Efek Sentuhan Layar | 6 | Gratis / Bintang / Iklan |
+| Musik Latar (Backsound) | 5 | Gratis / Iklan / Bintang |
+
+**Mekanisme Buka Kunci:**
+* 🌟 **Bintang** — dikumpulkan dari aktivitas belajar harian.
+* 📺 **Iklan** — tonton iklan reward (tema: 50–100 iklan; item lain: 2–6 iklan).
+* 💵 **Tunai (Xendit)** — Rp 5.000 / Rp 10.000 untuk tema premium.
+* 👑 **VIP Lifetime (Rp 39.000)** — sekali bayar, buka **semua** kosmetik sekaligus.
+
+**Tema Gratis:** Tema Klasik Ceria & Tema Nuansa Islami tersedia gratis untuk semua pengguna.
+
+**Tema Premium (11 tema total):** Galaxy, Samudra, Hutan, Permen, Cyberpunk, Malam Tenang, Negeri Salju, Kerajaan Dongeng.
+
+---
+
+### 6. 🏆 Gamifikasi & Kebiasaan Positif
+* 🌟 **Bintang Prestasi** dari setiap aktivitas belajar.
+* 🔥 **Daily Streak** untuk kebiasaan belajar konsisten.
+* 🎡 **Lucky Spin** harian gratis + tambahan spin via iklan.
+* 📊 **Scoreboard** kemajuan topik dan skor kuis.
+* 📤 **Kartu Prestasi Digital** siap dibagikan ke WhatsApp & media sosial.
+* 💰 **Paket Bintang Premium:** 100 bintang (Rp 5.000) / 300 bintang (Rp 10.000) / 1.000 bintang (Rp 20.000) via Xendit.
+
+---
+
+### 7. ☁️ Akun Google & Sinkronisasi Cloud
+* **Login opsional via Google** (dilindungi Parent Gate).
+* Progres belajar, kosmetik yang dimiliki & dipakai, serta status VIP **tersinkron di Supabase**.
+* **Migrasi otomatis** progres anonim saat pertama kali login.
+* **Sign-out bersih** — state kembali ke tamu default; login ulang memulihkan semua data cloud.
+* **Deep-link OAuth** untuk Android native via Capacitor Browser.
+
+---
+
+### 8. 💳 Sistem Pembayaran (Xendit)
+* Mendukung QRIS, GoPay, OVO, Dana, ShopeePay, dan metode lokal lainnya.
+* **Redirect otomatis** kembali ke aplikasi setelah pembayaran berhasil/gagal.
+* **Webhook Xendit** memproses verifikasi dan pemberian item/VIP otomatis.
+* Toast peringatan muncul jika pengguna mencoba checkout tanpa login Google.
+
+---
+
+## 🔍 Optimalisasi Mesin Pencari & Kesiapan Digital (SEO)
+
+1. **JSON-LD Rich Snippet:** `WebApplication` + `FAQPage` untuk Google Search.
+2. **Open Graph & Twitter Cards:** Banner pratinjau otomatis saat link dibagikan.
+3. **Sitemap & Robots.txt:** Semua konten dan aset grafis terindeks cepat.
+4. **Noscript Semantic Content:** Fallback HTML5 untuk screen reader.
+5. **LCP Preload:** Splash screen instan tanpa jeda putih.
+6. **Halaman Legal Bilingual:** Privacy Policy & Terms dalam ID & EN dengan URL kanonik.
+
+---
+
+## 🛠️ Teknologi & Peralatan yang Digunakan (Tech Stack)
+
+### 🌐 Core Engine
+* **React 19** — UI framework SPA modern.
+* **TypeScript ~5.8** — Keamanan tipe kode yang ketat.
+* **Vite 6** — Build tool generasi terbaru, super cepat.
+
+### 🎨 Styling & Animasi
+* **Tailwind CSS v4** — Desain responsif dan estetik.
+* **Motion (Framer Motion v12)** — Animasi kartu, maskot, dan transisi layar.
+* **Canvas Confetti** — Efek konfeti kemenangan kuis.
+* **Lucide React** — Ikon navigasi modern.
+* **Google Fonts (Nunito & Fredoka)** — Tipografi membulat ramah anak.
+
+### 🔊 Audio & Interaksi
+* **Web Audio API** — Efek suara instan tanpa file audio.
+* **TTS Engine (bilingual)** — Pelafalan Indonesia & Inggris.
+* **Haptic Feedback** — Getaran sentuh di perangkat mobile.
+* **Backsound Manager** — Sistem musik latar berbasis `AudioContext` dengan fade, volume, dan sinkronisasi trek ke Shop.
+
+### 📱 Mobile & Distribution
+* **Capacitor 8 (Ionic)** — Android native APK.
+* **PWA + Service Worker** — Install ke home screen, offline mode.
+
+### 🛡️ Backend & Keamanan
+* **Supabase** — Google OAuth + sinkronisasi data cloud (kosmetik, VIP, progres).
+* **Xendit** — Payment gateway lokal Indonesia (QRIS, e-wallet).
+* **Cloudflare** — CDN global, keamanan, dan uptime 24/7.
+* **Parent Gate** — Proteksi hitungan acak untuk menu sensitif.
+* **Halaman Legal (Privacy & Terms)** — Bilingual, SSR-safe, URL kanonik.
+
+---
+
+## 📋 Daftar Dependensi Utama
+
+| Paket / Library | Versi | Peran & Kegunaan |
+| :--- | :---: | :--- |
+| `react` & `react-dom` | 19 | Fondasi UI aplikasi. |
+| `vite` | 6 | Build tool super cepat. |
+| `typescript` | ~5.8 | Keamanan tipe kode. |
+| `tailwindcss` | 4 | Styling responsif. |
+| `motion` | 12 | Animasi maskot & transisi. |
+| `lucide-react` | — | Ikon navigasi. |
+| `canvas-confetti` | — | Efek konfeti kemenangan. |
+| `@supabase/supabase-js` | 2 | Auth Google OAuth & sinkronisasi cloud. |
+| `@capacitor/core` & `@capacitor/android` | 8 | Android native. |
+| `@capacitor/browser` | 8 | Buka browser sistem untuk OAuth. |
+| `@capacitor/app` | 8 | Deep-link handling setelah OAuth. |
+| `@capacitor/status-bar` & `splash-screen` | 8 | Status bar & splash screen native. |
+| `@capacitor-community/text-to-speech` | 8 | TTS native di Android. |
+| `vite-plugin-pwa` | 1 | PWA + offline caching. |
+
+---
+
+## 💡 Ringkasan Nilai Tambah (Value Proposition)
+
+1. **Mendidik Sekaligus Menghibur** — Ubah screen time pasif jadi waktu belajar aktif.
+2. **Kaya Wawasan & Berkarakter** — Kognitif (bahasa, matematika, sains) + emosional & spiritual (agama & adab).
+3. **Teknologi Terdepan** — Ringan, responsif, offline-ready, dan bebas iklan mengganggu.
+4. **Model Monetisasi Adil** — Semua konten edukasi gratis. Bintang & iklan untuk kosmetik tanpa biaya. VIP untuk yang ingin semua fitur sekaligus.
+
+---
+
+## 🌐 Tautan Penting
+
+| Halaman | URL |
+| :--- | :--- |
+| Aplikasi Utama | `https://rapin.arzhaning.my.id/` |
+| Kebijakan Privasi (ID) | `https://rapin.arzhaning.my.id/privacy` |
+| Kebijakan Privasi (EN) | `https://rapin.arzhaning.my.id/en/privacy` |
+| Syarat & Ketentuan (ID) | `https://rapin.arzhaning.my.id/terms` |
+| Syarat & Ketentuan (EN) | `https://rapin.arzhaning.my.id/en/terms` |
+
+---
+
+*Dibuat dengan segenap dedikasi dan cinta untuk mencerdaskan generasi penerus bangsa Indonesia.* 🇮🇩✨
+
+
 
 Aplikasi ini dapat diakses secara fleksibel melalui peramban web modern (**Progressive Web App / PWA**) maupun sebagai aplikasi **Android Native** yang ringan dan dapat dimainkan secara **100% Offline**.
 
