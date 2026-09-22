@@ -7,6 +7,7 @@ import React, {
   useCallback,
   ReactNode,
 } from 'react';
+import { ROUTE_CHANGE_EVENT } from '../hooks/usePathname';
 
 interface ModalEntry {
   id: string;
@@ -18,6 +19,7 @@ interface NavigationHistoryContextValue {
   showExitConfirm: boolean;
   handleStay: () => void;
   handleLeave: () => void;
+  navigate: (path: string) => void;
 }
 
 const NavigationHistoryContext = createContext<NavigationHistoryContextValue | null>(null);
@@ -124,6 +126,49 @@ export const NavigationHistoryProvider: React.FC<{ children: ReactNode }> = ({ c
     []
   );
 
+  // Pindah halaman di dalam situs (tanpa reload) dengan tetap menjaga history
+  // guard. Kalau ada modal/drawer yang masih terbuka, semuanya ditutup dan
+  // entry history-nya dilepas dulu; kalau tidak, entry 'modal' yatim tertinggal
+  // di bawah halaman baru dan tombol Back akan memunculkan ExitConfirmModal.
+  const navigate = useCallback((path: string) => {
+    if (typeof window === 'undefined') return;
+
+    const commit = () => {
+      window.history.pushState({ appState: 'app_active' }, '', path);
+      window.dispatchEvent(new Event(ROUTE_CHANGE_EVENT));
+    };
+
+    const openModals = modalStackRef.current.splice(0);
+    if (openModals.length === 0) {
+      commit();
+      return;
+    }
+
+    openModals.forEach((m) => m.onClose());
+
+    let done = false;
+    let timer: number | undefined;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.removeEventListener('popstate', finish);
+      if (timer !== undefined) window.clearTimeout(timer);
+      commit();
+    };
+
+    // Listener bawaan di atas terdaftar lebih dulu, jadi ia yang menelan
+    // popstate ini (lewat ignoreNextPopStateRef) sebelum finish() jalan.
+    ignoreNextPopStateRef.current = true;
+    window.addEventListener('popstate', finish);
+    // Jaga-jaga kalau popstate tidak pernah datang: jangan biarkan flag
+    // menelan tombol Back berikutnya.
+    timer = window.setTimeout(() => {
+      ignoreNextPopStateRef.current = false;
+      finish();
+    }, 500);
+    window.history.go(-openModals.length);
+  }, []);
+
   return (
     <NavigationHistoryContext.Provider
       value={{
@@ -131,6 +176,7 @@ export const NavigationHistoryProvider: React.FC<{ children: ReactNode }> = ({ c
         showExitConfirm,
         handleStay,
         handleLeave,
+        navigate,
       }}
     >
       {children}

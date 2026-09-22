@@ -9,7 +9,8 @@ import {
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useRegisterModal } from '../context/NavigationHistoryContext';
+import { useRegisterModal, useNavigationHistory } from '../context/NavigationHistoryContext';
+import { usePathname, ROUTES } from '../hooks/usePathname';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -17,14 +18,27 @@ interface NavbarProps {
   onEasterEgg: () => void;
 }
 
-const navLinks = [
+interface NavItem {
+  name: string;
+  href: string;
+  id: string;
+  // true = halaman terpisah (pindah rute), false/undefined = anchor di beranda
+  route?: boolean;
+}
+
+const NAV_ITEMS: NavItem[] = [
   { name: 'Beranda', href: '#beranda', id: 'beranda' },
   { name: 'Tentang', href: '#tentang', id: 'tentang' },
   { name: 'Portofolio', href: '#proyek', id: 'proyek' },
   { name: 'Layanan', href: '#layanan', id: 'layanan' },
+  { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
   { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
   { name: 'Kontak', href: '#kontak', id: 'kontak' },
 ];
+
+// Hanya anchor beranda yang ikut scroll-spy; index-nya harus sejajar dengan
+// sectionElementsRef di bawah.
+const navLinks = NAV_ITEMS.filter((l) => !l.route);
 
 // Class helper dipakai berulang di semua tombol/link interaktif supaya
 // keyboard user (Tab) selalu dapat indikasi fokus yang jelas — sebelumnya
@@ -38,6 +52,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
   const prefersReducedMotion = usePrefersReducedMotion();
+  const pathname = usePathname();
+  const { navigate } = useNavigationHistory();
+  // Path tak dikenal ikut menampilkan beranda (sama seperti App.tsx)
+  const isHome = pathname !== ROUTES.caseStudy;
 
   // Hubungkan tombol kembali browser agar menutup menu navigasi mobile
   useRegisterModal('mobile-nav-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
@@ -69,7 +87,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const sectionElementsRef = useRef<(HTMLElement | null)[]>([]);
   useEffect(() => {
     sectionElementsRef.current = navLinks.map((link) => document.getElementById(link.id));
-  }, []);
+    // Section beranda di-unmount saat pindah ke halaman lain; cache harus
+    // diambil ulang tiap rute berganti.
+  }, [pathname]);
 
   useEffect(() => {
     let ticking = false;
@@ -108,9 +128,27 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
+  // Di halaman lain, anchor beranda diarahkan ke '/#anchor'
+  const anchorHref = (href: string) => (isHome ? href : `/${href}`);
+
+  const goToRoute = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    setMobileMenuOpen(false);
+    if (pathname === path) {
+      window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+      return;
+    }
+    navigate(path);
+  };
+
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setMobileMenuOpen(false);
+    if (!isHome) {
+      navigate(`/${href}`);
+      return;
+    }
     const target = document.querySelector(href);
     if (target) {
       const navOffset = 80;
@@ -177,15 +215,20 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
           </a>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.id;
+          <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium">
+            {NAV_ITEMS.map((link) => {
+              const isActive = link.route
+                ? pathname === link.href
+                : isHome && activeSection === link.id;
               return (
                 <a
                   key={link.id}
                   id={`nav-link-${link.id}`}
-                  href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
+                  href={link.route ? link.href : anchorHref(link.href)}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={(e) =>
+                    link.route ? goToRoute(e, link.href) : scrollToSection(e, link.href)
+                  }
                   className={`text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${isActive
                     ? 'text-teal-600 dark:text-teal-400'
                     : darkMode
@@ -258,13 +301,18 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             }`}
         >
           <div className="flex flex-col space-y-1">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.id;
+            {NAV_ITEMS.map((link) => {
+              const isActive = link.route
+                ? pathname === link.href
+                : isHome && activeSection === link.id;
               return (
                 <a
                   key={link.id}
-                  href={link.href}
-                  onClick={(e) => scrollToSection(e, link.href)}
+                  href={link.route ? link.href : anchorHref(link.href)}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={(e) =>
+                    link.route ? goToRoute(e, link.href) : scrollToSection(e, link.href)
+                  }
                   className={`px-4 py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
                     ? darkMode
                       ? 'bg-teal-500/20 text-teal-400 font-semibold'

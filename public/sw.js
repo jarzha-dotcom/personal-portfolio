@@ -1,9 +1,14 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v2';
+const CACHE_VERSION = 'v3';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
+
+// Rute client-side yang dilayani index.html (lihat ROUTES di hooks/usePathname.ts).
+// Kalau offline dan halaman ini belum pernah dibuka, jatuh ke app shell '/'
+// (React yang merender halamannya) alih-alih offline.html.
+const SPA_ROUTES = ['/hasil-kerja'];
 
 // File minimal yang wajib ada biar halaman tetap bisa dibuka waktu offline.
 // Sengaja tidak precache semua asset JS/CSS hasil build (nama file berubah
@@ -65,7 +70,16 @@ self.addEventListener('fetch', (event) => {
                     caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
                     return response;
                 })
-                .catch(() => caches.match(request).then((cached) => cached || caches.match(OFFLINE_URL)))
+                .catch(() =>
+                    caches
+                        .match(request)
+                        .then((cached) => {
+                            if (cached) return cached;
+                            const path = url.pathname.replace(/\/+$/, '') || '/';
+                            return SPA_ROUTES.includes(path) ? caches.match('/') : undefined;
+                        })
+                        .then((response) => response || caches.match(OFFLINE_URL))
+                )
         );
         return;
     }

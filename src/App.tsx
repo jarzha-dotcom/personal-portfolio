@@ -21,6 +21,7 @@ import {
   useRegisterModal,
 } from './context/NavigationHistoryContext';
 import { ExitConfirmModal } from './components/ExitConfirmModal';
+import { usePathname, ROUTES } from './hooks/usePathname';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. CVPage (berat — isinya
 // 9 komponen: NavbarCV, HeroCV, AboutCV, Experience, SkillsCV, ContactCV,
@@ -38,10 +39,21 @@ const ChatWidget = lazy(() =>
 const CVPage = lazy(() =>
   import('./components/CVPage').then((m) => ({ default: m.CVPage }))
 );
+// Halaman /hasil-kerja (studi kasus klien). Lazy juga: pengunjung yang cuma
+// membuka beranda tidak perlu mengunduhnya.
+const CaseStudyPage = lazy(() =>
+  import('./components/CaseStudyPage').then((m) => ({ default: m.CaseStudyPage }))
+);
 
 function MainPortfolio() {
   const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
   const prefersReducedMotion = usePrefersReducedMotion();
+
+  // Routing ringan tanpa react-router: pathname dibaca dari URL, perpindahan
+  // lewat navigate() di NavigationHistoryContext. Path yang tidak dikenal
+  // tetap menampilkan beranda, seperti sebelumnya.
+  const pathname = usePathname();
+  const isCaseStudy = pathname === ROUTES.caseStudy;
 
   // Menandai apakah tema saat ini adalah pilihan MANUAL user (lewat toggle di
   // Navbar/CVPage) atau masih mengikuti preferensi OS. Dipakai supaya:
@@ -148,6 +160,35 @@ function MainPortfolio() {
     );
   }, []);
 
+  // Setelah pindah rute: scroll ke anchor (mis. '/#layanan' dari halaman Hasil
+  // Kerja) atau balik ke atas. Effect pertama saat mount dilewati supaya tidak
+  // menimpa restore scroll bawaan browser saat reload.
+  const isFirstRouteEffectRef = useRef(true);
+  useEffect(() => {
+    if (isFirstRouteEffectRef.current) {
+      isFirstRouteEffectRef.current = false;
+      return;
+    }
+    const hash = isCaseStudy ? '' : window.location.hash;
+    if (!hash) {
+      window.scrollTo(0, 0);
+      return;
+    }
+    // Tunggu section beranda selesai dirender ulang
+    const timeout = window.setTimeout(() => {
+      try {
+        const target = document.querySelector(hash);
+        if (target) {
+          const top = target.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top: Math.max(top, 0), behavior: 'auto' });
+        }
+      } catch (_) {
+        // hash bukan selector valid; abaikan
+      }
+    }, 120);
+    return () => window.clearTimeout(timeout);
+  }, [isCaseStudy, pathname]);
+
   // Kunci scroll body waktu mode CV sedang terbuka
   useEffect(() => {
     document.body.style.overflow = cvEggUnlocked ? 'hidden' : '';
@@ -238,22 +279,42 @@ function MainPortfolio() {
           di sini karena terlalu "CV-oriented" untuk halaman jasa. Komponen
           Experience sekarang eksklusif dipakai di dalam CVPage. */}
       <main id="main-content">
-        <Hero darkMode={darkMode} />
-        <Reveal>
-          <About darkMode={darkMode} />
-        </Reveal>
-        <Reveal>
-          <Projects darkMode={darkMode} />
-        </Reveal>
-        <Reveal>
-          <Services darkMode={darkMode} />
-        </Reveal>
-        <Reveal>
-          <Skills darkMode={darkMode} />
-        </Reveal>
-        <Reveal>
-          <Contact darkMode={darkMode} />
-        </Reveal>
+        {isCaseStudy ? (
+          <ChunkErrorBoundary
+            darkMode={darkMode}
+            variant="center"
+            message="Gagal memuat halaman Hasil Kerja. Cek koneksi internet Kakak, lalu coba lagi."
+          >
+            <Suspense
+              fallback={
+                <div className="min-h-[60vh] flex items-center justify-center">
+                  <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              }
+            >
+              <CaseStudyPage darkMode={darkMode} />
+            </Suspense>
+          </ChunkErrorBoundary>
+        ) : (
+          <>
+            <Hero darkMode={darkMode} />
+            <Reveal>
+              <About darkMode={darkMode} />
+            </Reveal>
+            <Reveal>
+              <Projects darkMode={darkMode} />
+            </Reveal>
+            <Reveal>
+              <Services darkMode={darkMode} />
+            </Reveal>
+            <Reveal>
+              <Skills darkMode={darkMode} />
+            </Reveal>
+            <Reveal>
+              <Contact darkMode={darkMode} />
+            </Reveal>
+          </>
+        )}
       </main>
 
       {/* Footer */}
