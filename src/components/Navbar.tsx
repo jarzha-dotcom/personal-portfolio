@@ -10,7 +10,9 @@ import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useRegisterModal, useNavigationHistory } from '../context/NavigationHistoryContext';
-import { usePathname, ROUTES } from '../hooks/usePathname';
+import { ROUTES } from '../routes';
+import { useLocation } from 'react-router-dom';
+import { ARTICLES } from '../data/articles';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -32,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { name: 'Portofolio', href: '#proyek', id: 'proyek' },
   { name: 'Layanan', href: '#layanan', id: 'layanan' },
   { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
+  { name: 'Artikel', href: ROUTES.articles, id: 'artikel', route: true },
   { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
   { name: 'Kontak', href: '#kontak', id: 'kontak' },
 ];
@@ -39,6 +42,11 @@ const NAV_ITEMS: NavItem[] = [
 // Hanya anchor beranda yang ikut scroll-spy; index-nya harus sejajar dengan
 // sectionElementsRef di bawah.
 const navLinks = NAV_ITEMS.filter((l) => !l.route);
+
+// Link "Artikel" baru tampil kalau minimal satu artikel sudah dipublikasikan
+// — supaya tidak ada link ke halaman yang isinya kosong.
+const hasPublishedArticles = ARTICLES.some((a) => a.published);
+const visibleNavItems = NAV_ITEMS.filter((l) => l.id !== 'artikel' || hasPublishedArticles);
 
 // Class helper dipakai berulang di semua tombol/link interaktif supaya
 // keyboard user (Tab) selalu dapat indikasi fokus yang jelas — sebelumnya
@@ -52,10 +60,11 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
   const prefersReducedMotion = usePrefersReducedMotion();
-  const pathname = usePathname();
+  const location = useLocation();
+  const pathname = location.pathname;
   const { navigate } = useNavigationHistory();
   // Path tak dikenal ikut menampilkan beranda (sama seperti App.tsx)
-  const isHome = pathname !== ROUTES.caseStudy;
+  const isHome = pathname !== ROUTES.caseStudy && pathname !== ROUTES.articles && !pathname.startsWith(`${ROUTES.articles}/`);
 
   // Hubungkan tombol kembali browser agar menutup menu navigasi mobile
   useRegisterModal('mobile-nav-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
@@ -216,7 +225,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium">
-            {NAV_ITEMS.map((link) => {
+            {visibleNavItems.map((link) => {
               const isActive = link.route
                 ? pathname === link.href
                 : isHome && activeSection === link.id;
@@ -301,7 +310,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             }`}
         >
           <div className="flex flex-col space-y-1">
-            {NAV_ITEMS.map((link) => {
+            {visibleNavItems.map((link) => {
               const isActive = link.route
                 ? pathname === link.href
                 : isHome && activeSection === link.id;

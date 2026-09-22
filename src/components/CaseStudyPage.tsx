@@ -11,7 +11,7 @@ import {
 import { PROJECTS, CONTACT_INFO } from '../data/portfolioData';
 import { TESTIMONIALS } from '../data/testimonials';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
-import { ROUTES } from '../hooks/usePathname';
+import { ROUTES } from '../routes';
 import type { ProjectItem } from '../types';
 
 interface CaseStudyPageProps {

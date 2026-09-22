@@ -21,7 +21,8 @@ import {
   useRegisterModal,
 } from './context/NavigationHistoryContext';
 import { ExitConfirmModal } from './components/ExitConfirmModal';
-import { usePathname, ROUTES } from './hooks/usePathname';
+import { ROUTES } from './routes';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. CVPage (berat — isinya
 // 9 komponen: NavbarCV, HeroCV, AboutCV, Experience, SkillsCV, ContactCV,
@@ -44,16 +45,29 @@ const CVPage = lazy(() =>
 const CaseStudyPage = lazy(() =>
   import('./components/CaseStudyPage').then((m) => ({ default: m.CaseStudyPage }))
 );
+// Halaman /artikel dan /artikel/:slug — sama-sama lazy, jarang dibuka
+// dibanding beranda.
+const ArticlesIndexPage = lazy(() =>
+  import('./components/ArticlesIndexPage').then((m) => ({ default: m.ArticlesIndexPage }))
+);
+const ArticlePage = lazy(() =>
+  import('./components/ArticlePage').then((m) => ({ default: m.ArticlePage }))
+);
+
+// Fallback ringan dipakai di semua Suspense boundary rute lazy-loaded.
+const PageLoadingSpinner: React.FC = () => (
+  <div className="min-h-[60vh] flex items-center justify-center">
+    <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 function MainPortfolio() {
   const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
   const prefersReducedMotion = usePrefersReducedMotion();
 
-  // Routing ringan tanpa react-router: pathname dibaca dari URL, perpindahan
-  // lewat navigate() di NavigationHistoryContext. Path yang tidak dikenal
-  // tetap menampilkan beranda, seperti sebelumnya.
-  const pathname = usePathname();
-  const isCaseStudy = pathname === ROUTES.caseStudy;
+  // Rute ditentukan React Router (<Routes> di bawah); di sini cuma perlu tahu
+  // pathname+hash untuk efek scroll-ke-anchor setelah pindah halaman.
+  const location = useLocation();
 
   // Menandai apakah tema saat ini adalah pilihan MANUAL user (lewat toggle di
   // Navbar/CVPage) atau masih mengikuti preferensi OS. Dipakai supaya:
@@ -169,7 +183,7 @@ function MainPortfolio() {
       isFirstRouteEffectRef.current = false;
       return;
     }
-    const hash = isCaseStudy ? '' : window.location.hash;
+    const hash = location.pathname === ROUTES.home ? location.hash : '';
     if (!hash) {
       window.scrollTo(0, 0);
       return;
@@ -187,7 +201,7 @@ function MainPortfolio() {
       }
     }, 120);
     return () => window.clearTimeout(timeout);
-  }, [isCaseStudy, pathname]);
+  }, [location.pathname, location.hash]);
 
   // Kunci scroll body waktu mode CV sedang terbuka
   useEffect(() => {
@@ -279,42 +293,75 @@ function MainPortfolio() {
           di sini karena terlalu "CV-oriented" untuk halaman jasa. Komponen
           Experience sekarang eksklusif dipakai di dalam CVPage. */}
       <main id="main-content">
-        {isCaseStudy ? (
-          <ChunkErrorBoundary
-            darkMode={darkMode}
-            variant="center"
-            message="Gagal memuat halaman Hasil Kerja. Cek koneksi internet Kakak, lalu coba lagi."
-          >
-            <Suspense
-              fallback={
-                <div className="min-h-[60vh] flex items-center justify-center">
-                  <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-                </div>
-              }
-            >
-              <CaseStudyPage darkMode={darkMode} />
-            </Suspense>
-          </ChunkErrorBoundary>
-        ) : (
-          <>
-            <Hero darkMode={darkMode} />
-            <Reveal>
-              <About darkMode={darkMode} />
-            </Reveal>
-            <Reveal>
-              <Projects darkMode={darkMode} />
-            </Reveal>
-            <Reveal>
-              <Services darkMode={darkMode} />
-            </Reveal>
-            <Reveal>
-              <Skills darkMode={darkMode} />
-            </Reveal>
-            <Reveal>
-              <Contact darkMode={darkMode} />
-            </Reveal>
-          </>
-        )}
+        <Routes>
+          <Route
+            path={ROUTES.caseStudy}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat halaman Hasil Kerja. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<PageLoadingSpinner />}>
+                  <CaseStudyPage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
+          <Route
+            path={ROUTES.articles}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat halaman Artikel. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<PageLoadingSpinner />}>
+                  <ArticlesIndexPage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
+          <Route
+            path={`${ROUTES.articles}/:slug`}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat artikel. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<PageLoadingSpinner />}>
+                  <ArticlePage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
+          {/* Path tak dikenal ikut menampilkan beranda tanpa mengubah URL yang
+              sedang terbuka di address bar (path="*" tidak melakukan redirect). */}
+          <Route
+            path="*"
+            element={
+              <>
+                <Hero darkMode={darkMode} />
+                <Reveal>
+                  <About darkMode={darkMode} />
+                </Reveal>
+                <Reveal>
+                  <Projects darkMode={darkMode} />
+                </Reveal>
+                <Reveal>
+                  <Services darkMode={darkMode} />
+                </Reveal>
+                <Reveal>
+                  <Skills darkMode={darkMode} />
+                </Reveal>
+                <Reveal>
+                  <Contact darkMode={darkMode} />
+                </Reveal>
+              </>
+            }
+          />
+        </Routes>
       </main>
 
       {/* Footer */}
@@ -395,8 +442,12 @@ function MainPortfolio() {
 
 export default function App() {
   return (
-    <NavigationHistoryProvider>
-      <MainPortfolio />
-    </NavigationHistoryProvider>
+    <BrowserRouter>
+      {/* NavigationHistoryProvider WAJIB di dalam BrowserRouter — ia memakai
+          useNavigate() dari react-router-dom (lihat NavigationHistoryContext.tsx). */}
+      <NavigationHistoryProvider>
+        <MainPortfolio />
+      </NavigationHistoryProvider>
+    </BrowserRouter>
   );
 }

@@ -8,7 +8,10 @@ const OFFLINE_URL = '/offline.html';
 // Rute client-side yang dilayani index.html (lihat ROUTES di hooks/usePathname.ts).
 // Kalau offline dan halaman ini belum pernah dibuka, jatuh ke app shell '/'
 // (React yang merender halamannya) alih-alih offline.html.
-const SPA_ROUTES = ['/hasil-kerja'];
+const SPA_ROUTES = ['/hasil-kerja', '/artikel'];
+// Artikel pakai slug dinamis (/artikel/xxx) — dicek lewat prefix, bukan
+// daftar tetap seperti SPA_ROUTES di atas.
+const SPA_ROUTE_PREFIXES = ['/artikel/'];
 
 // File minimal yang wajib ada biar halaman tetap bisa dibuka waktu offline.
 // Sengaja tidak precache semua asset JS/CSS hasil build (nama file berubah
@@ -76,7 +79,10 @@ self.addEventListener('fetch', (event) => {
                         .then((cached) => {
                             if (cached) return cached;
                             const path = url.pathname.replace(/\/+$/, '') || '/';
-                            return SPA_ROUTES.includes(path) ? caches.match('/') : undefined;
+                            const isSpaRoute =
+                                SPA_ROUTES.includes(path) ||
+                                SPA_ROUTE_PREFIXES.some((prefix) => path.startsWith(prefix));
+                            return isSpaRoute ? caches.match('/') : undefined;
                         })
                         .then((response) => response || caches.match(OFFLINE_URL))
                 )
