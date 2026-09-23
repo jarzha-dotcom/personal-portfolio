@@ -1,179 +1,633 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kebijakan Privasi | K. Arzhaning Jagad</title>
-  <meta name="description" content="Kebijakan Privasi arzhaning.my.id: data yang dikumpulkan, cookie, iklan Google AdSense, asisten AI, dan hak pengguna." />
-  <meta name="author" content="K. Arzhaning Jagad" />
-  <meta name="robots" content="index, follow" />
-  <meta name="theme-color" content="#0d9488" />
-  <link rel="canonical" href="https://arzhaning.my.id/privacy-policy/" />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://arzhaning.my.id/privacy-policy/" />
-  <meta property="og:title" content="Kebijakan Privasi | K. Arzhaning Jagad" />
-  <meta property="og:description" content="Kebijakan Privasi arzhaning.my.id: data yang dikumpulkan, cookie, iklan Google AdSense, asisten AI, dan hak pengguna." />
-  <meta property="og:locale" content="id_ID" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kebijakan Privasi | K. Arzhaning Jagad</title>
+<meta name="description" content="Kebijakan Privasi situs arzhaning.my.id — penjelasan pengumpulan data, cookie, Google AdSense, asisten AI, dan hak Anda." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://arzhaning.my.id/privacy-policy/" />
+<link rel="icon" type="image/png" href="/icons/icon-512.png" />
 
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3729737726899752"
-    crossorigin="anonymous"></script>
+<!-- Anti-flash: set tema SEBELUM CSS render -->
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('theme');
+    var preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && preferDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+</script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="icon" href="/favicon.ico" sizes="48x48" />
-  <link rel="icon" href="/icons/favicon-32x32.png" type="image/png" sizes="32x32" />
-  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" sizes="180x180" />
-  <style>
-:root{--bg:#f8fafc;--card:#ffffff;--text:#334155;--head:#0f172a;--muted:#64748b;--line:#e2e8f0;--accent:#0d9488;--accent-soft:#f0fdfa}
-@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#111a2e;--text:#cbd5e1;--head:#f1f5f9;--muted:#94a3b8;--line:#22304a;--accent:#2dd4bf;--accent-soft:#0f2a2e}}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:1.75;font-size:16px;-webkit-font-smoothing:antialiased}
-a{color:var(--accent)}
-.topbar{border-bottom:1px solid var(--line);background:var(--card)}
-.topbar-inner{max-width:820px;margin:0 auto;padding:.9rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
-.brand{font-family:'Poppins',sans-serif;font-weight:700;color:var(--accent);text-decoration:none;font-size:1.05rem}
-.topbar nav{display:flex;gap:1.1rem;font-size:.92rem}
-.topbar nav a{color:var(--muted);text-decoration:none;font-weight:500}
-.topbar nav a:hover,.topbar nav a[aria-current="page"]{color:var(--accent)}
-main{max-width:820px;margin:0 auto;padding:2.5rem 1.25rem 3rem}
-h1{font-family:'Poppins',sans-serif;font-size:clamp(1.7rem,4vw,2.2rem);line-height:1.25;color:var(--head);margin:0 0 .4rem;font-weight:700}
-.meta{color:var(--muted);font-size:.9rem;margin:0 0 1.75rem}
-.lead{background:var(--accent-soft);border-left:4px solid var(--accent);padding:1rem 1.15rem;border-radius:0 10px 10px 0;margin:0 0 2rem}
-.toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.25rem;margin:0 0 2.25rem;font-size:.95rem}
-.toc strong{color:var(--head)}
-.toc ol{margin:.5rem 0 0;padding-left:1.25rem;columns:2;column-gap:2rem}
-.toc li{break-inside:avoid;margin:.15rem 0}
-@media(max-width:600px){.toc ol{columns:1}}
-h2{font-family:'Poppins',sans-serif;font-size:1.2rem;color:var(--head);margin:2.25rem 0 .5rem;padding-bottom:.4rem;border-bottom:2px solid var(--accent);font-weight:600;scroll-margin-top:1rem}
-h3{font-size:1rem;color:var(--head);margin:1.25rem 0 .25rem;font-weight:600}
-p{margin:.6rem 0}
-ul{padding-left:1.25rem;margin:.6rem 0}
-li{margin:.3rem 0}
-table{width:100%;border-collapse:collapse;margin:.9rem 0;font-size:.92rem;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-th,td{text-align:left;padding:.65rem .8rem;border-bottom:1px solid var(--line);vertical-align:top}
-th{background:var(--accent-soft);color:var(--head);font-weight:600}
-tr:last-child td{border-bottom:0}
-.tablewrap{overflow-x:auto}
-.contact{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:1rem 1.25rem;margin-top:.75rem}
-.btn{display:inline-block;background:var(--accent);color:#fff;padding:.6rem 1.2rem;border-radius:9999px;text-decoration:none;font-weight:600;font-size:.95rem;margin-top:.4rem}
-@media (prefers-color-scheme:dark){.btn{color:#062a2a}}
-footer{border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.88rem;padding:1.75rem 1rem}
-footer a{color:var(--muted);margin:0 .5rem}
-footer a:hover{color:var(--accent)}
+<style>
+:root {
+  --bg: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --primary: #0d9488;
+  --primary-soft: rgba(13, 148, 136, 0.1);
+  --primary-glow: rgba(13, 148, 136, 0.25);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.05);
+}
+
+.dark {
+  --bg: #0b1120;
+  --bg-card: #0f172a;
+  --bg-elevated: #1e293b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --border: #1e293b;
+  --primary: #14b8a6;
+  --primary-soft: rgba(20, 184, 166, 0.12);
+  --primary-glow: rgba(20, 184, 166, 0.2);
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  transition: background 0.3s ease, color 0.3s ease;
+  overflow-x: hidden;
+}
+
+/* ===== Header ===== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: color-mix(in srgb, var(--bg-card) 85%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.header-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.brand img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.85rem;
+}
+
+.header-nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.header-nav a:hover,
+.header-nav a.active {
+  color: var(--primary);
+}
+
+/* ===== Theme Toggle ===== */
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+.theme-toggle svg { width: 18px; height: 18px; }
+.dark .icon-moon { display: none; }
+.icon-sun { display: none; }
+.dark .icon-sun { display: block; }
+
+/* ===== Hero ===== */
+.hero {
+  padding: 3.5rem 1.5rem 2.5rem;
+  text-align: center;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% -20%, var(--primary-glow), transparent),
+    var(--bg);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+.hero-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ===== Layout ===== */
+.layout {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.5rem 4rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+/* ===== TOC Sidebar ===== */
+.toc {
+  position: sticky;
+  top: 90px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.toc h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.toc ol {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toc a {
+  display: block;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+}
+
+.toc a:hover,
+.toc a.active {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ===== Content Cards ===== */
+.content-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.content-section:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+
+.content-section h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.content-section h2 .num {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.content-section p, .content-section li {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 0.6rem;
+}
+
+.content-section ul { padding-left: 1.25rem; }
+.content-section li::marker { color: var(--primary); }
+
+.content-section a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
+  text-underline-offset: 3px;
+}
+
+.content-section a:hover {
+  text-decoration-color: var(--primary);
+}
+
+/* ===== Table ===== */
+.policy-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  margin: 0.75rem 0;
+}
+
+.policy-table th,
+.policy-table td {
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+
+.policy-table th {
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.policy-table td { color: var(--text-muted); }
+
+/* ===== Contact Card ===== */
+.contact-card {
+  background: linear-gradient(135deg, var(--primary-soft), transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, var(--border));
+}
+
+.contact-card p { margin-bottom: 0.35rem; }
+
+/* ===== Footer ===== */
+.site-footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
+.site-footer nav {
+  display: flex;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.site-footer a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.site-footer a:hover { color: var(--primary); }
+
+/* ===== Back to Top ===== */
+.back-to-top {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 800px) {
+  .layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .toc {
+    position: static;
+  }
+  .toc ol {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem;
+  }
+  .header-nav { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
 </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/">K. Arzhaning Jagad</a>
-      <nav aria-label="Navigasi">
-        <a href="/">Beranda</a>
-        <a href="/privacy-policy/" aria-current="page">Kebijakan Privasi</a>
-        <a href="/terms/">Syarat &amp; Ketentuan</a>
-      </nav>
-    </div>
-  </header>
 
+<!-- ===== Header ===== -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="brand">
+      <img src="/icons/icon-512.png" alt="Logo" />
+      <span>Arzha</span>
+    </a>
+
+    <nav class="header-nav">
+      <a href="/">Beranda</a>
+      <a href="/privacy-policy/" class="active">Kebijakan Privasi</a>
+      <a href="/terms/">Syarat &amp; Ketentuan</a>
+    </nav>
+
+    <button class="theme-toggle" id="themeToggle" aria-label="Ganti tema terang/gelap">
+      <!-- Moon (tampil di light mode) -->
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+      <!-- Sun (tampil di dark mode) -->
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1" x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1" y1="12" x2="3" y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <span class="hero-badge">🔒 Privasi &amp; Keamanan Data</span>
+  <h1>Kebijakan Privasi</h1>
+  <p class="hero-meta">
+    Berlaku sejak: <strong>20 September 2026</strong> • Situs: <strong>arzhaning.my.id</strong>
+  </p>
+</section>
+
+<!-- ===== Main Layout ===== -->
+<div class="layout">
+
+  <!-- TOC Sidebar -->
+  <aside class="toc">
+    <h2>Daftar Isi</h2>
+    <ol>
+      <li><a href="#pendahuluan">Pendahuluan</a></li>
+      <li><a href="#data">Data yang Dikumpulkan</a></li>
+      <li><a href="#penggunaan">Penggunaan Data</a></li>
+      <li><a href="#asisten-ai">Asisten AI</a></li>
+      <li><a href="#cookie-iklan">Cookie &amp; Iklan</a></li>
+      <li><a href="#pihak-ketiga">Layanan Pihak Ketiga</a></li>
+      <li><a href="#penyimpanan">Penyimpanan &amp; Keamanan</a></li>
+      <li><a href="#hak">Hak Anda</a></li>
+      <li><a href="#anak">Privasi Anak</a></li>
+      <li><a href="#subdomain">Subdomain &amp; Tautan</a></li>
+      <li><a href="#perubahan">Perubahan Kebijakan</a></li>
+      <li><a href="#kontak">Kontak</a></li>
+    </ol>
+  </aside>
+
+  <!-- Content -->
   <main>
-    <h1>Kebijakan Privasi</h1>
-    <p class="meta">Berlaku sejak: 20 September 2026 • Situs: arzhaning.my.id</p>
+    <section class="content-section" id="pendahuluan">
+      <h2><span class="num">1</span> Pendahuluan</h2>
+      <p>Kebijakan Privasi ini menjelaskan bagaimana K. Arzhaning Jagad ("kami") mengumpulkan, menggunakan, dan melindungi informasi saat Anda mengunjungi <a href="https://arzhaning.my.id">arzhaning.my.id</a> ("Situs"). Dengan menggunakan Situs, Anda menyetujui praktik yang dijelaskan di sini. Jika Anda tidak setuju, mohon hentikan penggunaan Situs.</p>
+    </section>
 
-    <div class="lead">
-      <p>Ringkasnya: situs ini adalah portofolio dan halaman jasa pengembangan. Kami hanya mengumpulkan data seperlunya, tidak menjual data pribadi Anda, dan menjelaskan di bawah ini bagaimana cookie, iklan Google AdSense, serta asisten AI di situs ini bekerja.</p>
-    </div>
+    <section class="content-section" id="data">
+      <h2><span class="num">2</span> Data yang Kami Kumpulkan</h2>
+      <p><strong>a. Data yang Anda berikan</strong></p>
+      <ul>
+        <li>Pesan chat: isi percakapan yang Anda ketik pada asisten AI di Situs.</li>
+        <li>Kontak via WhatsApp: percakapan berlangsung di WhatsApp dan tunduk pada kebijakan privasi WhatsApp.</li>
+      </ul>
+      <p><strong>b. Data yang terkumpul otomatis</strong></p>
+      <ul>
+        <li>Alamat IP, jenis peramban, halaman yang dibuka, dan waktu akses (log server).</li>
+        <li>Alamat IP dipakai untuk rate limiting fitur chat.</li>
+      </ul>
+      <p><strong>c. Data di perangkat Anda</strong></p>
+      <ul>
+        <li>Riwayat chat disimpan di IndexedDB dan dibersihkan otomatis &gt; 30 hari.</li>
+        <li>Preferensi tampilan disimpan di localStorage.</li>
+      </ul>
+    </section>
 
-    <nav class="toc" aria-label="Daftar isi"><strong>Daftar isi</strong><ol><li><a href="#pendahuluan">Pendahuluan</a></li><li><a href="#data">Data yang Kami Kumpulkan</a></li><li><a href="#penggunaan">Cara Kami Menggunakan Data</a></li><li><a href="#asisten-ai">Asisten AI</a></li><li><a href="#cookie-iklan">Cookie dan Iklan (Google AdSense)</a></li><li><a href="#pihak-ketiga">Layanan Pihak Ketiga</a></li><li><a href="#penyimpanan">Penyimpanan dan Keamanan</a></li><li><a href="#hak">Hak Anda</a></li><li><a href="#anak">Privasi Anak</a></li><li><a href="#subdomain">Subdomain dan Tautan Eksternal</a></li><li><a href="#perubahan">Perubahan Kebijakan</a></li><li><a href="#kontak">Kontak</a></li></ol></nav>
+    <section class="content-section" id="penggunaan">
+      <h2><span class="num">3</span> Cara Kami Menggunakan Data</h2>
+      <ul>
+        <li>Menyajikan dan memelihara Situs serta fitur asisten AI.</li>
+        <li>Menjawab pertanyaan calon klien dan membantu estimasi proyek.</li>
+        <li>Menjaga keamanan dan mencegah penyalahgunaan.</li>
+        <li>Memahami penggunaan Situs untuk perbaikan.</li>
+        <li>Menayangkan iklan melalui Google AdSense bila diaktifkan.</li>
+      </ul>
+      <p><strong>Kami tidak menjual data pribadi Anda kepada siapa pun.</strong></p>
+    </section>
 
-    <h2 id="pendahuluan">1. Pendahuluan</h2>
-    <p>Kebijakan Privasi ini menjelaskan bagaimana K. Arzhaning Jagad ("kami") mengumpulkan, menggunakan, dan melindungi informasi saat Anda mengunjungi <a href="https://arzhaning.my.id">arzhaning.my.id</a> ("Situs"). Dengan menggunakan Situs, Anda menyetujui praktik yang dijelaskan di sini. Jika Anda tidak setuju, mohon hentikan penggunaan Situs.</p>
+    <section class="content-section" id="asisten-ai">
+      <h2><span class="num">4</span> Asisten AI</h2>
+      <p>Situs menyediakan asisten AI (Zannah, Rajendra, Kania, dan Radit). Pesan Anda diteruskan melalui server kami ke penyedia model AI (Google Gemini API). Pemrosesan oleh penyedia tunduk pada kebijakan privasi mereka.</p>
+      <p>Mohon tidak memasukkan data sensitif seperti kata sandi, nomor kartu, atau data kesehatan.</p>
+    </section>
 
-    <h2 id="data">2. Data yang Kami Kumpulkan</h2>
-    <h3>a. Data yang Anda berikan</h3>
-    <ul>
-      <li><strong>Pesan chat:</strong> isi percakapan yang Anda ketik pada asisten AI di Situs, termasuk informasi apa pun yang Anda tulis di dalamnya (misalnya kebutuhan proyek atau nama).</li>
-      <li><strong>Kontak via WhatsApp:</strong> jika Anda mengeklik tautan WhatsApp, percakapan berlangsung di WhatsApp dan tunduk pada kebijakan privasi WhatsApp. Kami hanya menerima informasi yang Anda kirimkan sendiri.</li>
-    </ul>
-    <h3>b. Data yang terkumpul otomatis</h3>
-    <ul>
-      <li>Alamat IP, jenis peramban dan perangkat, halaman yang dibuka, serta waktu akses (log server/hosting).</li>
-      <li>Alamat IP juga dipakai untuk pembatasan frekuensi penggunaan (<em>rate limiting</em>) fitur chat agar Situs tetap aman dan tersedia.</li>
-    </ul>
-    <h3>c. Data yang tersimpan di perangkat Anda</h3>
-    <ul>
-      <li>Riwayat percakapan chat disimpan di peramban Anda (IndexedDB) dan dibersihkan otomatis untuk sesi yang lebih dari 30 hari.</li>
-      <li>Preferensi tampilan (misalnya tema terang/gelap) disimpan di penyimpanan lokal peramban.</li>
-    </ul>
-    <p>Anda dapat menghapus data lokal ini kapan saja lewat pengaturan peramban.</p>
+    <section class="content-section" id="cookie-iklan">
+      <h2><span class="num">5</span> Cookie dan Iklan (Google AdSense)</h2>
+      <p>Situs ini menggunakan Google AdSense. Google menggunakan cookie untuk menayangkan iklan berdasarkan kunjungan Anda di Situs ini dan/atau situs lain.</p>
+      <ul>
+        <li>Nonaktifkan iklan personalisasi via <a href="https://adssettings.google.com" target="_blank" rel="noopener">Setelan Iklan Google</a>.</li>
+        <li>Info lebih lanjut: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">policies.google.com/technologies/partner-sites</a>.</li>
+      </ul>
+      <p>Anda juga dapat mengatur atau memblokir cookie melalui pengaturan peramban.</p>
+    </section>
 
-    <h2 id="penggunaan">3. Cara Kami Menggunakan Data</h2>
-    <ul>
-      <li>Menyajikan dan memelihara Situs serta fitur asisten AI.</li>
-      <li>Menjawab pertanyaan calon klien dan membantu estimasi kebutuhan proyek.</li>
-      <li>Menjaga keamanan, mencegah penyalahgunaan, dan membatasi beban layanan.</li>
-      <li>Memahami penggunaan Situs secara umum untuk perbaikan.</li>
-      <li>Menayangkan iklan melalui Google AdSense bila iklan diaktifkan (lihat bagian 5).</li>
-    </ul>
-    <p>Kami tidak menjual data pribadi Anda kepada siapa pun.</p>
+    <section class="content-section" id="pihak-ketiga">
+      <h2><span class="num">6</span> Layanan Pihak Ketiga</h2>
+      <table class="policy-table">
+        <thead>
+          <tr><th>Layanan</th><th>Keperluan</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Vercel</td><td>Hosting Situs dan fungsi server (log akses, IP)</td></tr>
+          <tr><td>Google (Gemini API)</td><td>Memproses pesan chat asisten AI</td></tr>
+          <tr><td>Google AdSense</td><td>Penayangan iklan dan cookie iklan</td></tr>
+          <tr><td>Google Fonts</td><td>Memuat font</td></tr>
+          <tr><td>WhatsApp (Meta)</td><td>Komunikasi langsung via tautan WhatsApp</td></tr>
+        </tbody>
+      </table>
+    </section>
 
-    <h2 id="asisten-ai">4. Asisten AI</h2>
-    <p>Situs menyediakan asisten AI (Zannah, Rajendra, Kania, dan Radit). Pesan yang Anda kirim diteruskan melalui server kami ke penyedia model AI, yaitu Google (Gemini API) dan layanan pendukung terkait fitur suara, agar balasan dapat dihasilkan. Pemrosesan oleh penyedia tersebut tunduk pada kebijakan privasi mereka masing-masing.</p>
-    <p><strong>Mohon tidak memasukkan data sensitif</strong> ke dalam chat, seperti kata sandi, nomor kartu, nomor identitas, atau data kesehatan.</p>
+    <section class="content-section" id="penyimpanan">
+      <h2><span class="num">7</span> Penyimpanan dan Keamanan</h2>
+      <p>Kami menerapkan langkah pengamanan yang wajar, termasuk koneksi terenkripsi (HTTPS). Namun, tidak ada metode transmisi atau penyimpanan data yang sepenuhnya bebas risiko. Log server disimpan selama diperlukan untuk keamanan dan operasional.</p>
+    </section>
 
-    <h2 id="cookie-iklan">5. Cookie dan Iklan (Google AdSense)</h2>
-    <p>Situs ini menggunakan Google AdSense dan dapat menampilkan iklan dari Google. Perlu Anda ketahui:</p>
-    <ul>
-      <li>Google, sebagai vendor pihak ketiga, menggunakan cookie untuk menayangkan iklan berdasarkan kunjungan Anda ke Situs ini dan/atau situs lain di internet.</li>
-      <li>Penggunaan cookie iklan (termasuk cookie DoubleClick) memungkinkan Google dan mitranya menayangkan iklan kepada Anda.</li>
-      <li>Anda dapat memilih untuk tidak menerima iklan yang dipersonalisasi melalui <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">Setelan Iklan Google</a>, atau mengunjungi <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer">aboutads.info</a> untuk menonaktifkan penggunaan cookie vendor pihak ketiga lainnya untuk iklan yang dipersonalisasi.</li>
-      <li>Informasi lebih lanjut tentang cara Google menggunakan data dari situs mitra: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">policies.google.com/technologies/partner-sites</a>.</li>
-    </ul>
-    <p>Anda juga dapat mengatur atau memblokir cookie melalui pengaturan peramban. Beberapa fitur Situs mungkin tidak berfungsi optimal jika cookie diblokir.</p>
+    <section class="content-section" id="hak">
+      <h2><span class="num">8</span> Hak Anda</h2>
+      <p>Sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi, Anda berhak meminta akses, perbaikan, atau penghapusan data pribadi, serta menarik persetujuan dan mengajukan keberatan. Untuk data yang hanya tersimpan di peramban, Anda dapat menghapusnya sendiri.</p>
+    </section>
 
-    <h2 id="pihak-ketiga">6. Layanan Pihak Ketiga</h2>
-    <div class="tablewrap"><table>
-      <thead><tr><th>Layanan</th><th>Keperluan</th></tr></thead>
-      <tbody>
-        <tr><td>Vercel</td><td>Hosting Situs dan fungsi server (log akses, alamat IP)</td></tr>
-        <tr><td>Google (Gemini API)</td><td>Memproses pesan chat untuk menghasilkan balasan asisten AI</td></tr>
-        <tr><td>Google AdSense</td><td>Penayangan iklan dan cookie iklan</td></tr>
-        <tr><td>Google Fonts</td><td>Memuat font; peramban Anda terhubung ke server Google</td></tr>
-        <tr><td>WhatsApp (Meta)</td><td>Komunikasi langsung ketika Anda mengeklik tautan WhatsApp</td></tr>
-      </tbody>
-    </table></div>
+    <section class="content-section" id="anak">
+      <h2><span class="num">9</span> Privasi Anak</h2>
+      <p>Situs ini ditujukan untuk audiens umum dan calon klien, bukan untuk anak di bawah 13 tahun. Kami tidak dengan sengaja mengumpulkan data pribadi anak. Aplikasi edukasi anak di subdomain terpisah dapat memiliki kebijakan tersendiri.</p>
+    </section>
 
-    <h2 id="penyimpanan">7. Penyimpanan dan Keamanan</h2>
-    <p>Kami menerapkan langkah pengamanan yang wajar, termasuk koneksi terenkripsi (HTTPS). Namun, tidak ada metode transmisi atau penyimpanan data yang sepenuhnya bebas risiko, sehingga kami tidak dapat menjamin keamanan mutlak. Log server disimpan selama diperlukan untuk keamanan dan operasional, sesuai kebijakan penyedia hosting.</p>
+    <section class="content-section" id="subdomain">
+      <h2><span class="num">10</span> Subdomain dan Tautan Eksternal</h2>
+      <p>Situs memuat tautan ke aplikasi pada subdomain (misalnya bgames.arzhaning.my.id dan rapin.arzhaning.my.id) serta situs pihak ketiga. Setiap aplikasi atau situs tersebut dapat memiliki praktik privasi sendiri.</p>
+    </section>
 
-    <h2 id="hak">8. Hak Anda</h2>
-    <p>Sesuai peraturan pelindungan data pribadi yang berlaku di Indonesia (termasuk UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi), Anda berhak untuk meminta akses, perbaikan, atau penghapusan data pribadi Anda, serta menarik persetujuan dan mengajukan keberatan atas pemrosesan tertentu. Untuk menggunakan hak tersebut, hubungi kami melalui kontak di bagian 12. Untuk data yang hanya tersimpan di peramban Anda, Anda dapat menghapusnya sendiri.</p>
+    <section class="content-section" id="perubahan">
+      <h2><span class="num">11</span> Perubahan Kebijakan</h2>
+      <p>Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu. Perubahan berlaku sejak dipublikasikan di halaman ini, dan tanggal "Berlaku sejak" di atas akan diperbarui.</p>
+    </section>
 
-    <h2 id="anak">9. Privasi Anak</h2>
-    <p>Situs ini ditujukan untuk audiens umum dan calon klien, bukan untuk anak di bawah 13 tahun, dan kami tidak dengan sengaja mengumpulkan data pribadi anak melalui Situs ini. Jika Anda orang tua atau wali dan mengetahui anak Anda mengirimkan data pribadi kepada kami, hubungi kami agar data tersebut dapat dihapus. Aplikasi edukasi anak yang berada di subdomain terpisah dapat memiliki kebijakan tersendiri.</p>
-
-    <h2 id="subdomain">10. Subdomain dan Tautan Eksternal</h2>
-    <p>Situs memuat tautan ke aplikasi pada subdomain (misalnya bgames.arzhaning.my.id dan rapin.arzhaning.my.id) serta situs pihak ketiga. Setiap aplikasi atau situs tersebut dapat memiliki praktik privasi sendiri. Kami tidak bertanggung jawab atas kebijakan situs pihak ketiga.</p>
-
-    <h2 id="perubahan">11. Perubahan Kebijakan</h2>
-    <p>Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu. Perubahan berlaku sejak dipublikasikan di halaman ini, dan tanggal "Berlaku sejak" di atas akan diperbarui.</p>
-
-    <h2 id="kontak">12. Kontak</h2>
-    <p>Pertanyaan atau permintaan terkait privasi dapat disampaikan melalui:</p>
-    <div class="contact">
-      <p><strong>K. Arzhaning Jagad (Arzha)</strong><br>
-      Cibitung, Bekasi, Jawa Barat, Indonesia<br>
-      Situs: <a href="https://arzhaning.my.id">arzhaning.my.id</a><br>
-      Email: <a href="mailto:Admin@arzhaning.my.id">Admin@arzhaning.my.id</a> atau <a href="mailto:Jarzha@gmail.com">Jarzha@gmail.com</a></p>
-      <a class="btn" href="https://wa.me/6282312312734" target="_blank" rel="noopener noreferrer">Hubungi via WhatsApp</a>
-    </div>
-
+    <section class="content-section contact-card" id="kontak">
+      <h2><span class="num">12</span> Kontak</h2>
+      <p><strong>K. Arzhaning Jagad (Arzha)</strong></p>
+      <p>Cibitung, Bekasi, Jawa Barat, Indonesia</p>
+      <p>Situs: <a href="https://arzhaning.my.id">arzhaning.my.id</a></p>
+      <p>Email: <a href="mailto:Admin@arzhaning.my.id">Admin@arzhaning.my.id</a> atau <a href="mailto:Jarzha@gmail.com">Jarzha@gmail.com</a></p>
+      <p><a href="https://wa.me/6282312312734" target="_blank" rel="noopener">Hubungi via WhatsApp</a></p>
+    </section>
   </main>
+</div>
 
-  <footer>
-    <p>© 2026 K. Arzhaning Jagad (Arzha) • Cibitung, Bekasi, Jawa Barat, Indonesia</p>
-    <p><a href="/">Beranda</a> • <a href="/privacy-policy/">Kebijakan Privasi</a> • <a href="/terms/">Syarat &amp; Ketentuan</a></p>
-  </footer>
+<!-- ===== Footer ===== -->
+<footer class="site-footer">
+  <nav>
+    <a href="/">Beranda</a>
+    <a href="/privacy-policy/">Kebijakan Privasi</a>
+    <a href="/terms/">Syarat &amp; Ketentuan</a>
+  </nav>
+  <p>© 2026 K. Arzhaning Jagad (Arzha) • Cibitung, Bekasi, Jawa Barat, Indonesia</p>
+</footer>
+
+<!-- ===== Back to Top ===== -->
+<button class="back-to-top" id="backToTop" aria-label="Kembali ke atas">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="18 15 12 9 6 15"/>
+  </svg>
+</button>
+
+<script>
+// ===== Theme Toggle =====
+const toggle = document.getElementById('themeToggle');
+toggle.addEventListener('click', () => {
+  const isDark = document.documentElement.classList.toggle('dark');
+  try {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  } catch (e) {}
+});
+
+// ===== Back to Top =====
+const backToTop = document.getElementById('backToTop');
+window.addEventListener('scroll', () => {
+  backToTop.classList.toggle('show', window.scrollY > 400);
+}, { passive: true });
+
+backToTop.addEventListener('click', () => {
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+});
+
+// ===== TOC Active Highlight =====
+const tocLinks = document.querySelectorAll('.toc a');
+const sections = document.querySelectorAll('.content-section[id]');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      tocLinks.forEach(link => {
+        link.classList.toggle('active', link.getAttribute('href') === '#' + entry.target.id);
+      });
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+
+sections.forEach(section => observer.observe(section));
+</script>
+
 </body>
 </html>
