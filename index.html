@@ -37,6 +37,7 @@
     content="Jasa pembuatan aplikasi web, mobile, dan game — dari konsep sampai rilis. Komunikasi langsung tanpa perantara, standar kerja rapi dan tepat waktu." />
   <meta property="og:site_name" content="K. Arzhaning Jagad — Jasa Development" />
   <meta property="og:image" content="https://arzhaning.my.id/og-image.png" />
+  <meta property="og:image:alt" content="K. Arzhaning Jagad — Jasa Web, Mobile App & Game Development" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   <meta property="og:locale" content="id_ID" />
@@ -246,6 +247,99 @@
   }
   </script>
 
+  <!--
+      Artikel — BlogPosting Schema. Sinkronkan manual dengan
+      src/data/articles.ts setiap kali artikel baru diubah published:true
+      (ideal-nya digenerate otomatis dari file itu saat build, tapi untuk
+      sekarang masih ditulis manual di sini).
+    -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Artikel K. Arzhaning Jagad",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Cara Kerja Sistem Manajemen Aset PT Global Multiparts",
+          "url": "https://arzhaning.my.id/artikel/cara-kerja-sistem-aset-pt-gmp",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Bedah teknis arsitektur serverless di balik Assets DEMO — dari stock opname manual yang rawan selisih, sampai audit yang bisa dicek kapan saja."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri untuk Klien Kecil-Menengah",
+          "url": "https://arzhaning.my.id/artikel/kenapa-google-apps-script-untuk-klien-kecil-menengah",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Alasan biaya dan maintenance di balik keputusan arsitektur untuk klien dengan budget terbatas — lengkap dengan kapan pendekatan ini TIDAK cocok dipakai."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "5 Tanda Bisnismu Sudah Waktunya Migrasi dari Google Apps Script ke Server Sendiri",
+          "url": "https://arzhaning.my.id/artikel/tanda-waktunya-migrasi-dari-apps-script",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Google Apps Script pas untuk skala kecil-menengah, tapi ada titik ketika sistem butuh \"naik kelas\". Ini tanda-tandanya."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Amankah Data Bisnis Disimpan di Google Sheets/Drive? Ini Faktanya",
+          "url": "https://arzhaning.my.id/artikel/amankah-data-bisnis-di-google-sheets-drive",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Kekhawatiran yang wajar sebelum memakai sistem berbasis Google Sheets/Drive untuk data bisnis — dan apa yang sebenarnya paling menentukan keamanannya."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Custom Chatbot vs Chatbot Template: Mana yang Cocok untuk Bisnis Kamu?",
+          "url": "https://arzhaning.my.id/artikel/custom-chatbot-vs-chatbot-template",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Perbandingan biaya jangka panjang dan kapan logika bisnis spesifik butuh solusi custom, bukan sekadar template siap pakai."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Berapa Biaya Sebenarnya Bikin Chatbot Custom? Rincian dari Rp1,5jt",
+          "url": "https://arzhaning.my.id/artikel/biaya-bikin-chatbot-custom-rincian",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Rp1,5jt itu harga mulai dari — bukan harga final. Ini rincian apa saja yang termasuk, dan apa yang bikin harganya berubah."
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "item": {
+          "@type": "BlogPosting",
+          "headline": "Apa Itu Autonomous Agent? Beda dengan Chatbot Biasa",
+          "url": "https://arzhaning.my.id/artikel/apa-itu-autonomous-agent-beda-chatbot-biasa",
+          "author": { "@type": "Person", "name": "K. Arzhaning Jagad" },
+          "description": "Chatbot menjawab pertanyaan. Autonomous Agent mengerjakan tugas sampai selesai. Ini beda mendasarnya, dan kapan kamu butuh yang mana."
+        }
+      }
+    ]
+  }
+  </script>
+
   <!-- Favicons -->
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png" />
@@ -365,11 +459,40 @@
       </p>
       <div style="margin-top: 1.5rem;">
         <a href="https://wa.me/6282312312734" style="display: inline-block; background-color: #0d9488; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; font-weight: 600;">Hubungi via WhatsApp (+62 823-1231-2734)</a>
-        <a href="/cv" style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Lihat CV & Pengalaman Korporat 7+ Tahun</a>
+        <a href="/hasil-kerja" style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Lihat Hasil Kerja untuk Klien Nyata</a>
+        <a href="/artikel" style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Baca Artikel</a>
       </div>
     </header>
 
     <main style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
+      <!-- Hasil Kerja — Studi Kasus Klien Nyata -->
+      <section style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+          <a href="/hasil-kerja" style="color: inherit; text-decoration: none;">Hasil Kerja untuk Klien Nyata</a>
+        </h2>
+        <p style="color: #475569; margin-top: 0.5rem;">
+          Studi kasus proyek yang sudah dipakai langsung oleh bisnis, lengkap dengan masalah awal, solusi yang dibangun, dan dampaknya — termasuk sistem manajemen aset untuk PT Global Multiparts.
+          <a href="/hasil-kerja" style="color: #0d9488; font-weight: 600;">Lihat studi kasus lengkap &rarr;</a>
+        </p>
+      </section>
+
+      <!-- Artikel — daftar statis untuk crawler; sinkronkan manual dengan
+           src/data/articles.ts setiap kali artikel baru di-publish:true -->
+      <section style="margin-bottom: 3rem;">
+        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+          <a href="/artikel" style="color: inherit; text-decoration: none;">Artikel</a>
+        </h2>
+        <ul style="list-style-type: none; padding-left: 0; display: grid; gap: 0.75rem; margin-top: 1rem;">
+          <li><a href="/artikel/cara-kerja-sistem-aset-pt-gmp" style="color: #0d9488; font-weight: 600;">Cara Kerja Sistem Manajemen Aset PT Global Multiparts</a></li>
+          <li><a href="/artikel/kenapa-google-apps-script-untuk-klien-kecil-menengah" style="color: #0d9488; font-weight: 600;">Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri untuk Klien Kecil-Menengah</a></li>
+          <li><a href="/artikel/tanda-waktunya-migrasi-dari-apps-script" style="color: #0d9488; font-weight: 600;">5 Tanda Bisnismu Sudah Waktunya Migrasi dari Google Apps Script ke Server Sendiri</a></li>
+          <li><a href="/artikel/amankah-data-bisnis-di-google-sheets-drive" style="color: #0d9488; font-weight: 600;">Amankah Data Bisnis Disimpan di Google Sheets/Drive? Ini Faktanya</a></li>
+          <li><a href="/artikel/custom-chatbot-vs-chatbot-template" style="color: #0d9488; font-weight: 600;">Custom Chatbot vs Chatbot Template: Mana yang Cocok untuk Bisnis Kamu?</a></li>
+          <li><a href="/artikel/biaya-bikin-chatbot-custom-rincian" style="color: #0d9488; font-weight: 600;">Berapa Biaya Sebenarnya Bikin Chatbot Custom? Rincian dari Rp1,5jt</a></li>
+          <li><a href="/artikel/apa-itu-autonomous-agent-beda-chatbot-biasa" style="color: #0d9488; font-weight: 600;">Apa Itu Autonomous Agent? Beda dengan Chatbot Biasa</a></li>
+        </ul>
+      </section>
+
       <!-- Layanan & Harga -->
       <section style="margin-bottom: 3rem;">
         <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">

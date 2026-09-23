@@ -8,6 +8,8 @@
 //  - `published` baru diubah ke true setelah body lengkap dan sudah dibaca
 //    ulang. Selama false, artikel tidak muncul di index maupun bisa diakses
 //    langsung lewat URL-nya (lihat ArticlePage/ArticlesIndexPage).
+//  - `publishedAt` diisi tanggal publikasi ISO string ("2026-09-23").
+//    Opsional — jika kosong, tanggal tidak ditampilkan di halaman artikel.
 //  - Artikel #8 (panduan aplikasi edukasi anak) sengaja TIDAK dimasukkan di
 //    sini — audiensnya orang tua, beda dari audiens jasa dev di situs ini.
 
@@ -25,6 +27,7 @@ export interface Article {
   readMinutes: number;
   body: ArticleBlock[];
   published: boolean;
+  publishedAt?: string; // ISO string, mis. "2026-09-23"
 }
 
 export const ARTICLES: Article[] = [
@@ -36,6 +39,7 @@ export const ARTICLES: Article[] = [
     category: 'Studi Kasus',
     readMinutes: 4,
     published: true,
+    publishedAt: '2026-09-20',
     body: [
       {
         paragraphs: [
@@ -97,6 +101,7 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     published: true,
+    publishedAt: '2026-09-18',
     body: [
       {
         paragraphs: [
@@ -145,6 +150,7 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     published: true,
+    publishedAt: '2026-09-15',
     body: [
       {
         paragraphs: [
@@ -197,6 +203,7 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 2,
     published: true,
+    publishedAt: '2026-09-12',
     body: [
       {
         paragraphs: [
@@ -273,6 +280,7 @@ export const ARTICLES: Article[] = [
     category: 'Panduan',
     readMinutes: 3,
     published: true,
+    publishedAt: '2026-09-10',
     body: [
       {
         paragraphs: [
@@ -315,8 +323,9 @@ export const ARTICLES: Article[] = [
     excerpt:
       'Rp1,5jt itu harga mulai dari — bukan harga final. Ini rincian apa saja yang termasuk, dan apa yang bikin harganya berubah.',
     category: 'Panduan',
-    readMinutes: 2,
+    readMinutes: 3,
     published: true,
+    publishedAt: '2026-09-08',
     body: [
       {
         paragraphs: [
@@ -364,6 +373,7 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 2,
     published: true,
+    publishedAt: '2026-09-05',
     body: [
       {
         paragraphs: [
@@ -416,3 +426,17 @@ export const ARTICLES: Article[] = [
 
 export const getArticleBySlug = (slug: string): Article | undefined =>
   ARTICLES.find((a) => a.slug === slug && a.published);
+
+// Artikel sebelumnya/selanjutnya di antara yang published, mengikuti urutan
+// tampil di ARTICLES (urutan yang sama dipakai di halaman index /artikel).
+export const getAdjacentArticles = (
+  slug: string
+): { prev: Article | null; next: Article | null } => {
+  const published = ARTICLES.filter((a) => a.published);
+  const index = published.findIndex((a) => a.slug === slug);
+  if (index === -1) return { prev: null, next: null };
+  return {
+    prev: index > 0 ? published[index - 1] : null,
+    next: index < published.length - 1 ? published[index + 1] : null,
+  };
+};
