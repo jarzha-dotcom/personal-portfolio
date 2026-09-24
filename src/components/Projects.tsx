@@ -88,7 +88,7 @@ const SERVICE_BENEFITS: { icon: LucideIcon; title: string; desc: string }[] = [
   {
     icon: Mic,
     title: 'Bisa diajak bicara',
-    desc: 'Suara dua arah yang natural (Google Chirp3-HD). Pelanggan cukup bicara, chatbot menjawab dengan suara.',
+    desc: 'Suara dua arah yang natural (Google WaveNet). Pelanggan cukup bicara, chatbot menjawab dengan suara.',
   },
   {
     icon: MessageCircle,

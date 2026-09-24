@@ -25,19 +25,17 @@ This repository powers the official portfolio website of **K. Arzhaning Jagad**,
 - **Autonomous File Extraction**: Unpacks and delivers client-ready downloadable deliverables (`.html`, `.txt`, `.pdf`, `.xlsx`) dynamically generated in the sandbox.
 - **Quota Protection**: Global daily cap + per-IP rate limiting to safeguard preview quotas and ensure 100% uptime.
 
-### 3. 🔄 4-Layer Resilient LLM Cascade
+### 3. 🔄 Resilient Multi-Layer AI Cascade (100% Free Tier AI Studio)
 ```
 [User Request]
        │
-       ├──► Layer 1: Google Antigravity Agent (Opt-in preview)
+       ├──► Layer 1: Google Antigravity Agent (Opt-in preview, AI Studio)
        │         └── [If unavailable / quota reached]
-       ├──► Layer 2: Google AI Studio Cascade (Gemini 3.8 / 3.7 / 3.5-Lite / 3.6 / 3.5 / 3.1-Lite)
-       │         └── [If rate limited / exhausted]
-       ├──► Layer 3: Google Cloud Platform (GCP) Gemini Fallback Key
-       │         └── [If unavailable]
-       ├──► Layer 3.5: Gemma 4 Open-Weight Backup (High RPD insurance)
+       ├──► Layer 2: Google AI Studio Cascade (Gemini 3.8 / 3.5-Lite / 3.7 / 3.1-Lite / 3.6 / 3.5)
+       │         └── [If rate limited / high demand 503 / 20 RPD exhausted]
+       ├──► Layer 3: Gemma 4 Open-Weight Powerhouse (Gemma 4 31B & 26B — 14.400 RPD, 30 RPM)
        │         └── [If all AI offline]
-       └──► Layer 4: Semantic Embedding FAQ + Fuse.js Client Search
+       └──► Layer 4: Semantic Embedding FAQ + Fuse.js Client Search (Zero-quota)
 ```
 
 ### 4. ⚡ High-Performance Frontend & UX
@@ -93,11 +91,12 @@ personal-portfolio/
 Create a `.env.local` or configure in the Vercel Project Settings:
 
 ```env
-# Primary Google AI Studio Key (Interactions API & Gemini cascade)
+# Primary Google AI Studio Key (Interactions API, Gemini & Gemma cascade — Free Tier)
 GEMINI_API_KEY=your_gemini_api_key_here
 
-# Optional: GCP Gemini API Key (Secondary fallback layer)
-GOOGLE_CLOUD_GEMINI_API_KEY=your_gcp_gemini_api_key_here
+# Google Cloud Platform Key for Text-to-Speech (WaveNet Free Tier 1M chars/mo)
+GCP_API_KEY=your_gcp_tts_api_key_here
+GCP_TTS=true
 ```
 
 ---

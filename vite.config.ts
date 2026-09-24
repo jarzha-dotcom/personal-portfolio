@@ -27,7 +27,7 @@ function localChatDevPlugin(): Plugin {
               (req as any).body = body;
 
               // Pastikan process.env memiliki key dari .env.local jika belum ada
-              if (!process.env.GEMINI_API_KEY || !process.env.GOOGLE_CLOUD_GEMINI_API_KEY) {
+              if (!process.env.GEMINI_API_KEY) {
                 try {
                   const envLocalPath = path.resolve(__dirname, '.env.local');
                   if (fs.existsSync(envLocalPath)) {
@@ -80,44 +80,14 @@ function localChatDevPlugin(): Plugin {
 // CATATAN: id-ID-Neural2-* kemungkinan besar TIDAK tersedia di GCP TTS.
 // id-ID-Wavenet-A dipakai sebagai default. Cek voice aktual via:
 //   GET https://texttospeech.googleapis.com/v1/voices?languageCode=id-ID&key=API_KEY
-const TTS_DEFAULT_VOICE = 'id-ID-Chirp3-HD-Zephyr';
+const TTS_DEFAULT_VOICE = 'id-ID-Wavenet-A';
 const TTS_ALLOWED_VOICES = new Set([
-  // Google DeepMind Chirp3 HD Voices (Ultra Realistic)
-  'id-ID-Chirp3-HD-Zephyr',
-  'id-ID-Chirp3-HD-Achernar',
-  'id-ID-Chirp3-HD-Aoede',
-  'id-ID-Chirp3-HD-Autonoe',
-  'id-ID-Chirp3-HD-Callirrhoe',
-  'id-ID-Chirp3-HD-Despina',
-  'id-ID-Chirp3-HD-Erinome',
-  'id-ID-Chirp3-HD-Gacrux',
-  'id-ID-Chirp3-HD-Kore',
-  'id-ID-Chirp3-HD-Laomedeia',
-  'id-ID-Chirp3-HD-Leda',
-  'id-ID-Chirp3-HD-Pulcherrima',
-  'id-ID-Chirp3-HD-Sulafat',
-  'id-ID-Chirp3-HD-Vindemiatrix',
-  'id-ID-Chirp3-HD-Achird',
-  'id-ID-Chirp3-HD-Algenib',
-  'id-ID-Chirp3-HD-Algieba',
-  'id-ID-Chirp3-HD-Alnilam',
-  'id-ID-Chirp3-HD-Charon',
-  'id-ID-Chirp3-HD-Enceladus',
-  'id-ID-Chirp3-HD-Fenrir',
-  'id-ID-Chirp3-HD-Iapetus',
-  'id-ID-Chirp3-HD-Orus',
-  'id-ID-Chirp3-HD-Puck',
-  'id-ID-Chirp3-HD-Rasalgethi',
-  'id-ID-Chirp3-HD-Sadachbia',
-  'id-ID-Chirp3-HD-Sadaltager',
-  'id-ID-Chirp3-HD-Schedar',
-  'id-ID-Chirp3-HD-Umbriel',
-  'id-ID-Chirp3-HD-Zubenelgenubi',
-  // Wavenet & Standard Voices
+  // Google Cloud Text-to-Speech WaveNet Voices (Free Tier)
   'id-ID-Wavenet-A',
   'id-ID-Wavenet-B',
   'id-ID-Wavenet-C',
   'id-ID-Wavenet-D',
+  // Google Cloud Text-to-Speech Standard Voices
   'id-ID-Standard-A',
   'id-ID-Standard-B',
   'id-ID-Standard-C',
@@ -406,7 +376,6 @@ function localTtsDevPlugin(envGcpApiKey: string): Plugin {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   if (env.GEMINI_API_KEY) process.env.GEMINI_API_KEY = env.GEMINI_API_KEY;
-  if (env.GOOGLE_CLOUD_GEMINI_API_KEY) process.env.GOOGLE_CLOUD_GEMINI_API_KEY = env.GOOGLE_CLOUD_GEMINI_API_KEY;
   if (env.GCP_API_KEY) process.env.GCP_API_KEY = env.GCP_API_KEY;
   const gcpApiKey = env.GCP_API_KEY || process.env.GCP_API_KEY || '';
 

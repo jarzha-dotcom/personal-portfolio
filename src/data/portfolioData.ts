@@ -331,9 +331,11 @@ export interface ModelOption {
 
 export const AVAILABLE_MODELS: ModelOption[] = [
   { id: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash', desc: 'Default • paling modern & cepat' },
+  { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Hemat kuota • 500 RPD' },
+  { id: 'gemma-4-31b-it', label: 'Gemma 4 31B', desc: 'Open-weight cerdas • 14.400 RPD' },
+  { id: 'gemma-4-26b-a4b-it', label: 'Gemma 4 26B', desc: 'Ultra cepat • 14.400 RPD' },
   { id: 'gemini-3.7-flash', label: 'Gemini 3.7 Flash', desc: 'Advanced, latensi rendah' },
+  { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Sangat stabil • 500 RPD' },
   { id: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash', desc: 'Seimbang speed & kualitas' },
   { id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash', desc: 'Stabil & efisien' },
-  { id: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash-Lite', desc: 'Ultra hemat kuota' },
-  { id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash-Lite', desc: 'Fallback paling stabil' },
 ];

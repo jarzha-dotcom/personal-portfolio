@@ -55,18 +55,18 @@ export interface SpeechSupport {
   ttsBrowser: boolean;
 }
 
-// Konfigurasi Suara berdasarkan Persona Bot (Google DeepMind Chirp3 HD):
-// Gender di bawah ini mengikuti daftar resmi voice Chirp3-HD dari Google Cloud
-// (Fenrir/Puck/Charon/Orus dkk = Male, Zephyr/Gacrux/Kore dkk = Female).
-// - Zannah:   Cewek (Ramah, Cerdas, Konsultatif)
-// - Radit:    Cowok (Tenang, Sigap, Direktori/Standby)
-// - Kania:    Cewek (Hangat, Detail, Asisten CV)
-// - Rajendra: Cowok (persona baru — voice beda dari Radit biar tidak kembar)
+// Konfigurasi Suara berdasarkan Persona Bot (Google Cloud Text-to-Speech WaveNet):
+// Gender di bawah ini mengikuti daftar resmi voice WaveNet id-ID dari Google Cloud
+// (Wavenet A/D = Female, Wavenet B/C = Male).
+// - Zannah:   Cewek (Ramah, Cerdas, Konsultatif) -> id-ID-Wavenet-A
+// - Radit:    Cowok (Tenang, Sigap, Direktori/Standby) -> id-ID-Wavenet-B
+// - Kania:    Cewek (Hangat, Detail, Asisten CV) -> id-ID-Wavenet-D
+// - Rajendra: Cowok (Portfolio AI Assistant) -> id-ID-Wavenet-C
 export const BOT_VOICES = {
-  ZANNAH: 'id-ID-Chirp3-HD-Zephyr',    // Cewek
-  RADIT: 'id-ID-Chirp3-HD-Fenrir',     // Cowok
-  KANIA: 'id-ID-Chirp3-HD-Gacrux',     // Cewek
-  RAJENDRA: 'id-ID-Chirp3-HD-Puck',    // Cowok
+  ZANNAH: 'id-ID-Wavenet-A',    // Cewek (Female)
+  RADIT: 'id-ID-Wavenet-B',     // Cowok (Male)
+  KANIA: 'id-ID-Wavenet-D',     // Cewek (Female)
+  RAJENDRA: 'id-ID-Wavenet-C',  // Cowok (Male)
 } as const;
 
 export const DEFAULT_GCP_VOICE = BOT_VOICES.ZANNAH;

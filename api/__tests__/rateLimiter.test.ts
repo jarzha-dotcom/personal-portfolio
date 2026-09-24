@@ -42,6 +42,15 @@ describe('rateLimiter', () => {
         expect(res2.remaining).toBe(RATE_LIMIT_PER_MODEL - 1);
     });
 
+    it('grants generous rate limit for Gemma models', () => {
+        const ip = `gemma-ip-${Date.now()}`;
+        const model = 'gemma-4-31b-it';
+
+        const res = checkRateLimit(ip, model);
+        expect(res.allowed).toBe(true);
+        expect(res.remaining).toBe(19); // 20 - 1
+    });
+
     it('tracks antigravity daily status and quota consumption', () => {
         const status = getAntigravityDailyStatus();
         expect(status.allowed).toBe(true);

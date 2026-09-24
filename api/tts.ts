@@ -10,51 +10,16 @@ const GCP_API_KEY = process.env.GCP_API_KEY;
 // billing GCP lagi nonaktif, jadi tidak buang waktu nunggu request GCP gagal.
 const GCP_TTS_ENABLED = (process.env.GCP_TTS || '').trim().toLowerCase() === 'true';
 
-// CATATAN PENTING: id-ID-Neural2-* kemungkinan besar TIDAK tersedia di GCP TTS —
-// Neural2 baru dirilis untuk sebagian bahasa. id-ID-Wavenet-A dipakai sebagai
-// default yang sudah lama tersedia & stabil. Cek daftar voice aktual via:
-//   GET https://texttospeech.googleapis.com/v1/voices?languageCode=id-ID&key=API_KEY
-// lalu sesuaikan DEFAULT_VOICE / ALLOWED_VOICES kalau GCP sudah merilis
-// Neural2/Chirp3-HD untuk id-ID di akun Kakak.
-const DEFAULT_VOICE = 'id-ID-Chirp3-HD-Zephyr';
+// Suara resmi Google Cloud Text-to-Speech WaveNet untuk id-ID (Free tier 1M karakter/bulan).
+const DEFAULT_VOICE = 'id-ID-Wavenet-A';
 
 const ALLOWED_VOICES = new Set([
-  // Google DeepMind Chirp3 HD Voices (Ultra Realistic)
-  'id-ID-Chirp3-HD-Zephyr',
-  'id-ID-Chirp3-HD-Achernar',
-  'id-ID-Chirp3-HD-Aoede',
-  'id-ID-Chirp3-HD-Autonoe',
-  'id-ID-Chirp3-HD-Callirrhoe',
-  'id-ID-Chirp3-HD-Despina',
-  'id-ID-Chirp3-HD-Erinome',
-  'id-ID-Chirp3-HD-Gacrux',
-  'id-ID-Chirp3-HD-Kore',
-  'id-ID-Chirp3-HD-Laomedeia',
-  'id-ID-Chirp3-HD-Leda',
-  'id-ID-Chirp3-HD-Pulcherrima',
-  'id-ID-Chirp3-HD-Sulafat',
-  'id-ID-Chirp3-HD-Vindemiatrix',
-  'id-ID-Chirp3-HD-Achird',
-  'id-ID-Chirp3-HD-Algenib',
-  'id-ID-Chirp3-HD-Algieba',
-  'id-ID-Chirp3-HD-Alnilam',
-  'id-ID-Chirp3-HD-Charon',
-  'id-ID-Chirp3-HD-Enceladus',
-  'id-ID-Chirp3-HD-Fenrir',
-  'id-ID-Chirp3-HD-Iapetus',
-  'id-ID-Chirp3-HD-Orus',
-  'id-ID-Chirp3-HD-Puck',
-  'id-ID-Chirp3-HD-Rasalgethi',
-  'id-ID-Chirp3-HD-Sadachbia',
-  'id-ID-Chirp3-HD-Sadaltager',
-  'id-ID-Chirp3-HD-Schedar',
-  'id-ID-Chirp3-HD-Umbriel',
-  'id-ID-Chirp3-HD-Zubenelgenubi',
-  // Wavenet & Standard Voices
+  // Google Cloud Text-to-Speech WaveNet Voices (Free Tier 1M karakter/bulan)
   'id-ID-Wavenet-A',
   'id-ID-Wavenet-B',
   'id-ID-Wavenet-C',
   'id-ID-Wavenet-D',
+  // Google Cloud Text-to-Speech Standard Voices (Free Tier 4M karakter/bulan)
   'id-ID-Standard-A',
   'id-ID-Standard-B',
   'id-ID-Standard-C',
@@ -62,25 +27,17 @@ const ALLOWED_VOICES = new Set([
 ]);
 
 // ── Fallback berjenjang kualitas suara ───────────────────────────────────────
-// Kalau tier teratas (Chirp3-HD) gagal disintesis di akun/region ini (mis. 400
-// karena belum tersedia), otomatis coba tier di bawahnya, dst. Kalau semua
-// tier GCP gagal, baru handler balas error supaya frontend fallback ke Web
-// Speech API browser (lihat catatan di bagian bawah file / voiceService.ts).
+// Menggunakan voice WaveNet (Tier 1, natural & gratis 1 juta karakter/bulan di GCP)
+// dengan fallback ke Standard (Tier 2, gratis 4 juta karakter/bulan).
 const VOICE_TIERS: string[][] = [
-  // Tier 1 — Chirp3-HD (paling natural)
-  [
-    'id-ID-Chirp3-HD-Zephyr',
-    'id-ID-Chirp3-HD-Kore',
-    'id-ID-Chirp3-HD-Puck',
-  ],
-  // Tier 2 — Wavenet (natural, sudah lama stabil)
+  // Tier 1 — Wavenet (natural, stabil & memiliki kuota gratis 1M karakter/bulan)
   [
     'id-ID-Wavenet-A',
     'id-ID-Wavenet-B',
     'id-ID-Wavenet-C',
     'id-ID-Wavenet-D',
   ],
-  // Tier 3 — Standard (paling robotik, tapi paling murah & hampir pasti tersedia)
+  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan)
   [
     'id-ID-Standard-A',
     'id-ID-Standard-B',
@@ -457,7 +414,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Semua tier GCP (Chirp3-HD -> Wavenet -> Standard) gagal.
+  // Semua tier GCP (Wavenet -> Standard) gagal.
   // Balas 502 supaya frontend (voiceService.ts) fallback ke Web Speech API browser.
   return res.status(502).json({
     error: 'TTS_FAILED',

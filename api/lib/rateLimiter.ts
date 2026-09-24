@@ -13,22 +13,29 @@ export function getRateLimitKey(ip: string, model: string): string {
     return `${ip}:${model}`;
 }
 
+export function getModelMaxRpm(model: string): number {
+    if (model.includes('gemma')) return 20; // Gemma has 30 RPM & 14.4K RPD in Google AI Studio
+    if (model.includes('flash-lite')) return 10; // Flash-Lite has 15 RPM & 500 RPD
+    return RATE_LIMIT_PER_MODEL; // Default 5 RPM
+}
+
 export function checkRateLimit(ip: string, model: string): { allowed: boolean; remaining: number } {
     const key = getRateLimitKey(ip, model);
     const now = Date.now();
     const record = rateLimitMap.get(key);
+    const maxRpm = getModelMaxRpm(model);
 
     if (!record || now > record.resetAt) {
         rateLimitMap.set(key, { count: 1, resetAt: now + RATE_WINDOW });
-        return { allowed: true, remaining: RATE_LIMIT_PER_MODEL - 1 };
+        return { allowed: true, remaining: maxRpm - 1 };
     }
 
-    if (record.count >= RATE_LIMIT_PER_MODEL) {
+    if (record.count >= maxRpm) {
         return { allowed: false, remaining: 0 };
     }
 
     record.count += 1;
-    return { allowed: true, remaining: RATE_LIMIT_PER_MODEL - record.count };
+    return { allowed: true, remaining: maxRpm - record.count };
 }
 
 export function cleanupOldRateLimits(): void {

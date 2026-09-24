@@ -31,14 +31,14 @@ import {
 } from './lib/semanticFaq.js';
 import {
     GEMINI_MODELS,
-    GCP_FALLBACK_MODELS,
     GEMMA_FALLBACK_MODELS,
     callGeminiModel,
     callGemmaModel,
 } from './lib/geminiModels.js';
 
+export const maxDuration = 30; // 30 detik batas waktu serverless Vercel untuk cascade fallback
+
 const AISTUDIO_API_KEY = process.env.GEMINI_API_KEY;
-const GCP_GEMINI_API_KEY = process.env.GOOGLE_CLOUD_GEMINI_API_KEY;
 
 // Cleanup berkala tanpa menahan proses Node.js
 if (typeof setInterval !== 'undefined') {
@@ -86,10 +86,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         const aiStudioKey = process.env.GEMINI_API_KEY || AISTUDIO_API_KEY;
-        const gcpKey = process.env.GOOGLE_CLOUD_GEMINI_API_KEY || GCP_GEMINI_API_KEY;
 
-        if (!aiStudioKey && !gcpKey) {
-            return res.status(503).json({ error: 'AI_UNAVAILABLE', detail: 'No API keys configured on Vercel Environment Variables' });
+        if (!aiStudioKey) {
+            return res.status(503).json({
+                error: 'AI_UNAVAILABLE',
+                detail: 'GEMINI_API_KEY belum dikonfigurasi di Vercel Environment Variables',
+            });
         }
 
         let body = req.body;
@@ -186,13 +188,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const contents = [...sanitizedHistory, { role: 'user', parts: userParts }];
 
-        const requestedModelIsValid = GEMINI_MODELS.some((m) => m.name === requestedModel);
-        const orderedGeminiModels = requestedModelIsValid
+        const requestedIsGemma = GEMMA_FALLBACK_MODELS.some((m) => m.name === requestedModel);
+        const requestedIsGemini = GEMINI_MODELS.some((m) => m.name === requestedModel);
+
+        const orderedGeminiModels = requestedIsGemini
             ? [
                 GEMINI_MODELS.find((m) => m.name === requestedModel)!,
                 ...GEMINI_MODELS.filter((m) => m.name !== requestedModel),
             ]
             : [...GEMINI_MODELS];
+
+        const orderedGemmaModels = requestedIsGemma
+            ? [
+                GEMMA_FALLBACK_MODELS.find((m) => m.name === requestedModel)!,
+                ...GEMMA_FALLBACK_MODELS.filter((m) => m.name !== requestedModel),
+            ]
+            : [...GEMMA_FALLBACK_MODELS];
 
         const isSummaryRequested =
             /\b(rangkum(an)?|resume|ringkas(an)?|export|unduh|download|file|dokumen)\b.{0,30}\b(obrolan|chat|diskusi|percakapan|proyek|project|rab|pembahasan)\b/i.test(sanitizedMessage) ||
@@ -441,6 +452,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
+        // SPECIAL LAYER: If user specifically requested a Gemma model, run Gemma FIRST!
+        if (aiStudioKey && requestedIsGemma) {
+            console.log(`[chat.ts] User explicitly requested Gemma model: ${requestedModel}`);
+            for (const modelConfig of orderedGemmaModels) {
+                const result = await callGemmaModel(aiStudioKey, modelConfig.name, contents, ip, systemInstruction);
+                if (result) {
+                    return sendResponse(result);
+                }
+            }
+            console.log('[chat.ts] Requested Gemma models failed, falling back to Gemini cascade...');
+        }
+
         // LAYER 2: Gemini model cascade (AI Studio key)
         if (aiStudioKey) {
             for (const modelConfig of orderedGeminiModels) {
@@ -449,7 +472,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     modelConfig.name,
                     contents,
                     ip,
-                    'aistudio',
                     systemInstruction
                 );
                 if (result) {
@@ -458,28 +480,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
-        // LAYER 3: GCP fallback
-        if (gcpKey) {
-            console.log('[chat.ts] 🔄 Using GCP API key as fallback...');
-            for (const modelConfig of GCP_FALLBACK_MODELS) {
-                const result = await callGeminiModel(
-                    gcpKey,
-                    modelConfig.name,
-                    contents,
-                    ip,
-                    'gcp',
-                    systemInstruction
-                );
-                if (result) {
-                    return sendResponse(result);
-                }
-            }
-        }
-
-        // LAYER 3.5: Gemma fallback
-        if (aiStudioKey) {
-            console.log('[chat.ts] 🔄 Trying Gemma models fallback...');
-            for (const modelConfig of GEMMA_FALLBACK_MODELS) {
+        // LAYER 3: Gemma fallback (AI Studio key - 14.4K RPD)
+        if (aiStudioKey && !requestedIsGemma) {
+            console.log('[chat.ts] 🔄 Trying Gemma models fallback (14.4K RPD)...');
+            for (const modelConfig of orderedGemmaModels) {
                 const result = await callGemmaModel(aiStudioKey, modelConfig.name, contents, ip, systemInstruction);
                 if (result) {
                     return sendResponse(result);

@@ -2,37 +2,57 @@ import { checkRateLimit } from './rateLimiter.js';
 
 export const GEMINI_MODELS = [
     { name: 'gemini-3.8-flash', priority: 1 },
-    { name: 'gemini-3.7-flash', priority: 2 },
-    { name: 'gemini-3.5-flash-lite', priority: 3 },
-    { name: 'gemini-3.6-flash', priority: 4 },
-    { name: 'gemini-3.5-flash', priority: 5 },
-    { name: 'gemini-3.1-flash-lite', priority: 6 },
-] as const;
-
-export const GCP_FALLBACK_MODELS = [
-    { name: 'gemini-3.8-flash', priority: 1 },
-    { name: 'gemini-3.7-flash', priority: 2 },
-    { name: 'gemini-3.5-flash', priority: 3 },
+    { name: 'gemini-3.5-flash-lite', priority: 2 }, // 500 RPD, 15 RPM
+    { name: 'gemini-3.7-flash', priority: 3 },
+    { name: 'gemini-3.1-flash-lite', priority: 4 }, // 500 RPD, 15 RPM
+    { name: 'gemini-3.6-flash', priority: 5 },
+    { name: 'gemini-3.5-flash', priority: 6 },
 ] as const;
 
 export const GEMMA_FALLBACK_MODELS = [
-    { name: 'gemma-4-26b-a4b-it' },
-    { name: 'gemma-4-31b-it' },
+    { name: 'gemma-4-31b-it', priority: 1 },    // 14.400 RPD, 30 RPM
+    { name: 'gemma-4-26b-a4b-it', priority: 2 }, // 14.400 RPD, 30 RPM
 ] as const;
 
 export type GeminiModelName = (typeof GEMINI_MODELS)[number]['name'];
+export type GemmaModelName = (typeof GEMMA_FALLBACK_MODELS)[number]['name'];
+
+// In-memory cooldown tracker to immediately bypass models experiencing 429 quota exhaustion or 503 high demand spikes
+const modelCooldownMap = new Map<string, number>();
+
+export function isModelInCooldown(modelName: string): boolean {
+    const expiresAt = modelCooldownMap.get(modelName);
+    if (!expiresAt) return false;
+    if (Date.now() > expiresAt) {
+        modelCooldownMap.delete(modelName);
+        return false;
+    }
+    return true;
+}
+
+export function setModelCooldown(modelName: string, durationMs = 3 * 60 * 1000): void {
+    modelCooldownMap.set(modelName, Date.now() + durationMs);
+}
+
+export function clearModelCooldown(modelName: string): void {
+    modelCooldownMap.delete(modelName);
+}
 
 export async function callGeminiModel(
     apiKey: string,
     modelName: string,
     contents: Array<{ role: string; parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }> }>,
     ip: string,
-    apiSource: 'aistudio' | 'gcp',
     systemInstruction: string
-): Promise<{ reply: string; model: string; remainingQuota: number; apiSource: 'aistudio' | 'gcp' } | null> {
-    const rateLimitStatus = checkRateLimit(ip, `${apiSource}:${modelName}`);
+): Promise<{ reply: string; model: string; remainingQuota: number; apiSource: 'aistudio' } | null> {
+    if (isModelInCooldown(modelName)) {
+        console.log(`[geminiModels] [aistudio] Model ${modelName} is in temporary cooldown (quota/spike), bypassing...`);
+        return null;
+    }
+
+    const rateLimitStatus = checkRateLimit(ip, `aistudio:${modelName}`);
     if (!rateLimitStatus.allowed) {
-        console.log(`[geminiModels] [${apiSource}] Model ${modelName} rate limited locally, skipping...`);
+        console.log(`[geminiModels] [aistudio] Model ${modelName} rate limited locally, skipping...`);
         return null;
     }
 
@@ -40,7 +60,7 @@ export async function callGeminiModel(
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
 
         const response = await fetch(`${endpoint}?key=${apiKey}`, {
             method: 'POST',
@@ -66,7 +86,13 @@ export async function callGeminiModel(
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
             if (response.status === 429) {
-                console.log(`[geminiModels] [${apiSource}] Model ${modelName} hit Google rate limit, trying next...`);
+                console.log(`[geminiModels] [aistudio] Model ${modelName} hit Google rate limit / quota (429), setting 3m cooldown...`);
+                setModelCooldown(modelName, 3 * 60 * 1000);
+                return null;
+            }
+            if (response.status === 503) {
+                console.log(`[geminiModels] [aistudio] Model ${modelName} high demand spike (503), setting 2m cooldown...`);
+                setModelCooldown(modelName, 2 * 60 * 1000);
                 return null;
             }
             throw new Error(err.error?.message || `HTTP ${response.status}`);
@@ -79,15 +105,17 @@ export async function callGeminiModel(
             throw new Error('Empty response from Gemini');
         }
 
+        clearModelCooldown(modelName);
+
         return {
             reply: reply.trim(),
             model: modelName,
             remainingQuota: rateLimitStatus.remaining,
-            apiSource,
+            apiSource: 'aistudio',
         };
     } catch (error: unknown) {
         const isTimeout = error instanceof Error && error.name === 'AbortError';
-        console.error(`[geminiModels] [${apiSource}] Error with model ${modelName}:`, isTimeout ? 'timeout' : error);
+        console.error(`[geminiModels] [aistudio] Error with model ${modelName}:`, isTimeout ? 'timeout' : error);
         return null;
     }
 }
@@ -99,6 +127,11 @@ export async function callGemmaModel(
     ip: string,
     systemInstruction: string
 ): Promise<{ reply: string; model: string; remainingQuota: number; apiSource: 'aistudio' } | null> {
+    if (isModelInCooldown(modelName)) {
+        console.log(`[geminiModels] [gemma] Model ${modelName} is in temporary cooldown, bypassing...`);
+        return null;
+    }
+
     const rateLimitStatus = checkRateLimit(ip, `gemma:${modelName}`);
     if (!rateLimitStatus.allowed) {
         console.log(`[geminiModels] [gemma] Model ${modelName} rate limited locally, skipping...`);
@@ -106,15 +139,25 @@ export async function callGemmaModel(
     }
 
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent`;
+
+    // Gemma open-weight models only accept text parts (strip inlineData/multimodal if present)
+    const sanitizedContents = contents.map((turn) => {
+        const textParts = turn.parts.filter((p) => typeof p.text === 'string' && p.text.length > 0);
+        return {
+            role: turn.role,
+            parts: textParts.length > 0 ? textParts : [{ text: '(Lampiran berkas)' }],
+        };
+    });
+
     const contentsWithSystem = [
         { role: 'user', parts: [{ text: `[INSTRUKSI SISTEM — ikuti ini sepanjang percakapan, jangan pernah disebut literal ke user]\n${systemInstruction}` }] },
         { role: 'model', parts: [{ text: 'Baik, saya akan ikuti instruksi itu sepanjang percakapan.' }] },
-        ...contents,
+        ...sanitizedContents,
     ];
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const timeoutId = setTimeout(() => controller.abort(), 7000);
 
         const response = await fetch(`${endpoint}?key=${apiKey}`, {
             method: 'POST',
@@ -138,7 +181,13 @@ export async function callGemmaModel(
 
         if (!response.ok) {
             if (response.status === 429) {
-                console.log(`[geminiModels] [gemma] Model ${modelName} hit Google rate limit, trying next...`);
+                console.log(`[geminiModels] [gemma] Model ${modelName} hit Google rate limit (429), setting 1m cooldown...`);
+                setModelCooldown(modelName, 60 * 1000);
+                return null;
+            }
+            if (response.status === 503) {
+                console.log(`[geminiModels] [gemma] Model ${modelName} high demand spike (503), setting 1m cooldown...`);
+                setModelCooldown(modelName, 60 * 1000);
                 return null;
             }
             const err = await response.json().catch(() => ({}));
@@ -148,6 +197,8 @@ export async function callGemmaModel(
         const data = await response.json();
         const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!reply) throw new Error('Empty response from Gemma');
+
+        clearModelCooldown(modelName);
 
         return {
             reply: reply.trim(),
