@@ -16,7 +16,7 @@ export const GCP_FALLBACK_MODELS = [
 ] as const;
 
 export const GEMMA_FALLBACK_MODELS = [
-    { name: 'gemma-4-26b-it' },
+    { name: 'gemma-4-26b-a4b-it' },
     { name: 'gemma-4-31b-it' },
 ] as const;
 
