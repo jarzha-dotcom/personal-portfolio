@@ -10,8 +10,8 @@ export const GEMINI_MODELS = [
 ] as const;
 
 export const GEMMA_FALLBACK_MODELS = [
-    { name: 'gemma-4-31b-it', priority: 1 },    // 14.400 RPD, 30 RPM
-    { name: 'gemma-4-26b-a4b-it', priority: 2 }, // 14.400 RPD, 30 RPM
+    { name: 'gemma-4-26b-a4b-it', priority: 1 }, // Active 4B MoE architecture: respons jauh lebih cepat & stabil (14.400 RPD)
+    { name: 'gemma-4-31b-it', priority: 2 },     // Dense 31B parameters (14.400 RPD)
 ] as const;
 
 export type GeminiModelName = (typeof GEMINI_MODELS)[number]['name'];
@@ -60,7 +60,7 @@ export async function callGeminiModel(
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const timeoutId = setTimeout(() => controller.abort(), 12000); // 12 detik toleransi untuk Gemini
 
         const response = await fetch(`${endpoint}?key=${apiKey}`, {
             method: 'POST',
@@ -149,25 +149,21 @@ export async function callGemmaModel(
         };
     });
 
-    const contentsWithSystem = [
-        { role: 'user', parts: [{ text: `[INSTRUKSI SISTEM — ikuti ini sepanjang percakapan, jangan pernah disebut literal ke user]\n${systemInstruction}` }] },
-        { role: 'model', parts: [{ text: 'Baik, saya akan ikuti instruksi itu sepanjang percakapan.' }] },
-        ...sanitizedContents,
-    ];
-
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        // Gemma 4 melakukan internal reasoning (thoughts) sebelum jawaban akhir, butuh toleransi waktu ~20-22s
+        const timeoutId = setTimeout(() => controller.abort(), 22000);
 
         const response = await fetch(`${endpoint}?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             signal: controller.signal,
             body: JSON.stringify({
-                contents: contentsWithSystem,
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                contents: sanitizedContents,
                 generationConfig: {
                     temperature: 0.85,
-                    maxOutputTokens: 2048,
+                    maxOutputTokens: 1024,
                     topP: 0.9,
                 },
                 safetySettings: [
@@ -190,12 +186,20 @@ export async function callGemmaModel(
                 setModelCooldown(modelName, 60 * 1000);
                 return null;
             }
+            if (response.status === 500) {
+                console.log(`[geminiModels] [gemma] Model ${modelName} Google internal error (500), setting 1m cooldown...`);
+                setModelCooldown(modelName, 60 * 1000);
+                return null;
+            }
             const err = await response.json().catch(() => ({}));
             throw new Error(err.error?.message || `HTTP ${response.status}`);
         }
 
         const data = await response.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        // Filter out internal thoughts part ({ thought: true }), ambil jawaban utama final
+        const answerPart = parts.find((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim().length > 0) || parts[parts.length - 1];
+        const reply = answerPart?.text;
         if (!reply) throw new Error('Empty response from Gemma');
 
         clearModelCooldown(modelName);

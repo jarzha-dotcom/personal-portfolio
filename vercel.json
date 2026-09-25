@@ -31,6 +31,14 @@
       ]
     }
   ],
+  "functions": {
+    "api/chat.ts": {
+      "maxDuration": 60
+    },
+    "api/tts.ts": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/((?!assets/|icons/|sw\\.js|manifest\\.json|offline\\.html).*)",
