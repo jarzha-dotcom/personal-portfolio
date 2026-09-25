@@ -5,6 +5,7 @@ import { About } from './components/About';
 import { Projects } from './components/Projects';
 import { Services } from './components/Services';
 import { Skills } from './components/Skills';
+import { ArticlesPreview } from './components/ArticlesPreview';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
@@ -354,6 +355,9 @@ function MainPortfolio() {
                 </Reveal>
                 <Reveal>
                   <Skills darkMode={darkMode} />
+                </Reveal>
+                <Reveal>
+                  <ArticlesPreview darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
                   <Contact darkMode={darkMode} />

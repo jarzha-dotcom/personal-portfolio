@@ -9,6 +9,7 @@ import { formatIDDate, toISODate } from '../utils/formatDate';
 import { ReadingProgress } from '../components/ReadingProgress';
 import { ShareButtons } from '../components/ShareButtons';
 import { AuthorCard } from '../components/AuthorCard';
+import { ArticleIllustration, hasArticleImages } from '../components/ArticleIllustration';
 
 interface ArticlePageProps {
   darkMode: boolean;
@@ -95,6 +96,12 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
   const { prev, next } = getAdjacentArticles(article.slug);
   const articleUrl = `${CANONICAL_BASE}${articleRoute(article.slug)}`;
 
+  // Sisipkan gambar "middle" persis di tengah body artikel (hanya untuk slug
+  // yang memang punya foto custom, biar artikel tanpa foto tidak dipaksa
+  // menampilkan kotak ikon di tengah teks).
+  const showMiddleImage = hasArticleImages(article.slug) && article.body.length > 1;
+  const middleImageIndex = Math.ceil(article.body.length / 2);
+
   const navCardClass = (align: 'left' | 'right') =>
     `group flex-1 rounded-xl border p-4 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
       align === 'right' ? 'text-right' : 'text-left'
@@ -126,6 +133,15 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
             Semua artikel
           </a>
+
+          {/* Ilustrasi hero */}
+          <ArticleIllustration
+            slug={article.slug}
+            category={article.category}
+            darkMode={darkMode}
+            size="hero"
+            className="mb-8"
+          />
 
           {/* Meta bar — kategori, tanggal, read time */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-4 text-xs">
@@ -206,7 +222,19 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
             {article.body.map((block, i) => {
               const isFirstBlock = i === 0;
               return (
-                <div key={i} className="space-y-3">
+                <React.Fragment key={i}>
+                  {showMiddleImage && i === middleImageIndex && (
+                    <figure className="not-prose py-2">
+                      <ArticleIllustration
+                        slug={article.slug}
+                        category={article.category}
+                        darkMode={darkMode}
+                        size="middle"
+                        position="middle"
+                      />
+                    </figure>
+                  )}
+                  <div className="space-y-3">
                   {block.heading && (
                     <h2
                       className={`text-xl sm:text-2xl font-bold mt-10 first:mt-0 ${
@@ -233,7 +261,8 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
                       </p>
                     );
                   })}
-                </div>
+                  </div>
+                </React.Fragment>
               );
             })}
           </div>

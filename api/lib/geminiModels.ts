@@ -198,14 +198,27 @@ export async function callGemmaModel(
         const data = await response.json();
         const parts = data.candidates?.[0]?.content?.parts || [];
         // Filter out internal thoughts part ({ thought: true }), ambil jawaban utama final
-        const answerPart = parts.find((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim().length > 0) || parts[parts.length - 1];
-        const reply = answerPart?.text;
-        if (!reply) throw new Error('Empty response from Gemma');
+        const nonThoughtPart = parts.find((p: any) => !p.thought && typeof p.text === 'string' && p.text.trim().length > 0);
+        let rawReply = nonThoughtPart?.text;
+
+        // Fallback jika tidak ada part terpisah, ambil part terakhir
+        if (!rawReply && parts.length > 0 && typeof parts[parts.length - 1]?.text === 'string') {
+            rawReply = parts[parts.length - 1].text;
+        }
+
+        if (!rawReply) throw new Error('Empty response from Gemma');
+
+        // Bersihkan channel thought token jika tersisa
+        const cleanReply = rawReply
+            .replace(/<\|channel\>thought[\s\S]*?<channel\|>/gi, '')
+            .trim();
+
+        if (!cleanReply) throw new Error('Gemma response only contained internal thought trace');
 
         clearModelCooldown(modelName);
 
         return {
-            reply: reply.trim(),
+            reply: cleanReply,
             model: modelName,
             remainingQuota: rateLimitStatus.remaining,
             apiSource: 'aistudio',

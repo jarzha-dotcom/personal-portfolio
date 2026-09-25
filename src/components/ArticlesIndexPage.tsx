@@ -5,6 +5,7 @@ import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { ROUTES, articleRoute } from '../routes';
 import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
 import { formatIDDate, toISODate } from '../utils/formatDate';
+import { ArticleIllustration } from '../components/ArticleIllustration';
 
 interface ArticlesIndexPageProps {
   darkMode: boolean;
@@ -318,127 +319,236 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
             </button>
           </div>
         ) : (
-          <div className="space-y-5">
-            {filtered.map((article, index) => {
-              const isLatest = article.slug === latestArticle?.slug && !hasActiveFilters;
-              return (
-                <a
-                  key={article.slug}
-                  href={articleRoute(article.slug)}
-                  onClick={(e) => goToArticle(e, article.slug)}
-                  style={{ animationDelay: `${index * 80}ms` }}
-                  className={`group relative block rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${FOCUS_RING} ${
-                    darkMode
-                      ? 'bg-slate-900/60 border-slate-800 hover:border-teal-500/50 hover:shadow-xl hover:shadow-teal-500/5'
-                      : 'bg-white border-slate-200 shadow-sm hover:border-teal-400 hover:shadow-xl hover:shadow-teal-500/10'
-                  } animate-[fadeInUp_0.5s_ease-out_both]`}
-                >
-                  {/* Gradient accent bar (left) */}
+          <div className="space-y-8">
+            {/* Featured card — artikel terbaru tampil besar dengan gambar penuh di atas */}
+            {!hasActiveFilters && latestArticle && (
+              <a
+                href={articleRoute(latestArticle.slug)}
+                onClick={(e) => goToArticle(e, latestArticle.slug)}
+                className={`group relative block rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${FOCUS_RING} ${
+                  darkMode
+                    ? 'bg-slate-900/60 border-slate-800 hover:border-teal-500/50 hover:shadow-xl hover:shadow-teal-500/5'
+                    : 'bg-white border-slate-200 shadow-sm hover:border-teal-400 hover:shadow-xl hover:shadow-teal-500/10'
+                } animate-[fadeInUp_0.5s_ease-out_both]`}
+              >
+                <div className="relative">
+                  <ArticleIllustration
+                    slug={latestArticle.slug}
+                    category={latestArticle.category}
+                    darkMode={darkMode}
+                    size="hero"
+                    position="top"
+                    edgeToEdge
+                    className={`border-b ${darkMode ? 'border-slate-800' : 'border-slate-200'}`}
+                  />
+                  {/* Badge terbaru di atas gambar */}
                   <div
                     aria-hidden="true"
-                    className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b transition-opacity duration-300 ${
-                      isLatest
-                        ? 'from-amber-400 to-orange-500 opacity-100'
-                        : darkMode
-                        ? 'from-teal-400 to-teal-600 opacity-0 group-hover:opacity-100'
-                        : 'from-teal-500 to-teal-700 opacity-0 group-hover:opacity-100'
+                    className={`absolute top-4 left-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider shadow-lg ${
+                      darkMode
+                        ? 'bg-slate-950/80 backdrop-blur text-amber-300 border border-amber-500/30'
+                        : 'bg-white/90 backdrop-blur text-amber-700 border border-amber-200'
                     }`}
-                  />
+                  >
+                    ✨ Terbaru
+                  </div>
+                </div>
 
-                  {/* Latest article badge */}
-                  {isLatest && (
-                    <div
-                      aria-hidden="true"
-                      className={`absolute top-0 right-0 px-3 py-1.5 rounded-bl-xl text-[10px] font-bold uppercase tracking-wider ${
+                <div className="p-5 sm:p-7">
+                  {/* Meta row */}
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-3 text-xs">
+                    <span
+                      className={`inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
                         darkMode
-                          ? 'bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-300 border-l border-b border-amber-500/30'
-                          : 'bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 border-l border-b border-amber-200'
+                          ? 'text-teal-300 bg-teal-500/10 border border-teal-500/20'
+                          : 'text-teal-700 bg-teal-50 border border-teal-200'
                       }`}
                     >
-                      ✨ Terbaru
-                    </div>
-                  )}
+                      <Sparkles className="w-3 h-3" aria-hidden="true" />
+                      {latestArticle.category}
+                    </span>
 
-                  <div className={`relative p-5 sm:p-6 ${isLatest ? 'pt-10 sm:pt-11' : ''}`}>
-                    {/* Meta row */}
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-3 text-xs">
-                      <span
-                        className={`inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
-                          darkMode
-                            ? 'text-teal-300 bg-teal-500/10 border border-teal-500/20'
-                            : 'text-teal-700 bg-teal-50 border border-teal-200'
-                        }`}
-                      >
-                        <Sparkles className="w-3 h-3" aria-hidden="true" />
-                        {article.category}
-                      </span>
+                    {latestArticle.publishedAt && (
+                      <>
+                        <span
+                          className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}
+                          aria-hidden="true"
+                        />
+                        <time
+                          dateTime={toISODate(latestArticle.publishedAt)}
+                          className={`inline-flex items-center gap-1 ${
+                            darkMode ? 'text-slate-400' : 'text-slate-500'
+                          }`}
+                        >
+                          <Calendar className="w-3 h-3" aria-hidden="true" />
+                          {formatIDDate(latestArticle.publishedAt)}
+                        </time>
+                      </>
+                    )}
 
-                      {article.publishedAt && (
-                        <>
+                    <span
+                      className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}
+                      aria-hidden="true"
+                    />
+                    <span
+                      className={`inline-flex items-center gap-1 ${
+                        darkMode ? 'text-slate-500' : 'text-slate-400'
+                      }`}
+                    >
+                      <Clock className="w-3 h-3" aria-hidden="true" />
+                      {latestArticle.readMinutes} menit baca
+                    </span>
+                  </div>
+
+                  {/* Title */}
+                  <h2
+                    className={`text-xl sm:text-2xl font-bold mb-2 leading-snug transition-colors group-hover:text-teal-500 ${
+                      darkMode ? 'text-white' : 'text-slate-900'
+                    }`}
+                  >
+                    {latestArticle.title}
+                  </h2>
+
+                  {/* Excerpt */}
+                  <p
+                    className={`text-sm sm:text-base leading-relaxed mb-4 ${
+                      darkMode ? 'text-slate-300' : 'text-slate-600'
+                    }`}
+                  >
+                    {latestArticle.excerpt}
+                  </p>
+
+                  {/* Read more CTA */}
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
+                      darkMode ? 'text-teal-400' : 'text-teal-600'
+                    }`}
+                  >
+                    Baca selengkapnya
+                    <ArrowRight
+                      className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                      aria-hidden="true"
+                    />
+                  </span>
+                </div>
+              </a>
+            )}
+
+            {/* Daftar artikel lainnya — thumbnail landscape di kiri, proporsional dengan rasio foto asli */}
+            <div className="space-y-5">
+              {filtered
+                .filter((article) => hasActiveFilters || article.slug !== latestArticle?.slug)
+                .map((article, index) => (
+                  <a
+                    key={article.slug}
+                    href={articleRoute(article.slug)}
+                    onClick={(e) => goToArticle(e, article.slug)}
+                    style={{ animationDelay: `${index * 80}ms` }}
+                    className={`group relative block rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1 ${FOCUS_RING} ${
+                      darkMode
+                        ? 'bg-slate-900/60 border-slate-800 hover:border-teal-500/50 hover:shadow-xl hover:shadow-teal-500/5'
+                        : 'bg-white border-slate-200 shadow-sm hover:border-teal-400 hover:shadow-xl hover:shadow-teal-500/10'
+                    } animate-[fadeInUp_0.5s_ease-out_both]`}
+                  >
+                    {/* Gradient accent bar (left), muncul saat hover */}
+                    <div
+                      aria-hidden="true"
+                      className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                        darkMode ? 'from-teal-400 to-teal-600' : 'from-teal-500 to-teal-700'
+                      }`}
+                    />
+
+                    <div className="flex flex-col sm:flex-row">
+                      <ArticleIllustration
+                        slug={article.slug}
+                        category={article.category}
+                        darkMode={darkMode}
+                        size="middle"
+                        position="top"
+                        edgeToEdge
+                        className="sm:w-56 md:w-64 shrink-0"
+                      />
+                      <div className="min-w-0 flex-1 p-5 sm:p-6">
+                        {/* Meta row */}
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-3 text-xs">
+                          <span
+                            className={`inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+                              darkMode
+                                ? 'text-teal-300 bg-teal-500/10 border border-teal-500/20'
+                                : 'text-teal-700 bg-teal-50 border border-teal-200'
+                            }`}
+                          >
+                            <Sparkles className="w-3 h-3" aria-hidden="true" />
+                            {article.category}
+                          </span>
+
+                          {article.publishedAt && (
+                            <>
+                              <span
+                                className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}
+                                aria-hidden="true"
+                              />
+                              <time
+                                dateTime={toISODate(article.publishedAt)}
+                                className={`inline-flex items-center gap-1 ${
+                                  darkMode ? 'text-slate-400' : 'text-slate-500'
+                                }`}
+                              >
+                                <Calendar className="w-3 h-3" aria-hidden="true" />
+                                {formatIDDate(article.publishedAt)}
+                              </time>
+                            </>
+                          )}
+
                           <span
                             className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}
                             aria-hidden="true"
                           />
-                          <time
-                            dateTime={toISODate(article.publishedAt)}
+                          <span
                             className={`inline-flex items-center gap-1 ${
-                              darkMode ? 'text-slate-400' : 'text-slate-500'
+                              darkMode ? 'text-slate-500' : 'text-slate-400'
                             }`}
                           >
-                            <Calendar className="w-3 h-3" aria-hidden="true" />
-                            {formatIDDate(article.publishedAt)}
-                          </time>
-                        </>
-                      )}
+                            <Clock className="w-3 h-3" aria-hidden="true" />
+                            {article.readMinutes} menit baca
+                          </span>
+                        </div>
 
-                      <span
-                        className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`}
-                        aria-hidden="true"
-                      />
-                      <span
-                        className={`inline-flex items-center gap-1 ${
-                          darkMode ? 'text-slate-500' : 'text-slate-400'
-                        }`}
-                      >
-                        <Clock className="w-3 h-3" aria-hidden="true" />
-                        {article.readMinutes} menit baca
-                      </span>
+                        {/* Title */}
+                        <h2
+                          className={`text-lg sm:text-xl font-bold mb-2 leading-snug transition-colors group-hover:text-teal-500 ${
+                            darkMode ? 'text-white' : 'text-slate-900'
+                          }`}
+                        >
+                          {article.title}
+                        </h2>
+
+                        {/* Excerpt */}
+                        <p
+                          className={`text-sm sm:text-[15px] leading-relaxed mb-4 ${
+                            darkMode ? 'text-slate-300' : 'text-slate-600'
+                          }`}
+                        >
+                          {article.excerpt}
+                        </p>
+
+                        {/* Read more CTA */}
+                        <span
+                          className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
+                            darkMode ? 'text-teal-400' : 'text-teal-600'
+                          }`}
+                        >
+                          Baca selengkapnya
+                          <ArrowRight
+                            className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
+                            aria-hidden="true"
+                          />
+                        </span>
+                      </div>
                     </div>
-
-                    {/* Title */}
-                    <h2
-                      className={`text-lg sm:text-xl font-bold mb-2 leading-snug transition-colors group-hover:text-teal-500 ${
-                        darkMode ? 'text-white' : 'text-slate-900'
-                      }`}
-                    >
-                      {article.title}
-                    </h2>
-
-                    {/* Excerpt */}
-                    <p
-                      className={`text-sm sm:text-[15px] leading-relaxed mb-4 ${
-                        darkMode ? 'text-slate-300' : 'text-slate-600'
-                      }`}
-                    >
-                      {article.excerpt}
-                    </p>
-
-                    {/* Read more CTA */}
-                    <span
-                      className={`inline-flex items-center gap-1.5 text-sm font-semibold ${
-                        darkMode ? 'text-teal-400' : 'text-teal-600'
-                      }`}
-                    >
-                      Baca selengkapnya
-                      <ArrowRight
-                        className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1"
-                        aria-hidden="true"
-                      />
-                    </span>
-                  </div>
-                </a>
-              );
-            })}
+                  </a>
+                ))}
+            </div>
           </div>
         )}
       </div>

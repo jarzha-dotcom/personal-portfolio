@@ -1,164 +1,141 @@
 # 🏢 Assets DEMO — Sistem Manajemen & Inventaris Aset Modern
 
-> **Solusi All-in-One Cerdas untuk Pelacakan, Penilaian Depresiasi Otomatis, dan Tata Kelola Aset Perusahaan.**  
-> *Dapat diakses langsung melalui Web (PWA), Android, dan iOS tanpa beban biaya server terpisah.*
+> **Solusi Pintar Pengelolaan, Pelacakan Fisik, dan Penilaian Depresiasi Aset Perusahaan dalam Satu Sentuhan.**  
+> *Dapat diakses instan melalui Web Browser (Laptop/PC), Tablet, serta Smartphone Android & iOS tanpa biaya sewa server bulanan.*
 
 ---
 
-## 🌟 Ringkasan Eksekutif (Executive Summary)
+## 🌟 Sekilas Produk (Product Overview)
 
-**Assets DEMO** adalah platform manajemen inventaris dan aset modern yang dirancang untuk mempermudah perusahaan memantau siklus hidup seluruh aset fisik maupun inventaris kantor secara transparan, akurat, dan terstruktur.
+**Assets DEMO** adalah sistem aplikasi manajemen inventaris dan aset fisik modern yang dirancang untuk membantu perusahaan beralih dari pencatatan manual yang lambat dan berisiko menjadi sistem digital terintegrasi yang akurat, otomatis, dan transparan.
 
-Dibangun khusus untuk menjawab tantangan audit dan pencatatan aset fisik di **PT Global Multiparts** yang tersebar di berbagai unit/cabang. Sistem ini mendigitalisasi pelacakan kondisi barang, penempelan label QR/barcode, pencatatan mutasi antar lokasi dengan audit log lengkap, hingga ekspor laporan otomatis format Excel/PDF untuk kebutuhan audit berkala. Versi publik yang dapat dicoba adalah **"Assets Demo"** dengan data simulasi demi menjaga kerahasiaan data internal klien.
+Seringkali perusahaan menghadapi kendala seperti:
+- Aset fisik tersebar di berbagai ruangan atau kantor cabang tanpa pelacakan yang jelas.
+- Nilai buku dan penyusutan aset (*depreciation*) harus dihitung manual dengan rumus spreadsheet yang rawan salah.
+- Jadwal servis rutin kendaraan atau garansi alat kantor terlewat hingga menimbulkan biaya perbaikan membengkak.
+- Lembar audit manual memakan waktu berhari-hari dan rawan kehilangan riwayat penanggung jawab barang.
 
-Dengan mengintegrasikan teknologi **Multi-Platform (Mobile & Web)** serta sistem **Serverless Berbiaya Nol**, aplikasi ini memungkinkan tim lapangan hingga jajaran manajemen melakukan pelacakan lokasi aset, pengecekan riwayat mutasi, pencatatan servis berkala, kalkulasi nilai buku aset (penyusutan finansial), hingga ekspor laporan resmi hanya dalam hitungan detik.
-
-### 🌐 Akses & Pratinjau Demo
-* **Tautan Aplikasi:** [https://assets.arzhaning.my.id/](https://assets.arzhaning.my.id/)
-* **Kategori Platform:** Progressive Web App (PWA), Android Native, & iOS Ready
-* **Pengembang:** Arzhaning *(admin@arzhaning.my.id)*
-
-### 🛡️ Status Deployment & Perlindungan Data Klien
-Sistem asli telah di-deploy dan aktif digunakan untuk operasional internal **PT Global Multiparts**. Demi mematuhi standar privasi data korporat, akses demo publik yang disediakan (**Assets Demo**) menggunakan data simulasi aman (*dummy data*).
+**Assets DEMO** hadir menjawab seluruh tantangan tersebut. Dengan memadukan teknologi kamera pemindai label pintar, pencatatan otomatis di awan (*cloud*), hingga kalkulator depresiasi finansial otomatis, pengelolaan aset perusahaan kini dapat dilakukan semudah mengoperasikan ponsel cerdas.
 
 ---
 
-## 🚀 Fitur Unggulan (Core Features)
+## 🚀 Tautan Akses & Akun Uji Coba (Live Demo)
 
-Aplikasi ini dilengkapi dengan fitur komprehensif yang dirancang khusus untuk memenuhi kebutuhan operasional harian perusahaan:
+Aplikasi telah siap digunakan secara publik untuk simulasi operasional:
 
-### 1. 📊 Dashboard Eksekutif & Statistik Finansial
-* **Ringkasan Real-Time:** Menampilkan total kuantitas aset, estimasi nilai perolehan awal, hingga total nilai buku terkini (*current book value*).
-* **Monitoring Status Aset:** Visualisasi persentase aset yang berstatus **Aktif**, dalam masa **Maintenance/Servis**, maupun aset yang telah **Dihapusbukukan (Disposed)**.
-* **Analisis Umur Manfaat:** Memantau sisa umur ekonomis aset secara visual untuk membantu perencanaan anggaran peremajaan barang.
+* 🌐 **Tautan Aplikasi Web:** [https://assets.byarzhaning.online/](https://assets.byarzhaning.online/)
+* 📱 **Kemudahan Akses:** Dapat dibuka langsung di Google Chrome / Safari, atau di-install menjadi aplikasi mandiri (*Add to Home Screen*) di Android & iPhone.
 
-### 2. 🏷️ Katalog & Pencarian Aset Kilat
-* **Pencarian Cerdas:** Temukan aset berdasarkan nama, ID, kategori, penanggung jawab, maupun lokasi penempatan secara instan.
-* **Filter Dinamis:** Pengelompokan data berdasarkan kategori dan status kondisi barang.
-* **Indikator Kesegaran Data:** Menampilkan penanda visual apakah data yang dilihat adalah data terkini dari cloud atau data memori lokal yang tersimpan.
-
-### 3. 📷 Pemindai QR Code & Barcode Terintegrasi
-* **Pindai Cepat di Lapangan:** Menggunakan kamera smartphone secara langsung untuk mendeteksi QR Code atau Barcode yang tertera pada label fisik aset.
-* **Akses Data Tanpa Mengetik:** Begitu label terpindai, sistem langsung membuka lembar rincian aset secara otomatis tanpa perlu pencarian manual.
-
-### 4. 📉 Perhitungan Penyusutan (Depresiasi) Otomatis
-* **Metode Garis Lurus (Straight-Line Depreciation):** Nilai buku aset menyusut secara presisi setiap bulan berdasarkan nilai awal, umur ekonomis, dan estimasi nilai residu.
-* **Kunci Nilai Otomatis:** Begitu status aset diubah menjadi *Disposed*, nilai buku otomatis terkunci ke nilai residu tanpa risiko kesalahan hitung manusiawi.
-* **Sinkronisasi Massal (Bulk Sync):** Admin dapat memperbarui dan mengunci nilai terkini seluruh aset ke basis data utama dalam satu kali klik.
-
-### 5. 📸 Dokumentasi Visual Multi-Foto Beresolusi Tinggi
-* **2 Slot Foto per Aset:** Mendokumentasikan kondisi fisik barang dari berbagai sudut (misal: tampak depan dan nomor seri barang).
-* **Kompresi Cerdas Otomatis:** Foto yang diambil langsung dari kamera atau galeri dikompresi secara cerdas sebelum diunggah, menghemat kuota internet dan mempercepat waktu tunggu tanpa mengurangi detail visual penting.
-
-### 6. 📝 Audit Trail & Riwayat Perubahan Transparan (Asset Logs)
-* **Pencatatan Setiap Perubahan:** Setiap ada pergantian status, perpindahan lokasi, atau penyerahan tanggung jawab ke pengguna baru, sistem mewajibkan pengisian **alasan perubahan**.
-* **Riwayat Akuntabel:** Siapa yang mengubah, kapan perubahan terjadi, serta nilai lama dan nilai baru tercatat rapi dan permanen untuk kebutuhan audit internal perusahaan.
-
-### 7. 📶 Keandalan Lapangan & Mode Offline (Offline Queue)
-* **Bekerja Tanpa Khawatir Sinyal Hilang:** Dirancang khusus untuk staf gudang atau tim lapangan yang sering berada di area minim sinyal.
-* **Antrian Otomatis:** Setiap perubahan data dan unggahan foto yang dilakukan saat offline akan disimpan dengan aman di perangkat, lalu disinkronisasikan otomatis begitu koneksi internet kembali pulih.
-* **Anti-Tindih Data (Conflict Prevention):** Sistem memiliki perlindungan dua lapis untuk memastikan data tidak saling menimpa secara diam-diam jika ada orang lain yang memperbarui aset yang sama.
-
-### 8. 📑 Ekspor Laporan Resmi (PDF & Excel) + Kirim Email
-* **Format Siap Cetak:** Hasilkan laporan daftar aset lengkap berformat **PDF** rapi berlogo perusahaan maupun format **Excel (.xlsx)** untuk olah data lanjutan.
-* **Kirim Otomatis ke Email:** File laporan dapat diunduh langsung ke gawai atau otomatis dikirimkan ke alamat email manajer/pimpinan yang telah terdaftar.
-
-### 9. ⏰ Jadwal Pengingat & Pemeliharaan (Reminders)
-* **Peringatan Berkala:** Catat tanggal jatuh tempo garansi, jadwal servis rutin alat berat/kendaraan, atau jadwal kalibrasi perangkat.
-* **Sistem Pengecekan Terjadwal:** Script cerdas memeriksa agenda pengingat setiap jam agar tidak ada pemeliharaan penting yang terlewat.
-
-### 10. 👥 Manajemen Pengguna & Keamanan Bertingkat (Role-Based Access)
-* **Tingkat Akses (Role):**
-  * **Admin:** Kendali penuh (tambah/edit aset, hapus, kelola pengguna, reset password, dan buat laporan).
-  * **User:** Mengakses katalog, melihat detail aset, memindai QR code, dan mengelola profil pribadi.
-* **Satu Sesi Aktif (Single Active Session):** Login di perangkat baru otomatis mengeluarkan akun dari perangkat lama demi mencegah akun dipakai bersamaan tanpa izin.
-* **Keamanan Sandi Terenkripsi:** Menggunakan enkripsi kata sandi bersalt modern yang aman dari peretasan.
-
-### 11. 🔔 Notifikasi Real-Time
-* Terintegrasi dengan layanan push notifikasi untuk mengirimkan pengumuman penting, status pengingat, dan konfirmasi laporan langsung ke layar pengguna.
-
-### 12. 🌓 Desain Antarmuka Elegan & Dark Mode Otomatis
-* Mengusung desain antarmuka modern dengan bilah navigasi fleksibel (*collapsible rail sidebar*) yang ramah pengguna di ponsel maupun layar laptop/desktop.
-* Dilengkapi tema **Gelap (Dark Mode)** dan **Terang (Light Mode)** yang otomatis menyesuaikan kenyamanan mata pengguna.
+### 🔑 Akun Uji Coba Bawaan:
+| Peran (Role) | Email Login | Kata Sandi | Hak Akses |
+| :--- | :--- | :--- | :--- |
+| **Administrator** | `admin@demo.com` | `123456` | Kendali penuh (Tambah/Edit aset, kelola user, ekspor laporan, hapus aset, dll.) |
+| **Staf Lapangan / User** | `staff@demo.com` | `123456` | Melihat katalog aset, scan label QR, cek riwayat dan profil pribadi |
 
 ---
 
-## 🔍 Kesiapan SEO & Aksesibilitas Web (PWA Ready)
+## 💎 Fitur-Fitur Unggulan & Nilai Manfaat Nyata
 
-Aplikasi web telah dioptimalkan secara menyeluruh agar mudah ditemukan, berpenampilan menarik saat dibagikan, serta memiliki performa layaknya aplikasi native:
+Aplikasi ini dirancang dengan prinsip **"Mudah untuk Pengguna Lapangan, Lengkap untuk Pengambil Keputusan"**:
 
-1. **Ramah Mesin Pencari (Search Engine Friendly):**
-   * Dilengkapi Meta Tag SEO judul, deskripsi informatif, dan kata kunci relevan untuk kemudahan pengindeksan di Google.
-   * Dilengkapi berkas resmi `robots.txt` dan `sitemap.xml`.
-2. **Tampilan Pratinjau Sosial Mewah (Open Graph & Twitter Cards):**
-   * Saat tautan dibagikan ke **WhatsApp, Facebook, LinkedIn, atau Twitter/X**, akan muncul kartu pratinjau profesional lengkap dengan logo, gambar (*og-image* resolusi 1200x630), judul, dan deskripsi ringkas.
-3. **Standar Data Terstruktur Google (Schema.org JSON-LD):**
-   * Terdaftar sebagai `SoftwareApplication` kategori bisnis (*BusinessApplication*), memberikan nilai kredibilitas tinggi di mata algoritma Google Search.
-4. **Teknologi Progressive Web App (PWA Siap Pasang):**
-   * Pengguna tidak wajib mengunduh melalui Play Store / App Store. Cukup buka tautan di browser (Chrome/Safari), lalu tekan tombol **"Tambahkan ke Layar Utama" / "Install"**.
-   * Memiliki ikon aplikasi mandiri, splash screen pembuka, dan berjalan layar penuh (*fullscreen standalone*) tanpa bilah alamat browser.
-5. **Akselerasi Muat Cepat (Smart Service Worker):**
-   * Berkas aplikasi disimpan secara efisien di memori peramban (*cache-first*), memungkinkan aplikasi terbuka seketika (sub-detik) saat dibuka kembali oleh pengguna.
+### 1. 📊 Dashboard Eksekutif & Statistik Finansial Instan
+* **Kilas Keuangan Real-Time:** Pimpinan dapat langsung melihat ringkasan total nilai perolehan awal aset dibandingkan total nilai buku (*current book value*) saat ini dalam hitungan detik.
+* **Grafik Status Operasional:** Visualisasi persentase aset yang sedang **Aktif**, dalam masa **Perbaikan/Servis**, maupun aset yang telah **Dihapusbukukan (Disposed)**.
+* **Analisis Umur Ekonomis:** Mengetahui estimasi sisa usia produktif barang untuk membantu penyusunan anggaran pengadaan berikutnya secara terencana.
 
----
+### 2. 📷 Pemindai Label QR Code & Barcode Super Kilat
+* **Audit Tanpa Ketik:** Staf lapangan cukup mengarahkan kamera ponsel ke label stiker QR code atau barcode yang terpasang pada fisik aset.
+* **Buka Data 1 Detik:** Begitu label terdeteksi, lembar spesifikasi, lokasi, dan nama penanggung jawab aset langsung terbuka secara otomatis di layar.
 
-## 🛠️ Tech Stack & Arsitektur Solusi
+### 3. 📉 Perhitungan Penyusutan (Depresiasi) Otomatis
+* **Standar Akuntansi Garis Lurus (Straight-Line Depreciation):** Setiap bulan nilai aset menyusut secara matematis dan presisi sesuai rumus baku akuntansi.
+* **Bebas Human Error:** Menghilangkan risiko kesalahan rumus Excel yang sering dialami tim pembukuan.
+* **Kunci Nilai Otomatis:** Saat aset dinyatakan afkir (*Disposed*), nilai buku otomatis dikunci ke nilai sisa (*nilai residu*) tanpa perlu penyesuaian manual.
+* **Tombol Sinkronisasi Massal:** Admin dapat memperbarui nilai buku seluruh inventaris perusahaan sekaligus hanya dalam satu klik.
 
-Aplikasi ini mengombinasikan framework antarmuka mutakhir dengan arsitektur backend tanpa server (*serverless*) yang cerdas dan efisien:
+### 4. 🏢 Katalog & Pencarian Pintar
+* **Pencarian Toleran:** Cari aset berdasarkan kode ID, merek, kategori, ruangan/lokasi penempatan, hingga nama karyawan yang memegang barang.
+* **Penyaringan Fleksibel:** Filter cepat berdasarkan kondisi barang (Aktif, Rusak, Servis, Disposed) atau kategori divisi.
+* **Pengguliran Tanpa Lemot:** Mampu memuat ribuan daftar aset secara mulus tanpa membuat ponsel menjadi berat.
 
-```
-┌─────────────────────────────────────────────────────────┐
-│        APLIKASI KLIEN (Multi-Platform: Web, Android, iOS)│
-│        React Native + Expo Router + NativeWind (Tailwind)│
-└────────────────────────────┬────────────────────────────┘
-                             │ Komunikasi Aman (HTTPS POST)
-                             ▼
-┌─────────────────────────────────────────────────────────┐
-│         SERVERLESS ENGINE (Google Apps Script)          │
-│       Autentikasi Token, Otorisasi Peran, & Router API   │
-└──────────────┬───────────────────────────┬──────────────┘
-               │                           │
-               ▼                           ▼
-┌───────────────────────────────┐ ┌───────────────────────┐
-│   DATABASE (Google Sheets)    │ │ STORAGE (Google Drive)│
-│  - Data Master Aset           │ │ - Foto Fisik Aset     │
-│  - Data Pengguna & Hak Akses  │ │ - Foto Profil Pengguna│
-│  - Sesi Aktif & Audit Trail   │ │ - Logo Kop Laporan    │
-└───────────────────────────────┘ └───────────────────────┘
-```
+### 5. 📸 Dokumentasi Foto Fisik Multi-Sudut
+* **Dua Slot Foto per Barang:** Menyimpan foto tampak depan barang dan nomor seri/kondisi fisik secara visual.
+* **Kompresi Cerdas Otomatis:** Gambar yang diambil lewat kamera dikompres otomatis oleh sistem sehingga hemat kuota internet dan cepat diunggah, namun tetap tajam untuk kebutuhan identifikasi.
+* **Tampilan Penuh (Lightbox):** Foto dapat diperbesar layar penuh untuk pemeriksaan detail fisik dari jauh.
 
-### 💡 Keuntungan Bisnis Arsitektur Ini:
-* **Nol Biaya Server (Zero Server Maintenance Cost):** Tidak memerlukan sewa server VPS, cloud hosting bulanan yang mahal, ataupun langganan database server pihak ketiga.
-* **Data Milik Perusahaan 100%:** Seluruh catatan aset tersimpan langsung di Google Spreadsheet resmi milik akun perusahaan, sehingga mudah dilihat, diekspor, atau diolah langsung oleh divisi keuangan tanpa keterikatan software tertutup (*no vendor lock-in*).
-* **Kestabilan Tinggi:** Didukung oleh infrastruktur Google Cloud yang memiliki tingkat uptime kelas dunia.
+### 6. 📝 Jejak Audit & Riwayat Mutasi Anti-Manipulasi (Audit Trail)
+* **Akuntabilitas Terjaga:** Setiap kali ada perpindahan ruangan, pergantian penanggung jawab, atau perubahan status fisik, sistem mewajibkan pengisian **alasan mutasi**.
+* **Riwayat Permanen:** Catatan mencakup *siapa yang mengubah*, *kapan jam perubahannya*, *data lama*, dan *data baru*. Sangat krusial untuk persiapan audit eksternal maupun internal.
+* **Pengarsipan Cerdas:** Riwayat mutasi lama diarsipkan secara rapi di latar belakang agar sistem harian tetap berjalan secepat kilat.
 
----
+### 7. 📶 Bekerja Tanpa Sinyal (Offline Mode & Antrian Cerdas)
+* **Ramah Area Minim Sinyal:** Sangat ideal untuk tim yang harus mengaudit aset di area gudang bawah tanah (*basement*) atau lokasi pelosok tanpa jaringan internet.
+* **Penyimpanan Lokal Aman:** Perubahan data dan foto tetap bisa diinput; sistem menyimpannya di memori aman perangkat pengguna.
+* **Sinkronisasi Otomatis:** Begitu ponsel kembali mendapatkan sinyal WiFi atau paket data, antrian perubahan langsung tersinkronisasi otomatis ke awan.
 
-## 📚 Library & Dependensi Utama (Fungsi & Nilai Nyata)
+### 8. 📑 Cetak Laporan Resmi (PDF & Excel) + Kirim Otomatis ke Email
+* **Format Siap Cetak (PDF):** Menghasilkan berkas laporan berlogo resmi perusahaan, rapi, dan siap ditandatangani untuk rapat pertanggungjawaban.
+* **Format Olah Data (Excel .xlsx):** Untuk kebutuhan pengolahan lanjutan oleh tim keuangan atau divisi pajak.
+* **Kirim Otomatis ke Email Pimpinan:** File laporan dapat langsung dikirimkan ke email atasan atau manajer terkait langsung dari aplikasi.
 
-Berikut adalah daftar teknologi dan pustaka utama yang digunakan serta manfaat langsungnya bagi kenyamanan pengguna:
+### 9. ⏰ Pengingat Servis, Kalibrasi, & Garansi (+ Google Calendar)
+* **Pencegahan Kerusakan Fatal:** Catat jadwal penggantian oli mobil operasional, servis berkala AC/forklift, atau tanggal berakhirnya garansi laptop kantor.
+* **Terhubung ke Kalender:** Jadwal pengingat otomatis disinkronkan ke Google Calendar dan mengirimkan notifikasi sebelum hari H agar tidak ada pemeliharaan yang terabaikan.
 
-| Nama Teknologi / Library | Kategori | Manfaat Nyata untuk Pengguna & Bisnis |
-|---|---|---|
-| **Expo & Expo Router** | Framework Utama | Menghadirkan perpindahan halaman yang mulus dan cepat serta memastikan aplikasi dapat berjalan di Web, Android, dan iOS dari satu basis kode terpadu. |
-| **React Native & React 19** | Core UI Engine | Menjamin tampilan antarmuka interaktif, responsif, dan memberikan pengalaman penggunaan layaknya aplikasi bawaan ponsel. |
-| **NativeWind & Tailwind CSS** | Desain & Tampilan | Menyediakan estetika antarmuka modern yang rapi, elegan, serta mendukung mode gelap/terang secara konsisten di semua ukuran layar. |
-| **Expo Camera** | Fitur Perangkat | Memberikan kemampuan pemindaian cepat QR Code dan Barcode langsung dari kamera perangkat tanpa perlu aplikasi scanner tambahan. |
-| **Expo Image Picker & Manipulator** | Dokumentasi & Media | Memudahkan pengambilan foto aset dari galeri/kamera serta otomatis mengecilkan ukuran berkas foto agar hemat memori dan cepat diunggah. |
-| **Shopify FlashList** | Performa Tampilan | Teknologi perenderan daftar aset super cepat yang menjamin pengalaman menggulir layar (*scrolling*) tetap ringan dan bebas patah-patah walau memuat ribuan data. |
-| **AsyncStorage & IndexedDB Adapter** | Penyimpanan Lokal | Menyimpan data antrian offline dan cache foto di memori perangkat dengan kapasitas besar dan aman. |
-| **OneSignal Push Notification** | Notifikasi | Menyampaikan pesan pemberitahuan penting dan pengingat jadwal aset langsung ke layar ponsel atau browser pengguna. |
-| **React Native Reanimated** | Animasi & Transisi | Menghadirkan efek transisi, animasi tombol, dan pergerakan menu yang luwes dan memanjakan mata pengguna. |
-| **Expo Sharing** | Berbagi Dokumen | Memungkinkan pengiriman berkas laporan PDF atau lembar kerja Excel secara instan ke aplikasi lain (WhatsApp, Telegram, Email, atau Google Drive). |
+### 10. 👥 Keamanan Bertingkat & Single Active Session
+* **Pemisahan Peran:** Staf biasa hanya dapat melihat dan memindai aset, sementara perubahan nilai dan data sensitif dilindungi di bawah wewenang Administrator.
+* **Anti-Bagi Akun (Single Active Login):** Login di perangkat baru otomatis mengeluarkan sesi di perangkat lama, mencegah penyalahgunaan akun bersama secara tidak sah.
+* **Enkripsi Kata Sandi Modern:** Password dilindungi dengan enkripsi acak bersalt kelas industri, aman dari risiko kebocoran data.
+
+### 11. 🔔 Notifikasi Langsung ke Perangkat (Push Notifications)
+* Pengumuman mutasi mendesak, konfirmasi pembuatan laporan, atau jadwal servis yang jatuh tempo dapat langsung berbunyi di ponsel maupun desktop staf terkait.
+
+### 12. 🌓 Tampilan Modern dengan Mode Gelap (Dark Mode)
+* Desain elegan dengan pilihan tema Terang (*Light Mode*) dan Gelap (*Dark Mode*) yang nyaman di mata untuk penggunaan siang maupun malam hari.
+* Tampilan fleksibel: Di HP hadir dengan menu bawah yang ringkas (*bottom tabs*), di tablet & laptop bertransformasi menjadi dashboard profesional dengan bilah navigasi samping (*sidebar rail*).
 
 ---
 
-## 💼 Mengapa Assets DEMO adalah Pilihan Tepat?
+## 🛠️ Teknologi Canggih di Balik Layar (Tech Stack Ramah Non-Teknis)
 
-1. **Hemat Anggaran:** Tidak ada biaya sewa server berkala—kinerja maksimal dengan biaya infrastruktur terendah.
-2. **Mudah Digunakan Siapa Saja:** Tampilan bersih, intuitif, dan tidak membingungkan staf lapangan maupun admin kantor.
-3. **Transparansi Menyeluruh:** Setiap mutasi dan penyusutan nilai aset tercatat rapi, siap pakai saat audit tiba.
-4. **Fleksibel & Portabel:** Dapat dibuka dari komputer kantor, tablet manajer, maupun handphone teknisi di gudang secara bersamaan.
+Kami memilih kombinasi teknologi modern kelas dunia yang memastikan aplikasi berkecepatan tinggi, aman, dan **sangat hemat anggaran**:
+
+| Komponen Sistem | Teknologi yang Digunakan | Penjelasan Mudah untuk Awam | Keuntungan Nyata bagi Perusahaan |
+| :--- | :--- | :--- | :--- |
+| **Aplikasi Multi-Platform** | **React Native & Expo Engine** | Teknologi yang sama yang dipakai oleh aplikasi kelas dunia seperti Instagram, Uber Eats, dan Airbnb. | **Hemat Biaya:** Cukup membuat satu sistem yang bisa langsung jalan sempurna di Komputer (Web), HP Android, dan Apple iOS tanpa bayar tim developer berkali-kali. |
+| **Tampilan & Desain** | **Tailwind CSS & NativeWind** | Standar desain antarmuka modern yang membuat tata letak aplikasi terlihat rapi, bersih, dan berkelas. | **Nyaman Dipakai:** Karyawan tidak perlu pelatihan rumit karena tampilan sangat intuitif, konsisten di semua ukuran layar. |
+| **Daftar Super Cepat** | **Shopify FlashList** | Mesin perender daftar barang mutakhir yang dikembangkan oleh tim e-commerce raksasa dunia, Shopify. | **Bebas Macet:** Membuka daftar berisi ribuan aset tetap ringan dan lancar digulir tanpa jeda (*smooth 60 fps*). |
+| **Kamera & Pemindai** | **Expo Camera & ZXing Engine** | Modul pemindai kamera otomatis berpresisi tinggi. | **Efisien:** Tidak perlu membeli alat pemindai barcode fisik yang mahal; cukup gunakan kamera HP yang sudah dimiliki staf. |
+| **Basis Data Awan (Database)** | **Google Sheets Cloud Database** | Seluruh data master aset dan riwayat tersimpan di ekosistem spreadsheet resmi milik Google. | **100% Kepemilikan Data:** Tidak ada ketergantungan software (*no vendor lock-in*). Data bisa dibuka langsung di Excel/Spreadsheet kapan pun dibutuhkan. |
+| **Penyimpanan Foto** | **Google Drive Enterprise Storage** | Foto fisik barang tersimpan di brankas penyimpanan cloud resmi Google. | **Aman & Lega:** Foto aset terlindungi dengan cadangan data Google tanpa risiko harddisk kantor rusak atau hilang. |
+| **Mesin Pemroses Awan** | **Google Cloud Serverless Engine (GAS)** | Mesin otomasi yang bekerja di awan secara otomatis tanpa membutuhkan komputer server fisik di kantor. | **NOL BIAYA SERVER:** Perusahaan menghemat jutaan rupiah per bulan karena tidak perlu sewa hosting VPS atau server fisik yang butuh perawatan teknisi. |
+| **Penyimpanan Offline** | **IndexedDB & Local Storage Engine** | Brankas memori lokal di dalam perangkat pengguna. | **Tetap Kerja Tanpa Internet:** Data inputan di gudang tidak akan hilang meski sambungan internet tiba-tiba mati total. |
+| **Notifikasi Instan** | **OneSignal Push Notification Engine** | Layanan pengantar notifikasi global tercepat. | **Respon Cepat:** Informasi penting dan jadwal pengingat langsung muncul di layar kunci ponsel staf secara instan. |
+| **Kemudahan Pasang (PWA)** | **Progressive Web App Technology** | Teknologi web mutakhir yang memungkinkan website dipasang layaknya aplikasi Play Store. | **Praktis:** Tidak perlu proses unduh rumit di toko aplikasi; staf cukup buka link dan tekan "Install" di layar HP. |
 
 ---
-*Dokumen ini disusun sebagai panduan pengenalan solusi bagi calon pengguna, klien, dan pemangku kepentingan.*
+
+## ⚖️ Perbandingan: Cara Lama vs Menggunakan Assets DEMO
+
+| Kebutuhan Pengelolaan | Cara Lama (Buku / Excel Biasa) | Menggunakan Assets DEMO |
+| :--- | :--- | :--- |
+| **Pencarian Lokasi Barang** | Buka map arsip tebal atau file Excel panjang, butuh 10–20 menit. | **1 Detik:** Scan stiker QR di barang atau ketik nama di kolom pencarian. |
+| **Penghitungan Nilai Depresiasi** | Dihitung manual setiap akhir bulan oleh akuntan, rawan rumus bergeser. | **Otomatis:** Nilai buku menyusut otomatis setiap bulan secara akurat. |
+| **Kondisi Fisik Terkini** | Hanya kira-kira atau berdasarkan ingatan orang. | **Foto Asli:** Ada bukti visual foto multi-sudut tersimpan rapi. |
+| **Riwayat Perpindahan Barang** | Sering lupa dicatat, barang berpindah tanpa diketahui siapa pelakunya. | **Audit Trail Ketat:** Setiap mutasi wajib menyertakan alasan dan nama staf. |
+| **Kondisi di Lapangan / Gudang** | Harus mencatat di kertas memo dulu karena tidak ada sinyal komputer. | **Offline Ready:** Langsung input di HP, otomatis tersimpan saat dapat sinyal. |
+| **Jadwal Servis Berkala** | Sering terlewat hingga mesin/kendaraan mogok dan rusak berat. | **Pengingat Pintar:** Notifikasi otomatis berbunyi dan masuk ke Google Calendar. |
+| **Biaya Pemeliharaan Sistem** | Sewa server jutaan per bulan + biaya perawatan teknisi khusus. | **Rp 0 / Bulan:** Memanfaatkan arsitektur serverless bebas biaya server. |
+
+---
+
+## 🏆 Kesimpulan Nilai Bisnis (Business Value)
+
+Aplikasi **Assets DEMO** bukan sekadar program inventaris barang, melainkan **investasi operasional cerdas** yang memberikan:
+1. **Efisiensi Kerja Maksimal:** Memangkas hingga 80% waktu yang biasanya terbuang untuk audit dan pencarian barang.
+2. **Pencegahan Kehilangan Aset:** Setiap penanggung jawab barang tercatat resmi dan transparan.
+3. **Kesiapan Audit Finansial:** Laporan PDF dan nilai buku depresiasi selalu siap disajikan kapan pun dewan direksi atau auditor meminta data.
+4. **Biaya Kepemilikan Terendah (*Lowest Total Cost of Ownership*):** Nol biaya sewa server, bebas biaya lisensi perangkat per-user, dan dapat dioperasikan langsung dari gawai yang sudah dimiliki tim saat ini.
+
+---
+*Dokumen ini disusun sebagai panduan pengenalan solusi komprehensif bagi pimpinan, pemangku kepentingan, dan calon klien.*

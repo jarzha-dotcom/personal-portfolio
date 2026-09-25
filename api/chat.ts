@@ -36,7 +36,7 @@ import {
     callGemmaModel,
 } from './lib/geminiModels.js';
 
-export const maxDuration = 30; // 30 detik batas waktu serverless Vercel untuk cascade fallback
+export const maxDuration = 60; // 60 detik batas waktu serverless Vercel untuk cascade fallback dan Gemma reasoning
 
 const AISTUDIO_API_KEY = process.env.GEMINI_API_KEY;
 
