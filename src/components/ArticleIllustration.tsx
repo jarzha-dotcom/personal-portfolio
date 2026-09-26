@@ -73,6 +73,82 @@ interface SlugImages {
   middle: string;
 }
 
+// Nama file MENTAH (bukan hasil import Vite) untuk tiap slug, persis sama
+// dengan yang dipakai di daftar `import ... from '../assets/images/...'` di
+// atas. HARUS tetap sinkron manual dengan SLUG_IMAGES di bawah -- kalau
+// nambah/ubah gambar artikel, update di DUA tempat ini bersamaan.
+//
+// Kenapa ada dua peta yang isinya "sama": SLUG_IMAGES di bawah menyimpan
+// HASIL import (URL yang sudah di-resolve Vite, cuma valid di dalam app yang
+// di-bundle Vite). Peta ini menyimpan nama file ASLINYA, dipakai
+// scripts/prerender.ts (jalan di luar Vite, lewat tsx) untuk mencari file
+// hasil build yang sudah di-hash lewat dist/.vite/manifest.json, supaya
+// og:image per-artikel bisa akurat. Kalau dua peta ini beda isi,
+// prerender.ts akan diam-diam fallback ke og:image generik (tidak sampai
+// gagal build) -- tapi tetap sebaiknya dijaga sinkron.
+export const SLUG_IMAGE_SOURCE_FILES: Record<string, SlugImages> = {
+  'cara-kerja-sistem-aset-pt-gmp': {
+    top: 'Cara Kerja Sistem Manajemen Aset PT Global Multiparts.jpeg',
+    middle: 'Cara Kerja Sistem Manajemen Aset PT Global Multiparts 2.jpeg',
+  },
+  'tanda-waktunya-migrasi-dari-apps-script': {
+    top: '5 Tanda Bisnismu Sudah Waktunya Migrasi.jpeg',
+    middle: '5 Tanda Bisnismu Sudah Waktunya Migrasi 2.jpeg',
+  },
+  'amankah-data-bisnis-di-google-sheets-drive': {
+    top: 'Amankah Data Bisnis Disimpan di Google Sheets-Drive.jpeg',
+    middle: 'Amankah Data Bisnis Disimpan di Google Sheets-Drive 2.jpeg',
+  },
+  'apa-itu-autonomous-agent-beda-chatbot-biasa': {
+    top: 'Apa Itu Autonomous Agent.jpeg',
+    middle: 'Apa Itu Autonomous Agent 2.jpeg',
+  },
+  'biaya-bikin-chatbot-custom-rincian': {
+    top: 'Berapa Biaya Sebenarnya Bikin Chatbot Custom.jpeg',
+    middle: 'Berapa Biaya Sebenarnya Bikin Chatbot Custom 2.jpeg',
+  },
+  'custom-chatbot-vs-chatbot-template': {
+    top: 'Custom Chatbot vs Chatbot Template.jpeg',
+    middle: 'Custom Chatbot vs Chatbot Template 2.jpeg',
+  },
+  'kenapa-google-apps-script-untuk-klien-kecil-menengah': {
+    top: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri.jpeg',
+    middle: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri 2.jpeg',
+  },
+  'arsitektur-multiplayer-real-time-b-games': {
+    top: 'Arsitektur Multiplayer Real-Time di B-Games.jpeg',
+    middle: 'Arsitektur Multiplayer Real-Time di B-Games 2.jpeg',
+  },
+  'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
+    top: '4 Sistem Saya, 4 Arsitektur Backend Berbeda.jpeg',
+    middle: '4 Sistem Saya, 4 Arsitektur Backend Berbeda 2.jpeg',
+  },
+  'apa-itu-cascade-ai-system': {
+    top: 'Apa Itu Cascade AI System.jpeg',
+    middle: 'Apa Itu Cascade AI System 2.jpeg',
+  },
+  'studi-kasus-devrab-proposal-30-detik': {
+    top: 'Di Balik Tombol Buatkan RAB.jpeg',
+    middle: 'Di Balik Tombol Buatkan RAB 2.jpeg',
+  },
+  'berapa-lama-bikin-website-aplikasi-bisnis-kecil': {
+    top: 'Berapa Lama Bikin Website.jpeg',
+    middle: 'Berapa Lama Bikin Website 2.jpeg',
+  },
+  '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': {
+    top: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer.jpeg',
+    middle: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer 2.jpeg',
+  },
+  'web-app-vs-mobile-app-vs-pwa': {
+    top: 'Perbedaan Web App, Mobile App, dan PWA.jpeg',
+    middle: 'Perbedaan Web App, Mobile App, dan PWA 2.jpeg',
+  },
+  'kenapa-harga-proposal-bisa-beda-beda': {
+    top: 'Kenapa Harga Proposal Development Bisa.jpeg',
+    middle: 'Kenapa Harga Proposal Development Bisa 2.jpeg',
+  },
+};
+
 const SLUG_IMAGES: Record<string, SlugImages> = {
   'cara-kerja-sistem-aset-pt-gmp': { top: gmpTop, middle: gmpMiddle },
   'tanda-waktunya-migrasi-dari-apps-script': { top: migrasiTop, middle: migrasiMiddle },

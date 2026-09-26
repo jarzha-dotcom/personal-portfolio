@@ -389,6 +389,15 @@ export default defineConfig(({ mode }) => {
       // Tersedia sebagai konstanta global di semua komponen React
       __CHAT_BUILD_ID__: JSON.stringify(buildId),
     },
+    build: {
+      // Menghasilkan dist/.vite/manifest.json yang memetakan path source
+      // (mis. "src/assets/images/Foo.jpeg") ke file hasil build yang sudah
+      // di-hash (mis. "assets/Foo-a1b2c3d4.jpeg"). Dipakai scripts/prerender.ts
+      // (dijalankan sebagai postbuild, di luar Vite) untuk resolve URL asli
+      // gambar artikel supaya og:image per-artikel akurat — tanpa ini,
+      // prerender tidak punya cara mengetahui nama file hasil hash.
+      manifest: true,
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

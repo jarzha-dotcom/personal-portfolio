@@ -27,6 +27,10 @@ import { TESTIMONIALS } from '../src/data/testimonials.ts';
 import { ROUTES, articleRoute } from '../src/routes.ts';
 import { formatIDDate, toISODate } from '../src/utils/formatDate.ts';
 import type { ProjectItem } from '../src/types.ts';
+// Asumsi lokasi file: src/components/ArticleIllustration.tsx (mengikuti pola
+// import '../components/ArticleIllustration' yang dipakai ArticlePage.tsx).
+// Kalau lokasinya beda, sesuaikan path ini.
+import { SLUG_IMAGE_SOURCE_FILES } from '../src/components/ArticleIllustration.tsx';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -89,6 +93,10 @@ interface HeadOptions {
   canonicalUrl: string;
   breadcrumb: { name: string; url: string }[];
   extraJsonLd?: unknown[];
+  // Kalau diisi, timpa og:image/twitter:image default (foto homepage) dengan
+  // gambar spesifik halaman ini. Kalau tidak diisi/null, tag og:image bawaan
+  // di dist/index.html dibiarkan apa adanya (fallback aman).
+  ogImage?: OgImage | null;
 }
 
 const REQUIRED_HEAD_ANCHORS = [
@@ -100,7 +108,19 @@ const REQUIRED_HEAD_ANCHORS = [
   /<meta property="og:description"\s+content="[^"]*"\s*\/>/,
   /<meta name="twitter:title" content="[^"]*" \/>/,
   /<meta name="twitter:description"\s+content="[^"]*"\s*\/>/,
+  /<meta property="og:image" content="[^"]*" \/>/,
+  /<meta property="og:image:alt" content="[^"]*" \/>/,
+  /<meta property="og:image:width" content="[^"]*" \/>/,
+  /<meta property="og:image:height" content="[^"]*" \/>/,
+  /<meta name="twitter:image" content="[^"]*" \/>/,
 ];
+
+interface OgImage {
+  url: string;
+  alt: string;
+  width: number;
+  height: number;
+}
 
 const applyHead = (html: string, opts: HeadOptions): string => {
   // Guard: kalau salah satu pola tag ini sudah tidak ada di dist/index.html
@@ -139,6 +159,24 @@ const applyHead = (html: string, opts: HeadOptions): string => {
     `<meta name="twitter:description" content="${desc}" />`
   );
 
+  if (opts.ogImage) {
+    const { url: imgUrl, alt, width, height } = opts.ogImage;
+    out = out.replace(/<meta property="og:image" content="[^"]*" \/>/, `<meta property="og:image" content="${imgUrl}" />`);
+    out = out.replace(
+      /<meta property="og:image:alt" content="[^"]*" \/>/,
+      `<meta property="og:image:alt" content="${escapeHtml(alt)}" />`
+    );
+    out = out.replace(
+      /<meta property="og:image:width" content="[^"]*" \/>/,
+      `<meta property="og:image:width" content="${width}" />`
+    );
+    out = out.replace(
+      /<meta property="og:image:height" content="[^"]*" \/>/,
+      `<meta property="og:image:height" content="${height}" />`
+    );
+    out = out.replace(/<meta name="twitter:image" content="[^"]*" \/>/, `<meta name="twitter:image" content="${imgUrl}" />`);
+  }
+
   // Breadcrumb + JSON-LD tambahan disisipkan tepat sebelum </head>.
   const ldScripts = [breadcrumbJsonLd(opts.breadcrumb), ...(opts.extraJsonLd ?? [])]
     .map(jsonLdScript)
@@ -146,6 +184,73 @@ const applyHead = (html: string, opts: HeadOptions): string => {
   out = out.replace('</head>', `  ${ldScripts}\n</head>`);
 
   return out;
+};
+
+// ---------------------------------------------------------------------------
+// og:image per-artikel — resolve URL asli (sudah di-hash Vite) lewat
+// dist/.vite/manifest.json (butuh build.manifest:true di vite.config.ts).
+// Kalau manifest tidak ada, atau slug/entry-nya tidak ketemu, FALLBACK DIAM
+// ke og:image default (foto homepage) -- tidak pernah menghasilkan URL yang
+// salah/rusak, cuma kurang spesifik. Warning dicetak sekali per masalah biar
+// kelihatan di log build tanpa spam.
+// ---------------------------------------------------------------------------
+
+const ARTICLE_IMAGE_WIDTH = 1408;
+const ARTICLE_IMAGE_HEIGHT = 768;
+const ARTICLE_IMAGES_SRC_DIR = 'src/assets/images'; // relatif ke root proyek (Vite root)
+
+type ViteManifest = Record<string, { file?: string }>;
+
+let manifestCache: ViteManifest | null | undefined;
+const readViteManifest = (): ViteManifest | null => {
+  if (manifestCache !== undefined) return manifestCache;
+  const manifestPath = join(DIST_DIR, '.vite', 'manifest.json');
+  if (!existsSync(manifestPath)) {
+    console.warn(
+      `\n[prerender] PERINGATAN: ${manifestPath} tidak ditemukan — og:image per-artikel akan pakai gambar default. ` +
+        `Pastikan "build.manifest: true" aktif di vite.config.ts dan build sudah dijalankan sebelum prerender.\n`
+    );
+    manifestCache = null;
+    return null;
+  }
+  try {
+    manifestCache = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+  } catch (err) {
+    console.warn(`\n[prerender] PERINGATAN: gagal parse ${manifestPath}: ${(err as Error).message}\n`);
+    manifestCache = null;
+  }
+  // TS tidak bisa mempersempit tipe manifestCache jadi bukan `undefined` di
+  // titik ini (control-flow narrowing untuk variabel closure yang diassign di
+  // dalam try/catch terbatas) -- padahal secara logika selalu sudah terisi
+  // ViteManifest atau null. `?? null` di sini murni buat memuaskan tipe
+  // return, bukan mengubah perilaku (assignment di atas tidak pernah
+  // benar-benar meninggalkan manifestCache sebagai undefined).
+  return manifestCache ?? null;
+};
+
+const resolveArticleOgImage = (article: Article): OgImage | null => {
+  const files = SLUG_IMAGE_SOURCE_FILES[article.slug];
+  if (!files) return null; // Artikel ini memang belum punya foto custom — normal, bukan error.
+
+  const manifest = readViteManifest();
+  if (!manifest) return null;
+
+  const key = `${ARTICLE_IMAGES_SRC_DIR}/${files.top}`;
+  const entry = manifest[key];
+  if (!entry?.file) {
+    console.warn(
+      `[prerender] PERINGATAN: manifest tidak punya entry untuk "${key}" (artikel: ${article.slug}). ` +
+        `og:image fallback ke default. Cek apakah SLUG_IMAGE_SOURCE_FILES di ArticleIllustration.tsx masih sinkron dengan nama file aslinya.`
+    );
+    return null;
+  }
+
+  return {
+    url: `${CANONICAL_BASE}/${entry.file}`,
+    alt: article.title,
+    width: ARTICLE_IMAGE_WIDTH,
+    height: ARTICLE_IMAGE_HEIGHT,
+  };
 };
 
 const ROOT_OPEN_TAG = '<div id="root">';
@@ -527,6 +632,7 @@ const buildArticlePage = (article: Article) => {
       { name: article.title, url: canonicalUrl },
     ],
     extraJsonLd: [blogPostingJsonLd],
+    ogImage: resolveArticleOgImage(article),
   });
 
   const finalHtml = replaceRootShell(html, inner);
