@@ -1,5 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, ArrowRight, Clock, Calendar, Search, Sparkles, FileText, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import {
+  ArrowLeft,
+  ArrowRight,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Calendar,
+  Search,
+  Sparkles,
+  FileText,
+  X,
+} from 'lucide-react';
 import { ARTICLES } from '../data/articles';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { ROUTES, articleRoute } from '../routes';
@@ -19,10 +31,36 @@ const CANONICAL_URL = 'https://arzhaning.my.id/artikel';
 const FOCUS_RING =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent';
 
+// Jumlah artikel non-featured per halaman. Featured card (artikel terbaru)
+// cuma tampil di halaman 1 saat tidak ada filter aktif, jadi tidak dihitung
+// ke kuota ini.
+const ARTICLES_PER_PAGE = 9;
+
+// Nomor halaman yang ditampilkan di pagination, dengan "..." kalau jumlah
+// halaman banyak -- selalu menyertakan halaman pertama, terakhir, dan
+// beberapa halaman di sekitar halaman aktif.
+const getPageNumbers = (current: number, total: number): (number | 'ellipsis')[] => {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+
+  const pages = new Set<number>([1, total, current - 1, current, current + 1]);
+  const sorted = Array.from(pages)
+    .filter((p) => p >= 1 && p <= total)
+    .sort((a, b) => a - b);
+
+  const result: (number | 'ellipsis')[] = [];
+  sorted.forEach((page, i) => {
+    if (i > 0 && page - sorted[i - 1] > 1) result.push('ellipsis');
+    result.push(page);
+  });
+  return result;
+};
+
 export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }) => {
   const { navigate } = useNavigationHistory();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const listTopRef = useRef<HTMLDivElement>(null);
 
   const published = useMemo(() => ARTICLES.filter((a) => a.published), []);
 
@@ -52,6 +90,56 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
 
   // Artikel terbaru (first item, asumsinya sudah di-sort descending)
   const latestArticle = published[0];
+
+  const hasActiveFilters = searchQuery.trim() !== '' || activeCategory !== null;
+
+  // Featured card cuma tampil saat tidak ada filter aktif -- jadi daftar
+  // "biasa" di bawahnya mengecualikan artikel itu hanya dalam kondisi yang
+  // sama. Inilah array yang dipaginasi, BUKAN `filtered` mentah, supaya
+  // featured card tidak ikut menggeser hitungan per halaman.
+  const listArticles = useMemo(
+    () => filtered.filter((a) => hasActiveFilters || a.slug !== latestArticle?.slug),
+    [filtered, hasActiveFilters, latestArticle]
+  );
+
+  const totalPages = Math.max(1, Math.ceil(listArticles.length / ARTICLES_PER_PAGE));
+  const rawPage = parseInt(searchParams.get('page') || '1', 10);
+  const currentPage = Math.min(Math.max(1, Number.isNaN(rawPage) ? 1 : rawPage), totalPages);
+
+  const pagedArticles = listArticles.slice(
+    (currentPage - 1) * ARTICLES_PER_PAGE,
+    currentPage * ARTICLES_PER_PAGE
+  );
+
+  const goToPage = (page: number) => {
+    const clamped = Math.min(Math.max(1, page), totalPages);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (clamped <= 1) next.delete('page');
+        else next.set('page', String(clamped));
+        return next;
+      },
+      { replace: false }
+    );
+    listTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  // Kalau filter berubah (search/kategori), balik ke halaman 1 -- daftar
+  // hasil filter yang baru mungkin lebih pendek dari halaman yang lagi dibuka.
+  useEffect(() => {
+    if (searchParams.get('page')) {
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.delete('page');
+          return next;
+        },
+        { replace: true }
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery, activeCategory]);
 
   useBreadcrumbSchema([
     { name: 'Beranda', url: 'https://arzhaning.my.id/' },
@@ -86,12 +174,26 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
     navigate(articleRoute(slug));
   };
 
+  // URL asli buat tiap nomor halaman (dipakai sebagai href, bukan cuma state
+  // internal) -- supaya kontrol paginasi jadi <a> yang beneran bisa di-crawl,
+  // di-buka-tab-baru (cmd/ctrl-klik), dan tetap jalan sebelum JS termuat.
+  // Cuma param `page` yang pernah masuk URL (search/kategori tetap di state
+  // lokal, tidak di-encode ke URL), jadi cukup begini saja.
+  const buildPageHref = (page: number): string => {
+    const clamped = Math.min(Math.max(1, page), totalPages);
+    return clamped <= 1 ? ROUTES.articles : `${ROUTES.articles}?page=${clamped}`;
+  };
+
+  const goToPageLink = (e: React.MouseEvent<HTMLAnchorElement>, page: number) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    goToPage(page);
+  };
+
   const clearFilters = () => {
     setSearchQuery('');
     setActiveCategory(null);
   };
-
-  const hasActiveFilters = searchQuery.trim() !== '' || activeCategory !== null;
 
   return (
     <div className="relative pt-28 md:pt-32 pb-16 md:pb-24 overflow-hidden">
@@ -274,6 +376,7 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
         </div>
 
         {/* Articles List */}
+        <div ref={listTopRef} className="scroll-mt-24" />
         {published.length === 0 ? (
           <div className="text-center py-16">
             <FileText
@@ -320,8 +423,10 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Featured card — artikel terbaru tampil besar dengan gambar penuh di atas */}
-            {!hasActiveFilters && latestArticle && (
+            {/* Featured card — artikel terbaru tampil besar dengan gambar penuh
+                di atas. Cuma di halaman 1 tanpa filter, biar tidak ikut
+                nongol lagi kalau user pindah ke halaman 2 dst. */}
+            {!hasActiveFilters && currentPage === 1 && latestArticle && (
               <a
                 href={articleRoute(latestArticle.slug)}
                 onClick={(e) => goToArticle(e, latestArticle.slug)}
@@ -436,9 +541,7 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
 
             {/* Daftar artikel lainnya — thumbnail landscape di kiri, proporsional dengan rasio foto asli */}
             <div className="space-y-5">
-              {filtered
-                .filter((article) => hasActiveFilters || article.slug !== latestArticle?.slug)
-                .map((article, index) => (
+              {pagedArticles.map((article, index) => (
                   <a
                     key={article.slug}
                     href={articleRoute(article.slug)}
@@ -549,6 +652,112 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
                   </a>
                 ))}
             </div>
+
+            {/* Pagination — cuma tampil kalau daftar (di luar featured card) lebih dari 1 halaman */}
+            {totalPages > 1 && (
+              <nav
+                aria-label="Navigasi halaman artikel"
+                className="flex flex-col items-center gap-3 pt-4"
+              >
+                <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                  Halaman {currentPage} dari {totalPages} &middot; {listArticles.length} artikel
+                  {hasActiveFilters ? ' cocok' : ' lainnya'}
+                </p>
+                <div className="flex items-center gap-1.5">
+                  {currentPage === 1 ? (
+                    <span
+                      aria-hidden="true"
+                      className={`inline-flex items-center justify-center w-9 h-9 rounded-full opacity-30 cursor-not-allowed ${
+                        darkMode
+                          ? 'bg-slate-800/80 text-slate-300 border border-slate-700'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                    </span>
+                  ) : (
+                    <a
+                      href={buildPageHref(currentPage - 1)}
+                      onClick={(e) => goToPageLink(e, currentPage - 1)}
+                      aria-label="Halaman sebelumnya"
+                      className={`inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors ${FOCUS_RING} ${
+                        darkMode
+                          ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                      }`}
+                    >
+                      <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                    </a>
+                  )}
+
+                  {getPageNumbers(currentPage, totalPages).map((page, i) =>
+                    page === 'ellipsis' ? (
+                      <span
+                        key={`ellipsis-${i}`}
+                        className={`w-9 h-9 inline-flex items-center justify-center text-sm ${
+                          darkMode ? 'text-slate-600' : 'text-slate-400'
+                        }`}
+                        aria-hidden="true"
+                      >
+                        &hellip;
+                      </span>
+                    ) : page === currentPage ? (
+                      <span
+                        key={page}
+                        aria-current="page"
+                        className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold ${
+                          darkMode
+                            ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/25'
+                            : 'bg-teal-600 text-white shadow-lg shadow-teal-600/25'
+                        }`}
+                      >
+                        {page}
+                      </span>
+                    ) : (
+                      <a
+                        key={page}
+                        href={buildPageHref(page)}
+                        onClick={(e) => goToPageLink(e, page)}
+                        aria-label={`Ke halaman ${page}`}
+                        className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-semibold transition-all duration-200 ${FOCUS_RING} ${
+                          darkMode
+                            ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                        }`}
+                      >
+                        {page}
+                      </a>
+                    )
+                  )}
+
+                  {currentPage === totalPages ? (
+                    <span
+                      aria-hidden="true"
+                      className={`inline-flex items-center justify-center w-9 h-9 rounded-full opacity-30 cursor-not-allowed ${
+                        darkMode
+                          ? 'bg-slate-800/80 text-slate-300 border border-slate-700'
+                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                      }`}
+                    >
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                    </span>
+                  ) : (
+                    <a
+                      href={buildPageHref(currentPage + 1)}
+                      onClick={(e) => goToPageLink(e, currentPage + 1)}
+                      aria-label="Halaman berikutnya"
+                      className={`inline-flex items-center justify-center w-9 h-9 rounded-full transition-colors ${FOCUS_RING} ${
+                        darkMode
+                          ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                      }`}
+                    >
+                      <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                    </a>
+                  )}
+                </div>
+              </nav>
+            )}
           </div>
         )}
       </div>

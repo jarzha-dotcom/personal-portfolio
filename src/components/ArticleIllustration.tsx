@@ -23,6 +23,16 @@ import {
   LineChart,
   FileText,
   Sparkles,
+  Gamepad2,
+  Users,
+  Layers,
+  GitBranch,
+  FileSignature,
+  Clock,
+  Rocket,
+  HelpCircle,
+  Smartphone,
+  Calculator,
 } from 'lucide-react';
 
 // Pastikan path ini benar relatif terhadap file komponen ini.
@@ -41,6 +51,22 @@ import chatbotVsTop from '../assets/images/Custom Chatbot vs Chatbot Template.jp
 import chatbotVsMiddle from '../assets/images/Custom Chatbot vs Chatbot Template 2.jpeg';
 import appsScriptTop from '../assets/images/Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri.jpeg';
 import appsScriptMiddle from '../assets/images/Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri 2.jpeg';
+import bgamesTop from '../assets/images/Arsitektur Multiplayer Real-Time di B-Games.jpeg';
+import bgamesMiddle from '../assets/images/Arsitektur Multiplayer Real-Time di B-Games 2.jpeg';
+import arsitekturBackendTop from '../assets/images/4 Sistem Saya, 4 Arsitektur Backend Berbeda.jpeg';
+import arsitekturBackendMiddle from '../assets/images/4 Sistem Saya, 4 Arsitektur Backend Berbeda 2.jpeg';
+import cascadeTop from '../assets/images/Apa Itu Cascade AI System.jpeg';
+import cascadeMiddle from '../assets/images/Apa Itu Cascade AI System 2.jpeg';
+import devrabTop from '../assets/images/Di Balik Tombol Buatkan RAB.jpeg';
+import devrabMiddle from '../assets/images/Di Balik Tombol Buatkan RAB 2.jpeg';
+import lamaWebsiteTop from '../assets/images/Berapa Lama Bikin Website.jpeg';
+import lamaWebsiteMiddle from '../assets/images/Berapa Lama Bikin Website 2.jpeg';
+import pertanyaanDeveloperTop from '../assets/images/5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer.jpeg';
+import pertanyaanDeveloperMiddle from '../assets/images/5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer 2.jpeg';
+import webMobilePwaTop from '../assets/images/Perbedaan Web App, Mobile App, dan PWA.jpeg';
+import webMobilePwaMiddle from '../assets/images/Perbedaan Web App, Mobile App, dan PWA 2.jpeg';
+import hargaProposalTop from '../assets/images/Kenapa Harga Proposal Development Bisa.jpeg';
+import hargaProposalMiddle from '../assets/images/Kenapa Harga Proposal Development Bisa 2.jpeg';
 
 interface SlugImages {
   top: string;
@@ -55,6 +81,20 @@ const SLUG_IMAGES: Record<string, SlugImages> = {
   'biaya-bikin-chatbot-custom-rincian': { top: chatbotBiayaTop, middle: chatbotBiayaMiddle },
   'custom-chatbot-vs-chatbot-template': { top: chatbotVsTop, middle: chatbotVsMiddle },
   'kenapa-google-apps-script-untuk-klien-kecil-menengah': { top: appsScriptTop, middle: appsScriptMiddle },
+  'arsitektur-multiplayer-real-time-b-games': { top: bgamesTop, middle: bgamesMiddle },
+  'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
+    top: arsitekturBackendTop,
+    middle: arsitekturBackendMiddle,
+  },
+  'apa-itu-cascade-ai-system': { top: cascadeTop, middle: cascadeMiddle },
+  'studi-kasus-devrab-proposal-30-detik': { top: devrabTop, middle: devrabMiddle },
+  'berapa-lama-bikin-website-aplikasi-bisnis-kecil': { top: lamaWebsiteTop, middle: lamaWebsiteMiddle },
+  '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': {
+    top: pertanyaanDeveloperTop,
+    middle: pertanyaanDeveloperMiddle,
+  },
+  'web-app-vs-mobile-app-vs-pwa': { top: webMobilePwaTop, middle: webMobilePwaMiddle },
+  'kenapa-harga-proposal-bisa-beda-beda': { top: hargaProposalTop, middle: hargaProposalMiddle },
 };
 
 /** Dipakai halaman lain (mis. ArticlePage) untuk cek apakah slug ini punya foto custom, sebelum menyisipkan gambar "middle" di tengah artikel. */
@@ -73,6 +113,14 @@ const SLUG_ILLUSTRATIONS: Record<string, IconPair> = {
   'tanda-waktunya-migrasi-dari-apps-script': { Icon: TrendingUp, Accent: Server },
   'kenapa-google-apps-script-untuk-klien-kecil-menengah': { Icon: Cloud, Accent: Store },
   'apa-itu-autonomous-agent-beda-chatbot-biasa': { Icon: Bot, Accent: Workflow },
+  'arsitektur-multiplayer-real-time-b-games': { Icon: Gamepad2, Accent: Users },
+  'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': { Icon: Layers, Accent: GitBranch },
+  'apa-itu-cascade-ai-system': { Icon: Workflow, Accent: ShieldCheck },
+  'studi-kasus-devrab-proposal-30-detik': { Icon: FileSignature, Accent: Sparkles },
+  'berapa-lama-bikin-website-aplikasi-bisnis-kecil': { Icon: Clock, Accent: Rocket },
+  '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': { Icon: HelpCircle, Accent: Briefcase },
+  'web-app-vs-mobile-app-vs-pwa': { Icon: LayoutTemplate, Accent: Smartphone },
+  'kenapa-harga-proposal-bisa-beda-beda': { Icon: Calculator, Accent: Scale },
 };
 
 const CATEGORY_ILLUSTRATIONS: Record<string, IconPair> = {

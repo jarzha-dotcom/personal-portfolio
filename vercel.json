@@ -41,6 +41,79 @@
   },
   "rewrites": [
     {
+      "source": "/hasil-kerja",
+      "destination": "/hasil-kerja/index.html"
+    },
+    {
+      "source": "/artikel",
+      "has": [{ "type": "query", "key": "page", "value": "2" }],
+      "destination": "/artikel/page/2/index.html"
+    },
+    {
+      "source": "/artikel",
+      "destination": "/artikel/index.html"
+    },
+    {
+      "source": "/artikel/web-app-vs-mobile-app-vs-pwa",
+      "destination": "/artikel/web-app-vs-mobile-app-vs-pwa/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-harga-proposal-bisa-beda-beda",
+      "destination": "/artikel/kenapa-harga-proposal-bisa-beda-beda/index.html"
+    },
+    {
+      "source": "/artikel/5-pertanyaan-sebelum-pakai-jasa-developer-freelance",
+      "destination": "/artikel/5-pertanyaan-sebelum-pakai-jasa-developer-freelance/index.html"
+    },
+    {
+      "source": "/artikel/berapa-lama-bikin-website-aplikasi-bisnis-kecil",
+      "destination": "/artikel/berapa-lama-bikin-website-aplikasi-bisnis-kecil/index.html"
+    },
+    {
+      "source": "/artikel/studi-kasus-devrab-proposal-30-detik",
+      "destination": "/artikel/studi-kasus-devrab-proposal-30-detik/index.html"
+    },
+    {
+      "source": "/artikel/apa-itu-cascade-ai-system",
+      "destination": "/artikel/apa-itu-cascade-ai-system/index.html"
+    },
+    {
+      "source": "/artikel/apa-itu-autonomous-agent-beda-chatbot-biasa",
+      "destination": "/artikel/apa-itu-autonomous-agent-beda-chatbot-biasa/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda",
+      "destination": "/artikel/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-google-apps-script-untuk-klien-kecil-menengah",
+      "destination": "/artikel/kenapa-google-apps-script-untuk-klien-kecil-menengah/index.html"
+    },
+    {
+      "source": "/artikel/arsitektur-multiplayer-real-time-b-games",
+      "destination": "/artikel/arsitektur-multiplayer-real-time-b-games/index.html"
+    },
+    {
+      "source": "/artikel/tanda-waktunya-migrasi-dari-apps-script",
+      "destination": "/artikel/tanda-waktunya-migrasi-dari-apps-script/index.html"
+    },
+    {
+      "source": "/artikel/amankah-data-bisnis-di-google-sheets-drive",
+      "destination": "/artikel/amankah-data-bisnis-di-google-sheets-drive/index.html"
+    },
+    {
+      "source": "/artikel/custom-chatbot-vs-chatbot-template",
+      "destination": "/artikel/custom-chatbot-vs-chatbot-template/index.html"
+    },
+    {
+      "source": "/artikel/biaya-bikin-chatbot-custom-rincian",
+      "destination": "/artikel/biaya-bikin-chatbot-custom-rincian/index.html"
+    },
+    {
+      "source": "/artikel/cara-kerja-sistem-aset-pt-gmp",
+      "destination": "/artikel/cara-kerja-sistem-aset-pt-gmp/index.html"
+    },
+    {
       "source": "/((?!assets/|icons/|sw\\.js|manifest\\.json|offline\\.html).*)",
       "destination": "/index.html"
     }
