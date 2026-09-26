@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, X, Share, SquarePlus } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
+import { announceNudgeShown, announceNudgeDismissed, scheduleAttentionReveal } from '../utils/attentionNudge';
 
 interface PWAInstallPromptProps {
     darkMode: boolean;
@@ -14,6 +15,8 @@ const DISMISS_KEY = 'pwa-install-dismissed-until';
 const REMIND_AFTER_DAYS = 7;
 /** Banner baru muncul setelah user sempat lihat-lihat halaman dulu, bukan langsung nge-block */
 const SHOW_DELAY_MS = 8000;
+/** Jeda tambahan MAKSIMAL kalau nudge lain (mis. bubble Zannah) masih tampil pas giliran banner ini */
+const ATTENTION_GRACE_MS = 6000;
 
 const isDismissedForNow = (): boolean => {
     try {
@@ -49,9 +52,21 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
             setVisible(false);
             return;
         }
-        const timer = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
-        return () => clearTimeout(timer);
+        // Sama seperti setTimeout biasa, tapi menunggu dulu (dengan batas)
+        // kalau nudge lain — mis. bubble Zannah — kebetulan masih tampil
+        // pas giliran banner ini tiba, supaya tidak numpuk di layar.
+        return scheduleAttentionReveal('pwa-install', SHOW_DELAY_MS, ATTENTION_GRACE_MS, () => setVisible(true));
     }, [eligible]);
+
+    // Siarkan status ke koordinator bersama — dipakai nudge lain untuk tahu
+    // kapan "jatah perhatian" sedang dipakai banner ini.
+    useEffect(() => {
+        if (visible) {
+            announceNudgeShown('pwa-install');
+        } else {
+            announceNudgeDismissed('pwa-install');
+        }
+    }, [visible]);
 
     if (!visible) return null;
 

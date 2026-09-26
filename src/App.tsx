@@ -14,6 +14,7 @@ import { ShowcaseBanner } from './components/ShowcaseBanner';
 import { PWAManager } from './components/PWAManager';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { ZannahWelcomeNudge } from './components/ZannahWelcomeNudge';
+import { ArticleRecommendationNudge } from './components/ArticleRecommendationNudge';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { ArrowUp } from 'lucide-react';
 import {
@@ -385,6 +386,12 @@ function MainPortfolio() {
           bukan overlay coachmark yang maksa. Baru dijadwalkan muncul setelah
           ChatWidget (dan tombol togglenya) siap. */}
       <ZannahWelcomeNudge darkMode={darkMode} enabled={chatWidgetReady} />
+
+      {/* Rekomendasi artikel acak — muncul sendiri 10 detik setelah beranda
+          dibuka, pojok kanan atas (desktop/tablet saja, lihat komentar di
+          dalam komponennya). `enabled` mengikuti rute, bukan chatWidgetReady,
+          karena tidak bergantung pada ChatWidget sama sekali. */}
+      <ArticleRecommendationNudge darkMode={darkMode} enabled={location.pathname === ROUTES.home} />
 
       {/* Floating Action Button (Back to Top) */}
       <div className="fixed bottom-6 right-6 z-40 no-print">

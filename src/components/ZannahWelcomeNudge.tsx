@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Sparkles, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { announceNudgeShown, announceNudgeDismissed } from '../utils/attentionNudge';
 
 const SHOW_AFTER_MS = 3500;
 
@@ -79,6 +80,18 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
     alreadyHandledRef.current = true;
     setVisible(false);
   };
+
+  // Siarkan status ke koordinator bersama (lihat utils/attentionNudge.ts) —
+  // dipakai nudge lain (banner install PWA, rekomendasi artikel) untuk tahu
+  // kapan "jatah perhatian" pengguna sedang dipakai bubble ini, supaya
+  // mereka tidak numpuk tampil bersamaan.
+  useEffect(() => {
+    if (visible) {
+      announceNudgeShown('zannah');
+    } else {
+      announceNudgeDismissed('zannah');
+    }
+  }, [visible]);
 
   // Escape menutup bubble — konsisten dengan pola dismiss lain (drawer mobile,
   // modal exit-confirm) yang sudah ada di app ini.

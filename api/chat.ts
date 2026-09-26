@@ -200,9 +200,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const orderedGemmaModels = requestedIsGemma
             ? [
-                GEMMA_FALLBACK_MODELS.find((m) => m.name === requestedModel)!,
+                GEMMA_FALLBACK_MODELS.find((m) => m.name === requestedModel),
                 ...GEMMA_FALLBACK_MODELS.filter((m) => m.name !== requestedModel),
-            ]
+            ].filter((m): m is (typeof GEMMA_FALLBACK_MODELS)[number] => Boolean(m))
             : [...GEMMA_FALLBACK_MODELS];
 
         const isSummaryRequested =

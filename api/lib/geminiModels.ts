@@ -10,8 +10,7 @@ export const GEMINI_MODELS = [
 ] as const;
 
 export const GEMMA_FALLBACK_MODELS = [
-    { name: 'gemma-4-26b-a4b-it', priority: 1 }, // Active 4B MoE architecture: respons jauh lebih cepat & stabil (14.400 RPD)
-    { name: 'gemma-4-31b-it', priority: 2 },     // Dense 31B parameters (14.400 RPD)
+    { name: 'gemma-4-26b-a4b-it', priority: 1 }, // Active 4B MoE architecture: respons cepat (~4-6s) & stabil (14.400 RPD)
 ] as const;
 
 export type GeminiModelName = (typeof GEMINI_MODELS)[number]['name'];
@@ -151,8 +150,8 @@ export async function callGemmaModel(
 
     try {
         const controller = new AbortController();
-        // Gemma 4 melakukan internal reasoning (thoughts) sebelum jawaban akhir, butuh toleransi waktu ~20-22s
-        const timeoutId = setTimeout(() => controller.abort(), 22000);
+        // Gemma 4 26B MoE responsif (~4-7s), timeout 14 detik cukup dan aman
+        const timeoutId = setTimeout(() => controller.abort(), 14000);
 
         const response = await fetch(`${endpoint}?key=${apiKey}`, {
             method: 'POST',

@@ -44,7 +44,7 @@ describe('rateLimiter', () => {
 
     it('grants generous rate limit for Gemma models', () => {
         const ip = `gemma-ip-${Date.now()}`;
-        const model = 'gemma-4-31b-it';
+        const model = 'gemma-4-26b-a4b-it';
 
         const res = checkRateLimit(ip, model);
         expect(res.allowed).toBe(true);
