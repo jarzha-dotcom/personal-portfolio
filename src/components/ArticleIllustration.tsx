@@ -207,6 +207,16 @@ const CATEGORY_ILLUSTRATIONS: Record<string, IconPair> = {
 
 const DEFAULT_ILLUSTRATION: IconPair = { Icon: FileText, Accent: Sparkles };
 
+const getIconPair = (slug: string, category?: string): IconPair =>
+  SLUG_ILLUSTRATIONS[slug] ??
+  (category ? CATEGORY_ILLUSTRATIONS[category] : undefined) ??
+  DEFAULT_ILLUSTRATION;
+
+/** Dipakai komponen lain (mis. InfiniteBanner) yang butuh ikon representatif
+ * satu artikel tanpa perlu merender full ArticleIllustration-nya. */
+export const getArticleIcon = (slug: string, category?: string): LucideIcon =>
+  getIconPair(slug, category).Icon;
+
 interface ArticleIllustrationProps {
   slug: string;
   category?: string;
@@ -234,11 +244,7 @@ export const ArticleIllustration: React.FC<ArticleIllustrationProps> = ({
   const hasCustomImage = !!imageUrl;
 
   // 2. Jika ada gambar custom, kita tidak perlu mengambil ikon (atau bisa pakai default sebagai fallback TS)
-  const { Icon, Accent } = !hasCustomImage
-    ? (SLUG_ILLUSTRATIONS[slug] ??
-      (category ? CATEGORY_ILLUSTRATIONS[category] : undefined) ??
-      DEFAULT_ILLUSTRATION)
-    : DEFAULT_ILLUSTRATION;
+  const { Icon, Accent } = !hasCustomImage ? getIconPair(slug, category) : DEFAULT_ILLUSTRATION;
 
   const isHero = size === 'hero';
 

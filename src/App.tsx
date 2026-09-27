@@ -11,6 +11,7 @@ import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
 import { ShowcaseBanner } from './components/ShowcaseBanner';
+import { InfiniteBanner } from './components/InfiniteBanner';
 import { PWAManager } from './components/PWAManager';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { ZannahWelcomeNudge } from './components/ZannahWelcomeNudge';
@@ -344,6 +345,9 @@ function MainPortfolio() {
             path="*"
             element={
               <>
+                <div className="pt-12 md:pt-16">
+                  <InfiniteBanner darkMode={darkMode} />
+                </div>
                 <Hero darkMode={darkMode} />
                 <Reveal>
                   <About darkMode={darkMode} />

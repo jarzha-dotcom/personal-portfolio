@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { ARTICLES } from '../data/articles';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
-import { ROUTES, articleRoute } from '../routes';
+import { ROUTES, articleRoute, CANONICAL_BASE } from '../routes';
 import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
 import { formatIDDate, toISODate } from '../utils/formatDate';
 import { ArticleIllustration } from '../components/ArticleIllustration';
@@ -26,7 +26,7 @@ interface ArticlesIndexPageProps {
 const PAGE_TITLE = 'Artikel | K. Arzhaning Jagad (Arzha)';
 const PAGE_DESCRIPTION =
   'Catatan teknis dan panduan seputar pengembangan web, mobile app, dan chatbot — dari pengalaman menangani proyek nyata.';
-const CANONICAL_URL = 'https://arzhaning.my.id/artikel';
+const CANONICAL_URL = `${CANONICAL_BASE}${ROUTES.articles}`;
 
 const FOCUS_RING =
   'focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent';
@@ -142,8 +142,8 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
   }, [searchQuery, activeCategory]);
 
   useBreadcrumbSchema([
-    { name: 'Beranda', url: 'https://arzhaning.my.id/' },
-    { name: 'Artikel', url: `https://arzhaning.my.id${ROUTES.articles}` },
+    { name: 'Beranda', url: `${CANONICAL_BASE}/` },
+    { name: 'Artikel', url: `${CANONICAL_BASE}${ROUTES.articles}` },
   ]);
 
   useEffect(() => {

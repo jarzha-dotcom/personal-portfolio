@@ -8,7 +8,7 @@ import {
   Database,
   Code2,
   Gamepad2,
-  FolderGit2
+  FolderGit2,
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 
@@ -30,8 +30,9 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
   return (
     <section
       id="beranda"
-      className={`relative pt-24 pb-12 md:pt-28 md:pb-16 overflow-hidden transition-colors duration-200 ${darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
-        }`}
+      className={`relative pt-6 pb-12 md:pt-8 md:pb-16 overflow-hidden transition-colors duration-200 ${
+        darkMode ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Hero Banner */}
@@ -59,7 +60,9 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
               <p className="text-slate-200 text-xs sm:text-sm max-w-2xl leading-relaxed mb-5">
                 Indie Developer dengan latar belakang audit korporat{' '}
                 <strong className="text-emerald-300 font-semibold">7+ tahun. </strong>
-                Menghadirkan layanan pembuatan aplikasi web, mobile, dan sistem bisnis dari konsep hingga rilis, dengan standar ketelitian data tinggi dan UI interaktif.
+                Menghadirkan layanan pembuatan aplikasi web, mobile, dan sistem bisnis
+                dari konsep hingga rilis, dengan standar ketelitian data tinggi dan UI
+                interaktif.
               </p>
 
               {/* CTA Buttons */}
@@ -105,8 +108,12 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
                   <div className="absolute bottom-2 left-2 right-2 text-center">
-                    <p className="text-white text-xs font-bold truncate">{PERSONAL_INFO.name}</p>
-                    <p className="text-emerald-300 text-[10px] truncate">{PERSONAL_INFO.titleJasa}</p>
+                    <p className="text-white text-xs font-bold truncate">
+                      {PERSONAL_INFO.name}
+                    </p>
+                    <p className="text-emerald-300 text-[10px] truncate">
+                      {PERSONAL_INFO.titleJasa}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -122,42 +129,60 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
               label: 'Pengalaman',
               value: PERSONAL_INFO.yearsOfExperience,
               lightBg: 'bg-emerald-500/15 text-emerald-600',
-              darkBg: 'bg-emerald-500/20 text-emerald-400'
+              darkBg: 'bg-emerald-500/20 text-emerald-400',
             },
             {
               icon: FileCheck2,
               label: 'Spesialisasi',
               value: 'Web, Mobile & Game',
               lightBg: 'bg-indigo-500/15 text-indigo-600',
-              darkBg: 'bg-indigo-500/20 text-indigo-400'
+              darkBg: 'bg-indigo-500/20 text-indigo-400',
             },
             {
               icon: Database,
               label: 'Latar Belakang',
               value: 'Disiplin Kerja Korporat',
               lightBg: 'bg-emerald-500/15 text-emerald-600',
-              darkBg: 'bg-emerald-500/20 text-emerald-400'
+              darkBg: 'bg-emerald-500/20 text-emerald-400',
             },
             {
               icon: Gamepad2,
               label: 'Rilis Terakhir',
               value: 'Game & App Edukasi',
               lightBg: 'bg-amber-500/15 text-amber-600',
-              darkBg: 'bg-amber-500/20 text-amber-400'
+              darkBg: 'bg-amber-500/20 text-amber-400',
             },
           ].map((item, i) => {
             const Icon = item.icon;
             return (
-              <div key={i} className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
-                }`}>
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${darkMode ? item.darkBg : item.lightBg}`}>
+              <div
+                key={i}
+                className={`p-3.5 rounded-xl border flex items-center gap-3 transition-colors ${
+                  darkMode
+                    ? 'bg-slate-900 border-slate-700'
+                    : 'bg-white border-slate-200 shadow-sm'
+                }`}
+              >
+                <div
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${darkMode ? item.darkBg : item.lightBg}`}
+                >
                   <Icon className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className={`text-[11px] font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'
-                    }`}>{item.label}</p>
-                  <p className={`text-xs font-bold ${darkMode ? 'text-white' : 'text-slate-900'
-                    }`}>{item.value}</p>
+                  <p
+                    className={`text-[11px] font-medium ${
+                      darkMode ? 'text-slate-400' : 'text-slate-500'
+                    }`}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    className={`text-xs font-bold ${
+                      darkMode ? 'text-white' : 'text-slate-900'
+                    }`}
+                  >
+                    {item.value}
+                  </p>
                 </div>
               </div>
             );

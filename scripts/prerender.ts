@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 import { ARTICLES, getAdjacentArticles, getRelatedArticles, type Article } from '../src/data/articles.ts';
 import { PROJECTS, CONTACT_INFO } from '../src/data/portfolioData.ts';
 import { TESTIMONIALS } from '../src/data/testimonials.ts';
-import { ROUTES, articleRoute } from '../src/routes.ts';
+import { ROUTES, articleRoute, CANONICAL_BASE } from '../src/routes.ts';
 import { formatIDDate, toISODate } from '../src/utils/formatDate.ts';
 import type { ProjectItem } from '../src/types.ts';
 // Asumsi lokasi file: src/components/ArticleIllustration.tsx (mengikuti pola
@@ -36,8 +36,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
 const DIST_DIR = join(ROOT_DIR, 'dist');
 const VERCEL_JSON_PATH = join(ROOT_DIR, 'vercel.json');
+const INDEX_HTML_PATH = join(DIST_DIR, 'index.html');
 
-const CANONICAL_BASE = 'https://arzhaning.my.id';
+// CANONICAL_BASE sekarang diimpor dari src/routes.ts (satu-satunya sumber),
+// bukan didefinisikan ulang di sini.
 const SITE_SUFFIX = 'K. Arzhaning Jagad (Arzha)';
 const ARTICLES_PER_PAGE = 9;
 
@@ -728,6 +730,35 @@ const buildSitemap = (paginationInfo: { totalPages: number; pageUrl: (page: numb
 // sudah tidak published/tidak ada.
 // ---------------------------------------------------------------------------
 
+// index.html adalah satu-satunya tempat CANONICAL_BASE tidak bisa ikut
+// diimpor dari src/routes.ts (dia HTML statis, bukan modul JS) — nilainya
+// di-hardcode manual di og:url/canonical dist/index.html (lihat catatan di
+// routes.ts). Guard ini mendeteksi kalau dua-duanya sampai beda, supaya
+// ketahuan di log build daripada diam-diam og:url homepage nunjuk ke domain
+// yang salah.
+const checkIndexHtmlCanonicalDrift = () => {
+  if (!existsSync(INDEX_HTML_PATH)) return;
+  const html = readFileSync(INDEX_HTML_PATH, 'utf-8');
+  const ogUrlMatch = html.match(/<meta property="og:url" content="([^"]*)" \/>/);
+  const canonicalMatch = html.match(/<link rel="canonical" href="([^"]*)" \/>/);
+
+  const mismatches: string[] = [];
+  if (ogUrlMatch && !ogUrlMatch[1].startsWith(CANONICAL_BASE)) {
+    mismatches.push(`og:url = "${ogUrlMatch[1]}"`);
+  }
+  if (canonicalMatch && !canonicalMatch[1].startsWith(CANONICAL_BASE)) {
+    mismatches.push(`canonical = "${canonicalMatch[1]}"`);
+  }
+
+  if (mismatches.length) {
+    console.warn(
+      `\n[prerender] PERINGATAN: dist/index.html (homepage) tidak sinkron dengan CANONICAL_BASE ("${CANONICAL_BASE}") di src/routes.ts:\n` +
+        mismatches.map((m) => `  - ${m}`).join('\n') +
+        `\n  index.html tidak ikut diimpor otomatis (bukan modul JS) — update og:url dan <link rel="canonical"> di index.html secara manual supaya cocok.\n`
+    );
+  }
+};
+
 const checkVercelRewriteDrift = (publishedSlugs: string[], totalPages: number) => {
   if (!existsSync(VERCEL_JSON_PATH)) return;
   const vercelConfig = JSON.parse(readFileSync(VERCEL_JSON_PATH, 'utf-8'));
@@ -801,6 +832,7 @@ const main = () => {
     published.map((a) => a.slug),
     totalPages
   );
+  checkIndexHtmlCanonicalDrift();
 
   console.log(`\n[prerender] Selesai. ${written.length} file ditulis:`);
   for (const file of written) {

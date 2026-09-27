@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Clock, Calendar, Sparkles } from 'lucide-react';
 import { getArticleBySlug, getAdjacentArticles } from '../data/articles';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
-import { ROUTES, articleRoute } from '../routes';
+import { ROUTES, articleRoute, CANONICAL_BASE } from '../routes';
 import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
 import { formatIDDate, toISODate } from '../utils/formatDate';
 import { ReadingProgress } from '../components/ReadingProgress';
@@ -15,8 +15,6 @@ import { RelatedArticles } from '../components/RelatedArticles';
 interface ArticlePageProps {
   darkMode: boolean;
 }
-
-const CANONICAL_BASE = 'https://arzhaning.my.id';
 
 export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
   const { slug } = useParams<{ slug: string }>();
