@@ -3,7 +3,7 @@ import {
     detectAgentIntent,
     detectCrossPersonaIntent,
     sanitizeUploadedFiles,
-} from '../lib/intentDetector';
+} from '../_lib/intentDetector';
 
 describe('intentDetector', () => {
     it('detects file_analysis when files are uploaded', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { callDevRABEngine, renderDevRABProposalHtml } from '../lib/devrabClient';
+import { callDevRABEngine, renderDevRABProposalHtml } from '../_lib/devrabClient';
 
 describe('devrabClient', () => {
     const originalEnv = process.env;

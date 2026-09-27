@@ -17,7 +17,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
-import { saveSummary, getSummary, StoredSummaryMessage } from './lib/summaryStore';
+import { saveSummary, getSummary, StoredSummaryMessage } from './_lib/summaryStore';
 
 const MAX_MESSAGES = 60;
 const MAX_TEXT_LENGTH = 4000;

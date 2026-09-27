@@ -10,7 +10,7 @@ import {
     consumeDevRABDailyQuota,
     DEVRAB_RATE_LIMIT_PER_HOUR,
     DEVRAB_DAILY_CAP,
-} from '../lib/rateLimiter';
+} from '../_lib/rateLimiter';
 
 describe('rateLimiter', () => {
     it('allows requests within limit and decrements remaining', () => {

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getUsage, getMonthlyLimit } from './lib/ttsQuota';
+import { getUsage, getMonthlyLimit } from './_lib/ttsQuota';
 
 // PIN ini SENGAJA cuma disimpan sebagai env var server-side (Vercel env
 // vars, bukan VITE_*/NEXT_PUBLIC_* dsb) -- jangan pernah di-expose ke

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { reserveQuota, releaseQuota, getMonthlyLimit, type TtsTier } from './lib/ttsQuota';
+import { reserveQuota, releaseQuota, getMonthlyLimit, type TtsTier } from './_lib/ttsQuota';
 
 const GCP_API_KEY = process.env.GCP_API_KEY;
 

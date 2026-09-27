@@ -1,40 +1,40 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSystemInstruction, BotPersona } from './lib/prompts.js';
+import { getSystemInstruction, BotPersona } from './_lib/prompts.js';
 import {
     checkRateLimit,
     cleanupOldRateLimits,
     getAntigravityDailyStatus,
     consumeAntigravityDailyQuota,
     ANTIGRAVITY_DAILY_CAP,
-} from './lib/rateLimiter.js';
+} from './_lib/rateLimiter.js';
 import {
     buildAgentDocumentAttachment,
     generateSummaryAttachment,
     reconcileReplyWithOutcome,
-} from './lib/documentGenerator.js';
+} from './_lib/documentGenerator.js';
 import {
     pingDevRABEngine,
-} from './lib/devrabClient.js';
+} from './_lib/devrabClient.js';
 import {
     callAntigravity,
     ANTIGRAVITY_MODEL,
-} from './lib/antigravity.js';
+} from './_lib/antigravity.js';
 import {
     detectAgentIntent,
     detectCrossPersonaIntent,
     assessAgentReadiness,
     sanitizeUploadedFiles,
     AgentIntentAction,
-} from './lib/intentDetector.js';
+} from './_lib/intentDetector.js';
 import {
     handleFaqSemanticSearch,
-} from './lib/semanticFaq.js';
+} from './_lib/semanticFaq.js';
 import {
     GEMINI_MODELS,
     GEMMA_FALLBACK_MODELS,
     callGeminiModel,
     callGemmaModel,
-} from './lib/geminiModels.js';
+} from './_lib/geminiModels.js';
 
 export const maxDuration = 60; // 60 detik batas waktu serverless Vercel untuk cascade fallback dan Gemma reasoning
 

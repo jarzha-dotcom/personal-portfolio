@@ -5,7 +5,7 @@ import {
     renderRabHtml,
     renderResearchHtml,
     generateSummaryAttachment,
-} from '../lib/documentGenerator';
+} from '../_lib/documentGenerator';
 
 describe('documentGenerator', () => {
     it('escapes HTML special characters', () => {
