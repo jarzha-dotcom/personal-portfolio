@@ -6,9 +6,16 @@
  * Kenapa ini perlu ada: sebelumnya klik "Chat via WhatsApp" cuma buka
  * wa.me dengan teks generik ("saya ingin tanya soal X") — Arzha gak punya
  * konteks obrolan sebelum balas. Sekarang, pas tombol ini diklik, transkrip
- * chat yang SEDANG ditampilkan ke user dikirim ke backend (`/api/share-summary`),
+ * chat yang SEDANG ditampilkan ke user dikirim ke backend (`POST /api/summary`),
  * disimpan sementara (lihat retention di api/lib/summaryStore.ts), dan
- * dibalikin sebagai link privat yang otomatis ikut ke-embed di teks WhatsApp.
+ * dibalikin sebagai link privat (`GET /api/summary?id=...`) yang otomatis
+ * ikut ke-embed di teks WhatsApp.
+ *
+ * Catatan teknis: create & view SENGAJA digabung jadi SATU file/function
+ * (`api/summary.ts`, dibedain lewat method POST vs GET) alih-alih 2 file
+ * terpisah, karena Vercel Hobby plan cuma boleh maks. 12 Serverless
+ * Functions per deployment — projek ini sempat kepentok limit itu waktu
+ * fiturnya masih dipecah jadi 2 function.
  *
  * PENTING soal privasi (selaras dengan Kebijakan Privasi §2 & §4a di
  * index.html): fungsi ini SENGAJA cuma dipanggil dari satu tempat
@@ -43,7 +50,7 @@ export async function createShareableSummaryLink(
   if (messages.length === 0) return null;
 
   try {
-    const res = await fetch('/api/share-summary', {
+    const res = await fetch('/api/summary', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ botName, messages }),
