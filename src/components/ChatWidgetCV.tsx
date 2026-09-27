@@ -29,7 +29,7 @@ const KANIA_LOADING_STATUSES = [
     'Menyempurnakan detail jawaban...',
 ];
 
-// Voice Kania: Cewek (Google Cloud Text-to-Speech WaveNet D - Hangat, Ramah, Detail)
+// Voice Kania: Cewek Hangat, Ramah, Detail)
 const KANIA_VOICE = BOT_VOICES.KANIA;
 
 interface ChatWidgetCVProps {

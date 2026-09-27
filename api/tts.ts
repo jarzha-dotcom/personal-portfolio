@@ -1,4 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { reserveQuota, releaseQuota, getMonthlyLimit, type TtsTier } from './lib/ttsQuota';
 
 const GCP_API_KEY = process.env.GCP_API_KEY;
 
@@ -10,11 +11,18 @@ const GCP_API_KEY = process.env.GCP_API_KEY;
 // billing GCP lagi nonaktif, jadi tidak buang waktu nunggu request GCP gagal.
 const GCP_TTS_ENABLED = (process.env.GCP_TTS || '').trim().toLowerCase() === 'true';
 
-// Suara resmi Google Cloud Text-to-Speech WaveNet untuk id-ID (Free tier 1M karakter/bulan).
-const DEFAULT_VOICE = 'id-ID-Wavenet-A';
+// Suara resmi Google Cloud Text-to-Speech Chirp 3 HD untuk id-ID (Free tier 1M karakter/bulan).
+// NB: cek ulang nama voice ini di GCP Console (Text-to-Speech > Voices, filter id-ID)
+// sebelum deploy -- daftar & ketersediaan per-locale bisa berubah.
+const DEFAULT_VOICE = 'id-ID-Chirp3-HD-Aoede';
 
 const ALLOWED_VOICES = new Set([
-  // Google Cloud Text-to-Speech WaveNet Voices (Free Tier 1M karakter/bulan)
+  // Google Cloud Text-to-Speech Chirp 3 HD Voices (Free Tier 1M karakter/bulan, kualitas tertinggi)
+  'id-ID-Chirp3-HD-Aoede',
+  'id-ID-Chirp3-HD-Charon',
+  'id-ID-Chirp3-HD-Despina',
+  'id-ID-Chirp3-HD-Puck',
+  // Google Cloud Text-to-Speech WaveNet Voices (Free Tier 4M karakter/bulan)
   'id-ID-Wavenet-A',
   'id-ID-Wavenet-B',
   'id-ID-Wavenet-C',
@@ -27,17 +35,31 @@ const ALLOWED_VOICES = new Set([
 ]);
 
 // ── Fallback berjenjang kualitas suara ───────────────────────────────────────
-// Menggunakan voice WaveNet (Tier 1, natural & gratis 1 juta karakter/bulan di GCP)
-// dengan fallback ke Standard (Tier 2, gratis 4 juta karakter/bulan).
+// Chirp 3 HD (Tier 1, paling natural, kuota gratis 1M karakter/bulan) → WaveNet
+// (Tier 2, kuota gratis 4M karakter/bulan, disamakan dengan Standard) →
+// Standard (Tier 3, kuota gratis 4M karakter/bulan, lihat catatan di handler).
+//
+// Tier 1 & 2 masing-masing di-gate oleh quota tracking sendiri (ttsQuota.ts,
+// via Upstash Redis) SEBELUM voice-nya dicoba dipanggil ke GCP -- lihat index
+// tier ini dipetakan ke TIER_NAMES di bawah, urutannya harus tetap sinkron.
 const VOICE_TIERS: string[][] = [
-  // Tier 1 — Wavenet (natural, stabil & memiliki kuota gratis 1M karakter/bulan)
+  // Tier 0 — Chirp 3 HD (kuota gratis 1M karakter/bulan)
+  [
+    'id-ID-Chirp3-HD-Aoede',
+    'id-ID-Chirp3-HD-Charon',
+    'id-ID-Chirp3-HD-Despina',
+    'id-ID-Chirp3-HD-Puck',
+  ],
+  // Tier 1 — Wavenet (natural, stabil & kuota gratis 4M karakter/bulan)
   [
     'id-ID-Wavenet-A',
     'id-ID-Wavenet-B',
     'id-ID-Wavenet-C',
     'id-ID-Wavenet-D',
   ],
-  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan)
+  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan -- sengaja
+  // gak di-gate quota tracking sendiri, kuotanya jauh lebih longgar & ini
+  // sudah rung terakhir sebelum frontend fallback ke Web Speech browser)
   [
     'id-ID-Standard-A',
     'id-ID-Standard-B',
@@ -45,6 +67,13 @@ const VOICE_TIERS: string[][] = [
     'id-ID-Standard-D',
   ],
 ];
+
+// Pemetaan index VOICE_TIERS -> nama tier buat quota tracking (semua tier
+// sekarang di-gate, termasuk Standard -- biar fallback terakhir ke Web
+// Speech browser itu beneran "0 risiko saldo", bukan cuma diasumsikan aman
+// karena kuotanya gede). Limit bulanan tiap tier diambil dari
+// getMonthlyLimit() (ttsQuota.ts) -- default 80% dari kuota gratis GCP.
+const TIER_NAMES: TtsTier[] = ['chirp', 'wavenet', 'standard'];
 
 function tierIndexOf(voiceName: string): number {
   return VOICE_TIERS.findIndex((tier) => tier.includes(voiceName));
@@ -387,8 +416,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const fallbackChain = buildFallbackChain(selectedVoice);
   const attemptErrors: { voice: string; error: string }[] = [];
+  const chars = cleanText.length;
 
   for (const voiceName of fallbackChain) {
+    const tier = TIER_NAMES[tierIndexOf(voiceName)];
+
+    // ── Quota gate SEBELUM manggil GCP ────────────────────────────────────
+    // Semua tier (Chirp, WaveNet, Standard) di-gate lewat Redis. Cek+reservasi
+    // ini atomic (lihat ttsQuota.ts) -- kalau kuota bulan ini sudah abis,
+    // langsung skip ke voice/tier berikutnya TANPA sempat manggil GCP sama
+    // sekali (beda dari fallback lama yang cuma reaktif terhadap error API).
+    // Kalau ketiga tier abis kuotanya, handler ini balas 502 di bawah, dan
+    // frontend (voiceService.ts) yang fallback ke Web Speech browser -- jadi
+    // gak ada satu pun request yang "nembus" ke GCP di luar kuota gratis.
+    let reserved = false;
+    let quotaCheckFailed = false;
+    if (tier) {
+      const limit = getMonthlyLimit(tier);
+      try {
+        reserved = await reserveQuota(tier, chars, limit);
+      } catch (quotaErr) {
+        // Redis lagi bermasalah (BUKAN berarti kuota penuh) -- jangan sampai
+        // TTS ikut mati gara-gara ini. Tetap lanjut coba synthesize seperti
+        // biasa tanpa tracking buat percobaan ini (reserved tetap false,
+        // jadi releaseQuota gak ikut dipanggil di catch block bawah).
+        console.error(`[tts.ts] reserveQuota gagal (tier ${tier}), lanjut tanpa quota gate:`, quotaErr);
+        quotaCheckFailed = true;
+      }
+      if (!reserved && !quotaCheckFailed) {
+        // Ini baru beneran "kuota penuh" (reserveQuota sukses jalan & bilang
+        // false) -- skip ke voice/tier berikutnya, gak usah manggil GCP.
+        attemptErrors.push({ voice: voiceName, error: `Kuota bulanan tier "${tier}" sudah penuh` });
+        continue;
+      }
+    }
+
     try {
       const audioContent = await synthesizeWithVoice(voiceName, cleanText);
 
@@ -401,6 +463,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         remainingQuota: rateLimitStatus.remaining,
       });
     } catch (error: unknown) {
+      if (tier && reserved) {
+        // GCP call-nya gagal padahal kuota sempat direservasi -- rollback,
+        // biar karakter yang gagal disintesis gak ikut kehitung "kepake".
+        try {
+          await releaseQuota(tier, chars);
+        } catch (releaseErr) {
+          console.error(`[tts.ts] releaseQuota gagal (tier ${tier}):`, releaseErr);
+        }
+      }
+
       const isTimeout = error instanceof Error && error.name === 'AbortError';
       const message = isTimeout
         ? 'Request timeout ke GCP TTS'

@@ -21,6 +21,7 @@ import { useVoiceChat } from '../hooks/useVoiceChat';
 import { VoiceSpeakingBars } from './VoiceSpeakingBars';
 import { useStreamingText } from '../hooks/useStreamingText';
 import { downloadChatSummaryFile, shareChatSummaryFile, canShareChatSummary } from '../utils/chatSummaryGenerator';
+import { createShareableSummaryLink } from '../services/shareSummaryService';
 import { useRegisterModal } from '../context/NavigationHistoryContext';
 
 const ZANNAH_LOADING_STATUSES = [
@@ -253,6 +254,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Dicek sekali per mount (bukan tiap render) — kapabilitas Web Share API
   // (File sharing) gak berubah selama sesi browser berjalan.
   const [canShareSummary] = useState<boolean>(() => canShareChatSummary());
+  // Status tombol "Chat via WhatsApp": 'idle' → belum diklik, 'preparing' →
+  // lagi upload ringkasan ke server buat dibikinin link, 'ready' cuma dipakai
+  // sesaat sebelum window.open. Dipakai buat kasih feedback jujur ke user
+  // ("Menyiapkan ringkasan...") karena sekarang ada jeda network sebelum
+  // WhatsApp kebuka (beda dari sebelumnya yang instant window.open).
+  const [whatsappCtaState, setWhatsappCtaState] = useState<'idle' | 'preparing'>('idle');
   const [aiMode, setAiMode] = useState<'ai' | 'fallback' | 'unknown'>('unknown');
   const [activeModel, setActiveModel] = useState<string>('');
   const isRadit = aiMode === 'fallback';
@@ -691,12 +698,41 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
-  const openWhatsApp = useCallback(() => {
+  // Klik "Chat via WhatsApp" SEKARANG mengirim ringkasan percakapan (yang lagi
+  // ditampilkan ke user) ke backend dulu (opt-in: cuma pas tombol ini diklik,
+  // bukan tiap pesan — lihat Kebijakan Privasi §2 & §4a), supaya Arzha bisa
+  // buka linknya & baca konteks obrolan SEBELUM membalas — bukan modal user
+  // ceritain ulang dari nol di WhatsApp.
+  //
+  // Kalau upload gagal/timeout (server down, user offline pas klik, dst),
+  // kita SENGAJA tetap buka WhatsApp dengan teks konteks biasa tanpa link —
+  // gagal dapet link ringkasan bukan alasan buat block user menghubungi Arzha
+  // sama sekali.
+  const openWhatsApp = useCallback(async () => {
+    if (whatsappCtaState === 'preparing') return; // cegah double-klik nembak 2 request
+    setWhatsappCtaState('preparing');
+
+    const botName = isRadit ? 'Radit' : 'Zannah';
+    const summaryPayload = messages
+      .filter((m) => m.id !== 'welcome') // welcome message generik, gak perlu ikut kekirim
+      .map((m) => ({ sender: m.sender, text: m.text, timestamp: m.timestamp }));
+
+    let summaryLine = '';
+    if (summaryPayload.length > 0) {
+      const result = await createShareableSummaryLink(botName, summaryPayload);
+      if (result) {
+        summaryLine = `\n\n📋 Ringkasan obrolan saya dengan ${botName}: ${result.url}`;
+      }
+      // result === null → diam-diam lanjut tanpa link, lihat komentar di atas.
+    }
+
     const context = lastQueryRef.current
       ? `Halo Arzha, saya ingin tanya soal: ${lastQueryRef.current}`
       : 'Halo Arzha, saya tertarik dengan jasa development kamu.';
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(context)}`, '_blank');
-  }, [cleanPhone]);
+
+    setWhatsappCtaState('idle');
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(context + summaryLine)}`, '_blank');
+  }, [cleanPhone, isRadit, messages, whatsappCtaState]);
 
   // ── Bot reply helpers ──────────────────────────────────────────────────────
   const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
@@ -1050,6 +1086,35 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       );
     }, 400);
     timeoutsRef.current.push(id);
+  };
+
+  // Dipakai buat merender SATU tombol quick-option, dipanggil dari dua tempat
+  // (di dalam kotak balasan untuk CTA/WhatsApp, & di luar kotak khusus untuk
+  // "Menu Utama") supaya styling & behavior-nya tetap konsisten satu sumber.
+  const renderQuickOptionButton = (opt: QuickOption) => {
+    const isWhatsapp = opt.id === 'whatsapp';
+    const isPreparing = isWhatsapp && whatsappCtaState === 'preparing';
+    return (
+      <button
+        key={opt.id}
+        disabled={isPreparing}
+        onClick={() => handleOptionClick(opt.id, opt.label)}
+        className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-all active:scale-95 disabled:opacity-60 disabled:cursor-wait ${isWhatsapp
+          ? darkMode
+            ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
+            : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
+          : opt.id === 'menu'
+            ? darkMode
+              ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
+              : 'border-slate-300 text-slate-600 hover:bg-slate-100'
+            : darkMode
+              ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
+              : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
+          }`}
+      >
+        {isPreparing ? '⏳ Menyiapkan ringkasan...' : opt.label}
+      </button>
+    );
   };
 
   const handleOptionClick = (id: string, label: string) => {
@@ -1726,6 +1791,20 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                           }`}
                       >
                         {renderMessageBody(m.text, m.sender === 'user', m.isStreaming)}
+
+                        {/* CTA (RAB, Research, WhatsApp, dll) — SEKARANG di dalam
+                            kotak balasan, biar kebaca sebagai bagian dari respons
+                            Zannah, bukan elemen navigasi lepas yang mengambang di
+                            bawahnya. Cuma "Menu Utama" yang sengaja dikecualikan
+                            (lihat blok terpisah di luar kotak, setelah </div>
+                            penutup bubble ini) karena perannya beda: itu navigasi
+                            keluar dari topik saat ini, bukan aksi atas balasan ini. */}
+                        {m.options && m.options.some((o) => o.id !== 'menu') && (
+                          <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-dashed border-current/10">
+                            {m.options.filter((o) => o.id !== 'menu').map(renderQuickOptionButton)}
+                          </div>
+                        )}
+
                         <div className="flex items-center justify-between gap-2 mt-1">
                           {m.sender === 'bot' ? (
                             <div className="flex items-center gap-1.5">
@@ -1886,28 +1965,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                         </div>
                       )}
 
-                      {m.options && m.options.length > 0 && (
+                      {/* Cuma "Menu Utama" yang tetap di luar kotak balasan — lihat
+                          catatan di dalam bubble di atas untuk alasannya. */}
+                      {m.options && m.options.some((o) => o.id === 'menu') && (
                         <div className="flex flex-wrap gap-1.5">
-                          {m.options.map((opt) => (
-                            <button
-                              key={opt.id}
-                              onClick={() => handleOptionClick(opt.id, opt.label)}
-                              className={`text-[10.5px] px-2.5 py-1.5 rounded-full border font-medium transition-all active:scale-95 ${opt.id === 'whatsapp'
-                                ? darkMode
-                                  ? 'border-emerald-700 text-emerald-400 bg-emerald-950/40 hover:bg-emerald-900/40'
-                                  : 'border-emerald-300 text-emerald-700 bg-emerald-50 hover:bg-emerald-100'
-                                : opt.id === 'menu'
-                                  ? darkMode
-                                    ? 'border-slate-600 text-slate-300 hover:bg-slate-700'
-                                    : 'border-slate-300 text-slate-600 hover:bg-slate-100'
-                                  : darkMode
-                                    ? 'border-teal-700 text-teal-300 bg-teal-950/30 hover:bg-teal-900/40'
-                                    : 'border-teal-200 text-teal-700 bg-teal-50 hover:bg-teal-100'
-                                }`}
-                            >
-                              {opt.label}
-                            </button>
-                          ))}
+                          {m.options.filter((o) => o.id === 'menu').map(renderQuickOptionButton)}
                         </div>
                       )}
                     </div>

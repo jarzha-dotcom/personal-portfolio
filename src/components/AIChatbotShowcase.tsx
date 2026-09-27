@@ -48,8 +48,8 @@ import { BOT_VOICES } from '../services/voiceService';
 const SHOWCASE_BOT_NAME = 'Rajendra';
 const SHOWCASE_BOT_INITIALS = 'RJ';
 const SHOWCASE_BOT_ROLE = 'AI Portfolio Assistant';
-// Menggunakan voice resmi BOT_VOICES.RAJENDRA ('id-ID-Wavenet-C', male)
-// dari voiceService.ts (Google Cloud Text-to-Speech WaveNet).
+// Menggunakan voice resmi BOT_VOICES.RAJENDRA (male)
+// dari voiceService.ts .
 const SHOWCASE_VOICE = BOT_VOICES.RAJENDRA;
 const MAX_DISPLAY_MESSAGES = 50;
 const MAX_HISTORY_TURNS = 12; // 6 putaran percakapan terakhir

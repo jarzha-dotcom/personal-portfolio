@@ -442,7 +442,7 @@ body {
   <span class="hero-badge">🔒 Privasi &amp; Keamanan Data</span>
   <h1>Kebijakan Privasi</h1>
   <p class="hero-meta">
-    Berlaku sejak: <strong>20 September 2026</strong> • Situs: <strong>arzhaning.my.id</strong>
+    Berlaku sejak: <strong>20 September 2026</strong> • Diperbarui: <strong>27 September 2026</strong> • Situs: <strong>arzhaning.my.id</strong>
   </p>
 </section>
 
@@ -480,6 +480,7 @@ body {
       <p><strong>a. Data yang Anda berikan</strong></p>
       <ul>
         <li>Pesan chat: isi percakapan yang Anda ketik pada asisten AI di Situs.</li>
+        <li>Ringkasan chat untuk WhatsApp: <strong>hanya saat Anda menekan tombol "Chat via WhatsApp"</strong>, riwayat percakapan Anda dengan asisten AI pada sesi tersebut dikirim &amp; disimpan sementara di server kami, agar Mas Arzha dapat membaca konteks obrolan Anda sebelum membalas. Lihat detail lengkapnya di bagian <a href="#asisten-ai">Asisten AI</a>.</li>
         <li>Kontak via WhatsApp: percakapan berlangsung di WhatsApp dan tunduk pada kebijakan privasi WhatsApp.</li>
       </ul>
       <p><strong>b. Data yang terkumpul otomatis</strong></p>
@@ -510,6 +511,15 @@ body {
       <h2><span class="num">4</span> Asisten AI</h2>
       <p>Situs menyediakan asisten AI (Zannah, Rajendra, Kania, dan Radit). Pesan Anda diteruskan melalui server kami ke penyedia model AI (Google Gemini API). Pemrosesan oleh penyedia tunduk pada kebijakan privasi mereka.</p>
       <p>Mohon tidak memasukkan data sensitif seperti kata sandi, nomor kartu, atau data kesehatan.</p>
+
+      <p><strong>Ringkasan untuk WhatsApp (opt-in).</strong> Riwayat chat asisten AI secara default hanya tersimpan di perangkat Anda sendiri (lihat bagian 2c). Namun, saat Anda secara sadar menekan tombol <strong>"Chat via WhatsApp"</strong> pada widget chat, Situs akan:</p>
+      <ul>
+        <li>Mengirim isi percakapan Anda pada sesi tersebut ke server kami untuk dibuatkan satu tautan (link) ringkasan yang privat;</li>
+        <li>Menyimpan ringkasan itu sementara selama maksimum <strong>7 hari</strong>, lalu menghapusnya secara otomatis;</li>
+        <li>Menyertakan tautan tersebut pada pesan WhatsApp yang akan Anda kirim ke Mas Arzha, agar beliau dapat membaca konteks obrolan Anda sebelum membalas;</li>
+        <li>Halaman ringkasan diberi label <em>noindex</em> (tidak dapat ditemukan lewat mesin pencari) dan tidak di-cache publik, namun tetap dapat diakses siapa pun yang memegang tautannya — perlakukan tautan tersebut seperti Anda memperlakukan isi chat itu sendiri.</li>
+      </ul>
+      <p>Aksi ini <strong>tidak</strong> terjadi otomatis di setiap pesan yang Anda ketik — hanya saat tombol "Chat via WhatsApp" itu sendiri yang Anda klik. Jika Anda ingin ringkasan dihapus lebih cepat dari 7 hari, hubungi kami melalui kontak pada bagian 12.</p>
     </section>
 
     <section class="content-section" id="cookie-iklan">
@@ -529,7 +539,7 @@ body {
           <tr><th>Layanan</th><th>Keperluan</th></tr>
         </thead>
         <tbody>
-          <tr><td>Vercel</td><td>Hosting Situs dan fungsi server (log akses, IP)</td></tr>
+          <tr><td>Vercel</td><td>Hosting Situs, fungsi server (log akses, IP), dan penyimpanan sementara ringkasan chat untuk WhatsApp (Vercel KV, maks. 7 hari)</td></tr>
           <tr><td>Google (Gemini API)</td><td>Memproses pesan chat asisten AI</td></tr>
           <tr><td>Google AdSense</td><td>Penayangan iklan dan cookie iklan</td></tr>
           <tr><td>Google Fonts</td><td>Memuat font</td></tr>
@@ -541,6 +551,7 @@ body {
     <section class="content-section" id="penyimpanan">
       <h2><span class="num">7</span> Penyimpanan dan Keamanan</h2>
       <p>Kami menerapkan langkah pengamanan yang wajar, termasuk koneksi terenkripsi (HTTPS). Namun, tidak ada metode transmisi atau penyimpanan data yang sepenuhnya bebas risiko. Log server disimpan selama diperlukan untuk keamanan dan operasional.</p>
+      <p>Ringkasan chat yang dibuat lewat tombol "Chat via WhatsApp" (lihat bagian 4) disimpan paling lama <strong>7 hari</strong> sejak dibuat, lalu terhapus otomatis dari server kami.</p>
     </section>
 
     <section class="content-section" id="hak">

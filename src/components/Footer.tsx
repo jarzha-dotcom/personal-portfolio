@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   ArrowUp,
   Linkedin,
@@ -12,9 +12,19 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { PERSONAL_INFO, CONTACT_INFO } from '../data/portfolioData';
+import { TtsQuotaModal } from './TtsQuotaModal';
+
+// Easter egg "rahasia" buat ngecek kuota TTS: tap/klik teks copyright 5x
+// dalam 2 detik. Window waktu pendek sengaja dipilih biar gak ke-trigger
+// gak sengaja kalau ada yang klak-klik iseng lambat, tapi tetap gampang
+// dipicu sendiri kalau tau caranya.
+const QUOTA_EASTER_EGG_TAPS = 5;
+const QUOTA_EASTER_EGG_WINDOW_MS = 2000;
 
 export const Footer: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [showQuotaModal, setShowQuotaModal] = useState(false);
+  const tapTimestamps = useRef<number[]>([]);
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -27,6 +37,18 @@ export const Footer: React.FC = () => {
     navigator.clipboard.writeText(CONTACT_INFO.email);
     setCopiedEmail(true);
     setTimeout(() => setCopiedEmail(false), 2000);
+  };
+
+  const handleCopyrightTap = () => {
+    const now = Date.now();
+    const recent = [...tapTimestamps.current, now].filter(
+      (t) => now - t <= QUOTA_EASTER_EGG_WINDOW_MS
+    );
+    tapTimestamps.current = recent;
+    if (recent.length >= QUOTA_EASTER_EGG_TAPS) {
+      tapTimestamps.current = [];
+      setShowQuotaModal(true);
+    }
   };
 
   return (
@@ -163,7 +185,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-500">
           <div className="flex flex-col sm:flex-row items-center gap-x-4 gap-y-1.5">
-            <p>
+            <p onClick={handleCopyrightTap} className="select-none">
               © 2026 K. Arzhaning Jagad. All rights reserved.
             </p>
             <nav aria-label="Legal" className="flex items-center gap-3">
@@ -187,6 +209,8 @@ export const Footer: React.FC = () => {
         </div>
 
       </div>
+
+      {showQuotaModal && <TtsQuotaModal onClose={() => setShowQuotaModal(false)} />}
     </footer>
   );
 };

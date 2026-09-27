@@ -55,18 +55,24 @@ export interface SpeechSupport {
   ttsBrowser: boolean;
 }
 
-// Konfigurasi Suara berdasarkan Persona Bot (Google Cloud Text-to-Speech WaveNet):
-// Gender di bawah ini mengikuti daftar resmi voice WaveNet id-ID dari Google Cloud
-// (Wavenet A/D = Female, Wavenet B/C = Male).
-// - Zannah:   Cewek (Ramah, Cerdas, Konsultatif) -> id-ID-Wavenet-A
-// - Radit:    Cowok (Tenang, Sigap, Direktori/Standby) -> id-ID-Wavenet-B
-// - Kania:    Cewek (Hangat, Detail, Asisten CV) -> id-ID-Wavenet-D
-// - Rajendra: Cowok (Portfolio AI Assistant) -> id-ID-Wavenet-C
+// Konfigurasi Suara berdasarkan Persona Bot (Google Cloud Text-to-Speech Chirp 3 HD):
+// Ini cuma voice PILIHAN/default per bot -- backend (api/tts.ts) yang urus
+// fallback berjenjang: Chirp 3 HD -> Wavenet -> Standard -> (kalau semua gagal)
+// frontend ini yang fallback ke Web Speech browser. Tiap tier Chirp & Wavenet
+// di-gate kuota bulanan sendiri (lihat api/_lib/ttsQuota.ts), jadi kalaupun
+// nama voice di bawah ini "diminta", yang beneran dipakai bisa turun tier
+// otomatis kalau kuota Chirp bulan ini abis -- ditandai lewat `degraded: true`
+// di SpeakOptions.onSourceResolved.
+// NB: cek ulang nama voice Chirp 3 HD id-ID ini di GCP Console sebelum deploy.
+// - Zannah:   Cewek (Ramah, Cerdas, Konsultatif) -> id-ID-Chirp3-HD-Aoede
+// - Radit:    Cowok (Tenang, Sigap, Direktori/Standby) -> id-ID-Chirp3-HD-Charon
+// - Kania:    Cewek (Hangat, Detail, Asisten CV) -> id-ID-Chirp3-HD-Despina
+// - Rajendra: Cowok (Portfolio AI Assistant) -> id-ID-Chirp3-HD-Puck
 export const BOT_VOICES = {
-  ZANNAH: 'id-ID-Wavenet-A',    // Cewek (Female)
-  RADIT: 'id-ID-Wavenet-B',     // Cowok (Male)
-  KANIA: 'id-ID-Wavenet-D',     // Cewek (Female)
-  RAJENDRA: 'id-ID-Wavenet-C',  // Cowok (Male)
+  ZANNAH: 'id-ID-Chirp3-HD-Aoede',    // Cewek (Female)
+  RADIT: 'id-ID-Chirp3-HD-Charon',    // Cowok (Male)
+  KANIA: 'id-ID-Chirp3-HD-Despina',   // Cewek (Female)
+  RAJENDRA: 'id-ID-Chirp3-HD-Puck',   // Cowok (Male)
 } as const;
 
 export const DEFAULT_GCP_VOICE = BOT_VOICES.ZANNAH;
