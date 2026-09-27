@@ -59,7 +59,7 @@ export interface SpeechSupport {
 // Ini cuma voice PILIHAN/default per bot -- backend (api/tts.ts) yang urus
 // fallback berjenjang: Chirp 3 HD -> Wavenet -> Standard -> (kalau semua gagal)
 // frontend ini yang fallback ke Web Speech browser. Tiap tier Chirp & Wavenet
-// di-gate kuota bulanan sendiri (lihat api/_lib/ttsQuota.ts), jadi kalaupun
+// di-gate kuota bulanan sendiri (lihat api/lib/ttsQuota.ts), jadi kalaupun
 // nama voice di bawah ini "diminta", yang beneran dipakai bisa turun tier
 // otomatis kalau kuota Chirp bulan ini abis -- ditandai lewat `degraded: true`
 // di SpeakOptions.onSourceResolved.
