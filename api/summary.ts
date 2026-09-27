@@ -17,7 +17,54 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
-import { saveSummary, getSummary, StoredSummaryMessage } from './_lib/summaryStore';
+import { Redis } from '@upstash/redis';
+
+// ── Storage (inline, SENGAJA gak dipisah ke file/folder lain) ───────────────
+// Sebelumnya ini di file terpisah (api/lib/summaryStore.ts), tapi Vercel
+// sempat gagal resolve import lintas-folder itu di production
+// (ERR_MODULE_NOT_FOUND, path-nya kebaca beda dari yang ada di repo).
+// Digabung ke sini biar nggak ada satu pun relative import ke folder lain
+// di dalam /api — menghilangkan seluruh kelas bug "module not found" yang
+// disebabkan mismatch nama folder/huruf besar-kecil antara kode & repo.
+const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+
+if (!UPSTASH_URL || !UPSTASH_TOKEN) {
+  console.error(
+    '[api/summary] Env var Upstash tidak ditemukan. Cek Vercel Dashboard → Storage ' +
+    '(integrasi Upstash harus ter-connect ke environment PRODUCTION) dan Settings → ' +
+    'Environment Variables (harus ada UPSTASH_REDIS_REST_URL & UPSTASH_REDIS_REST_TOKEN, ' +
+    'atau KV_REST_API_URL & KV_REST_API_TOKEN). Habis nambah/ubah env var, WAJIB redeploy.'
+  );
+}
+
+const redis = new Redis({ url: UPSTASH_URL ?? '', token: UPSTASH_TOKEN ?? '' });
+
+// 7 hari — SAMAKAN dengan angka retention di Kebijakan Privasi §4a & §7 (index.html).
+const SUMMARY_TTL_SECONDS = 7 * 24 * 60 * 60;
+
+interface StoredSummaryMessage {
+  sender: 'user' | 'bot';
+  text: string;
+  timestamp: string;
+}
+
+interface StoredSummary {
+  botName: string;
+  messages: StoredSummaryMessage[];
+  createdAt: string;
+}
+
+const keyFor = (id: string) => `chat-summary:${id}`;
+
+async function saveSummary(id: string, data: StoredSummary): Promise<void> {
+  await redis.set(keyFor(id), data, { ex: SUMMARY_TTL_SECONDS });
+}
+
+async function getSummary(id: string): Promise<StoredSummary | null> {
+  const data = await redis.get<StoredSummary>(keyFor(id));
+  return data ?? null;
+}
 
 const MAX_MESSAGES = 60;
 const MAX_TEXT_LENGTH = 4000;

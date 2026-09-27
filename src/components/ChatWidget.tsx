@@ -854,14 +854,42 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     return opts;
   };
 
+  // "Chat via WhatsApp" DULU nempel permanen di SETIAP balasan Zannah,
+  // padahal gak semua balasan itu momen yang pas buat diarahkan ke follow-up
+  // manusia (mis. balasan penjelasan teknis biasa) — malah bikin tombolnya
+  // berisik/kehilangan makna karena selalu ada. Sekarang tombol itu cuma
+  // muncul kalau ada SINYAL KUAT percakapannya udah "matang" buat lanjut ke
+  // Arzha langsung:
+  //   1. RAB/estimasi udah pernah SUKSES dibikin — titik wajar buat lanjut
+  //      bicara harga/kontrak/timeline sama orangnya langsung.
+  //   2. Backend (chat.ts) sendiri lagi menyarankan aksi agent (highlight
+  //      terisi) — itu tandanya topiknya udah cukup konkret/actionable.
+  //   3. Balasan Zannah SENDIRI (isi teksnya) memang mengarah ke ajakan
+  //      diskusi langsung/lanjut ke tahap berikutnya (WHATSAPP_INTENT_PATTERN
+  //      di bawah) — ini proxy paling dekat ke "Zannah merasa perlu", karena
+  //      Zannah cuma LLM yang gak punya cara resmi buat "mengeluarkan sinyal
+  //      terstruktur" selain lewat kata-katanya sendiri. Kalau nanti chat.ts
+  //      dikembangkan buat expose field eksplisit semacam
+  //      `suggestedContact: boolean`, ganti aja poin ini dengan baca field
+  //      itu langsung — jauh lebih akurat daripada nebak dari teks.
+  //
+  // Fallback Radit (raditCTA di bawah) SENGAJA TETAP selalu nampilin tombol
+  // ini apa adanya — justru itu titik di mana bot gagal jawab & manusia
+  // memang paling dibutuhkan, jadi gak perlu heuristic tambahan.
+  const WHATSAPP_INTENT_PATTERN =
+    /(hubungi(lah)? (mas |kak )?arzha|chat(ting)? (langsung )?(dengan|sama) arzha|diskusi(kan)? langsung|konsultasi(kan)? langsung|jadwalkan|dijadwalkan|booking|deal(?:ing)?|kontrak|pembayaran|\bdp\b|mulai proyek|lanjut ke tahap|follow[- ]?up (manual|langsung)|hubungi (saya|kami) via|kontak (langsung )?arzha)/i;
+
+  const shouldOfferWhatsapp = (replyText: string, highlight?: AgentIntentAction | null): boolean =>
+    hasGeneratedEstimate || !!highlight || WHATSAPP_INTENT_PATTERN.test(replyText);
+
   // Opsi cepat (quick reply) yang ditampilkan di bawah tiap balasan Zannah AI.
   // Aksi AI Agent SENGAJA berupa tombol opt-in (bukan auto-trigger) — biar
   // user yang memutuskan kapan mau pakai kemampuan yang lebih "berat" & makan
   // kuota Antigravity (100 RPD), bukan heuristic yang nebak-nebak sendiri.
-  const standardCTA = (hasRecentFiles: boolean, highlight?: AgentIntentAction | null): QuickOption[] => [
+  const standardCTA = (hasRecentFiles: boolean, replyText: string, highlight?: AgentIntentAction | null): QuickOption[] => [
     ...buildAgentCTA(hasRecentFiles, highlight),
     { id: 'menu', label: '⬅️ Menu Utama' },
-    { id: 'whatsapp', label: '💬 Chat via WhatsApp' },
+    ...(shouldOfferWhatsapp(replyText, highlight) ? [{ id: 'whatsapp', label: '💬 Chat via WhatsApp' }] : []),
   ];
 
   const raditCTA: QuickOption[] = [
@@ -979,7 +1007,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       // tidak pernah menyertakan field ini, jadi tombol tampil normal.
       streamBotMessage(
         replyText,
-        standardCTA(!!lastFilesRef.current, result.suggestedAgentAction),
+        standardCTA(!!lastFilesRef.current, replyText, result.suggestedAgentAction),
         true,
         isFromVoice,
         result.attachments,
@@ -1036,7 +1064,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       // yang belum sempat re-render), tolak dengan sopan.
       appendBotMessage(
         'Wah, fitur AI Agent buat obrolan ini udah kepakai maksimal, Kak 😊 Coba mulai obrolan baru ya, atau lanjut ngobrol biasa dulu di sini.',
-        standardCTA(!!lastFilesRef.current),
+        standardCTA(!!lastFilesRef.current, 'Wah, fitur AI Agent buat obrolan ini udah kepakai maksimal, Kak 😊 Coba mulai obrolan baru ya, atau lanjut ngobrol biasa dulu di sini.'),
         true,
       );
       return;
@@ -1137,7 +1165,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
           setIsTyping(false);
           appendBotMessage(
             'Hai Kak! Zannah sudah siap bantu diskusi lagi nih 😊 Ada ide proyek atau hal yang mau ditanyakan?',
-            standardCTA(!!lastFilesRef.current),
+            standardCTA(!!lastFilesRef.current, 'Hai Kak! Zannah sudah siap bantu diskusi lagi nih 😊 Ada ide proyek atau hal yang mau ditanyakan?'),
             true,
           );
         }, 400);
@@ -1195,7 +1223,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
       if (!lastFilesRef.current || lastFilesRef.current.length === 0) {
         appendBotMessage(
           'Hmm, sepertinya belum ada file yang bisa dianalisis lebih dalam nih, Kak. Coba lampirkan filenya dulu ya 😊',
-          standardCTA(false),
+          standardCTA(false, 'Hmm, sepertinya belum ada file yang bisa dianalisis lebih dalam nih, Kak. Coba lampirkan filenya dulu ya 😊'),
           true,
         );
         return;
