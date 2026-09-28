@@ -25,8 +25,11 @@ import {
     Plus,
     History,
     ExternalLink,
+    MessageCircle,
 } from 'lucide-react';
 import { sendMessageToGemini, ChatMessage, AgentStep, sendAgentAnalyticsEvent } from '../services/geminiService';
+import { CONTACT_INFO } from '../data/portfolioData';
+import { createShareableSummaryLink } from '../services/shareSummaryService';
 import {
     createConversation,
     getActiveConversationId,
@@ -187,6 +190,14 @@ const QUICK_PILLS = [
 ];
 
 // Helper: safe unique ID generator (bebas dari race condition milidetik)
+// Sama seperti di ChatWidget.tsx: encodeURIComponent standar TIDAK meng-encode
+// tanda kurung "(" ")" — kalau nama proyek/detail brief dari user kebetulan
+// mengandung itu, bisa bikin URL wa.me kepotong browser scan otomatis. Di-fix
+// manual di sini juga karena file ini punya alur pembuatan link WA sendiri
+// (lihat openWhatsAppWithSummary di bawah).
+const encodeUriComponentSafe = (str: string): string =>
+    encodeURIComponent(str).replace(/\(/g, '%28').replace(/\)/g, '%29');
+
 const generateMessageId = (prefix = 'msg'): string => {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) {
         return `${prefix}-${crypto.randomUUID()}`;
@@ -297,10 +308,54 @@ const AgentStepTrace: React.FC<{ steps: AgentStep[]; darkMode: boolean; onDone?:
 };
 
 
-const renderRichMarkdown = (content: string, darkMode: boolean) => {
+const renderRichMarkdown = (
+    content: string,
+    darkMode: boolean,
+    onWhatsAppClick?: (baseText: string) => void,
+    whatsappPreparing?: boolean,
+) => {
     const lines = content.split('\n');
 
     return lines.map((line, lineIdx) => {
+        // Deteksi link WhatsApp yang ditulis Zannah/Rajendra sendiri (lihat
+        // prompts.ts §5/"Format Kontak Resmi") & ubah jadi tombol interaktif
+        // yang otomatis kirim ringkasan chat — SAMA PERSIS logikanya dengan
+        // waMatch di ChatWidget.tsx (Zannah), biar Rajendra konsisten juga.
+        const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/\S+?)\)(?=\s|$)/);
+        if (waMatch && onWhatsAppClick) {
+            const [fullMatch, label, url] = waMatch;
+            const before = line.substring(0, line.indexOf(fullMatch));
+            const after = line.substring(line.indexOf(fullMatch) + fullMatch.length);
+
+            // Ambil teks brief yang sudah disusun Rajendra sendiri di query
+            // param `text` link ini (URLSearchParams SUDAH otomatis decode —
+            // jangan decodeURIComponent lagi, nanti dobel-decode).
+            let baseText = label;
+            try {
+                const parsedUrl = new URL(url);
+                baseText = parsedUrl.searchParams.get('text') || label;
+            } catch {
+                // URL kebetulan malformed (kepotong dsb) → fallback ke label tombol saja.
+            }
+
+            return (
+                <div key={lineIdx} className="my-2">
+                    {before && <div>{renderInlineFormattedText(before, darkMode)}</div>}
+                    <button
+                        type="button"
+                        disabled={whatsappPreparing}
+                        onClick={() => onWhatsAppClick(baseText)}
+                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
+                    >
+                        <MessageCircle className="w-4 h-4 shrink-0 fill-current" />
+                        <span>{whatsappPreparing ? '⏳ Menyiapkan ringkasan...' : label}</span>
+                        <ExternalLink className="w-3 h-3 ml-1 opacity-80" />
+                    </button>
+                    {after && <div>{renderInlineFormattedText(after, darkMode)}</div>}
+                </div>
+            );
+        }
+
         const isBullet = /^\s*[-*•]\s+(.*)/.exec(line);
         const isNumbered = /^\s*(\d+)\.\s+(.*)/.exec(line);
         const isQuote = /^\s*>\s*(.*)/.exec(line);
@@ -496,6 +551,45 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, 
     // percakapan yang tersimpan dimuat belakangan dari IndexedDB (async)
     // lewat effect di bawah, karena IndexedDB nggak bisa dibaca secara sinkron.
     const [messages, setMessages] = useState<DisplayMessage[]>(() => [buildWelcomeMessage()]);
+
+    // ── WhatsApp CTA (link ditulis Rajendra sendiri, lihat renderRichMarkdown) ──
+    // Sama seperti Zannah (ChatWidget.tsx): klik link WA yang Rajendra tulis
+    // otomatis upload transkrip chat ini ke backend dulu & nempelin link
+    // ringkasannya ke teks WA, biar Arzha bisa baca konteksnya sebelum balas.
+    // SENGAJA ditaruh SETELAH `messages` di-declare (bukan sebelum, seperti
+    // draft pertama saya) — dependency array useCallback di bawah merujuk
+    // `messages`, dan karena itu array literal biasa (dievaluasi LANGSUNG saat
+    // render, bukan ditunda), taruh sebelum deklarasinya bikin
+    // ReferenceError (temporal dead zone) tiap kali komponen ini di-render.
+    const [whatsappCtaState, setWhatsappCtaState] = useState<'idle' | 'preparing'>('idle');
+    const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
+
+    const openWhatsAppWithSummary = useCallback(async (baseText: string) => {
+        if (whatsappCtaState === 'preparing') return;
+        setWhatsappCtaState('preparing');
+
+        const summaryPayload = messages
+            .filter((m) => m.id !== 'welcome')
+            .map((m) => ({
+                sender: (m.role === 'user' ? 'user' : 'bot') as 'user' | 'bot',
+                text: m.content,
+                timestamp: m.timestamp || '',
+            }));
+
+        let summaryLine = '';
+        if (summaryPayload.length > 0) {
+            const result = await createShareableSummaryLink(SHOWCASE_BOT_NAME, summaryPayload);
+            if (result) {
+                summaryLine = `\n\n📋 Ringkasan obrolan saya dengan ${SHOWCASE_BOT_NAME}: ${result.url}`;
+            }
+            // result === null → upload gagal/offline, diam-diam lanjut tanpa
+            // link (lihat komentar senada di ChatWidget.tsx openWhatsApp).
+        }
+
+        setWhatsappCtaState('idle');
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(baseText + summaryLine)}`, '_blank');
+    }, [cleanPhone, messages, whatsappCtaState]);
+
     const [history, setHistory] = useState<ChatMessage[]>([]);
     // id percakapan yang lagi aktif di IndexedDB. Auto-save ditahan sampai
     // isStorageReady true, biar nggak menimpa data tersimpan dengan welcome
@@ -1345,7 +1439,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, 
                                 ) : (
                                     <>
                                         {msg.role === 'assistant' && !msg.isError && !msg.isRateLimit
-                                            ? renderRichMarkdown(msg.content, darkMode)
+                                            ? renderRichMarkdown(msg.content, darkMode, openWhatsAppWithSummary, whatsappCtaState === 'preparing')
                                             : <span>{renderInlineFormattedText(msg.content, darkMode)}</span>}
 
                                         {msg.isStreaming && (

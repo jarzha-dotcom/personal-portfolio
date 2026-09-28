@@ -156,7 +156,7 @@ export function canShareChatSummary(): boolean {
 export async function shareChatSummaryFile(
   messages: ChatSummaryMessage[],
   botName: string = 'Rajendra'
-): Promise<'shared' | 'unsupported' | 'cancelled' | 'error'> {
+): Promise<'shared' | 'unsupported' | 'cancelled' | 'blocked' | 'error'> {
   if (typeof window === 'undefined' || !messages || messages.length === 0) return 'error';
 
   if (!canShareChatSummary()) return 'unsupported';
@@ -165,19 +165,32 @@ export async function shareChatSummaryFile(
     const summaryText = buildChatSummaryText(messages, botName);
     const dateSlug = new Date().toISOString().slice(0, 10);
     const filename = `Rangkuman-Diskusi-${botName}-${dateSlug}.txt`;
-    const file = new File([summaryText], filename, { type: 'text/plain;charset=utf-8' });
+    // MIME polos (tanpa ";charset=utf-8"): parameter charset bisa membuat browser
+    // menolak tipe file saat share() dijalankan. Isi tetap ter-encode UTF-8.
+    const file = new File([summaryText], filename, { type: 'text/plain' });
 
-    if (!navigator.canShare({ files: [file] })) return 'unsupported';
-
-    await navigator.share({
+    // Hanya files + title (tanpa field `text`) -- beberapa implementasi desktop
+    // menolak kombinasi file dan text.
+    const shareData: ShareData = {
       files: [file],
       title: `Rangkuman Diskusi - ${botName}`,
-      text: 'Rangkuman diskusi proyek dari website portofolio K. Arzhaning Jagad (Arzha).',
-    });
+    };
+
+    if (!navigator.canShare(shareData)) return 'unsupported';
+
+    await navigator.share(shareData);
     return 'shared';
   } catch (error: unknown) {
-    // AbortError = user nutup share-sheet tanpa milih target, ini bukan error
-    if (error instanceof Error && error.name === 'AbortError') return 'cancelled';
+    if (error instanceof Error) {
+      // AbortError = user nutup share-sheet tanpa milih target, ini bukan error
+      if (error.name === 'AbortError') return 'cancelled';
+      // NotAllowedError = ditolak browser/OS (tipe file, user activation, dsb).
+      // Pemanggil sebaiknya fallback ke download.
+      if (error.name === 'NotAllowedError') {
+        console.warn('Share diblokir browser/OS:', error.message);
+        return 'blocked';
+      }
+    }
     console.error('Gagal membagikan file rangkuman chat:', error);
     return 'error';
   }

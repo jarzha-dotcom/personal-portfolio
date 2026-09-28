@@ -364,7 +364,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     } else if (result === 'cancelled') {
       setShareSummaryState('idle');
     } else {
-      // 'unsupported' atau 'error' — fallback ke download manual biar user
+      // 'unsupported', 'blocked', atau 'error' — fallback ke download manual biar user
       // tetap dapet filenya walau share-sheet gagal/gak didukung.
       setShareSummaryState('idle');
       handleDownloadSummary();
@@ -698,41 +698,60 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
 
   const cleanPhone = CONTACT_INFO.phone.replace(/[^0-9]/g, '');
 
-  // Klik "Chat via WhatsApp" SEKARANG mengirim ringkasan percakapan (yang lagi
-  // ditampilkan ke user) ke backend dulu (opt-in: cuma pas tombol ini diklik,
-  // bukan tiap pesan — lihat Kebijakan Privasi §2 & §4a), supaya Arzha bisa
-  // buka linknya & baca konteks obrolan SEBELUM membalas — bukan modal user
-  // ceritain ulang dari nol di WhatsApp.
+  // Fungsi INTI yang dipakai OLEH DUA jalur WhatsApp yang ada di widget ini:
+  //   1. Tombol CTA kecil "💬 Chat via WhatsApp" (quick option di bawah bubble)
+  //   2. Tombol besar yang muncul dari link WA yang DITULIS Zannah SENDIRI di
+  //      teks balasannya (lihat waMatch di renderMessageBody) — sebelumnya ini
+  //      cuma <a href> polos, gak lewat sini sama sekali, makanya link
+  //      ringkasannya gak pernah nempel walau tombol #1 di bawahnya sudah benar.
   //
-  // Kalau upload gagal/timeout (server down, user offline pas klik, dst),
-  // kita SENGAJA tetap buka WhatsApp dengan teks konteks biasa tanpa link —
-  // gagal dapet link ringkasan bukan alasan buat block user menghubungi Arzha
-  // sama sekali.
-  const openWhatsApp = useCallback(async () => {
+  // Upload transkrip ke backend dulu (opt-in: cuma pas salah satu tombol WA
+  // ini diklik — lihat Kebijakan Privasi §2 & §4a), supaya Arzha bisa baca
+  // konteks obrolan SEBELUM membalas.
+  const openWhatsAppWithSummary = useCallback(async (baseText: string) => {
     if (whatsappCtaState === 'preparing') return; // cegah double-klik nembak 2 request
     setWhatsappCtaState('preparing');
 
-    const botName = isRadit ? 'Radit' : 'Zannah';
-    const summaryPayload = messages
-      .filter((m) => m.id !== 'welcome') // welcome message generik, gak perlu ikut kekirim
-      .map((m) => ({ sender: m.sender, text: m.text, timestamp: m.timestamp }));
+    // Buka tab SEKARANG, selagi masih dalam gestur klik. Kalau window.open dipanggil
+    // setelah await, browser (terutama Safari & HP) sering memblokirnya sebagai popup.
+    const waWindow = window.open('', '_blank');
 
-    let summaryLine = '';
-    if (summaryPayload.length > 0) {
-      const result = await createShareableSummaryLink(botName, summaryPayload);
-      if (result) {
-        summaryLine = `\n\n📋 Ringkasan obrolan saya dengan ${botName}: ${result.url}`;
+    try {
+      const botName = isRadit ? 'Radit' : 'Zannah';
+      const summaryPayload = messages
+        .filter((m) => m.id !== 'welcome') // welcome message generik, gak perlu ikut kekirim
+        .map((m) => ({ sender: m.sender, text: m.text, timestamp: m.timestamp }));
+
+      let summaryLine = '';
+      if (summaryPayload.length > 0) {
+        const result = await createShareableSummaryLink(botName, summaryPayload);
+        if (result) {
+          summaryLine = `\n\n📋 Ringkasan obrolan saya dengan ${botName}: ${result.url}`;
+        }
+        // result === null → upload gagal/offline, diam-diam lanjut tanpa link
+        // (gagal dapet link bukan alasan buat block user menghubungi Arzha).
       }
-      // result === null → diam-diam lanjut tanpa link, lihat komentar di atas.
-    }
 
+      const url = `https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(baseText + summaryLine)}`;
+      if (waWindow) {
+        waWindow.location.href = url;
+      } else {
+        window.location.href = url; // fallback kalau tab tetap diblokir
+      }
+    } finally {
+      setWhatsappCtaState('idle');
+    }
+  }, [cleanPhone, isRadit, messages, whatsappCtaState]);
+
+  // Dipakai KHUSUS oleh tombol CTA kecil "💬 Chat via WhatsApp" — basis
+  // teksnya digenerate dari topik obrolan terakhir, beda dari jalur #2 di
+  // atas yang basis teksnya sudah ditulis Zannah sendiri di dalam balasan.
+  const openWhatsApp = useCallback(() => {
     const context = lastQueryRef.current
       ? `Halo Arzha, saya ingin tanya soal: ${lastQueryRef.current}`
       : 'Halo Arzha, saya tertarik dengan jasa development kamu.';
-
-    setWhatsappCtaState('idle');
-    window.open(`https://wa.me/${cleanPhone}?text=${encodeUriComponentSafe(context + summaryLine)}`, '_blank');
-  }, [cleanPhone, isRadit, messages, whatsappCtaState]);
+    return openWhatsAppWithSummary(context);
+  }, [openWhatsAppWithSummary]);
 
   // ── Bot reply helpers ──────────────────────────────────────────────────────
   const appendBotMessage = (text: string, options?: QuickOption[], isAI = false, autoSpeak = false) => {
@@ -879,8 +898,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const WHATSAPP_INTENT_PATTERN =
     /(hubungi(lah)? (mas |kak )?arzha|chat(ting)? (langsung )?(dengan|sama) arzha|diskusi(kan)? langsung|konsultasi(kan)? langsung|jadwalkan|dijadwalkan|booking|deal(?:ing)?|kontrak|pembayaran|\bdp\b|mulai proyek|lanjut ke tahap|follow[- ]?up (manual|langsung)|hubungi (saya|kami) via|kontak (langsung )?arzha)/i;
 
-  const shouldOfferWhatsapp = (replyText: string, highlight?: AgentIntentAction | null): boolean =>
-    hasGeneratedEstimate || !!highlight || WHATSAPP_INTENT_PATTERN.test(replyText);
+  // Kalau Zannah SUDAH nulis tombol WA-nya sendiri di dalam balasan (lihat
+  // waMatch di renderMessageBody, dari instruksi prompts.ts §5), JANGAN
+  // tambahin lagi tombol pill "Chat via WhatsApp" di bawah — user sempat
+  // laporan tombolnya jadi dobel & keduanya cuma buka wa.me yang sama persis.
+  const WA_INLINE_LINK_PATTERN = /\[[^\]]+\]\(https?:\/\/wa\.me\/\S+?\)/;
+
+  const shouldOfferWhatsapp = (replyText: string, highlight?: AgentIntentAction | null): boolean => {
+    if (WA_INLINE_LINK_PATTERN.test(replyText)) return false;
+    return hasGeneratedEstimate || !!highlight || WHATSAPP_INTENT_PATTERN.test(replyText);
+  };
 
   // Opsi cepat (quick reply) yang ditampilkan di bawah tiap balasan Zannah AI.
   // Aksi AI Agent SENGAJA berupa tombol opt-in (bukan auto-trigger) — biar
@@ -1445,26 +1472,42 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
             );
           }
 
-          // Deteksi link WhatsApp khusus untuk diubah jadi CTA Button interaktif
+          // Deteksi link WhatsApp yang DITULIS ZANNAH SENDIRI di teks balasan
+          // (lihat prompts.ts §5) & ubah jadi tombol interaktif yang otomatis
+          // nempelin link ringkasan chat — pakai fungsi yang SAMA dengan
+          // tombol CTA "Chat via WhatsApp" di bawah bubble (openWhatsAppWithSummary),
+          // supaya perilakunya konsisten & gak perlu 2 baris kode yang beda.
           const waMatch = line.match(/\[([^\]]+)\]\((https?:\/\/wa\.me\/\S+?)\)(?=\s|$)/);
           if (waMatch) {
             const [fullMatch, label, url] = waMatch;
             const before = line.substring(0, line.indexOf(fullMatch));
             const after = line.substring(line.indexOf(fullMatch) + fullMatch.length);
 
+            // Ambil teks brief yang sudah disusun Zannah sendiri di query
+            // param `text` link ini (URLSearchParams SUDAH otomatis decode —
+            // jangan decodeURIComponent lagi, nanti dobel-decode & bisa error
+            // kalau isinya kebetulan ada karakter "%").
+            let baseText = label;
+            try {
+              baseText = new URL(url).searchParams.get('text') || label;
+            } catch {
+              // URL kebetulan malformed (kepotong dsb) → fallback ke label tombol saja.
+            }
+            const isPreparing = whatsappCtaState === 'preparing';
+
             return (
               <div key={lineIdx} className="my-2">
                 {before && <p className="mb-1.5">{formatInlineText(before)}</p>}
-                <a
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                <button
+                  type="button"
+                  disabled={isPreparing}
+                  onClick={() => openWhatsAppWithSummary(baseText)}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs shadow-md shadow-emerald-900/30 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-wait"
                 >
                   <MessageCircle className="w-4 h-4 shrink-0 fill-current" />
-                  <span>{label}</span>
+                  <span>{isPreparing ? '⏳ Menyiapkan ringkasan...' : label}</span>
                   <ExternalLink className="w-3 h-3 ml-1 opacity-80" />
-                </a>
+                </button>
                 {after && <p className="mt-1.5">{formatInlineText(after)}</p>}
               </div>
             );
@@ -1831,6 +1874,16 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                           <div className="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-dashed border-current/10">
                             {m.options.filter((o) => o.id !== 'menu').map(renderQuickOptionButton)}
                           </div>
+                        )}
+                        {/* Caption transparansi: pill "Chat via WhatsApp" ini bisa
+                            muncul dari heuristic (RAB kelar/highlight) TANPA Zannah
+                            sempat cerita soal ringkasan di teksnya sendiri — jadi
+                            info ini perlu ditulis eksplisit di sini juga, gak cukup
+                            cuma andalin instruksi prompt (lihat prompts.ts §5). */}
+                        {m.options?.some((o) => o.id === 'whatsapp') && (
+                          <p className="text-[9.5px] opacity-60 italic mt-1">
+                            💡 Klik tombol WhatsApp di atas otomatis menyertakan link ringkasan obrolan ini untuk Arzha.
+                          </p>
                         )}
 
                         <div className="flex items-center justify-between gap-2 mt-1">

@@ -43,8 +43,15 @@ interface ShareSummaryResponse {
  * dengan mudah fallback ke teks WhatsApp biasa tanpa link, alih-alih block
  * user gara-gara fitur tambahan ini gagal.
  */
+/**
+ * Nama bot boleh apa aja yang bakal ditampilkan ke Arzha di halaman ringkasan
+ * (lihat api/summary.ts) — sengaja `string` polos (bukan union tertutup)
+ * karena dipanggil dari 3 bot berbeda (Zannah/ChatWidget, Rajendra/
+ * AIChatbotShowcase, dan fallback "Radit"), dan menambah bot baru nanti
+ * seharusnya nggak perlu mengubah tipe di file ini.
+ */
 export async function createShareableSummaryLink(
-  botName: 'Zannah' | 'Radit',
+  botName: string,
   messages: ShareableChatMessage[]
 ): Promise<ShareSummaryResponse | null> {
   if (messages.length === 0) return null;
