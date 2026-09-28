@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { reserveQuota, releaseQuota, getMonthlyLimit, type TtsTier } from './_lib/ttsQuota';
+import { reserveQuota, releaseQuota, getMonthlyLimit, getUsage, type TtsTier } from './_lib/ttsQuota.js';
 
 const GCP_API_KEY = process.env.GCP_API_KEY;
 
@@ -362,13 +362,78 @@ function sanitizeForSpeech(raw: string): string {
     .trim();
 }
 
+// ── Endpoint usage-check (GET /api/tts) ──────────────────────────────────────
+// Digabung ke file yang sama dengan endpoint synthesize (POST /api/tts) --
+// BUKAN file terpisah -- karena Vercel Hobby plan cuma boleh 12 Serverless
+// Function per deployment, dan tiap file baru di dalam api/ (yang gak diawali
+// "_") dihitung sebagai function tersendiri. Dibedain lewat req.method, bukan
+// lewat file, biar gak nambah function baru sama sekali.
+const TTS_USAGE_PIN = process.env.TTS_USAGE_PIN;
+
+interface RateLimitRecord {
+  count: number;
+  resetAt: number;
+}
+const usageRateLimitMap = new Map<string, RateLimitRecord>();
+const USAGE_RATE_LIMIT_PER_IP = 8; // 8 percobaan / menit / IP
+const USAGE_RATE_WINDOW = 60 * 1000;
+
+function checkUsageRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const record = usageRateLimitMap.get(ip);
+  if (!record || now > record.resetAt) {
+    usageRateLimitMap.set(ip, { count: 1, resetAt: now + USAGE_RATE_WINDOW });
+    return true;
+  }
+  if (record.count >= USAGE_RATE_LIMIT_PER_IP) return false;
+  record.count += 1;
+  return true;
+}
+
+async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
+  if (!TTS_USAGE_PIN) {
+    // Belum di-setting -- tolak semua request daripada kebuka tanpa proteksi.
+    return res.status(503).json({ error: 'TTS_USAGE_PIN belum dikonfigurasi di server' });
+  }
+
+  const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
+  if (!checkUsageRateLimit(ip)) {
+    return res.status(429).json({ error: 'Terlalu banyak percobaan, coba lagi sebentar' });
+  }
+
+  const providedPin = req.headers['x-tts-usage-pin'];
+  if (providedPin !== TTS_USAGE_PIN) {
+    return res.status(401).json({ error: 'PIN salah' });
+  }
+
+  try {
+    const [chirpUsed, wavenetUsed, standardUsed] = await Promise.all([
+      getUsage('chirp'),
+      getUsage('wavenet'),
+      getUsage('standard'),
+    ]);
+
+    return res.status(200).json({
+      chirp: { used: chirpUsed, limit: getMonthlyLimit('chirp') },
+      wavenet: { used: wavenetUsed, limit: getMonthlyLimit('wavenet') },
+      standard: { used: standardUsed, limit: getMonthlyLimit('standard') },
+    });
+  } catch (error) {
+    console.error('[tts.ts] handleUsageCheck gagal ambil usage dari Redis:', error);
+    return res.status(502).json({ error: 'Gagal ambil data usage dari Redis' });
+  }
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS & method check
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-tts-usage-pin');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
+
+  // GET = usage-check (easter egg quota modal), POST = synthesize (perilaku lama)
+  if (req.method === 'GET') return handleUsageCheck(req, res);
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   if (!GCP_TTS_ENABLED) {

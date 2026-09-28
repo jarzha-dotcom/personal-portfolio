@@ -28,7 +28,17 @@ import { Redis } from '@upstash/redis';
 // Redis.fromEnv() otomatis baca UPSTASH_REDIS_REST_URL & UPSTASH_REDIS_REST_TOKEN
 // dari environment variable -- otomatis ke-inject Vercel begitu integration
 // "Upstash for Redis" di-connect ke project (Vercel Marketplace).
-const redis = Redis.fromEnv();
+//
+// Dibuat LAZY (baru dibuat saat pertama kali dipakai, di dalam fungsi yang
+// dipanggil dari blok try/catch di tts.ts) -- bukan di top-level modul.
+// Kalau dibuat di top-level dan env var-nya belum ada / salah, error-nya
+// terjadi saat modul di-load dan seluruh function /api/tts langsung 500,
+// padahal niat desainnya "Redis bermasalah jangan sampai TTS ikut mati".
+let redisClient: Redis | null = null;
+function getRedis(): Redis {
+  if (!redisClient) redisClient = Redis.fromEnv();
+  return redisClient;
+}
 
 export type TtsTier = 'chirp' | 'wavenet' | 'standard';
 
@@ -38,10 +48,13 @@ const MONTHLY_LIMIT_ENV_VAR: Record<TtsTier, string> = {
   standard: 'TTS_STANDARD_MONTHLY_LIMIT',
 };
 
-// Default 80% dari kuota gratis resmi GCP masing-masing tier:
-// Chirp 3 HD = 1.000.000 karakter/bulan, WaveNet & Standard = 4.000.000
-// karakter/bulan masing-masing (GCP sekarang nyamain kuota gratis &
-// harga per-karakter WaveNet dengan Standard -- dulu WaveNet cuma 1 juta).
+// Default 80% dari kuota gratis resmi GCP masing-masing tier (dicek langsung
+// ke cloud.google.com/text-to-speech/pricing):
+// - Chirp 3 HD  = 1.000.000 karakter/bulan
+// - WaveNet     = 4.000.000 karakter/bulan (sekarang disamakan dengan Standard,
+//                 dulu 1 juta -- kalau kamu baca sumber lain yang masih bilang
+//                 1 juta, itu angka lama)
+// - Standard    = 4.000.000 karakter/bulan
 const DEFAULT_MONTHLY_LIMIT: Record<TtsTier, number> = {
   chirp: 800_000,
   wavenet: 3_200_000,
@@ -89,18 +102,18 @@ export async function reserveQuota(
 ): Promise<boolean> {
   const key = monthKey(tier);
 
-  const newTotal = await redis.incrby(key, chars);
+  const newTotal = await getRedis().incrby(key, chars);
 
   if (newTotal === chars) {
     // Ini increment pertama buat key bulan ini → key baru dibuat.
     // Kasih TTL biar otomatis "kadaluarsa" begitu bulan depan mulai
     // (+1 hari buffer buat jaga-jaga selisih jam server/UTC).
-    await redis.expire(key, secondsUntilNextMonth() + 24 * 60 * 60);
+    await getRedis().expire(key, secondsUntilNextMonth() + 24 * 60 * 60);
   }
 
   if (newTotal > monthlyLimit) {
     // Kelewat limit -- rollback, jangan biarkan reservasi ini "nyangkut".
-    await redis.decrby(key, chars);
+    await getRedis().decrby(key, chars);
     return false;
   }
 
@@ -113,11 +126,11 @@ export async function reserveQuota(
  * karakter yang gagal disintesis gak ikut kehitung "kepake beneran").
  */
 export async function releaseQuota(tier: TtsTier, chars: number): Promise<void> {
-  await redis.decrby(monthKey(tier), chars);
+  await getRedis().decrby(monthKey(tier), chars);
 }
 
 /** Buat keperluan monitoring/debug -- lihat pemakaian bulan berjalan. */
 export async function getUsage(tier: TtsTier): Promise<number> {
-  const val = await redis.get<number>(monthKey(tier));
+  const val = await getRedis().get<number>(monthKey(tier));
   return val ?? 0;
 }
