@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { reserveQuota, releaseQuota, getMonthlyLimit, getUsage, type TtsTier } from './_lib/ttsQuota.js';
 
@@ -15,24 +16,6 @@ const GCP_TTS_ENABLED = (process.env.GCP_TTS || '').trim().toLowerCase() === 'tr
 // NB: cek ulang nama voice ini di GCP Console (Text-to-Speech > Voices, filter id-ID)
 // sebelum deploy -- daftar & ketersediaan per-locale bisa berubah.
 const DEFAULT_VOICE = 'id-ID-Chirp3-HD-Aoede';
-
-const ALLOWED_VOICES = new Set([
-  // Google Cloud Text-to-Speech Chirp 3 HD Voices (Free Tier 1M karakter/bulan, kualitas tertinggi)
-  'id-ID-Chirp3-HD-Aoede',
-  'id-ID-Chirp3-HD-Charon',
-  'id-ID-Chirp3-HD-Despina',
-  'id-ID-Chirp3-HD-Puck',
-  // Google Cloud Text-to-Speech WaveNet Voices (Free Tier 4M karakter/bulan)
-  'id-ID-Wavenet-A',
-  'id-ID-Wavenet-B',
-  'id-ID-Wavenet-C',
-  'id-ID-Wavenet-D',
-  // Google Cloud Text-to-Speech Standard Voices (Free Tier 4M karakter/bulan)
-  'id-ID-Standard-A',
-  'id-ID-Standard-B',
-  'id-ID-Standard-C',
-  'id-ID-Standard-D',
-]);
 
 // ── Fallback berjenjang kualitas suara ───────────────────────────────────────
 // Chirp 3 HD (Tier 1, paling natural, kuota gratis 1M karakter/bulan) → WaveNet
@@ -57,9 +40,8 @@ const VOICE_TIERS: string[][] = [
     'id-ID-Wavenet-C',
     'id-ID-Wavenet-D',
   ],
-  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan -- sengaja
-  // gak di-gate quota tracking sendiri, kuotanya jauh lebih longgar & ini
-  // sudah rung terakhir sebelum frontend fallback ke Web Speech browser)
+  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan; tetap
+  // di-gate quota tracking juga, lihat TIER_NAMES di bawah)
   [
     'id-ID-Standard-A',
     'id-ID-Standard-B',
@@ -75,26 +57,81 @@ const VOICE_TIERS: string[][] = [
 // getMonthlyLimit() (ttsQuota.ts) -- default 80% dari kuota gratis GCP.
 const TIER_NAMES: TtsTier[] = ['chirp', 'wavenet', 'standard'];
 
+// Satu sumber kebenaran: voice yang boleh diminta = semua voice di VOICE_TIERS.
+const ALLOWED_VOICES = new Set<string>(([] as string[]).concat(...VOICE_TIERS));
+
 function tierIndexOf(voiceName: string): number {
   return VOICE_TIERS.findIndex((tier) => tier.includes(voiceName));
 }
 
-// Bangun urutan percobaan: mulai dari voice yang diminta/default, lalu turun
-// ke satu representasi dari tiap tier di bawahnya yang belum dicoba.
-function buildFallbackChain(startVoice: string): string[] {
-  const chain = [startVoice];
-  const startTier = tierIndexOf(startVoice);
-  const fromTier = startTier === -1 ? 0 : startTier + 1;
+// ── Gender voice (supaya fallback tier tidak menukar cowok <-> cewek) ────────
+// Persona cowok (Charon/Puck) tidak boleh jatuh ke Wavenet-A yang bersuara cewek.
+// Gender diambil dari GCP (voices:list, gratis, di-cache 24 jam). Kalau gagal,
+// dipakai tabel statis di bawah -- VERIFIKASI tabel ini di GCP Console sekali.
+type Gender = 'FEMALE' | 'MALE';
+const STATIC_GENDER: Record<string, Gender> = {
+  'id-ID-Chirp3-HD-Aoede': 'FEMALE',
+  'id-ID-Chirp3-HD-Despina': 'FEMALE',
+  'id-ID-Chirp3-HD-Charon': 'MALE',
+  'id-ID-Chirp3-HD-Puck': 'MALE',
+  'id-ID-Wavenet-A': 'FEMALE', 'id-ID-Wavenet-B': 'MALE', 'id-ID-Wavenet-C': 'MALE', 'id-ID-Wavenet-D': 'FEMALE',
+  'id-ID-Standard-A': 'FEMALE', 'id-ID-Standard-B': 'MALE', 'id-ID-Standard-C': 'MALE', 'id-ID-Standard-D': 'FEMALE',
+};
+const GENDER_TTL_MS = 24 * 60 * 60 * 1000;
+let genderCache: Record<string, string> | null = null;
+let genderCacheAt = 0;
 
-  for (let t = fromTier; t < VOICE_TIERS.length; t++) {
-    const candidate = VOICE_TIERS[t].find((v) => v !== startVoice);
-    if (candidate) chain.push(candidate);
+async function getVoiceGenders(): Promise<Record<string, string>> {
+  if (genderCache && Date.now() - genderCacheAt < GENDER_TTL_MS) return genderCache;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 3000);
+  try {
+    const response = await fetch('https://texttospeech.googleapis.com/v1/voices?languageCode=id-ID', {
+      headers: { 'X-Goog-Api-Key': GCP_API_KEY as string },
+      signal: controller.signal,
+    });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = (await response.json()) as { voices?: { name: string; ssmlGender?: string }[] };
+    const map: Record<string, string> = { ...STATIC_GENDER };
+    for (const v of data.voices ?? []) if (v.ssmlGender) map[v.name] = v.ssmlGender;
+    genderCache = map;
+    genderCacheAt = Date.now();
+    return map;
+  } catch (err) {
+    console.warn('[tts.ts] voices:list gagal, pakai tabel gender statis:', err);
+    return genderCache ?? STATIC_GENDER;
+  } finally {
+    clearTimeout(timeoutId);
   }
+}
 
-  return chain;
+// Urutan percobaan: voice yang diminta/default dulu, lalu turun tier satu per satu
+// dengan voice BERGENDER SAMA. Generator ini malas: gender baru dicari kalau
+// percobaan pertama gagal / kuotanya penuh, jadi jalur normal tanpa overhead.
+async function* voiceCandidates(startVoice: string): AsyncGenerator<string> {
+  yield startVoice;
+  const startTier = tierIndexOf(startVoice);
+  for (let t = startTier === -1 ? 0 : startTier + 1; t < VOICE_TIERS.length; t++) {
+    const genders = await getVoiceGenders();
+    const wanted = genders[startVoice];
+    const pick =
+      VOICE_TIERS[t].find((v) => v !== startVoice && wanted && genders[v] === wanted) ??
+      VOICE_TIERS[t].find((v) => v !== startVoice);
+    if (pick) yield pick;
+  }
 }
 
 const MAX_CHARS = 800; // batasi panjang teks per request TTS
+const MAX_INPUT_CHARS = MAX_CHARS * 3; // batas kasar SEBELUM sanitasi (cegah regex di body raksasa)
+const PER_ATTEMPT_TIMEOUT_MS = 5000; // timeout satu percobaan ke GCP
+const TOTAL_DEADLINE_MS = 8500; // batas total handler (di bawah batas durasi function Vercel)
+
+// Kalau TTS_ALLOWED_ORIGINS diisi (pisah koma), hanya origin itu yang dibalas CORS.
+// Kalau kosong, perilaku lama ('*') dipertahankan supaya tidak putus saat deploy.
+const ALLOWED_ORIGINS = (process.env.TTS_ALLOWED_ORIGINS || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
 
 // ── Rate limiting per IP (pola sama seperti chat.ts) ────────────────────────────
 interface RateLimitRecord {
@@ -127,16 +164,18 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 async function synthesizeWithVoice(
   voiceName: string,
   text: string,
+  timeoutMs: number,
 ): Promise<string> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout per percobaan
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(
-      `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GCP_API_KEY}`,
+      'https://texttospeech.googleapis.com/v1/text:synthesize',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        // API key di header (bukan query string) supaya tidak masuk URL/log.
+        headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': GCP_API_KEY as string },
         signal: controller.signal,
         body: JSON.stringify({
           input: { text },
@@ -144,7 +183,7 @@ async function synthesizeWithVoice(
           audioConfig: {
             audioEncoding: 'MP3',
             speakingRate: 1.0,
-            pitch: 0,
+            // pitch sengaja tidak dikirim: default 0, dan voice Chirp 3 HD tidak mendukung pitch.
           },
         }),
       },
@@ -170,9 +209,11 @@ async function synthesizeWithVoice(
 
 function cleanupOldRateLimits() {
   const now = Date.now();
-  for (const [ip, record] of rateLimitMap.entries()) {
-    if (now > record.resetAt) {
-      rateLimitMap.delete(ip);
+  for (const map of [rateLimitMap, usageRateLimitMap]) {
+    for (const [ip, record] of map.entries()) {
+      if (now > record.resetAt) {
+        map.delete(ip);
+      }
     }
   }
 }
@@ -211,10 +252,6 @@ function sanitizeForSpeech(raw: string): string {
 // lewat file, biar gak nambah function baru sama sekali.
 const TTS_USAGE_PIN = process.env.TTS_USAGE_PIN;
 
-interface RateLimitRecord {
-  count: number;
-  resetAt: number;
-}
 const usageRateLimitMap = new Map<string, RateLimitRecord>();
 const USAGE_RATE_LIMIT_PER_IP = 8; // 8 percobaan / menit / IP
 const USAGE_RATE_WINDOW = 60 * 1000;
@@ -231,6 +268,14 @@ function checkUsageRateLimit(ip: string): boolean {
   return true;
 }
 
+// Perbandingan waktu-konstan supaya PIN tidak bisa ditebak lewat selisih waktu respons.
+function pinMatches(provided: unknown): boolean {
+  if (typeof provided !== 'string' || !TTS_USAGE_PIN) return false;
+  const a = Buffer.from(provided);
+  const b = Buffer.from(TTS_USAGE_PIN);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
   if (!TTS_USAGE_PIN) {
     // Belum di-setting -- tolak semua request daripada kebuka tanpa proteksi.
@@ -242,8 +287,7 @@ async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
     return res.status(429).json({ error: 'Terlalu banyak percobaan, coba lagi sebentar' });
   }
 
-  const providedPin = req.headers['x-tts-usage-pin'];
-  if (providedPin !== TTS_USAGE_PIN) {
+  if (!pinMatches(req.headers['x-tts-usage-pin'])) {
     return res.status(401).json({ error: 'PIN salah' });
   }
 
@@ -267,7 +311,13 @@ async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS & method check
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = typeof req.headers.origin === 'string' ? req.headers.origin : undefined;
+  if (ALLOWED_ORIGINS.length === 0) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  } else if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, x-tts-usage-pin');
 
@@ -296,14 +346,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const { text, voice } = req.body as { text?: string; voice?: string };
+  const body = (req.body ?? {}) as { text?: unknown; voice?: unknown };
+  const { text, voice } = body;
 
-  if (!text || typeof text !== 'string' || !text.trim()) {
+  if (typeof text !== 'string' || !text.trim()) {
     return res.status(400).json({ error: 'Teks tidak valid' });
   }
 
-  const selectedVoice = voice && ALLOWED_VOICES.has(voice) ? voice : DEFAULT_VOICE;
-  const cleanText = sanitizeForSpeech(text).slice(0, MAX_CHARS);
+  const selectedVoice = typeof voice === 'string' && ALLOWED_VOICES.has(voice) ? voice : DEFAULT_VOICE;
+  const cleanText = sanitizeForSpeech(text.slice(0, MAX_INPUT_CHARS)).slice(0, MAX_CHARS);
 
   if (!cleanText) {
     return res.status(400).json({ error: 'Teks kosong setelah dibersihkan' });
@@ -320,12 +371,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
-  const fallbackChain = buildFallbackChain(selectedVoice);
+  const deadline = Date.now() + TOTAL_DEADLINE_MS;
   const attemptErrors: { voice: string; error: string }[] = [];
   const chars = cleanText.length;
 
-  for (const voiceName of fallbackChain) {
+  for await (const voiceName of voiceCandidates(selectedVoice)) {
     const tier = TIER_NAMES[tierIndexOf(voiceName)];
+
+    const remainingMs = deadline - Date.now();
+    if (remainingMs < 1500) {
+      attemptErrors.push({ voice: voiceName, error: 'Batas waktu total habis' });
+      break;
+    }
 
     // ── Quota gate SEBELUM manggil GCP ────────────────────────────────────
     // Semua tier (Chirp, WaveNet, Standard) di-gate lewat Redis. Cek+reservasi
@@ -358,7 +415,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     try {
-      const audioContent = await synthesizeWithVoice(voiceName, cleanText);
+      const audioContent = await synthesizeWithVoice(voiceName, cleanText, Math.min(PER_ATTEMPT_TIMEOUT_MS, remainingMs));
 
       return res.status(200).json({
         audioContent,
@@ -392,7 +449,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Semua tier GCP (Wavenet -> Standard) gagal.
+  // Semua tier GCP (Chirp -> Wavenet -> Standard) gagal / kuota penuh / waktu habis.
   // Balas 502 supaya frontend (voiceService.ts) fallback ke Web Speech API browser.
   return res.status(502).json({
     error: 'TTS_FAILED',

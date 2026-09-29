@@ -23,7 +23,7 @@ const pct = (used: number, limit: number) => (limit > 0 ? Math.min(100, Math.rou
  * Modal "rahasia" buat ngecek pemakaian kuota TTS bulan ini -- dipicu dari
  * easter egg (tap berulang di suatu elemen, lihat Footer.tsx). Minta PIN
  * dulu tiap dibuka; PIN gak pernah disimpan di frontend/localStorage,
- * cuma dikirim sekali ke api/tts-usage.ts buat divalidasi server-side.
+ * cuma dikirim sekali ke GET /api/tts (api/tts.ts) buat divalidasi server-side.
  */
 export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
   const [pin, setPin] = useState('');
@@ -37,7 +37,8 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch('/api/tts-usage', {
+      const res = await fetch('/api/tts', {
+        method: 'GET',
         headers: { 'x-tts-usage-pin': pin },
       });
       if (res.status === 401) {
@@ -46,6 +47,10 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
       }
       if (res.status === 429) {
         setError('Kebanyakan coba, tunggu sebentar.');
+        return;
+      }
+      if (res.status === 503) {
+        setError('TTS_USAGE_PIN belum diset di server.');
         return;
       }
       if (!res.ok) {

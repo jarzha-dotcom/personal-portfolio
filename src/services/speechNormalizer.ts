@@ -89,7 +89,7 @@ export function angkaKeKata(digits: string): string {
  *   "800" -> bulat
  */
 function uraikanAngka(tok: string): { bulat: string; pecahan: string } {
-  if (/^\d{1,3}(?:\.\d{3})+(?:,\d+)?$/.test(tok)) {
+  if (/^[1-9]\d{0,2}(?:\.\d{3})+(?:,\d+)?$/.test(tok)) {
     const [bulat, pecahan = ''] = tok.split(',');
     return { bulat: bulat.replace(/\./g, ''), pecahan };
   }
@@ -107,7 +107,7 @@ function bacaAngka(tok: string, berSatuan = false): string {
   const frac = /^0*$/.test(pecahan) ? '' : pecahan; // ",00" diabaikan
   const kataBulat = angkaKeKata(bulat);
   if (!frac) return kataBulat;
-  if (berSatuan && frac === '5') {
+  if (berSatuan && /^50*$/.test(frac)) {
     return bulat.replace(/^0+/, '') === '' ? 'setengah' : `${kataBulat} setengah`;
   }
   return `${kataBulat} koma ${bacaPerDigit(frac)}`;
@@ -183,13 +183,23 @@ const RE_SATUAN_TEKNIS = new RegExp(
   'gi',
 );
 
+const RE_SATUAN_TEKNIS_RENTANG = new RegExp(
+  String.raw`(?<![\d.,])(${NUM})\s*[-–—]\s*(${NUM})\s?(${Object.keys(SATUAN_TEKNIS).join('|')})\b`,
+  'gi',
+);
+
 const RE_RENTANG_WAKTU =
   /(?<![\d.,])(\d+)\s*[-–—]\s*(\d+)\s*(hari|minggu|bulan|tahun|orang|item|halaman|jam|menit|detik|kali|proyek|project|klien|fitur|sprint|kata|karakter|baris|pengguna|users?|kelas|sesi)\b/gi;
 const RE_RENTANG_TAHUN = /\b((?:19|20)\d{2})\s*[-–—]\s*((?:19|20)\d{2})\b/g;
 const RE_LEBIH_DARI =
   /(?<![\d.,])(\d+)\+\s*(tahun|bulan|hari|proyek|project|klien|pengalaman)\b/gi;
 
-const RE_RIBUAN = /(?<![\d.,])\d{1,3}(?:\.\d{3})+(?:,\d+)?(?!\d|\.\d)/g;
+const RE_RIBUAN = /(?<![\d.,])[1-9]\d{0,2}(?:\.\d{3})+(?:,\d+)?(?!\d|\.\d)/g;
+// Ribuan gaya Inggris satu kelompok: "10,000" / "25,500" / "1,000". Sengaja TIDAK
+// menangkap "1,500" / "2,750" (satu digit di depan) karena itu lebih mungkin desimal Indonesia.
+const RE_RIBUAN_INGGRIS = /(?<![\d.,])(?:\d,000|\d{2,3},\d{3})(?![\d,]|\.\d)/g;
+// "0.5" / "0.125" -> "nol koma ..." (titik desimal gaya Inggris, hanya yang diawali 0)
+const RE_NOL_TITIK = /(?<![\d.,])0\.(\d{1,3})(?!\d|[.,]\d)/g;
 const RE_DESIMAL_KOMA = /(?<![\d.,])(\d+),(\d{1,3})(?!\d|,\d)/g;
 
 function jamKeKata(h: string, m: string): string | null {
@@ -233,7 +243,11 @@ function konversiAngka(input: string): string {
   });
 
   // Uang rupiah -- rentang dulu, baru tunggal
-  s = s.replace(RE_UANG_RENTANG, (_m, n1: string, u1: string | undefined, n2: string, u2?: string) => {
+  s = s.replace(RE_UANG_RENTANG, (m: string, n1: string, u1: string | undefined, n2: string, u2?: string) => {
+    // "Rp500.000 - 3 hari" BUKAN rentang: angka kedua harus punya satuan, "Rp", atau >= 1.000.
+    // Kalau bukan, biarkan apa adanya -- RE_UANG di bawah yang mengonversi nominal pertama.
+    const adaRp2 = /(?:[-–—]|s\/d|sd|sampai|hingga)\s*(?:Rp\.?|IDR)/i.test(m);
+    if (!u2 && !adaRp2 && kurangDariSeribu(n2)) return m;
     const unit2 = namaSatuan(u2);
     // "Rp1,5 - 5 juta": angka kecil tanpa satuan mewarisi satuan angka kedua
     const warisan = !namaSatuan(u1) && unit2 && kurangDariSeribu(n1) ? unit2 : '';
@@ -265,12 +279,14 @@ function konversiAngka(input: string): string {
   s = s.replace(RE_PERSEN, (_m, n: string) => ` ${bacaAngka(n)} persen `);
   s = s.replace(RE_SUHU, (_m, n: string, u: string) => ` ${bacaAngka(n)} derajat ${u === 'C' ? 'Celsius' : 'Fahrenheit'} `);
 
-  // Satuan teknis: 16 GB, 200ms, 1.5 MB
+  // Satuan teknis: 16 GB, 200ms, 1.5 MB, 5-10 GB
+  s = s.replace(RE_SATUAN_TEKNIS_RENTANG, (_m, a: string, b: string, u: string) => ` ${bacaAngka(a)} sampai ${bacaAngka(b)} ${SATUAN_TEKNIS[u.toLowerCase()]} `);
   s = s.replace(RE_SATUAN_TEKNIS, (_m, n: string, u: string) => ` ${bacaAngka(n)} ${SATUAN_TEKNIS[u.toLowerCase()]} `);
 
   // "/jam", "/bulan" -> "per jam", "per bulan"
   s = s.replace(
-    /\s*\/\s*(?=(?:jam|hari|bulan|tahun|minggu|orang|menit|detik|pcs|unit|item|halaman|kata|proyek|project|sesi|user|bln)\b)/gi,
+    // Kiri harus angka/nominal/kata satuan, supaya "admin/user" TIDAK jadi "admin per user".
+    /(?<=(?:\d|rupiah|ribu|juta|miliar|triliun|persen|orang|pcs|unit|item|users?|proyek|project|sesi|halaman|kata|kali|hari|jam|bulan|tahun|minggu|menit|detik)\s*)\s*\/\s*(?=(?:jam|hari|bulan|tahun|minggu|orang|menit|detik|pcs|unit|item|halaman|kata|proyek|project|sesi|user|bln)\b)/gi,
     ' per ',
   );
 
@@ -280,6 +296,8 @@ function konversiAngka(input: string): string {
   s = s.replace(RE_LEBIH_DARI, (_m, n: string, kata: string) => ` lebih dari ${angkaKeKata(n)} ${kata} `);
 
   // Sisa: 1.500 orang -> "seribu lima ratus orang" ; 3,14 -> "tiga koma satu empat"
+  s = s.replace(RE_RIBUAN_INGGRIS, (m) => bacaAngka(m.replace(',', '.')));
+  s = s.replace(RE_NOL_TITIK, (_m, d: string) => `nol koma ${bacaPerDigit(d)}`);
   s = s.replace(RE_RIBUAN, (m) => bacaAngka(m));
   s = s.replace(RE_DESIMAL_KOMA, (_m, a: string, b: string) => `${angkaKeKata(a)} koma ${bacaPerDigit(b)}`);
 
@@ -724,7 +742,7 @@ const ACRONYMS_EN: readonly string[] = [
  */
 const ACRONYMS_ID: readonly string[] = [
   'KTP', 'NPWP', 'NIK', 'SIM', 'BPJS', 'UMKM', 'UMR', 'PPN', 'PPh', 'WIB', 'WIT',
-  'HRD', 'SOP', 'PT', 'HP', 'SMS',
+  'HRD', 'SOP', 'PT', 'HP', 'SMS', 'PKL', 'SPT', 'DPT',
 ];
 
 // ── Mesin pencocokan kamus ────────────────────────────────────────────────────
@@ -846,44 +864,44 @@ const ATURAN_KHUSUS: ReadonlyArray<readonly [RegExp, string]> = [
 
 const SINGKATAN_ID: ReadonlyArray<readonly [RegExp, string]> = [
   // titik setelahnya DIPERTAHANKAN supaya batas kalimat tidak hilang
-  [/\bdll\b/gi, 'dan lain-lain'],
-  [/\bdsb\b/gi, 'dan sebagainya'],
-  [/\bdst\b/gi, 'dan seterusnya'],
-  [/\bdkk\b/gi, 'dan kawan-kawan'],
+  [/\b[Dd]ll\b/g, 'dan lain-lain'],
+  [/\b[Dd]sb\b/g, 'dan sebagainya'],
+  [/\b[Dd]st\b/g, 'dan seterusnya'],
+  [/\b[Dd]kk\b/g, 'dan kawan-kawan'],
   // titik ikut dibuang karena bukan akhir kalimat
-  [/\bcth\.\s*/gi, 'contoh '],
-  [/\bmis\.\s*/gi, 'misalnya '],
-  [/\bhlm\.\s*/gi, 'halaman '],
-  [/\bmaks\.\s*/gi, 'maksimal '],
+  [/\b[Cc]th\.\s*/g, 'contoh '],
+  [/\b[Mm]is\.\s*/g, 'misalnya '],
+  [/\b[Hh]lm\.\s*/g, 'halaman '],
+  [/\b[Mm]aks\.\s*/g, 'maksimal '],
   [/\bJl\.\s*/g, 'Jalan '],
   [/\bNo\.\s*(?=\d)/g, 'nomor '],
-  [/\bTelp?\.\s*/gi, 'telepon '],
-  [/\bcth\b/gi, 'contoh'],
-  [/\bttg\b/gi, 'tentang'],
-  [/\byg\b/gi, 'yang'],
-  [/\bdgn\b/gi, 'dengan'],
-  [/\butk\b/gi, 'untuk'],
-  [/\bsbg\b/gi, 'sebagai'],
-  [/\bblm\b/gi, 'belum'],
-  [/\bsdh\b/gi, 'sudah'],
-  [/\baja\b/gi, 'saja'],
-  [/\bgmn\b/gi, 'bagaimana'],
-  [/\bkpd\b/gi, 'kepada'],
-  [/\btsb\b/gi, 'tersebut'],
-  [/\bkrn\b/gi, 'karena'],
-  [/\btdk\b/gi, 'tidak'],
-  [/\bjg\b/gi, 'juga'],
-  [/\bdlm\b/gi, 'dalam'],
-  [/\bspt\b/gi, 'seperti'],
-  [/\bdpt\b/gi, 'dapat'],
-  [/\bhrs\b/gi, 'harus'],
-  [/\btp\b/gi, 'tapi'],
-  [/\bpkl\b/gi, 'pukul'],
-  [/\byth\b/gi, 'yang terhormat'],
+  [/\b[Tt]elp?\.\s*/g, 'telepon '],
+  [/\b[Cc]th\b/g, 'contoh'],
+  [/\b[Tt]tg\b/g, 'tentang'],
+  [/\b[Yy]g\b/g, 'yang'],
+  [/\b[Dd]gn\b/g, 'dengan'],
+  [/\b[Uu]tk\b/g, 'untuk'],
+  [/\b[Ss]bg\b/g, 'sebagai'],
+  [/\b[Bb]lm\b/g, 'belum'],
+  [/\b[Ss]dh\b/g, 'sudah'],
+  [/\b[Aa]ja\b/g, 'saja'],
+  [/\b[Gg]mn\b/g, 'bagaimana'],
+  [/\b[Kk]pd\b/g, 'kepada'],
+  [/\b[Tt]sb\b/g, 'tersebut'],
+  [/\b[Kk]rn\b/g, 'karena'],
+  [/\b[Tt]dk\b/g, 'tidak'],
+  [/\b[Jj]g\b/g, 'juga'],
+  [/\b[Dd]lm\b/g, 'dalam'],
+  [/\b[Ss]pt\b/g, 'seperti'],
+  [/\b[Dd]pt\b/g, 'dapat'],
+  [/\b[Hh]rs\b/g, 'harus'],
+  [/\b[Tt]p\b/g, 'tapi'],
+  [/\b[Pp]kl\b/g, 'pukul'],
+  [/\b[Yy]th\b/g, 'yang terhormat'],
   [/\bBpk\b/g, 'Bapak'],
-  [/\bTgl\b/gi, 'tanggal'],
-  [/\bThn\b/gi, 'tahun'],
-  [/\bBln\b/gi, 'bulan'],
+  [/\b[Tt]gl\b/g, 'tanggal'],
+  [/\b[Tt]hn\b/g, 'tahun'],
+  [/\b[Bb]ln\b/g, 'bulan'],
 ];
 
 // "teman2" -> "teman-teman", kecuali nama teknologi yang memang berakhiran 2

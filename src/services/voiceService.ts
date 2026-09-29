@@ -83,6 +83,11 @@ export const DEFAULT_GCP_VOICE = BOT_VOICES.ZANNAH;
 
 const MAX_CACHE_ENTRIES = 60;
 const MAX_TTS_CHARS = 800;
+// Batas waktu tunggu /api/tts di sisi client sebelum fallback ke suara browser.
+const TTS_FETCH_TIMEOUT_MS = 10_000;
+// Kalau server balas 503 (GCP_TTS=false / API key kosong), jangan tanya lagi
+// selama jeda ini -- langsung suara browser tanpa round-trip sia-sia.
+const GCP_BACKOFF_MS = 5 * 60 * 1000;
 
 // ── State (module-level singleton) ────────────────────────────────────────────
 
@@ -105,6 +110,7 @@ let currentAbortController: AbortController | null = null;
 // fetch ini masih relevan" begitu fetch selesai — kalau sudah ada speak()
 // yang lebih baru mulai selagi kita nunggu network, hasil yang lama dibuang.
 let requestSeq = 0;
+let gcpUnavailableUntil = 0;
 
 // Minimal type shim — Web Speech API belum punya tipe resmi di lib.dom.d.ts
 interface SpeechRecognitionLike extends EventTarget {
@@ -161,14 +167,22 @@ export function stripMarkdownForSpeech(raw: string): string {
     // Link markdown HARUS diproses sebelum URL polos, kalau tidak "[teks](https://x)"
     // rusak jadi "[teks](". URL polos (termasuk wa.me) dibiarkan: normalizer yang urus.
     .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`{1,3}[^`]*`{1,3}/g, '')
+    // Penanda list/kutipan di awal baris ("* item", "- item", "• item", "> kutipan").
+    // Harus sebelum penanganan *italic*, kalau tidak "* a\n* b" salah dipasangkan.
+    .replace(/^[ \t]*[*\-•][ \t]+/gm, '')
+    .replace(/^[ \t]*>[ \t]?/gm, '')
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
-    .replace(/`{1,3}[^`]*`{1,3}/g, '')
     // Hanya heading di awal baris; "#1" (nomor) dibiarkan untuk normalizer.
     .replace(/^#{1,6}\s+/gm, '')
     .replace(/[_~]/g, '')
-    // Emoji & simbol pictographic umum
-    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+    // Emoji & simbol pictographic umum (+ variation selector & ZWJ sisa emoji)
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}\u{200D}]/gu, '')
+    // Baris baru = jeda: baris yang tidak berakhir tanda baca diberi titik supaya
+    // item list / judul tidak terbaca menyambung dengan baris berikutnya.
+    .replace(/([^.!?:;,\s])[ \t]*\n+\s*/g, '$1. ')
+    .replace(/\s*\n\s*/g, ' ')
     .replace(/\s{2,}/g, ' ')
     .trim();
 
@@ -211,20 +225,28 @@ export function isSpeechSupported(): SpeechSupport {
 
 // ── TTS: playback control ────────────────────────────────────────────────────
 
-/** Hentikan audio GCP yang sedang main DAN speech synthesis browser (siapa pun yang aktif).
- * Juga membatalkan request /api/tts yang masih in-flight (kalau ada), supaya
- * gak ada network call kebuang percuma & gak ada race condition audio lama
- * nimpa audio baru. */
+/**
+ * Hentikan audio GCP yang sedang main DAN speech synthesis browser (siapa pun yang aktif).
+ * Juga membatalkan request /api/tts yang masih in-flight dan meng-invalidasi semua
+ * speak() yang masih menunggu (fetch/play), jadi tidak ada audio/suara browser yang
+ * "bangkit" setelah stop.
+ *
+ * KONTRAK: speak() yang diinterupsi (oleh stopSpeaking() atau speak() baru) TIDAK
+ * memanggil onEnd/onError -- di jalur GCP maupun browser. Pemanggil yang menekan
+ * stop bertanggung jawab mereset state UI-nya sendiri.
+ */
 export function stopSpeaking(): void {
+  requestSeq++;
   if (currentAbortController) {
     currentAbortController.abort();
     currentAbortController = null;
   }
   if (currentAudio) {
-    currentAudio.pause();
-    currentAudio.currentTime = 0;
+    currentAudio.onplay = null;
     currentAudio.onended = null;
     currentAudio.onerror = null;
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
     currentAudio = null;
   }
   if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -250,6 +272,8 @@ async function fetchGCPAudio(text: string, voice: string, signal?: AbortSignal):
     return cached;
   }
 
+  if (Date.now() < gcpUnavailableUntil) throw new Error('TTS_TEMPORARILY_DISABLED');
+
   const response = await fetch('/api/tts', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -258,6 +282,7 @@ async function fetchGCPAudio(text: string, voice: string, signal?: AbortSignal):
   });
 
   if (!response.ok) {
+    if (response.status === 503) gcpUnavailableUntil = Date.now() + GCP_BACKOFF_MS;
     const err = await response.json().catch(() => ({}));
     throw new Error(err.error || `TTS_HTTP_${response.status}`);
   }
@@ -274,12 +299,14 @@ async function fetchGCPAudio(text: string, voice: string, signal?: AbortSignal):
   return result;
 }
 
-function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
+function speakWithBrowser(text: string, opts: SpeakOptions, token: number): VoiceSource {
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     opts.onError?.(new Error('SPEECH_SYNTHESIS_UNSUPPORTED'));
     opts.onEnd?.();
     return 'none';
   }
+
+  opts.onSourceResolved?.({ source: 'browser', degraded: true });
 
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'id-ID';
@@ -291,13 +318,25 @@ function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
   const idVoice = voices.find((v) => v.lang?.toLowerCase().startsWith('id'));
   if (idVoice) utter.voice = idVoice;
 
-  utter.onstart = () => opts.onStart?.();
+  // Handler utterance lama bisa datang TERLAMBAT (setelah cancel()/speak() baru).
+  // Token menjamin event basi tidak menyentuh state maupun callback milik speak() baru.
+  const isStale = () => token !== requestSeq;
+
+  utter.onstart = () => {
+    if (!isStale()) opts.onStart?.();
+  };
   utter.onend = () => {
-    currentUtterance = null;
-    opts.onEnd?.();
+    if (currentUtterance === utter) currentUtterance = null;
+    if (!isStale()) opts.onEnd?.();
   };
   utter.onerror = (e) => {
-    currentUtterance = null;
+    if (currentUtterance === utter) currentUtterance = null;
+    if (isStale()) return;
+    // 'canceled'/'interrupted' = dihentikan sengaja, bukan error sungguhan.
+    if (e.error === 'canceled' || e.error === 'interrupted') {
+      opts.onEnd?.();
+      return;
+    }
     opts.onError?.(e);
     opts.onEnd?.();
   };
@@ -309,7 +348,7 @@ function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
 
 /**
  * Ucapkan teks. Otomatis strip markdown, coba GCP TTS dulu, fallback ke
- * Web Speech Synthesis kalau GCP gagal/tidak tersedia/audio-nya diblok
+ * Web Speech Synthesis kalau GCP gagal/timeout/tidak tersedia/audio-nya diblok
  * autoplay browser. Menghentikan audio sebelumnya (kalau ada) sebelum
  * mulai yang baru.
  *
@@ -317,10 +356,10 @@ function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
  * langsung klik pesan B sebelum fetch A selesai): panggilan yang lebih tua
  * otomatis dibatalkan (fetch di-abort & hasilnya dibuang diam-diam tanpa
  * memicu callback), jadi gak ada audio lama yang nimpa audio baru.
+ * Hal yang sama berlaku kalau user memanggil stopSpeaking() di tengah jalan.
  */
 export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<VoiceSource> {
   const text = stripMarkdownForSpeech(rawText);
-  console.log('[TTS input]', JSON.stringify(rawText), '=>', JSON.stringify(text));
   stopSpeaking();
 
   if (!text) {
@@ -330,28 +369,35 @@ export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<V
 
   const voice = opts.voice || DEFAULT_GCP_VOICE;
 
-  // Token unik buat panggilan ini. Kalau ada speak() lain mulai duluan
-  // sebelum fetch kita selesai, requestSeq bakal berubah dan kita tau hasil
-  // kita udah "basi" — jangan sentuh currentAudio atau panggil callback.
+  // Token unik buat panggilan ini. stopSpeaking() dan speak() lain menaikkan
+  // requestSeq, jadi hasil yang sudah "basi" dibuang tanpa menyentuh apa pun.
   const myToken = ++requestSeq;
   const controller = new AbortController();
   currentAbortController = controller;
+
+  let timedOut = false;
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, TTS_FETCH_TIMEOUT_MS);
 
   let gcpResult: GCPAudioResult | null = null;
 
   try {
     gcpResult = await fetchGCPAudio(text, voice, controller.signal);
   } catch (err) {
-    if (controller.signal.aborted) {
-      // Dibatalkan karena ada speak() baru — diam-diam berhenti di sini,
-      // request yang baru itu yang bakal urus onStart/onEnd-nya sendiri.
+    if (controller.signal.aborted && !timedOut) {
+      // Dibatalkan karena stopSpeaking()/speak() baru -- diam-diam berhenti.
       return 'none';
     }
-    console.warn('[voiceService] GCP TTS gagal, fallback ke browser speech:', err);
+    if (!(err instanceof Error && err.message === 'TTS_TEMPORARILY_DISABLED')) {
+      console.warn('[voiceService] GCP TTS gagal, fallback ke browser speech:', err);
+    }
+  } finally {
+    clearTimeout(timeoutId);
+    if (currentAbortController === controller) currentAbortController = null;
   }
 
-  // Selagi kita nunggu fetch (walau berhasil), bisa jadi ada speak() lain
-  // yang udah lebih dulu mulai & selesai. Kalau begitu, buang hasil ini.
   if (myToken !== requestSeq) return 'none';
 
   if (gcpResult) {
@@ -361,30 +407,36 @@ export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<V
       remainingQuota: gcpResult.remainingQuota,
     });
 
+    const audio = new Audio(gcpResult.dataUrl);
+    currentAudio = audio;
+    audio.onplay = () => opts.onStart?.();
+    audio.onended = () => {
+      if (currentAudio !== audio) return;
+      currentAudio = null;
+      opts.onEnd?.();
+    };
+    audio.onerror = () => {
+      if (currentAudio !== audio) return;
+      currentAudio = null;
+      opts.onError?.(new Error('AUDIO_PLAYBACK_ERROR'));
+      opts.onEnd?.();
+    };
+
     try {
-      const audio = new Audio(gcpResult.dataUrl);
-      currentAudio = audio;
-      audio.onplay = () => opts.onStart?.();
-      audio.onended = () => {
-        currentAudio = null;
-        opts.onEnd?.();
-      };
-      audio.onerror = () => {
-        currentAudio = null;
-        opts.onError?.(new Error('AUDIO_PLAYBACK_ERROR'));
-        opts.onEnd?.();
-      };
       await audio.play();
       return 'gcp';
     } catch (playErr) {
+      // stopSpeaking() saat play() masih pending membuat play() reject (AbortError).
+      // Itu BUKAN alasan fallback -- user memang minta berhenti.
+      if (myToken !== requestSeq) return 'none';
+
       // Kemungkinan besar autoplay diblokir browser (NotAllowedError) karena
-      // play() dipanggil di luar user-gesture langsung (mis. auto-speak
-      // balasan bot), atau error decode lain. Bersihkan state audio yang
-      // gagal ini dulu supaya gak nyangkut, baru coba fallback browser.
+      // play() dipanggil di luar user-gesture langsung, atau error decode lain.
       console.warn('[voiceService] Audio GCP gagal diputar (mungkin autoplay diblokir), fallback ke browser speech:', playErr);
-      if (currentAudio) {
-        currentAudio.onended = null;
-        currentAudio.onerror = null;
+      if (currentAudio === audio) {
+        audio.onplay = null;
+        audio.onended = null;
+        audio.onerror = null;
         currentAudio = null;
       }
     }
@@ -392,8 +444,7 @@ export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<V
 
   if (myToken !== requestSeq) return 'none';
 
-  opts.onSourceResolved?.({ source: 'browser', degraded: true });
-  return speakWithBrowser(text, opts);
+  return speakWithBrowser(text, opts, myToken);
 }
 
 // ── STT: Speech-to-Text ────────────────────────────────────────────────────────
@@ -446,14 +497,32 @@ export function startListening(opts: ListenOptions): (() => void) | null {
   };
 
   recognition.onend = () => {
-    recognitionInstance = null;
+    // Jangan timpa instance BARU kalau onend ini milik sesi lama yang baru selesai.
+    if (recognitionInstance === recognition) recognitionInstance = null;
     opts.onEnd?.();
   };
 
   recognitionInstance = recognition;
-  recognition.start();
+  try {
+    recognition.start();
+  } catch (err) {
+    // mis. InvalidStateError kalau instance sudah berjalan
+    if (recognitionInstance === recognition) recognitionInstance = null;
+    opts.onError?.(err);
+    opts.onEnd?.();
+    return null;
+  }
 
-  return () => stopListening();
+  // Cleanup hanya menghentikan sesi MILIKNYA sendiri (aman dipanggil dari
+  // cleanup useEffect lama tanpa mematikan sesi mic yang lebih baru).
+  return () => {
+    try {
+      recognition.stop();
+    } catch {
+      // ignore — instance mungkin sudah berhenti sendiri
+    }
+    if (recognitionInstance === recognition) recognitionInstance = null;
+  };
 }
 
 /** Hentikan sesi mendengarkan mic yang sedang aktif (kalau ada). */
