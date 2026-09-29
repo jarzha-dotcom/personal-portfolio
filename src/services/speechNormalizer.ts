@@ -17,7 +17,9 @@
  *                        bentuk jamak "s" otomatis ikut, mis. "bug" juga kena "bugs")
  *   - TERMS_CS         : kata yang bentrok dengan kata biasa kalau huruf kecil
  *                        (mis. "React", "Java", "Ruby") -> hanya cocok persis
- *   - ACRONYMS         : singkatan yang dieja per huruf otomatis ("API" -> "A-P-I")
+ *   - ACRONYMS_EN / _ID: singkatan yang dieja per huruf otomatis. EN pakai nama
+ *                        huruf Inggris ("API" -> "Ei-Pi-Ai"), ID pakai huruf
+ *                        Indonesia ("KTP" -> "Ka-Te-Pe")
  * Spasi, tanda hubung, dan titik di kunci otomatis toleran: kunci 'Node.js'
  * juga cocok dengan "NodeJS", "Node js", "node-js"; 'Front-end' cocok dengan
  * "Frontend" dan "Front end".
@@ -201,6 +203,14 @@ function jamKeKata(h: string, m: string): string | null {
 function konversiAngka(input: string): string {
   let s = input;
 
+  // Ribuan gaya Inggris "1,500,000" / "1,500,000.50" -> gaya Indonesia "1.500.000" / "1.500.000,50".
+  // Minimal 2 kelompok koma supaya tidak salah kena desimal Indonesia ("1,500" tetap ambigu, dibiarkan).
+  // Yang diawali "$" dilewati karena RE_USD sudah menanganinya sendiri.
+  s = s.replace(/(?<![\d.,])(?<!\$\s*)\d{1,3}(?:,\d{3}){2,}(?:\.\d+)?(?![\d,])/g, (m) => {
+    const [bulat, pecahan] = m.split('.');
+    return bulat.replace(/,/g, '.') + (pecahan ? `,${pecahan}` : '');
+  });
+
   // Nomor telepon -> baca per digit (harus sebelum pola angka lain)
   s = s.replace(RE_TELEPON, (m) => {
     const plus = m.startsWith('+') ? 'plus ' : '';
@@ -289,9 +299,9 @@ type Term = readonly [tulisan: string, cara_baca: string];
 const TERMS_CI: readonly Term[] = [
   // ── Nama proyek & portofolio (khusus) ──
   ['B-Games', 'Bi-Geims'],
-  ['Assets GMP', 'Aset J-M-P'],
-  ['Asset GMP', 'Aset J-M-P'],
-  ['PT GMP', 'P-T J-M-P'],
+  ['Assets GMP', 'Aset Ge Em Pe'],
+  ['Asset GMP', 'Aset Ge Em Pe'],
+  ['PT GMP', 'Pe Te Ge Em Pe'],
   ['Portfolio', 'Portofolio'],
 
   // ── JavaScript / TypeScript & ekosistemnya ──
@@ -687,8 +697,11 @@ const TERMS_CS: readonly Term[] = [
   ['WA', 'WhatsApp'],
 ];
 
-/** Singkatan yang dieja per huruf: "API" -> "A-P-I". Hanya cocok huruf besar. */
-const ACRONYMS: readonly string[] = [
+/**
+ * Singkatan teknis/Inggris: dieja dengan nama huruf INGGRIS, konsisten semua
+ * hurufnya. "AI" -> "Ei-Ai", "API" -> "Ei-Pi-Ai". Hanya cocok huruf besar.
+ */
+const ACRONYMS_EN: readonly string[] = [
   // web & pemrograman
   'API', 'HTML', 'CSS', 'SCSS', 'PHP', 'JS', 'TS', 'JSX', 'TSX', 'UI', 'UX', 'SEO',
   'SPA', 'SSR', 'SSG', 'PWA', 'DOM', 'SDK', 'IDE', 'CLI', 'GUI', 'URL', 'URI',
@@ -696,16 +709,22 @@ const ACRONYMS: readonly string[] = [
   'CSRF', 'XSS', 'ORM', 'MVC', 'MVP', 'MVVM', 'JWT', 'XML', 'CSV', 'PDF', 'RPC',
   'gRPC', 'tRPC', 'JVM', 'VM', 'DB', 'ID', 'OTP', 'QR', 'CMS', 'LMS', 'ETL', 'SLA',
   // perangkat
-  'CPU', 'GPU', 'SSD', 'USB', 'LAN', 'OS', 'PC', 'TV', 'HP', 'SMS', 'IoT',
+  'CPU', 'GPU', 'SSD', 'USB', 'LAN', 'OS', 'PC', 'TV', 'IoT',
   // AI
   'AI', 'ML', 'NLP', 'LLM', 'GPT', 'RAG', 'OCR', 'TTS', 'STT',
   // cloud
   'AWS', 'GCP',
   // bisnis & proses
-  'KPI', 'ROI', 'CRM', 'ERP', 'HRD', 'HR', 'SOP', 'QC', 'QA', 'UAT', 'BRD', 'PRD',
-  'SAP', 'POS', 'IT', 'CEO', 'CTO', 'PIC', 'WFH', 'WFO', 'FAQ', 'USD', 'PT', 'CV',
-  // singkatan Indonesia yang sering dieja
+  'KPI', 'ROI', 'CRM', 'ERP', 'HR', 'QC', 'QA', 'UAT', 'BRD', 'PRD',
+  'SAP', 'POS', 'IT', 'CEO', 'CTO', 'PIC', 'WFH', 'WFO', 'FAQ', 'USD','CV'
+];
+
+/**
+ * Singkatan Indonesia: dieja dengan nama huruf INDONESIA. "KTP" -> "Ka-Te-Pe".
+ */
+const ACRONYMS_ID: readonly string[] = [
   'KTP', 'NPWP', 'NIK', 'SIM', 'BPJS', 'UMKM', 'UMR', 'PPN', 'PPh', 'WIB', 'WIT',
+  'HRD', 'SOP', 'PT', 'HP', 'SMS',
 ];
 
 // ── Mesin pencocokan kamus ────────────────────────────────────────────────────
@@ -756,14 +775,51 @@ function compileTerms(
     });
 }
 
-const spellOut = (a: string): string => a.split('').join('-');
+/**
+ * Nama huruf Inggris, ditulis fonetis supaya suara id-ID membacanya benar
+ * dan SELALU konsisten (tidak campur "A" Indonesia + "I" Inggris).
+ * Kalau ada huruf yang terdengar kurang pas, ubah di tabel ini.
+ */
+const HURUF_EN: Record<string, string> = {
+  A: 'Ei', B: 'Bi', C: 'Si', D: 'Di', E: 'Ii', F: 'Ef', G: 'Ji', H: 'Eic', I: 'Ai',
+  J: 'Jei', K: 'Kei', L: 'El', M: 'Em', N: 'En', O: 'Ou', P: 'Pi', Q: 'Kyu', R: 'Ar',
+  S: 'Es', T: 'Ti', U: 'Yu', V: 'Vi', W: 'Dabelyu', X: 'Eks', Y: 'Wai', Z: 'Zi',
+};
+
+/** Nama huruf Indonesia. Vokal tunggal sengaja huruf kecil. */
+const HURUF_ID: Record<string, string> = {
+  A: 'a', B: 'Be', C: 'Ce', D: 'De', E: 'e', F: 'Ef', G: 'Ge', H: 'Ha', I: 'i',
+  J: 'Je', K: 'Ka', L: 'El', M: 'Em', N: 'En', O: 'o', P: 'Pe', Q: 'Ki', R: 'Er',
+  S: 'Es', T: 'Te', U: 'u', V: 'Fe', W: 'We', X: 'Eks', Y: 'Ye', Z: 'Zet',
+};
+
+const ejaHuruf = (a: string, tabel: Record<string, string>): string =>
+  a.split('').map((c) => tabel[c.toUpperCase()] ?? c).join('-');
+
+const spellEN = (a: string): string => ejaHuruf(a, HURUF_EN);
+const spellID = (a: string): string => ejaHuruf(a, HURUF_ID);
+
+/**
+ * Ejaan huruf tunggal berhubung strip yang berasal dari kamus/aturan khusus
+ * ("A-P-I Ki", "Open A-I", "Soket I-O", "V-S Kod", ...) diperlakukan sebagai
+ * istilah teknis -> nama huruf Inggris. Untuk ejaan Indonesia di kamus, tulis
+ * langsung nama hurufnya ("Pe Te Je Em Pe"), jangan "P-T J-M-P".
+ * "I-komers" tidak kena karena bukan huruf tunggal.
+ */
+const RE_EJAAN_HURUF = /(?<![A-Za-z])[A-Z](?:-[A-Z])+(?![A-Za-z])/g;
+const ejaanKamusKeInggris = (s: string): string =>
+  s.replace(RE_EJAAN_HURUF, (m) => spellEN(m.replace(/-/g, '')));
 
 // Urutan penting: CI dulu (memuat "Node.js", "React Native", dst.), baru CS
 // (kata tunggal "Node", "React"), terakhir singkatan.
 const applyTermsCI = compileTerms(TERMS_CI, { caseSensitive: false, plural: true });
 const applyTermsCS = compileTerms(TERMS_CS, { caseSensitive: true, plural: false });
-const applyAcronyms = compileTerms(
-  ACRONYMS.map((a): Term => [a, spellOut(a)]),
+const applyAcronymsEN = compileTerms(
+  ACRONYMS_EN.map((a): Term => [a, spellEN(a)]),
+  { caseSensitive: true, plural: true },
+);
+const applyAcronymsID = compileTerms(
+  ACRONYMS_ID.map((a): Term => [a, spellID(a)]),
   { caseSensitive: true, plural: true },
 );
 
@@ -863,7 +919,9 @@ export function normalizeIndonesianForSpeech(text: string): string {
   // 4. Kamus pelafalan
   s = applyTermsCI(s);
   s = applyTermsCS(s);
-  s = applyAcronyms(s);
+  s = applyAcronymsEN(s);
+  s = applyAcronymsID(s);
+  s = ejaanKamusKeInggris(s);
 
   // 5. Singkatan Bahasa Indonesia
   for (const [re, out] of SINGKATAN_ID) s = s.replace(re, out);

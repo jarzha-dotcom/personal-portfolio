@@ -320,6 +320,7 @@ function speakWithBrowser(text: string, opts: SpeakOptions): VoiceSource {
  */
 export async function speak(rawText: string, opts: SpeakOptions = {}): Promise<VoiceSource> {
   const text = stripMarkdownForSpeech(rawText);
+  console.log('[TTS input]', JSON.stringify(rawText), '=>', JSON.stringify(text));
   stopSpeaking();
 
   if (!text) {
