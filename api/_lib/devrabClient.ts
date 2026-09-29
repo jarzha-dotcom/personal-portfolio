@@ -76,7 +76,11 @@ export async function pingDevRABEngine(): Promise<void> {
 export async function callDevRABEngine(
   payload: DevRABProposalRequest,
   timeoutMs = 25000,
-  maxRetries = 2
+  maxRetries = 2,
+  // Batas TOTAL waktu (ms) untuk semua percobaan digabung. 0 = tanpa batas (perilaku lama).
+  // Dipakai chat.ts (maxDuration 60 detik) supaya 3 percobaan x 25 detik tidak menghabiskan
+  // jatah fungsi serverless sebelum Zannah sempat menarasikan hasilnya ke user.
+  totalBudgetMs = 0
 ): Promise<DevRABProposalResponse | null> {
   const apiUrl = process.env.DEVRAB_API_URL;
   const apiKey = process.env.DEVRAB_API_KEY;
@@ -115,6 +119,8 @@ export async function callDevRABEngine(
     clientInfo: payload.clientInfo,
   };
 
+  const startedAt = Date.now();
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     if (attempt > 0) {
       const delay = attempt * 1500;
@@ -122,9 +128,20 @@ export async function callDevRABEngine(
       await new Promise((r) => setTimeout(r, delay));
     }
 
+    // Hitung sisa budget waktu; kalau sudah terlalu sedikit untuk percobaan yang berarti, berhenti.
+    let attemptTimeoutMs = timeoutMs;
+    if (totalBudgetMs > 0) {
+      const remaining = totalBudgetMs - (Date.now() - startedAt);
+      if (attempt > 0 && remaining < 4000) {
+        console.warn(`[devrabClient] Budget waktu total ${totalBudgetMs}ms habis, berhenti mencoba (sebelum percobaan ke-${attempt + 1}).`);
+        break;
+      }
+      attemptTimeoutMs = Math.max(3000, Math.min(timeoutMs, remaining));
+    }
+
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+      const timeoutId = setTimeout(() => controller.abort(), attemptTimeoutMs);
 
       const res = await fetch(apiUrl, {
         method: 'POST',
@@ -178,7 +195,7 @@ export async function callDevRABEngine(
       }
     } catch (err: any) {
       const isTimeout = err?.name === 'AbortError';
-      console.error(`[devrabClient][attempt ${attempt + 1}] Gagal menghubungi DevRAB:`, isTimeout ? `Timeout ${timeoutMs}ms` : err?.message || err);
+      console.error(`[devrabClient][attempt ${attempt + 1}] Gagal menghubungi DevRAB:`, isTimeout ? `Timeout ${attemptTimeoutMs}ms` : err?.message || err);
       if (attempt === maxRetries) {
         console.error(`[devrabClient] GAGAL TOTAL setelah ${maxRetries + 1} percobaan (network/timeout). Beralih ke draf lokal. URL: ${apiUrl}`);
         return null;

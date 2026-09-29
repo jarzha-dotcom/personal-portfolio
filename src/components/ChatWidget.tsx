@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2, RotateCw } from 'lucide-react';
+import { MessageSquare, X, Send, User, Wifi, WifiOff, Mic, Volume2, Loader2, ExternalLink, MessageCircle, Paperclip, FileText, Download, Plus, History, Trash2, Share2 } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Portal } from './Portal';
 import { CONTACT_INFO } from '../data/portfolioData';
@@ -75,11 +75,9 @@ interface Message {
   uploadedFiles?: PendingFile[];
   /** File hasil kerja Antigravity yang bisa didownload (mis. RAB.xlsx, laporan.pdf) */
   attachments?: Attachment[];
-  /** Diisi kalau balasan ini adalah HASIL sukses dari aksi AI Agent tertentu
-   * (bukan cuma "disarankan" — beneran dieksekusi & berhasil). Dipakai buat
-   * ngederivasi `hasGeneratedEstimate`/dst dari riwayat pesan, biar tombol
-   * "Buatkan Estimasi" gak nawarin generate ulang dari nol kalau udah pernah
-   * berhasil di percakapan yang sama — lihat komentar di dekat pemakaiannya. */
+  /** Diisi kalau balasan ini adalah HASIL sukses RAB/aksi agent (mis. 'estimate' kalau
+   * backend melaporkan lampiran dengan outcome 'success'). Hanya penanda riwayat; tidak
+   * lagi dipakai untuk memilih tombol karena estimasi/update/retry kini lewat percakapan. */
   agentResultType?: AgentIntentAction;
 }
 
@@ -817,13 +815,8 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   // Backend sudah tidak pernah memanggil Antigravity sendiri berdasar
   // heuristic ini; user tetap yang klik tombol.
   //
-  // Dicek dari riwayat pesan percakapan yang lagi aktif — begitu ada 1 aja
-  // balasan yang `agentResultType === 'estimate'` (RAB udah pernah SUKSES
-  // dibikin), tombol "Buatkan Estimasi" versi awal gak ditawarkan lagi;
-  // diganti tombol "Update Estimasi" (lihat buildAgentCTA). Otomatis reset
-  // ke false begitu pindah/mulai obrolan baru, karena `messages` sendiri
-  // ikut berganti isi (lihat startNewChat & openConversationById).
-  const hasGeneratedEstimate = messages.some((m) => m.agentResultType === 'estimate');
+  // Catatan: `AgentIntentAction` dipakai hanya untuk highlight tombol riset/analisis file.
+  // Estimasi/RAB tidak lagi berupa tombol; pemicunya percakapan (lihat chat.ts).
 
   const buildAgentCTA = (hasRecentFiles: boolean, highlight?: AgentIntentAction | null): QuickOption[] => {
     // Cap sesi lokal ATAU kuota harian global backend abis → jangan tampilin
@@ -847,18 +840,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     // begitu topik obrolan pindah ke balasan berikutnya yang gak match
     // pattern manapun / belum cukup detail, tombolnya otomatis hilang lagi
     // karena `highlight` bakal null di balasan itu.
-    if (highlight === 'estimate') {
-      // RAB udah pernah sukses dibikin sebelumnya di percakapan ini → jangan
-      // tawarin generate ulang dari nol (bisa bikin file baru yang gak
-      // konsisten / boros Antigravity Agent tanpa perlu). Tawarin jalur
-      // revisi: tombol ini cuma nanya dulu apa ada perubahan fitur, BUKAN
-      // langsung manggil Antigravity lagi (lihat handleOptionClick).
-      if (hasGeneratedEstimate) {
-        opts.push({ id: 'agent_estimate_revise', label: '✏️ Update Estimasi (Ada Fitur Berubah?)' });
-      } else {
-        opts.push({ id: 'agent_estimate', label: '⭐ 📊 Buatkan Estimasi Biaya & Timeline' });
-      }
-    } else if (highlight === 'research') {
+    // Estimasi/RAB, coba proses ulang, dan update estimasi SENGAJA tidak lagi
+    // berupa tombol: semuanya sekarang dipicu lewat percakapan (chat.ts) dan
+    // hasilnya dituturkan Zannah sendiri di teks balasan (narrateOutcome di
+    // documentGenerator.ts), lengkap dengan link PDF resmi, portal & pembayaran.
+    // Tombol dulu dipilih heuristik terpisah dari kalimat Zannah, sehingga sering
+    // tidak nyambung dengan yang dia ucapkan.
+    if (highlight === 'research') {
       opts.push({ id: 'agent_research', label: '⭐ 🔎 Riset Kompetitor/Pasar Singkat' });
     }
 
@@ -873,41 +861,12 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
     return opts;
   };
 
-  // "Chat via WhatsApp" DULU nempel permanen di SETIAP balasan Zannah,
-  // padahal gak semua balasan itu momen yang pas buat diarahkan ke follow-up
-  // manusia (mis. balasan penjelasan teknis biasa) — malah bikin tombolnya
-  // berisik/kehilangan makna karena selalu ada. Sekarang tombol itu cuma
-  // muncul kalau ada SINYAL KUAT percakapannya udah "matang" buat lanjut ke
-  // Arzha langsung:
-  //   1. RAB/estimasi udah pernah SUKSES dibikin — titik wajar buat lanjut
-  //      bicara harga/kontrak/timeline sama orangnya langsung.
-  //   2. Backend (chat.ts) sendiri lagi menyarankan aksi agent (highlight
-  //      terisi) — itu tandanya topiknya udah cukup konkret/actionable.
-  //   3. Balasan Zannah SENDIRI (isi teksnya) memang mengarah ke ajakan
-  //      diskusi langsung/lanjut ke tahap berikutnya (WHATSAPP_INTENT_PATTERN
-  //      di bawah) — ini proxy paling dekat ke "Zannah merasa perlu", karena
-  //      Zannah cuma LLM yang gak punya cara resmi buat "mengeluarkan sinyal
-  //      terstruktur" selain lewat kata-katanya sendiri. Kalau nanti chat.ts
-  //      dikembangkan buat expose field eksplisit semacam
-  //      `suggestedContact: boolean`, ganti aja poin ini dengan baca field
-  //      itu langsung — jauh lebih akurat daripada nebak dari teks.
-  //
-  // Fallback Radit (raditCTA di bawah) SENGAJA TETAP selalu nampilin tombol
-  // ini apa adanya — justru itu titik di mana bot gagal jawab & manusia
-  // memang paling dibutuhkan, jadi gak perlu heuristic tambahan.
-  const WHATSAPP_INTENT_PATTERN =
-    /(hubungi(lah)? (mas |kak )?arzha|chat(ting)? (langsung )?(dengan|sama) arzha|diskusi(kan)? langsung|konsultasi(kan)? langsung|jadwalkan|dijadwalkan|booking|deal(?:ing)?|kontrak|pembayaran|\bdp\b|mulai proyek|lanjut ke tahap|follow[- ]?up (manual|langsung)|hubungi (saya|kami) via|kontak (langsung )?arzha)/i;
-
-  // Kalau Zannah SUDAH nulis tombol WA-nya sendiri di dalam balasan (lihat
-  // waMatch di renderMessageBody, dari instruksi prompts.ts §5), JANGAN
-  // tambahin lagi tombol pill "Chat via WhatsApp" di bawah — user sempat
-  // laporan tombolnya jadi dobel & keduanya cuma buka wa.me yang sama persis.
-  const WA_INLINE_LINK_PATTERN = /\[[^\]]+\]\(https?:\/\/wa\.me\/\S+?\)/;
-
-  const shouldOfferWhatsapp = (replyText: string, highlight?: AgentIntentAction | null): boolean => {
-    if (WA_INLINE_LINK_PATTERN.test(replyText)) return false;
-    return hasGeneratedEstimate || !!highlight || WHATSAPP_INTENT_PATTERN.test(replyText);
-  };
+  // Ajakan WhatsApp untuk balasan Zannah SEKARANG ditulis Zannah sendiri sebagai
+  // link di teks (prompts.ts §5 + narrateOutcome untuk hasil RAB), yang dirender
+  // jadi tombol lewat waMatch di renderMessageBody. Pill di bawah bubble dulu
+  // dipilih heuristik terpisah & sering tidak nyambung dengan ucapan Zannah, jadi
+  // dimatikan untuk balasan Zannah. Fallback Radit (raditCTA) tetap punya tombolnya.
+  const shouldOfferWhatsapp = (_replyText: string, _highlight?: AgentIntentAction | null): boolean => false;
 
   // Opsi cepat (quick reply) yang ditampilkan di bawah tiap balasan Zannah AI.
   // Aksi AI Agent SENGAJA berupa tombol opt-in (bukan auto-trigger) — biar
@@ -1040,8 +999,13 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
         result.attachments,
         // Tandai balasan ini sebagai hasil sukses aksi agent tertentu (kalau
         // ini memang balasan dari klik tombol agent, bukan chat biasa) —
-        // dipakai buat `hasGeneratedEstimate` dkk di bawah.
-        agentMode ? agentAction : undefined
+        // RAB dianggap SUKSES kalau backend melaporkan outcome 'success' pada lampiran
+        // (berlaku untuk pemicu lewat percakapan maupun jalur agent lama).
+        result.attachments?.some((att) => att.outcome === 'success')
+          ? 'estimate'
+          : agentMode && agentAction !== 'estimate'
+            ? agentAction
+            : undefined
       );
     } catch (err: unknown) {
       // ── Graceful degradation: fall to Radit (Directory Model) ──────────
@@ -1960,24 +1924,11 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                       {m.attachments && m.attachments.length > 0 && (
                         <div className="space-y-2 mt-2">
                           {m.attachments.map((att, i) => {
-                            // `outcome` sekarang dideklarasikan resmi di tipe `Attachment`
-                            // (services/geminiService.ts), mengikuti AgentDocumentOutcome dari
-                            // backend (api/lib/documentGenerator.ts). Fallback ke heuristik nama
-                            // lama cuma sebagai jaring pengaman kalau ada deploy backend lama yang
-                            // belum sempat mengisi field ini.
-                            const isFallbackLocalDraft = att.outcome
-                              ? att.outcome === 'fallback_local'
-                              : att.name.includes('Kasar');
-                            // Bug lama: tombol retry cuma muncul untuk 'fallback_local'
-                            // (masalah koneksi ke DevRAB). Untuk 'checklist_incomplete'
-                            // (RAB ditahan karena ada data checklist yang kurang, mis.
-                            // nama/email), user sama sekali tidak dikasih jalan keluar
-                            // selain scroll ke tombol lama. Sekarang tombolnya tetap
-                            // muncul, tapi label & pesannya dibedakan supaya jujur —
-                            // ini bukan soal koneksi, tapi soal checklist yang belum lengkap.
-                            const isChecklistIncomplete = att.outcome === 'checklist_incomplete';
-                            const showRetryButton = isFallbackLocalDraft || isChecklistIncomplete;
-
+                            // Portal & Pembayaran, PDF resmi, coba proses ulang, update estimasi,
+                            // dan ajakan WhatsApp SENGAJA tidak lagi jadi tombol di sini. Semuanya
+                            // dituturkan Zannah sendiri di teks balasan (narrateOutcome di backend,
+                            // link diambil dari data DevRAB asli), supaya ucapan dan aksinya selalu
+                            // nyambung. Yang tersisa hanya unduhan arsip file hasilnya.
                             return (
                             <div key={`${m.id}-att-${i}`} className="flex flex-wrap items-center gap-1.5">
                               <button
@@ -1991,55 +1942,6 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                                 <Download className="w-3 h-3" />
                                 {att.name}
                               </button>
-
-                              {showRetryButton && (
-                                <button
-                                  type="button"
-                                  onClick={() => runAgentAction(
-                                    'estimate',
-                                    isChecklistIncomplete
-                                      ? 'Coba proses lagi RAB & proposal resmi dari kebutuhan proyek yang sudah dilengkapi.'
-                                      : 'Hubungkan ulang ke DevRAB Cloud Engine untuk menyusun proposal dan RAB interaktif resmi dari kebutuhan proyek yang sudah disepakati.',
-                                    undefined,
-                                    isChecklistIncomplete ? '🔄 Coba Proses RAB Lagi' : '🔄 Coba Hubungkan ke DevRAB'
-                                  )}
-                                  className={`inline-flex items-center gap-1.5 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg border transition-all active:scale-95 ${darkMode
-                                    ? 'bg-amber-500/15 border-amber-500/40 text-amber-300 hover:bg-amber-500/25'
-                                    : 'bg-amber-50 border-amber-300 text-amber-900 hover:bg-amber-100'
-                                    }`}
-                                  title={isChecklistIncomplete ? 'Coba proses ulang RAB sekarang' : 'Hubungkan ulang ke DevRAB Cloud Engine untuk proposal resmi'}
-                                >
-                                  <RotateCw className="w-3 h-3 text-amber-600 dark:text-amber-400" />
-                                  {isChecklistIncomplete ? 'Coba Proses Lagi' : 'Coba Hubungkan Ulang ke DevRAB'}
-                                </button>
-                              )}
-
-                              {att.previewUrl && (
-                                <a
-                                  href={att.previewUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1 text-[9.5px] font-bold px-2.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition-all"
-                                >
-                                  <ExternalLink className="w-3 h-3" />
-                                  Portal &amp; Pembayaran
-                                </a>
-                              )}
-
-                              {att.pdfUrl && (
-                                <a
-                                  href={att.pdfUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`inline-flex items-center gap-1 text-[9.5px] font-semibold px-2 py-1.5 rounded-lg border transition-colors ${darkMode
-                                    ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'
-                                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
-                                    }`}
-                                >
-                                  <FileText className="w-3 h-3 text-indigo-500" />
-                                  PDF Resmi
-                                </a>
-                              )}
                             </div>
                             );
                           })}
