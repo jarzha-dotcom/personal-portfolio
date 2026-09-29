@@ -345,7 +345,7 @@ function MainPortfolio() {
             path="*"
             element={
               <>
-                <div className="pt-12 md:pt-16">
+                <div className="pt-16 md:pt-16">
                   <InfiniteBanner darkMode={darkMode} />
                 </div>
                 <Hero darkMode={darkMode} />
