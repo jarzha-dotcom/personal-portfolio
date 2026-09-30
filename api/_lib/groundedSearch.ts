@@ -303,7 +303,7 @@ const FAIL_PRIORITY: Record<GroundingFailReason, number> = {
  * @param context   Potongan percakapan sebelumnya (topik proyek, dsb) agar kata ganti seperti
  *                  "kompetitornya" / "riset lagi" punya acuan.
  */
-export async function runGroundedResearch(
+async function runGroundedResearchInner(
     apiKey: string | undefined,
     question: string,
     context: string,
@@ -445,7 +445,38 @@ export async function runGroundedResearch(
     return { ok: false, reason: bestFail };
 }
 
-/** Ringkasan status untuk log/debug (tidak berisi rahasia). */
+// ── Statistik ringan sejak instance server ini menyala (untuk modal admin) ─────
+const instanceStartedAt = Date.now();
+const stats = {
+    ok: 0,
+    cached: 0,
+    failed: 0,
+    failByReason: {} as Record<string, number>,
+    lastResult: null as null | { at: string; ok: boolean; model?: string; reason?: string; sources?: number },
+};
+
+/** Titik masuk publik: menjalankan riset lalu mencatat statistik. */
+export async function runGroundedResearch(
+    apiKey: string | undefined,
+    question: string,
+    context: string,
+    ip: string
+): Promise<GroundedOutcome> {
+    const outcome = await runGroundedResearchInner(apiKey, question, context, ip);
+    const at = new Date().toISOString();
+    if (outcome.ok) {
+        if (outcome.cached) stats.cached += 1;
+        else stats.ok += 1;
+        stats.lastResult = { at, ok: true, model: outcome.cached ? `${outcome.model} (cache)` : outcome.model, sources: outcome.sources.length };
+    } else {
+        stats.failed += 1;
+        stats.failByReason[outcome.reason] = (stats.failByReason[outcome.reason] || 0) + 1;
+        stats.lastResult = { at, ok: false, reason: outcome.reason };
+    }
+    return outcome;
+}
+
+/** Ringkasan status untuk log/debug & modal admin (tidak berisi rahasia). */
 export function getGroundingDiagnostics() {
     const now = Date.now();
     const blocked: Record<string, string> = {};
@@ -460,6 +491,14 @@ export function getGroundingDiagnostics() {
         candidatePool: discovered ? rankModels(discovered.ids) : [...FALLBACK_MODELS],
         blocked,
         cacheSize: resultCache.size,
+        ipHourlyCap: IP_HOURLY_CAP,
+        mode: process.env.GROUNDING_MODELS?.trim()
+            ? 'override (GROUNDING_MODELS)'
+            : (process.env.GROUNDING_DISCOVERY || '').toLowerCase() === 'off'
+            ? 'auto, tanpa discovery'
+            : 'auto (ListModels)',
+        stats: { ...stats, failByReason: { ...stats.failByReason } },
+        instanceUptimeSec: Math.round((Date.now() - instanceStartedAt) / 1000),
     };
 }
 

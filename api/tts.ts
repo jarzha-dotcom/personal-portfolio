@@ -18,44 +18,35 @@ const GCP_TTS_ENABLED = (process.env.GCP_TTS || '').trim().toLowerCase() === 'tr
 const DEFAULT_VOICE = 'id-ID-Chirp3-HD-Aoede';
 
 // ── Fallback berjenjang kualitas suara ───────────────────────────────────────
-// Chirp 3 HD (Tier 1, paling natural, kuota gratis 1M karakter/bulan) → WaveNet
-// (Tier 2, kuota gratis 4M karakter/bulan, disamakan dengan Standard) →
-// Standard (Tier 3, kuota gratis 4M karakter/bulan, lihat catatan di handler).
+// Chirp 3 HD (paling natural, kuota gratis 1M karakter/bulan) → WaveNet (kuota
+// gratis 4M karakter/bulan) → (kalau semua habis/gagal) frontend fallback ke
+// Web Speech browser, yang tidak makan biaya sama sekali.
 //
-// Tier 1 & 2 masing-masing di-gate oleh quota tracking sendiri (ttsQuota.ts,
-// via Upstash Redis) SEBELUM voice-nya dicoba dipanggil ke GCP -- lihat index
-// tier ini dipetakan ke TIER_NAMES di bawah, urutannya harus tetap sinkron.
+// Voice Standard SENGAJA DIHAPUS: kuota gratis Standard dan WaveNet sama-sama
+// 4M dan tampaknya satu kolam. Kalau dua tier di-gate terpisah masing-masing 80%,
+// totalnya bisa melewati jatah gratis. Dengan hanya dua tier, tiap tier punya
+// kuota gratis sendiri dan gate 80% benar-benar melindungi.
+//
+// Setiap tier di-gate quota tracking sendiri (ttsQuota.ts, Upstash Redis)
+// SEBELUM GCP dipanggil. Index tier di bawah harus sinkron dengan TIER_NAMES.
 const VOICE_TIERS: string[][] = [
-  // Tier 0 — Chirp 3 HD (kuota gratis 1M karakter/bulan)
+  // Tier 0 — Chirp 3 HD
   [
     'id-ID-Chirp3-HD-Aoede',
     'id-ID-Chirp3-HD-Charon',
     'id-ID-Chirp3-HD-Despina',
     'id-ID-Chirp3-HD-Puck',
   ],
-  // Tier 1 — Wavenet (natural, stabil & kuota gratis 4M karakter/bulan)
+  // Tier 1 — WaveNet
   [
     'id-ID-Wavenet-A',
     'id-ID-Wavenet-B',
     'id-ID-Wavenet-C',
     'id-ID-Wavenet-D',
   ],
-  // Tier 2 — Standard (paling ringan, kuota gratis 4M karakter/bulan; tetap
-  // di-gate quota tracking juga, lihat TIER_NAMES di bawah)
-  [
-    'id-ID-Standard-A',
-    'id-ID-Standard-B',
-    'id-ID-Standard-C',
-    'id-ID-Standard-D',
-  ],
 ];
 
-// Pemetaan index VOICE_TIERS -> nama tier buat quota tracking (semua tier
-// sekarang di-gate, termasuk Standard -- biar fallback terakhir ke Web
-// Speech browser itu beneran "0 risiko saldo", bukan cuma diasumsikan aman
-// karena kuotanya gede). Limit bulanan tiap tier diambil dari
-// getMonthlyLimit() (ttsQuota.ts) -- default 80% dari kuota gratis GCP.
-const TIER_NAMES: TtsTier[] = ['chirp', 'wavenet', 'standard'];
+const TIER_NAMES: TtsTier[] = ['chirp', 'wavenet'];
 
 // Satu sumber kebenaran: voice yang boleh diminta = semua voice di VOICE_TIERS.
 const ALLOWED_VOICES = new Set<string>(([] as string[]).concat(...VOICE_TIERS));
@@ -75,7 +66,6 @@ const STATIC_GENDER: Record<string, Gender> = {
   'id-ID-Chirp3-HD-Charon': 'MALE',
   'id-ID-Chirp3-HD-Puck': 'MALE',
   'id-ID-Wavenet-A': 'FEMALE', 'id-ID-Wavenet-B': 'MALE', 'id-ID-Wavenet-C': 'MALE', 'id-ID-Wavenet-D': 'FEMALE',
-  'id-ID-Standard-A': 'FEMALE', 'id-ID-Standard-B': 'MALE', 'id-ID-Standard-C': 'MALE', 'id-ID-Standard-D': 'FEMALE',
 };
 const GENDER_TTL_MS = 24 * 60 * 60 * 1000;
 let genderCache: Record<string, string> | null = null;
@@ -161,6 +151,15 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 }
 
 // ── Panggilan sintesis untuk satu voice tertentu ─────────────────────────────
+// Error HTTP dari GCP. Status 4xx = request ditolak sebelum diproses (tidak ditagih),
+// jadi reservasi kuota boleh dikembalikan. Error lain (timeout, jaringan, 5xx,
+// respons kosong) dianggap MUNGKIN sudah dihitung GCP -> reservasi dipertahankan.
+class GcpHttpError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
+
 async function synthesizeWithVoice(
   voiceName: string,
   text: string,
@@ -191,7 +190,7 @@ async function synthesizeWithVoice(
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `HTTP ${response.status}`);
+      throw new GcpHttpError(response.status, err.error?.message || `HTTP ${response.status}`);
     }
 
     const data = await response.json();
@@ -276,6 +275,55 @@ function pinMatches(provided: unknown): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+// ── Peringatan kuota mendekati batas ─────────────────────────────────────────
+// Batas bulanan (getMonthlyLimit) sudah dijaga ketat oleh reserveQuota, tapi tanpa
+// peringatan kuota Chirp bisa habis tiba-tiba dan semua pengguna mendadak turun ke
+// suara WaveNet/browser. Log di bawah muncul di Vercel Logs (console.warn /
+// console.error) supaya bisa dipantau atau dipasangi alert.
+const QUOTA_WARN_RATIO = 0.8; // >= 80% dari batas -> console.warn
+const QUOTA_CRITICAL_RATIO = 0.95; // >= 95% dari batas -> console.error
+const QUOTA_CHECK_INTERVAL_MS = 10 * 60 * 1000; // baca Redis paling sering sekali / 10 menit / tier / instance
+const lastQuotaCheckAt = new Map<TtsTier, number>();
+
+const quotaPercent = (used: number, limit: number): number =>
+  limit > 0 ? Math.round((used / limit) * 100) : 0;
+
+/**
+ * Cek pemakaian tier setelah sintesis sukses dan log peringatan kalau mendekati
+ * batas. Tidak pernah melempar error: kegagalan Redis hanya di-log dan TIDAK boleh
+ * mengganggu respons audio.
+ */
+async function warnIfQuotaNearLimit(tier: TtsTier): Promise<void> {
+  const now = Date.now();
+  if (now - (lastQuotaCheckAt.get(tier) ?? 0) < QUOTA_CHECK_INTERVAL_MS) return;
+  lastQuotaCheckAt.set(tier, now); // ditandai dulu supaya request paralel tidak ikut membaca Redis
+
+  try {
+    const limit = getMonthlyLimit(tier);
+    const used = await getUsage(tier);
+    if (limit <= 0) return;
+
+    const ratio = used / limit;
+    const message = `[tts.ts] Kuota tier "${tier}" sudah ${quotaPercent(used, limit)}% (${used}/${limit} karakter bulan ini).`;
+    if (ratio >= QUOTA_CRITICAL_RATIO) {
+      console.error(`${message} KRITIS: sebentar lagi semua suara turun tier.`);
+    } else if (ratio >= QUOTA_WARN_RATIO) {
+      console.warn(`${message} Mendekati batas.`);
+    }
+  } catch (error) {
+    console.error(`[tts.ts] warnIfQuotaNearLimit gagal baca usage tier "${tier}":`, error);
+  }
+}
+
+function usageSummary(used: number, limit: number) {
+  return {
+    used,
+    limit,
+    percent: quotaPercent(used, limit),
+    nearLimit: limit > 0 && used / limit >= QUOTA_WARN_RATIO,
+  };
+}
+
 async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
   if (!TTS_USAGE_PIN) {
     // Belum di-setting -- tolak semua request daripada kebuka tanpa proteksi.
@@ -292,16 +340,14 @@ async function handleUsageCheck(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const [chirpUsed, wavenetUsed, standardUsed] = await Promise.all([
+    const [chirpUsed, wavenetUsed] = await Promise.all([
       getUsage('chirp'),
       getUsage('wavenet'),
-      getUsage('standard'),
     ]);
 
     return res.status(200).json({
-      chirp: { used: chirpUsed, limit: getMonthlyLimit('chirp') },
-      wavenet: { used: wavenetUsed, limit: getMonthlyLimit('wavenet') },
-      standard: { used: standardUsed, limit: getMonthlyLimit('standard') },
+      chirp: usageSummary(chirpUsed, getMonthlyLimit('chirp')),
+      wavenet: usageSummary(wavenetUsed, getMonthlyLimit('wavenet')),
     });
   } catch (error) {
     console.error('[tts.ts] handleUsageCheck gagal ambil usage dari Redis:', error);
@@ -373,7 +419,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const deadline = Date.now() + TOTAL_DEADLINE_MS;
   const attemptErrors: { voice: string; error: string }[] = [];
-  const chars = cleanText.length;
+  // Dihitung dalam BYTE UTF-8: GCP menyatakan jumlah karakter tagihan <= jumlah byte,
+  // jadi ini batas atas yang konservatif untuk reservasi kuota.
+  const chars = Buffer.byteLength(cleanText, 'utf8');
 
   for await (const voiceName of voiceCandidates(selectedVoice)) {
     const tier = TIER_NAMES[tierIndexOf(voiceName)];
@@ -384,38 +432,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       break;
     }
 
-    // ── Quota gate SEBELUM manggil GCP ────────────────────────────────────
-    // Semua tier (Chirp, WaveNet, Standard) di-gate lewat Redis. Cek+reservasi
-    // ini atomic (lihat ttsQuota.ts) -- kalau kuota bulan ini sudah abis,
-    // langsung skip ke voice/tier berikutnya TANPA sempat manggil GCP sama
-    // sekali (beda dari fallback lama yang cuma reaktif terhadap error API).
-    // Kalau ketiga tier abis kuotanya, handler ini balas 502 di bawah, dan
-    // frontend (voiceService.ts) yang fallback ke Web Speech browser -- jadi
-    // gak ada satu pun request yang "nembus" ke GCP di luar kuota gratis.
+    // ── Quota gate SEBELUM manggil GCP (FAIL-CLOSED) ──────────────────────
+    // Tiap tier di-gate lewat Redis (reservasi atomic, lihat ttsQuota.ts).
+    // GCP HANYA dipanggil kalau reservasi berhasil. Kuota penuh, Redis error,
+    // atau tier tak dikenal -> semuanya berarti "jangan panggil GCP" dan lanjut
+    // ke tier berikutnya. Kalau semua tier ditolak, handler balas 502 dan
+    // frontend fallback ke Web Speech browser (gratis). Jadi tidak ada request
+    // yang menembus ke GCP di luar kuota gratis, bahkan saat Redis sedang down.
+    if (!tier) {
+      attemptErrors.push({ voice: voiceName, error: 'Tier voice tidak dikenal' });
+      continue;
+    }
+
     let reserved = false;
-    let quotaCheckFailed = false;
-    if (tier) {
-      const limit = getMonthlyLimit(tier);
-      try {
-        reserved = await reserveQuota(tier, chars, limit);
-      } catch (quotaErr) {
-        // Redis lagi bermasalah (BUKAN berarti kuota penuh) -- jangan sampai
-        // TTS ikut mati gara-gara ini. Tetap lanjut coba synthesize seperti
-        // biasa tanpa tracking buat percobaan ini (reserved tetap false,
-        // jadi releaseQuota gak ikut dipanggil di catch block bawah).
-        console.error(`[tts.ts] reserveQuota gagal (tier ${tier}), lanjut tanpa quota gate:`, quotaErr);
-        quotaCheckFailed = true;
-      }
-      if (!reserved && !quotaCheckFailed) {
-        // Ini baru beneran "kuota penuh" (reserveQuota sukses jalan & bilang
-        // false) -- skip ke voice/tier berikutnya, gak usah manggil GCP.
-        attemptErrors.push({ voice: voiceName, error: `Kuota bulanan tier "${tier}" sudah penuh` });
-        continue;
-      }
+    try {
+      reserved = await reserveQuota(tier, chars, getMonthlyLimit(tier));
+    } catch (quotaErr) {
+      console.error(`[tts.ts] reserveQuota gagal (tier ${tier}), tier dilewati (fail-closed):`, quotaErr);
+      attemptErrors.push({ voice: voiceName, error: `Cek kuota tier "${tier}" gagal` });
+      continue;
+    }
+    if (!reserved) {
+      attemptErrors.push({ voice: voiceName, error: `Kuota bulanan tier "${tier}" sudah penuh` });
+      continue;
     }
 
     try {
       const audioContent = await synthesizeWithVoice(voiceName, cleanText, Math.min(PER_ATTEMPT_TIMEOUT_MS, remainingMs));
+
+      await warnIfQuotaNearLimit(tier); // tidak pernah melempar error
 
       return res.status(200).json({
         audioContent,
@@ -426,9 +471,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         remainingQuota: rateLimitStatus.remaining,
       });
     } catch (error: unknown) {
-      if (tier && reserved) {
-        // GCP call-nya gagal padahal kuota sempat direservasi -- rollback,
-        // biar karakter yang gagal disintesis gak ikut kehitung "kepake".
+      // Rollback reservasi HANYA kalau GCP jelas menolak (HTTP 4xx, tidak ditagih).
+      // Timeout / error jaringan / 5xx / respons kosong: reservasi dipertahankan
+      // karena GCP mungkin sudah menghitung karakternya (lebih baik over-count).
+      if (error instanceof GcpHttpError && error.status >= 400 && error.status < 500) {
         try {
           await releaseQuota(tier, chars);
         } catch (releaseErr) {
@@ -449,7 +495,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // Semua tier GCP (Chirp -> Wavenet -> Standard) gagal / kuota penuh / waktu habis.
+  // Semua tier GCP (Chirp -> Wavenet) gagal / kuota penuh / waktu habis.
   // Balas 502 supaya frontend (voiceService.ts) fallback ke Web Speech API browser.
   return res.status(502).json({
     error: 'TTS_FAILED',

@@ -79,6 +79,13 @@ const AGENT_HINT_PATTERNS: RegExp[] = [
 const clientMightUseAgent = (text: string): boolean =>
     AGENT_HINT_PATTERNS.some((pattern) => pattern.test(text));
 
+// Mirror kasar dari WEB_RESEARCH_STRONG_RE di chat.ts (riset web via Google Search grounding,
+// yang sekarang juga berlaku untuk Rajendra). Murni kosmetik: hanya memilih copy loading
+// "Mencari di web..." agar tidak keliru tampil sebagai "AI Agent sedang riset & eksekusi".
+const WEB_RESEARCH_HINT_RE =
+    /\b(riset|research|kompetitor|pesaing|benchmark(ing)?|bandingkan|perbandingan|harga\s*pasar(an)?|pasaran|tren|trend)\w*|\bcari(kan|in)?\s+(tahu|tau|info|informasi|data|referensi|berita)\b|\bcarikan\b/i;
+const clientMightResearchWeb = (text: string): boolean => text.trim().length >= 12 && WEB_RESEARCH_HINT_RE.test(text);
+
 import { AVAILABLE_MODELS, ModelOption } from '../data/portfolioData';
 export { AVAILABLE_MODELS, type ModelOption };
 
@@ -411,9 +418,12 @@ const stripTrailingPunctuation = (url: string): { clean: string; trailing: strin
 const renderInlineFormattedText = (text: string, darkMode: boolean): React.ReactNode => {
     if (!text) return null;
 
-    // Tokenize bold (**...**), code (`...`), italic (*...*), dan URL mentah (https://...)
+    // Tokenize bold (**...**), code (`...`), italic (*...*), link markdown ([label](https://...)),
+    // dan URL mentah (https://...). Link markdown dibutuhkan untuk daftar "Sumber riset web" yang
+    // ditempel backend (groundedSearch.ts) sebagai "- [judul situs](url)"; tanpa ini URL redirect
+    // yang panjang tampil mentah.
     const parts: React.ReactNode[] = [];
-    const regex = /(\*\*.*?\*\*|`.*?`|\*.*?\*|https?:\/\/[^\s<>"')\]]+)/g;
+    const regex = /(\*\*.*?\*\*|`.*?`|\*.*?\*|\[[^\]\n]+\]\(https?:\/\/[^\s)]+\)|https?:\/\/[^\s<>"')\]]+)/g;
     let lastIndex = 0;
     let match: RegExpExecArray | null;
 
@@ -441,6 +451,24 @@ const renderInlineFormattedText = (text: string, darkMode: boolean): React.React
                     {raw.slice(1, -1)}
                 </code>
             );
+        } else if (raw.startsWith('[')) {
+            const md = /^\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)$/.exec(raw);
+            if (md) {
+                parts.push(
+                    <a
+                        key={match.index}
+                        href={md[2]}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`underline font-medium ${darkMode ? 'text-teal-300 hover:text-teal-200' : 'text-teal-600 hover:text-teal-700'
+                            }`}
+                    >
+                        {md[1]}
+                    </a>
+                );
+            } else {
+                parts.push(raw);
+            }
         } else if (raw.startsWith('http://') || raw.startsWith('https://')) {
             const { clean, trailing } = stripTrailingPunctuation(raw);
             parts.push(
@@ -654,7 +682,7 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, 
     // Hint UI: pesan yang sedang dikirim kemungkinan bakal lewat Antigravity
     // (dipakai buat copy loading indicator "mungkin agak lama" — cuma tebakan
     // client-side, keputusan final tetap di backend).
-    const [loadingHint, setLoadingHint] = useState<'normal' | 'maybe-agent'>('normal');
+    const [loadingHint, setLoadingHint] = useState<'normal' | 'maybe-agent' | 'web-research'>('normal');
 
     // ── Muat percakapan aktif dari IndexedDB sekali saat komponen pertama mount ──
     useEffect(() => {
@@ -946,7 +974,15 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, 
         setPendingFiles([]); // preview di-clear, tapi objectURL-nya masih dipakai bubble di atas
         setUploadError(null);
         setIsLoading(true);
-        setLoadingHint(clientMightUseAgent(text) ? 'maybe-agent' : 'normal');
+        setLoadingHint(
+            forceAgentOverride
+                ? 'maybe-agent'
+                : clientMightResearchWeb(text)
+                    ? 'web-research'
+                    : clientMightUseAgent(text)
+                        ? 'maybe-agent'
+                        : 'normal'
+        );
 
         try {
             const currentHistory = history.slice(-MAX_HISTORY_TURNS);
@@ -1755,7 +1791,9 @@ export const AIChatbotShowcase: React.FC<AIChatbotShowcaseProps> = ({ darkMode, 
                                 }`}>
                                 {loadingHint === 'maybe-agent'
                                     ? 'AI Agent sedang riset & eksekusi... (~10-15s)'
-                                    : LOADING_STATUSES[loadingTextIndex]}
+                                    : loadingHint === 'web-research'
+                                        ? '🔎 Mencari di web & merangkum sumber... (~5-10s)'
+                                        : LOADING_STATUSES[loadingTextIndex]}
                             </span>
                         </div>
                     </div>

@@ -159,7 +159,10 @@ const RE_K = /(?<![\d.,])(\d{2,3})k\b/gi;
 const RE_USD =
   /\$\s*(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)(?:\s*(k|jt|juta|ribu|rb|miliar|million|billion)\b)?/gi;
 
-const RE_TELEPON = /(?<![\d.,])(?:\+62|62|0)8\d{1,3}[-\s]?\d{3,4}[-\s]?\d{2,5}(?!\d)/g;
+// 0812-3456-7890 | 081234567890 | +62 812 3456 7890 | +62-812-3456-7890 | 6281234567890
+const RE_TELEPON = /(?<![\d.,])(?:\+62[-\s]?|62|0)8\d{1,3}[-\s]?\d{3,4}[-\s]?\d{2,5}(?!\d)/g;
+// Telepon tetap: (021) 5551234 | 021-5551234 | 0274 123456  (wajib ada tanda kurung / pemisah)
+const RE_TELEPON_TETAP = /(?<![\d.,])(?:\(0\d{2,3}\)[-\s]?|0\d{2,3}[-\s])\d{6,8}(?!\d)/g;
 
 const RE_JAM_RENTANG =
   /(?<![\d.,:])(\d{1,2})[.:](\d{2})\s*[-–—]\s*(\d{1,2})[.:](\d{2})\s*(WIB|WITA|WIT)\b/g;
@@ -202,12 +205,84 @@ const RE_RIBUAN_INGGRIS = /(?<![\d.,])(?:\d,000|\d{2,3},\d{3})(?![\d,]|\.\d)/g;
 const RE_NOL_TITIK = /(?<![\d.,])0\.(\d{1,3})(?!\d|[.,]\d)/g;
 const RE_DESIMAL_KOMA = /(?<![\d.,])(\d+),(\d{1,3})(?!\d|,\d)/g;
 
+// ── Tanggal, pecahan, skor "x dari y", "3x", desimal bertitik ────────────────
+const BULAN = [
+  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+];
+// 17/08/2025 | 17-08-2025 | 17.08.2025  (hari/bulan/tahun; tahun wajib 4 digit)
+const RE_TANGGAL =
+  /(?<![\d.,/-])(0?[1-9]|[12]\d|3[01])[/.-](0?[1-9]|1[0-2])[/.-]((?:19|20)\d{2})(?![\d/-]|[.,]\d)/g;
+// 2025-08-17 (ISO)
+const RE_TANGGAL_ISO =
+  /(?<![\d.,/-])((?:19|20)\d{2})-(0?[1-9]|1[0-2])-(0?[1-9]|[12]\d|3[01])(?![\d/-]|[.,]\d)/g;
+// "skor 4/5" | "halaman 3/10" | "rating: 4,8/5" -> "... dari ..."
+const RE_DARI_KONTEKS =
+  /\b(skor|rating|nilai|peringkat|bintang|halaman|hlm\.?|slide|langkah|step|tahap|bagian|babak|level|bab)(\s*:?\s*)(\d+(?:[.,]\d+)?)\s?\/\s?(\d{1,3})(?![\w/]|[.,]\d)/gi;
+// "4,8/5" | "9.5/10" (desimal di depan garis miring = hampir pasti skor)
+const RE_DARI_DESIMAL = /(?<![\w.,/])(\d+[.,]\d{1,2})\/(5|10|100)(?![\w/]|[.,]\d)/g;
+// 1/2 | 3/4 | 2/3  (satu-dua digit; penyebut 2..10)
+const RE_PECAHAN = /(?<![\w.,/])(\d{1,2})\/(\d{1,2})(?![\w/]|[.,]\d)/g;
+// "3x lipat" | "10x" | "1,5x"  (tidak kena "3x3", "2x4", "0x1F", "3xl")
+const RE_KALI_SUFIKS = /(?<![\w.,])(\d+(?:[.,]\d+)?)\s?[xX×](?!\w)/g;
+// "3 x 4" | "1920x1080"
+const RE_KALI_ANTAR_ANGKA = /(?<![\w.,])(\d+(?:[.,]\d+)?)\s?[xX×]\s?(\d+(?:[.,]\d+)?)(?!\w)/g;
+// "1.5 detik" | "2.75 jam" -> desimal gaya Inggris hanya kalau diikuti kata ukuran,
+// supaya TTS tidak membacanya "seribu lima ratus" / "lima belas".
+const KATA_UKURAN =
+  'detik|menit|jam|hari|minggu|bulan|tahun|kali|liter|meter|orang|poin|bintang|lantai|unit|item|halaman|sesi|kata|baris|pengguna|users?|klien|proyek|project|fitur|derajat';
+const RE_DESIMAL_TITIK_SATUAN = new RegExp(
+  String.raw`(?<![\w.,])(\d{1,3})\.(\d{1,2})(?![\d.]|\.\d)(?=\s?(?:${KATA_UKURAN})\b)`,
+  'gi',
+);
+// "IPK 3.75" | "skor 4.5" | "sekitar 2.5"
+const RE_DESIMAL_TITIK_KONTEKS =
+  /(?<=\b(?:skor|rating|nilai|ipk|gpa|sekitar|rata-rata|mencapai|hampir|sebesar|senilai)\s+)(\d{1,2})\.(\d{1,2})(?![\d.]|\.\d)/gi;
+// 2.1.0 | 1.0.3 (tiga segmen atau lebih; ribuan sudah diproses lebih dulu)
+const RE_TITIK_BERUNTUN = /(?<![\w.,])\d+(?:\.\d+){2,}(?![\w]|\.\d)/g;
+
 function jamKeKata(h: string, m: string): string | null {
   if (Number(h) > 23 || Number(m) > 59) return null;
   const jam = angkaKeKata(String(Number(h)));
   if (m === '00') return jam;
   const menit = m[0] === '0' ? `nol ${angkaKeKata(m[1])}` : angkaKeKata(String(Number(m)));
   return `${jam} ${menit}`;
+}
+
+function tanggalKeKata(d: string, m: string, y: string): string | null {
+  const hari = Number(d);
+  const bulan = Number(m);
+  const tahun = Number(y);
+  const cek = new Date(Date.UTC(tahun, bulan - 1, hari));
+  if (cek.getUTCMonth() !== bulan - 1 || cek.getUTCDate() !== hari) return null; // mis. 31/02
+  return `${angkaKeKata(String(hari))} ${BULAN[bulan - 1]} ${angkaKeKata(String(tahun))}`;
+}
+
+/** 1/2 -> setengah, 3/4 -> tiga perempat, 1/3 -> sepertiga, 10/10 -> sepuluh dari sepuluh. */
+function pecahanKeKata(n: number, m: number): string | null {
+  if (m < 2 || m > 10) return null;
+  if (n === m) return `${angkaKeKata(String(n))} dari ${angkaKeKata(String(m))}`; // "10/10" = skor
+  if (n < 1 || n > m) return null;
+  if (n === 1 && m === 2) return 'setengah';
+  const penyebut = `per${angkaKeKata(String(m))}`; // pertiga, perempat, perlima, ...
+  return n === 1 ? `se${penyebut}` : `${angkaKeKata(String(n))} ${penyebut}`;
+}
+
+/** Telepon -> per digit, dikelompokkan dengan koma supaya ada jeda napas alami. */
+function teleponKeKata(m: string): string {
+  const plus = m.startsWith('+') ? 'plus ' : '';
+  const raw = m.replace(/^\+/, '').replace(/[()]/g, '');
+  let groups = raw.split(/[-\s]+/).filter(Boolean);
+  if (groups.length === 1) {
+    // Tanpa pemisah: kelompokkan per empat digit, sisa 1-2 digit digabung ke kelompok terakhir.
+    const digits = groups[0];
+    groups = digits.match(/\d{1,4}/g) ?? [digits];
+    if (groups.length > 1 && groups[groups.length - 1].length < 3) {
+      const last = groups.pop() as string;
+      groups[groups.length - 1] += last;
+    }
+  }
+  return `${plus}${groups.map(bacaPerDigit).join(', ')}`;
 }
 
 function konversiAngka(input: string): string {
@@ -222,10 +297,25 @@ function konversiAngka(input: string): string {
   });
 
   // Nomor telepon -> baca per digit (harus sebelum pola angka lain)
-  s = s.replace(RE_TELEPON, (m) => {
-    const plus = m.startsWith('+') ? 'plus ' : '';
-    return ` ${plus}${bacaPerDigit(m.replace(/\D/g, ''))} `;
-  });
+  s = s.replace(RE_TELEPON, (m) => ` ${teleponKeKata(m)} `);
+  s = s.replace(RE_TELEPON_TETAP, (m) => ` ${teleponKeKata(m)} `);
+
+  // Tanggal: 17/08/2025 -> "tujuh belas Agustus dua ribu dua puluh lima" (tanggal tidak valid dibiarkan)
+  s = s.replace(RE_TANGGAL, (m, d: string, mo: string, y: string) => tanggalKeKata(d, mo, y) ?? m);
+  s = s.replace(RE_TANGGAL_ISO, (m, y: string, mo: string, d: string) => tanggalKeKata(d, mo, y) ?? m);
+
+  // Skor / halaman: "skor 4/5", "4,8/5" -> "... dari lima" (sebelum pecahan & desimal)
+  s = s.replace(RE_DARI_KONTEKS, (_m, kata: string, sp: string, n: string, tot: string) =>
+    `${kata}${sp}${bacaAngka(n)} dari ${angkaKeKata(tot)}`,
+  );
+  s = s.replace(RE_DARI_DESIMAL, (_m, n: string, tot: string) => `${bacaAngka(n)} dari ${angkaKeKata(tot)}`);
+
+  // Pecahan: 1/2, 3/4, 2/3
+  s = s.replace(RE_PECAHAN, (m, a: string, b: string) => pecahanKeKata(Number(a), Number(b)) ?? m);
+
+  // Perkalian: "3x lipat" -> "tiga kali lipat"; "3 x 4" -> "tiga kali empat"
+  s = s.replace(RE_KALI_ANTAR_ANGKA, (_m, a: string, b: string) => `${bacaAngka(a)} kali ${bacaAngka(b)}`);
+  s = s.replace(RE_KALI_SUFIKS, (_m, a: string) => `${bacaAngka(a)} kali`);
 
   // Jam: 09.00-17.00 WIB | 17.30 WIB | pukul 08.15
   s = s.replace(RE_JAM_RENTANG, (m, h1, m1, h2, m2, zona) => {
@@ -295,11 +385,20 @@ function konversiAngka(input: string): string {
   s = s.replace(RE_RENTANG_TAHUN, '$1 sampai $2');
   s = s.replace(RE_LEBIH_DARI, (_m, n: string, kata: string) => ` lebih dari ${angkaKeKata(n)} ${kata} `);
 
+  // Desimal gaya Inggris yang jelas konteksnya: "1.5 detik", "IPK 3.75"
+  s = s.replace(RE_DESIMAL_TITIK_SATUAN, (_m, a: string, b: string) => `${angkaKeKata(a)} koma ${bacaPerDigit(b)}`);
+  s = s.replace(RE_DESIMAL_TITIK_KONTEKS, (_m, a: string, b: string) => `${angkaKeKata(a)} koma ${bacaPerDigit(b)}`);
+
   // Sisa: 1.500 orang -> "seribu lima ratus orang" ; 3,14 -> "tiga koma satu empat"
   s = s.replace(RE_RIBUAN_INGGRIS, (m) => bacaAngka(m.replace(',', '.')));
   s = s.replace(RE_NOL_TITIK, (_m, d: string) => `nol koma ${bacaPerDigit(d)}`);
   s = s.replace(RE_RIBUAN, (m) => bacaAngka(m));
   s = s.replace(RE_DESIMAL_KOMA, (_m, a: string, b: string) => `${angkaKeKata(a)} koma ${bacaPerDigit(b)}`);
+
+  // Nomor bertitik yang bukan ribuan/IP: "2.1.0" -> "dua titik satu titik nol"
+  s = s.replace(RE_TITIK_BERUNTUN, (m) =>
+    m.split('.').map((seg) => angkaKeKata(String(Number(seg)))).join(' titik '),
+  );
 
   return s;
 }
@@ -742,7 +841,7 @@ const ACRONYMS_EN: readonly string[] = [
  */
 const ACRONYMS_ID: readonly string[] = [
   'KTP', 'NPWP', 'NIK', 'SIM', 'BPJS', 'UMKM', 'UMR', 'PPN', 'PPh', 'WIB', 'WIT',
-  'HRD', 'SOP', 'PT', 'HP', 'SMS', 'PKL', 'SPT', 'DPT',
+  'HRD', 'SOP', 'PT', 'HP', 'SMS', 'PKL', 'SPT', 'DPT','RAB',
 ];
 
 // ── Mesin pencocokan kamus ────────────────────────────────────────────────────
@@ -857,7 +956,14 @@ const ATURAN_KHUSUS: ReadonlyArray<readonly [RegExp, string]> = [
   [/\bQ&A\b/g, 'Kiu en Ei'],
   [/\bR&D\b/g, 'Ar en Di'],
   [/\bI\/O\b/g, 'I-O'],
-  [/\b24\s*\/\s*7\b/g, 'dua puluh empat tujuh'],
+  [/\b24\s*\/\s*7\b/g, 'dua puluh empat jam, tujuh hari seminggu'],
+  // "Q3 2026" -> "kuartal 3 2026" (hanya kalau diikuti tahun, supaya "Q&A"/"Q3" lain tak terganggu)
+  [/\bQ([1-4])(?=\s+(?:19|20)\d{2}\b)/g, 'kuartal $1'],
+  [/½/g, ' setengah '],
+  [/¼/g, ' seperempat '],
+  [/¾/g, ' tiga perempat '],
+  [/⅓/g, ' sepertiga '],
+  [/⅔/g, ' dua pertiga '],
   [/\bE-?commerce\b/gi, 'I-komers'],
   [/\bdan\/atau\b/gi, 'dan atau'],
 ];
@@ -910,6 +1016,26 @@ const KECUALI_ULANG_2 = new Set([
   'llama', 'claude', 'gemini', 'angularjs', 'ipv', 'mp', 'es', 'ec', 'md',
 ]);
 
+// v2.1.0 | versi v2.1 | IP 192.168.1.1 | @studio.kreatif
+// Diproses SEBELUM angka, supaya "v2.500" atau "10.0.0.1" tidak dianggap ribuan/desimal.
+const RE_VERSI_V = /(?<![\w.])(?:(versi|version)\s+)?v(\d+(?:\.\d+){1,3})(?!\w|\.\d)/gi;
+const RE_IP = /(?<![\w.])(?<!Rp\.?\s*)(?<!\$\s*)\d{1,3}(?:\.\d{1,3}){3}(?!\w|\.\d)/g;
+const RE_HANDLE = /(?<![\w.@])@([A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+)*)/g;
+
+function versiDanAlamat(input: string): string {
+  let s = input;
+  s = s.replace(RE_VERSI_V, (_m, kata: string | undefined, ver: string) =>
+    `${kata ?? 'versi'} ${ver.split('.').map((seg) => angkaKeKata(String(Number(seg)))).join(' titik ')}`,
+  );
+  s = s.replace(RE_IP, (m) => {
+    const oktet = m.split('.');
+    const valid = oktet.every((o) => /^(0|[1-9]\d{0,2})$/.test(o) && Number(o) <= 255);
+    return valid ? ` ${oktet.map(bacaPerDigit).join(' titik ')} ` : m;
+  });
+  s = s.replace(RE_HANDLE, (_m, h: string) => ` ${h.replace(/\./g, ' titik ')} `);
+  return s;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // FUNGSI UTAMA
 // ═══════════════════════════════════════════════════════════════════════════
@@ -927,6 +1053,9 @@ export function normalizeIndonesianForSpeech(text: string): string {
   s = s.replace(/\bwa\.me\S*/gi, ' tautan WhatsApp ');
   s = s.replace(/https?:\/\/\S+/gi, ' ');
   s = s.replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/g, ' alamat email ');
+
+  // 1b. Versi (v2.1.0), alamat IP, dan handle sosial media (@nama.akun)
+  s = versiDanAlamat(s);
 
   // 2. Pola khusus (C#, C++, .NET, CI/CD, 24/7, ...)
   for (const [re, out] of ATURAN_KHUSUS) s = s.replace(re, out);
@@ -956,5 +1085,11 @@ export function normalizeIndonesianForSpeech(text: string): string {
   s = s.replace(/#(\d+)/g, 'nomor $1');
   s = s.replace(/[#@|•·]/g, ' ');
 
-  return s.replace(/\s{2,}/g, ' ').trim();
+  return (
+    s
+      .replace(/\s{2,}/g, ' ')
+      // Spasi sisa sebelum tanda baca ("rupiah ," -> "rupiah,") akibat penggantian di atas.
+      .replace(/\s+([,;.!?])(?=\s|$)/g, '$1')
+      .trim()
+  );
 }
