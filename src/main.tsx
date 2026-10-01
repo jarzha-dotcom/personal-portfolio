@@ -3,9 +3,13 @@ import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 import { cleanupStaleCache } from './utils/chatStorage';
+import { printConsoleGreeting } from './utils/consoleGreeting';
 
 // Bersihkan cache chat dari build lama saat app pertama kali load
 cleanupStaleCache();
+
+// Sapaan buat yang suka ngoprek (dicetak sekali, di luar React)
+printConsoleGreeting();
 
 // Tangani kegagalan dynamic import Vite (misal saat versi baru dideploy / chunk hash berubah)
 window.addEventListener('vite:preloadError', (event) => {
