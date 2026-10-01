@@ -166,6 +166,7 @@ export const ARTICLES: Article[] = [
         heading: 'Cara Membandingkan yang Lebih Adil',
         paragraphs: [
           'Daripada membandingkan angka akhir saja, lebih baik minta rincian Scope of Work dari masing-masing proposal — apa saja yang in-scope, apa yang out-of-scope, dan bagaimana biaya infrastruktur dihitung terpisah dari biaya jasa development. Dari situ, perbandingan yang lebih adil bisa dilakukan, bukan cuma berdasarkan angka total yang berdiri sendiri tanpa konteks.',
+          'Prinsip yang sama yang saya pakai di DevRAB, mesin proposal di balik Zannah: biaya jasa dipisahkan dari biaya infrastruktur, margin risiko dicantumkan terang-terangan, dan setiap proposal membawa SOW lengkap dengan batas in-scope dan out-of-scope. Selengkapnya ada di artikel "Mengenal DevRAB".',
         ],
       },
     ],
@@ -275,43 +276,82 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'studi-kasus-devrab-proposal-30-detik',
-    title: 'Di Balik Tombol "Buatkan RAB": Bagaimana Zannah Menyusun Proposal dalam Hitungan Detik',
+    title: 'Mengenal DevRAB: Mesin Proposal di Balik Tombol "Buatkan RAB" Milik Zannah',
     excerpt:
-      'Bukan produk terpisah yang bisa dikunjungi — ini mesin internal di balik chat Zannah yang baru bekerja setelah sistem yakin informasinya cukup.',
-    category: 'Teknis',
-    readMinutes: 6,
-    pillar: 'ai-chatbot-agent',
+      'DevRAB adalah platform yang saya bangun untuk menyusun SOW, RAB, tanda tangan digital, dan pembayaran dalam satu alur — mesin di balik tombol "Buatkan RAB" milik Zannah.',
+    category: 'Studi Kasus',
+    readMinutes: 7,
+    pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-22',
     body: [
       {
         paragraphs: [
-          'Salah satu momen yang paling sering bikin pengunjung situs saya kaget: lagi ngobrol santai sama Zannah soal ide aplikasi, tiba-tiba muncul tawaran "mau saya buatkan RAB dan proposalnya sekarang?" — dan begitu tombolnya ditekan, dalam hitungan detik muncul dokumen lengkap dengan estimasi biaya, timeline, sampai tombol tanda tangan digital. Fitur ini tidak berdiri sendiri sebagai produk yang bisa dikunjungi lewat tautan demo seperti B-Games atau Assets DEMO — dia murni mesin yang bekerja di balik layar, dipanggil Zannah sendiri, dan namanya sendiri tidak pernah disebut eksplisit ke pengunjung. Yang mereka lihat cuma hasil akhirnya.',
+          'Pernah ngobrol santai dengan Zannah soal ide aplikasi, lalu tiba-tiba muncul tawaran "mau saya buatkan RAB dan proposalnya sekarang?" Begitu tombolnya ditekan, dalam hitungan detik muncul tautan ke dokumen lengkap: ruang lingkup pekerjaan, estimasi biaya, termin pembayaran, sampai tempat tanda tangan digital. Mesin di balik momen itu namanya DevRAB — platform yang saya bangun supaya ide proyek bisa jadi proposal profesional tanpa harus begadang di Word dan Excel.',
+          'Nama ini belum pernah saya kenalkan secara terbuka, karena DevRAB memang bukan produk showcase seperti B-Games atau Assets DEMO: tidak ada halaman demo yang bisa dikunjungi, dia bekerja di belakang chat. Tapi justru di sinilah banyak prinsip kerja saya dituangkan jadi sistem: biaya yang transparan, batas pekerjaan yang jelas, dan proses persetujuan yang rapi.',
+        ],
+      },
+      {
+        heading: 'Masalah yang Mau Diselesaikan',
+        paragraphs: [
+          'Menyusun proposal proyek software secara manual itu lambat dan gampang bolong. Satu sampai tiga hari habis untuk mengetik, estimasi sering meleset karena biaya server dan margin risiko terlupa, klien menawar tanpa paham rincian fiturnya, tanda tangan kontrak harus lewat cetak-scan-kirim, dan konfirmasi transfer tenggelam di chat WhatsApp. DevRAB dibuat untuk merapikan seluruh rantai itu, dari estimasi awal sampai uang muka masuk, di satu tempat.',
+        ],
+      },
+      {
+        heading: 'Dari Ide Mentah ke Estimasi yang Masuk Akal',
+        paragraphs: [
+          'Dari deskripsi proyek, AI (Google Gemini) merancang rincian fitur, jam kerja, biaya infrastruktur, dan timeline. Ia juga mengecek harga pasar terkini di Indonesia lewat pencarian — tarif programmer, domain, sewa server, sampai biaya API pihak ketiga — jadi angkanya tidak bertumpu pada template lama. Sebagai titik awal tersedia lebih dari sepuluh template industri (toko online, aplikasi mobile, SaaS/ERP, kasir, klinik, platform kursus, sistem booking, layanan on-demand, platform AI, company profile) dan pustaka lebih dari 70 fitur siap pilih.',
+          'Kalau klien punya batas anggaran, misalnya Rp25 juta, mesin ini memprioritaskan fitur inti dan menandai sisanya sebagai opsi, supaya total tetap masuk anggaran tanpa mengorbankan hal yang wajib ada. Perhitungan diskon, PPN, margin risiko, dan termin bertahap (misalnya 30% uang muka, 40% setelah desain dan demo, 30% setelah peluncuran) dikerjakan otomatis. Biaya jasa development dipisahkan dari biaya infrastruktur seperti server, domain, dan SSL, jadi klien bisa melihat ke mana uangnya pergi.',
+        ],
+      },
+      {
+        heading: 'Scope of Work yang Tidak Bolong',
+        paragraphs: [
+          'Setiap proposal membawa SOW: tujuan bisnis proyek, daftar yang dikerjakan (in-scope), batasan yang tidak termasuk (out-of-scope), prasyarat dari sisi klien, dan rekomendasi arsitektur teknologi. Ini yang mencegah perdebatan "kan cuma fitur kecil" di tengah proyek — topik yang juga saya bahas di artikel tentang lima pertanyaan sebelum memakai jasa developer freelance.',
+        ],
+      },
+      {
+        heading: 'Portal Klien: Simulasi, Tanda Tangan, dan Bayar dalam Satu Halaman',
+        paragraphs: [
+          'Klien menerima tautan khusus tanpa perlu registrasi atau kata sandi. Di portal itu mereka bisa mengaktifkan atau menonaktifkan fitur opsional dan melihat total harga serta nominal tiap termin berubah langsung. Kalau cocok, persetujuan ditandatangani dengan jari atau mouse di layar; kalau belum, ada kotak revisi untuk mengirim catatan tanpa membatalkan proposal.',
+          'Uang muka bisa dibayar lewat Xendit — QRIS, virtual account, atau kartu — atau lewat transfer manual dengan unggah foto bukti. Bukti transfer masuk ke dashboard admin untuk diverifikasi satu klik, dan status proyek ikut berjalan dari Draft, Sent, Approved, DP Paid, sampai Paid. Dokumen akhirnya bisa dicetak dalam format A4 berkop atau disimpan sebagai PDF, lengkap dengan nominal yang ditulis dengan kalimat terbilang.',
         ],
       },
       {
         heading: 'Zannah Tidak Asal Menawarkan',
         paragraphs: [
-          'Sebelum tombol "buatkan RAB" itu muncul, ada pengecekan kesiapan di belakang layar. Sistem menilai apakah percakapan sejauh ini sudah cukup jelas: jenis platform atau proyeknya sudah disebut (web app, mobile app, dashboard, sistem internal, dan sejenisnya), minimal dua sampai tiga kebutuhan konkret sudah dibahas, dan ada indikasi target waktu atau kisaran anggaran yang sudah disinggung. Kalau salah satu dari itu belum jelas, sistem sengaja bersikap ketat dan tidak menawarkan dulu — lebih baik nunggu sampai informasinya cukup, daripada menghasilkan proposal asal-asalan dari obrolan yang masih mentah.',
+          'Zannah terhubung ke DevRAB lewat API, jadi pengunjung tidak perlu mengisi formulir apa pun. Tapi tombol "Buatkan RAB" tidak muncul sembarangan. Di belakang layar ada pengecekan kesiapan: jenis platform atau proyeknya sudah disebut (web app, mobile app, dashboard, sistem internal, dan sejenisnya), minimal dua sampai tiga kebutuhan konkret sudah dibahas, dan ada indikasi target waktu atau kisaran anggaran. Kalau salah satunya belum jelas, sistem sengaja bersikap ketat — lebih baik menunggu informasi cukup daripada menghasilkan proposal asal-asalan dari obrolan yang masih mentah.',
         ],
       },
       {
-        heading: 'Kalau Mesinnya Sedang Bermasalah, Percakapan Tidak Berhenti',
+        heading: 'Kalau Mesinnya Bermasalah, Percakapan Tidak Berhenti',
         paragraphs: [
-          'Begitu tombol ditekan, permintaan dikirim ke mesin generator dengan mekanisme percobaan ulang otomatis — kalau gagal karena server sibuk atau timeout, sistem mencoba lagi dengan jeda yang makin panjang tiap percobaan, sampai beberapa kali sebelum benar-benar menyerah. Uniknya, begitu topik soal estimasi proyek mulai muncul di percakapan, sistem sudah lebih dulu mengirim "ping" diam-diam ke mesin ini di background — semacam pemanasan awal supaya begitu benar-benar dibutuhkan, mesinnya sudah dalam kondisi siap, bukan baru mulai dari kondisi dingin.',
-          'Kalau setelah semua percobaan tetap gagal — server API-nya belum dikonfigurasi, jaringan bermasalah, atau apa pun penyebabnya — sistem tidak menampilkan pesan error ke pengunjung. Zannah tetap menyusun draf estimasi seadanya secara lokal, supaya percakapan tetap punya sesuatu untuk dilanjutkan, bukan berhenti mendadak di tengah jalan.',
+          'Begitu tombol ditekan, permintaan dikirim ke DevRAB dengan mekanisme percobaan ulang otomatis: kalau gagal karena server sibuk atau timeout, sistem mencoba lagi dengan jeda yang makin panjang di tiap percobaan. Begitu topik estimasi proyek mulai muncul di obrolan, sistem juga sudah mengirim "ping" diam-diam sebagai pemanasan, supaya mesinnya siap saat benar-benar dibutuhkan.',
+          'Kalau semua percobaan tetap gagal, pengunjung tidak melihat pesan error. Zannah tetap menyusun draf estimasi seadanya secara lokal supaya percakapan punya sesuatu untuk dilanjutkan. Ini prinsip yang sama dengan Cascade AI System: turunkan tingkat kecanggihan, jangan berhenti total.',
         ],
       },
       {
         heading: 'Kenapa Setiap Isi Proposal Harus "Dicuci" Dulu',
         paragraphs: [
-          'Karena rincian proposal ini pada akhirnya berasal dari apa yang diketik pengunjung di chat, seluruh isinya diperlakukan sebagai data yang tidak bisa dipercaya begitu saja sebelum ditampilkan sebagai halaman. Setiap teks yang masuk ke dokumen hasil — judul proyek, daftar fitur, dan sebagainya — melewati proses pembersihan karakter berbahaya dulu, dan setiap tautan yang muncul di dokumen divalidasi supaya hanya boleh berupa alamat web yang sah. Detail teknis kecil ini yang mencegah dokumen hasil generate bisa disalahgunakan buat menyisipkan sesuatu yang tidak diinginkan.',
+          'Karena rincian proposal berasal dari apa yang diketik pengunjung di chat, seluruh isinya diperlakukan sebagai data yang tidak boleh langsung dipercaya. Setiap teks yang masuk ke dokumen hasil, seperti judul proyek dan daftar fitur, dibersihkan dari karakter berbahaya, dan setiap tautan divalidasi supaya hanya alamat web yang sah yang lolos. Di sisi admin, kata sandi disimpan dengan PBKDF2 SHA-256 dan percobaan login berulang yang mencurigakan diblokir otomatis.',
         ],
       },
       {
-        heading: 'Kenapa Fitur Ini Sengaja Tidak Dijadikan Produk Terpisah',
+        heading: 'Fondasi Teknisnya',
         paragraphs: [
-          'Tetap menjaga fitur ini sebagai bagian dari alur ngobrol biasa — bukan produk berdiri sendiri yang harus dikunjungi, didaftarkan, atau dipelajari cara pakainya — itu pilihan sadar. Calon klien tidak perlu tahu ada "mesin RAB" di belakang layar; yang mereka rasakan cukup: ngobrol soal ide proyek, dan tanpa diminta secara eksplisit, hasil akhirnya sudah siap dalam bentuk yang bisa langsung ditindaklanjuti. Kompleksitas teknisnya sengaja disembunyikan supaya pengalamannya tetap terasa sesederhana mungkin dari sisi pengunjung.',
+          'DevRAB berjalan di jaringan global Cloudflare dengan database Turso dan penyimpanan berkas Cloudflare R2 untuk logo agensi dan foto bukti bayar; tampilannya dibangun dengan React dan Tailwind. Alasan memilih kombinasi ini dibahas di artikel "4 Sistem Saya, 4 Arsitektur Backend Berbeda".',
+        ],
+      },
+      {
+        heading: 'Batasan yang Perlu Diketahui',
+        paragraphs: [
+          'Hasil DevRAB adalah estimasi awal yang disusun cepat, bukan harga mati. Angkanya bisa direvisi lewat portal, dan untuk proyek yang rumit, konsultasi langsung tetap cara paling akurat untuk menetapkan lingkup dan biaya. AI mempercepat penyusunannya, tapi tidak menggantikan penilaian soal apa yang realistis dikerjakan.',
+        ],
+      },
+      {
+        heading: 'Cara Mencobanya',
+        paragraphs: [
+          'Cara paling mudah mengalaminya langsung: buka chat Zannah di pojok kanan bawah situs ini, ceritakan ide proyekmu — jenis aplikasinya, kebutuhan utama, dan kira-kira target waktu atau anggarannya — lalu lihat proposal yang muncul. Kamu juga bisa melampirkan sketsa, PDF, atau CSV supaya kebutuhannya terbaca lebih jelas. Kalau penasaran dengan detail teknisnya, atau ingin membahas pendekatan serupa untuk alur proposalmu sendiri, kontak saya ada di halaman kontak.',
         ],
       },
     ],
@@ -347,7 +387,7 @@ export const ARTICLES: Article[] = [
       {
         heading: 'Prinsip yang Sama Juga Dipakai di Fitur Lain',
         paragraphs: [
-          'Filosofi "jangan pernah berhenti total, turunkan saja tingkat kecanggihannya" ini bukan cuma dipakai di percakapan biasa. Di fitur pembuatan proposal otomatis misalnya, kalau mesin generatornya gagal dihubungi setelah beberapa kali percobaan ulang, sistem tetap menyiapkan draf lokal seadanya alih-alih menampilkan pesan error ke pengunjung. Prinsip yang sama, diterapkan di lapisan yang berbeda.',
+          'Filosofi "jangan pernah berhenti total, turunkan saja tingkat kecanggihannya" ini bukan cuma dipakai di percakapan biasa. Di DevRAB, mesin pembuat proposal di balik Zannah, misalnya, kalau mesin generatornya gagal dihubungi setelah beberapa kali percobaan ulang, sistem tetap menyiapkan draf lokal seadanya alih-alih menampilkan pesan error ke pengunjung. Prinsip yang sama, diterapkan di lapisan yang berbeda.',
         ],
       },
       {
@@ -410,7 +450,7 @@ export const ARTICLES: Article[] = [
     slug: 'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda',
     title: '4 Sistem Saya, 4 Arsitektur Backend Berbeda — Ini Alasannya',
     excerpt:
-      'Assets DEMO pakai Google Sheets, B-Games pakai Supabase, mesin RAB di balik Zannah pakai Cloudflare + Turso. Bukan karena ikut tren, tapi karena kebutuhannya memang beda.',
+      'Assets DEMO pakai Google Sheets, B-Games pakai Supabase, DevRAB pakai Cloudflare + Turso. Bukan karena ikut tren, tapi karena kebutuhannya memang beda.',
     category: 'Teknis',
     readMinutes: 5,
     pillar: 'zero-server-cost',
@@ -436,9 +476,9 @@ export const ARTICLES: Article[] = [
         ],
       },
       {
-        heading: 'Mesin RAB di Balik Zannah — Cloudflare Edge & Turso',
+        heading: 'DevRAB — Cloudflare Edge & Turso',
         paragraphs: [
-          'Satu hal yang perlu diluruskan dulu: ini bukan "proyek showcase" seperti dua yang di atas. Tidak ada halaman demo terpisah, tidak muncul di halaman proyek, dan namanya tidak pernah disebut eksplisit ke pengunjung — dia cuma mesin yang dipanggil Zannah di belakang layar saat pengunjung minta dibuatkan RAB. Tapi keputusan arsitekturnya tetap relevan dibahas, karena pertimbangannya beda lagi dari dua sistem di atas.',
+          'DevRAB — mesin proposal yang dipanggil Zannah saat pengunjung minta dibuatkan RAB — beda dari dua sistem di atas: bukan showcase dengan halaman demo publik, melainkan platform yang bekerja di belakang chat. Kenalan lengkapnya ada di artikel "Mengenal DevRAB", tapi keputusan arsitekturnya tetap relevan dibahas di sini karena pertimbangannya beda lagi.',
           'Mesin ini dipakai dari mana saja tanpa tahu kapan trafiknya datang, jadi latensi akses harus tetap rendah dari kota mana pun. Cloudflare dipilih karena jaringannya tersebar di ratusan pusat data global, dan Turso sebagai database terdistribusi memastikan data proposal dan status pembayaran tersinkron cepat tanpa satu titik kegagalan tunggal.',
         ],
       },
@@ -452,7 +492,7 @@ export const ARTICLES: Article[] = [
         heading: 'Pertanyaan yang Sebenarnya Menentukan Pilihan',
         paragraphs: [
           'Kalau ditarik pola umumnya, ada empat pertanyaan yang saya ajukan sebelum menentukan arsitektur untuk sistem apa pun (termasuk punya klien): seberapa kompleks relasi datanya, seberapa besar toleransi biaya bulanan, siapa yang harus punya kendali penuh atas data, dan seberapa penting sinkronisasi real-time antar banyak pengguna sekaligus. Jawaban dari empat pertanyaan itu yang menentukan arsitekturnya — bukan sekadar ikut tren teknologi yang lagi ramai dibicarakan.',
-          'Kalau kamu sedang bingung menentukan arsitektur yang pas untuk kebutuhan bisnismu, ini bisa jadi bahan diskusi awal yang gratis, tanpa kewajiban order.',
+          'Bingung menentukan arsitektur untuk bisnismu? Jawab keempat pertanyaan itu versi bisnismu sendiri, lalu bawa hasilnya ke chat Zannah — itu sudah cukup jadi bahan awal diskusi.',
         ],
       },
     ],
@@ -513,7 +553,7 @@ export const ARTICLES: Article[] = [
     excerpt:
       'Bagaimana sinkronisasi giliran pemain di Ludo dan Ular Tangga dibangun tanpa lag, dan cara menangani pemain yang tiba-tiba disconnect.',
     category: 'Teknis',
-    readMinutes: 7,
+    readMinutes: 8,
     pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-17',
@@ -540,7 +580,7 @@ export const ARTICLES: Article[] = [
       {
         heading: 'Kalau Ada Pemain yang Tiba-tiba Disconnect',
         paragraphs: [
-          'Ini bagian yang sering diremehkan tapi paling penting untuk pengalaman bermain: kalau salah satu pemain kehilangan koneksi di tengah permainan, permainan tidak boleh macet menunggu dia kembali selamanya. B-Games punya mekanisme AFK takeover — begitu server mendeteksi satu pemain tidak merespons dalam waktu tertentu, bot cerdas otomatis mengambil alih girilannya sampai pemain itu kembali online atau permainan selesai.',
+          'Ini bagian yang sering diremehkan tapi paling penting untuk pengalaman bermain: kalau salah satu pemain kehilangan koneksi di tengah permainan, permainan tidak boleh macet menunggu dia kembali selamanya. B-Games punya mekanisme AFK takeover — begitu server mendeteksi satu pemain tidak merespons dalam waktu tertentu, bot cerdas otomatis mengambil alih gilirannya sampai pemain itu kembali online atau permainan selesai.',
           'Pemain lain di room tetap bisa lanjut main tanpa harus menunggu atau membatalkan pertandingan. Begitu pemain yang disconnect kembali, kontrol dikembalikan ke dia secara mulus di giliran berikutnya.',
         ],
       },
@@ -551,9 +591,16 @@ export const ARTICLES: Article[] = [
         ],
       },
       {
+        heading: 'Di Sekitar Meja Permainan',
+        paragraphs: [
+          'Mesin giliran dan server otoritatif itu melayani empat permainan: Ludo Classic untuk 2–4 pemain, Ludo Hexagon dengan papan heksagonal untuk hingga 6 pemain, Ular Tangga, dan Tic-Tac-Toe. Di sekelilingnya ada data yang tidak cocok disimpan di dalam server game, yaitu profil, daftar teman, dompet koin, leaderboard, dan riwayat pertandingan. Bagian itu hidup di Supabase (PostgreSQL), sementara server game fokus ke aturan main.',
+          'Pemain bisa langsung main sebagai tamu tanpa daftar, lalu menghubungkan akun ke Google kapan saja supaya koin dan prestasinya tidak hilang saat ganti perangkat. B-Games juga bisa dipasang ke layar utama sebagai PWA dan bisa dicoba langsung di bgames.arzhaning.my.id.',
+        ],
+      },
+      {
         heading: 'Prinsip yang Bisa Dipakai di Luar Game',
         paragraphs: [
-          'Pola "server otoritatif + klien cuma mengirim niat, bukan hasil akhir" ini sebenarnya bukan cuma relevan untuk game. Prinsip yang sama dipakai di sistem apa pun yang butuh beberapa pengguna mengubah data yang sama secara bersamaan tanpa saling menimpa atau bisa dimanipulasi sepihak — misalnya sistem approval multi-user atau update stok real-time. Kalau bisnismu punya kebutuhan sinkronisasi data real-time semacam ini, arsitekturnya bisa didiskusikan lebih lanjut secara gratis.',
+          'Pola "server otoritatif + klien cuma mengirim niat, bukan hasil akhir" ini sebenarnya bukan cuma relevan untuk game. Prinsip yang sama dipakai di sistem apa pun yang butuh beberapa pengguna mengubah data yang sama secara bersamaan tanpa saling menimpa atau bisa dimanipulasi sepihak — misalnya sistem approval multi-user atau update stok real-time. Kalau bisnismu punya kebutuhan sinkronisasi data real-time semacam ini, ceritakan alur kerjanya ke Zannah di chat, lalu kita bahas arsitektur yang pas.',
         ],
       },
     ],
@@ -564,7 +611,7 @@ export const ARTICLES: Article[] = [
     excerpt:
       'Google Apps Script pas untuk skala kecil-menengah, tapi ada titik ketika sistem butuh "naik kelas". Ini tanda-tandanya.',
     category: 'Teknis',
-    readMinutes: 3,
+    readMinutes: 4,
     pillar: 'zero-server-cost',
     published: true,
     publishedAt: '2026-09-15',
@@ -577,7 +624,7 @@ export const ARTICLES: Article[] = [
       {
         heading: '1. Sering Kena Galat "Batas Eksekusi" atau "Kuota Terlampaui"',
         paragraphs: [
-          'Google Apps Script punya plafon waktu eksekusi per proses dan kuota panggilan layanan harian yang di-reset tiap hari. Sesekali kena galat ini wajar (biasanya karena proses yang belum dioptimalkan), tapi kalau errornya sudah rutin muncul di jam sibuk — itu tanda beban kerja sistemmu sudah melewati kapasitas yang wajar untuk platform ini.',
+          'Google Apps Script membatasi satu eksekusi maksimal sekitar 6 menit, dan punya kuota panggilan layanan harian yang di-reset tiap hari (angka resminya bisa berubah sewaktu-waktu, jadi cek dokumentasi kuota Google untuk versi terbaru). Sesekali kena galat ini wajar (biasanya karena proses yang belum dioptimalkan), tapi kalau errornya sudah rutin muncul di jam sibuk — itu tanda beban kerja sistemmu sudah melewati kapasitas yang wajar untuk platform ini.',
         ],
       },
       {
@@ -589,7 +636,7 @@ export const ARTICLES: Article[] = [
       {
         heading: '3. Butuh Banyak Proses Bersamaan Secara Real-Time',
         paragraphs: [
-          'Apps Script pada dasarnya berjalan sekuensial — satu proses harus selesai dulu sebelum proses berikutnya jalan sepenuhnya paralel dalam skala besar. Ini tidak masalah untuk sistem yang dipakai beberapa petugas sekaligus, tapi kalau kebutuhanmu sudah mengarah ke puluhan atau ratusan user menulis data secara bersamaan detik itu juga (misalnya sistem kasir multi-cabang real-time), arsitektur berbasis server dengan database yang memang dirancang untuk concurrency tinggi akan jauh lebih stabil.',
+          'Apps Script sebenarnya bisa menjalankan beberapa eksekusi sekaligus, tapi ada batasnya — dokumentasi Google saat ini menyebut 30 eksekusi simultan per pengguna. Yang lebih sering jadi masalah justru penulisan ke Sheets: kalau dua orang menyimpan ke area data yang sama di saat bersamaan, urutannya harus diatur dengan penguncian (LockService), dan selama kunci dipegang, proses lain harus menunggu giliran. Ini tidak masalah untuk sistem yang dipakai beberapa petugas sekaligus, tapi kalau kebutuhanmu sudah mengarah ke puluhan atau ratusan user menulis data pada detik yang sama (misalnya sistem kasir multi-cabang real-time), arsitektur berbasis server dengan database yang memang dirancang untuk concurrency tinggi akan jauh lebih stabil.',
         ],
       },
       {
@@ -601,13 +648,13 @@ export const ARTICLES: Article[] = [
       {
         heading: '5. Tim Sudah Besar dan Butuh Kontrol Akses Granular',
         paragraphs: [
-          'Sheets sebagai database tidak punya sistem role-based access control atau audit log sedetail database khusus. Kalau bisnismu sudah butuh mengatur siapa boleh lihat/edit data sampai level bar is atau kolom tertentu, dengan jejak audit yang lengkap untuk kebutuhan kepatuhan (compliance), itu kebutuhan yang lebih pas dijawab oleh database dan backend yang dirancang untuk itu.',
+          'Sheets sebagai database tidak punya sistem role-based access control atau audit log sedetail database khusus. Kalau bisnismu sudah butuh mengatur siapa boleh lihat/edit data sampai level baris atau kolom tertentu, dengan jejak audit yang lengkap untuk kebutuhan kepatuhan (compliance), itu kebutuhan yang lebih pas dijawab oleh database dan backend yang dirancang untuk itu.',
         ],
       },
       {
         heading: 'Migrasi Bukan Berarti Buang Semua',
         paragraphs: [
-          'Kalau satu atau dua tanda di atas mulai terasa, bukan berarti sistemnya harus dibongkar total. Sering kali solusinya hybrid — bagian yang masih ringan tetap di Apps Script, bagian yang sudah berat dipindah ke server/database khusus. Kalau kamu mulai merasakan salah satu tanda ini, itu bisa jadi bahan diskusi awal yang gratis, tanpa kewajiban order.',
+          'Kalau satu atau dua tanda di atas mulai terasa, bukan berarti sistemnya harus dibongkar total. Sering kali solusinya hybrid — bagian yang masih ringan tetap di Apps Script, bagian yang sudah berat dipindah ke server/database khusus. Kalau satu atau dua tanda di atas sudah terasa, catat dulu galat apa yang paling sering muncul dan di jam berapa — itu data paling berguna untuk menentukan bagian mana yang perlu dipindah lebih dulu.',
         ],
       },
     ],
@@ -701,7 +748,7 @@ export const ARTICLES: Article[] = [
         heading: 'Keputusan Berdasarkan Kebutuhan, Bukan Hype',
         paragraphs: [
           '"AI chatbot" sedang jadi kata kunci yang menarik, dan gampang tergoda pakai solusi paling canggih padahal kebutuhannya sebenarnya sederhana. Kalau kamu cuma butuh jawab FAQ dan tangkap lead dasar, chatbot template sudah cukup — tidak perlu custom yang lebih mahal dan lebih lama development-nya.',
-          'Tapi kalau chatbot-nya perlu terhubung ke data internal, menjalankan tugas otomatis multi-langkah, atau jadi bagian dari alur kerja yang lebih besar (bukan sekadar widget percakapan di pojok website), di situlah custom mulai lebih masuk akal — baik dari sisi kemampuan maupun biaya jangka panjang. Kalau kamu belum yakin kebutuhanmu masuk kategori yang mana, itu bisa jadi bahan diskusi awal yang gratis, tanpa kewajiban order.',
+          'Tapi kalau chatbot-nya perlu terhubung ke data internal, menjalankan tugas otomatis multi-langkah, atau jadi bagian dari alur kerja yang lebih besar (bukan sekadar widget percakapan di pojok website), di situlah custom mulai lebih masuk akal — baik dari sisi kemampuan maupun biaya jangka panjang. Kalau belum yakin masuk kategori mana, coba tulis tiga hal yang ingin dilakukan chatbot-mu. Kalau salah satunya menyentuh data internal atau tugas multi-langkah, itu sinyal untuk melirik solusi custom.',
         ],
       },
     ],
@@ -761,7 +808,7 @@ export const ARTICLES: Article[] = [
     excerpt:
       'Bedah teknis arsitektur serverless di balik Assets DEMO — dari stock opname manual yang rawan selisih, sampai audit yang bisa dicek kapan saja.',
     category: 'Studi Kasus',
-    readMinutes: 4,
+    readMinutes: 6,
     pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-05',
@@ -798,6 +845,19 @@ export const ARTICLES: Article[] = [
         ],
       },
       {
+        heading: 'Yang Dilihat Pimpinan, dan yang Dipakai Staf Lapangan',
+        paragraphs: [
+          'Untuk pimpinan, dashboard menampilkan total nilai perolehan aset berdampingan dengan total nilai buku saat ini, plus grafik status operasional: aktif, dalam perbaikan, atau sudah dihapusbukukan (disposed). Untuk staf lapangan, tampilannya dibuat jauh lebih sederhana: katalog dengan pencarian berdasarkan kode, merek, kategori, ruangan, sampai nama pemegang barang, filter kondisi, dan pemindai QR. Pembagian peran menjaga agar staf biasa hanya bisa melihat dan memindai, sementara perubahan nilai dan data sensitif tetap di tangan administrator.',
+          'Setiap aset punya dua slot foto (tampak depan, serta nomor seri atau kondisi fisik) yang bisa diperbesar layar penuh untuk pemeriksaan detail. Daftar aset dirender dengan Shopify FlashList, jadi ribuan baris tetap lancar digulir di HP biasa.',
+        ],
+      },
+      {
+        heading: 'Pengingat Servis, Garansi, dan Notifikasi',
+        paragraphs: [
+          'Aset bukan cuma soal nilai buku. Jadwal servis berkala, kalibrasi, atau tanggal berakhirnya garansi bisa dicatat per aset, disinkronkan ke Google Calendar, dan diingatkan lewat push notification (OneSignal) sebelum hari-H. Tujuannya sederhana: servis AC atau kendaraan operasional tidak terlewat sampai kerusakannya jadi mahal.',
+        ],
+      },
+      {
         heading: 'Batasan yang Perlu Diketahui',
         paragraphs: [
           'Pendekatan serverless berbasis Google Apps Script ini paling pas untuk skala operasional kecil-menengah — bukan untuk trafik sangat tinggi dengan ribuan transaksi bersamaan setiap detik. Google Apps Script punya batas kuota eksekusi harian, jadi kalau volume data dan penggunanya jauh lebih besar dari kebutuhan multi-cabang seperti PT GMP, arsitektur berbasis server/database khusus akan lebih cocok. Untuk kasus PT GMP sendiri, batasan ini belum jadi masalah karena skala operasionalnya memang pas dengan pendekatan ini.',
@@ -807,13 +867,20 @@ export const ARTICLES: Article[] = [
         heading: 'Hasilnya',
         paragraphs: [
           'Dengan sistem ini, audit aset jadi lebih cepat dan transparan — nilai buku selalu akurat dan siap diperiksa kapan saja, tanpa perlu rekonsiliasi manual dulu. Dari sisi anggaran, biaya sewa server tetap Rp0 per bulan, karena semuanya berjalan di atas ekosistem cloud yang sudah dipakai perusahaan.',
-          'Versi publik dari sistem ini — Assets Demo, dengan data simulasi demi menjaga privasi data PT Global Multiparts — bisa dicoba langsung untuk melihat bagaimana alur kerjanya secara nyata.',
+          'Versi publik dari sistem ini — Assets Demo, dengan data simulasi demi menjaga privasi data PT Global Multiparts — bisa dicoba langsung di assets.arzhaning.my.id untuk melihat bagaimana alur kerjanya secara nyata.',
+        ],
+      },
+      {
+        heading: 'Coba Sendiri dengan Akun Demo',
+        paragraphs: [
+          'Buka assets.arzhaning.my.id dan masuk dengan salah satu akun uji coba. Untuk melihat sisi pimpinan dengan kendali penuh (tambah dan edit aset, kelola pengguna, ekspor laporan), pakai admin@demo.com dengan kata sandi 123456. Untuk merasakan sisi staf lapangan (melihat katalog, memindai label QR, memeriksa riwayat), pakai staff@demo.com dengan kata sandi yang sama. Semua datanya simulasi, jadi silakan dicoba bebas.',
+          'Satu catatan: karena sistem membatasi satu sesi aktif per akun, kalau ada pengunjung lain yang sedang memakai akun yang sama, sesimu bisa terputus. Kalau itu terjadi, cukup masuk lagi.',
         ],
       },
       {
         heading: 'Kalau Bisnismu Punya Masalah Serupa',
         paragraphs: [
-          'Pola ini tidak cuma berlaku untuk manajemen aset — prinsip yang sama (memanfaatkan ekosistem cloud yang sudah ada alih-alih membangun infrastruktur baru dari nol) bisa dipakai untuk berbagai proses bisnis lain yang masih manual dan rawan selisih data. Kalau bisnismu punya masalah pendataan atau pelacakan yang serupa, ini bisa jadi bahan diskusi awal yang gratis, tanpa kewajiban order.',
+          'Pola ini tidak cuma berlaku untuk manajemen aset — prinsip yang sama (memanfaatkan ekosistem cloud yang sudah ada alih-alih membangun infrastruktur baru dari nol) bisa dipakai untuk berbagai proses bisnis lain yang masih manual dan rawan selisih data. Kalau bisnismu punya masalah pendataan atau pelacakan serupa, coba dulu demonya, lalu catat bagian alur mana yang paling mirip dengan proses di tempatmu — itu bahan yang bagus untuk memulai diskusi lewat chat Zannah.',
         ],
       },
     ],

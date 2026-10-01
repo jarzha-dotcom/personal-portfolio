@@ -23,7 +23,7 @@ Seringkali perusahaan menghadapi kendala seperti:
 
 Aplikasi telah siap digunakan secara publik untuk simulasi operasional:
 
-* 🌐 **Tautan Aplikasi Web:** [https://assets.byarzhaning.online/](https://assets.byarzhaning.online/)
+* 🌐 **Tautan Aplikasi Web:** [https://assets.arzhaning.my.id/](https://assets.arzhaning.my.id/)
 * 📱 **Kemudahan Akses:** Dapat dibuka langsung di Google Chrome / Safari, atau di-install menjadi aplikasi mandiri (*Add to Home Screen*) di Android & iPhone.
 
 ### 🔑 Akun Uji Coba Bawaan:
