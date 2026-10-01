@@ -165,18 +165,6 @@ function MainPortfolio() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Hint buat yang suka buka console — bagian dari easter egg
-  useEffect(() => {
-    console.log(
-      '%c👋 Suka ngoprek ya?',
-      'font-size:16px;font-weight:bold;color:#0d9488;'
-    );
-    console.log(
-      '%c"Buka console log itu mirip ngintip ke balik panggung: kamu bakal tahu mana efek megah yang memang disusun rapi, dan mana yang cuma ditahan pakai isolasi "try...catch."',
-      'font-size:12px;color:#64748b;'
-    );
-  }, []);
-
   // Setelah pindah rute: scroll ke anchor (mis. '/#layanan' dari halaman Hasil
   // Kerja) atau balik ke atas. Effect pertama saat mount dilewati supaya tidak
   // menimpa restore scroll bawaan browser saat reload.
