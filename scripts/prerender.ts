@@ -81,6 +81,67 @@ const breadcrumbJsonLd = (items: { name: string; url: string }[]) => ({
 // Template dist/index.html — head & shell #root
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+// Blok artikel di homepage (index.html) — digenerate dari ARTICLES tiap build,
+// menggantikan daftar manual yang dulu cepat basi (cuma memuat sebagian artikel).
+// Ada dua blok, masing-masing diapit penanda komentar di index.html:
+//   - ARTICLES_JSONLD : <script type="application/ld+json"> ItemList (di <head>)
+//   - ARTICLES_LIST   : <li> link artikel di "Semantic Static Shell" untuk crawler
+// Penanda dipertahankan di output, jadi menjalankan `npm run prerender` dua kali
+// tanpa build ulang tetap aman (isi di antara penanda cukup ditimpa lagi).
+// ---------------------------------------------------------------------------
+
+// Batas jumlah artikel di blok homepage — artikel yang lebih lama tetap ada di
+// /artikel dan sitemap.xml, hanya tidak ikut di-link dari beranda.
+const HOME_ARTICLE_LIMIT = 20;
+
+const fillMarkedBlock = (html: string, name: string, content: string): string => {
+  const start = `<!-- PRERENDER:${name}:START -->`;
+  const end = `<!-- PRERENDER:${name}:END -->`;
+  const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
+  if (!pattern.test(html)) {
+    throw new Error(
+      `[prerender] Penanda ${start} ... ${end} tidak ditemukan di dist/index.html. ` +
+        `Pastikan index.html sumber masih memuat kedua komentar penanda itu.`
+    );
+  }
+  // Pakai fungsi (bukan string) supaya "$" di dalam konten tidak ditafsirkan khusus oleh replace().
+  return html.replace(pattern, () => `${start}${content}${end}`);
+};
+
+const fillHomeArticleBlocks = (html: string): string => {
+  const latest = ARTICLES.filter((a) => a.published).slice(0, HOME_ARTICLE_LIMIT);
+
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Artikel K. Arzhaning Jagad',
+    itemListElement: latest.map((a, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'BlogPosting',
+        headline: a.title,
+        url: `${CANONICAL_BASE}${articleRoute(a.slug)}`,
+        author: { '@type': 'Person', name: 'K. Arzhaning Jagad' },
+        description: a.excerpt,
+        ...(a.publishedAt ? { datePublished: a.publishedAt } : {}),
+      },
+    })),
+  };
+
+  const listItems = latest
+    .map(
+      (a) =>
+        `<li><a href="${articleRoute(a.slug)}" style="color: #0d9488; font-weight: 600;">${escapeHtml(a.title)}</a></li>`
+    )
+    .join('\n          ');
+
+  let out = fillMarkedBlock(html, 'ARTICLES_JSONLD', `\n  ${jsonLdScript(itemList)}\n  `);
+  out = fillMarkedBlock(out, 'ARTICLES_LIST', `\n          ${listItems}\n          `);
+  return out;
+};
+
 let baseHtmlCache: string | null = null;
 const readBaseHtml = (): string => {
   if (baseHtmlCache) return baseHtmlCache;
@@ -91,7 +152,7 @@ const readBaseHtml = (): string => {
         `Jalankan "vite build" dulu sebelum prerender (script ini butuh HTML hasil build, bukan index.html sumber).`
     );
   }
-  baseHtmlCache = readFileSync(path, 'utf-8');
+  baseHtmlCache = fillHomeArticleBlocks(readFileSync(path, 'utf-8'));
   return baseHtmlCache;
 };
 
@@ -857,6 +918,11 @@ const main = async () => {
   for (const article of published) {
     written.push(await buildArticlePage(article));
   }
+
+  // Homepage = dist/index.html itu sendiri; tulis ulang dengan blok artikel yang
+  // sudah terisi dari data (lihat fillHomeArticleBlocks).
+  writeFileSync(INDEX_HTML_PATH, readBaseHtml(), 'utf-8');
+  written.push(INDEX_HTML_PATH);
 
   const sitemapPath = buildSitemap({ totalPages, pageUrl });
   written.push(sitemapPath);
