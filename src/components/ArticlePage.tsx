@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Clock, Calendar, Sparkles } from 'lucide-react';
-import { getArticleBySlug, getAdjacentArticles } from '../data/articles';
+import { getArticleBySlug, getAdjacentArticles, type ArticleBlock } from '../data/articles';
+import { loadArticleBody } from '../data/loadArticleBody';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { ROUTES, articleRoute, CANONICAL_BASE } from '../routes';
 import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
@@ -16,10 +17,42 @@ interface ArticlePageProps {
   darkMode: boolean;
 }
 
+// Placeholder tipis selama isi artikel (chunk terpisah) sedang dimuat.
+const BodySkeleton: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
+  const bar = darkMode ? 'bg-slate-800' : 'bg-slate-200';
+  return (
+    <div className="space-y-3 animate-pulse" role="status" aria-label="Memuat isi artikel">
+      {[100, 95, 88, 100, 70, 92, 60].map((w, i) => (
+        <div key={i} className={`h-4 rounded ${bar}`} style={{ width: `${w}%` }} />
+      ))}
+    </div>
+  );
+};
+
 export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
   const { slug } = useParams<{ slug: string }>();
   const { navigate } = useNavigationHistory();
   const article = slug ? getArticleBySlug(slug) : undefined;
+
+  // Isi artikel dimuat terpisah dari metadata. Disimpan bersama slug-nya supaya
+  // saat pindah artikel, isi artikel lama tidak sempat tampil di artikel baru.
+  // blocks: undefined = sedang memuat, null = gagal/tidak ada, array = siap.
+  const [loaded, setLoaded] = useState<{ slug: string; blocks: ArticleBlock[] | null } | null>(
+    null
+  );
+  const articleSlug = article?.slug;
+  useEffect(() => {
+    if (!articleSlug) return;
+    let cancelled = false;
+    loadArticleBody(articleSlug).then((blocks) => {
+      if (!cancelled) setLoaded({ slug: articleSlug, blocks });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [articleSlug]);
+  const blocks = loaded && loaded.slug === articleSlug ? loaded.blocks : undefined;
+  const bodyBlocks = blocks ?? [];
 
   useBreadcrumbSchema(
     article
@@ -97,8 +130,8 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
   // Sisipkan gambar "middle" persis di tengah body artikel (hanya untuk slug
   // yang memang punya foto custom, biar artikel tanpa foto tidak dipaksa
   // menampilkan kotak ikon di tengah teks).
-  const showMiddleImage = hasArticleImages(article.slug) && article.body.length > 1;
-  const middleImageIndex = Math.ceil(article.body.length / 2);
+  const showMiddleImage = hasArticleImages(article.slug) && bodyBlocks.length > 1;
+  const middleImageIndex = Math.ceil(bodyBlocks.length / 2);
 
   const navCardClass = (align: 'left' | 'right') =>
     `group flex-1 rounded-xl border p-4 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent ${
@@ -230,7 +263,13 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
               <div
                 className={`space-y-8 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}
               >
-                {article.body.map((block, i) => {
+                {blocks === undefined && <BodySkeleton darkMode={darkMode} />}
+                {blocks === null && (
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    Isi artikel gagal dimuat. Coba muat ulang halaman ini.
+                  </p>
+                )}
+                {bodyBlocks.map((block, i) => {
                   const isFirstBlock = i === 0;
                   return (
                     <React.Fragment key={i}>

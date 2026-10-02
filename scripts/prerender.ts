@@ -21,7 +21,13 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { ARTICLES, getAdjacentArticles, getRelatedArticles, type Article } from '../src/data/articles.ts';
+import {
+  ARTICLES,
+  getAdjacentArticles,
+  getRelatedArticles,
+  type Article,
+  type ArticleBlock,
+} from '../src/data/articles.ts';
 import { PROJECTS, CONTACT_INFO } from '../src/data/portfolioData.ts';
 import { TESTIMONIALS } from '../src/data/testimonials.ts';
 import { ROUTES, articleRoute, CANONICAL_BASE } from '../src/routes.ts';
@@ -545,11 +551,38 @@ const buildArtikelIndexPages = () => {
 // Halaman: /artikel/<slug>
 // ---------------------------------------------------------------------------
 
-const buildArticlePage = (article: Article) => {
+// Isi artikel dipisah per pilar (src/data/article-bodies/<pillar>.ts, export
+// `bodies`). Di Node/tsx tidak ada import.meta.glob seperti di Vite, jadi file
+// pilar dimuat dengan import() dinamis biasa dan di-cache per pilar.
+// Artikel published TANPA isi sengaja menggagalkan build: lebih baik build
+// merah daripada menerbitkan halaman statis kosong yang lalu diindeks Google.
+const bodiesByPillar = new Map<string, Record<string, ArticleBlock[]>>();
+
+const loadBodyForPrerender = async (article: Article): Promise<ArticleBlock[]> => {
+  const file = `src/data/article-bodies/${article.pillar}.ts`;
+  let bodies = bodiesByPillar.get(article.pillar);
+  if (!bodies) {
+    try {
+      const mod = await import(`../${file}`);
+      bodies = mod.bodies as Record<string, ArticleBlock[]>;
+    } catch (err) {
+      throw new Error(`[prerender] Gagal memuat ${file} untuk artikel "${article.slug}": ${String(err)}`);
+    }
+    bodiesByPillar.set(article.pillar, bodies);
+  }
+  const body = bodies[article.slug];
+  if (!body || body.length === 0) {
+    throw new Error(`[prerender] Artikel published "${article.slug}" belum punya isi di ${file}`);
+  }
+  return body;
+};
+
+const buildArticlePage = async (article: Article) => {
+  const body = await loadBodyForPrerender(article);
   const { prev, next } = getAdjacentArticles(article.slug);
   const canonicalUrl = `${CANONICAL_BASE}${articleRoute(article.slug)}`;
 
-  const bodyHtml = article.body
+  const bodyHtml = body
     .map((block) => {
       const heading = block.heading
         ? `<h2 style="font-size: 1.3rem; font-weight: 700; color: #0f172a; margin: 1.75rem 0 0.5rem 0;">${escapeHtml(block.heading)}</h2>`
@@ -812,7 +845,7 @@ const checkVercelRewriteDrift = (publishedSlugs: string[], totalPages: number) =
 // Main
 // ---------------------------------------------------------------------------
 
-const main = () => {
+const main = async () => {
   const written: string[] = [];
 
   written.push(buildHasilKerjaPage());
@@ -822,7 +855,7 @@ const main = () => {
 
   const published = publishedArticles();
   for (const article of published) {
-    written.push(buildArticlePage(article));
+    written.push(await buildArticlePage(article));
   }
 
   const sitemapPath = buildSitemap({ totalPages, pageUrl });
@@ -843,4 +876,7 @@ const main = () => {
   );
 };
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

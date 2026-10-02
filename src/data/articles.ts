@@ -3,8 +3,21 @@
 // Aturan pakai:
 //  -  `slug`  dipakai di URL (/artikel/ <slug >), jangan diubah setelah
 //    dipublikasikan — itu akan memutus link yang sudah dibagikan/diindeks.
-//  -  `body`  diisi paragraf demi paragraf (array string). Boleh kosong
-//    selama draft — halaman akan menampilkan  `excerpt`  saja sebagai preview.
+//  -  ISI artikel (`body`) TIDAK ada di file ini. Isi dikelompokkan PER PILAR di
+//    src/data/article-bodies/<pillar>.ts  (nama file = key pilar) yang meng-export
+//    `bodies: Record<slug, ArticleBlock[]>`. Di browser dimuat lazy lewat
+//    loadArticleBody() di  src/data/loadArticleBody.ts  (Vite-only), di build
+//    lewat scripts/prerender.ts. File INI sengaja bebas import.meta.glob supaya
+//    aman diimpor dari Node (prerender, vitest). Halaman index tidak ikut
+//    mengunduh isi artikel, dan artikel sepilar
+//    (yang saling direkomendasikan) berbagi satu chunk, jadi pindah antar-artikel
+//    terasa instan.
+//    Artikel baru = (1) tambah entri metadata di ARTICLES, (2) tambahkan isinya
+//    ke file pilar yang sesuai.
+//    Pilar baru   = tambah di PillarKey & PILLARS, lalu buat file <pillar>.ts baru
+//    (meng-export `bodies`). Kalau satu pilar sudah > ~15-20 artikel, pertimbangkan
+//    memecahnya.
+//    Artikel draft boleh belum punya isi sama sekali.
 //  -  `published`  baru diubah ke true setelah body lengkap dan sudah dibaca
 //    ulang. Selama false, artikel tidak muncul di index maupun bisa diakses
 //    langsung lewat URL-nya (lihat ArticlePage/ArticlesIndexPage).
@@ -71,7 +84,6 @@ export interface Article {
   category: string;
   readMinutes: number;
   pillar: PillarKey;
-  body: ArticleBlock[];
   published: boolean;
   publishedAt?: string; // ISO string, mis. "2026-09-23"
 }
@@ -87,40 +99,6 @@ export const ARTICLES: Article[] = [
     pillar: 'panduan-bisnis',
     published: true,
     publishedAt: '2026-09-26',
-    body: [
-      {
-        paragraphs: [
-          'Salah satu keputusan paling awal yang harus diambil sebelum proyek dimulai: dibangun sebagai web app biasa, aplikasi mobile native, atau PWA (Progressive Web App)? Ketiganya sering disamaratakan padahal konsekuensinya beda — dari segi biaya, kecepatan rilis, sampai pengalaman pengguna.',
-        ],
-      },
-      {
-        heading: 'Web App Biasa',
-        paragraphs: [
-          'Web app adalah aplikasi yang cuma bisa diakses lewat browser, tanpa bisa dipasang ke layar utama HP layaknya aplikasi biasa. Cocok untuk kebutuhan yang memang lebih sering diakses dari laptop/PC, atau untuk portal yang aksesnya sesekali saja dan tidak butuh dikenal publik sebagai aplikasi tersendiri.',
-        ],
-      },
-      {
-        heading: 'Aplikasi Mobile Native',
-        paragraphs: [
-          'Aplikasi native dibangun khusus untuk sistem operasi tertentu (Android/iOS) dan didistribusikan lewat Play Store atau App Store. Keunggulannya: performa maksimal, akses penuh ke fitur perangkat (kamera, notifikasi push, sensor), dan bisa berjalan 100% offline tanpa bergantung ke browser sama sekali. Rajendra Pintar misalnya, dirilis sebagai APK Android resmi lewat Capacitor supaya bisa dimainkan offline penuh tanpa kuota internet — penting untuk kasus penggunaan yang memang butuh keandalan offline maksimal.',
-          'Konsekuensinya: proses rilis lewat Play Store/App Store butuh waktu review tambahan, dan setiap update besar biasanya perlu dipublikasikan ulang lewat toko aplikasi.',
-        ],
-      },
-      {
-        heading: 'PWA — Jalan Tengah yang Sering Jadi Pilihan Terbaik',
-        paragraphs: [
-          'PWA adalah web app yang "berperilaku" seperti aplikasi native — bisa dipasang ke layar utama HP (Add to Home Screen), bekerja offline lewat Service Worker, dan mendapat notifikasi push, tapi tetap dibangun dan di-deploy seperti website biasa tanpa perlu proses review toko aplikasi. Assets DEMO dan B-Games sama-sama memakai pendekatan ini: satu basis kode yang jalan di web, bisa diinstal di Android maupun iOS, tanpa harus membuat aplikasi terpisah untuk tiap platform.',
-          'Trade-off-nya: PWA di iOS masih punya sedikit keterbatasan akses fitur perangkat dibanding aplikasi native murni, meski untuk kebanyakan kebutuhan bisnis hal ini jarang jadi masalah signifikan.',
-        ],
-      },
-      {
-        heading: 'Pertanyaan Panduan untuk Menentukan Pilihan',
-        paragraphs: [
-          'Beberapa pertanyaan yang bisa membantu menentukan arah: apakah pengguna butuh mengakses fitur perangkat yang sangat spesifik (kamera resolusi tinggi, sensor khusus, akses penuh Bluetooth)? Kalau ya, native lebih masuk akal. Apakah anggaran dan timeline terbatas, tapi tetap butuh pengalaman mirip aplikasi di HP? PWA biasanya jawaban paling efisien. Apakah aksesnya memang lebih sering dari komputer dan cuma sesekali dari HP? Web app biasa sudah cukup, tidak perlu dipaksa jadi PWA atau native.',
-          'Bukan soal mana yang "lebih canggih" — masing-masing punya tempatnya sendiri. Kalau masih bingung menentukan yang paling pas untuk kebutuhanmu, ini bisa didiskusikan lebih dulu secara gratis sebelum memutuskan arah development.',
-        ],
-      },
-    ],
   },
   {
     slug: 'kenapa-harga-proposal-bisa-beda-beda',
@@ -132,44 +110,6 @@ export const ARTICLES: Article[] = [
     pillar: 'panduan-bisnis',
     published: true,
     publishedAt: '2026-09-25',
-    body: [
-      {
-        paragraphs: [
-          'Wajar kalau bingung membandingkan dua proposal dari developer berbeda yang daftar fiturnya terlihat mirip, tapi harganya bisa selisih jutaan. Selisih itu bukan berarti salah satu asal pasang harga — biasanya ada faktor di balik angka yang tidak langsung kelihatan dari daftar fitur di permukaan.',
-        ],
-      },
-      {
-        heading: 'Kompleksitas yang Tersembunyi di Balik Nama Fitur yang Sama',
-        paragraphs: [
-          'Fitur bernama "integrasi WhatsApp" bisa berarti dua hal yang sangat berbeda: sekadar tombol yang membuka chat WhatsApp biasa, atau integrasi API resmi yang bisa kirim notifikasi otomatis dan menerima balasan terprogram. Fitur bernama "laporan otomatis" bisa berarti tombol export sederhana, atau sistem yang menghitung, memformat, dan mengirim laporan ke email tanpa campur tangan manual. Nama fiturnya sama, tapi kerja di baliknya jauh berbeda — dan itu yang paling sering jadi sumber selisih harga.',
-        ],
-      },
-      {
-        heading: 'Pilihan Arsitektur Ikut Menentukan Angka',
-        paragraphs: [
-          'Sistem yang dibangun di atas arsitektur zero server cost (seperti Google Apps Script) biasanya punya biaya development yang berbeda dibanding sistem dengan database dan server khusus — bukan karena satu lebih murahan, tapi karena kebutuhan skalanya memang berbeda. Sistem dengan kebutuhan concurrency tinggi atau integrasi kompleks ke banyak layanan pihak ketiga (payment gateway, AI, sistem ERP) secara wajar butuh waktu development lebih panjang dibanding sistem pencatatan sederhana.',
-        ],
-      },
-      {
-        heading: 'Riset Harga Pasar yang Sebenarnya Dilakukan atau Tidak',
-        paragraphs: [
-          'Proposal yang disusun dengan riset harga pasar aktual (tarif programmer terkini, harga infrastruktur yang berlaku sekarang) cenderung lebih presisi dibanding proposal dengan angka template yang sudah lama tidak diperbarui. Angka yang "kelihatan murah" kadang justru belum memperhitungkan biaya infrastruktur atau margin risiko yang wajar, dan berpotensi meleset atau menambah biaya tak terduga di tengah proyek.',
-        ],
-      },
-      {
-        heading: 'Termin Pembayaran dan Margin Risiko',
-        paragraphs: [
-          'Struktur pembayaran bertahap (milestone) dan margin risiko (risk contingency) yang dimasukkan ke dalam perhitungan juga memengaruhi angka akhir. Proposal yang mencantumkan margin risiko secara transparan biasanya lebih realistis ketimbang proposal yang terlihat murah di awal tapi rawan biaya tambahan begitu ada kendala tak terduga di tengah pengerjaan.',
-        ],
-      },
-      {
-        heading: 'Cara Membandingkan yang Lebih Adil',
-        paragraphs: [
-          'Daripada membandingkan angka akhir saja, lebih baik minta rincian Scope of Work dari masing-masing proposal — apa saja yang in-scope, apa yang out-of-scope, dan bagaimana biaya infrastruktur dihitung terpisah dari biaya jasa development. Dari situ, perbandingan yang lebih adil bisa dilakukan, bukan cuma berdasarkan angka total yang berdiri sendiri tanpa konteks.',
-          'Prinsip yang sama yang saya pakai di DevRAB, mesin proposal di balik Zannah: biaya jasa dipisahkan dari biaya infrastruktur, margin risiko dicantumkan terang-terangan, dan setiap proposal membawa SOW lengkap dengan batas in-scope dan out-of-scope. Selengkapnya ada di artikel "Mengenal DevRAB".',
-        ],
-      },
-    ],
   },
   {
     slug: '5-pertanyaan-sebelum-pakai-jasa-developer-freelance',
@@ -181,49 +121,6 @@ export const ARTICLES: Article[] = [
     pillar: 'panduan-bisnis',
     published: true,
     publishedAt: '2026-09-24',
-    body: [
-      {
-        paragraphs: [
-          'Kabar buruk soal developer freelance yang hilang kontak di tengah proyek, atau baru ketahuan ada biaya tersembunyi setelah sistem jalan, itu bukan cerita langka. Sebelum sepakat kerja sama, ada lima pertanyaan yang sebaiknya ditanyakan lebih dulu — bukan untuk mencurigai, tapi supaya ekspektasi jelas sejak awal.',
-        ],
-      },
-      {
-        heading: '1. Siapa yang Memegang Source Code Setelah Selesai?',
-        paragraphs: [
-          'Ini pertanyaan paling mendasar yang sering terlewat. Beberapa developer atau agensi menahan source code sebagai "jaminan" supaya klien tidak lari ke developer lain untuk maintenance. Cara kerja saya sebaliknya: source code sepenuhnya milik klien begitu proyek selesai dan lunas — termasuk akses penuh ke repository-nya. Tidak ada ketergantungan paksa ke saya untuk maintenance ke depannya, meski tentu saya tetap terbuka membantu kalau dibutuhkan.',
-        ],
-      },
-      {
-        heading: '2. Apa yang Terjadi Kalau Developer Hilang Kontak di Tengah Jalan?',
-        paragraphs: [
-          'Ini risiko nyata di dunia freelance, apalagi kalau developernya tidak jelas identitas dan rekam jejaknya. Pertanyaan yang wajar: apakah ada progres yang bisa diserahterimakan sebagian kalau memang terjadi sesuatu di tengah jalan? Karena source code sudah dipegang klien sejak awal (bukan cuma di akhir proyek), risiko kehilangan total pekerjaan yang sudah dibayar bisa ditekan — progres bisa dilanjutkan developer lain kalau memang terpaksa.',
-        ],
-      },
-      {
-        heading: '3. Apa Ada Biaya Tersembunyi di Luar Harga Development?',
-        paragraphs: [
-          'Beberapa biaya memang wajar terpisah dari biaya development — misalnya biaya sewa server (kalau arsitekturnya bukan zero server cost), biaya API pihak ketiga yang dipakai AI atau payment gateway begitu volume pemakaian melewati kuota gratis, atau biaya domain tahunan. Yang penting bukan apakah ada biaya terpisah ini, tapi apakah developer-nya transparan menjelaskannya sejak diskusi awal — bukan baru muncul sebagai kejutan setelah sistemnya jalan.',
-        ],
-      },
-      {
-        heading: '4. Bagaimana Proses Revisi Diatur?',
-        paragraphs: [
-          'Tanpa kesepakatan jelas soal revisi, gampang muncul kesalahpahaman — klien merasa "kan cuma revisi kecil", developer merasa itu sudah di luar cakupan awal. Cara paling aman adalah dokumen Scope of Work yang mencantumkan jelas apa yang termasuk dalam paket dan apa yang di luar cakupan (out-of-scope), supaya kedua pihak punya acuan yang sama kalau ada perdebatan soal revisi.',
-        ],
-      },
-      {
-        heading: '5. Siapa yang Pegang Akses Admin dan Kredensial Setelah Selesai?',
-        paragraphs: [
-          'Akses ke akun hosting, database, domain, dan kredensial layanan pihak ketiga lainnya sebaiknya diserahkan penuh ke klien setelah proyek selesai — bukan ditahan developer sebagai bentuk "kendali" atas sistem yang sebenarnya sudah dibayar klien. Kalau developer keberatan menyerahkan akses ini tanpa alasan teknis yang jelas, itu tanda yang perlu diwaspadai sejak sebelum kerja sama dimulai.',
-        ],
-      },
-      {
-        heading: 'Kesimpulan',
-        paragraphs: [
-          'Kelima pertanyaan ini bukan soal mencurigai developer secara berlebihan, tapi soal memastikan proyek digitalmu tidak jadi taruhan kalau ada hal tidak terduga terjadi di tengah jalan. Developer yang percaya diri dengan cara kerjanya biasanya justru terbuka menjawab kelima hal ini sejak diskusi pertama, tanpa perlu didesak.',
-        ],
-      },
-    ],
   },
   {
     slug: 'berapa-lama-bikin-website-aplikasi-bisnis-kecil',
@@ -235,44 +132,6 @@ export const ARTICLES: Article[] = [
     pillar: 'panduan-bisnis',
     published: true,
     publishedAt: '2026-09-23',
-    body: [
-      {
-        paragraphs: [
-          '"Berapa lama jadinya?" adalah pertanyaan kedua yang paling sering muncul setelah soal harga. Jawaban jujurnya: tergantung jenis proyeknya — dan variasinya cukup jauh antara landing page sederhana dengan sistem custom yang terhubung ke banyak layanan pihak ketiga.',
-        ],
-      },
-      {
-        heading: 'Rentang Waktu per Jenis Proyek',
-        paragraphs: [
-          'Sebagai gambaran kasar dari pengalaman menangani proyek-proyek sejenis: landing page atau company profile sederhana biasanya selesai dalam 3–7 hari kerja. Website atau aplikasi dengan beberapa halaman dinamis dan form interaktif (tanpa sistem backend kompleks) sekitar 1–2 minggu. Sistem custom dengan database sendiri dan alur kerja spesifik (seperti manajemen inventaris atau approval internal) umumnya 2–4 minggu. Sementara sistem yang butuh integrasi banyak pihak ketiga sekaligus — payment gateway, WhatsApp API, AI chatbot, autentikasi multi-role — bisa memakan waktu 4–8 minggu tergantung kompleksitasnya.',
-          'Angka-angka ini bukan janji baku untuk semua kasus — tetap tergantung kejelasan requirement di awal dan seberapa cepat proses review berjalan dari sisi klien.',
-        ],
-      },
-      {
-        heading: 'Empat Tahap yang Selalu Dilalui',
-        paragraphs: [
-          'Setiap proyek melewati empat tahap yang sama: konsultasi kebutuhan (diskusi ide, fitur, dan target pengguna sampai jelas), desain & prototipe (wireframe atau preview interaktif sebelum coding penuh dimulai, supaya arah visualnya disepakati dulu), development & testing (coding, integrasi, dan pengujian menyeluruh), lalu deployment & rilis (deploy ke lingkungan produksi plus pendampingan awal setelah live). Tidak ada tahap yang dilompati, karena masing-masing menentukan kualitas tahap berikutnya.',
-        ],
-      },
-      {
-        heading: 'Apa yang Mempercepat Prosesnya',
-        paragraphs: [
-          'Beberapa hal yang bikin proyek selesai lebih cepat dari estimasi awal: requirement yang sudah jelas dan tertulis sejak konsultasi pertama (bukan berubah-ubah di tengah jalan), respons review yang cepat dari klien di tiap tahap (desain dan hasil development yang menunggu approval lama otomatis memperpanjang timeline keseluruhan), dan jumlah revisi mayor yang terbatas pada yang benar-benar dibutuhkan.',
-        ],
-      },
-      {
-        heading: 'Apa yang Memperlambat Prosesnya',
-        paragraphs: [
-          'Sebaliknya, yang paling sering bikin molor: requirement yang berubah signifikan di tengah development (misalnya fitur baru yang tidak ada di kesepakatan awal), integrasi ke sistem pihak ketiga yang dokumentasinya kurang jelas atau butuh proses approval dari pihak lain (misalnya pengajuan akses API), serta proses review dan approval yang tertunda berhari-hari di sisi klien karena kesibukan lain.',
-        ],
-      },
-      {
-        heading: 'Cara Mendapat Estimasi yang Akurat',
-        paragraphs: [
-          'Estimasi paling akurat tetap didapat lewat konsultasi langsung, bukan tebak-tebakan dari deskripsi singkat. Semakin detail kebutuhan yang disampaikan di awal — termasuk fitur mana yang wajib ada dan mana yang bisa menyusul di fase berikutnya — semakin presisi juga timeline yang bisa dijanjikan.',
-        ],
-      },
-    ],
   },
   {
     slug: 'studi-kasus-devrab-proposal-30-detik',
@@ -284,77 +143,6 @@ export const ARTICLES: Article[] = [
     pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-22',
-    body: [
-      {
-        paragraphs: [
-          'Pernah ngobrol santai dengan Zannah soal ide aplikasi, lalu tiba-tiba muncul tawaran "mau saya buatkan RAB dan proposalnya sekarang?" Begitu tombolnya ditekan, dalam hitungan detik muncul tautan ke dokumen lengkap: ruang lingkup pekerjaan, estimasi biaya, termin pembayaran, sampai tempat tanda tangan digital. Mesin di balik momen itu namanya DevRAB — platform yang saya bangun supaya ide proyek bisa jadi proposal profesional tanpa harus begadang di Word dan Excel.',
-          'Nama ini belum pernah saya kenalkan secara terbuka, karena DevRAB memang bukan produk showcase seperti B-Games atau Assets DEMO: tidak ada halaman demo yang bisa dikunjungi, dia bekerja di belakang chat. Tapi justru di sinilah banyak prinsip kerja saya dituangkan jadi sistem: biaya yang transparan, batas pekerjaan yang jelas, dan proses persetujuan yang rapi.',
-        ],
-      },
-      {
-        heading: 'Masalah yang Mau Diselesaikan',
-        paragraphs: [
-          'Menyusun proposal proyek software secara manual itu lambat dan gampang bolong. Satu sampai tiga hari habis untuk mengetik, estimasi sering meleset karena biaya server dan margin risiko terlupa, klien menawar tanpa paham rincian fiturnya, tanda tangan kontrak harus lewat cetak-scan-kirim, dan konfirmasi transfer tenggelam di chat WhatsApp. DevRAB dibuat untuk merapikan seluruh rantai itu, dari estimasi awal sampai uang muka masuk, di satu tempat.',
-        ],
-      },
-      {
-        heading: 'Dari Ide Mentah ke Estimasi yang Masuk Akal',
-        paragraphs: [
-          'Dari deskripsi proyek, AI (Google Gemini) merancang rincian fitur, jam kerja, biaya infrastruktur, dan timeline. Ia juga mengecek harga pasar terkini di Indonesia lewat pencarian — tarif programmer, domain, sewa server, sampai biaya API pihak ketiga — jadi angkanya tidak bertumpu pada template lama. Sebagai titik awal tersedia lebih dari sepuluh template industri (toko online, aplikasi mobile, SaaS/ERP, kasir, klinik, platform kursus, sistem booking, layanan on-demand, platform AI, company profile) dan pustaka lebih dari 70 fitur siap pilih.',
-          'Kalau klien punya batas anggaran, misalnya Rp25 juta, mesin ini memprioritaskan fitur inti dan menandai sisanya sebagai opsi, supaya total tetap masuk anggaran tanpa mengorbankan hal yang wajib ada. Perhitungan diskon, PPN, margin risiko, dan termin bertahap (misalnya 30% uang muka, 40% setelah desain dan demo, 30% setelah peluncuran) dikerjakan otomatis. Biaya jasa development dipisahkan dari biaya infrastruktur seperti server, domain, dan SSL, jadi klien bisa melihat ke mana uangnya pergi.',
-        ],
-      },
-      {
-        heading: 'Scope of Work yang Tidak Bolong',
-        paragraphs: [
-          'Setiap proposal membawa SOW: tujuan bisnis proyek, daftar yang dikerjakan (in-scope), batasan yang tidak termasuk (out-of-scope), prasyarat dari sisi klien, dan rekomendasi arsitektur teknologi. Ini yang mencegah perdebatan "kan cuma fitur kecil" di tengah proyek — topik yang juga saya bahas di artikel tentang lima pertanyaan sebelum memakai jasa developer freelance.',
-        ],
-      },
-      {
-        heading: 'Portal Klien: Simulasi, Tanda Tangan, dan Bayar dalam Satu Halaman',
-        paragraphs: [
-          'Klien menerima tautan khusus tanpa perlu registrasi atau kata sandi. Di portal itu mereka bisa mengaktifkan atau menonaktifkan fitur opsional dan melihat total harga serta nominal tiap termin berubah langsung. Kalau cocok, persetujuan ditandatangani dengan jari atau mouse di layar; kalau belum, ada kotak revisi untuk mengirim catatan tanpa membatalkan proposal.',
-          'Uang muka bisa dibayar lewat Xendit — QRIS, virtual account, atau kartu — atau lewat transfer manual dengan unggah foto bukti. Bukti transfer masuk ke dashboard admin untuk diverifikasi satu klik, dan status proyek ikut berjalan dari Draft, Sent, Approved, DP Paid, sampai Paid. Dokumen akhirnya bisa dicetak dalam format A4 berkop atau disimpan sebagai PDF, lengkap dengan nominal yang ditulis dengan kalimat terbilang.',
-        ],
-      },
-      {
-        heading: 'Zannah Tidak Asal Menawarkan',
-        paragraphs: [
-          'Zannah terhubung ke DevRAB lewat API, jadi pengunjung tidak perlu mengisi formulir apa pun. Tapi tombol "Buatkan RAB" tidak muncul sembarangan. Di belakang layar ada pengecekan kesiapan: jenis platform atau proyeknya sudah disebut (web app, mobile app, dashboard, sistem internal, dan sejenisnya), minimal dua sampai tiga kebutuhan konkret sudah dibahas, dan ada indikasi target waktu atau kisaran anggaran. Kalau salah satunya belum jelas, sistem sengaja bersikap ketat — lebih baik menunggu informasi cukup daripada menghasilkan proposal asal-asalan dari obrolan yang masih mentah.',
-        ],
-      },
-      {
-        heading: 'Kalau Mesinnya Bermasalah, Percakapan Tidak Berhenti',
-        paragraphs: [
-          'Begitu tombol ditekan, permintaan dikirim ke DevRAB dengan mekanisme percobaan ulang otomatis: kalau gagal karena server sibuk atau timeout, sistem mencoba lagi dengan jeda yang makin panjang di tiap percobaan. Begitu topik estimasi proyek mulai muncul di obrolan, sistem juga sudah mengirim "ping" diam-diam sebagai pemanasan, supaya mesinnya siap saat benar-benar dibutuhkan.',
-          'Kalau semua percobaan tetap gagal, pengunjung tidak melihat pesan error. Zannah tetap menyusun draf estimasi seadanya secara lokal supaya percakapan punya sesuatu untuk dilanjutkan. Ini prinsip yang sama dengan Cascade AI System: turunkan tingkat kecanggihan, jangan berhenti total.',
-        ],
-      },
-      {
-        heading: 'Kenapa Setiap Isi Proposal Harus "Dicuci" Dulu',
-        paragraphs: [
-          'Karena rincian proposal berasal dari apa yang diketik pengunjung di chat, seluruh isinya diperlakukan sebagai data yang tidak boleh langsung dipercaya. Setiap teks yang masuk ke dokumen hasil, seperti judul proyek dan daftar fitur, dibersihkan dari karakter berbahaya, dan setiap tautan divalidasi supaya hanya alamat web yang sah yang lolos. Di sisi admin, kata sandi disimpan dengan PBKDF2 SHA-256 dan percobaan login berulang yang mencurigakan diblokir otomatis.',
-        ],
-      },
-      {
-        heading: 'Fondasi Teknisnya',
-        paragraphs: [
-          'DevRAB berjalan di jaringan global Cloudflare dengan database Turso dan penyimpanan berkas Cloudflare R2 untuk logo agensi dan foto bukti bayar; tampilannya dibangun dengan React dan Tailwind. Alasan memilih kombinasi ini dibahas di artikel "4 Sistem Saya, 4 Arsitektur Backend Berbeda".',
-        ],
-      },
-      {
-        heading: 'Batasan yang Perlu Diketahui',
-        paragraphs: [
-          'Hasil DevRAB adalah estimasi awal yang disusun cepat, bukan harga mati. Angkanya bisa direvisi lewat portal, dan untuk proyek yang rumit, konsultasi langsung tetap cara paling akurat untuk menetapkan lingkup dan biaya. AI mempercepat penyusunannya, tapi tidak menggantikan penilaian soal apa yang realistis dikerjakan.',
-        ],
-      },
-      {
-        heading: 'Cara Mencobanya',
-        paragraphs: [
-          'Cara paling mudah mengalaminya langsung: buka chat Zannah di pojok kanan bawah situs ini, ceritakan ide proyekmu — jenis aplikasinya, kebutuhan utama, dan kira-kira target waktu atau anggarannya — lalu lihat proposal yang muncul. Kamu juga bisa melampirkan sketsa, PDF, atau CSV supaya kebutuhannya terbaca lebih jelas. Kalau penasaran dengan detail teknisnya, atau ingin membahas pendekatan serupa untuk alur proposalmu sendiri, kontak saya ada di halaman kontak.',
-        ],
-      },
-    ],
   },
   {
     slug: 'apa-itu-cascade-ai-system',
@@ -366,37 +154,6 @@ export const ARTICLES: Article[] = [
     pillar: 'ai-chatbot-agent',
     published: true,
     publishedAt: '2026-09-21',
-    body: [
-      {
-        paragraphs: [
-          'Salah satu kekhawatiran wajar soal chatbot berbasis AI: bagaimana kalau layanan AI-nya lagi bermasalah atau penuh antrean pas ada pengunjung yang butuh jawaban cepat? Kalau chatbot cuma bergantung ke satu model AI tunggal, jawabannya bisa berhenti total di momen yang salah. Cascade AI System dirancang khusus untuk mencegah situasi itu.',
-        ],
-      },
-      {
-        heading: 'Cadangan Bertingkat, Bukan Cuma Satu Rencana',
-        paragraphs: [
-          'Prinsipnya sederhana: kalau model AI utama sedang mengalami lonjakan antrean trafik di server Google, sistem secara otomatis mengalihkan percakapan ke model AI cadangan dalam hitungan milidetik — tanpa pengunjung menyadari ada perpindahan sama sekali. Salah satu model cadangan yang dipakai adalah Gemma 4, dengan kuota harian yang cukup besar (14.400 permintaan per hari), jadi ada ruang yang luas sebelum kuota itu ikut terlampaui.',
-        ],
-      },
-      {
-        heading: 'Lapisan Terakhir: Asisten Lokal yang Tidak Bergantung Internet AI',
-        paragraphs: [
-          'Yang paling menarik dari sistem ini adalah lapisan terakhirnya. Bahkan kalau koneksi ke seluruh layanan AI Google sedang terputus total, asisten lokal (Radit di website saya) tetap bisa menjawab puluhan pertanyaan umum secara mandiri — karena jawabannya sudah disiapkan dan berjalan tanpa harus memanggil AI eksternal sama sekali. Jadi pengunjung tidak pernah benar-benar mendapat "chatbot mati total", cuma turun tingkat kecerdasan jawabannya di skenario paling buruk.',
-        ],
-      },
-      {
-        heading: 'Prinsip yang Sama Juga Dipakai di Fitur Lain',
-        paragraphs: [
-          'Filosofi "jangan pernah berhenti total, turunkan saja tingkat kecanggihannya" ini bukan cuma dipakai di percakapan biasa. Di DevRAB, mesin pembuat proposal di balik Zannah, misalnya, kalau mesin generatornya gagal dihubungi setelah beberapa kali percobaan ulang, sistem tetap menyiapkan draf lokal seadanya alih-alih menampilkan pesan error ke pengunjung. Prinsip yang sama, diterapkan di lapisan yang berbeda.',
-        ],
-      },
-      {
-        heading: 'Kenapa Ini Bukan Sekadar Fitur Tambahan',
-        paragraphs: [
-          'Untuk chatbot bisnis yang jadi ujung tombak layanan pelanggan 24 jam, downtime di jam sibuk itu setara kehilangan calon pelanggan yang datang tepat saat sistem sedang bermasalah. Cascade system ini yang membuat chatbot tetap bisa diandalkan tanpa harus bayar SLA mahal ke satu provider AI tunggal — arsitekturnya sendiri yang jadi jaring pengamannya.',
-        ],
-      },
-    ],
   },
   {
     slug: 'apa-itu-autonomous-agent-beda-chatbot-biasa',
@@ -408,43 +165,6 @@ export const ARTICLES: Article[] = [
     pillar: 'ai-chatbot-agent',
     published: true,
     publishedAt: '2026-09-20',
-    body: [
-      {
-        paragraphs: [
-          '"AI Agent" makin sering dipakai sebagai istilah pemasaran, sampai sering disamakan begitu saja dengan chatbot biasa. Padahal keduanya bekerja dengan cara yang cukup berbeda — dan bedanya bukan cuma soal seberapa "pintar" jawabannya.',
-        ],
-      },
-      {
-        heading: 'Chatbot Biasa: Reaktif, Satu Putaran',
-        paragraphs: [
-          'Chatbot konvensional bekerja reaktif — kamu kirim pesan, dia balas satu jawaban, selesai. Kalau butuh beberapa langkah (cari data, olah, susun jadi dokumen, kirim), tiap langkah biasanya perlu dipicu manual satu per satu oleh penggunanya, atau alurnya sudah harus disusun kaku sejak awal lewat builder percakapan.',
-        ],
-      },
-      {
-        heading: 'Autonomous Agent: Satu Perintah, Banyak Langkah Otomatis',
-        paragraphs: [
-          'Autonomous Agent yang dipakai di layanan saya berjalan di atas Google Antigravity lewat Interactions API — agent serba-guna yang, dari satu permintaan, bisa bernalar, menjalankan kode, mengelola file, dan menyusun hasil akhirnya sendiri di dalam sandbox aman, tanpa perlu dituntun langkah demi langkah. Bedanya dengan chatbot biasa: satu permintaan bisa memicu rangkaian kerja otonom sampai tugasnya benar-benar selesai, bukan cuma satu balasan teks.',
-        ],
-      },
-      {
-        heading: 'Contoh Nyata: Generate Dokumen RAB/Riset Otomatis',
-        paragraphs: [
-          'Praktiknya di layanan yang saya kembangkan: Autonomous Agent bisa langsung men-generate dokumen RAB atau hasil riset secara instan begitu diminta — bukan sekadar menjawab dengan teks, tapi benar-benar menghasilkan dokumen jadi. Ditambah dengan multi-LLM auto-failover, kalau satu model AI sedang bermasalah, sistem otomatis beralih ke model lain supaya layanan tetap jalan tanpa downtime yang terasa oleh pengguna.',
-        ],
-      },
-      {
-        heading: 'Kapan Butuh Agent, Kapan Chatbot Biasa Sudah Cukup',
-        paragraphs: [
-          'Kalau kebutuhannya sekadar menjawab pertanyaan umum atau menangkap data lead dasar, chatbot biasa sudah lebih dari cukup — lebih murah dan lebih cepat dibangun. Autonomous Agent baru benar-benar dibutuhkan kalau prosesnya melibatkan banyak langkah yang harus dieksekusi sampai tuntas — misalnya menyusun dokumen dari data mentah, mengambil keputusan bertahap, atau menjalankan tugas yang biasanya butuh seseorang duduk mengerjakannya manual.',
-        ],
-      },
-      {
-        heading: 'Satu Catatan soal Biaya',
-        paragraphs: [
-          'Karena agent menjalankan banyak langkah bernalar dalam satu permintaan (bukan satu balasan sederhana), token yang dipakai per interaksi juga lebih banyak dibanding chatbot biasa. Untuk pemakaian skala kecil ini biasanya masih masuk kuota gratis harian dari Google AI Studio; begitu volumenya melewati kuota itu, biaya pay-as-you-go lewat Google Cloud mulai berlaku sesuai pemakaian. Rincian lebih lengkap soal komponen biaya ini ada di artikel "Berapa Biaya Sebenarnya Bikin Chatbot Custom?" — worth dibaca sebelum memutuskan skala fitur agent yang dibutuhkan.',
-        ],
-      },
-    ],
   },
   {
     slug: 'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda',
@@ -456,46 +176,6 @@ export const ARTICLES: Article[] = [
     pillar: 'zero-server-cost',
     published: true,
     publishedAt: '2026-09-19',
-    body: [
-      {
-        paragraphs: [
-          'Sering ada yang nanya begini setelah baca artikel saya soal Zero Server Cost pakai Google Apps Script: "kalau gitu semua sistem yang kamu bikin pasti pakai Google Sheets dong?" Jawabannya tidak. Dari beberapa sistem yang saya bangun — baik yang jadi showcase publik maupun yang bekerja diam-diam di balik layar — masing-masing pakai arsitektur database dan hosting yang berbeda. Itu pilihan sadar, bukan karena tidak konsisten.',
-        ],
-      },
-      {
-        heading: 'Assets DEMO — Google Sheets & Google Apps Script',
-        paragraphs: [
-          'Untuk sistem manajemen aset seperti Assets DEMO, kebutuhan utamanya adalah biaya Rp0 per bulan dan kepemilikan data 100% di tangan klien — bukan tersimpan di server pihak ketiga yang harus dipercaya begitu saja. Volume transaksinya pun tidak ekstrem: pencatatan aset, mutasi, depresiasi bulanan — bukan ribuan transaksi bersamaan tiap detik. Google Sheets sebagai database dan Apps Script sebagai logic engine pas untuk profil kebutuhan ini.',
-        ],
-      },
-      {
-        heading: 'B-Games — Supabase (PostgreSQL)',
-        paragraphs: [
-          'B-Games itu cerita yang beda sama sekali. Ada relasi data yang jauh lebih kompleks — profil pengguna, daftar pertemanan, dompet koin, riwayat pertandingan, leaderboard global yang harus di-query dan diurutkan cepat. Ini jenis kebutuhan yang Google Sheets tidak akan sanggup tangani dengan baik begitu datanya membesar — query relasional semacam itu memang wilayahnya database seperti PostgreSQL.',
-          'Supabase dipilih karena memberi database PostgreSQL penuh plus autentikasi dan realtime subscription siap pakai, tanpa harus mengelola server database sendiri dari nol.',
-        ],
-      },
-      {
-        heading: 'DevRAB — Cloudflare Edge & Turso',
-        paragraphs: [
-          'DevRAB — mesin proposal yang dipanggil Zannah saat pengunjung minta dibuatkan RAB — beda dari dua sistem di atas: bukan showcase dengan halaman demo publik, melainkan platform yang bekerja di belakang chat. Kenalan lengkapnya ada di artikel "Mengenal DevRAB", tapi keputusan arsitekturnya tetap relevan dibahas di sini karena pertimbangannya beda lagi.',
-          'Mesin ini dipakai dari mana saja tanpa tahu kapan trafiknya datang, jadi latensi akses harus tetap rendah dari kota mana pun. Cloudflare dipilih karena jaringannya tersebar di ratusan pusat data global, dan Turso sebagai database terdistribusi memastikan data proposal dan status pembayaran tersinkron cepat tanpa satu titik kegagalan tunggal.',
-        ],
-      },
-      {
-        heading: 'Website Portofolio Utama — Vercel',
-        paragraphs: [
-          'Untuk situs utama sendiri, trafiknya tidak menentu — bisa sepi, bisa melonjak kalau ada yang membagikan link ke grup atau media sosial. Vercel dengan arsitektur serverless-nya cocok untuk pola ini: fungsi backend cuma aktif dan dikenai biaya saat ada permintaan, bukan biaya flat bulanan yang tetap jalan meski trafiknya nol.',
-        ],
-      },
-      {
-        heading: 'Pertanyaan yang Sebenarnya Menentukan Pilihan',
-        paragraphs: [
-          'Kalau ditarik pola umumnya, ada empat pertanyaan yang saya ajukan sebelum menentukan arsitektur untuk sistem apa pun (termasuk punya klien): seberapa kompleks relasi datanya, seberapa besar toleransi biaya bulanan, siapa yang harus punya kendali penuh atas data, dan seberapa penting sinkronisasi real-time antar banyak pengguna sekaligus. Jawaban dari empat pertanyaan itu yang menentukan arsitekturnya — bukan sekadar ikut tren teknologi yang lagi ramai dibicarakan.',
-          'Bingung menentukan arsitektur untuk bisnismu? Jawab keempat pertanyaan itu versi bisnismu sendiri, lalu bawa hasilnya ke chat Zannah — itu sudah cukup jadi bahan awal diskusi.',
-        ],
-      },
-    ],
   },
   {
     slug: 'kenapa-google-apps-script-untuk-klien-kecil-menengah',
@@ -507,45 +187,6 @@ export const ARTICLES: Article[] = [
     pillar: 'zero-server-cost',
     published: true,
     publishedAt: '2026-09-18',
-    body: [
-      {
-        paragraphs: [
-          'Salah satu pertanyaan yang paling sering muncul waktu diskusi awal dengan calon klien UMKM: "biaya server per bulannya berapa?" Ini pertanyaan yang wajar — banyak sistem custom yang dijual tanpa menghitung biaya sewa server bulanan yang harus dibayar terus-menerus selama sistemnya dipakai, di luar biaya development awal.',
-        ],
-      },
-      {
-        heading: 'Masalah Umum UMKM: Budget Server Bulanan Terasa Berat',
-        paragraphs: [
-          'Untuk bisnis skala kecil-menengah, biaya sewa VPS atau cloud hosting bulanan — meski kelihatannya kecil per bulan — akan terus menumpuk selama sistem itu dipakai, dan biasanya naik lagi begitu trafik atau datanya bertambah. Belum lagi biaya maintenance server itu sendiri: patch keamanan, backup, monitoring uptime. Untuk bisnis yang belum butuh skala besar, ini pengeluaran rutin yang sebenarnya bisa dihindari.',
-        ],
-      },
-      {
-        heading: 'Apa Itu Google Apps Script, dan Kenapa Bisa Gratis',
-        paragraphs: [
-          'Google Apps Script adalah platform scripting bawaan Google yang bisa "menempel" ke Google Sheets, Google Drive, Gmail, dan layanan Google lain, lalu dijalankan sebagai backend aplikasi. Karena berjalan di infrastruktur Google sendiri, tidak ada server terpisah yang perlu disewa — dan yang lebih penting, layanan ini gratis dipakai baik lewat akun Google biasa maupun akun Google Workspace milik perusahaan.',
-          'Google Sheets berperan sebagai database, Google Drive sebagai penyimpanan file, dan Apps Script sebagai "otak" yang menjalankan logika bisnisnya — validasi data, kalkulasi otomatis, sampai kirim email laporan terjadwal. Semua data pun tetap berada di akun Google milik perusahaan sendiri, bukan tersebar di server pihak ketiga yang harus dipercaya begitu saja.',
-        ],
-      },
-      {
-        heading: 'Studi Kasus Singkat: PT Global Multiparts',
-        paragraphs: [
-          'Sistem manajemen aset yang saya bangun untuk PT Global Multiparts memakai pendekatan ini sepenuhnya — Apps Script sebagai logic engine, Sheets sebagai database, Drive untuk penyimpanan foto aset. Hasilnya: biaya sewa server tetap Rp0 per bulan, sementara proses audit aset yang tadinya manual dan rawan selisih sekarang bisa dicek kapan saja lewat satu sumber data yang konsisten.',
-        ],
-      },
-      {
-        heading: 'Batasan Jujur: Kapan Pendekatan Ini TIDAK Cocok',
-        paragraphs: [
-          'Ini bukan solusi ajaib untuk semua skala bisnis. Google Apps Script punya plafon eksekusi per proses dan kuota panggilan layanan harian yang di-reset tiap hari — cukup longgar untuk kebutuhan operasional UMKM sehari-hari, tapi bisa jadi masalah kalau sistemnya harus menangani trafik sangat tinggi, ribuan transaksi bersamaan setiap detik, atau butuh skalabilitas horizontal seperti aplikasi berskala enterprise. Untuk kebutuhan semacam itu, arsitektur server/database khusus tetap jadi pilihan yang lebih tepat, meski biayanya lebih mahal.',
-          'Google juga bisa mengubah kebijakan kuota mereka sewaktu-waktu tanpa pengumuman besar — jadi ini bukan pendekatan yang "dijamin selamanya" sama seperti server sendiri yang sepenuhnya di bawah kendali kita. Trade-off ini perlu disadari sejak awal, bukan ditemukan setelah sistem berjalan.',
-        ],
-      },
-      {
-        heading: 'Kesimpulan: Cocok untuk Siapa',
-        paragraphs: [
-          'Pendekatan serverless berbasis Google Apps Script paling masuk akal untuk bisnis kecil-menengah yang butuh mendigitalisasi proses manual (pendataan, approval, laporan berkala) tanpa mau menanggung biaya server bulanan yang terus berjalan, dan yang volume operasionalnya belum berada di level enterprise. Kalau bisnismu masuk kategori itu, ini salah satu opsi paling efisien dari sisi biaya jangka panjang yang bisa didiskusikan.',
-        ],
-      },
-    ],
   },
   {
     slug: 'arsitektur-multiplayer-real-time-b-games',
@@ -557,53 +198,6 @@ export const ARTICLES: Article[] = [
     pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-17',
-    body: [
-      {
-        paragraphs: [
-          'Game papan multiplayer kelihatannya sederhana — cuma lempar dadu, gerakkan bidak, gantian giliran. Tapi begitu dua pemain atau lebih main di perangkat berbeda secara bersamaan, ada masalah klasik yang harus diselesaikan: bagaimana memastikan kedua layar selalu menampilkan status permainan yang sama persis, dan bagaimana mencegah pemain curang mengubah hasil dadu di perangkatnya sendiri.',
-        ],
-      },
-      {
-        heading: 'Kenapa Tidak Bikin WebSocket Sendiri dari Nol',
-        paragraphs: [
-          'Opsi paling umum untuk real-time adalah bikin server WebSocket custom yang menyiarkan setiap gerakan pemain ke semua klien yang terhubung. Masalahnya, pendekatan ini gampang kena celah kalau tidak hati-hati: state permainan yang seharusnya cuma boleh diubah lewat aturan resmi (giliran siapa, langkah apa yang valid) malah bisa dimanipulasi langsung dari sisi klien kalau validasinya lemah.',
-          'B-Games dibangun di atas boardgame.io, mesin permainan papan yang memang dirancang khusus untuk masalah ini. State permainan disimpan dan divalidasi secara otoritatif di server — klien cuma mengirim "niat" langkah (misalnya: "gerakkan bidak A ke petak 14"), lalu server yang memutuskan apakah langkah itu valid berdasarkan aturan permainan, bukan klien yang menentukan sendiri hasilnya.',
-        ],
-      },
-      {
-        heading: 'Server Ringan yang Menangani Banyak Room Sekaligus',
-        paragraphs: [
-          'Di belakang boardgame.io, ada Koa.js sebagai server backend — framework Node.js yang sengaja dipilih karena ringan dan hemat memori dibanding alternatif yang lebih berat. Ini penting karena satu server perlu menangani banyak room permainan sekaligus, masing-masing dengan koneksi WebSocket-nya sendiri, tanpa saling mengganggu performa room lain.',
-          'Setiap room punya kode unik yang dibagikan ke teman untuk join — begitu semua pemain masuk, server mulai menyiarkan setiap perubahan state (posisi bidak, hasil dadu, giliran berikutnya) ke semua klien secara nyaris instan.',
-        ],
-      },
-      {
-        heading: 'Kalau Ada Pemain yang Tiba-tiba Disconnect',
-        paragraphs: [
-          'Ini bagian yang sering diremehkan tapi paling penting untuk pengalaman bermain: kalau salah satu pemain kehilangan koneksi di tengah permainan, permainan tidak boleh macet menunggu dia kembali selamanya. B-Games punya mekanisme AFK takeover — begitu server mendeteksi satu pemain tidak merespons dalam waktu tertentu, bot cerdas otomatis mengambil alih gilirannya sampai pemain itu kembali online atau permainan selesai.',
-          'Pemain lain di room tetap bisa lanjut main tanpa harus menunggu atau membatalkan pertandingan. Begitu pemain yang disconnect kembali, kontrol dikembalikan ke dia secara mulus di giliran berikutnya.',
-        ],
-      },
-      {
-        heading: 'Kenapa Responsnya Terasa Instan',
-        paragraphs: [
-          'Di sisi tampilan, animasi dadu 3D dan pergerakan bidak dirender pakai React Native Reanimated dan Skia — mesin animasi yang jalan di UI thread terpisah dari logika JavaScript utama, jadi animasi tetap mulus 60 FPS meski ada proses lain yang berjalan di background. Kombinasi server otoritatif yang ringan plus animasi yang tidak nge-block ini yang bikin waktu respons antar pemain bisa di bawah 50 milidetik — cepat cukup untuk terasa seperti main di satu papan fisik yang sama.',
-        ],
-      },
-      {
-        heading: 'Di Sekitar Meja Permainan',
-        paragraphs: [
-          'Mesin giliran dan server otoritatif itu melayani empat permainan: Ludo Classic untuk 2–4 pemain, Ludo Hexagon dengan papan heksagonal untuk hingga 6 pemain, Ular Tangga, dan Tic-Tac-Toe. Di sekelilingnya ada data yang tidak cocok disimpan di dalam server game, yaitu profil, daftar teman, dompet koin, leaderboard, dan riwayat pertandingan. Bagian itu hidup di Supabase (PostgreSQL), sementara server game fokus ke aturan main.',
-          'Pemain bisa langsung main sebagai tamu tanpa daftar, lalu menghubungkan akun ke Google kapan saja supaya koin dan prestasinya tidak hilang saat ganti perangkat. B-Games juga bisa dipasang ke layar utama sebagai PWA dan bisa dicoba langsung di bgames.arzhaning.my.id.',
-        ],
-      },
-      {
-        heading: 'Prinsip yang Bisa Dipakai di Luar Game',
-        paragraphs: [
-          'Pola "server otoritatif + klien cuma mengirim niat, bukan hasil akhir" ini sebenarnya bukan cuma relevan untuk game. Prinsip yang sama dipakai di sistem apa pun yang butuh beberapa pengguna mengubah data yang sama secara bersamaan tanpa saling menimpa atau bisa dimanipulasi sepihak — misalnya sistem approval multi-user atau update stok real-time. Kalau bisnismu punya kebutuhan sinkronisasi data real-time semacam ini, ceritakan alur kerjanya ke Zannah di chat, lalu kita bahas arsitektur yang pas.',
-        ],
-      },
-    ],
   },
   {
     slug: 'tanda-waktunya-migrasi-dari-apps-script',
@@ -615,49 +209,6 @@ export const ARTICLES: Article[] = [
     pillar: 'zero-server-cost',
     published: true,
     publishedAt: '2026-09-15',
-    body: [
-      {
-        paragraphs: [
-          'Di artikel sebelumnya saya jelaskan kenapa Google Apps Script jadi pilihan efisien untuk sistem klien kecil-menengah — gratis, tanpa biaya server bulanan, dan cukup untuk kebutuhan operasional sehari-hari. Tapi "cukup untuk sekarang" tidak selalu berarti "cukup selamanya". Berikut lima tanda sistemmu sudah mulai kelewat besar untuk pendekatan ini.',
-        ],
-      },
-      {
-        heading: '1. Sering Kena Galat "Batas Eksekusi" atau "Kuota Terlampaui"',
-        paragraphs: [
-          'Google Apps Script membatasi satu eksekusi maksimal sekitar 6 menit, dan punya kuota panggilan layanan harian yang di-reset tiap hari (angka resminya bisa berubah sewaktu-waktu, jadi cek dokumentasi kuota Google untuk versi terbaru). Sesekali kena galat ini wajar (biasanya karena proses yang belum dioptimalkan), tapi kalau errornya sudah rutin muncul di jam sibuk — itu tanda beban kerja sistemmu sudah melewati kapasitas yang wajar untuk platform ini.',
-        ],
-      },
-      {
-        heading: '2. Data Sudah Mendekati Batas Sel Spreadsheet',
-        paragraphs: [
-          'Google Sheets sebagai database punya batas jumlah sel — per September 2026 batas ini baru saja dinaikkan jadi 20 juta sel per spreadsheet (dari sebelumnya 10 juta), dihitung dari total semua tab di dalamnya. Terdengar besar, tapi untuk data transaksional yang terus bertambah setiap hari (tiap baris = puluhan kolom), batas ini bisa tercapai lebih cepat dari yang dibayangkan. Kalau kamu sudah mulai memecah data ke banyak spreadsheet cuma supaya tidak kena limit, itu tandanya arsitektur ini sudah dipaksakan.',
-        ],
-      },
-      {
-        heading: '3. Butuh Banyak Proses Bersamaan Secara Real-Time',
-        paragraphs: [
-          'Apps Script sebenarnya bisa menjalankan beberapa eksekusi sekaligus, tapi ada batasnya — dokumentasi Google saat ini menyebut 30 eksekusi simultan per pengguna. Yang lebih sering jadi masalah justru penulisan ke Sheets: kalau dua orang menyimpan ke area data yang sama di saat bersamaan, urutannya harus diatur dengan penguncian (LockService), dan selama kunci dipegang, proses lain harus menunggu giliran. Ini tidak masalah untuk sistem yang dipakai beberapa petugas sekaligus, tapi kalau kebutuhanmu sudah mengarah ke puluhan atau ratusan user menulis data pada detik yang sama (misalnya sistem kasir multi-cabang real-time), arsitektur berbasis server dengan database yang memang dirancang untuk concurrency tinggi akan jauh lebih stabil.',
-        ],
-      },
-      {
-        heading: '4. Butuh Integrasi Kompleks di Luar Ekosistem Google',
-        paragraphs: [
-          'Selama kebutuhannya masih di dalam ekosistem Google (Sheets, Drive, Gmail, Calendar), Apps Script sangat efisien. Tapi begitu sistem harus terhubung ke payment gateway, ERP pihak ketiga, atau butuh menerima webhook real-time dari banyak sumber eksternal sekaligus, kamu akan mulai merasa "menambal" keterbatasan platform ini alih-alih benar-benar memakainya sesuai kekuatannya.',
-        ],
-      },
-      {
-        heading: '5. Tim Sudah Besar dan Butuh Kontrol Akses Granular',
-        paragraphs: [
-          'Sheets sebagai database tidak punya sistem role-based access control atau audit log sedetail database khusus. Kalau bisnismu sudah butuh mengatur siapa boleh lihat/edit data sampai level baris atau kolom tertentu, dengan jejak audit yang lengkap untuk kebutuhan kepatuhan (compliance), itu kebutuhan yang lebih pas dijawab oleh database dan backend yang dirancang untuk itu.',
-        ],
-      },
-      {
-        heading: 'Migrasi Bukan Berarti Buang Semua',
-        paragraphs: [
-          'Kalau satu atau dua tanda di atas mulai terasa, bukan berarti sistemnya harus dibongkar total. Sering kali solusinya hybrid — bagian yang masih ringan tetap di Apps Script, bagian yang sudah berat dipindah ke server/database khusus. Kalau satu atau dua tanda di atas sudah terasa, catat dulu galat apa yang paling sering muncul dan di jam berapa — itu data paling berguna untuk menentukan bagian mana yang perlu dipindah lebih dulu.',
-        ],
-      },
-    ],
   },
   {
     slug: 'amankah-data-bisnis-di-google-sheets-drive',
@@ -669,43 +220,6 @@ export const ARTICLES: Article[] = [
     pillar: 'keamanan-data',
     published: true,
     publishedAt: '2026-09-12',
-    body: [
-      {
-        paragraphs: [
-          'Pertanyaan yang wajar muncul begitu tahu sistemnya "cuma" pakai Google Sheets dan Drive: apa data bisnis aman disimpan di sana? Jawaban singkatnya — infrastrukturnya sendiri aman, tapi keamanan sebenarnya lebih ditentukan oleh cara akses diatur, bukan oleh platformnya.',
-        ],
-      },
-      {
-        heading: 'Fakta soal Infrastrukturnya',
-        paragraphs: [
-          'Data yang tersimpan di Google Sheets dan Drive dienkripsi baik saat disimpan (at rest) maupun saat berpindah (in transit), berjalan di infrastruktur Google yang sama dipakai jutaan organisasi termasuk perusahaan besar dan instansi pemerintahan lewat Google Workspace. Dari sisi infrastruktur murni, ini bukan penyimpanan "abal-abal" — justru salah satu infrastruktur cloud paling banyak diaudit di dunia.',
-        ],
-      },
-      {
-        heading: 'Risiko Sebenarnya: Manajemen Akses, Bukan Infrastruktur',
-        paragraphs: [
-          'Titik lemah yang paling sering jadi masalah bukan di sisi Google, tapi di sisi pengguna: kata sandi lemah atau dipakai ulang, tidak mengaktifkan verifikasi 2 langkah (2FA), atau — yang paling sering terjadi — file dibagikan dengan pengaturan "siapa saja yang punya link bisa akses" padahal isinya data sensitif. Sistem sekelas apa pun jadi rentan kalau pintu masuknya dibiarkan longgar seperti ini.',
-        ],
-      },
-      {
-        heading: 'Fitur yang Sering Terlewat: Version History',
-        paragraphs: [
-          'Satu keuntungan yang jarang disadari: Sheets dan Drive punya riwayat versi bawaan. Kalau ada data yang tidak sengaja terhapus atau rusak, versi sebelumnya bisa dipulihkan tanpa perlu sistem backup terpisah — sesuatu yang di banyak sistem custom lain justru harus dibangun manual dan sering terlewat.',
-        ],
-      },
-      {
-        heading: 'Rekomendasi Praktis',
-        paragraphs: [
-          'Pakai akun Google Workspace milik perusahaan untuk sistem operasional, bukan akun Gmail pribadi — supaya admin perusahaan bisa mengatur kebijakan keamanan terpusat (2FA wajib, kontrol perangkat, dsb), bukan bergantung ke kebiasaan personal tiap karyawan. Simpan data sensitif di Shared Drive dengan permission spesifik per orang/grup, bukan file di My Drive pribadi yang dibagikan lewat link. Dan aktifkan 2FA di semua akun yang punya akses ke data operasional — ini langkah paling murah dengan dampak keamanan paling besar.',
-        ],
-      },
-      {
-        heading: 'Kesimpulan',
-        paragraphs: [
-          'Pertanyaan yang lebih tepat bukan "apakah Google Sheets/Drive aman", tapi "apakah akses ke datanya dikelola dengan benar". Dengan Workspace, permission yang rapi, dan 2FA aktif, tingkat keamanannya sudah setara dengan yang dipakai banyak sistem korporat. Kalau ada kekhawatiran spesifik soal data bisnismu, itu bisa dibahas langsung di awal diskusi proyek.',
-        ],
-      },
-    ],
   },
   {
     slug: 'custom-chatbot-vs-chatbot-template',
@@ -717,41 +231,6 @@ export const ARTICLES: Article[] = [
     pillar: 'ai-chatbot-agent',
     published: true,
     publishedAt: '2026-09-10',
-    body: [
-      {
-        paragraphs: [
-          'Kalau kamu sedang mencari chatbot untuk bisnis, dua pilihan utama yang biasanya muncul: pakai platform chatbot template yang sudah jadi, atau bangun chatbot custom dari nol. Keduanya valid — pertanyaannya bukan "mana yang lebih bagus", tapi "mana yang cocok dengan kebutuhan bisnismu sekarang".',
-        ],
-      },
-      {
-        heading: 'Apa Itu Chatbot Template',
-        paragraphs: [
-          'Chatbot template adalah platform siap pakai seperti Chatfuel atau Tidio — tinggal daftar, susun alur percakapan lewat builder visual (drag-and-drop), dan chatbot langsung bisa dipasang di website atau WhatsApp dalam hitungan jam. Kelebihan utamanya jelas: cepat jalan, tidak perlu developer, dan ada versi gratis atau paket murah untuk mulai.',
-          'Platform seperti ini paling pas untuk kebutuhan yang sifatnya generik — jawab FAQ, tangkap lead dasar (nama, email, nomor HP), atau arahkan pengunjung ke halaman tertentu. Kalau alur percakapannya sederhana dan tidak perlu "mikir", template sudah lebih dari cukup.',
-        ],
-      },
-      {
-        heading: 'Kapan Custom Lebih Masuk Akal',
-        paragraphs: [
-          'Masalahnya muncul begitu logika bisnismu tidak lagi sesederhana alur percakapan linear. Beberapa tanda kamu butuh solusi custom: chatbot perlu mengambil atau menulis data ke sistem internal (stok barang, status pesanan, database pelanggan), perlu menghasilkan dokumen otomatis (misalnya draf RAB atau laporan), atau perlu berjalan sebagai agent otonom yang bisa mengeksekusi tugas multi-langkah — bukan sekadar menjawab satu pertanyaan lalu selesai.',
-          'Contohnya, layanan AI Chatbot & Virtual Agent yang saya kembangkan sendiri menggabungkan chatbot percakapan 2 arah (teks dan suara) dengan Autonomous Agent yang bisa langsung generate dokumen RAB/riset dan menjalankan alur lead generator lewat WhatsApp. Ini jenis kebutuhan yang tidak bisa disusun lewat builder drag-and-drop platform template — butuh integrasi dan logika yang memang dirancang khusus untuk proses bisnis tersebut.',
-        ],
-      },
-      {
-        heading: 'Perbandingan Biaya Jangka Panjang',
-        paragraphs: [
-          'Platform template biasanya memakai model biaya langganan bulanan yang naik seiring bertambahnya jumlah kontak, percakapan, atau fitur AI yang dipakai — sebagian bahkan sekarang menghitung biaya per percakapan yang dijawab, bukan biaya flat per bulan. Ini masuk akal untuk mulai dengan modal kecil, tapi biayanya bisa terus naik selama chatbot itu dipakai, dan biasanya makin mahal justru waktu bisnismu makin ramai — padahal itu momen yang seharusnya dirayakan, bukan bikin tagihan membengkak.',
-          'Chatbot custom sebaliknya: ada biaya development di depan, tapi begitu selesai, sistemnya milik kamu sepenuhnya — tidak ada biaya langganan bulanan ke pihak platform yang terus berjalan selama chatbot dipakai. Break-even point-nya biasanya tercapai justru saat volume penggunaan sudah tinggi, kebalikan dari model langganan yang makin mahal seiring volume naik.',
-        ],
-      },
-      {
-        heading: 'Keputusan Berdasarkan Kebutuhan, Bukan Hype',
-        paragraphs: [
-          '"AI chatbot" sedang jadi kata kunci yang menarik, dan gampang tergoda pakai solusi paling canggih padahal kebutuhannya sebenarnya sederhana. Kalau kamu cuma butuh jawab FAQ dan tangkap lead dasar, chatbot template sudah cukup — tidak perlu custom yang lebih mahal dan lebih lama development-nya.',
-          'Tapi kalau chatbot-nya perlu terhubung ke data internal, menjalankan tugas otomatis multi-langkah, atau jadi bagian dari alur kerja yang lebih besar (bukan sekadar widget percakapan di pojok website), di situlah custom mulai lebih masuk akal — baik dari sisi kemampuan maupun biaya jangka panjang. Kalau belum yakin masuk kategori mana, coba tulis tiga hal yang ingin dilakukan chatbot-mu. Kalau salah satunya menyentuh data internal atau tugas multi-langkah, itu sinyal untuk melirik solusi custom.',
-        ],
-      },
-    ],
   },
   {
     slug: 'biaya-bikin-chatbot-custom-rincian',
@@ -763,44 +242,6 @@ export const ARTICLES: Article[] = [
     pillar: 'ai-chatbot-agent',
     published: true,
     publishedAt: '2026-09-08',
-    body: [
-      {
-        paragraphs: [
-          'Paket AI Chatbot & Virtual Agent yang saya tawarkan dibanderol "mulai dari Rp1,5jt". Kata "mulai dari" ini bukan basa-basi pemasaran — harga final memang ditentukan lewat diskusi kebutuhan, fitur, dan kompleksitas, bukan angka tetap untuk semua orang. Supaya lebih jelas, ini rincian apa yang termasuk di harga awal dan apa yang bisa mengubahnya.',
-        ],
-      },
-      {
-        heading: 'Apa yang Termasuk di Harga Mulai Rp1,5jt',
-        paragraphs: [
-          'Paket dasarnya mencakup empat komponen: chatbot AI dengan percakapan cerdas, interaksi suara 2 arah (bisa dengar dan bicara, bukan cuma teks), Autonomous Agent untuk tugas otomatis, dan fitur lead generator lewat WhatsApp. Ini bukan sekadar chatbot FAQ — sudah termasuk kemampuan agent yang bisa mengeksekusi tugas, bukan cuma menjawab pertanyaan.',
-        ],
-      },
-      {
-        heading: 'Ke Mana Biayanya Mengalir: 4 Tahap Kerja',
-        paragraphs: [
-          'Setiap proyek — termasuk chatbot — melewati empat tahap: konsultasi kebutuhan (diskusi ide, fitur, target pengguna), desain & prototipe (wireframe dan preview interaktif sebelum coding penuh dimulai), development & testing (coding, integrasi, QA menyeluruh), lalu deployment & rilis (deploy ke server produksi plus maintenance awal). Harga mencakup keempat tahap ini secara end-to-end, dikerjakan langsung tanpa estafet antar tim.',
-        ],
-      },
-      {
-        heading: 'Apa yang Bikin Harga Naik dari Angka Awal',
-        paragraphs: [
-          'Beberapa hal yang biasanya menggeser harga dari estimasi awal: kompleksitas integrasi (misalnya chatbot perlu terhubung ke sistem stok atau database internal, bukan cuma menjawab dari data statis), jumlah channel yang didukung (WhatsApp saja vs WhatsApp + website + Instagram sekaligus), dan revisi mayor tambahan di luar revisi standar yang sudah termasuk dalam pengerjaan. Semakin spesifik logika bisnis yang harus dipahami chatbot, semakin besar juga waktu development-nya.',
-        ],
-      },
-      {
-        heading: 'Biaya yang Terpisah dari Development: Pemakaian API',
-        paragraphs: [
-          'Ini bagian yang penting untuk dipahami di awal: Autonomous Agent yang dipakai berjalan di atas layanan AI Google (Interactions API), dan ada dua jalur pemakaiannya. Lewat Google AI Studio, tersedia kuota gratis harian (free tier) — cukup untuk pemakaian skala kecil atau tahap awal. Begitu volume pemakaiannya melewati kuota gratis itu, atau butuh keandalan setara produksi, jalurnya pindah ke Google Cloud dengan skema pay-as-you-go — biaya dihitung dari token dan tools yang benar-benar dipakai agent saat bekerja, bukan biaya flat bulanan.',
-          'Artinya, untuk chatbot dengan volume pemakaian yang masih ringan, biaya API-nya bisa saja Rp0 karena masih di dalam kuota gratis. Begitu bisnisnya makin ramai dan kuota gratis terlampaui, barulah biaya pay-as-you-go mulai berjalan sesuai volume pemakaian nyata. Siapa yang menanggung biaya ini kalau sampai terlampaui, dan di titik volume berapa itu biasanya terjadi untuk skala bisnismu, adalah pertanyaan yang wajar diajukan sejak diskusi awal — bukan sesuatu yang seharusnya baru diketahui belakangan.',
-        ],
-      },
-      {
-        heading: 'Cara Menghitung Estimasi Kasar untuk Bisnismu',
-        paragraphs: [
-          'Semakin sederhana kebutuhannya (satu channel, tanpa integrasi ke sistem internal, alur percakapan standar), semakin dekat harganya ke angka Rp1,5jt. Semakin kompleks (multi-channel, terhubung ke data bisnis, butuh logika khusus), semakin masuk akal untuk mengalokasikan budget lebih. Cara paling akurat tetap lewat konsultasi langsung — gratis dan tanpa kewajiban order — supaya estimasinya sesuai kebutuhan riil, bukan tebak-tebakan dari luar.',
-        ],
-      },
-    ],
   },
   {
     slug: 'cara-kerja-sistem-aset-pt-gmp',
@@ -812,78 +253,6 @@ export const ARTICLES: Article[] = [
     pillar: 'studi-kasus-produk',
     published: true,
     publishedAt: '2026-09-05',
-    body: [
-      {
-        paragraphs: [
-          'PT Global Multiparts punya aset fisik yang tersebar di berbagai unit dan cabang — dari mesin, peralatan, sampai inventaris kantor. Sebelumnya, pendataan aset ini dilakukan manual: stock opname jalan sendiri-sendiri per cabang, kalkulasi penyusutan dihitung terpisah, dan hasilnya sering selisih antara catatan dengan kondisi fisik di lapangan. Waktu tim audit butuh laporan, tidak ada satu sumber data yang bisa langsung dipercaya.',
-          'Sistem yang dibangun untuk PT GMP — dinamai Assets DEMO di versi publiknya — dirancang untuk menutup celah itu: satu sistem yang mencatat kondisi aset, menghitung penyusutan otomatis, dan bisa diaudit kapan saja, tanpa menambah beban biaya server bulanan.',
-        ],
-      },
-      {
-        heading: 'Kenapa Bukan Server Sendiri?',
-        paragraphs: [
-          'Opsi paling umum untuk sistem seperti ini adalah backend custom di atas server sendiri (VPS, cloud hosting, dsb). Tapi itu berarti biaya sewa server bulanan yang harus dianggarkan terus-menerus, plus maintenance server itu sendiri — sesuatu yang membebani anggaran operasional untuk kebutuhan yang sebenarnya tidak butuh skala besar.',
-          'Assets DEMO dibangun di atas arsitektur Serverless Zero Server Cost — Google Apps Script sebagai logic engine, Google Sheets sebagai database, dan Google Drive sebagai penyimpanan foto/dokumen. Ekosistem ini sudah ada dan dipakai banyak perusahaan lewat akun Google Workspace mereka, jadi tidak ada biaya sewa server tambahan sama sekali. Datanya pun 100% ada di infrastruktur milik perusahaan sendiri, bukan di server pihak ketiga yang harus dipercaya begitu saja.',
-        ],
-      },
-      {
-        heading: 'Alur Sistem, dari Scan sampai Laporan',
-        paragraphs: [
-          'Alur kerjanya mengikuti lima tahap. Pertama, petugas lapangan scan label QR atau barcode fisik yang tertempel di aset, lewat kamera di aplikasi (pakai Expo Camera) — tanpa perlu ketik manual ID aset satu per satu.',
-          'Kedua, data yang di-scan divalidasi. Kalau lokasi sedang minim sinyal (misalnya di gudang), data masuk ke Offline Queue dulu — sistem tetap bisa dipakai tanpa koneksi internet, dan otomatis sinkron begitu sinyal kembali. Ada proteksi anti-tindih dua lapis supaya data dari beberapa petugas yang scan aset yang sama tidak saling menimpa.',
-          'Ketiga, data masuk ke Serverless Logic Engine (Google Apps Script) yang menjalankan semua logika bisnis: kalkulasi depresiasi, validasi role akses, sampai audit trail.',
-          'Keempat, hasilnya tersimpan di Google Sheets sebagai database utama dan Google Drive untuk penyimpanan foto/dokumen pendukung.',
-          'Kelima, dari data yang sudah rapi itu, laporan resmi dalam format PDF dan Excel bisa diekspor otomatis dan dikirim ke email pimpinan — tanpa perlu rekap manual lagi.',
-        ],
-      },
-      {
-        heading: 'Fitur yang Menjawab Masalah Nyata di Lapangan',
-        paragraphs: [
-          'Depresiasi dihitung otomatis pakai metode garis lurus (Straight-Line Depreciation) per bulan — nilai buku aset menyusut sendiri sesuai jadwal, nilai residunya otomatis terkunci begitu aset dinyatakan disposed (tidak dipakai lagi), dan seluruh aset bisa disinkronkan ulang cuma dengan satu klik.',
-          'Setiap foto dokumentasi dikompres otomatis supaya tidak boros kuota data maupun storage — penting untuk petugas yang kerja dari lokasi dengan koneksi terbatas. Setiap mutasi aset (pindah lokasi, ganti kondisi, dsb) wajib disertai alasan, jadi audit trail-nya lengkap dan bisa ditelusuri kapan saja.',
-          'Untuk sisi keamanan, sistem membatasi satu sesi aktif per akun (single active session) dan kata sandi disimpan dengan hash bersalt — jadi satu akun tidak bisa dipakai login bersamaan di banyak perangkat tanpa terdeteksi.',
-        ],
-      },
-      {
-        heading: 'Yang Dilihat Pimpinan, dan yang Dipakai Staf Lapangan',
-        paragraphs: [
-          'Untuk pimpinan, dashboard menampilkan total nilai perolehan aset berdampingan dengan total nilai buku saat ini, plus grafik status operasional: aktif, dalam perbaikan, atau sudah dihapusbukukan (disposed). Untuk staf lapangan, tampilannya dibuat jauh lebih sederhana: katalog dengan pencarian berdasarkan kode, merek, kategori, ruangan, sampai nama pemegang barang, filter kondisi, dan pemindai QR. Pembagian peran menjaga agar staf biasa hanya bisa melihat dan memindai, sementara perubahan nilai dan data sensitif tetap di tangan administrator.',
-          'Setiap aset punya dua slot foto (tampak depan, serta nomor seri atau kondisi fisik) yang bisa diperbesar layar penuh untuk pemeriksaan detail. Daftar aset dirender dengan Shopify FlashList, jadi ribuan baris tetap lancar digulir di HP biasa.',
-        ],
-      },
-      {
-        heading: 'Pengingat Servis, Garansi, dan Notifikasi',
-        paragraphs: [
-          'Aset bukan cuma soal nilai buku. Jadwal servis berkala, kalibrasi, atau tanggal berakhirnya garansi bisa dicatat per aset, disinkronkan ke Google Calendar, dan diingatkan lewat push notification (OneSignal) sebelum hari-H. Tujuannya sederhana: servis AC atau kendaraan operasional tidak terlewat sampai kerusakannya jadi mahal.',
-        ],
-      },
-      {
-        heading: 'Batasan yang Perlu Diketahui',
-        paragraphs: [
-          'Pendekatan serverless berbasis Google Apps Script ini paling pas untuk skala operasional kecil-menengah — bukan untuk trafik sangat tinggi dengan ribuan transaksi bersamaan setiap detik. Google Apps Script punya batas kuota eksekusi harian, jadi kalau volume data dan penggunanya jauh lebih besar dari kebutuhan multi-cabang seperti PT GMP, arsitektur berbasis server/database khusus akan lebih cocok. Untuk kasus PT GMP sendiri, batasan ini belum jadi masalah karena skala operasionalnya memang pas dengan pendekatan ini.',
-        ],
-      },
-      {
-        heading: 'Hasilnya',
-        paragraphs: [
-          'Dengan sistem ini, audit aset jadi lebih cepat dan transparan — nilai buku selalu akurat dan siap diperiksa kapan saja, tanpa perlu rekonsiliasi manual dulu. Dari sisi anggaran, biaya sewa server tetap Rp0 per bulan, karena semuanya berjalan di atas ekosistem cloud yang sudah dipakai perusahaan.',
-          'Versi publik dari sistem ini — Assets Demo, dengan data simulasi demi menjaga privasi data PT Global Multiparts — bisa dicoba langsung di assets.arzhaning.my.id untuk melihat bagaimana alur kerjanya secara nyata.',
-        ],
-      },
-      {
-        heading: 'Coba Sendiri dengan Akun Demo',
-        paragraphs: [
-          'Buka assets.arzhaning.my.id dan masuk dengan salah satu akun uji coba. Untuk melihat sisi pimpinan dengan kendali penuh (tambah dan edit aset, kelola pengguna, ekspor laporan), pakai admin@demo.com dengan kata sandi 123456. Untuk merasakan sisi staf lapangan (melihat katalog, memindai label QR, memeriksa riwayat), pakai staff@demo.com dengan kata sandi yang sama. Semua datanya simulasi, jadi silakan dicoba bebas.',
-          'Satu catatan: karena sistem membatasi satu sesi aktif per akun, kalau ada pengunjung lain yang sedang memakai akun yang sama, sesimu bisa terputus. Kalau itu terjadi, cukup masuk lagi.',
-        ],
-      },
-      {
-        heading: 'Kalau Bisnismu Punya Masalah Serupa',
-        paragraphs: [
-          'Pola ini tidak cuma berlaku untuk manajemen aset — prinsip yang sama (memanfaatkan ekosistem cloud yang sudah ada alih-alih membangun infrastruktur baru dari nol) bisa dipakai untuk berbagai proses bisnis lain yang masih manual dan rawan selisih data. Kalau bisnismu punya masalah pendataan atau pelacakan serupa, coba dulu demonya, lalu catat bagian alur mana yang paling mirip dengan proses di tempatmu — itu bahan yang bagus untuk memulai diskusi lewat chat Zannah.',
-        ],
-      },
-    ],
   },
 
   // ===== Draft (published: false) — belum ada body, dikumpulkan di akhir,
@@ -899,7 +268,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'zero-server-cost',
     published: false,
-    body: [],
   },
   {
     slug: 'serverless-vs-vps-bukan-soal-canggih',
@@ -910,7 +278,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'zero-server-cost',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-1-website-butuh-3-karakter-ai-berbeda',
@@ -921,7 +288,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'ai-chatbot-agent',
     published: false,
-    body: [],
   },
   {
     slug: 'bagaimana-ai-membaca-dokumen-yang-kamu-upload',
@@ -932,7 +298,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'ai-chatbot-agent',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-ai-chatbot-saya-bisa-bicara',
@@ -943,7 +308,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'ai-chatbot-agent',
     published: false,
-    body: [],
   },
   {
     slug: 'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab',
@@ -954,7 +318,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'studi-kasus-produk',
     published: false,
-    body: [],
   },
   {
     slug: 'membangun-aplikasi-100-persen-offline-rajendra-pintar',
@@ -965,7 +328,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'studi-kasus-produk',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-b-games-pakai-postgresql-bukan-google-sheets',
@@ -976,7 +338,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'studi-kasus-produk',
     published: false,
-    body: [],
   },
   {
     slug: 'tanda-bisnismu-butuh-sistem-custom',
@@ -987,7 +348,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'panduan-bisnis',
     published: false,
-    body: [],
   },
   {
     slug: 'checklist-sebelum-konsultasi-pertama-dengan-developer',
@@ -998,7 +358,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'panduan-bisnis',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu',
@@ -1009,7 +368,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'keamanan-data',
     published: false,
-    body: [],
   },
   {
     slug: 'single-active-session-mencegah-akun-dibajak',
@@ -1020,7 +378,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'keamanan-data',
     published: false,
-    body: [],
   },
   {
     slug: 'enkripsi-password-standar-militer-itu-apa',
@@ -1031,7 +388,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'keamanan-data',
     published: false,
-    body: [],
   },
   {
     slug: 'dari-scan-kamera-ke-data-aset-1-detik',
@@ -1042,7 +398,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan',
@@ -1053,7 +408,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'offline-first-dua-aplikasi-saya-tetap-jalan-tanpa-internet',
@@ -1064,7 +418,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'anti-afk-bot-di-b-games',
@@ -1075,7 +428,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-daftar-ribuan-aset-tidak-lag-flashlist',
@@ -1086,7 +438,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'dari-audit-internal-ke-software-development',
@@ -1097,7 +448,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'personal-brand',
     published: false,
-    body: [],
   },
   {
     slug: 'zero-server-cost-bukan-gimmick',
@@ -1108,7 +458,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'personal-brand',
     published: false,
-    body: [],
   },
   {
     slug: 'react-native-expo-vs-flutter-kenapa-saya-pilih',
@@ -1119,7 +468,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'zero-server-cost',
     published: false,
-    body: [],
   },
   {
     slug: 'kenapa-supabase-untuk-proyek-yang-butuh-autentikasi-cepat',
@@ -1130,7 +478,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'zero-server-cost',
     published: false,
-    body: [],
   },
   {
     slug: 'xendit-vs-payment-gateway-lain-kenapa-saya-pilih',
@@ -1141,7 +488,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
     published: false,
-    body: [],
   },
   {
     slug: 'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh',
@@ -1152,7 +498,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'panduan-bisnis',
     published: false,
-    body: [],
   },
   {
     slug: 'progressive-web-app-pwa-dijelaskan-sesederhana-mungkin',
@@ -1163,7 +508,6 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'panduan-bisnis',
     published: false,
-    body: [],
   },
 ];
 // Daftar slug per pilar, dihitung otomatis dari ARTICLES (published saja) --
