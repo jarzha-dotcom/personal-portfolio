@@ -36,7 +36,7 @@ import type { ProjectItem } from '../src/types.ts';
 // Asumsi lokasi file: src/components/ArticleIllustration.tsx (mengikuti pola
 // import '../components/ArticleIllustration' yang dipakai ArticlePage.tsx).
 // Kalau lokasinya beda, sesuaikan path ini.
-import { SLUG_IMAGE_SOURCE_FILES } from '../src/components/ArticleIllustration.tsx';
+import { SLUG_IMAGE_URLS } from '../src/components/ArticleIllustration.tsx';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = join(__dirname, '..');
@@ -256,66 +256,22 @@ const applyHead = (html: string, opts: HeadOptions): string => {
 };
 
 // ---------------------------------------------------------------------------
-// og:image per-artikel — resolve URL asli (sudah di-hash Vite) lewat
-// dist/.vite/manifest.json (butuh build.manifest:true di vite.config.ts).
-// Kalau manifest tidak ada, atau slug/entry-nya tidak ketemu, FALLBACK DIAM
-// ke og:image default (foto homepage) -- tidak pernah menghasilkan URL yang
-// salah/rusak, cuma kurang spesifik. Warning dicetak sekali per masalah biar
-// kelihatan di log build tanpa spam.
+// og:image per-artikel -- gambar artikel di-host di Vercel Blob, jadi URL-nya
+// sudah absolut (https://...vercel-storage.com/...) dan tidak perlu lagi
+// lookup ke dist/.vite/manifest.json. Sumber tunggalnya SLUG_IMAGE_URLS di
+// ArticleIllustration.tsx (sama persis dengan yang dipakai komponen).
+// Slug tanpa foto custom -> null -> og:image default (foto homepage) dibiarkan.
 // ---------------------------------------------------------------------------
 
 const ARTICLE_IMAGE_WIDTH = 1408;
 const ARTICLE_IMAGE_HEIGHT = 768;
-const ARTICLE_IMAGES_SRC_DIR = 'src/assets/images'; // relatif ke root proyek (Vite root)
-
-type ViteManifest = Record<string, { file?: string }>;
-
-let manifestCache: ViteManifest | null | undefined;
-const readViteManifest = (): ViteManifest | null => {
-  if (manifestCache !== undefined) return manifestCache;
-  const manifestPath = join(DIST_DIR, '.vite', 'manifest.json');
-  if (!existsSync(manifestPath)) {
-    console.warn(
-      `\n[prerender] PERINGATAN: ${manifestPath} tidak ditemukan — og:image per-artikel akan pakai gambar default. ` +
-        `Pastikan "build.manifest: true" aktif di vite.config.ts dan build sudah dijalankan sebelum prerender.\n`
-    );
-    manifestCache = null;
-    return null;
-  }
-  try {
-    manifestCache = JSON.parse(readFileSync(manifestPath, 'utf-8'));
-  } catch (err) {
-    console.warn(`\n[prerender] PERINGATAN: gagal parse ${manifestPath}: ${(err as Error).message}\n`);
-    manifestCache = null;
-  }
-  // TS tidak bisa mempersempit tipe manifestCache jadi bukan `undefined` di
-  // titik ini (control-flow narrowing untuk variabel closure yang diassign di
-  // dalam try/catch terbatas) -- padahal secara logika selalu sudah terisi
-  // ViteManifest atau null. `?? null` di sini murni buat memuaskan tipe
-  // return, bukan mengubah perilaku (assignment di atas tidak pernah
-  // benar-benar meninggalkan manifestCache sebagai undefined).
-  return manifestCache ?? null;
-};
 
 const resolveArticleOgImage = (article: Article): OgImage | null => {
-  const files = SLUG_IMAGE_SOURCE_FILES[article.slug];
-  if (!files) return null; // Artikel ini memang belum punya foto custom — normal, bukan error.
-
-  const manifest = readViteManifest();
-  if (!manifest) return null;
-
-  const key = `${ARTICLE_IMAGES_SRC_DIR}/${files.top}`;
-  const entry = manifest[key];
-  if (!entry?.file) {
-    console.warn(
-      `[prerender] PERINGATAN: manifest tidak punya entry untuk "${key}" (artikel: ${article.slug}). ` +
-        `og:image fallback ke default. Cek apakah SLUG_IMAGE_SOURCE_FILES di ArticleIllustration.tsx masih sinkron dengan nama file aslinya.`
-    );
-    return null;
-  }
+  const images = SLUG_IMAGE_URLS[article.slug];
+  if (!images) return null; // Artikel ini memang belum punya foto custom -- normal, bukan error.
 
   return {
-    url: `${CANONICAL_BASE}/${entry.file}`,
+    url: images.top,
     alt: article.title,
     width: ARTICLE_IMAGE_WIDTH,
     height: ARTICLE_IMAGE_HEIGHT,

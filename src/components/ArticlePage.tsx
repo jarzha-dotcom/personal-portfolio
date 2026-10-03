@@ -12,6 +12,7 @@ import { ShareButtons } from '../components/ShareButtons';
 import { AuthorCard } from '../components/AuthorCard';
 import { ArticleIllustration, hasArticleImages } from '../components/ArticleIllustration';
 import { RelatedArticles } from '../components/RelatedArticles';
+import { ArticleAudioPlayer } from '../components/ArticleAudioPlayer';
 
 interface ArticlePageProps {
   darkMode: boolean;
@@ -293,6 +294,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
 
               {/* Judul */}
               <h1
+                data-audio-title
                 className={`text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight mb-4 leading-[1.15] ${
                   darkMode ? 'text-white' : 'text-slate-900'
                 }`}
@@ -322,6 +324,9 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
                 />
               </div>
 
+              {/* Pemutar audio — otomatis tidak tampil kalau artikel belum punya audio */}
+              <ArticleAudioPlayer slug={article.slug} darkMode={darkMode} />
+
               {/* Body artikel dengan drop cap di paragraf pertama */}
               <div
                 className={`space-y-8 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}
@@ -347,7 +352,7 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
                           />
                         </figure>
                       )}
-                      <div className="space-y-3">
+                      <div className="space-y-3" data-audio-block={i}>
                         {block.heading && (
                           <h2
                             className={`text-xl sm:text-2xl font-bold mt-10 first:mt-0 ${

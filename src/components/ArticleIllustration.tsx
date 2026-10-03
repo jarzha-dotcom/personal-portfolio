@@ -38,61 +38,41 @@ import {
   Handshake,
 } from 'lucide-react';
 
-// Pastikan path ini benar relatif terhadap file komponen ini.
-// Konvensi: file "Judul.jpeg" = gambar TOP (hero), "Judul 2.jpeg" = gambar MIDDLE.
-import gmpTop from '../assets/images/Cara Kerja Sistem Manajemen Aset PT Global Multiparts.jpeg';
-import gmpMiddle from '../assets/images/Cara Kerja Sistem Manajemen Aset PT Global Multiparts 2.jpeg';
-import migrasiTop from '../assets/images/5 Tanda Bisnismu Sudah Waktunya Migrasi.jpeg';
-import migrasiMiddle from '../assets/images/5 Tanda Bisnismu Sudah Waktunya Migrasi 2.jpeg';
-import gsheetsTop from '../assets/images/Amankah Data Bisnis Disimpan di Google Sheets-Drive.jpeg';
-import gsheetsMiddle from '../assets/images/Amankah Data Bisnis Disimpan di Google Sheets-Drive 2.jpeg';
-import agentTop from '../assets/images/Apa Itu Autonomous Agent.jpeg';
-import agentMiddle from '../assets/images/Apa Itu Autonomous Agent 2.jpeg';
-import chatbotBiayaTop from '../assets/images/Berapa Biaya Sebenarnya Bikin Chatbot Custom.jpeg';
-import chatbotBiayaMiddle from '../assets/images/Berapa Biaya Sebenarnya Bikin Chatbot Custom 2.jpeg';
-import chatbotVsTop from '../assets/images/Custom Chatbot vs Chatbot Template.jpeg';
-import chatbotVsMiddle from '../assets/images/Custom Chatbot vs Chatbot Template 2.jpeg';
-import appsScriptTop from '../assets/images/Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri.jpeg';
-import appsScriptMiddle from '../assets/images/Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri 2.jpeg';
-import bgamesTop from '../assets/images/Arsitektur Multiplayer Real-Time di B-Games.jpeg';
-import bgamesMiddle from '../assets/images/Arsitektur Multiplayer Real-Time di B-Games 2.jpeg';
-import arsitekturBackendTop from '../assets/images/4 Sistem Saya, 4 Arsitektur Backend Berbeda.jpeg';
-import arsitekturBackendMiddle from '../assets/images/4 Sistem Saya, 4 Arsitektur Backend Berbeda 2.jpeg';
-import cascadeTop from '../assets/images/Apa Itu Cascade AI System.jpeg';
-import cascadeMiddle from '../assets/images/Apa Itu Cascade AI System 2.jpeg';
-import devrabTop from '../assets/images/Di Balik Tombol Buatkan RAB.jpeg';
-import devrabMiddle from '../assets/images/Di Balik Tombol Buatkan RAB 2.jpeg';
-import lamaWebsiteTop from '../assets/images/Berapa Lama Bikin Website.jpeg';
-import lamaWebsiteMiddle from '../assets/images/Berapa Lama Bikin Website 2.jpeg';
-import pertanyaanDeveloperTop from '../assets/images/5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer.jpeg';
-import pertanyaanDeveloperMiddle from '../assets/images/5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer 2.jpeg';
-import webMobilePwaTop from '../assets/images/Perbedaan Web App, Mobile App, dan PWA.jpeg';
-import webMobilePwaMiddle from '../assets/images/Perbedaan Web App, Mobile App, dan PWA 2.jpeg';
-import hargaProposalTop from '../assets/images/Kenapa Harga Proposal Development Bisa.jpeg';
-import hargaProposalMiddle from '../assets/images/Kenapa Harga Proposal Development Bisa 2.jpeg';
-import auditTrailTop from '../assets/images/Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh.jpeg';
-import auditTrailMiddle from '../assets/images/Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh 2.jpeg';
-import checklistKonsultasiTop from '../assets/images/Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama.jpeg';
-import checklistKonsultasiMiddle from '../assets/images/Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama 2.jpeg';
+// ---------------------------------------------------------------------------
+// Gambar artikel di-host di Vercel Blob (bukan lagi di-bundle oleh Vite).
+//
+// 1. Jalankan `npx tsx --env-file=.env.local scripts/upload-images.ts`
+// 2. Salin "BLOB_BASE_URL" yang dicetak script itu ke konstanta di bawah.
+//
+// Konvensi nama file: "Judul.jpeg" = gambar TOP (hero), "Judul 2.jpeg" = MIDDLE.
+// URL dibentuk dari nama file lewat slugify() -- fungsi ini HARUS sama persis
+// dengan slugify() di scripts/upload-images.ts, jadi tidak perlu salin 34 URL
+// satu per satu.
+//
+// Kenapa tanpa import.meta.env: scripts/prerender.ts jalan di luar Vite (lewat
+// tsx) dan ikut meng-import file ini, jadi file ini tidak boleh bergantung
+// pada fitur khusus Vite.
+// ---------------------------------------------------------------------------
+const BLOB_BASE_URL = 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles';
+
+const slugify = (filename: string): string =>
+  filename
+    .replace(/\.jpe?g$/i, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+export const blobImageUrl = (filename: string): string =>
+  `${BLOB_BASE_URL}/${slugify(filename)}.jpeg`;
 
 interface SlugImages {
   top: string;
   middle: string;
 }
 
-// Nama file MENTAH (bukan hasil import Vite) untuk tiap slug, persis sama
-// dengan yang dipakai di daftar `import ... from '../assets/images/...'` di
-// atas. HARUS tetap sinkron manual dengan SLUG_IMAGES di bawah -- kalau
-// nambah/ubah gambar artikel, update di DUA tempat ini bersamaan.
-//
-// Kenapa ada dua peta yang isinya "sama": SLUG_IMAGES di bawah menyimpan
-// HASIL import (URL yang sudah di-resolve Vite, cuma valid di dalam app yang
-// di-bundle Vite). Peta ini menyimpan nama file ASLINYA, dipakai
-// scripts/prerender.ts (jalan di luar Vite, lewat tsx) untuk mencari file
-// hasil build yang sudah di-hash lewat dist/.vite/manifest.json, supaya
-// og:image per-artikel bisa akurat. Kalau dua peta ini beda isi,
-// prerender.ts akan diam-diam fallback ke og:image generik (tidak sampai
-// gagal build) -- tapi tetap sebaiknya dijaga sinkron.
+// Nama file ASLI (sebelum di-slugify) untuk tiap slug. Ini satu-satunya tempat
+// yang perlu diubah saat menambah/mengganti gambar artikel. Tetap di-export
+// untuk kompatibilitas dengan kode lama.
 export const SLUG_IMAGE_SOURCE_FILES: Record<string, SlugImages> = {
   'cara-kerja-sistem-aset-pt-gmp': {
     top: 'Cara Kerja Sistem Manajemen Aset PT Global Multiparts.jpeg',
@@ -164,34 +144,19 @@ export const SLUG_IMAGE_SOURCE_FILES: Record<string, SlugImages> = {
   },
 };
 
-const SLUG_IMAGES: Record<string, SlugImages> = {
-  'cara-kerja-sistem-aset-pt-gmp': { top: gmpTop, middle: gmpMiddle },
-  'tanda-waktunya-migrasi-dari-apps-script': { top: migrasiTop, middle: migrasiMiddle },
-  'amankah-data-bisnis-di-google-sheets-drive': { top: gsheetsTop, middle: gsheetsMiddle },
-  'apa-itu-autonomous-agent-beda-chatbot-biasa': { top: agentTop, middle: agentMiddle },
-  'biaya-bikin-chatbot-custom-rincian': { top: chatbotBiayaTop, middle: chatbotBiayaMiddle },
-  'custom-chatbot-vs-chatbot-template': { top: chatbotVsTop, middle: chatbotVsMiddle },
-  'kenapa-google-apps-script-untuk-klien-kecil-menengah': { top: appsScriptTop, middle: appsScriptMiddle },
-  'arsitektur-multiplayer-real-time-b-games': { top: bgamesTop, middle: bgamesMiddle },
-  'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
-    top: arsitekturBackendTop,
-    middle: arsitekturBackendMiddle,
-  },
-  'apa-itu-cascade-ai-system': { top: cascadeTop, middle: cascadeMiddle },
-  'studi-kasus-devrab-proposal-30-detik': { top: devrabTop, middle: devrabMiddle },
-  'berapa-lama-bikin-website-aplikasi-bisnis-kecil': { top: lamaWebsiteTop, middle: lamaWebsiteMiddle },
-  '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': {
-    top: pertanyaanDeveloperTop,
-    middle: pertanyaanDeveloperMiddle,
-  },
-  'web-app-vs-mobile-app-vs-pwa': { top: webMobilePwaTop, middle: webMobilePwaMiddle },
-  'kenapa-harga-proposal-bisa-beda-beda': { top: hargaProposalTop, middle: hargaProposalMiddle },
-  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': { top: auditTrailTop, middle: auditTrailMiddle },
-  'checklist-sebelum-konsultasi-pertama-dengan-developer': {
-    top: checklistKonsultasiTop,
-    middle: checklistKonsultasiMiddle,
-  },
-};
+/**
+ * URL absolut (Vercel Blob) per slug. Dipakai komponen ini dan juga
+ * scripts/prerender.ts untuk og:image per-artikel -- cukup pakai nilai ini
+ * langsung, tidak perlu lagi lookup ke dist/.vite/manifest.json.
+ */
+export const SLUG_IMAGE_URLS: Record<string, SlugImages> = Object.fromEntries(
+  Object.entries(SLUG_IMAGE_SOURCE_FILES).map(([slug, files]) => [
+    slug,
+    { top: blobImageUrl(files.top), middle: blobImageUrl(files.middle) },
+  ]),
+);
+
+const SLUG_IMAGES = SLUG_IMAGE_URLS;
 
 /** Dipakai halaman lain (mis. ArticlePage) untuk cek apakah slug ini punya foto custom, sebelum menyisipkan gambar "middle" di tengah artikel. */
 export const hasArticleImages = (slug: string): boolean => !!SLUG_IMAGES[slug];
@@ -296,6 +261,8 @@ export const ArticleIllustration: React.FC<ArticleIllustrationProps> = ({
         <img
           src={imageUrl}
           alt="Ilustrasi Artikel"
+          width={1408}
+          height={768}
           loading={isHero && position === 'top' ? 'eager' : 'lazy'}
           decoding="async"
           className="absolute inset-0 w-full h-full object-cover"

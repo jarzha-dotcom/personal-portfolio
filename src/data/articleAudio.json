@@ -1,0 +1,1022 @@
+{
+  "5-pertanyaan-sebelum-pakai-jasa-developer-freelance": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3122,
+    "bytes": 799296,
+    "duration": 199.824,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.184
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.184,
+        "end": 23.568
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 23.568,
+        "end": 55.536
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 55.536,
+        "end": 87.552
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 87.552,
+        "end": 121.68
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 121.68,
+        "end": 149.544
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 149.544,
+        "end": 178.92
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 178.92,
+        "end": 199.824
+      }
+    ],
+    "hash": "eb64e35040082bd4896c8660e29959378df790f66f1935b8f8e47ec76911b368",
+    "generatedAt": "2026-10-03T15:06:13.887Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/5-pertanyaan-sebelum-pakai-jasa-developer-freelance-eb64e350.mp3",
+    "storage": "blob"
+  },
+  "amankah-data-bisnis-di-google-sheets-drive": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 2495,
+    "bytes": 631968,
+    "duration": 157.992,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.536
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.536,
+        "end": 21.72
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 21.72,
+        "end": 48.384
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 48.384,
+        "end": 77.112
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 77.112,
+        "end": 98.64
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 98.64,
+        "end": 133.824
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 133.824,
+        "end": 157.992
+      }
+    ],
+    "hash": "0511460a4b9ff50ffff0337a917782817e235249dcc989a679c3f86bc79a80cc",
+    "generatedAt": "2026-10-03T15:12:30.938Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/amankah-data-bisnis-di-google-sheets-drive-0511460a.mp3",
+    "storage": "blob"
+  },
+  "apa-itu-audit-trail-dan-kenapa-bisnismu-butuh": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6420,
+    "bytes": 1644768,
+    "duration": 411.192,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.336
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.336,
+        "end": 51.384
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 51.384,
+        "end": 102.84
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 102.84,
+        "end": 149.976
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 149.976,
+        "end": 201.6
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 201.6,
+        "end": 245.088
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 245.088,
+        "end": 290.952
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 290.952,
+        "end": 339
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 339,
+        "end": 383.736
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 383.736,
+        "end": 411.192
+      }
+    ],
+    "hash": "7f0f232dd4a4488979852e5dd6e3d9c78f94241215b26d6a7367bd56769e0f7b",
+    "generatedAt": "2026-10-03T15:02:36.589Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh-7f0f232d.mp3",
+    "storage": "blob"
+  },
+  "apa-itu-autonomous-agent-beda-chatbot-biasa": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 2718,
+    "bytes": 672000,
+    "duration": 168,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.128
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.128,
+        "end": 18.072
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 18.072,
+        "end": 40.848
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 40.848,
+        "end": 73.992
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 73.992,
+        "end": 102.816
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 102.816,
+        "end": 132.864
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 132.864,
+        "end": 168
+      }
+    ],
+    "hash": "b562f4d94256182a26b0320e6974bdb94ccf03a0af4fa976cf376f5541841da2",
+    "generatedAt": "2026-10-03T15:09:01.311Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/apa-itu-autonomous-agent-beda-chatbot-biasa-b562f4d9.mp3",
+    "storage": "blob"
+  },
+  "apa-itu-cascade-ai-system": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 2340,
+    "bytes": 582912,
+    "duration": 145.728,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.048
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.048,
+        "end": 28.872
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 28.872,
+        "end": 58.848
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 58.848,
+        "end": 93.384
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 93.384,
+        "end": 120.912
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 120.912,
+        "end": 145.728
+      }
+    ],
+    "hash": "507f258cdbb5fe8c83b7ae8105acc7a14d2954f05ece548a8c53374280f732c5",
+    "generatedAt": "2026-10-03T15:08:31.494Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/apa-itu-cascade-ai-system-507f258c.mp3",
+    "storage": "blob"
+  },
+  "arsitektur-multiplayer-real-time-b-games": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 4373,
+    "bytes": 1081920,
+    "duration": 270.48,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 3.648
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 3.648,
+        "end": 27.456
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 27.456,
+        "end": 79.344
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 79.344,
+        "end": 115.032
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 115.032,
+        "end": 156.408
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 156.408,
+        "end": 189.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 189.792,
+        "end": 239.856
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 239.856,
+        "end": 270.48
+      }
+    ],
+    "hash": "e09a16aaeec09b2ebbb921d9e2774da9f097ba9b9227fb02d59b311f5feb94b8",
+    "generatedAt": "2026-10-03T15:11:14.428Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/arsitektur-multiplayer-real-time-b-games-e09a16aa.mp3",
+    "storage": "blob"
+  },
+  "berapa-lama-bikin-website-aplikasi-bisnis-kecil": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 2945,
+    "bytes": 702048,
+    "duration": 175.512,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.544
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.544,
+        "end": 21.408
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 21.408,
+        "end": 76.104
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 76.104,
+        "end": 108.312
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 108.312,
+        "end": 132.12
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 132.12,
+        "end": 155.784
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 155.784,
+        "end": 175.512
+      }
+    ],
+    "hash": "c8f4ff3b5051a4cb51299c2eea6763a538af38ce50ad477091d5751444778043",
+    "generatedAt": "2026-10-03T15:06:49.138Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/berapa-lama-bikin-website-aplikasi-bisnis-kecil-c8f4ff3b.mp3",
+    "storage": "blob"
+  },
+  "biaya-bikin-chatbot-custom-rincian": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3518,
+    "bytes": 913632,
+    "duration": 228.408,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.688
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.688,
+        "end": 30.144
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 30.144,
+        "end": 56.352
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 56.352,
+        "end": 87.48
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 87.48,
+        "end": 120.504
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 120.504,
+        "end": 195.84
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 195.84,
+        "end": 228.408
+      }
+    ],
+    "hash": "b3e2a1168ffdfc9b9de573b4cf17da62d44905a34d4a788c9b9f096ef4c22efa",
+    "generatedAt": "2026-10-03T14:41:01.569Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/biaya-bikin-chatbot-custom-rincian-b3e2a116.mp3",
+    "storage": "blob"
+  },
+  "cara-kerja-sistem-aset-pt-gmp": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6987,
+    "bytes": 1830912,
+    "duration": 457.728,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.104
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.104,
+        "end": 48.048
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 48.048,
+        "end": 102.144
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 102.144,
+        "end": 174.96
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 174.96,
+        "end": 230.064
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 230.064,
+        "end": 286.56
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 286.56,
+        "end": 313.416
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 313.416,
+        "end": 345.672
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 345.672,
+        "end": 381.408
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 381.408,
+        "end": 427.272
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 427.272,
+        "end": 457.728
+      }
+    ],
+    "hash": "47fbec4b503e00150836c4cfa7bcc88bc75b564175bbede1365d2bba8bfa5755",
+    "generatedAt": "2026-10-03T15:14:32.171Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/cara-kerja-sistem-aset-pt-gmp-47fbec4b.mp3",
+    "storage": "blob"
+  },
+  "checklist-sebelum-konsultasi-pertama-dengan-developer": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7106,
+    "bytes": 1840512,
+    "duration": 460.128,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.424
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.424,
+        "end": 53.52
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 53.52,
+        "end": 94.464
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 94.464,
+        "end": 138.96
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 138.96,
+        "end": 186.408
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 186.408,
+        "end": 236.304
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 236.304,
+        "end": 284.472
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 284.472,
+        "end": 340.128
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 340.128,
+        "end": 383.904
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 383.904,
+        "end": 402.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 402.792,
+        "end": 431.88
+      },
+      {
+        "kind": "block",
+        "blockIndex": 10,
+        "start": 431.88,
+        "end": 460.128
+      }
+    ],
+    "hash": "4095dc06dcb1d140928297e9aa044cc48c485c1b0442d91a2383e7768acba596",
+    "generatedAt": "2026-10-03T15:03:56.583Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/checklist-sebelum-konsultasi-pertama-dengan-developer-4095dc06.mp3",
+    "storage": "blob"
+  },
+  "custom-chatbot-vs-chatbot-template": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3671,
+    "bytes": 893184,
+    "duration": 223.296,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.776
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.776,
+        "end": 23.16
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 23.16,
+        "end": 63.456
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 63.456,
+        "end": 121.392
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 121.392,
+        "end": 174.48
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 174.48,
+        "end": 223.296
+      }
+    ],
+    "hash": "c27e5a101ee6199efa1fd799f212c8bd6439ef3a14fd0cc8d23d6fed8f4f4fbc",
+    "generatedAt": "2026-10-03T15:13:15.383Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/custom-chatbot-vs-chatbot-template-c27e5a10.mp3",
+    "storage": "blob"
+  },
+  "kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3394,
+    "bytes": 854112,
+    "duration": 213.528,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.208
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.208,
+        "end": 31.152
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 31.152,
+        "end": 64.128
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 64.128,
+        "end": 102.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 102.792,
+        "end": 148.608
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 148.608,
+        "end": 170.664
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 170.664,
+        "end": 213.528
+      }
+    ],
+    "hash": "fab79020ab7fad440a6e9e54de4c7e063d85597f8ace20f8974048c88d3b590b",
+    "generatedAt": "2026-10-03T15:09:39.328Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-fab79020.mp3",
+    "storage": "blob"
+  },
+  "kenapa-google-apps-script-untuk-klien-kecil-menengah": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3471,
+    "bytes": 871488,
+    "duration": 217.872,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.136
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.136,
+        "end": 25.44
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 25.44,
+        "end": 57.288
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 57.288,
+        "end": 108.816
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 108.816,
+        "end": 136.392
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 136.392,
+        "end": 190.488
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 190.488,
+        "end": 217.872
+      }
+    ],
+    "hash": "443d507d3957e4925566013ba2f8afe9de151bb1d4d6c619eda628db51855bd5",
+    "generatedAt": "2026-10-03T15:10:19.996Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-google-apps-script-untuk-klien-kecil-menengah-443d507d.mp3",
+    "storage": "blob"
+  },
+  "kenapa-harga-proposal-bisa-beda-beda": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3039,
+    "bytes": 734016,
+    "duration": 183.504,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.256
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.256,
+        "end": 23.472
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 23.472,
+        "end": 60.216
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 60.216,
+        "end": 92.64
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 92.64,
+        "end": 119.784
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 119.784,
+        "end": 142.248
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 142.248,
+        "end": 183.504
+      }
+    ],
+    "hash": "f7cf13fcaebe24d758aadd74bf9ebd636e7491d9f4fa6f4eca5b772d59c60db0",
+    "generatedAt": "2026-10-03T15:05:35.145Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-harga-proposal-bisa-beda-beda-f7cf13fc.mp3",
+    "storage": "blob"
+  },
+  "studi-kasus-devrab-proposal-30-detik": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6823,
+    "bytes": 1814880,
+    "duration": 453.72,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.216
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.216,
+        "end": 61.032
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 61.032,
+        "end": 91.56
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 91.56,
+        "end": 172.104
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 172.104,
+        "end": 198.168
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 198.168,
+        "end": 257.424
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 257.424,
+        "end": 298.008
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 298.008,
+        "end": 342.984
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 342.984,
+        "end": 376.56
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 376.56,
+        "end": 397.848
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 397.848,
+        "end": 420.336
+      },
+      {
+        "kind": "block",
+        "blockIndex": 10,
+        "start": 420.336,
+        "end": 453.72
+      }
+    ],
+    "hash": "20a44ffc8b2d66143c9926194135b708dc1f56ff84c36ae7444d54564159244a",
+    "generatedAt": "2026-10-03T15:08:05.127Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/studi-kasus-devrab-proposal-30-detik-20a44ffc.mp3",
+    "storage": "blob"
+  },
+  "tanda-waktunya-migrasi-dari-apps-script": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 3657,
+    "bytes": 929856,
+    "duration": 232.464,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.808
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.808,
+        "end": 28.176
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 28.176,
+        "end": 60.984
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 60.984,
+        "end": 98.952
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 98.952,
+        "end": 147.456
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 147.456,
+        "end": 176.4
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 176.4,
+        "end": 203.016
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 203.016,
+        "end": 232.464
+      }
+    ],
+    "hash": "55272bd5e1e573fd2e7b4d4a053c3fe50a009d608c215f74d8755af7704f307f",
+    "generatedAt": "2026-10-03T15:11:59.210Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/tanda-waktunya-migrasi-dari-apps-script-55272bd5.mp3",
+    "storage": "blob"
+  },
+  "web-app-vs-mobile-app-vs-pwa": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 2953,
+    "bytes": 737184,
+    "duration": 184.296,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.864
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.864,
+        "end": 26.472
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 26.472,
+        "end": 46.368
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 46.368,
+        "end": 90.192
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 90.192,
+        "end": 138.12
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 138.12,
+        "end": 184.296
+      }
+    ],
+    "hash": "c1fb268e76bc02a828aea4e48531193d6d563960bcf5c249b320870db2e423b6",
+    "generatedAt": "2026-10-03T15:05:03.270Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/web-app-vs-mobile-app-vs-pwa-c1fb268e.mp3",
+    "storage": "blob"
+  }
+}

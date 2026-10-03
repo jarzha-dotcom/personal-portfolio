@@ -9,3 +9,5 @@ coverage/
 # .gitignore
 .env
 .env.local
+.audio-cache/
+public/audio/

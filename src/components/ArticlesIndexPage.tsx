@@ -10,6 +10,7 @@ import {
   Search,
   Sparkles,
   FileText,
+  Headphones,
   X,
 } from 'lucide-react';
 import { ARTICLES } from '../data/articles';
@@ -18,6 +19,22 @@ import { ROUTES, articleRoute, CANONICAL_BASE } from '../routes';
 import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
 import { formatIDDate, toISODate } from '../utils/formatDate';
 import { ArticleIllustration } from '../components/ArticleIllustration';
+import { hasArticleAudio } from '../components/ArticleAudioPlayer';
+
+// Penanda kecil "Ada audio" di baris meta kartu. Sengaja BUKAN tombol putar:
+// kartu artikel adalah satu tautan utuh, dan audio akan terputus saat pindah halaman.
+const AudioBadge: React.FC<{ slug: string; darkMode: boolean }> = ({ slug, darkMode }) => {
+  if (!hasArticleAudio(slug)) return null;
+  return (
+    <>
+      <span className={`h-3 w-px ${darkMode ? 'bg-slate-700' : 'bg-slate-200'}`} aria-hidden="true" />
+      <span className={`inline-flex items-center gap-1 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}>
+        <Headphones className="w-3 h-3" aria-hidden="true" />
+        Ada audio
+      </span>
+    </>
+  );
+};
 
 interface ArticlesIndexPageProps {
   darkMode: boolean;
@@ -503,6 +520,7 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
                       <Clock className="w-3 h-3" aria-hidden="true" />
                       {latestArticle.readMinutes} menit baca
                     </span>
+                    <AudioBadge slug={latestArticle.slug} darkMode={darkMode} />
                   </div>
 
                   {/* Title */}
@@ -615,6 +633,7 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
                             <Clock className="w-3 h-3" aria-hidden="true" />
                             {article.readMinutes} menit baca
                           </span>
+                          <AudioBadge slug={article.slug} darkMode={darkMode} />
                         </div>
 
                         {/* Title */}
