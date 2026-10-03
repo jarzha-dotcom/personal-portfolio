@@ -20,7 +20,7 @@ export const bodies: Record<string, ArticleBlock[]> = {
     {
       heading: 'Dari Ide Mentah ke Estimasi yang Masuk Akal',
       paragraphs: [
-        'Dari deskripsi proyek, AI (Google Gemini) merancang rincian fitur, jam kerja, biaya infrastruktur, dan timeline. Ia juga mengecek harga pasar terkini di Indonesia lewat pencarian — tarif programmer, domain, sewa server, sampai biaya API pihak ketiga — jadi angkanya tidak bertumpu pada template lama. Sebagai titik awal tersedia lebih dari sepuluh template industri (toko online, aplikasi mobile, SaaS/ERP, kasir, klinik, platform kursus, sistem booking, layanan on-demand, platform AI, company profile) dan pustaka lebih dari 70 fitur siap pilih.',
+        'Dari deskripsi proyek, AI merancang rincian fitur, jam kerja, biaya infrastruktur, dan timeline. Ia juga mengecek harga pasar terkini di Indonesia lewat pencarian — tarif programmer, domain, sewa server, sampai biaya API pihak ketiga — jadi angkanya tidak bertumpu pada template lama. Sebagai titik awal tersedia lebih dari sepuluh template industri (toko online, aplikasi mobile, SaaS/ERP, kasir, klinik, platform kursus, sistem booking, layanan on-demand, platform AI, company profile) dan pustaka lebih dari 70 fitur siap pilih.',
         'Kalau klien punya batas anggaran, misalnya Rp25 juta, mesin ini memprioritaskan fitur inti dan menandai sisanya sebagai opsi, supaya total tetap masuk anggaran tanpa mengorbankan hal yang wajib ada. Perhitungan diskon, PPN, margin risiko, dan termin bertahap (misalnya 30% uang muka, 40% setelah desain dan demo, 30% setelah peluncuran) dikerjakan otomatis. Biaya jasa development dipisahkan dari biaya infrastruktur seperti server, domain, dan SSL, jadi klien bisa melihat ke mana uangnya pergi.',
       ],
     },

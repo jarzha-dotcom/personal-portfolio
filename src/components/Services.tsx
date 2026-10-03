@@ -53,7 +53,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
             icon: <FileSpreadsheet className="w-6 h-6" />,
             title: 'Internal Tools & Dashboard Bisnis',
             description:
-                'Pembuatan web app untuk manajemen inventaris aset, rekonsiliasi data stok vs finansial, otomasi working paper, dan dashboard analitik dengan standar ketelitian audit korporat 7+ tahun.',
+                'Pembuatan web app untuk manajemen inventaris aset, rekonsiliasi data stok vs finansial, otomasi working paper, dan dashboard analitik dengan standar ketelitian 7+ tahun pengalaman di operasional dan audit korporat.',
             features: ['Data Reconciliation 99%', 'Export Excel/PDF Otomatis', 'Realtime Audit Log', 'Standar SOP Korporat'],
             color: 'indigo',
         },

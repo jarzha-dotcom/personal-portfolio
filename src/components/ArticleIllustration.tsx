@@ -33,6 +33,9 @@ import {
   HelpCircle,
   Smartphone,
   Calculator,
+  History,
+  ListChecks,
+  Handshake,
 } from 'lucide-react';
 
 // Pastikan path ini benar relatif terhadap file komponen ini.
@@ -67,6 +70,10 @@ import webMobilePwaTop from '../assets/images/Perbedaan Web App, Mobile App, dan
 import webMobilePwaMiddle from '../assets/images/Perbedaan Web App, Mobile App, dan PWA 2.jpeg';
 import hargaProposalTop from '../assets/images/Kenapa Harga Proposal Development Bisa.jpeg';
 import hargaProposalMiddle from '../assets/images/Kenapa Harga Proposal Development Bisa 2.jpeg';
+import auditTrailTop from '../assets/images/Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh.jpeg';
+import auditTrailMiddle from '../assets/images/Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh 2.jpeg';
+import checklistKonsultasiTop from '../assets/images/Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama.jpeg';
+import checklistKonsultasiMiddle from '../assets/images/Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama 2.jpeg';
 
 interface SlugImages {
   top: string;
@@ -147,6 +154,14 @@ export const SLUG_IMAGE_SOURCE_FILES: Record<string, SlugImages> = {
     top: 'Kenapa Harga Proposal Development Bisa.jpeg',
     middle: 'Kenapa Harga Proposal Development Bisa 2.jpeg',
   },
+  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': {
+    top: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh.jpeg',
+    middle: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh 2.jpeg',
+  },
+  'checklist-sebelum-konsultasi-pertama-dengan-developer': {
+    top: 'Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama.jpeg',
+    middle: 'Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama 2.jpeg',
+  },
 };
 
 const SLUG_IMAGES: Record<string, SlugImages> = {
@@ -171,6 +186,11 @@ const SLUG_IMAGES: Record<string, SlugImages> = {
   },
   'web-app-vs-mobile-app-vs-pwa': { top: webMobilePwaTop, middle: webMobilePwaMiddle },
   'kenapa-harga-proposal-bisa-beda-beda': { top: hargaProposalTop, middle: hargaProposalMiddle },
+  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': { top: auditTrailTop, middle: auditTrailMiddle },
+  'checklist-sebelum-konsultasi-pertama-dengan-developer': {
+    top: checklistKonsultasiTop,
+    middle: checklistKonsultasiMiddle,
+  },
 };
 
 /** Dipakai halaman lain (mis. ArticlePage) untuk cek apakah slug ini punya foto custom, sebelum menyisipkan gambar "middle" di tengah artikel. */
@@ -197,6 +217,8 @@ const SLUG_ILLUSTRATIONS: Record<string, IconPair> = {
   '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': { Icon: HelpCircle, Accent: Briefcase },
   'web-app-vs-mobile-app-vs-pwa': { Icon: LayoutTemplate, Accent: Smartphone },
   'kenapa-harga-proposal-bisa-beda-beda': { Icon: Calculator, Accent: Scale },
+  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': { Icon: History, Accent: ShieldCheck },
+  'checklist-sebelum-konsultasi-pertama-dengan-developer': { Icon: ListChecks, Accent: Handshake },
 };
 
 const CATEGORY_ILLUSTRATIONS: Record<string, IconPair> = {

@@ -1,7 +1,7 @@
 # 🌟 Selamat Datang di Platform Portofolio & Ekosistem AI Saya
 
 > **Halo! Saya K. Arzhaning Jagad (biasa dipanggil Arzha).**  
-> *Indie Developer & Data/System Specialist dengan pengalaman lebih dari 7 tahun dalam tata kelola data presisi dan rekayasa perangkat lunak modern.*  
+> *Indie Developer & Data/System Specialist dengan pengalaman 7+ tahun di operasional dan audit korporat, kini membangun aplikasi dan sistem berbasis cloud.*  
 > 📍 Berdomisili di Cibitung, Bekasi, Jawa Barat  
 > 🌐 Website Utama: [arzhaning.my.id](https://arzhaning.my.id) | 💬 Konsultasi Langsung via WhatsApp: [0823-1231-2734](https://wa.me/6282312312734) | ✉️ Email: [admin@arzhaning.my.id](mailto:admin@arzhaning.my.id)
 
@@ -13,7 +13,7 @@ Di era digital saat ini, banyak pemilik bisnis dan perusahaan menghadapi dua dil
 1. **Aplikasi yang bagus tampilannya, tapi logika bisnis dan datanya sering bermasalah (banyak selisih data, rawan eror, dan sulit diaudit).**
 2. **Biaya bulanan yang membengkak** hanya untuk membayar sewa server dan pemeliharaan teknologi yang rumit.
 
-Sebagai seorang **Indie Developer** yang berakar kuat dari pengalaman lebih dari 7 tahun di bidang audit internal dan tata kelola data korporat, saya memadukan dua dunia tersebut:
+Sebagai seorang **Indie Developer** yang berakar dari pengalaman 7+ tahun di dunia korporat (operasional, administrasi bisnis, hingga audit internal), saya memadukan dua dunia tersebut:
 *   **Ketelitian Data & Logika Bisnis yang Matang**: Setiap sistem yang saya rancang wajib memiliki alur data yang rapi, akurat (tingkat akurasi rekonsiliasi data hingga 99%), dan siap dipertanggungjawabkan kapan saja.
 *   **Efisiensi Biaya Nyata (*Zero Server Cost Architecture*)**: Saya gemar merancang sistem yang memanfaatkan ekosistem cerdas (seperti Google Cloud Serverless, Google Sheets DB terenkripsi, maupun Vercel) sehingga bisnis Anda bisa menghemat jutaan rupiah biaya sewa server setiap bulannya.
 
@@ -30,28 +30,27 @@ Saya merancang asisten kecerdasan buatan (AI) interaktif agar calon klien dan pe
 
 *   **👩 Zannah (Konsultan Solusi & Estimasi Anggaran Proyek)**  
     *Tersedia di pojok kanan bawah layar.*  
-    Zannah bertugas membantu Anda membedah ide aplikasi yang ingin Anda bangun, menyarankan solusi teknologi yang paling hemat anggaran, membuatkan estimasi Rencana Anggaran Biaya (RAB) transparan, menghitung estimasi timeline pengerjaan, dan menyiapkan dokumen ringkasan diskusi resmi yang bisa Anda unduh seketika. Zannah juga bisa **riset web singkat** (kompetitor, kisaran harga pasar, tren teknologi) lengkap dengan daftar sumbernya.
+    Zannah bertugas membantu Anda membedah ide aplikasi yang ingin Anda bangun, menyarankan solusi teknologi yang paling hemat anggaran, membuatkan estimasi Rencana Anggaran Biaya (RAB) transparan, menghitung estimasi timeline pengerjaan, dan menyiapkan dokumen ringkasan diskusi resmi yang bisa Anda unduh seketika.
 *   **👨 Rajendra (Konsultan Arsitektur & Teknologi)**  
     *Tersedia di bagian AI Showcase halaman depan.*  
-    Rajendra dirancang dengan karakter formal dan analitis. Anda bisa mengajaknya berdiskusi seputar arsitektur sistem, keamanan data, integrasi API, alur inventaris, hingga pemilihan model AI Google terbaru (Gemini 3.8 Flash, Gemma 4, dan lainnya melalui dropdown model). Rajendra juga bisa **riset web** untuk membandingkan teknologi atau memeriksa data terkini, dan punya **mode Live Demo (AI Agent 🧪)**: untuk ide yang perlu dibuktikan cepat, agen menjalankan kode di lingkungan terisolasi untuk membuat prototipe atau *proof of concept* singkat.
+    Rajendra dirancang dengan karakter formal dan analitis. Anda bisa mengajaknya berdiskusi seputar arsitektur sistem, keamanan data, integrasi API, alur inventaris, hingga pemilihan model AI Google terbaru (Gemini 3.8 Flash, Gemma 4, dan lainnya melalui dropdown model).
 *   **⚡ Radit (Asisten Penjawab Cepat FAQ)**  
     Bekerja secara cerdas di balik layar untuk menjawab pertanyaan umum seputar jasa dan portofolio saya dalam hitungan detik tanpa membebani kuota internet.
 
 ---
 
 ### 2. 🗣️ Fitur Suara Alami Manusia (AI Bisa Berbicara Bahasa Indonesia)
-Saya tidak menggunakan suara robot yang kaku. Saya menyematkan teknologi sintesis suara alami (*Google Cloud Text-to-Speech: Chirp 3 HD & WaveNet*):
+Saya tidak menggunakan suara robot yang kaku. Saya menyematkan teknologi sintesis suara alami (*Google Cloud WaveNet*):
 *   **Intonasi Hangat & Ramah**: Asisten AI dapat membacakan jawabannya dalam bahasa Indonesia dengan artikulasi jernih selayaknya berbicara dengan rekan kerja.
 *   **Fasih Mengeja Angka**: Mampu menyebutkan nominal rupiah (misal: "Rp 1.500.000"), tanggal, persentase, serta singkatan istilah bisnis dengan tepat.
 *   **Animasi Gelombang Suara (*Voice Bars*)**: Dilengkapi indikator visual dinamis saat asisten sedang berbicara.
-*   **Bisa Bicara Lewat Mikrofon**: Anda tidak harus mengetik. Ucapkan pertanyaan Anda, lalu asisten menjawab dengan suara.
 
 ---
 
 ### 3. 📄 Integrasi Otomatis DevRAB: Portal Klien, Tanda Tangan Digital & Pembayaran Online
 Chatbot Zannah yang saya bangun terhubung langsung (*Machine-to-Machine*) dengan platform **DevRAB Cloud Engine** karya saya:
-*   **Analisis Berkas Kebutuhan Anda**: Anda dapat melampirkan berkas sketsa coretan tangan, desain halaman, dokumen acuan, maupun data tabel (PNG/JPG/WebP, PDF, CSV; maksimal 3 berkas, 6 MB per berkas). AI akan memeriksa isinya untuk memahami kebutuhan teknis Anda.
-*   **Otomatisasi Penerbitan Proposal Resmi**: Begitu rincian kebutuhan proyek disepakati, sistem langsung memprosesnya ke DevRAB. **Zannah lalu menyampaikan hasilnya langsung di chat**: total estimasi, timeline, ringkasan termin, serta tautan **PDF resmi** dan **Portal Klien Interaktif**. Ada fitur yang berubah? Cukup ketik perubahannya di chat dan Zannah akan memperbarui estimasinya. Jika proposal resmi belum berhasil dibuat, Zannah menyampaikannya secara terus terang dan melampirkan draf estimasi kasar sebagai gambaran awal. Portal Klien memuat:
+*   **Analisis Berkas Kebutuhan Anda**: Anda dapat melampirkan berkas sketsa coretan tangan, desain halaman, dokumen acuan, maupun data tabel (foto PNG/JPG, PDF, CSV). AI akan memeriksa isinya untuk memahami kebutuhan teknis Anda.
+*   **Otomatisasi Penerbitan Proposal Resmi**: Begitu rincian kebutuhan proyek disepakati, sistem langsung memprosesnya ke DevRAB dan memberikan Anda tautan khusus ke **Portal Klien Interaktif**, yang memuat:
     *   **Scope of Work (SOW)** lengkap dengan rincian fitur dan batas pengerjaan yang jelas.
     *   **Rencana Anggaran Biaya (RAB) & Termin Pembayaran**: Estimasi biaya transparan yang terbagi dalam tahapan (*milestones*).
     *   **Persetujuan dengan Tanda Tangan Digital**: Anda dapat menyetujui proposal secara resmi dengan membubuhkan tanda tangan digital langsung di layar HP atau komputer Anda.
@@ -60,12 +59,11 @@ Chatbot Zannah yang saya bangun terhubung langsung (*Machine-to-Machine*) dengan
 
 ---
 
-### 4. 🛡️ Dirancang Tetap Online 24/7 (Cadangan Bertingkat)
+### 4. 🛡️ Sistem Selalu Online 24/7 (Anti-Macet & Anti-Down)
 Saya menerapkan arsitektur **Cadangan Bertingkat (*Cascade AI System*)**:
-*   Jika salah satu model AI utama sedang mengalami lonjakan antrean trafik di server Google, sistem secara otomatis mengalihkan percakapan ke model AI cadangan secara otomatis, nyaris tanpa terasa oleh pengguna.
+*   Jika salah satu model AI utama sedang mengalami lonjakan antrean trafik di server Google, sistem secara otomatis mengalihkan percakapan ke model AI cadangan dalam hitungan milidetik tanpa disadari oleh pengguna.
 *   Didukung mesin AI berdaya tahan tinggi (**Gemma 4** dengan kuota raksasa **14.400 permintaan per hari**).
 *   Bahkan jika koneksi AI global sedang terputus total, asisten lokal (**Radit**) tetap sanggup menjawab puluhan pertanyaan umum secara mandiri.
-*   **Riset web pun punya cadangan**: bila satu model pencarian kehabisan kuota, sistem otomatis berpindah ke model lain. Jika semuanya sedang tidak tersedia, asisten tetap menjawab dan terus terang bahwa data web terbaru belum bisa dicek.
 
 ---
 
@@ -110,12 +108,12 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 | Komponen | Teknologi yang Saya Pakai | Keuntungan Langsung untuk Bisnis Anda |
 | :--- | :--- | :--- |
 | **Tampilan Depan (Frontend)** | **React 19, Vite 6, TypeScript, Tailwind CSS v4, Motion** | Aplikasi terbuka seketika (*loading kilat*), tampilan terlihat mewah dan profesional, serta bebas dari bug pengetikan kode (*type-safe*). |
-| **Kecerdasan Buatan (AI Engine)** | **Google Gemini Series, Gemma 4 & Google Search Grounding** | Jawaban cerdas, analitis, dan dirancang tahan gangguan berkat kuota harian cadangan raksasa (14.400 panggilan/hari). Riset web berbasis pencarian Google lengkap dengan sumbernya. |
+| **Kecerdasan Buatan (AI Engine)** | **Gemini Series & Gemma 4** | Jawaban cerdas, analitis, dan memiliki ketahanan 24/7 berkat kuota harian cadangan raksasa (14.400 panggilan/hari). |
 | **Otomatisasi Proposal & RAB** | **DevRAB Cloud Engine & Client Portal** | Terhubung langsung dengan asisten AI Zannah untuk menerbitkan portal proposal interaktif, lengkap dengan SOW, persetujuan tanda tangan digital, dan pembayaran otomatis. |
-| **Analisis Berkas & Live Demo** | **Google Antigravity (Interactions API)** | Chatbot mampu menganalisis gambar dan tabel CSV yang Anda unggah, serta menjalankan prototipe singkat di lingkungan terisolasi. Dokumen PDF dibaca langsung oleh model Gemini. |
-| **Suara Alami (Voice TTS)** | **Google Cloud Text-to-Speech (Chirp 3 HD & WaveNet)** | Memberikan kesan mewah dan humanis bagi pelanggan bisnis Anda dengan suara narasi berbahasa Indonesia yang ramah. |
+| **Analisis Berkas Cerdas** | **Google Antigravity (Interactions API)** | Chatbot mampu memeriksa dan menganalisis berkas yang Anda unggah (sketsa desain, dokumen PDF, tabel data) secara mendalam. |
+| **Suara Alami (Voice TTS)** | **Google Cloud WaveNet Audio** | Memberikan kesan mewah dan humanis bagi pelanggan bisnis Anda dengan suara narasi berbahasa Indonesia yang ramah. |
 | **Infrastruktur Cloud (Backend)** | **Vercel Serverless Architecture** | **Hemat Anggaran Server**: Anda tidak perlu pusing membayar biaya sewa server bulanan yang mahal. Server hanya aktif saat ada pengunjung, kuat menampung ribuan pengguna sekaligus. |
-| **Penyimpanan & Privasi Obrolan** | **IndexedDB Local Storage** | Riwayat obrolan Anda disimpan di browser Anda sendiri, bukan di database saya. Agar bisa dijawab, isi pesan diproses oleh layanan AI Google (Gemini API); rincian pengelolaan datanya ada di Kebijakan Privasi di website. |
+| **Keamanan & Privasi Obrolan** | **IndexedDB Local Storage** | Riwayat obrolan tersimpan aman di browser masing-masing pengunjung sehingga kerahasiaan data percakapan bisnis Anda terjamin 100%. |
 | **Transaksi & Pembayaran** | **Xendit Payment Gateway** | Menerima pembayaran instan dari pelanggan Anda lewat QRIS (semua bank & e-wallet) dengan konfirmasi otomatis tanpa verifikasi manual. |
 
 ---

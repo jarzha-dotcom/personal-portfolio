@@ -90,6 +90,28 @@ export interface Article {
 export const ARTICLES: Article[] = [
   // ===== Artikel published, diurutkan dari PALING BARU ke PALING LAMA =====
   {
+    slug: 'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh',
+    title: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh Fitur Ini Lebih dari yang Kamu Kira',
+    excerpt:
+      '"Siapa yang mengubah data ini?" adalah pertanyaan yang baru terasa penting saat sudah terlambat. Ini kenapa fitur ini sebaiknya ada sejak awal.',
+    category: 'Panduan',
+    readMinutes: 5,
+    pillar: 'panduan-bisnis',
+    published: true,
+    publishedAt: '2026-09-28',
+  },
+  {
+    slug: 'checklist-sebelum-konsultasi-pertama-dengan-developer',
+    title: 'Checklist: Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama dengan Developer',
+    excerpt:
+      'Konsultasi yang produktif dimulai dari persiapan yang tepat — ini daftar yang bikin diskusi awal jadi lebih efisien untuk kedua pihak.',
+    category: 'Panduan',
+    readMinutes: 5,
+    pillar: 'panduan-bisnis',
+    published: true,
+    publishedAt: '2026-09-27',
+  },
+  {
     slug: 'web-app-vs-mobile-app-vs-pwa',
     title: 'Perbedaan Web App, Mobile App, dan PWA — Mana yang Kamu Butuhkan?',
     excerpt:
@@ -350,16 +372,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
   {
-    slug: 'checklist-sebelum-konsultasi-pertama-dengan-developer',
-    title: 'Checklist: Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama dengan Developer',
-    excerpt:
-      'Konsultasi yang produktif dimulai dari persiapan yang tepat — ini daftar yang bikin diskusi awal jadi lebih efisien untuk kedua pihak.',
-    category: 'Panduan',
-    readMinutes: 3,
-    pillar: 'panduan-bisnis',
-    published: false,
-  },
-  {
     slug: 'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu',
     title: 'Kenapa Riwayat Chat AI Disimpan di Browser Kamu (IndexedDB), Bukan di Server Saya',
     excerpt:
@@ -441,7 +453,7 @@ export const ARTICLES: Article[] = [
   },
   {
     slug: 'dari-audit-internal-ke-software-development',
-    title: 'Dari 7 Tahun Audit Internal ke Software Development: Kenapa Latar Belakang Data Membentuk Cara Saya Bangun Sistem',
+    title: 'Dari Audit Internal ke Software Development: Kenapa Latar Belakang Data Membentuk Cara Saya Bangun Sistem',
     excerpt:
       'Kebiasaan mengecek selisih data dan menelusuri audit trail dari dunia audit ternyata jadi fondasi cara saya merancang sistem sekarang.',
     category: 'Reflektif',
@@ -487,16 +499,6 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
-    published: false,
-  },
-  {
-    slug: 'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh',
-    title: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh Fitur Ini Lebih dari yang Kamu Kira',
-    excerpt:
-      '"Siapa yang mengubah data ini?" adalah pertanyaan yang baru terasa penting saat sudah terlambat. Ini kenapa fitur ini sebaiknya ada sejak awal.',
-    category: 'Panduan',
-    readMinutes: 3,
-    pillar: 'panduan-bisnis',
     published: false,
   },
   {

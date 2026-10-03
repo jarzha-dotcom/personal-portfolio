@@ -32,7 +32,7 @@ Dengan DevRAB, pembuatan estimasi biaya yang dulunya memakan waktu berhari-hari 
 ## 🌟 Rincian Fitur-Fitur Unggulan
 
 ### 1. 🧠 Asisten Pembuat Proposal Cerdas (AI Agent Generator)
-- **Teknologi Google Gemini Mutakhir**: Menganalisis ide mentah Anda dan merancangnya menjadi rincian teknis yang sangat matang.
+- **Teknologi Mutakhir**: Menganalisis ide mentah Anda dan merancangnya menjadi rincian teknis yang sangat matang.
 - **Riset Harga Pasar Live Otomatis**: AI aktif mengecek estimasi harga pasar terkini di Indonesia untuk tarif programmer, harga domain, sewa server/VPS, hingga biaya API pihak ketiga.
 - **10+ Template Industri Siap Pakai**:
   - 🛒 **E-Commerce & Toko Online** (Katalog, Checkout, Payment Gateway, Ongkir Otomatis).
@@ -121,7 +121,7 @@ Meskipun terlihat sangat simpel dan mudah digunakan di mata pengguna, di balik l
 | :--- | :--- | :--- |
 | **Tampilan Pengguna (Frontend)** | **React 19 & Vite 6** | Menggunakan versi React paling mutakhir di dunia. Memberikan perpindahan halaman secepat kilat tanpa *loading* yang membosankan. |
 | **Desain & Gaya Visual** | **Tailwind CSS v4 & Motion** | Antarmuka modern, bersih, dan mewah dengan animasi halus berkecepatan 60 frame per detik di semua ukuran layar (HP, tablet, laptop). |
-| **Kecerdasan Buatan (AI Engine)** | **Google Gemini AI SDK** | Otak kecerdasan buatan dari Google dengan kemampuan analisis mendalam, didukung riset pasar otomatis via Google Search. |
+| **Kecerdasan Buatan (AI Engine)** | **Gemini AI SDK** | Otak kecerdasan buatan dari Google dengan kemampuan analisis mendalam, didukung riset pasar otomatis via Google Search. |
 | **Jaringan & Hosting Cloud** | **Cloudflare Global Edge** | Dijalankan di 300+ pusat data di seluruh dunia. Aplikasi selalu aktif, sangat cepat diakses dari mana saja, dan kebal dari gangguan server down. |
 | **Penyimpanan Database** | **Turso Distributed libSQL** | Database cloud terdistribusi dengan kecepatan baca/tulis dalam hitungan mikrodetik dan sinkronisasi data yang sangat andal. |
 | **Penyimpanan Berkas (Cloud Storage)** | **Cloudflare R2 Storage** | Tempat penyimpanan aman berstandar industri untuk logo agensi dan foto struk bukti pembayaran klien. |

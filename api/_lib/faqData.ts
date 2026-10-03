@@ -124,7 +124,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'proses',
     quickLabel: 'Kenapa bisa percaya sama Arzha?',
     keywords: ['ga percaya', 'tidak percaya', 'ragu', 'takut ditipu', 'penipuan', 'aman ga', 'terpercaya', 'bukti kerja', 'ga mau', 'kabur'],
-    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat 7+ tahun yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 3 proyek live nyata yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
+    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 3 proyek live nyata yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
   },
   // ── 🛠️ Skill & Teknis ──
   {
@@ -153,7 +153,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'tech',
     quickLabel: 'Apa keunggulan jasa Arzha?',
     keywords: ['keunggulan', 'kelebihan', 'kenapa harus arzha', 'bedanya apa', 'keistimewaan'],
-    answer: '3 poin unggulan: 1) Ketelitian & kedisiplinan audit korporat 7+ tahun (anti-ngilang), 2) Tech stack modern & kencang tanpa bloatware (React 19 + AI Agent), 3) Pendampingan teknis ramah & garansi support 1 bulan.',
+    answer: '3 poin unggulan: 1) Ketelitian & kedisiplinan 7+ tahun pengalaman di operasional dan audit korporat (anti-ngilang), 2) Tech stack modern & kencang tanpa bloatware (React 19 + AI Agent), 3) Pendampingan teknis ramah & garansi support 1 bulan.',
   },
   // ── 📂 Bukti Proyek ──
   {

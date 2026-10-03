@@ -157,4 +157,138 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'checklist-sebelum-konsultasi-pertama-dengan-developer': [
+    {
+      paragraphs: [
+        'Konsultasi pertama dengan developer sering habis untuk hal-hal dasar: sebenarnya mau bikin apa, siapa yang akan memakai, dan kira-kira berapa dana yang tersedia. Semua itu wajar dibahas, tapi kalau kamu datang dengan jawabannya, waktu yang sama bisa dipakai untuk hal yang lebih berharga: menilai pilihan, menimbang risiko, dan menyusun prioritas.',
+        'Artikel ini berisi tujuh hal yang layak disiapkan, ditambah template singkat yang bisa langsung disalin. Ini kebalikan dari artikel "5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer Freelance": di sana soal apa yang perlu kamu tanyakan ke developer, di sini soal apa yang perlu kamu siapkan sebelum bicara. Tidak ada yang wajib sempurna; persiapan setengah jadi pun jauh lebih baik daripada datang dengan tangan kosong.',
+      ],
+    },
+    {
+      heading: '1. Tuliskan Masalahnya, Bukan Solusinya',
+      paragraphs: [
+        '"Saya mau bikin aplikasi" adalah solusi. "Staf gudang butuh dua hari tiap akhir bulan untuk merekap stok dari tiga file Excel" adalah masalah. Developer justru butuh yang kedua, karena dari situ ia bisa menilai apakah yang kamu perlukan memang aplikasi, cukup perbaikan alur kerja, atau sistem yang jauh lebih sederhana dari bayanganmu.',
+        'Coba tulis dalam satu atau dua kalimat: siapa yang kesulitan, apa yang sulit, dan seberapa sering terjadi. Kalau bisa, sertakan akibatnya, misalnya waktu terbuang, data yang selisih, atau pelanggan yang harus menunggu.',
+      ],
+    },
+    {
+      heading: '2. Sebutkan Jenisnya, Tapi Tidak Apa-apa Kalau Belum Yakin',
+      paragraphs: [
+        'Developer perlu tahu bentuk produknya: website company profile, toko online, aplikasi mobile, dashboard, atau sistem internal untuk operasional. Pilihan ini ikut menentukan arah teknologi dan biaya. Kalau kamu belum yakin, jangan ditebak. Cukup jelaskan siapa yang akan memakainya dan dari perangkat apa: staf lapangan lewat HP, tim kantor lewat laptop, atau pelanggan umum.',
+        'Dari situ pilihan antara web app, aplikasi mobile, atau PWA bisa dibahas bersama. Perbedaan ketiganya sudah saya bahas di artikel "Perbedaan Web App, Mobile App, dan PWA".',
+      ],
+    },
+    {
+      heading: '3. Daftar Tiga sampai Lima Kebutuhan yang Konkret',
+      paragraphs: [
+        'Hindari kata sifat yang tidak bisa diuji seperti "modern", "mudah", atau "lengkap". Pakai kalimat yang menyebut siapa melakukan apa: "staf bisa memindai barcode barang lewat HP", "laporan penjualan terkirim ke email pemilik tiap Senin pagi", "pelanggan bisa membayar lewat QRIS dan statusnya berubah otomatis". Kebutuhan yang konkret bisa langsung dihitung usahanya; yang abstrak hanya menghasilkan perkiraan kasar.',
+        'Setelah daftarnya jadi, tandai mana yang wajib ada di versi pertama dan mana yang bagus kalau ada. Pemisahan ini sangat berguna kalau anggaran ternyata lebih kecil dari estimasi: fitur inti dikerjakan dulu, sisanya jadi opsi tahap berikutnya, tanpa harus membuang hal yang benar-benar kamu butuhkan.',
+      ],
+    },
+    {
+      heading: '4. Kumpulkan Contoh dan Berkas yang Sudah Ada',
+      paragraphs: [
+        'Satu foto sering lebih jelas daripada satu halaman penjelasan. Foto formulir kertas yang dipakai sekarang, tangkapan layar file Excel, sketsa tangan di kertas, atau aplikasi lain yang menurutmu "kira-kira seperti itu", semuanya sangat membantu. Jangan khawatir kalau berantakan; coretan tangan pun sudah menghemat banyak pertanyaan. Di chat Zannah, kamu bahkan bisa melampirkan foto, PDF, atau CSV supaya kebutuhannya terbaca langsung.',
+        'Kalau ada data lama yang nanti perlu dipindahkan ke sistem baru, sebutkan juga bentuknya (Excel, buku catatan, atau sistem lain) dan perkiraan jumlahnya. Pemindahan data kadang jadi bagian yang paling banyak memakan waktu, dan lebih baik ketahuan sejak awal.',
+      ],
+    },
+    {
+      heading: '5. Perkirakan Siapa yang Memakai dan Seberapa Banyak',
+      paragraphs: [
+        'Jumlah dan kondisi pemakai memengaruhi rancangan lebih dari yang orang kira. Sistem yang dipakai tiga orang admin berbeda kebutuhannya dengan sistem yang diakses ratusan pelanggan bersamaan. Yang berguna disebutkan: kira-kira berapa pengguna, apakah mereka memakainya bersamaan, dari mana mereka bekerja, dan apakah ada lokasi dengan sinyal buruk seperti gudang atau area basement. Jawaban terakhir menentukan perlu tidaknya mode offline, yang jelas memengaruhi rancangan dan biaya.',
+        'Perkiraan ini juga menentukan apakah pendekatan hemat biaya seperti Google Apps Script cukup untuk saat ini, dan kapan sebaiknya pindah ke server sendiri, seperti yang saya bahas di artikel soal tanda-tanda waktunya migrasi.',
+      ],
+    },
+    {
+      heading: '6. Jujur soal Target Waktu dan Kisaran Anggaran',
+      paragraphs: [
+        'Ini bagian yang paling sering dihindari, padahal paling berpengaruh. Developer menanyakan kisaran anggaran bukan untuk menghabiskannya, tapi supaya bisa menyusun prioritas yang realistis: apa yang masuk versi pertama dan apa yang ditunda. Tanpa angka sama sekali, usulan bisa meleset jauh ke dua arah, terlalu mewah atau terlalu minimalis.',
+        'Kalau belum punya angka, tidak apa-apa. Sebutkan saja "belum tahu" dan minta gambaran rentang untuk proyek sejenis. Hal yang sama berlaku untuk waktu: kalau ada tanggal yang tidak bisa digeser, seperti peluncuran, event, atau awal tahun ajaran, sebutkan dari awal. Rincian soal lamanya proses ada di artikel "Berapa Lama Bikin Website/Aplikasi untuk Bisnis Kecil", dan alasan harga antar-proposal bisa berbeda jauh ada di artikel "Kenapa Harga Proposal Development Bisa Beda-beda".',
+      ],
+    },
+    {
+      heading: '7. Siapkan Bagianmu: Materi, Akses, dan Pengambil Keputusan',
+      paragraphs: [
+        'Proyek sering tertahan bukan karena proses coding-nya, tapi karena menunggu bahan dari sisi klien. Beberapa hal yang sebaiknya sudah jelas siapa pemegangnya: materi seperti logo, teks, dan foto; data awal yang harus dimasukkan; akses ke akun yang diperlukan seperti domain, akun Google, atau akun payment gateway; dan siapa yang berhak memutuskan kalau ada pilihan yang harus diambil.',
+        'Itu sebabnya proposal yang disusun lewat DevRAB memuat bagian prasyarat klien, yaitu daftar data atau materi yang harus disiapkan sebelum pengerjaan dimulai. Kalau kamu sudah memikirkannya dari awal, bagian itu tinggal dicentang.',
+      ],
+    },
+    {
+      heading: 'Yang Tidak Perlu Kamu Siapkan',
+      paragraphs: [
+        'Kamu tidak perlu menguasai istilah teknis, memilih bahasa pemrograman atau database, atau punya desain final. Itu bagian developer. Kalau ada developer yang membuatmu merasa harus menguasai jargon dulu supaya dianggap serius, anggap itu informasi tentang developernya.',
+      ],
+    },
+    {
+      heading: 'Template Singkat yang Bisa Disalin',
+      paragraphs: [
+        'Kalau mau praktis, salin kerangka ini dan isi sebisanya. Masalah yang ingin diselesaikan: … Jenis produk, atau siapa pemakainya dan dari perangkat apa: … Kebutuhan inti (3 sampai 5 poin): … Yang bagus kalau ada: … Contoh atau berkas yang bisa dilampirkan: … Perkiraan jumlah pemakai dan lokasi kerja: … Target waktu: … Kisaran anggaran (boleh "belum tahu"): …',
+        'Kerangka yang sama bisa kamu tempel langsung ke chat Zannah di situs ini. Sebelum menawarkan tombol "Buatkan RAB", Zannah memang menggali tiga hal dari daftar tadi: jenis produknya, minimal dua sampai tiga kebutuhan konkret, dan indikasi target waktu atau anggaran. Makin lengkap jawabanmu di awal, makin cepat sampai ke proposal yang bisa kamu baca dan revisi. Kalau persiapanmu belum lengkap pun tidak masalah; justru untuk itu diskusi awal ada.',
+      ],
+    },
+  ],
+  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': [
+    {
+      paragraphs: [
+        '"Siapa yang mengubah data ini?" jarang terpikir saat bisnis berjalan lancar, lalu mendadak jadi sangat penting saat ada yang janggal: stok tidak cocok dengan catatan, harga berubah tanpa ada yang ingat memutuskannya, atau sebuah barang ternyata sudah pindah ruangan entah sejak kapan. Di titik itu, fitur yang bisa menjawabnya baru terasa berharga, dan sayangnya sering baru dicari setelah masalahnya terjadi.',
+        'Fitur itu disebut audit trail. Artikel ini menjelaskan apa isinya, kenapa jauh lebih bernilai kalau sudah ada sejak awal, dan bagaimana menilai apakah bisnismu membutuhkannya. Saya membahasnya dari dua sisi: sebagai orang yang membangun sistem, dan sebagai orang yang bekerja di bidang audit internal.',
+      ],
+    },
+    {
+      heading: 'Apa Itu Audit Trail, dalam Bahasa Sederhana',
+      paragraphs: [
+        'Audit trail adalah catatan berurutan tentang setiap perubahan penting di dalam sistem: siapa yang melakukan, kapan, apa yang berubah, dan idealnya kenapa. Bayangkan buku tamu yang halamannya tidak bisa disobek: setiap perubahan menambah satu baris baru, bukan menimpa baris yang lama.',
+        'Ini berbeda dari sekadar menyimpan data terbaru. Sistem biasa hanya tahu kondisi sekarang: barang ini ada di Ruang B. Sistem dengan audit trail tahu ceritanya: barang ini tadinya di Ruang A, dipindah ke Ruang B oleh orang tertentu pada jam tertentu, dengan alasan tertentu.',
+        'Riwayat versi di Google Sheets atau Word memang mencatat siapa dan kapan, tapi tidak menjelaskan alasannya, sulit dicari per barang atau per transaksi, dan tidak dirancang sebagai bukti yang bisa ditunjukkan ke pihak lain.',
+      ],
+    },
+    {
+      heading: 'Empat Pertanyaan yang Harus Bisa Dijawab Catatannya',
+      paragraphs: [
+        'Audit trail yang berguna setidaknya menjawab empat hal. Siapa yang melakukan perubahan. Kapan persisnya, sampai jam. Apa yang berubah, termasuk nilai lama dan nilai barunya, karena tahu bahwa "status diubah" tidak cukup kalau tidak tahu dari apa ke apa. Dan kenapa, bagian yang paling sering dilewatkan.',
+        'Alasan adalah unsur yang paling berharga sekaligus paling jarang terisi, karena sistem biasanya tidak mewajibkannya. Padahal tanpa alasan, kamu hanya tahu bahwa sesuatu berubah, bukan apakah perubahan itu wajar. "Dipindah ke gudang cabang karena ruangan direnovasi" dan tidak ada keterangan sama sekali adalah dua hal yang sangat berbeda saat diperiksa enam bulan kemudian.',
+      ],
+    },
+    {
+      heading: 'Contoh Nyata: Riwayat Mutasi di Assets DEMO',
+      paragraphs: [
+        'Di sistem manajemen aset yang saya bahas di artikel "Cara Kerja Sistem Manajemen Aset PT Global Multiparts", setiap perpindahan ruangan, pergantian penanggung jawab, atau perubahan status fisik wajib disertai alasan mutasi. Catatannya menyimpan siapa yang mengubah, jam perubahannya, data lama, dan data baru, dan riwayat itu dicatat permanen. Saat ada audit, internal maupun eksternal, jejaknya tinggal dibuka.',
+        'Ada satu pelajaran praktis di sini: riwayat yang terus bertambah akan membuat sistem melambat kalau tidak diurus. Karena itu riwayat mutasi yang sudah lama diarsipkan di latar belakang, sementara pemakaian harian tetap cepat. Audit trail yang baik memikirkan dua hal sekaligus: lengkap untuk diperiksa, ringan untuk dipakai.',
+      ],
+    },
+    {
+      heading: 'Tiga Situasi Umum yang Terasa Bedanya',
+      paragraphs: [
+        'Tanpa audit trail, situasi seperti ini biasanya berakhir dengan saling menuding atau menyerah. Stok di sistem 40, di rak 36, dan tidak ada yang tahu ke mana 4 sisanya. Harga sebuah barang berubah, penjualan minggu itu ikut berubah, dan tidak ada yang ingat siapa yang mengubahnya atau kenapa. Sebuah laptop kantor dipinjam, dipindah, lalu dipinjamkan lagi, dan ketika dicari, tiga orang yakin barangnya ada di orang lain.',
+        'Dengan audit trail, ketiganya berubah dari perdebatan menjadi pencarian: buka riwayatnya, urutkan berdasarkan waktu, lihat di titik mana datanya berubah.',
+      ],
+    },
+    {
+      heading: 'Apakah Bisnismu Membutuhkannya?',
+      paragraphs: [
+        'Tidak setiap sistem butuh audit trail selengkap itu. Website company profile jelas tidak. Tapi sebagai pegangan, makin banyak jawaban "ya" untuk pertanyaan berikut, makin kuat alasannya. Apakah ada barang atau uang bernilai yang perlu dipertanggungjawabkan? Apakah lebih dari satu orang bisa mengubah data yang sama? Apakah pernah ada selisih yang tidak bisa dilacak asalnya? Apakah bisnismu bisa diperiksa pihak lain, seperti auditor, pemeriksa pajak, prinsipal, atau pelanggan korporat? Dan apakah ada pergantian orang yang memegang aset atau data secara berkala?',
+        'Dua atau tiga jawaban "ya" sudah cukup untuk menjadikannya bagian dari rancangan awal, bukan fitur tambahan.',
+      ],
+    },
+    {
+      heading: 'Kenapa Lebih Murah Kalau Ada dari Awal',
+      paragraphs: [
+        'Alasannya sederhana: audit trail hanya merekam apa yang terjadi setelah ia dipasang. Data bulan-bulan sebelumnya tidak akan punya riwayat apa pun, dan tidak ada cara merekonstruksinya. Menambahkannya belakangan juga berarti menyentuh setiap tempat di aplikasi yang mengubah data, jauh lebih repot daripada merancangnya sejak awal. Biayanya kecil kalau direncanakan, besar kalau ditambal.',
+        'Trade-off-nya ada di sisi pemakai: wajib mengisi alasan menambah satu langkah. Ini bisa dibuat ringan, misalnya lewat pilihan alasan yang umum ditambah kolom catatan bebas, supaya staf lapangan tidak merasa terbebani. Yang tidak kalah penting, sampaikan ke tim bahwa tujuannya akuntabilitas dan pelacakan, bukan mencari siapa yang salah.',
+      ],
+    },
+    {
+      heading: 'Pertanyaan yang Layak Diajukan ke Developer',
+      paragraphs: [
+        'Kalau kamu sedang menilai proposal sistem dan fitur ini penting buatmu, beberapa pertanyaan cukup untuk membedakan audit trail yang sungguhan dari yang sekadar tertulis di daftar fitur. Apakah catatannya menyimpan nilai lama dan nilai baru, atau hanya "data diubah"? Apakah catatan itu bisa diedit atau dihapus, dan oleh siapa? Apakah alasan perubahan bisa diwajibkan? Bagaimana riwayat dicari dan ditampilkan, misalnya per aset, per orang, atau per rentang tanggal? Dan berapa lama riwayat disimpan, serta apa yang terjadi saat datanya sudah menumpuk?',
+        'Pertanyaan semacam ini melengkapi daftar di artikel "5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer Freelance".',
+      ],
+    },
+    {
+      heading: 'Mulai dari Mana',
+      paragraphs: [
+        'Kalau bisnismu sudah punya sistem tanpa audit trail, kamu tidak perlu menunggu semuanya dibongkar. Pilih satu tempat yang paling sering bermasalah, misalnya perpindahan aset atau perubahan harga, lalu mulai mencatat di situ. Kalau sedang merencanakan sistem baru, tuliskan kebutuhan ini sejak awal di daftar fitur. Menyebutkannya di chat Zannah akan membuatnya masuk ke cakupan proposal sejak awal, bukan jadi tambahan di tengah jalan.',
+      ],
+    },
+  ],
 };

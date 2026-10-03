@@ -3,7 +3,7 @@ import profileImage from '../assets/images/profile_photo_1788181262553.jpg';
 
 export const AUTHOR_AVATAR = profileImage; 
 export const AUTHOR_BIO =
-  '7+ tahun di audit internal, sekarang juga menerima proyek freelance sebagai developer. Fokus: game multiplayer, edukasi anak, internal tools, dan AI agent. End-to-end, transparan, dan responsif.';
+  '7+ tahun pengalaman di operasional dan audit korporat, sekarang juga menerima proyek freelance sebagai developer. Fokus: game multiplayer, edukasi anak, internal tools, dan AI agent. End-to-end, transparan, dan responsif.';
 
 export const AUTHOR_SOCIALS = {
   whatsapp: 'https://wa.me/6282312312734',

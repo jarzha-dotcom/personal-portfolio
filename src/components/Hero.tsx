@@ -58,7 +58,7 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
               </h1>
 
               <p className="text-slate-200 text-xs sm:text-sm max-w-2xl leading-relaxed mb-5">
-                Indie Developer dengan latar belakang audit korporat{' '}
+                Indie Developer dengan latar belakang pengalaman di operasional dan audit korporat{' '}
                 <strong className="text-emerald-300 font-semibold">7+ tahun. </strong>
                 Menghadirkan layanan pembuatan aplikasi web, mobile, dan sistem bisnis
                 dari konsep hingga rilis, dengan standar ketelitian data tinggi dan UI

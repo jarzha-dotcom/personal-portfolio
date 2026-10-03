@@ -54,6 +54,14 @@
       "destination": "/artikel/index.html"
     },
     {
+      "source": "/artikel/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh",
+      "destination": "/artikel/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh/index.html"
+    },
+    {
+      "source": "/artikel/checklist-sebelum-konsultasi-pertama-dengan-developer",
+      "destination": "/artikel/checklist-sebelum-konsultasi-pertama-dengan-developer/index.html"
+    },
+    {
       "source": "/artikel/web-app-vs-mobile-app-vs-pwa",
       "destination": "/artikel/web-app-vs-mobile-app-vs-pwa/index.html"
     },
