@@ -58,30 +58,41 @@ interface ParsedModel {
     minor: number;
     lite: boolean;
     preview: boolean;
+    gemma?: boolean;
 }
 
 function parseModelId(id: string): ParsedModel | null {
     // Hanya keluarga flash / flash-lite teks. Pro tidak dapat Search grounding gratis; varian
     // image/tts/live/audio/robotics/dst sengaja dibuang.
+    // Gemma 4 masuk grup kuota "Default" (Search grounding 0/1.5K di AI Studio, bersama deep-research,
+    // antigravity, dst). Belum pasti mendukung tool google_search, jadi dicoba SETELAH keluarga 2.x dan
+    // SEBELUM 3.x (grup Gemini 3 = 0/0). Kalau ditolak, otomatis diistirahatkan.
+    if (/^gemma-4-[a-z0-9-]+-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
+    if (/(tts|image|live|audio|native|robotics|embedding|computer|dialog|thinking)/i.test(id)) return null;
     const m = id.match(/^gemini-(\d+)(?:\.(\d+))?-flash(-lite)?(-preview(?:-[\w.]+)?)?$/);
     if (!m) return null;
     const major = parseInt(m[1], 10);
     const minor = m[2] ? parseInt(m[2], 10) : 0;
     // Keluarga 2.0 (dan yang lebih lama) sudah dimatikan Google.
-    if (major < 2 || (major === 2 && minor < 5)) return null;
+    if (major < 2) return null;
     return { id, major, minor, lite: !!m[3], preview: !!m[4] };
 }
 
-/** Urutan: keluarga 2.5 (jatah gratis) -> 3.x; lite dulu; stabil dulu; versi lebih baru dulu. */
+/** Urutan: 2.5 -> 2.0 -> 3.x; lite dulu; stabil dulu; versi lebih baru dulu. */
 function rankModels(ids: string[]): string[] {
     const parsed = ids.map(parseModelId).filter((x): x is ParsedModel => !!x);
-    const bucket = (p: ParsedModel) => (p.major === 2 && p.minor === 5 ? 0 : 1);
+    // Jatah Search grounding tier gratis (dashboard AI Studio): grup Gemini 2.5 dan 2 = 1.5K/hari,
+    // grup Gemini 3 = 0/0 (selalu ditolak). Jadi 2.5 dulu, lalu 2.0, 3.x paling akhir.
+    // Model yang 404 ("no longer available to new users") otomatis diistirahatkan 24 jam.
+    const bucket = (p: ParsedModel) => (p.gemma ? 2 : p.major === 2 && p.minor === 5 ? 0 : p.major === 2 ? 1 : 3);
     parsed.sort((a, b) => {
         if (bucket(a) !== bucket(b)) return bucket(a) - bucket(b);
         if (a.lite !== b.lite) return a.lite ? -1 : 1;
         if (a.preview !== b.preview) return a.preview ? 1 : -1;
         if (a.major !== b.major) return b.major - a.major;
-        return b.minor - a.minor;
+        if (a.minor !== b.minor) return b.minor - a.minor;
+        // Gemma: utamakan varian MoE 26B-A4B yang lebih cepat daripada 31B.
+        return Number(/a4b/.test(b.id)) - Number(/a4b/.test(a.id));
     });
     return parsed.map((p) => p.id);
 }
@@ -130,6 +141,10 @@ async function getCandidateModels(apiKey: string): Promise<string[]> {
     if (lastGoodModel && ranked.includes(lastGoodModel)) {
         ranked = [lastGoodModel, ...ranked.filter((m) => m !== lastGoodModel)];
     }
+    // PENTING: buang model yang sedang "istirahat" SEBELUM dipotong ke MAX_CANDIDATES. Sebelumnya
+    // 5 model teratas yang mati menghabiskan semua slot, sehingga model lain yang siap tidak pernah dicoba.
+    const now = Date.now();
+    ranked = ranked.filter((m) => (modelBlockedUntil.get(m) || 0) <= now);
     return ranked.slice(0, MAX_CANDIDATES);
 }
 
@@ -287,6 +302,7 @@ function cacheSet(key: string, value: Extract<GroundedOutcome, { ok: true }>) {
     resultCache.set(key, { at: Date.now(), value });
 }
 
+
 const FAIL_PRIORITY: Record<GroundingFailReason, number> = {
     no_key: 0,
     local_cap: 0,
@@ -358,7 +374,7 @@ async function runGroundedResearchInner(
 
         // Model 2.5 flash/flash-lite: matikan "thinking" agar token output tidak habis untuk berpikir
         // (di API, thinking ikut dihitung ke maxOutputTokens dan bisa membuat jawaban kosong/terpotong).
-        const generationConfig: Record<string, unknown> = { temperature: 0.2, maxOutputTokens: 2500 };
+        const generationConfig: Record<string, unknown> = { temperature: 0.2, maxOutputTokens: 6000 };
         if (/^gemini-2\.5-flash/.test(model)) generationConfig.thinkingConfig = { thinkingBudget: 0 };
 
         try {
@@ -382,11 +398,11 @@ async function runGroundedResearchInner(
             if (!res.ok) {
                 let detail = '';
                 try {
-                    detail = (await res.text()).slice(0, 600);
+                    detail = (await res.text()).slice(0, 2500);
                 } catch {
                     // abaikan
                 }
-                console.warn(`[groundedSearch][${model}] HTTP ${res.status}: ${detail.slice(0, 200)}`);
+                console.warn(`[groundedSearch][${model}] HTTP ${res.status}: ${detail.replace(/\s+/g, ' ').slice(0, 700)}`);
                 if (res.status === 429) {
                     const cls = classifyRateError(detail);
                     modelBlockedUntil.set(model, Date.now() + cls.blockMs);
@@ -394,13 +410,16 @@ async function runGroundedResearchInner(
                     noteFail('quota');
                 } else if (res.status === 404) {
                     // Model sudah tidak ada: istirahat panjang & paksa ListModels ulang di panggilan berikutnya.
-                    modelBlockedUntil.set(model, Date.now() + 6 * 60 * 60 * 1000);
-                    discovered = null;
+                    const retired = /no longer available/i.test(detail);
+                    modelBlockedUntil.set(model, Date.now() + (retired ? 24 : 6) * 60 * 60 * 1000);
+                    // Jangan paksa ListModels ulang kalau modelnya cuma "retired for new users" (ListModels masih menampilkannya).
+                    if (!retired) discovered = null;
                     if (lastGoodModel === model) lastGoodModel = null;
                     noteFail('error');
                 } else if (res.status === 400 || res.status === 401 || res.status === 403) {
                     // Tool tidak didukung model ini / tidak ada akses / kunci bermasalah.
-                    modelBlockedUntil.set(model, Date.now() + 30 * 60 * 1000);
+                    const toolUnsupported = /search as tool is not enabled|not supported|not enabled/i.test(detail);
+                    modelBlockedUntil.set(model, Date.now() + (toolUnsupported ? 24 * 60 : 30) * 60 * 1000);
                     if (lastGoodModel === model) lastGoodModel = null;
                     noteFail('error');
                 } else {
@@ -414,7 +433,13 @@ async function runGroundedResearchInner(
             const data: any = await res.json();
             const cand = data?.candidates?.[0];
             const parts: any[] = Array.isArray(cand?.content?.parts) ? cand.content.parts : [];
-            const text = cleanText(parts.map((p) => (typeof p?.text === 'string' ? p.text : '')).join(''));
+            const text = cleanText(
+                parts
+                    .filter((p) => !p?.thought)
+                    .map((p) => (typeof p?.text === 'string' ? p.text : ''))
+                    .join('')
+                    .replace(/<\|channel\>thought[\s\S]*?<channel\|>/gi, '')
+            );
             const sources = extractSources(cand?.groundingMetadata);
             const queries: string[] = Array.isArray(cand?.groundingMetadata?.webSearchQueries)
                 ? cand.groundingMetadata.webSearchQueries.filter((q: unknown) => typeof q === 'string').slice(0, 5)

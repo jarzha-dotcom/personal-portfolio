@@ -37,6 +37,19 @@ export function clearModelCooldown(modelName: string): void {
     modelCooldownMap.delete(modelName);
 }
 
+
+/**
+ * Gabungkan SEMUA part teks jawaban (bukan thought). Model 3.x bisa memecah jawaban ke beberapa
+ * part (mis. part teks + part thoughtSignature); membaca hanya parts[0] membuat jawaban terpotong
+ * di tengah kalimat/URL tanpa error apa pun.
+ */
+function joinReplyParts(parts: any[]): string {
+    return parts
+        .filter((p) => p && !p.thought && typeof p.text === 'string')
+        .map((p) => p.text)
+        .join('');
+}
+
 export async function callGeminiModel(
     apiKey: string,
     modelName: string,
@@ -70,7 +83,9 @@ export async function callGeminiModel(
                 systemInstruction: { parts: [{ text: systemInstruction }] },
                 generationConfig: {
                     temperature: 0.85,
-                    maxOutputTokens: 2048,
+                    // Model 3.x menghitung token "thinking" ke dalam batas ini. 2048 terlalu mepet untuk
+                    // system prompt sepanjang ini; jawaban Zannah pendek jadi tarif tambahan nyaris nol.
+                    maxOutputTokens: 8192,
                     topP: 0.9,
                 },
                 safetySettings: [
@@ -98,10 +113,21 @@ export async function callGeminiModel(
         }
 
         const data = await response.json();
-        const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+        const cand = data.candidates?.[0];
+        const reply = joinReplyParts(Array.isArray(cand?.content?.parts) ? cand.content.parts : []);
+        const finishReason: string | undefined = cand?.finishReason;
+        const partCount = Array.isArray(cand?.content?.parts) ? cand.content.parts.length : 0;
+
+        // Jawaban terpotong itu HTTP 200 -> tidak pernah muncul sebagai error. Log eksplisit supaya terlihat di Vercel.
+        if (finishReason && finishReason !== 'STOP') {
+            console.warn(
+                `[geminiModels] [aistudio] ${modelName} finishReason=${finishReason} parts=${partCount} ` +
+                    `thoughtTokens=${data.usageMetadata?.thoughtsTokenCount ?? '-'} outTokens=${data.usageMetadata?.candidatesTokenCount ?? '-'} replyLen=${reply.length}`
+            );
+        }
 
         if (!reply) {
-            throw new Error('Empty response from Gemini');
+            throw new Error(`Empty response from Gemini (finishReason=${finishReason || '-'})`);
         }
 
         clearModelCooldown(modelName);
@@ -162,7 +188,7 @@ export async function callGemmaModel(
                 contents: sanitizedContents,
                 generationConfig: {
                     temperature: 0.85,
-                    maxOutputTokens: 1024,
+                    maxOutputTokens: 2048,
                     topP: 0.9,
                 },
                 safetySettings: [

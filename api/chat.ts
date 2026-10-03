@@ -331,10 +331,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Pertanyaan tentang data Mas Arzha sendiri dijawab dari prompt, BUKAN dicari di web.
         const OWN_DATA_RE = /\b(arzha|paket|zannah|portofolio|portfolio|kontak|whatsapp|b-?games|rajendra|assets\s*demo)\b/i;
 
+        // "riset lagi" / "coba cari ulang" (pendek, sengaja ditawarkan Zannah saat riset gagal) harus
+        // menjalankan ulang riset. Dulu pesan ini (10 karakter) kalah oleh gerbang panjang minimum 12,
+        // sehingga riset TIDAK jalan dan model mengarang sendiri blok <hasil_riset_web>.
+        const RESEARCH_RETRY_RE =
+            /^\s*(coba\s+|tolong\s+|ayo\s+|yuk\s+)?(riset|research|cari(in|kan)?|cek)\w*\s+(lagi|ulang)(\s+(dong|deh|ya|aja))?\s*[.!?]*\s*$/i;
+        const isResearchRetry = RESEARCH_RETRY_RE.test(sanitizedMessage);
+
         const webResearchRequested: boolean = (() => {
             // Zannah dan Rajendra sama-sama punya riset web (Kania, asisten HRD, tidak).
             if ((activePersona !== 'zannah' && activePersona !== 'rajendra') || agentMode === true) return false;
-            if (sanitizedFiles.length > 0 || rabTextAction || sanitizedMessage.trim().length < 12) return false;
+            if (sanitizedFiles.length > 0 || rabTextAction) return false;
+            if (isResearchRetry) return true;
+            if (sanitizedMessage.trim().length < 12) return false;
             const strong = WEB_RESEARCH_STRONG_RE.test(sanitizedMessage);
             if (OWN_DATA_RE.test(sanitizedMessage) && !strong) return false;
             if (strong) return true;
@@ -586,7 +595,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 .slice(-6)
                 .map((h) => `${h.role === 'user' ? 'User' : botName}: ${String(h.parts?.[0]?.text || '').replace(/\s+/g, ' ').slice(0, 300)}`)
                 .join('\n');
-            const grounded = await runGroundedResearch(aiStudioKey, sanitizedMessage, recentContext, ip);
+            // Untuk "riset lagi", pakai pertanyaan riset user yang SEBELUMNYA sebagai query.
+            const researchQuestion = isResearchRetry
+                ? String(
+                      [...rawFullHistory].reverse().find((h) => {
+                          const t = String(h.parts?.[0]?.text || '');
+                          return h.role === 'user' && WEB_RESEARCH_STRONG_RE.test(t) && !RESEARCH_RETRY_RE.test(t);
+                      })?.parts?.[0]?.text || sanitizedMessage
+                  ).slice(0, 1000)
+                : sanitizedMessage;
+            const grounded = await runGroundedResearch(aiStudioKey, researchQuestion, recentContext, ip);
 
             const lastTurn = contents[contents.length - 1] as {
                 role: string;
@@ -623,6 +641,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
+        // ── Pengaman keluaran ───────────────────────────────────────────────────
+        // 1) Blok <hasil_riset_web> hanya boleh datang dari SISTEM. Kalau model menulisnya sendiri
+        //    (riset tidak jalan/gagal tapi model "meniru" format), itu karangan: buang.
+        const stripFakeResearch = (resData: any) => {
+            if (!resData || typeof resData.reply !== 'string' || groundedSources.length > 0) return resData;
+            if (!/hasil_riset_web/i.test(resData.reply)) return resData;
+            console.warn('[chat.ts] Model menulis blok <hasil_riset_web> sendiri tanpa hasil grounding nyata; dibuang.');
+            const cleaned = resData.reply
+                .replace(/<hasil_riset_web>[\s\S]*?(<\/hasil_riset_web>|$)/gi, '')
+                .replace(/<\/?hasil_riset_web>/gi, '')
+                .trim();
+            return {
+                ...resData,
+                reply:
+                    cleaned.length > 20
+                        ? cleaned
+                        : `Maaf Kak, pencarian web belum berhasil jalan barusan, jadi ${botName} belum punya data terbaru yang bisa dipercaya untuk disampaikan. Kakak bisa ketik "riset lagi" sebentar lagi, atau langsung tanya Mas Arzha via WhatsApp ya.`,
+            };
+        };
+
+        // 2) Link WhatsApp yang terpotong di tengah URL (tanpa ")" penutup) dirender mentah oleh klien,
+        //    jadi bukan CTA. Bangun ulang link-nya dari server.
+        const WA_DANGLING_RE = /\[[^\]]*\]\(https:\/\/wa\.me\/\d+[^)]*$/;
+        const repairWaLink = (resData: any) => {
+            if (!resData || typeof resData.reply !== 'string') return resData;
+            const reply: string = resData.reply.trimEnd();
+            if (!WA_DANGLING_RE.test(reply)) return resData;
+            console.warn('[chat.ts] Link WhatsApp terpotong di balasan model; diperbaiki oleh server.');
+            const brief = encodeURIComponent(
+                `Halo Mas Arzha, saya tadi berdiskusi dengan ${botName} di website portofolio dan ingin melanjutkan pembahasan proyek.`
+            );
+            return {
+                ...resData,
+                reply:
+                    reply.replace(WA_DANGLING_RE, `[💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/6282312312734?text=${brief})`) +
+                    '\n\nNanti pas Kakak klik, ringkasan obrolan kita ikut terkirim ke Mas Arzha ya, biar beliau langsung paham konteksnya.',
+            };
+        };
+
         const appendGroundedSources = (resData: any) => {
             if (!resData || groundedSources.length === 0 || typeof resData.reply !== 'string') return resData;
             return { ...resData, reply: `${resData.reply.trim()}${formatSourcesMarkdown(groundedSources)}` };
@@ -644,7 +701,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Helper untuk kirim respons streaming SSE jika diminta & memungkinkan
         const sendResponse = async (finalData: any) => {
             const enriched = appendGroundedSources(
-                await enrichWithAgentDocument(enrichWithSummaryAttachment(attachAgentMeta(finalData)))
+                repairWaLink(
+                    stripFakeResearch(await enrichWithAgentDocument(enrichWithSummaryAttachment(attachAgentMeta(finalData))))
+                )
             );
             if (requestStream && res.socket && !res.headersSent) {
                 res.setHeader('Content-Type', 'text/event-stream');
