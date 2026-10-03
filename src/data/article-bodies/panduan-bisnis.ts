@@ -221,8 +221,20 @@ export const bodies: Record<string, ArticleBlock[]> = {
     },
     {
       heading: 'Template Singkat yang Bisa Disalin',
+      paragraphs: ['Kalau mau praktis, salin kerangka di bawah ini dan isi sebisanya:'],
+      template: [
+        'Masalah yang ingin diselesaikan: …',
+        'Jenis produk, atau siapa pemakainya dan dari perangkat apa: …',
+        'Kebutuhan inti (3 sampai 5 poin): …',
+        'Yang bagus kalau ada: …',
+        'Contoh atau berkas yang bisa dilampirkan: …',
+        'Perkiraan jumlah pemakai dan lokasi kerja: …',
+        'Target waktu: …',
+        'Kisaran anggaran (boleh "belum tahu"): …',
+      ],
+    },
+    {
       paragraphs: [
-        'Kalau mau praktis, salin kerangka ini dan isi sebisanya. Masalah yang ingin diselesaikan: … Jenis produk, atau siapa pemakainya dan dari perangkat apa: … Kebutuhan inti (3 sampai 5 poin): … Yang bagus kalau ada: … Contoh atau berkas yang bisa dilampirkan: … Perkiraan jumlah pemakai dan lokasi kerja: … Target waktu: … Kisaran anggaran (boleh "belum tahu"): …',
         'Kerangka yang sama bisa kamu tempel langsung ke chat Zannah di situs ini. Sebelum menawarkan tombol "Buatkan RAB", Zannah memang menggali tiga hal dari daftar tadi: jenis produknya, minimal dua sampai tiga kebutuhan konkret, dan indikasi target waktu atau anggaran. Makin lengkap jawabanmu di awal, makin cepat sampai ke proposal yang bisa kamu baca dan revisi. Kalau persiapanmu belum lengkap pun tidak masalah; justru untuk itu diskusi awal ada.',
       ],
     },

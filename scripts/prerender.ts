@@ -651,7 +651,15 @@ const buildArticlePage = async (article: Article) => {
       const paragraphs = block.paragraphs
         .map((p) => `<p style="${styleBodyText} margin: 0 0 1rem 0;">${escapeHtml(p)}</p>`)
         .join('\n            ');
-      return `${heading}\n            ${paragraphs}`;
+      // Kotak template (opsional): tiap baris satu isian, disalin utuh oleh
+      // pembaca. Gaya sengaja dibuat sederhana karena ini hanya shell statis
+      // untuk crawler; tampilan asli dirender komponen ArticlePage.
+      const template = block.template?.length
+        ? `<div style="${styleCard} margin: 0 0 1rem 0; background: #f8fafc;">${block.template
+            .map((line) => `<p style="${styleBodyText} margin: 0 0 0.5rem 0;">${escapeHtml(line)}</p>`)
+            .join('')}</div>`
+        : '';
+      return `${heading}\n            ${paragraphs}${template ? `\n            ${template}` : ''}`;
     })
     .join('\n            ');
 

@@ -54,6 +54,8 @@ export interface ArticleBlock {
   // Opsional — kalau diisi, dirender sebagai subheading sebelum paragrafnya.
   heading?: string;
   paragraphs: string[];
+  // Opsional — baris-baris isian yang tampil sebagai kotak template dengan tombol "Salin".
+  template?: string[];
 }
 // Kunci pilar konten — dipakai untuk mengelompokkan artikel yang temanya
 // berdekatan (beda dari `category`, yang cuma label tampilan singkat di UI).

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Clock, Calendar, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Clock, Calendar, Copy, Sparkles } from 'lucide-react';
 import { getArticleBySlug, getAdjacentArticles, type ArticleBlock } from '../data/articles';
 import { loadArticleBody } from '../data/loadArticleBody';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
@@ -25,6 +25,69 @@ const BodySkeleton: React.FC<{ darkMode: boolean }> = ({ darkMode }) => {
       {[100, 95, 88, 100, 70, 92, 60].map((w, i) => (
         <div key={i} className={`h-4 rounded ${bar}`} style={{ width: `${w}%` }} />
       ))}
+    </div>
+  );
+};
+
+// Kotak template yang bisa disalin: satu baris per isian + tombol "Salin"
+// yang menyalin semua baris sekaligus (dipisah baris baru), siap ditempel ke
+// chat atau email.
+const TemplateBox: React.FC<{ lines: string[]; darkMode: boolean }> = ({ lines, darkMode }) => {
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!copied) return;
+    const t = window.setTimeout(() => setCopied(false), 2000);
+    return () => window.clearTimeout(t);
+  }, [copied]);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(lines.join('\n'));
+      setCopied(true);
+    } catch {
+      // Clipboard API bisa ditolak (izin/HTTP). Pembaca masih bisa
+      // menyeleksi teks di kotak secara manual, jadi gagal diam-diam saja.
+    }
+  };
+
+  return (
+    <div
+      className={`not-prose rounded-2xl border p-5 sm:p-6 ${
+        darkMode ? 'bg-slate-900/80 border-slate-700' : 'bg-slate-50 border-slate-200'
+      }`}
+    >
+      <div className="flex justify-end mb-3">
+        <button
+          type="button"
+          onClick={handleCopy}
+          aria-live="polite"
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 ${
+            darkMode
+              ? 'border-teal-700/70 text-teal-300 bg-teal-950/40 hover:bg-teal-900/50 focus-visible:ring-offset-slate-900'
+              : 'border-teal-300 text-teal-800 bg-teal-50 hover:bg-teal-100'
+          }`}
+        >
+          {copied ? (
+            <Check className="w-3.5 h-3.5" aria-hidden="true" />
+          ) : (
+            <Copy className="w-3.5 h-3.5" aria-hidden="true" />
+          )}
+          {copied ? 'Tersalin' : 'Salin template'}
+        </button>
+      </div>
+      <div className="space-y-2.5">
+        {lines.map((line, k) => (
+          <p
+            key={k}
+            className={`text-sm sm:text-base leading-relaxed pl-3 border-l-2 ${
+              darkMode ? 'border-teal-500/60 text-slate-200' : 'border-teal-400 text-slate-700'
+            }`}
+          >
+            {line}
+          </p>
+        ))}
+      </div>
     </div>
   );
 };
@@ -311,6 +374,9 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
                             </p>
                           );
                         })}
+                        {block.template && block.template.length > 0 && (
+                          <TemplateBox lines={block.template} darkMode={darkMode} />
+                        )}
                       </div>
                     </React.Fragment>
                   );
