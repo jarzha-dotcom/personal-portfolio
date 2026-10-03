@@ -10,4 +10,5 @@ coverage/
 .env
 .env.local
 .audio-cache/
-public/audio/src/assets/images/*.jpeg
+public/audio/
+src/assets/images/*.jpeg
