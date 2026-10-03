@@ -338,7 +338,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             /^\s*(coba\s+|tolong\s+|ayo\s+|yuk\s+)?(riset|research|cari(in|kan)?|cek)\w*\s+(lagi|ulang)(\s+(dong|deh|ya|aja))?\s*[.!?]*\s*$/i;
         const isResearchRetry = RESEARCH_RETRY_RE.test(sanitizedMessage);
 
-        const webResearchRequested: boolean = (() => {
+        // Pertanyaan KEMAMPUAN / tanpa topik ("hi, bisa riset harga pasar ga?") BUKAN permintaan riset yang
+        // bisa dijalankan: pencarian tanpa topik cuma membuang kuota dan hasilnya ngawur. Zannah cukup
+        // menjawab "bisa" lalu menanyakan topiknya.
+        const RESEARCH_FILLER_RE =
+            /\b(hi|hai|halo|hello|hey|kak|kakak|mas|zannah|bisa|bisakah|mau|ingin|pengen|boleh|tolong|coba|dong|deh|ya|yah|ga|gak|nggak|tidak|kah|riset\w*|research|cari\w*|cek|tentang|soal|buat|untuk|apa|aja|nih|sih|dulu|pasar|pasaran|harga|data|info|informasi|terbaru|terkini|sekarang|saat|ini|itu|yang|dan|atau|di|ke|dari|berapa|gimana|bagaimana|kompetitor|pesaing|benchmark\w*|bandingkan|perbandingan|tren|trend|referensi|lagi|ulang)\b/gi;
+        const topicWordCount = (t: string) =>
+            t
+                .replace(RESEARCH_FILLER_RE, ' ')
+                .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+                .split(/\s+/)
+                .filter((w) => w.length > 2).length;
+
+        const previousResearchQuestion = isResearchRetry
+            ? String(
+                  [...rawFullHistory].reverse().find((h) => {
+                      const t = String(h.parts?.[0]?.text || '');
+                      return h.role === 'user' && WEB_RESEARCH_STRONG_RE.test(t) && !RESEARCH_RETRY_RE.test(t);
+                  })?.parts?.[0]?.text || ''
+              )
+            : '';
+        const researchQuestion = (isResearchRetry && previousResearchQuestion ? previousResearchQuestion : sanitizedMessage).slice(0, 1000);
+        // Topik boleh datang dari obrolan sebelumnya ("saya mau bikin toko online" ... lalu "riset kompetitor").
+        const priorUserTopicExists = rawFullHistory.some((h) => {
+            if (h.role !== 'user') return false;
+            const t = String(h.parts?.[0]?.text || '').trim();
+            return t !== sanitizedMessage.trim() && !RESEARCH_RETRY_RE.test(t) && topicWordCount(t) >= 2;
+        });
+
+        const researchWouldRun: boolean = (() => {
             // Zannah dan Rajendra sama-sama punya riset web (Kania, asisten HRD, tidak).
             if ((activePersona !== 'zannah' && activePersona !== 'rajendra') || agentMode === true) return false;
             if (sanitizedFiles.length > 0 || rabTextAction) return false;
@@ -349,6 +377,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             if (strong) return true;
             return WEB_FRESHNESS_RE.test(sanitizedMessage) && WEB_TOPIC_RE.test(sanitizedMessage);
         })();
+        const researchTopicVague: boolean =
+            researchWouldRun && topicWordCount(researchQuestion) === 0 && !priorUserTopicExists;
+        const webResearchRequested: boolean = researchWouldRun && !researchTopicVague;
 
         const enrichWithSummaryAttachment = (resData: any) => {
             if (!isSummaryRequested || !resData || rabTextAction) return resData;
@@ -554,7 +585,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             !rawDetectedIntent && userPreviouslyOnRabTrack && !rabAlreadyIssued;
 
         let detectedAgentIntent: AgentIntentAction | null = rawDetectedIntent;
-        if (rawDetectedIntent === 'research' && webResearchRequested) {
+        if (rawDetectedIntent === 'research' && (webResearchRequested || researchTopicVague)) {
             // Riset sudah ditangani langsung lewat grounded search (lihat bawah); jangan tawarkan
             // tombol riset agent lagi untuk permintaan yang sama, dan hemat 1 panggilan readiness.
             detectedAgentIntent = null;
@@ -595,15 +626,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 .slice(-6)
                 .map((h) => `${h.role === 'user' ? 'User' : botName}: ${String(h.parts?.[0]?.text || '').replace(/\s+/g, ' ').slice(0, 300)}`)
                 .join('\n');
-            // Untuk "riset lagi", pakai pertanyaan riset user yang SEBELUMNYA sebagai query.
-            const researchQuestion = isResearchRetry
-                ? String(
-                      [...rawFullHistory].reverse().find((h) => {
-                          const t = String(h.parts?.[0]?.text || '');
-                          return h.role === 'user' && WEB_RESEARCH_STRONG_RE.test(t) && !RESEARCH_RETRY_RE.test(t);
-                      })?.parts?.[0]?.text || sanitizedMessage
-                  ).slice(0, 1000)
-                : sanitizedMessage;
             const grounded = await runGroundedResearch(aiStudioKey, researchQuestion, recentContext, ip);
 
             const lastTurn = contents[contents.length - 1] as {
@@ -635,9 +657,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     lastTurn.parts.push({
                         text:
                             `(Catatan sistem: sistem sudah mencoba pencarian web untuk pertanyaan Kakak di atas, tapi hasilnya TIDAK tersedia: ${reasonText[grounded.reason] || 'pencarian web tidak tersedia'}. ` +
-                            `Jawab jujur: sampaikan singkat bahwa kali ini ${botName} belum bisa mengecek data web terbaru, JANGAN mengaku sudah mencari di internet. Lalu tetap bantu dengan gambaran umum dari pengetahuanmu, tandai jelas bahwa itu bukan data terbaru, dan tawarkan mencoba riset lagi nanti (Kakak tinggal minta "riset lagi").)`,
+                            `Jawab jujur: sampaikan singkat bahwa kali ini ${botName} belum bisa mengecek data web terbaru, JANGAN mengaku sudah mencari di internet. JANGAN menyebut angka, kisaran harga, atau nama pesaing dari ingatanmu (terkesan seperti data riset dan bisa salah). Cukup minta maaf singkat, tanyakan detail kebutuhan proyek Kakak, tawarkan mencoba riset lagi nanti (Kakak tinggal ketik "riset lagi") atau lanjut ngobrol langsung dengan Mas Arzha. Jangan memaksa jualan.)`,
                     });
                 }
+            }
+        }
+
+        if (!webResearchRequested && researchTopicVague) {
+            const vagueTurn = contents[contents.length - 1] as { role: string; parts: Array<{ text?: string }> };
+            if (vagueTurn?.role === 'user') {
+                vagueTurn.parts.push({
+                    text:
+                        `(Catatan sistem: Kakak menanyakan soal riset tapi BELUM menyebut topiknya, jadi sistem TIDAK menjalankan pencarian web. ` +
+                        `Jawab singkat dan ramah (2-3 kalimat): ya, ${botName} bisa riset web (harga pasar, kompetitor, tren, perbandingan teknologi). ` +
+                        `Lalu tanyakan SATU hal saja: mau riset apa, misalnya harga pasar untuk jenis proyek apa (website, aplikasi, chatbot) atau kompetitor di bidang apa. ` +
+                        `JANGAN menyebut angka/kisaran harga, JANGAN mengaku sudah atau sedang mencari, dan JANGAN menawarkan paket Mas Arzha di balasan ini.)`,
+                });
             }
         }
 
