@@ -10,4 +10,4 @@ coverage/
 .env
 .env.local
 .audio-cache/
-public/audio/
+public/audio/src/assets/images/*.jpeg
