@@ -3,19 +3,19 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-"scripts": {
-  "dev": "vite --port=3000 --host=0.0.0.0",
-  "build": "vite build",
-  "postbuild": "npm run prerender",
-  "prerender": "tsx --import ./scripts/register-asset-stub.mjs scripts/prerender.ts",
-  "upload:images": "tsx --env-file=.env.local scripts/upload-images.ts",
-  "audio": "tsx --env-file=.env.local scripts/generate-article-audio.ts",
-  "audio:upload": "tsx --env-file=.env.local scripts/generate-article-audio.ts --upload=blob",
-  "preview": "vite preview",
-  "clean": "rm -rf dist server.js",
-  "lint": "tsc --noEmit",
-  "test": "vitest run"
-}
+  "scripts": {
+    "dev": "vite --port=3000 --host=0.0.0.0",
+    "build": "vite build",
+    "postbuild": "npm run prerender",
+    "prerender": "tsx --import ./scripts/register-asset-stub.mjs scripts/prerender.ts",
+    "upload:images": "tsx --env-file=.env.local scripts/upload-images.ts",
+    "audio": "tsx --env-file=.env.local scripts/generate-article-audio.ts",
+    "audio:upload": "tsx --env-file=.env.local scripts/generate-article-audio.ts --upload=blob",
+    "preview": "vite preview",
+    "clean": "rm -rf dist server.js",
+    "lint": "tsc --noEmit",
+    "test": "vitest run"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "@types/tar-stream": "^3.1.4",
