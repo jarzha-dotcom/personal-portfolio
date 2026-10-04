@@ -1,6 +1,9 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSystemInstruction, BotPersona } from './_lib/prompts.js';
-import { classifyResearchIntent } from './_lib/researchIntent.js';
+import { classifyResearchIntent, probeClassifier, RESEARCH_INTENT_VERSION } from './_lib/researchIntent.js';
+
+// Penanda versi file ini (muncul di modal admin supaya jelas versi mana yang sedang jalan).
+const CHAT_CODE_VERSION = 'chat-2026-10-04.5';
 import {
     checkRateLimit,
     cleanupOldRateLimits,
@@ -20,6 +23,7 @@ import {
 } from './_lib/devrabClient.js';
 import {
     runGroundedResearch,
+    probeGrounding,
     formatSourcesMarkdown,
     getGroundingDiagnostics,
     type GroundedSource,
@@ -115,7 +119,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 return res.status(401).json({ error: 'INVALID_PIN' });
             }
             pinFailures.delete(callerIp);
-            return res.status(200).json(getGroundingDiagnostics());
+            const versions = { chat: CHAT_CODE_VERSION, intent: RESEARCH_INTENT_VERSION };
+            // ?probe=1 -> tes LANGSUNG tiap model grounding + klasifikator (memakai panggilan API sungguhan).
+            if (String(req.query?.probe || '') === '1') {
+                const probeKey = process.env.GEMINI_API_KEY || AISTUDIO_API_KEY;
+                const t = Math.min(30000, Math.max(5000, Number(req.query?.t) || 15000));
+                const [probe, classifier] = await Promise.all([probeGrounding(probeKey, t), probeClassifier(probeKey)]);
+                return res.status(200).json({ ...getGroundingDiagnostics(), versions, probe, classifier });
+            }
+            return res.status(200).json({ ...getGroundingDiagnostics(), versions });
         }
 
         if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
@@ -345,7 +357,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // bisa dijalankan: pencarian tanpa topik cuma membuang kuota dan hasilnya ngawur. Zannah cukup
         // menjawab "bisa" lalu menanyakan topiknya.
         const RESEARCH_FILLER_RE =
-            /\b(hi|hai|halo|hello|hey|kak|kakak|mas|zannah|bisa|bisakah|mau|ingin|pengen|boleh|tolong|coba|dong|deh|ya|yah|ga|gak|nggak|tidak|kah|riset\w*|research|cari\w*|cek|tentang|soal|buat|untuk|apa|aja|nih|sih|dulu|pasar|pasaran|harga|data|info|informasi|terbaru|terkini|sekarang|saat|ini|itu|yang|dan|atau|di|ke|dari|berapa|gimana|bagaimana|kompetitor|pesaing|benchmark\w*|bandingkan|perbandingan|tren|trend|referensi|lagi|ulang)\b/gi;
+            /\b(hi|hai|halo|hello|hey|kak|kakak|mas|zannah|bisa|bisakah|mau|ingin|pengen|boleh|tolong|coba|dong|deh|ya|yah|ga|gak|nggak|tidak|kah|riset\w*|research|cari\w*|cek|tentang|soal|buat|untuk|apa|aja|nih|sih|dulu|pasar|pasaran|harga|data|info|informasi|terbaru|terkini|sekarang|saat|ini|itu|yang|dan|atau|di|ke|dari|berapa|gimana|bagaimana|kompetitor|pesaing|benchmark\w*|bandingkan|perbandingan|tren|trend|referensi|lagi|ulang|kamu|anda|kau|aku|saya|gue|gua|gw|lu|lo|kita|kalian|mereka|dia|beliau|mampu|dapat|sanggup|bantu\w*|minta|mohon|tanya\w*|jawab\w*|kasih|beri\w*|tau|tahu|sebutkan|jelaskan|ceritakan|udah|sudah|belum|pernah|juga|kok|nah|oke|ok|iya|yaa|yuk|ayo|mas|mbak|pak|bu|bro|sis|min|admin)\b/gi;
         const topicWordCount = (t: string) =>
             t
                 .replace(RESEARCH_FILLER_RE, ' ')

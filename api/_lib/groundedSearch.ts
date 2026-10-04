@@ -359,19 +359,23 @@ async function runGroundedResearchInner(
         '(kompetitor/pemain utama, kisaran harga, fitur pembeda, tren terkini) sesuai yang diminta.';
 
     const startedAt = Date.now();
-    const TOTAL_BUDGET_MS = 14000;
+    // Gemma + google_search butuh lebih dari 11 dtk di project ini (terbukti: riset berakhir 'timeout' padahal model 2.5 &
+    // 3.x gagal cepat). Anggaran bisa diatur lewat env tanpa ubah kode; pastikan maxDuration fungsi Vercel lebih besar.
+    const TOTAL_BUDGET_MS = Math.max(8000, Number(process.env.GROUNDING_TOTAL_MS) || 18000);
     let bestFail = 'error' as GroundingFailReason;
     const noteFail = (r: GroundingFailReason) => {
         if (FAIL_PRIORITY[r] >= FAIL_PRIORITY[bestFail]) bestFail = r;
     };
     let anyApiCallMade = false;
 
+    console.log(`[groundedSearch] mulai: kandidat=[${candidates.join(', ')}] anggaran=${TOTAL_BUDGET_MS}ms q="${question.slice(0, 80).replace(/\s+/g, ' ')}"`);
     for (const model of candidates) {
+        const callStartedAt = Date.now();
         const remaining = TOTAL_BUDGET_MS - (Date.now() - startedAt);
         if (remaining < 3000) break;
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), Math.min(11000, remaining));
+        const timeoutId = setTimeout(() => controller.abort(), Math.min(TOTAL_BUDGET_MS - 2000, remaining));
 
         // Model 2.5 flash/flash-lite: matikan "thinking" agar token output tidak habis untuk berpikir
         // (di API, thinking ikut dihitung ke maxOutputTokens dan bisa membuat jawaban kosong/terpotong).
@@ -403,7 +407,7 @@ async function runGroundedResearchInner(
                 } catch {
                     // abaikan
                 }
-                console.warn(`[groundedSearch][${model}] HTTP ${res.status}: ${detail.replace(/\s+/g, ' ').slice(0, 700)}`);
+                console.warn(`[groundedSearch][${model}] HTTP ${res.status} (${Date.now() - callStartedAt}ms): ${detail.replace(/\s+/g, ' ').slice(0, 700)}`);
                 if (res.status === 429) {
                     const cls = classifyRateError(detail);
                     modelBlockedUntil.set(model, Date.now() + cls.blockMs);
@@ -456,12 +460,12 @@ async function runGroundedResearchInner(
             lastGoodModel = model;
             const value = { ok: true as const, text: text.slice(0, 2800), sources, queries, model };
             if (cacheKey) cacheSet(cacheKey, value);
-            console.log(`[groundedSearch][${model}] OK: ${sources.length} sumber, ${queries.length} query. Pemakaian lokal hari ini: ${dayCount}/${DAILY_CAP}`);
+            console.log(`[groundedSearch][${model}] OK dalam ${Date.now() - callStartedAt}ms: ${sources.length} sumber, ${queries.length} query. Pemakaian lokal hari ini: ${dayCount}/${DAILY_CAP}`);
             return value;
         } catch (err: any) {
             clearTimeout(timeoutId);
             const isTimeout = err?.name === 'AbortError';
-            console.warn(`[groundedSearch][${model}] ${isTimeout ? 'Timeout' : 'Error'}:`, isTimeout ? '' : err?.message || err);
+            console.warn(`[groundedSearch][${model}] ${isTimeout ? 'Timeout' : 'Error'} setelah ${Date.now() - callStartedAt}ms:`, isTimeout ? '' : err?.message || err);
             noteFail(isTimeout ? 'timeout' : 'error');
         }
     }
@@ -523,9 +527,120 @@ export function getGroundingDiagnostics() {
             : (process.env.GROUNDING_DISCOVERY || '').toLowerCase() === 'off'
             ? 'auto, tanpa discovery'
             : 'auto (ListModels)',
+        version: GROUNDING_CODE_VERSION,
+        fallbackModels: [...FALLBACK_MODELS],
+        env: {
+            groundingModels: !!process.env.GROUNDING_MODELS?.trim(),
+            discovery: (process.env.GROUNDING_DISCOVERY || 'on').toLowerCase(),
+            totalMs: Number(process.env.GROUNDING_TOTAL_MS) || 18000,
+        },
         stats: { ...stats, failByReason: { ...stats.failByReason } },
         instanceUptimeSec: Math.round((Date.now() - instanceStartedAt) / 1000),
     };
+}
+
+
+// ── Debug: penanda versi + tes langsung (dipakai modal admin) ─────────────────────────────
+export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.5';
+
+export interface ProbeRow {
+    model: string;
+    ok: boolean;
+    status: number | null;
+    ms: number;
+    sources: number;
+    queries: number;
+    textLen: number;
+    finishReason?: string;
+    error?: string;
+    restingNow?: string;
+}
+
+export interface ProbeResult {
+    source: 'env' | 'discovery' | 'fallback' | 'no_key';
+    listedCount: number;
+    listedGemma: string[];
+    discoveryFailed: boolean;
+    timeoutMs: number;
+    rows: ProbeRow[];
+}
+
+async function probeOne(apiKey: string, model: string, timeoutMs: number): Promise<ProbeRow> {
+    const startedAt = Date.now();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    const row: ProbeRow = { model, ok: false, status: null, ms: 0, sources: 0, queries: 0, textLen: 0 };
+    const until = modelBlockedUntil.get(model) || 0;
+    if (until > Date.now()) row.restingNow = `${Math.ceil((until - Date.now()) / 60000)} menit lagi`;
+    try {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+            signal: controller.signal,
+            body: JSON.stringify({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: 'Cari di web: berapa kisaran harga domain .id per tahun di Indonesia saat ini? Jawab singkat.' }],
+                    },
+                ],
+                tools: [{ google_search: {} }],
+                generationConfig: { temperature: 0.2, maxOutputTokens: 1024 },
+            }),
+        });
+        clearTimeout(timeoutId);
+        row.status = res.status;
+        if (!res.ok) {
+            const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ');
+            row.error = body.slice(0, 260);
+        } else {
+            const data: any = await res.json();
+            const cand = data?.candidates?.[0];
+            const parts: any[] = Array.isArray(cand?.content?.parts) ? cand.content.parts : [];
+            row.textLen = parts.filter((p) => !p?.thought).map((p) => (typeof p?.text === 'string' ? p.text : '')).join('').length;
+            row.finishReason = cand?.finishReason;
+            row.sources = Array.isArray(cand?.groundingMetadata?.groundingChunks) ? cand.groundingMetadata.groundingChunks.length : 0;
+            row.queries = Array.isArray(cand?.groundingMetadata?.webSearchQueries) ? cand.groundingMetadata.webSearchQueries.length : 0;
+            row.ok = row.sources > 0;
+            if (!row.ok) row.error = row.textLen > 0 ? 'Model menjawab TANPA sumber web (tool pencarian tidak dipakai/tidak didukung)' : 'Respons kosong';
+        }
+    } catch (err: any) {
+        clearTimeout(timeoutId);
+        row.error = err?.name === 'AbortError' ? `Timeout (> ${timeoutMs}ms)` : String(err?.message || err).slice(0, 200);
+    }
+    row.ms = Date.now() - startedAt;
+    return row;
+}
+
+/**
+ * Tes LANGSUNG ke semua model kandidat (paralel), tanpa memengaruhi status istirahat/kuota lokal.
+ * Memakai panggilan API sungguhan (maks 6), jadi hanya dipanggil dari modal admin berPIN.
+ */
+export async function probeGrounding(apiKey: string | undefined, timeoutMs = 15000): Promise<ProbeResult> {
+    const base: ProbeResult = { source: 'no_key', listedCount: 0, listedGemma: [], discoveryFailed: false, timeoutMs, rows: [] };
+    if (!apiKey) return base;
+
+    let ids: string[] = [];
+    const env = process.env.GROUNDING_MODELS;
+    if (env && env.trim()) {
+        base.source = 'env';
+        ids = env.split(',').map((x) => x.trim()).filter(Boolean);
+    } else {
+        const found = await discoverModelIds(apiKey);
+        if (found) {
+            discovered = { at: Date.now(), ids: found };
+            base.source = 'discovery';
+            base.listedCount = found.length;
+            base.listedGemma = found.filter((m) => /gemma/i.test(m));
+            ids = rankModels(found);
+        } else {
+            base.source = 'fallback';
+            base.discoveryFailed = true;
+            ids = [...FALLBACK_MODELS];
+        }
+    }
+    base.rows = await Promise.all(ids.slice(0, 6).map((m) => probeOne(apiKey, m, timeoutMs)));
+    return base;
 }
 
 /** Khusus pengujian. */

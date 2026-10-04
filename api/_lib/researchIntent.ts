@@ -123,4 +123,15 @@ export async function classifyResearchIntent(
     return null;
 }
 
+export const RESEARCH_INTENT_VERSION = 'intent-2026-10-04.5';
+
+/** Debug (modal admin): jalankan klasifikator sekali dan ukur waktunya. */
+export async function probeClassifier(apiKey: string | undefined) {
+    if (!apiKey) return { version: RESEARCH_INTENT_VERSION, ms: 0, verdict: null, note: 'no_key' };
+    const t = Date.now();
+    const verdict = await classifyResearchIntent(apiKey, 'berapa harga domain .id sekarang?', 'User: halo');
+    const resting = [...cooldownUntil.entries()].filter(([, v]) => v > Date.now()).map(([k, v]) => `${k}: ${Math.ceil((v - Date.now()) / 60000)} mnt`);
+    return { version: RESEARCH_INTENT_VERSION, ms: Date.now() - t, verdict, note: resting.length ? `istirahat: ${resting.join(', ')}` : '' };
+}
+
 export const __test = { parseVerdict };

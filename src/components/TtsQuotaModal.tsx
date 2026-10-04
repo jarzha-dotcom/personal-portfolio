@@ -22,6 +22,10 @@ interface GroundingStatus {
   cacheSize: number;
   ipHourlyCap: number;
   mode: string;
+  version?: string;
+  versions?: { chat: string; intent: string };
+  fallbackModels?: string[];
+  env?: { groundingModels: boolean; discovery: string; totalMs: number };
   stats: {
     ok: number;
     cached: number;
@@ -30,6 +34,31 @@ interface GroundingStatus {
     lastResult: null | { at: string; ok: boolean; model?: string; reason?: string; sources?: number };
   };
   instanceUptimeSec: number;
+}
+
+interface ProbeRow {
+  model: string;
+  ok: boolean;
+  status: number | null;
+  ms: number;
+  sources: number;
+  queries: number;
+  textLen: number;
+  finishReason?: string;
+  error?: string;
+  restingNow?: string;
+}
+
+interface ProbeResponse {
+  probe: {
+    source: string;
+    listedCount: number;
+    listedGemma: string[];
+    discoveryFailed: boolean;
+    timeoutMs: number;
+    rows: ProbeRow[];
+  };
+  classifier: { version: string; ms: number; verdict: null | { needsWeb: boolean; clarify: boolean }; note?: string };
 }
 
 interface TtsQuotaModalProps {
@@ -77,6 +106,33 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
   const [search, setSearch] = useState<GroundingStatus | null>(null);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [searchLoading, setSearchLoading] = useState(false);
+  const [probe, setProbe] = useState<ProbeResponse | null>(null);
+  const [probeLoading, setProbeLoading] = useState(false);
+  const [probeError, setProbeError] = useState<string | null>(null);
+
+  // Tes LANGSUNG: server memanggil tiap model grounding + klasifikator sungguhan (maks ~6 panggilan API).
+  const runProbe = async () => {
+    setProbeLoading(true);
+    setProbeError(null);
+    try {
+      const res = await fetch('/api/chat?view=grounding&probe=1&t=15000', {
+        method: 'GET',
+        headers: { 'x-tts-usage-pin': pin },
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        setProbeError(`Tes gagal (HTTP ${res.status}). Kalau 504, naikkan maxDuration fungsi atau kecilkan &t=.`);
+        return;
+      }
+      const json = (await res.json()) as ProbeResponse & GroundingStatus;
+      setProbe({ probe: json.probe, classifier: json.classifier });
+      setSearch(json);
+    } catch {
+      setProbeError('Gagal konek ke server (mungkin kena batas waktu fungsi).');
+    } finally {
+      setProbeLoading(false);
+    }
+  };
 
   // Status riset web (Search Grounding). Dipisah dari kuota TTS supaya kegagalannya
   // (mis. endpoint belum terdeploy) TIDAK menghalangi tampilan kuota TTS. PIN yang sama
@@ -266,6 +322,20 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
                         <span className="text-slate-200 text-right">{search.mode}</span>
                       </div>
                       <div className="flex justify-between gap-3">
+                        <span className="text-slate-400">Versi kode di server</span>
+                        <span className="font-mono text-slate-200 text-right text-[10px] leading-tight">
+                          {search.version ? (
+                            <>
+                              {search.version}
+                              <br />
+                              {search.versions?.chat} · {search.versions?.intent}
+                            </>
+                          ) : (
+                            'tidak ada penanda (kode lama)'
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex justify-between gap-3">
                         <span className="text-slate-400">Cache hasil</span>
                         <span className="text-slate-200">{fmt(search.cacheSize)} entri</span>
                       </div>
@@ -320,6 +390,64 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
                             ? `berhasil (${stats.lastResult.model}, ${stats.lastResult.sources} sumber)`
                             : `gagal (${FAIL_LABEL[stats.lastResult.reason || ''] || stats.lastResult.reason})`}
                         </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => void runProbe()}
+                        disabled={probeLoading}
+                        className="w-full bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-teal-300 text-xs font-semibold py-2 rounded-lg flex items-center justify-center gap-1.5 border border-slate-700"
+                      >
+                        {probeLoading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Menguji model (sampai ~15 dtk)...
+                          </>
+                        ) : (
+                          'Tes riset langsung'
+                        )}
+                      </button>
+                      {probeError && <p className="text-xs text-red-400">{probeError}</p>}
+                      {probe && (
+                        <div className="text-[11px] space-y-2">
+                          <p className="text-slate-400">
+                            Sumber daftar: <span className="text-slate-200">{probe.probe.source}</span>
+                            {probe.probe.discoveryFailed ? ' (ListModels gagal)' : ` (${probe.probe.listedCount} model terdaftar)`}
+                            {' · '}Gemma di ListModels:{' '}
+                            <span className="text-slate-200 font-mono">
+                              {probe.probe.listedGemma.length ? probe.probe.listedGemma.join(', ') : 'tidak ada'}
+                            </span>
+                          </p>
+                          <ul className="space-y-1.5">
+                            {probe.probe.rows.map((r) => (
+                              <li key={r.model} className="rounded border border-slate-800 bg-slate-950/60 px-2 py-1.5">
+                                <div className="flex items-center justify-between gap-2">
+                                  <span className="font-mono text-slate-200 truncate">{r.model}</span>
+                                  <span className={r.ok ? 'text-teal-300 shrink-0' : 'text-red-300 shrink-0'}>
+                                    {r.ok ? `OK · ${r.sources} sumber` : `GAGAL${r.status ? ` · ${r.status}` : ''}`} · {fmt(r.ms)} ms
+                                  </span>
+                                </div>
+                                {(r.error || r.finishReason || r.restingNow) && (
+                                  <p className="text-slate-500 break-words mt-0.5">
+                                    {r.restingNow ? `[istirahat ${r.restingNow}] ` : ''}
+                                    {r.finishReason && r.finishReason !== 'STOP' ? `finish=${r.finishReason} ` : ''}
+                                    {r.error || ''}
+                                  </p>
+                                )}
+                              </li>
+                            ))}
+                          </ul>
+                          <div className="flex justify-between gap-3">
+                            <span className="text-slate-400">Klasifikator niat (Gemma)</span>
+                            <span className="text-slate-200 text-right">
+                              {probe.classifier.verdict
+                                ? `needs_web=${String(probe.classifier.verdict.needsWeb)} · ${fmt(probe.classifier.ms)} ms`
+                                : `gagal/timeout · ${fmt(probe.classifier.ms)} ms`}
+                              {probe.classifier.note ? ` · ${probe.classifier.note}` : ''}
+                            </span>
+                          </div>
+                        </div>
                       )}
                     </div>
 
