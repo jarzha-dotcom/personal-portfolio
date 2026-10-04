@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getSystemInstruction, BotPersona } from './_lib/prompts.js';
+import { classifyResearchIntent } from './_lib/researchIntent.js';
 import {
     checkRateLimit,
     cleanupOldRateLimits,
@@ -325,9 +326,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Gemini API, bukan kuota Antigravity), lalu Zannah menuturkan hasilnya + sumber.
         const WEB_RESEARCH_STRONG_RE =
             /\b(riset|research|kompetitor|pesaing|benchmark(ing)?|bandingkan|perbandingan|harga\s*pasar(an)?|pasaran|tren|trend)\w*|\bcari(kan|in)?\s+(tahu|tau|info|informasi|data|referensi|berita)\b|\bcarikan\b/i;
-        const WEB_FRESHNESS_RE = /\b(terbaru|terkini|saat\s*ini|2025|2026)\b/i;
+        // Penanda "butuh data aktual/pasar": kata waktu, kata superlatif harga, atau permintaan sumber.
+        const WEB_FRESHNESS_RE =
+            /\b(terbaru|terkini|saat\s*ini|sekarang|skrg|hari\s*ini|bulan\s*ini|tahun\s*ini|kini|2025|2026|2027|termurah|paling\s+murah|rata-?rata|kisaran|di\s+pasaran|sebutkan\s+sumber\w*|sumbernya|sertakan\s+sumber\w*|cantumkan\s+sumber\w*|beserta\s+sumber\w*|dari\s+mana\s+(data|angka|sumber)\w*)\b/i;
         const WEB_TOPIC_RE =
-            /\b(harga|fitur|versi|teknologi|framework|library|tools?|aplikasi|platform|pasar|vendor|layanan|regulasi|aturan|pajak|hosting|cloud|ai|model)\b/i;
+            /\b(harga|fitur|versi|teknologi|framework|library|tools?|aplikasi|platform|pasar|vendor|layanan|regulasi|aturan|pajak|hosting|cloud|ai|model|website|web|situs|biaya|tarif|jasa|murah|domain|chatbot|software|developer|freelance|agensi|toko\s+online|e-?commerce|mobile|vps|server|ssl|seo)\b/i;
         // Pertanyaan tentang data Mas Arzha sendiri dijawab dari prompt, BUKAN dicari di web.
         const OWN_DATA_RE = /\b(arzha|paket|zannah|portofolio|portfolio|kontak|whatsapp|b-?games|rajendra|assets\s*demo)\b/i;
 
@@ -358,7 +361,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                   })?.parts?.[0]?.text || ''
               )
             : '';
-        const researchQuestion = (isResearchRetry && previousResearchQuestion ? previousResearchQuestion : sanitizedMessage).slice(0, 1000);
+        let researchQuestion = (isResearchRetry && previousResearchQuestion ? previousResearchQuestion : sanitizedMessage).slice(0, 1000);
         // Topik boleh datang dari obrolan sebelumnya ("saya mau bikin toko online" ... lalu "riset kompetitor").
         const priorUserTopicExists = rawFullHistory.some((h) => {
             if (h.role !== 'user') return false;
@@ -366,19 +369,56 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return t !== sanitizedMessage.trim() && !RESEARCH_RETRY_RE.test(t) && topicWordCount(t) >= 2;
         });
 
-        const researchWouldRun: boolean = (() => {
+        // Kata tanya soal angka/ketersediaan/perbandingan: tanda pesan MUNGKIN butuh data aktual.
+        const MARKET_Q_RE =
+            /\b(berapa|harga|biaya|tarif|murah|mahal|naik|turun|bandingkan|banding|vs|versus|gratis|masih\s+(ada|jalan|berlaku|bisa)|rilis|update|tersedia|kuota|limit|pricing|gaji)\b/i;
+        // Pesan lanjutan dari utas riset: balasan bot sebelumnya berisi sumber riset / pengakuan riset gagal.
+        const lastBotTextForResearch = String([...rawFullHistory].reverse().find((h) => h.role !== 'user')?.parts?.[0]?.text || '');
+        const researchThreadActive = /sumber riset web|belum bisa mengecek data web|pencarian web|riset lagi/i.test(lastBotTextForResearch);
+
+        // 'yes' = pasti riset, 'no' = pasti tidak, 'gray' = ambigu -> diputuskan model kecil (Gemma).
+        const researchGate: 'yes' | 'no' | 'gray' = (() => {
             // Zannah dan Rajendra sama-sama punya riset web (Kania, asisten HRD, tidak).
-            if ((activePersona !== 'zannah' && activePersona !== 'rajendra') || agentMode === true) return false;
-            if (sanitizedFiles.length > 0 || rabTextAction) return false;
-            if (isResearchRetry) return true;
-            if (sanitizedMessage.trim().length < 12) return false;
+            if ((activePersona !== 'zannah' && activePersona !== 'rajendra') || agentMode === true) return 'no';
+            if (sanitizedFiles.length > 0 || rabTextAction) return 'no';
+            if (isResearchRetry) return 'yes';
+            if (sanitizedMessage.trim().length < 12 && !researchThreadActive) return 'no';
             const strong = WEB_RESEARCH_STRONG_RE.test(sanitizedMessage);
-            if (OWN_DATA_RE.test(sanitizedMessage) && !strong) return false;
-            if (strong) return true;
-            return WEB_FRESHNESS_RE.test(sanitizedMessage) && WEB_TOPIC_RE.test(sanitizedMessage);
+            if (OWN_DATA_RE.test(sanitizedMessage) && !strong) return 'no';
+            if (strong) return 'yes';
+            if (WEB_FRESHNESS_RE.test(sanitizedMessage) || MARKET_Q_RE.test(sanitizedMessage) || researchThreadActive) return 'gray';
+            return 'no';
         })();
+
+        let researchWouldRun: boolean = researchGate === 'yes';
+        let researchClarify = false;
+        // Riset SPEKULATIF: untuk pesan abu-abu, pencarian dimulai BERSAMAAN dengan klasifikasi (Gemma ~6-7 dtk)
+        // supaya waktu tunggu tidak menumpuk. Kalau klasifikator bilang tidak perlu, hasilnya dibuang.
+        let speculativeResearch: ReturnType<typeof runGroundedResearch> | null = null;
+        if (researchGate === 'gray') {
+            const ctxForGate = rawFullHistory
+                .slice(-6)
+                .map((h) => `${h.role === 'user' ? 'User' : botName}: ${String(h.parts?.[0]?.text || '').replace(/\s+/g, ' ').slice(0, 300)}`)
+                .join('\n');
+            if (aiStudioKey) {
+                speculativeResearch = runGroundedResearch(aiStudioKey, researchQuestion, ctxForGate, ip);
+                void speculativeResearch.catch(() => undefined); // cegah unhandled rejection kalau hasilnya dibuang
+            }
+            const verdict = aiStudioKey ? await classifyResearchIntent(aiStudioKey, sanitizedMessage, ctxForGate) : null;
+            if (verdict) {
+                if (verdict.clarify) {
+                    researchClarify = true;
+                } else if (verdict.needsWeb) {
+                    researchWouldRun = true;
+                }
+            } else {
+                // Model penentu gagal: condong ke RISET (jawaban karangan lebih merugikan daripada pencarian ekstra),
+                // tapi hanya kalau ada kata topik teknis/bisnis atau ini lanjutan utas riset.
+                researchWouldRun = WEB_TOPIC_RE.test(sanitizedMessage) || researchThreadActive;
+            }
+        }
         const researchTopicVague: boolean =
-            researchWouldRun && topicWordCount(researchQuestion) === 0 && !priorUserTopicExists;
+            researchClarify || (researchWouldRun && topicWordCount(researchQuestion) === 0 && !priorUserTopicExists);
         const webResearchRequested: boolean = researchWouldRun && !researchTopicVague;
 
         const enrichWithSummaryAttachment = (resData: any) => {
@@ -626,7 +666,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 .slice(-6)
                 .map((h) => `${h.role === 'user' ? 'User' : botName}: ${String(h.parts?.[0]?.text || '').replace(/\s+/g, ' ').slice(0, 300)}`)
                 .join('\n');
-            const grounded = await runGroundedResearch(aiStudioKey, researchQuestion, recentContext, ip);
+            const grounded = speculativeResearch ? await speculativeResearch : await runGroundedResearch(aiStudioKey, researchQuestion, recentContext, ip);
 
             const lastTurn = contents[contents.length - 1] as {
                 role: string;
@@ -715,6 +755,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             };
         };
 
+        // 3) Model kadang menulis "berdasarkan riset ... (Niagahoster/Fastwork)" padahal TIDAK ada hasil pencarian
+        //    nyata (riset tidak terpicu atau gagal). Angka & nama sumber itu karangan: beri label jelas.
+        const UNVERIFIED_CLAIM_RE =
+            /(berdasarkan|menurut|sesuai|bersumber|dari)\s+(hasil\s+)?(riset|pencarian|survei|survey|data)\s+(pasar|web|internet|terbaru|terkini|agensi|platform)|(berdasarkan|menurut|bersumber|sumber)[^.\n]{0,80}(niagahoster|qwords|fastwork|jagoanhosting|sribulancer|upwork|glints|dewaweb|rumahweb|hostinger|idcloudhost)/i;
+        const flagUnverifiedClaims = (resData: any) => {
+            if (!resData || typeof resData.reply !== 'string' || groundedSources.length > 0) return resData;
+            if (!UNVERIFIED_CLAIM_RE.test(resData.reply)) return resData;
+            console.warn('[chat.ts] Balasan mengklaim hasil riset/sumber pasar tanpa hasil pencarian nyata; diberi label.');
+            return {
+                ...resData,
+                reply:
+                    '⚠️ *Catatan: angka dan nama sumber pasar di bawah ini BELUM diverifikasi lewat pencarian web (bukan data terbaru), jadi anggap hanya perkiraan umum.*\n\n' +
+                    resData.reply,
+            };
+        };
+
         const appendGroundedSources = (resData: any) => {
             if (!resData || groundedSources.length === 0 || typeof resData.reply !== 'string') return resData;
             return { ...resData, reply: `${resData.reply.trim()}${formatSourcesMarkdown(groundedSources)}` };
@@ -737,7 +793,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const sendResponse = async (finalData: any) => {
             const enriched = appendGroundedSources(
                 repairWaLink(
-                    stripFakeResearch(await enrichWithAgentDocument(enrichWithSummaryAttachment(attachAgentMeta(finalData))))
+                    flagUnverifiedClaims(
+                        stripFakeResearch(await enrichWithAgentDocument(enrichWithSummaryAttachment(attachAgentMeta(finalData))))
+                    )
                 )
             );
             if (requestStream && res.socket && !res.headersSent) {

@@ -45,7 +45,7 @@ export type GroundedOutcome =
     | { ok: false; reason: GroundingFailReason };
 
 // Daftar cadangan kalau ListModels gagal/kosong. Model yang sudah tidak ada otomatis dilewati (404).
-const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemma-4-26b-a4b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
 const MAX_CANDIDATES = 5;
 const MODEL_LIST_TTL_MS = 6 * 60 * 60 * 1000;
 
@@ -67,7 +67,8 @@ function parseModelId(id: string): ParsedModel | null {
     // Gemma 4 masuk grup kuota "Default" (Search grounding 0/1.5K di AI Studio, bersama deep-research,
     // antigravity, dst). Belum pasti mendukung tool google_search, jadi dicoba SETELAH keluarga 2.x dan
     // SEBELUM 3.x (grup Gemini 3 = 0/0). Kalau ditolak, otomatis diistirahatkan.
-    if (/^gemma-4-[a-z0-9-]+-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
+    // Hanya 26B-A4B: 31B terlalu lambat untuk batas waktu serverless.
+    if (/^gemma-4-26b-a4b-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
     if (/(tts|image|live|audio|native|robotics|embedding|computer|dialog|thinking)/i.test(id)) return null;
     const m = id.match(/^gemini-(\d+)(?:\.(\d+))?-flash(-lite)?(-preview(?:-[\w.]+)?)?$/);
     if (!m) return null;
