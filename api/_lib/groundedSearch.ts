@@ -45,7 +45,7 @@ export type GroundedOutcome =
     | { ok: false; reason: GroundingFailReason };
 
 // Daftar cadangan kalau ListModels gagal/kosong. Model yang sudah tidak ada otomatis dilewati (404).
-const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemma-4-26b-a4b-it', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
 const MAX_CANDIDATES = 5;
 const MODEL_LIST_TTL_MS = 6 * 60 * 60 * 1000;
 
@@ -68,7 +68,8 @@ function parseModelId(id: string): ParsedModel | null {
     // antigravity, dst). Belum pasti mendukung tool google_search, jadi dicoba SETELAH keluarga 2.x dan
     // SEBELUM 3.x (grup Gemini 3 = 0/0). Kalau ditolak, otomatis diistirahatkan.
     // Hanya 26B-A4B: 31B terlalu lambat untuk batas waktu serverless.
-    if (/^gemma-4-26b-a4b-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
+    // Opt-in (GROUNDING_ALLOW_GEMMA=1): di log produksi Gemma + google_search timeout berulang (11 dtk & 15 dtk).
+    if (process.env.GROUNDING_ALLOW_GEMMA === '1' && /^gemma-4-26b-a4b-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
     if (/(tts|image|live|audio|native|robotics|embedding|computer|dialog|thinking)/i.test(id)) return null;
     const m = id.match(/^gemini-(\d+)(?:\.(\d+))?-flash(-lite)?(-preview(?:-[\w.]+)?)?$/);
     if (!m) return null;
@@ -367,7 +368,7 @@ async function runGroundedResearchInner(
     const startedAt = Date.now();
     // Gemma + google_search butuh lebih dari 11 dtk di project ini (terbukti: riset berakhir 'timeout' padahal model 2.5 &
     // 3.x gagal cepat). Anggaran bisa diatur lewat env tanpa ubah kode; pastikan maxDuration fungsi Vercel lebih besar.
-    const TOTAL_BUDGET_MS = Math.max(8000, Number(process.env.GROUNDING_TOTAL_MS) || 18000);
+    const TOTAL_BUDGET_MS = Math.max(8000, Number(process.env.GROUNDING_TOTAL_MS) || 15000);
     let bestFail = 'error' as GroundingFailReason;
     const noteFail = (r: GroundingFailReason) => {
         if (FAIL_PRIORITY[r] >= FAIL_PRIORITY[bestFail]) bestFail = r;
@@ -473,6 +474,12 @@ async function runGroundedResearchInner(
             const isTimeout = err?.name === 'AbortError';
             console.warn(`[groundedSearch][${model}] ${isTimeout ? 'Timeout' : 'Error'} setelah ${Date.now() - callStartedAt}ms:`, isTimeout ? '' : err?.message || err);
             noteFail(isTimeout ? 'timeout' : 'error');
+            // Model yang timeout diistirahatkan supaya permintaan berikutnya TIDAK ikut menunggu belasan detik
+            // lagi (sebelumnya satu model macet menghabiskan seluruh anggaran waktu di setiap riset).
+            if (isTimeout) {
+                modelBlockedUntil.set(model, Date.now() + 20 * 60 * 1000);
+                console.warn(`[groundedSearch][${model}] diistirahatkan 20 menit karena timeout.`);
+            }
         }
     }
 
@@ -546,7 +553,7 @@ export function getGroundingDiagnostics() {
         env: {
             groundingModels: !!process.env.GROUNDING_MODELS?.trim(),
             discovery: (process.env.GROUNDING_DISCOVERY || 'on').toLowerCase(),
-            totalMs: Number(process.env.GROUNDING_TOTAL_MS) || 18000,
+            totalMs: Number(process.env.GROUNDING_TOTAL_MS) || 15000,
         },
         stats: { ...stats, failByReason: { ...stats.failByReason } },
         instanceUptimeSec: Math.round((Date.now() - instanceStartedAt) / 1000),
@@ -555,7 +562,7 @@ export function getGroundingDiagnostics() {
 
 
 // ── Debug: penanda versi + tes langsung (dipakai modal admin) ─────────────────────────────
-export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.6';
+export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.7';
 
 export interface ProbeRow {
     model: string;
@@ -653,7 +660,13 @@ export async function probeGrounding(apiKey: string | undefined, timeoutMs = 150
             ids = [...FALLBACK_MODELS];
         }
     }
-    base.rows = await Promise.all(ids.slice(0, 6).map((m) => probeOne(apiKey, m, timeoutMs)));
+    // Kandidat TAMBAHAN yang sengaja diuji: model "Default" di dashboard (grup kuota Search grounding 1.5K/hari).
+    // Gemini Robotics-ER adalah keluarga Gemini (bukan Gemma) dan dokumentasinya menyebut dukungan Search grounding.
+    const extras = ['gemini-robotics-er-2-preview', 'gemini-robotics-er-1.6-preview', 'gemini-robotics-er-1.5-preview'].filter(
+        (m) => !ids.includes(m) && (base.source !== 'discovery' || base.listedCount === 0 || (discovered?.ids || []).includes(m))
+    );
+    const toProbe = [...ids.slice(0, 6), ...extras];
+    base.rows = await Promise.all(toProbe.map((m) => probeOne(apiKey, m, timeoutMs)));
     return base;
 }
 
