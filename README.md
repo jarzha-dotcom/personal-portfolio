@@ -67,7 +67,20 @@ Saya menerapkan arsitektur **Cadangan Bertingkat (*Cascade AI System*)**:
 
 ---
 
-### 5. 🎮 Showcase Proyek Nyata yang Sudah Live & Siap Anda Uji
+### 5. 🎨 Galeri Demo Desain Landing Page
+*Kunjungi: [arzhaning.my.id/demos](https://arzhaning.my.id/demos)*
+
+Saya menyediakan galeri **prototipe desain landing page** orisinal untuk berbagai jenis bisnis sebagai referensi nyata kualitas pengerjaan saya:
+
+*   **16+ Kategori Bisnis**: Bengkel, klinik estetika, klinik gigi, bimbel, gym, kedai kopi, salon, petshop, ekspedisi, wedding organizer, galeri seni, laundry, rental mobil, kontraktor, toko kue, distributor sparepart.
+*   **Desain Premium & Responsif**: Setiap prototipe dibangun dengan standar desain modern — dark/light mode, animasi halus, dan 100% mobile-friendly.
+*   **Self-Contained Single File**: Masing-masing demo adalah satu file HTML mandiri — tidak ada dependensi eksternal yang harus diinstal.
+
+> ⚠️ **Perlindungan Hak Cipta**: Seluruh file desain di `public/demos/` dilindungi hak cipta penuh. Setiap file tertanam *watermark* berlapis (visual badge, MutationObserver respawn, meta tag, dan console banner) yang tidak dapat dihapus tanpa melanggar lisensi. Lihat bagian [Lisensi & Hak Cipta](#️-lisensi--hak-cipta) di bawah.
+
+---
+
+### 6. 🎮 Showcase Proyek Nyata yang Sudah Live & Siap Anda Uji
 Saya lebih percaya pada bukti nyata daripada sekadar janji. Berikut adalah beberapa aplikasi berskala penuh karya saya yang sedang aktif dan bisa langsung Anda akses:
 
 1.  **🎲 B-Games — Arena Game Papan Klasik Digital Multiplayer Online**  
@@ -118,6 +131,49 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 
 ---
 
+## 🛡️ Lisensi & Hak Cipta
+
+Repository ini berstatus **publik untuk tujuan evaluasi portofolio** — bukan open source. Seluruh konten dilindungi di bawah lisensi **Proprietary & Confidential** (lihat file [LICENSE](./LICENSE)).
+
+### File Demo Desain (`public/demos/`)
+File-file desain landing page di folder ini adalah **karya orisinal eksklusif** K. Arzhaning Jagad:
+- ❌ **Dilarang** menyalin, mendistribusikan, menggunakan sebagai template, atau menjual ulang
+- ❌ **Dilarang** menghapus, memodifikasi, atau mengelak dari watermark hak cipta
+- ✅ **Diizinkan** melihat sebagai referensi kualitas untuk tujuan evaluasi jasa
+
+Pelanggaran akan ditindaklanjuti melalui **DMCA takedown** dan jalur hukum yang berlaku.
+
+---
+
+## 🔧 Developer Notes (Untuk Pengembang)
+
+### Menjalankan Project Secara Lokal
+```bash
+npm install
+npm run dev
+```
+
+### Script yang Tersedia
+| Script | Perintah | Keterangan |
+| :--- | :--- | :--- |
+| Dev server | `npm run dev` | Jalankan di `localhost:3000` |
+| Build produksi | `npm run build` | Output ke `/dist` |
+| Prerender SSG | `npm run prerender` | Dijalankan otomatis setelah build |
+| Lint TypeScript | `npm run lint` | Cek tipe tanpa emit |
+| Unit test | `npm run test` | Jalankan Vitest |
+| **Watermark demo** | **`npm run demo:watermark`** | **Inject watermark ke semua `demo-*.html` baru** |
+| Watermark (force) | `npm run demo:watermark -- --force` | Update ulang watermark di semua file demo |
+
+> **Setelah menambahkan file demo baru**, selalu jalankan `npm run demo:watermark` sebelum commit.
+
+### Variabel Environment
+Salin `.env.example` menjadi `.env.local` dan isi nilai yang diperlukan:
+```bash
+cp .env.example .env.local
+```
+
+---
+
 ## 💼 Layanan Jasa yang Saya Tawarkan
 
 Saya siap membantu mewujudkan kebutuhan digital bisnis Anda, mulai dari tahap konsultasi konsep hingga aplikasi siap pakai:
@@ -144,4 +200,5 @@ Punya ide aplikasi, ingin mengotomatiskan alur kerja bisnis, atau ingin memasang
 
 ---
 
-*Hak Cipta © 2026 K. Arzhaning Jagad (Arzha). Seluruh hak cipta dilindungi undang-undang.*
+*Hak Cipta © 2026 K. Arzhaning Jagad (Arzha). Seluruh hak cipta dilindungi undang-undang.*  
+*File desain di `public/demos/` dilindungi tambahan — lihat [LICENSE](./LICENSE) untuk detail lengkap.*

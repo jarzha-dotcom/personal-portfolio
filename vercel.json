@@ -39,6 +39,13 @@
       "maxDuration": 30
     }
   },
+  "redirects": [
+    {
+      "source": "/demos",
+      "destination": "/demos/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/hasil-kerja",
@@ -122,7 +129,7 @@
       "destination": "/artikel/cara-kerja-sistem-aset-pt-gmp/index.html"
     },
     {
-      "source": "/((?!assets/|icons/|sw\\.js|manifest\\.json|offline\\.html).*)",
+      "source": "/((?!assets/|icons/|demos/|sw\\.js|manifest\\.json|offline\\.html).*)",
       "destination": "/index.html"
     }
   ]

@@ -1,0 +1,162 @@
+[
+  {
+    "file": "demo-galeri-seni.html",
+    "thumb": "thumbs/demo-galeri-seni.webp",
+    "title": "Landing Page Galeri & Pelukis",
+    "desc": "Portofolio seniman dengan galeri karya, profil studio, info pameran, dan form pertanyaan koleksi.",
+    "tags": [
+      "Landing Page",
+      "Seni"
+    ]
+  },
+  {
+    "file": "demo-klinik-gigi.html",
+    "thumb": "thumbs/demo-klinik-gigi.webp",
+    "title": "Landing Page Klinik Gigi",
+    "desc": "Halaman klinik dengan daftar layanan, estimasi biaya, form reservasi ke WhatsApp, FAQ, dan testimoni pasien.",
+    "tags": [
+      "Landing Page",
+      "Kesehatan"
+    ]
+  },
+  {
+    "file": "demo-klinik-estetika.html",
+    "thumb": "thumbs/demo-klinik-estetika.webp",
+    "title": "Landing Page Klinik Estetika",
+    "desc": "Klinik skincare premium dengan kuis tipe kulit, filter treatment, profil dokter spesialis, testimoni, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Kesehatan"
+    ]
+  },
+  {
+    "file": "demo-bengkel-autofix.html",
+    "thumb": "thumbs/demo-bengkel-autofix.webp",
+    "title": "Landing Page Bengkel Mobil",
+    "desc": "Bengkel spesialis mesin dan servis AC dengan kalkulator biaya, cek garansi plat, simulasi AC, testimoni, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Otomotif"
+    ]
+  },
+  {
+    "file": "demo-kedai-kopi.html",
+    "thumb": "thumbs/demo-kedai-kopi.webp",
+    "title": "Landing Page Kedai Kopi",
+    "desc": "Kedai kopi artisanal dengan mood matcher, menu digital (cari, urutkan, keranjang), pilihan area duduk, reservasi meja, dan mode gelap/terang.",
+    "tags": [
+      "Landing Page",
+      "Kuliner"
+    ]
+  },
+  {
+    "file": "demo-gym-titan.html",
+    "thumb": "thumbs/demo-gym-titan.webp",
+    "title": "Landing Page Pusat Kebugaran",
+    "desc": "Gym 24 jam dengan jadwal kelas harian, kalkulator BMI, simulasi paket membership, testimoni, dan pemesanan ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Kebugaran"
+    ]
+  },
+  {
+    "file": "demo-bimbel-genius.html",
+    "thumb": "thumbs/demo-bimbel-genius.webp",
+    "title": "Landing Page Bimbel & Kursus",
+    "desc": "Bimbel SD, SMP, hingga SMA/UTBK dengan kalkulator paket belajar, jadwal kelas, daftar cabang, testimoni, dan form kelas percobaan ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Pendidikan"
+    ]
+  },
+  {
+    "file": "demo-distributor-sparepart.html",
+    "thumb": "thumbs/demo-distributor-sparepart.webp",
+    "title": "Website Distributor Sparepart",
+    "desc": "Situs grosir sparepart industri dengan katalog produk (cari dan filter merek/kategori), permintaan penawaran (RFQ), kalkulator ongkos kargo, FAQ, dan daftar klien.",
+    "tags": [
+      "Website Bisnis",
+      "B2B"
+    ]
+  },
+  {
+    "file": "demo-kontraktor-cipta-karya.html",
+    "thumb": "thumbs/demo-kontraktor-cipta-karya.webp",
+    "title": "Landing Page Kontraktor & Renovasi",
+    "desc": "Jasa bangun dan renovasi rumah dengan estimator biaya otomatis, portofolio proyek, alur kerja, testimoni, dan form konsultasi ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Jasa Konstruksi"
+    ]
+  },
+  {
+    "file": "demo-petshop-paw-claw.html",
+    "thumb": "thumbs/demo-petshop-paw-claw.webp",
+    "title": "Landing Page Pet Shop & Klinik Hewan",
+    "desc": "Pet shop dan klinik hewan terpadu dengan kalkulator harga layanan, katalog produk, profil dokter hewan, testimoni, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Hewan Peliharaan"
+    ]
+  },
+  {
+    "file": "demo-laundry-bening.html",
+    "thumb": "thumbs/demo-laundry-bening.webp",
+    "title": "Landing Page Laundry Kiloan & Satuan",
+    "desc": "Laundry kiloan dan satuan dengan kalkulator harga paket, pilihan parfum dan add-on, cek status pesanan, dan order antar-jemput ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Jasa"
+    ]
+  },
+  {
+    "file": "demo-wedding-royal-destiny.html",
+    "thumb": "thumbs/demo-wedding-royal-destiny.webp",
+    "title": "Landing Page Wedding Organizer",
+    "desc": "Wedding organizer dan katering mewah dengan kalkulator estimasi biaya, galeri pernikahan, menu katering, testimoni, dan konsultasi ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Pernikahan"
+    ]
+  },
+  {
+    "file": "demo-toko-kue-sweet-delight.html",
+    "thumb": "thumbs/demo-toko-kue-sweet-delight.webp",
+    "title": "Landing Page Toko Kue & Bakery",
+    "desc": "Toko kue dan pastry dengan katalog produk berfilter, builder custom cake dengan preview visual dan estimasi harga, testimoni, dan order ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Kuliner"
+    ]
+  },
+  {
+    "file": "demo-ekspedisi-nusantara.html",
+    "thumb": "thumbs/demo-ekspedisi-nusantara.webp",
+    "title": "Landing Page Ekspedisi & Kurir",
+    "desc": "Jasa ekspedisi dan kurir dengan simulasi cek resi, kalkulator tarif ongkir, FAQ, testimoni, dan form request pickup.",
+    "tags": [
+      "Landing Page",
+      "Logistik"
+    ]
+  },
+  {
+    "file": "demo-salon-aura-glow.html",
+    "thumb": "thumbs/demo-salon-aura-glow.webp",
+    "title": "Landing Page Salon & Spa",
+    "desc": "Salon dan spa premium dengan daftar layanan berfilter, kalkulator booking dan diskon, slider before-after, profil stylist, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Kecantikan"
+    ]
+  },
+  {
+    "file": "demo-rental-mobil-transprime.html",
+    "thumb": "thumbs/demo-rental-mobil-transprime.webp",
+    "title": "Landing Page Rental Mobil",
+    "desc": "Rental mobil lepas kunci dan dengan sopir dengan daftar armada berfilter, kalkulator sewa, cara sewa, testimoni, FAQ, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Otomotif"
+    ]
+  }
+]

@@ -16,6 +16,7 @@ import { PWAManager } from './components/PWAManager';
 import { ChunkErrorBoundary } from './components/ChunkErrorBoundary';
 import { ZannahWelcomeNudge } from './components/ZannahWelcomeNudge';
 import { ArticleRecommendationNudge } from './components/ArticleRecommendationNudge';
+import { DemoShowcaseNudge } from './components/DemoShowcaseNudge';
 import { usePrefersReducedMotion } from './hooks/usePrefersReducedMotion';
 import { ArrowUp } from 'lucide-react';
 import {
@@ -384,6 +385,10 @@ function MainPortfolio() {
           dalam komponennya). `enabled` mengikuti rute, bukan chatWidgetReady,
           karena tidak bergantung pada ChatWidget sama sekali. */}
       <ArticleRecommendationNudge darkMode={darkMode} enabled={location.pathname === ROUTES.home} />
+
+      {/* Promosi galeri contoh desain — baru muncul setelah ±1 menit aktif di
+          beranda, dengan cooldown di localStorage (lihat komponennya). */}
+      <DemoShowcaseNudge darkMode={darkMode} enabled={location.pathname === ROUTES.home} />
 
       {/* Floating Action Button (Back to Top) */}
       <div className="fixed bottom-6 right-6 z-40 no-print">

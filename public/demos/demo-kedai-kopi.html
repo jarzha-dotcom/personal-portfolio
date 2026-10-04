@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kala Senja Coffee & Space — Artisanal Coffee & Creative Sanctuary</title>
+  <meta name="description" content="Kedai kopi artisanal & creative space bernuansa hangat dengan biji kopi nusantara, digital menu interaktif, dan reservasi meja instan." />
+  
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN with custom config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            warm: {
+              canvas: '#FDFBF7',
+              darkCanvas: '#150F0B',
+              surface: '#F7F3EB',
+              darkSurface: '#201610',
+              border: '#E8E1D3',
+              darkBorder: '#382619',
+              amber: '#8A4B23',
+              amberLight: '#E0A96D',
+              deep: '#221A15',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background-color: #FDFBF7;
+      color: #221A15;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+    html.dark body {
+      background-color: #150F0B;
+      color: #FAF6F0;
+    }
+    .font-serif {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #F4EFE6; }
+    ::-webkit-scrollbar-thumb { background: #C4B5A5; border-radius: 9999px; }
+    html.dark ::-webkit-scrollbar-track { background: #1C140E; }
+    html.dark ::-webkit-scrollbar-thumb { background: #473628; }
+  </style>
+</head>
+<body class="selection:bg-amber-700/20 selection:text-amber-900">
+
+  <!-- ================= TOP ANNOUNCEMENT BAR ================= -->
+  <aside id="topAnnouncement" class="bg-[#32231A] text-[#E8DFD5] text-xs font-medium py-2 px-4 border-b border-[#4A372C] transition-all">
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 overflow-hidden truncate">
+        <span class="text-[#E0A96D] text-sm shrink-0 animate-pulse">✨</span>
+        <p class="truncate">
+          <span class="text-[#E0A96D] font-semibold">Happy Hour Pagi:</span>
+          Diskon 20% Es Kopi Kala Senja & Manual Brew setiap Senin–Jumat 08:00 – 11:00 WIB
+        </p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <button onclick="copyPromoCode()" id="btnPromoCopy" class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-[#483325] hover:bg-[#5C4231] text-[#F3ECE4] text-[11px] font-mono tracking-wider transition-colors cursor-pointer border border-[#634937]">
+          <span>KODE: SENJAPAGI</span>
+        </button>
+        <button onclick="document.getElementById('topAnnouncement').style.display='none'" class="text-[#B9A696] hover:text-white p-0.5 cursor-pointer">✕</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= STICKY WARM NAVIGATION ================= -->
+  <header id="mainNavbar" class="sticky top-0 z-40 w-full bg-[#FDFBF7]/95 dark:bg-[#150F0B]/95 backdrop-blur-md border-b border-[#E8E1D3] dark:border-[#382619] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between">
+      <!-- Zone 1: Single text element wordmark -->
+      <a href="#" class="text-xl sm:text-2xl font-serif font-bold tracking-tight text-[#221A15] dark:text-[#FAF6F0] hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">
+        Kala Senja
+      </a>
+
+      <!-- Zone 2: Navigation Links -->
+      <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-[#4D3F35] dark:text-[#D4C3B4]">
+        <a href="#menu" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">Menu</a>
+        <a href="#mood-matcher" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">Temukan Kopi</a>
+        <a href="#the-space" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">The Space</a>
+        <a href="#cerita" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">Cerita Kami</a>
+        <a href="#ulasan" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">Ulasan</a>
+        <a href="#lokasi" class="hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors">Lokasi</a>
+      </nav>
+
+      <!-- Zone 3: Primary Actions & Toggles -->
+      <div class="flex items-center gap-2.5">
+        <!-- Dark Mode Toggle Button -->
+        <button id="themeToggleBtn" onclick="toggleDarkMode()" aria-label="Toggle Mode Gelap / Terang" title="Beralih Mode Gelap / Terang" class="p-2 rounded-lg border border-[#E8E1D3] dark:border-[#3A281E] bg-white/80 dark:bg-[#221711] text-[#6E5D4F] dark:text-[#E0A96D] hover:text-[#221A15] dark:hover:text-white transition-colors cursor-pointer">
+          <span id="themeIcon">🌙</span>
+        </button>
+
+        <!-- Ambient Sound Toggle Button -->
+        <button id="audioToggleBtn" onclick="toggleAmbientSound()" aria-label="Suara Suasana Kafe" title="Dengarkan Suasana Hujan & Kafe" class="p-2 rounded-lg border border-[#E8E1D3] dark:border-[#3A281E] bg-white/80 dark:bg-[#221711] text-[#6E5D4F] dark:text-[#C7B5A6] hover:text-[#221A15] dark:hover:text-white transition-colors cursor-pointer">
+          <span id="audioIcon">🌧️</span>
+          <span class="hidden xl:inline text-xs ml-1 font-medium" id="audioLabel">Audio Kafe</span>
+        </button>
+
+        <!-- Cart Bag Icon -->
+        <button onclick="openCartDrawer()" aria-label="Buka Keranjang Pesanan" class="relative p-2 rounded-lg bg-white/80 dark:bg-[#221711] border border-[#E8E1D3] dark:border-[#3A281E] text-[#3D2F25] dark:text-[#F0E6DC] hover:text-[#8A4B23] dark:hover:text-[#E0A96D] transition-colors cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <span id="cartBadge" class="hidden absolute -top-1.5 -right-1.5 bg-[#8A4B23] text-white text-[11px] font-bold w-5 h-5 rounded-full flex items-center justify-center tabular-nums">0</span>
+        </button>
+
+        <!-- Reservation CTA -->
+        <a href="#reservasi" class="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold uppercase tracking-wider text-white bg-[#8A4B23] hover:bg-[#723C1B] rounded-lg transition-colors shadow-xs whitespace-nowrap cursor-pointer">
+          <span>Reservasi Meja</span>
+        </a>
+
+        <!-- Mobile Menu Toggle -->
+        <button onclick="toggleMobileNav()" aria-label="Menu" class="lg:hidden p-2 rounded-lg text-[#3D2F25] dark:text-[#E0D3C7] hover:bg-[#EFE8DC] dark:hover:bg-[#2C1E14] cursor-pointer">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div id="mobileNav" class="hidden lg:hidden bg-[#FDFBF7] dark:bg-[#1C140E] border-b border-[#E8E1D3] dark:border-[#382619] px-6 py-4 space-y-3">
+      <nav class="flex flex-col space-y-3 text-sm font-medium text-[#3D2F25] dark:text-[#EAE0D5]">
+        <a href="#menu" onclick="toggleMobileNav()" class="py-1 border-b border-[#F2ECE1] dark:border-[#2D1F15]">Menu Pilihan</a>
+        <a href="#mood-matcher" onclick="toggleMobileNav()" class="py-1 border-b border-[#F2ECE1] dark:border-[#2D1F15]">Temukan Kopi Mood</a>
+        <a href="#the-space" onclick="toggleMobileNav()" class="py-1 border-b border-[#F2ECE1] dark:border-[#2D1F15]">The Space & Fasilitas</a>
+        <a href="#cerita" onclick="toggleMobileNav()" class="py-1 border-b border-[#F2ECE1] dark:border-[#2D1F15]">Cerita & Filosofi</a>
+        <a href="#ulasan" onclick="toggleMobileNav()" class="py-1 border-b border-[#F2ECE1] dark:border-[#2D1F15]">Ulasan Pengunjung</a>
+        <a href="#lokasi" onclick="toggleMobileNav()" class="py-1">Jam & Lokasi</a>
+      </nav>
+      <div class="pt-2">
+        <a href="#reservasi" onclick="toggleMobileNav()" class="w-full py-2.5 px-4 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-wider text-white bg-[#8A4B23] rounded-lg">
+          Reservasi Meja Sekarang
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= HERO SECTION ================= -->
+  <section class="relative overflow-hidden bg-[#241A13] text-[#F9F6F0]">
+    <div class="absolute inset-0 z-0">
+      <img src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1920&q=80" alt="Interior Kala Senja" class="w-full h-full object-cover object-center opacity-40 scale-102" />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#1C140E]/95 via-[#241A13]/85 to-[#241A13]/60"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
+      <div class="max-w-2xl space-y-6">
+        <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#E0A96D]">
+          <span>✨</span>
+          <span>Artisanal Coffee & Creative Sanctuary</span>
+          <span>·</span>
+          <span>Senopati, Jakarta Selatan</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl lg:text-6xl font-serif font-bold tracking-tight text-[#FAF7F2] leading-[1.15]">
+          Menemukan Ketenangan di Tiap Tetes Seduhan Senja.
+        </h1>
+
+        <p class="text-base sm:text-lg text-[#D6C7B7] leading-relaxed max-w-xl">
+          Dari kebun kopi dataran tinggi Nusantara langsung ke cangkirmu. Ruang hangat untuk bekerja dengan tenang, berdiskusi bermakna, atau sekadar merayakan senja bersama aroma seduhan terbaik.
+        </p>
+
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <a href="#menu" class="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-lg bg-[#E0A96D] hover:bg-[#D49856] text-[#221710] font-semibold text-sm transition-all shadow-md">
+            <span>☕ Jelajahi Menu Pilihan</span>
+            <span>→</span>
+          </a>
+          <a href="#reservasi" class="inline-flex items-center gap-2 px-6 py-3.5 rounded-lg bg-[#3F2E23]/80 hover:bg-[#4E392C] text-[#FAF7F2] border border-[#6D5341] font-semibold text-sm transition-all">
+            <span>📅 Reservasi Meja</span>
+          </a>
+        </div>
+
+        <div class="pt-8 border-t border-[#4A372A]/70 grid grid-cols-3 gap-4 text-left">
+          <div>
+            <p class="text-xl sm:text-2xl font-serif font-bold text-[#E0A96D] tabular-nums">100%</p>
+            <p class="text-xs text-[#BFAFA0] mt-0.5">Biji Nusantara Pilihan</p>
+          </div>
+          <div>
+            <p class="text-xl sm:text-2xl font-serif font-bold text-[#E0A96D] tabular-nums">4.9 ★</p>
+            <p class="text-xs text-[#BFAFA0] mt-0.5">850+ Ulasan Google</p>
+          </div>
+          <div>
+            <p class="text-xl sm:text-2xl font-serif font-bold text-[#E0A96D] tabular-nums">150 Mbps</p>
+            <p class="text-xs text-[#BFAFA0] mt-0.5">Fiber Optic & Colokan</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Spotlight Card -->
+      <div class="mt-12 lg:mt-0 lg:absolute lg:right-8 lg:bottom-12 max-w-sm w-full bg-[#1F1610]/90 backdrop-blur-md border border-[#523B2B] rounded-xl p-5 shadow-2xl text-[#FAF7F2]">
+        <div class="flex items-center justify-between border-b border-[#3D2C20] pb-2 mb-2">
+          <span class="text-[11px] font-mono uppercase tracking-wider text-[#E0A96D]">Seduhan Hari Ini</span>
+          <span class="text-[11px] text-[#A8988B]">V60 Pour Over</span>
+        </div>
+        <p class="font-serif text-lg font-bold text-[#FAF7F2]">Gayo Pantan Musara</p>
+        <p class="text-xs text-[#C8B8A6] mt-1">Fermentasi anaerobik 72 jam dari petani binaan Takengon, Aceh.</p>
+        <div class="flex items-center gap-2 text-[11px] text-[#E0A96D] mt-3 pt-2 border-t border-[#3D2C20]">
+          <span>Strawberry Wine · Peach · Jasmine</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FLAVOR COMPASS / MOOD MATCHER ================= -->
+  <section id="mood-matcher" class="py-16 sm:py-24 bg-[#F5F0E6] dark:bg-[#1A120D] border-y border-[#E8DFC0]/60 dark:border-[#382619] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-10">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">🧭 Artisanal Flavor Compass</span>
+        <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight mt-1">
+          Temukan Seduhan Sesuai Suasana Hatimu
+        </h2>
+        <p class="text-sm text-[#5E4D40] dark:text-[#C5B3A3] mt-2">
+          Pilih mood kamu saat ini dan biarkan barista kami memandumu ke rasa yang tepat.
+        </p>
+      </div>
+
+      <!-- Mood Buttons -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-4xl mx-auto mb-8">
+        <button onclick="selectMood('focus')" id="moodBtn-focus" class="mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#2E1E14] text-[#FAF7F2] border-[#2E1E14] shadow-md">
+          <p class="text-xs opacity-80">💼 Kerja</p>
+          <p class="text-xs sm:text-sm font-semibold">Butuh Fokus & Energi</p>
+        </button>
+        <button onclick="selectMood('chill')" id="moodBtn-chill" class="mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#FDFBF7] dark:bg-[#231812] text-[#423226] dark:text-[#E0D3C7] border-[#DFD5C4] dark:border-[#3E2C20]">
+          <p class="text-xs opacity-80">🌅 Senja</p>
+          <p class="text-xs sm:text-sm font-semibold">Santai Nikmati Senja</p>
+        </button>
+        <button onclick="selectMood('sweet')" id="moodBtn-sweet" class="mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#FDFBF7] dark:bg-[#231812] text-[#423226] dark:text-[#E0D3C7] border-[#DFD5C4] dark:border-[#3E2C20]">
+          <p class="text-xs opacity-80">🍫 Manis</p>
+          <p class="text-xs sm:text-sm font-semibold">Rileks Manis & Creamy</p>
+        </button>
+        <button onclick="selectMood('fresh')" id="moodBtn-fresh" class="mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#FDFBF7] dark:bg-[#231812] text-[#423226] dark:text-[#E0D3C7] border-[#DFD5C4] dark:border-[#3E2C20]">
+          <p class="text-xs opacity-80">🍃 Segar</p>
+          <p class="text-xs sm:text-sm font-semibold">Segar & Non-Kafein</p>
+        </button>
+      </div>
+
+      <!-- Recommendation Display Box -->
+      <div class="max-w-4xl mx-auto bg-[#FDFBF7] dark:bg-[#221711] rounded-2xl border border-[#E0D7C6] dark:border-[#3D291D] p-6 sm:p-8 shadow-xs">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          <div class="md:col-span-5 relative">
+            <div class="aspect-4/3 rounded-xl overflow-hidden bg-[#E8DFD1] dark:bg-[#2D1F16]">
+              <img id="moodImage" src="https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80" alt="Rekomendasi Kopi" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <div class="md:col-span-7 space-y-3">
+            <span class="text-xs font-semibold text-[#8A4B23] dark:text-[#E0A96D] uppercase tracking-wider">Hasil Rekomendasi Barista</span>
+            <h3 id="moodTitle" class="text-xl sm:text-2xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0]">Gayo Pantan Musara (Anaerobic)</h3>
+            <p id="moodDesc" class="text-sm text-[#4E3E32] dark:text-[#C5B3A3] leading-relaxed">
+              Seduhan manual dengan karakter buah peach manis dan aroma melati semerbak membangkitkan fokus tanpa membuat lambung terasa kembung.
+            </p>
+            <div class="pt-2">
+              <span class="text-xs font-semibold text-[#665445] dark:text-[#A8988B]">Karakter Rasa:</span>
+              <div id="moodNotes" class="flex flex-wrap gap-2 mt-1">
+                <span class="text-xs px-2.5 py-1 rounded bg-[#EFE8DC] dark:bg-[#2F2118] text-[#3E3025] dark:text-[#FAF6F0]">Strawberry Wine</span>
+                <span class="text-xs px-2.5 py-1 rounded bg-[#EFE8DC] dark:bg-[#2F2118] text-[#3E3025] dark:text-[#FAF6F0]">Ripe Peach</span>
+                <span class="text-xs px-2.5 py-1 rounded bg-[#EFE8DC] dark:bg-[#2F2118] text-[#3E3025] dark:text-[#FAF6F0]">Melati</span>
+              </div>
+            </div>
+            <div class="pt-3 border-t border-[#EAE3D3] dark:border-[#382619] flex items-center justify-between text-xs">
+              <span class="text-[#5C4B3D] dark:text-[#C5B3A3]">Pasangan Pas: <strong id="moodPairing" class="text-[#221A15] dark:text-[#FAF6F0]">Artisanal Almond Croissant</strong></span>
+            </div>
+            <button id="moodOrderBtn" onclick="quickOrderFromMood()" class="mt-2 inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#8A4B23] hover:bg-[#723C1B] text-white text-xs font-semibold tracking-wide transition-colors cursor-pointer">
+              <span>🛍️ Pesan Menu Ini</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= DIGITAL MENU SECTION ================= -->
+  <section id="menu" class="py-16 sm:py-24 bg-[#FDFBF7] dark:bg-[#150F0B] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-[#EAE3D3] dark:border-[#382619]">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">✨ Koleksi Seduhan & Kuliner</span>
+          <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight mt-1">Our Artisanal Menu</h2>
+          <p class="text-sm text-[#665445] dark:text-[#C5B3A3] mt-1 max-w-xl">Biji kopi arabika pilihan Nusantara dari Aceh hingga Flores dipadu bahan segar berkualitas.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <input type="text" id="menuSearch" oninput="renderMenu()" placeholder="Cari kopi, pastry, rasa..." class="w-full sm:w-64 px-3.5 py-2 text-xs rounded-lg bg-white dark:bg-[#201610] border border-[#DED4C3] dark:border-[#3D291D] text-[#221A15] dark:text-[#FAF6F0] focus:outline-none focus:border-[#8A4B23]" />
+          <select id="menuSort" onchange="renderMenu()" class="py-2 px-3 text-xs rounded-lg bg-white dark:bg-[#201610] border border-[#DED4C3] dark:border-[#3D291D] text-[#3D2F24] dark:text-[#FAF6F0]">
+            <option value="default">Urutan Standar</option>
+            <option value="asc">Harga Terendah</option>
+            <option value="desc">Harga Tertinggi</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Categories Filter Tabs -->
+      <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8" id="categoryTabs">
+        <button onclick="setMenuCategory('all')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-[#2E1E14] text-white dark:bg-[#E0A96D] dark:text-[#221A15]">Semua Menu</button>
+        <button onclick="setMenuCategory('signature')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]">Signature Coffee</button>
+        <button onclick="setMenuCategory('manual')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]">Manual Brew</button>
+        <button onclick="setMenuCategory('non_coffee')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]">Non-Coffee</button>
+        <button onclick="setMenuCategory('pastry')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]">Pastry & Bites</button>
+        <button onclick="setMenuCategory('food')" class="cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]">Makanan Utama</button>
+      </div>
+
+      <!-- Menu Grid Container -->
+      <div id="menuGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= THE SPACE & FACILITIES ================= -->
+  <section id="the-space" class="py-16 sm:py-24 bg-[#FAF7F0] dark:bg-[#1B130E] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mb-12">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">Arsitektur & Kenyamanan</span>
+        <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight mt-1">
+          The Space: Didesain untuk Produktivitas & Relaksasi
+        </h2>
+        <p class="text-sm text-[#5E4D40] dark:text-[#C5B3A3] mt-2">
+          Kombinasi material kayu jati daur ulang, bata terakota ekspos, dan vegetasi tropis menciptakan atmosfer yang menyejukkan mata.
+        </p>
+      </div>
+
+      <!-- Area Tabs -->
+      <div class="bg-[#FDFBF7] dark:bg-[#221711] rounded-2xl border border-[#DFD6C6] dark:border-[#382619] overflow-hidden shadow-xs mb-16">
+        <div class="flex border-b border-[#EAE2D4] dark:border-[#382619]">
+          <button onclick="switchArea('indoor')" id="areaTab-indoor" class="py-3.5 px-6 text-xs sm:text-sm font-semibold border-b-2 border-[#8A4B23] text-[#8A4B23] dark:text-[#E0A96D]">Indoor Sanctuary (AC)</button>
+          <button onclick="switchArea('courtyard')" id="areaTab-courtyard" class="py-3.5 px-6 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-[#614F42] dark:text-[#C5B3A3]">Courtyard Semi-Outdoor</button>
+          <button onclick="switchArea('rooftop')" id="areaTab-rooftop" class="py-3.5 px-6 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-[#614F42] dark:text-[#C5B3A3]">Sunset Rooftop View</button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 p-6 sm:p-10 items-center">
+          <div class="lg:col-span-7">
+            <div class="aspect-16/10 rounded-xl overflow-hidden bg-[#E2D8C7] shadow-xs">
+              <img id="spaceAreaImage" src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80" alt="Area Kala Senja" class="w-full h-full object-cover" />
+            </div>
+          </div>
+          <div class="lg:col-span-5 space-y-4">
+            <span class="text-xs font-semibold text-[#8A4B23] dark:text-[#E0A96D] uppercase">Suasana Area</span>
+            <h3 id="spaceAreaTitle" class="font-serif text-2xl font-bold text-[#221A15] dark:text-[#FAF6F0]">Indoor Sanctuary (AC)</h3>
+            <p id="spaceAreaDesc" class="text-sm text-[#4E3E32] dark:text-[#C5B3A3] leading-relaxed">
+              Area berpendingin udara yang sejuk dan tenang. Dilengkapi meja ergonomis luas, kursi empuk, serta stopkontak di setiap titik.
+            </p>
+            <div class="p-3.5 rounded-xl bg-[#F4EFE6] dark:bg-[#2C1E15] text-xs text-[#524134] dark:text-[#D8CBC0]">
+              <strong>Paling Cocok Untuk:</strong> <span id="spaceAreaBest">Kerja Remote, WFC Produktif, Diskusi Santai</span>
+            </div>
+            <a href="#reservasi" class="inline-block px-5 py-2.5 rounded-lg bg-[#8A4B23] text-white text-xs font-semibold">Pilih Area Ini untuk Reservasi</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facilities Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">📶</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Wi-Fi 150 Mbps</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Koneksi fiber optik dedicated super stabil untuk Zoom dan upload file besar.</p>
+        </div>
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">⚡</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Stopkontak Tiap Meja</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Setiap meja dilengkapi colokan standar dan port fast-charging tanpa perlu rebutan.</p>
+        </div>
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">🚗</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Parkir Luas & Aman</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Area parkir mobil dan motor memadai diawasi CCTV 24 jam dan satpam ramah.</p>
+        </div>
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">✨</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Musholla Ber-AC</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Ruang ibadah bersih, wangi, ber-AC lengkap dengan alat sholat bersih & tempat wudhu.</p>
+        </div>
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">🎸</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Live Acoustic Senja</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Musik akustik intim setiap Jumat & Sabtu malam mulai pukul 19:30 WIB.</p>
+        </div>
+        <div class="bg-[#FDFBF7] dark:bg-[#201610] p-6 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <div class="text-2xl mb-3">👥</div>
+          <h4 class="font-serif font-bold text-base text-[#221A15] dark:text-[#FAF6F0] mb-1">Meeting Pods</h4>
+          <p class="text-xs text-[#5E4D40] dark:text-[#BFAEA0]">Ruang privat bersekat akustik untuk workshop atau meeting tim tertutup.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TABLE RESERVATION SECTION ================= -->
+  <section id="reservasi" class="py-16 sm:py-24 bg-[#F5EFE6] dark:bg-[#19110B] border-y border-[#E2D8C7] dark:border-[#382619] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">📅 Reservasi Meja & VIP Space</span>
+        <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight mt-1">
+          Amankan Sudut Ternyamanmu
+        </h2>
+        <p class="text-sm text-[#614F42] dark:text-[#C5B3A3] mt-2">
+          Reservasi instan tanpa biaya muka. Meja disimpan hingga 20 menit dari waktu kedatangan.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start max-w-6xl mx-auto">
+        <!-- Form -->
+        <div class="lg:col-span-7 bg-[#FDFBF7] dark:bg-[#221812] p-6 sm:p-8 rounded-2xl border border-[#DFD6C6] dark:border-[#3D291D] shadow-xs">
+          <h3 class="font-serif text-xl font-bold text-[#221A15] dark:text-[#FAF6F0] mb-5 pb-3 border-b border-[#EFEAE0] dark:border-[#382619]">
+            Formulir Reservasi Meja
+          </h3>
+
+          <form onsubmit="handleReservationSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Nama Pemesan *</label>
+                <input type="text" id="resName" required placeholder="Contoh: Rian Pratama" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0] focus:outline-none focus:border-[#8A4B23]" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Nomor WhatsApp *</label>
+                <input type="tel" id="resPhone" required placeholder="Contoh: 081234567890" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0] focus:outline-none focus:border-[#8A4B23]" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Jumlah Tamu</label>
+              <select id="resGuests" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0]">
+                <option value="1 - 2 Orang">1 - 2 Orang</option>
+                <option value="3 - 5 Orang" selected>3 - 5 Orang</option>
+                <option value="Group / VIP (6-12 Orang)">Group / VIP (6-12 Orang)</option>
+              </select>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Tanggal</label>
+                <input type="date" id="resDate" required class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0]" />
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Jam Kedatangan</label>
+                <select id="resTime" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0]">
+                  <option value="09:00 (Pagi Tenang)">09:00 (Pagi Tenang)</option>
+                  <option value="11:30 (Siang / Lunch)">11:30 (Siang / Lunch)</option>
+                  <option value="14:00 (WFC Produktif)">14:00 (WFC Produktif)</option>
+                  <option value="16:30 (Golden Hour Senja)" selected>16:30 (Golden Hour Senja)</option>
+                  <option value="19:00 (Malam Hangat)">19:00 (Malam Hangat)</option>
+                  <option value="20:30 (Live Acoustic)">20:30 (Live Acoustic)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Pilihan Area</label>
+              <select id="resArea" class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0]">
+                <option value="Indoor Sanctuary (AC)">Indoor Sanctuary (AC) — Tenang & Stopkontak</option>
+                <option value="Courtyard Semi-Outdoor">Courtyard Semi-Outdoor — Rindang & Udara Segar</option>
+                <option value="Sunset Rooftop View" selected>Sunset Rooftop View — Sunset Romantis</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-[#544335] dark:text-[#C5B3A3] mb-1">Catatan Tambahan (Opsional)</label>
+              <input type="text" id="resNotes" placeholder="Contoh: Meja dekat colokan, rayakan ulang tahun..." class="w-full text-xs px-3.5 py-2.5 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22] text-[#221A15] dark:text-[#FAF6F0]" />
+            </div>
+
+            <button type="submit" class="w-full py-3.5 px-6 rounded-xl bg-[#8A4B23] hover:bg-[#723C1B] text-white text-xs font-semibold tracking-wider uppercase transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer">
+              <span>Kirim Konfirmasi Reservasi via WhatsApp</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Digital Pass Card -->
+        <div class="lg:col-span-5 space-y-4">
+          <div id="bookingPassCard" class="bg-[#2E1E14] text-[#FAF7F2] p-6 rounded-2xl border border-[#4F392B] shadow-xl">
+            <div class="flex items-center justify-between pb-3 border-b border-[#4F392B] mb-3">
+              <span class="font-serif font-bold text-sm text-[#E0A96D]">🎫 Digital Reservation Pass</span>
+              <span class="px-2 py-0.5 rounded bg-emerald-900/60 text-emerald-300 text-[10px] font-mono border border-emerald-700/50">STATUS: TERSEDIA</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div>
+                <span class="text-[#A39282] uppercase text-[10px]">Kode Booking</span>
+                <p id="passCode" class="font-mono text-xl font-bold text-[#E0A96D]">KS-7821</p>
+              </div>
+              <div class="grid grid-cols-2 gap-2 pt-1">
+                <div>
+                  <span class="text-[#A39282] uppercase text-[10px]">Tamu</span>
+                  <p id="passGuests" class="font-medium">3 - 5 Orang</p>
+                </div>
+                <div>
+                  <span class="text-[#A39282] uppercase text-[10px]">Area</span>
+                  <p id="passArea" class="font-medium">Sunset Rooftop View</p>
+                </div>
+              </div>
+              <div class="pt-1">
+                <span class="text-[#A39282] uppercase text-[10px]">Jadwal Kunjungan</span>
+                <p id="passSchedule" class="font-medium text-[#FAF7F2]">Hari Ini · 16:30 WIB</p>
+              </div>
+            </div>
+            <p class="text-[11px] text-[#B8A696] pt-4 mt-3 border-t border-[#4F392B]">
+              Tunjukkan bukti tiket ini kepada barista atau kasir saat tiba di Kala Senja.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= STORY & PHILOSOPHY ================= -->
+  <section id="cerita" class="py-16 sm:py-24 bg-[#F2EDE2] dark:bg-[#1D140E] border-t border-[#DFD5C4] dark:border-[#382619] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div class="lg:col-span-6 relative">
+          <div class="aspect-4/3 rounded-2xl overflow-hidden shadow-lg border border-[#DDD2BF] bg-[#E3D8C6]">
+            <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1000&q=80" alt="Manual Brew di Kala Senja" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <div class="lg:col-span-6 space-y-4">
+          <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">🌱 Filosofi & Akar Cerita</span>
+          <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight leading-tight">
+            Dari Petani Nusantara Menuju Cangkir Senjamu
+          </h2>
+          <p class="text-sm text-[#524133] dark:text-[#C5B3A3] leading-relaxed">
+            Kala Senja lahir dari kerinduan akan sebuah jeda di tengah ritme kota yang bergerak terlampau lekas. Kami percaya bahwa secangkir kopi bukan sekadar asupan kafein, melainkan medium kontemplasi dan pertemuan yang hangat.
+          </p>
+          <p class="text-sm text-[#614F40] dark:text-[#C5B3A3] leading-relaxed">
+            Kami bermitra langsung dengan kelompok tani di dataran tinggi Gayo, lereng Gunung Inerie Flores, hingga Kintamani Bali melalui skema perdagangan berkeadilan (fair trade).
+          </p>
+          <div class="grid grid-cols-3 gap-4 pt-4 border-t border-[#DFD5C4] dark:border-[#382619]">
+            <div>
+              <h4 class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Fair Trade</h4>
+              <p class="text-xs text-[#6E5D4F] dark:text-[#A8988B] mt-0.5">Kemitraan berdaya bersama petani lokal.</p>
+            </div>
+            <div>
+              <h4 class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Zero Waste</h4>
+              <p class="text-xs text-[#6E5D4F] dark:text-[#A8988B] mt-0.5">Ampas kopi diolah jadi pupuk organik.</p>
+            </div>
+            <div>
+              <h4 class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Slow Living</h4>
+              <p class="text-xs text-[#6E5D4F] dark:text-[#A8988B] mt-0.5">Ruang santai tanpa tergesa-gesa.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CUSTOMER REVIEWS ================= -->
+  <section id="ulasan" class="py-16 sm:py-24 bg-[#FDFBF7] dark:bg-[#150F0B] transition-colors">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 pb-6 border-b border-[#E8DFC0] dark:border-[#382619]">
+        <div>
+          <span class="text-xs font-semibold uppercase tracking-wider text-[#8A4B23] dark:text-[#E0A96D]">💬 Suara Pengunjung</span>
+          <h2 class="text-2xl sm:text-4xl font-serif font-bold text-[#221A15] dark:text-[#FAF6F0] tracking-tight mt-1">Kata Mereka Tentang Kala Senja</h2>
+          <p class="text-sm text-[#5E4D40] dark:text-[#C5B3A3] mt-1 max-w-xl">Rumah kedua bagi pekerja kreatif, pencinta kopi, dan penikmat senja.</p>
+        </div>
+        <div class="flex items-center gap-4 bg-[#F7F2E8] dark:bg-[#201610] p-4 rounded-xl border border-[#DFD6C6] dark:border-[#382619]">
+          <span class="font-serif text-3xl font-bold text-[#8A4B23] dark:text-[#E0A96D]">4.9</span>
+          <div class="text-xs text-[#524133] dark:text-[#C5B3A3]">
+            <p class="font-semibold text-[#221A15] dark:text-[#FAF6F0]">Nilai Sempurna di Google</p>
+            <p>850+ Ulasan Terverifikasi</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-[#FAF7F0] dark:bg-[#1F150F] p-6 rounded-2xl border border-[#E3D9C8] dark:border-[#382619] flex flex-col justify-between">
+          <p class="text-xs sm:text-sm text-[#423226] dark:text-[#D5C7B8] italic leading-relaxed">
+            "Tempat WFC paling juara di Senopati! Wi-Fi-nya kencang 140 Mbps, kopinya serius enak terutama Gayo Anaerobic, dan suasananya tenang banget buat deep work."
+          </p>
+          <div class="mt-4 pt-3 border-t border-[#EAE1D1] dark:border-[#382619]">
+            <p class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Andi Pratama</p>
+            <p class="text-[11px] text-[#786759] dark:text-[#A8988B]">Product Designer · Indoor Sanctuary</p>
+          </div>
+        </div>
+
+        <div class="bg-[#FAF7F0] dark:bg-[#1F150F] p-6 rounded-2xl border border-[#E3D9C8] dark:border-[#382619] flex flex-col justify-between">
+          <p class="text-xs sm:text-sm text-[#423226] dark:text-[#D5C7B8] italic leading-relaxed">
+            "Es Kopi Kala Senja ada sentuhan sea salt yang bikin nagih! Sunset di area rooftop-nya magis banget kalau datang pas jam 5 sore."
+          </p>
+          <div class="mt-4 pt-3 border-t border-[#EAE1D1] dark:border-[#382619]">
+            <p class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Clarissa Maharani</p>
+            <p class="text-[11px] text-[#786759] dark:text-[#A8988B]">Coffee Enthusiast · Sunset Rooftop</p>
+          </div>
+        </div>
+
+        <div class="bg-[#FAF7F0] dark:bg-[#1F150F] p-6 rounded-2xl border border-[#E3D9C8] dark:border-[#382619] flex flex-col justify-between">
+          <p class="text-xs sm:text-sm text-[#423226] dark:text-[#D5C7B8] italic leading-relaxed">
+            "Pernah sewa meeting pod buat tim 8 orang. Fasilitasnya lengkap, pelayanannya sangat tanggap, dan Nasi Goreng Kecombrangnya enak banget."
+          </p>
+          <div class="mt-4 pt-3 border-t border-[#EAE1D1] dark:border-[#382619]">
+            <p class="font-serif font-bold text-sm text-[#221A15] dark:text-[#FAF6F0]">Dimas Wicaksono</p>
+            <p class="text-[11px] text-[#786759] dark:text-[#A8988B]">Startup Founder · Meeting Pods</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer id="lokasi" class="bg-[#1C140E] text-[#D8CBC0] pt-16 pb-12 border-t border-[#38281D]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-[#38281D]">
+        <div class="lg:col-span-4 space-y-3">
+          <h3 class="text-2xl font-serif font-bold text-[#FAF7F2]">Kala Senja</h3>
+          <p class="text-xs text-[#B8A696] leading-relaxed max-w-sm">
+            Kedai kopi artisanal nusantara & creative sanctuary di Senopati, Jakarta Selatan. Ruang hangat untuk rehat dan berkarya.
+          </p>
+          <a href="https://maps.google.com/?q=Jakarta" target="_blank" class="inline-block px-3 py-1.5 rounded bg-[#2E2016] text-xs text-[#E0A96D] border border-[#523C2B]">
+            📍 Petunjuk Arah Google Maps →
+          </a>
+        </div>
+
+        <div class="lg:col-span-3 space-y-2 text-xs">
+          <h4 class="font-serif font-bold text-sm text-[#FAF7F2]">Jam Operasional</h4>
+          <p><span class="text-[#E0A96D]">Senin — Jumat:</span> 08:00 - 23:00 WIB</p>
+          <p><span class="text-[#E0A96D]">Sabtu — Minggu:</span> 07:30 - 24:00 WIB</p>
+          <p class="text-[11px] text-[#8C7A6D]">*Dapur beroperasi hingga 21:30 WIB</p>
+        </div>
+
+        <div class="lg:col-span-3 space-y-2 text-xs">
+          <h4 class="font-serif font-bold text-sm text-[#FAF7F2]">Alamat & Kontak</h4>
+          <p>Jl. Rawa Senja No. 42, Senopati Selatan, Jakarta Selatan 12190</p>
+          <p>WhatsApp: <a href="https://wa.me/6281234567890" target="_blank" class="text-[#E0A96D] underline">+62 812-3456-7890</a></p>
+          <p>Instagram: @kalasenja.space</p>
+        </div>
+
+        <div class="lg:col-span-2 space-y-2 text-xs">
+          <h4 class="font-serif font-bold text-sm text-[#FAF7F2]">Playlist Senja</h4>
+          <p class="text-[11px] text-[#B8A696]">Dengarkan playlist acoustic & indie folk kedai di Spotify.</p>
+          <a href="https://open.spotify.com" target="_blank" class="inline-block text-[#1DB954] font-medium underline">Buka di Spotify ↗</a>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#8C7A6D] gap-4">
+        <p>© 2026 Kala Senja Coffee & Space. Seluruh Hak Cipta Dilindungi.</p>
+        <div class="flex gap-4">
+          <a href="#menu" class="hover:text-[#E0A96D]">Menu Digital</a>
+          <span>·</span>
+          <a href="#reservasi" class="hover:text-[#E0A96D]">Reservasi</a>
+          <span>·</span>
+          <a href="#the-space" class="hover:text-[#E0A96D]">Fasilitas</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ================= ITEM CUSTOMIZER MODAL ================= -->
+  <div id="itemModal" class="hidden fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-[#FDFBF7] dark:bg-[#1E150F] rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl border border-[#E0D7C6] dark:border-[#382619]">
+      <div class="relative h-48 bg-[#E8DFD1]">
+        <img id="modalImg" src="" alt="Menu" class="w-full h-full object-cover" />
+        <button onclick="closeItemModal()" class="absolute top-3 right-3 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white cursor-pointer">✕</button>
+        <div class="absolute bottom-3 left-4 right-4 text-white">
+          <h3 id="modalName" class="text-xl font-serif font-bold"></h3>
+          <p id="modalDesc" class="text-xs text-[#EAE2D7] line-clamp-1"></p>
+        </div>
+      </div>
+
+      <div class="p-5 space-y-4 text-[#2E2218] dark:text-[#FAF6F0] max-h-[60vh] overflow-y-auto">
+        <!-- Temperature -->
+        <div>
+          <label class="block text-xs font-semibold text-[#665445] dark:text-[#A8988B] mb-1.5 uppercase">Suhu Penyajian</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setModalTemp('Dingin')" id="modalTemp-Dingin" class="py-2 px-3 rounded-lg text-xs font-medium border bg-[#2E1E14] text-white">🧊 Dingin (Iced)</button>
+            <button type="button" onclick="setModalTemp('Panas')" id="modalTemp-Panas" class="py-2 px-3 rounded-lg text-xs font-medium border bg-white dark:bg-[#2C1E15] text-[#4A392C] dark:text-[#FAF6F0]">☕ Panas (Hot)</button>
+          </div>
+        </div>
+
+        <!-- Sugar -->
+        <div>
+          <label class="block text-xs font-semibold text-[#665445] dark:text-[#A8988B] mb-1.5 uppercase">Tingkat Gula</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button type="button" onclick="setModalSugar('100%')" id="sugar-100" class="py-1.5 text-xs rounded border bg-[#2E1E14] text-white">100%</button>
+            <button type="button" onclick="setModalSugar('50%')" id="sugar-50" class="py-1.5 text-xs rounded border bg-white dark:bg-[#2C1E15]">50%</button>
+            <button type="button" onclick="setModalSugar('25%')" id="sugar-25" class="py-1.5 text-xs rounded border bg-white dark:bg-[#2C1E15]">25%</button>
+            <button type="button" onclick="setModalSugar('0%')" id="sugar-0" class="py-1.5 text-xs rounded border bg-white dark:bg-[#2C1E15]">0%</button>
+          </div>
+        </div>
+
+        <!-- Milk (if applicable) -->
+        <div id="modalMilkSection">
+          <label class="block text-xs font-semibold text-[#665445] dark:text-[#A8988B] mb-1.5 uppercase">Pilihan Susu</label>
+          <select id="modalMilk" onchange="calculateModalTotal()" class="w-full text-xs px-3 py-2 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22]">
+            <option value="Fresh Milk">Fresh Milk (+Rp 0)</option>
+            <option value="Oat Milk">Oat Milk (+Rp 6.000)</option>
+            <option value="Almond Milk">Almond Milk (+Rp 8.000)</option>
+          </select>
+        </div>
+
+        <!-- Extra shot -->
+        <div class="flex items-center justify-between text-xs pt-2 border-t border-[#EDE5D6] dark:border-[#332217]">
+          <span>Tambah Extra Espresso Shot (+Rp 8.000)</span>
+          <input type="checkbox" id="modalExtraShot" onchange="calculateModalTotal()" class="w-4 h-4 text-[#8A4B23]" />
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block text-xs font-semibold text-[#665445] dark:text-[#A8988B] mb-1 uppercase">Catatan Khusus</label>
+          <input type="text" id="modalNotes" placeholder="Contoh: Es batunya sedikit saja..." class="w-full text-xs px-3 py-2 rounded-lg bg-white dark:bg-[#2C1E15] border border-[#D6CBB8] dark:border-[#422F22]" />
+        </div>
+
+        <!-- Quantity -->
+        <div class="flex items-center justify-between pt-2 border-t border-[#EDE5D6] dark:border-[#332217]">
+          <span class="text-xs font-semibold uppercase">Jumlah</span>
+          <div class="flex items-center gap-3">
+            <button onclick="changeModalQty(-1)" class="w-7 h-7 rounded bg-[#F4EFE6] dark:bg-[#2C1E15] flex items-center justify-center font-bold">-</button>
+            <span id="modalQtyDisplay" class="font-bold text-sm">1</span>
+            <button onclick="changeModalQty(1)" class="w-7 h-7 rounded bg-[#F4EFE6] dark:bg-[#2C1E15] flex items-center justify-center font-bold">+</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-[#F6F1E6] dark:bg-[#251A13] border-t border-[#E8DFC0] dark:border-[#382619] flex items-center justify-between">
+        <div>
+          <span class="text-[10px] uppercase text-[#786455] dark:text-[#A8988B]">Total Harga</span>
+          <p id="modalTotalPrice" class="text-base font-serif font-bold text-[#221A15] dark:text-[#FAF6F0]">Rp 0</p>
+        </div>
+        <button onclick="confirmAddToCart()" class="py-2.5 px-5 rounded-xl bg-[#8A4B23] hover:bg-[#723C1B] text-white text-xs font-semibold">
+          Tambah ke Keranjang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SLIDE-OVER CART DRAWER ================= -->
+  <div id="cartDrawer" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex justify-end">
+    <div class="w-full max-w-md bg-[#FDFBF7] dark:bg-[#1E150F] h-full flex flex-col shadow-2xl border-l border-[#E2D8C7] dark:border-[#382619]">
+      <div class="p-5 border-b border-[#E8DFC0] dark:border-[#382619] flex items-center justify-between bg-[#F8F3EA] dark:bg-[#251A13]">
+        <h3 class="font-serif text-lg font-bold text-[#221A15] dark:text-[#FAF6F0]">Keranjang Pesanan</h3>
+        <button onclick="closeCartDrawer()" class="p-1 text-[#614F42] dark:text-[#C5B3A3] text-lg font-bold cursor-pointer">✕</button>
+      </div>
+
+      <div id="cartBody" class="flex-1 overflow-y-auto p-5 space-y-4">
+        <!-- Rendered items or empty state -->
+      </div>
+
+      <div id="cartFooter" class="p-5 bg-[#F6F0E4] dark:bg-[#251A13] border-t border-[#E2D8C7] dark:border-[#382619] space-y-3">
+        <div class="space-y-1 text-xs">
+          <div class="flex justify-between"><span>Subtotal</span><span id="cartSubtotal" class="font-semibold">Rp 0</span></div>
+          <div class="flex justify-between"><span>PB1 Restoran (10%)</span><span id="cartTax" class="font-semibold">Rp 0</span></div>
+          <div class="flex justify-between text-sm font-bold pt-2 border-t border-[#DFD6C6] dark:border-[#382619]">
+            <span>Total</span><span id="cartGrandTotal" class="text-[#8A4B23] dark:text-[#E0A96D]">Rp 0</span>
+          </div>
+        </div>
+        <button onclick="checkoutViaWhatsApp()" class="w-full py-3.5 px-4 rounded-xl bg-[#25D366] hover:bg-[#20BA5A] text-white text-xs font-bold tracking-wider uppercase transition-colors shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+          <span>Kirim Pesanan ke WhatsApp Barista</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= WHATSAPP FLOATING BUTTON ================= -->
+  <div class="fixed bottom-5 right-5 z-40">
+    <a href="https://wa.me/6281234567890?text=Halo%20Kala%20Senja,%20saya%20ingin%20tanya%20ketersediaan%20tempat%20hari%20ini" target="_blank" class="flex items-center gap-2 px-4 py-3 rounded-full bg-[#25D366] hover:bg-[#20BA5A] text-white shadow-lg transition-all">
+      <span class="text-base">💬</span>
+      <span class="hidden sm:inline text-xs font-semibold tracking-wide">Tanya via WhatsApp</span>
+    </a>
+  </div>
+
+  <!-- ================= VANILLA JAVASCRIPT LOGIC ================= -->
+  <script>
+    /* Data Store */
+    const MENU_DATA = [
+      {
+        id: 'sig-1',
+        name: 'Es Kopi Kala Senja',
+        category: 'signature',
+        price: 28000,
+        tag: 'Best Seller',
+        desc: 'Espresso house blend arabika-robusta, gula aren kelapa organik, fresh milk creamy, dan sea salt Kusamba.',
+        image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Gula Aren', 'Toffee', 'Creamy', 'Sea Salt'],
+        allowsMilk: true
+      },
+      {
+        id: 'sig-2',
+        name: 'Senja Cinnamon Macchiato',
+        category: 'signature',
+        price: 34000,
+        tag: 'Favorit Barista',
+        desc: 'Double shot espresso, sirup kayu manis panggang racikan sendiri, oat milk sutra, dan kayu manis Ceylon.',
+        image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Kayu Manis', 'Madu Hutan', 'Nutty'],
+        allowsMilk: true
+      },
+      {
+        id: 'sig-3',
+        name: 'Pandan Sunset Cold Brew',
+        category: 'signature',
+        price: 32000,
+        tag: 'Segar & Unik',
+        desc: 'Cold brew 18 jam dengan infusi daun pandan asli, santan ringan, dan sentuhan perasan jeruk purut.',
+        image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Pandan Wangi', 'Citrus Peel', 'Cokelat'],
+        allowsMilk: false
+      },
+      {
+        id: 'mb-1',
+        name: 'Gayo Pantan Musara (Anaerobic)',
+        category: 'manual',
+        price: 38000,
+        tag: 'Specialty Beans',
+        desc: 'Proses anaerobik 72 jam Takengon. Karakter rasa strawberry wine, peach matang, dan aroma melati semerbak.',
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Strawberry Wine', 'Peach', 'Melati'],
+        allowsMilk: false
+      },
+      {
+        id: 'mb-2',
+        name: 'Flores Bajawa Kartika (Washed)',
+        category: 'manual',
+        price: 35000,
+        tag: 'Clean & Balanced',
+        desc: 'Biji kopi lereng Gunung Inerie Flores. Rasa bersih cokelat susu, gula palem, dan kacang kenari.',
+        image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Milk Chocolate', 'Orange Zest', 'Kenari'],
+        allowsMilk: false
+      },
+      {
+        id: 'nc-1',
+        name: 'Matcha Senja Uji Kyoto',
+        category: 'non_coffee',
+        price: 36000,
+        tag: 'Favorit',
+        desc: 'Matcha seremonial asli dari Uji Kyoto dikocok tradisional dengan whisk bambu bersama susu oat.',
+        image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Uji Matcha', 'Earthy Umami', 'Creamy'],
+        allowsMilk: true
+      },
+      {
+        id: 'pas-1',
+        name: 'Artisanal Almond Croissant',
+        category: 'pastry',
+        price: 32000,
+        tag: 'Freshly Baked',
+        desc: 'Croissant mentega Prancis dua kali panggang dengan isian krim frangipane almond lumer dan almond renyah.',
+        image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Mentega Prancis', 'Almond Frangipane', 'Flaky'],
+        allowsMilk: false
+      },
+      {
+        id: 'food-1',
+        name: 'Nasi Goreng Kecombrang Senja',
+        category: 'food',
+        price: 45000,
+        tag: 'Chef Special',
+        desc: 'Nasi goreng harum bunga kecombrang dengan suwiran ayam rempah, telur mata sapi, dan kerupuk gendar.',
+        image: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=600&q=80',
+        tastingNotes: ['Kecombrang Wangi', 'Wok Hei', 'Ayam Rempah'],
+        allowsMilk: false
+      }
+    ];
+
+    const MOOD_DATA = {
+      focus: {
+        title: 'Gayo Pantan Musara (Anaerobic)',
+        desc: 'Seduhan manual dengan karakter buah peach manis dan aroma melati semerbak membangkitkan fokus tanpa membuat lambung terasa kembung.',
+        image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=800&q=80',
+        notes: ['Strawberry Wine', 'Ripe Peach', 'Melati'],
+        pairing: 'Artisanal Almond Croissant',
+        menuId: 'mb-1'
+      },
+      chill: {
+        title: 'Es Kopi Kala Senja',
+        desc: 'Keseimbangan manis gula aren kelapa organik, fresh milk dingin, dan sentuhan garam laut Kusamba yang menenangkan pikiran.',
+        image: 'https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=800&q=80',
+        notes: ['Gula Aren', 'Toffee', 'Comforting Creamy'],
+        pairing: 'Artisanal Almond Croissant',
+        menuId: 'sig-1'
+      },
+      sweet: {
+        title: 'Senja Cinnamon Macchiato',
+        desc: 'Kehangatan kayu manis panggang berpadu espresso ganda dan susu berbusa sutra yang memanjakan lidah di penghujung hari.',
+        image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=800&q=80',
+        notes: ['Kayu Manis', 'Madu Hutan', 'Nutty Sweet'],
+        pairing: 'Artisanal Almond Croissant',
+        menuId: 'sig-2'
+      },
+      fresh: {
+        title: 'Pandan Sunset Cold Brew',
+        desc: 'Kesegaran seduh dingin 18 jam dengan aroma pandan alami dan perasan jeruk nipis yang merehidrasi tubuh seketika.',
+        image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?auto=format&fit=crop&w=800&q=80',
+        notes: ['Pandan Wangi', 'Citrus Fresh', 'Zero Heavy Milk'],
+        pairing: 'Nasi Goreng Kecombrang',
+        menuId: 'sig-3'
+      }
+    };
+
+    /* State Variables */
+    let currentCategory = 'all';
+    let currentMood = 'focus';
+    let cart = [];
+    let activeModalItem = null;
+    let modalSelectedTemp = 'Dingin';
+    let modalSelectedSugar = '100%';
+    let modalQty = 1;
+
+    /* Dark Mode Logic */
+    function initTheme() {
+      const savedTheme = localStorage.getItem('kala_theme');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('themeIcon').textContent = '☀️';
+      } else {
+        document.documentElement.classList.remove('dark');
+        document.getElementById('themeIcon').textContent = '🌙';
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('kala_theme', isDark ? 'dark' : 'light');
+      document.getElementById('themeIcon').textContent = isDark ? '☀️' : '🌙';
+    }
+
+    /* Ambient Web Audio Synthesizer */
+    let audioCtx = null;
+    let isAmbientPlaying = false;
+    let rainSource = null;
+
+    function toggleAmbientSound() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+
+      if (isAmbientPlaying) {
+        if (rainSource) { rainSource.stop(); rainSource = null; }
+        isAmbientPlaying = false;
+        document.getElementById('audioLabel').textContent = 'Audio Kafe';
+        document.getElementById('audioIcon').textContent = '🌧️';
+      } else {
+        // Generate soft pink noise rain
+        const bufferSize = audioCtx.sampleRate * 2;
+        const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        const data = buffer.getChannelData(0);
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555;
+          b1 = 0.99332 * b1 + white * 0.0750;
+          b2 = 0.96900 * b2 + white * 0.1538;
+          b3 = 0.86650 * b3 + white * 0.3104;
+          b4 = 0.55000 * b4 + white * 0.5329;
+          data[i] = (b0 + b1 + b2 + b3 + b4) * 0.04;
+        }
+
+        rainSource = audioCtx.createBufferSource();
+        rainSource.buffer = buffer;
+        rainSource.loop = true;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(600, audioCtx.currentTime);
+
+        const gain = audioCtx.createGain();
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+
+        rainSource.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        rainSource.start();
+
+        isAmbientPlaying = true;
+        document.getElementById('audioLabel').textContent = 'Suasana Hidup';
+        document.getElementById('audioIcon').textContent = '🔊';
+      }
+    }
+
+    /* Menu Rendering & Filtering */
+    function renderMenu() {
+      const container = document.getElementById('menuGrid');
+      const search = document.getElementById('menuSearch').value.toLowerCase().trim();
+      const sort = document.getElementById('menuSort').value;
+
+      let items = MENU_DATA.filter(item => {
+        const matchCat = currentCategory === 'all' || item.category === currentCategory;
+        const matchSearch = !search || item.name.toLowerCase().includes(search) || item.desc.toLowerCase().includes(search);
+        return matchCat && matchSearch;
+      });
+
+      if (sort === 'asc') items.sort((a,b) => a.price - b.price);
+      if (sort === 'desc') items.sort((a,b) => b.price - a.price);
+
+      if (items.length === 0) {
+        container.innerHTML = '<div class="col-span-3 text-center py-12 text-[#7A695C]">Menu tidak ditemukan. Coba kata kunci lain.</div>';
+        return;
+      }
+
+      container.innerHTML = items.map(item => `
+        <div class="group flex flex-col bg-white dark:bg-[#1F150F] rounded-xl border border-[#E5DDCF] dark:border-[#38261A] overflow-hidden hover:shadow-lg transition-all">
+          <div class="relative aspect-4/3 bg-[#EFE9DF] overflow-hidden">
+            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+            ${item.tag ? `<div class="absolute top-3 left-3 bg-[#241A12]/90 text-[#E0A96D] text-[11px] font-medium px-2.5 py-0.5 rounded-sm">${item.tag}</div>` : ''}
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-baseline justify-between gap-2 mb-1">
+                <h3 class="font-serif text-lg font-bold text-[#221A15] dark:text-[#FAF6F0]">${item.name}</h3>
+                <span class="font-serif font-bold text-base text-[#8A4B23] dark:text-[#E0A96D] tabular-nums">Rp ${item.price.toLocaleString('id-ID')}</span>
+              </div>
+              <p class="text-xs text-[#5C4A3C] dark:text-[#C5B3A3] line-clamp-2 mb-2">${item.desc}</p>
+              <div class="text-[11px] text-[#7A6757] dark:text-[#A8988B]">
+                ${item.tastingNotes.join(' · ')}
+              </div>
+            </div>
+            <div class="pt-4 mt-3 border-t border-[#F0E9DC] dark:border-[#332217] flex items-center justify-between">
+              <span class="text-[11px] text-[#8C7A6D]">Pilihan Barista</span>
+              <button onclick="openItemModal('${item.id}') class="px-3 py-1.5 rounded-lg bg-[#FAF6EE] dark:bg-[#2C1E15] hover:bg-[#8A4B23] text-[#4A392C] dark:text-[#FAF6F0] hover:text-white border border-[#DED4C3] dark:border-[#422F22] text-xs font-semibold cursor-pointer">
+                + Pesan
+              </button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setMenuCategory(cat) {
+      currentCategory = cat;
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.className = 'cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-white dark:bg-[#201610] text-[#524235] dark:text-[#C5B3A3] border-[#DFD6C6] dark:border-[#3A281E]';
+      });
+      event.target.className = 'cat-btn px-4 py-2 text-xs font-medium rounded-lg whitespace-nowrap border bg-[#2E1E14] text-white dark:bg-[#E0A96D] dark:text-[#221A15]';
+      renderMenu();
+    }
+
+    /* Mood Compass */
+    function selectMood(moodKey) {
+      currentMood = moodKey;
+      document.querySelectorAll('.mood-btn').forEach(btn => {
+        btn.className = 'mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#FDFBF7] dark:bg-[#231812] text-[#423226] dark:text-[#E0D3C7] border-[#DFD5C4] dark:border-[#3E2C20]';
+      });
+      document.getElementById('moodBtn-' + moodKey).className = 'mood-btn py-3 px-4 rounded-xl text-left transition-all border bg-[#2E1E14] text-[#FAF7F2] border-[#2E1E14] shadow-md';
+
+      const data = MOOD_DATA[moodKey];
+      document.getElementById('moodTitle').textContent = data.title;
+      document.getElementById('moodDesc').textContent = data.desc;
+      document.getElementById('moodImage').src = data.image;
+      document.getElementById('moodPairing').textContent = data.pairing;
+      document.getElementById('moodNotes').innerHTML = data.notes.map(n => `<span class="text-xs px-2.5 py-1 rounded bg-[#EFE8DC] dark:bg-[#2F2118] text-[#3E3025] dark:text-[#FAF6F0]">${n}</span>`).join('');
+    }
+
+    function quickOrderFromMood() {
+      const data = MOOD_DATA[currentMood];
+      openItemModal(data.menuId);
+    }
+
+    /* Modal Customizer */
+    function openItemModal(itemId) {
+      const item = MENU_DATA.find(i => i.id === itemId);
+      if (!item) return;
+      activeModalItem = item;
+      modalQty = 1;
+      modalSelectedTemp = 'Dingin';
+      modalSelectedSugar = '100%';
+
+      document.getElementById('modalName').textContent = item.name;
+      document.getElementById('modalDesc').textContent = item.desc;
+      document.getElementById('modalImg').src = item.image;
+      document.getElementById('modalQtyDisplay').textContent = '1';
+      document.getElementById('modalNotes').value = '';
+      document.getElementById('modalExtraShot').checked = false;
+
+      // Toggle milk section
+      document.getElementById('modalMilkSection').style.display = item.allowsMilk ? 'block' : 'none';
+
+      setModalTemp('Dingin');
+      setModalSugar('100%');
+      calculateModalTotal();
+
+      document.getElementById('itemModal').classList.remove('hidden');
+    }
+
+    function closeItemModal() {
+      document.getElementById('itemModal').classList.add('hidden');
+    }
+
+    function setModalTemp(temp) {
+      modalSelectedTemp = temp;
+      const d = document.getElementById('modalTemp-Dingin');
+      const p = document.getElementById('modalTemp-Panas');
+      if (temp === 'Dingin') {
+        d.className = 'py-2 px-3 rounded-lg text-xs font-medium border bg-[#2E1E14] text-white';
+        p.className = 'py-2 px-3 rounded-lg text-xs font-medium border bg-white dark:bg-[#2C1E15] text-[#4A392C] dark:text-[#FAF6F0]';
+      } else {
+        p.className = 'py-2 px-3 rounded-lg text-xs font-medium border bg-[#2E1E14] text-white';
+        d.className = 'py-2 px-3 rounded-lg text-xs font-medium border bg-white dark:bg-[#2C1E15] text-[#4A392C] dark:text-[#FAF6F0]';
+      }
+    }
+
+    function setModalSugar(sugar) {
+      modalSelectedSugar = sugar;
+      ['100', '50', '25', '0'].forEach(s => {
+        const btn = document.getElementById('sugar-' + s);
+        if (s + '%' === sugar) {
+          btn.className = 'py-1.5 text-xs rounded border bg-[#2E1E14] text-white';
+        } else {
+          btn.className = 'py-1.5 text-xs rounded border bg-white dark:bg-[#2C1E15] text-[#4A392C] dark:text-[#FAF6F0]';
+        }
+      });
+    }
+
+    function changeModalQty(delta) {
+      modalQty = Math.max(1, modalQty + delta);
+      document.getElementById('modalQtyDisplay').textContent = modalQty;
+      calculateModalTotal();
+    }
+
+    function calculateModalTotal() {
+      if (!activeModalItem) return;
+      let unit = activeModalItem.price;
+      if (activeModalItem.allowsMilk) {
+        const milk = document.getElementById('modalMilk').value;
+        if (milk.includes('Oat')) unit += 6000;
+        if (milk.includes('Almond')) unit += 8000;
+      }
+      if (document.getElementById('modalExtraShot').checked) {
+        unit += 8000;
+      }
+      const total = unit * modalQty;
+      document.getElementById('modalTotalPrice').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+    }
+
+    function confirmAddToCart() {
+      if (!activeModalItem) return;
+      let unit = activeModalItem.price;
+      let milk = 'Fresh Milk';
+      if (activeModalItem.allowsMilk) {
+        milk = document.getElementById('modalMilk').value;
+        if (milk.includes('Oat')) unit += 6000;
+        if (milk.includes('Almond')) unit += 8000;
+      }
+      const extraShot = document.getElementById('modalExtraShot').checked;
+      if (extraShot) unit += 8000;
+
+      cart.push({
+        item: activeModalItem,
+        temp: modalSelectedTemp,
+        sugar: modalSelectedSugar,
+        milk: milk,
+        extraShot: extraShot,
+        notes: document.getElementById('modalNotes').value.trim(),
+        qty: modalQty,
+        unitPrice: unit
+      });
+
+      updateCartBadge();
+      closeItemModal();
+      openCartDrawer();
+    }
+
+    /* Cart Drawer Logic */
+    function updateCartBadge() {
+      const badge = document.getElementById('cartBadge');
+      const count = cart.reduce((sum, i) => sum + i.qty, 0);
+      if (count > 0) {
+        badge.textContent = count;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+
+    function openCartDrawer() {
+      const body = document.getElementById('cartBody');
+      if (cart.length === 0) {
+        body.innerHTML = `
+          <div class="text-center py-16 text-[#7A695C]">
+            <p class="font-serif text-lg text-[#221A15] dark:text-[#FAF6F0]">Keranjang Kosong</p>
+            <p class="text-xs mt-1">Pilih menu kopi atau hidangan favorit Anda.</p>
+          </div>
+        `;
+        document.getElementById('cartSubtotal').textContent = 'Rp 0';
+        document.getElementById('cartTax').textContent = 'Rp 0';
+        document.getElementById('cartGrandTotal').textContent = 'Rp 0';
+      } else {
+        let subtotal = 0;
+        body.innerHTML = cart.map((ci, idx) => {
+          const itemTotal = ci.unitPrice * ci.qty;
+          subtotal += itemTotal;
+          return `
+            <div class="p-3 bg-white dark:bg-[#251A13] rounded-xl border border-[#E3D9C8] dark:border-[#382619] flex gap-3 text-xs">
+              <div class="flex-1">
+                <div class="flex justify-between items-start">
+                  <h4 class="font-serif font-bold text-[#221A15] dark:text-[#FAF6F0]">${ci.item.name}</h4>
+                  <button onclick="removeCartItem(${idx})" class="text-rose-600 cursor-pointer">✕</button>
+                </div>
+                <p class="text-[11px] text-[#7A695C] dark:text-[#A8988B] mt-0.5">
+                  ${ci.temp} · Gula ${ci.sugar} ${ci.item.allowsMilk ? '· ' + ci.milk : ''} ${ci.extraShot ? '· +Shot' : ''}
+                </p>
+                ${ci.notes ? `<p class="text-[10px] text-[#8A4B23] italic">"${ci.notes}"</p>` : ''}
+                <div class="flex justify-between items-center mt-2 pt-1 border-t border-[#F2ECE1] dark:border-[#332217]">
+                  <span class="font-bold tabular-nums">Rp ${itemTotal.toLocaleString('id-ID')}</span>
+                  <div class="flex items-center gap-2">
+                    <button onclick="changeCartQty(${idx}, -1)" class="w-5 h-5 rounded bg-[#F4EFE6] dark:bg-[#332217] text-center">-</button>
+                    <span>${ci.qty}</span>
+                    <button onclick="changeCartQty(${idx}, 1)" class="w-5 h-5 rounded bg-[#F4EFE6] dark:bg-[#332217] text-center">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        const tax = Math.round(subtotal * 0.1);
+        const grand = subtotal + tax;
+        document.getElementById('cartSubtotal').textContent = `Rp ${subtotal.toLocaleString('id-ID')}`;
+        document.getElementById('cartTax').textContent = `Rp ${tax.toLocaleString('id-ID')}`;
+        document.getElementById('cartGrandTotal').textContent = `Rp ${grand.toLocaleString('id-ID')}`;
+      }
+
+      document.getElementById('cartDrawer').classList.remove('hidden');
+    }
+
+    function closeCartDrawer() {
+      document.getElementById('cartDrawer').classList.add('hidden');
+    }
+
+    function changeCartQty(index, delta) {
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) {
+        cart.splice(index, 1);
+      }
+      updateCartBadge();
+      openCartDrawer();
+    }
+
+    function removeCartItem(index) {
+      cart.splice(index, 1);
+      updateCartBadge();
+      openCartDrawer();
+    }
+
+    function checkoutViaWhatsApp() {
+      if (cart.length === 0) return;
+      let text = `*Halo Kala Senja Coffee & Space!* ☕\nSaya ingin memesan menu berikut:\n\n`;
+      let subtotal = 0;
+      cart.forEach((c, idx) => {
+        const itemTot = c.unitPrice * c.qty;
+        subtotal += itemTot;
+        text += `${idx + 1}. *${c.item.name}* (${c.qty}x)\n`;
+        text += `   - Suhu: ${c.temp}, Gula: ${c.sugar}\n`;
+        if (c.item.allowsMilk) text += `   - Susu: ${c.milk}\n`;
+        if (c.extraShot) text += `   - Extra Espresso Shot: Ya\n`;
+        if (c.notes) text += `   - Catatan: ${c.notes}\n`;
+        text += `   - Subtotal: Rp ${itemTot.toLocaleString('id-ID')}\n\n`;
+      });
+      const tax = Math.round(subtotal * 0.1);
+      const grand = subtotal + tax;
+      text += `💰 *Total Pembayaran:* Rp ${grand.toLocaleString('id-ID')} (Termasuk PB1 10%)\n\nMohon dikonfirmasi pesanannya ya. Terima kasih!`;
+      window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    /* Space Area Switching */
+    const SPACE_DATA = {
+      indoor: {
+        title: 'Indoor Sanctuary (AC)',
+        desc: 'Area berpendingin udara yang sejuk dan tenang. Dilengkapi meja ergonomis luas, kursi empuk, serta stopkontak di setiap titik.',
+        best: 'Kerja Remote, WFC Produktif, Diskusi Santai',
+        img: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=1200&q=80'
+      },
+      courtyard: {
+        title: 'Courtyard Semi-Outdoor',
+        desc: 'Taman terbuka beratap kaca dengan sirkulasi udara alami dan rimbunnya dedaunan tropis untuk bercengkerama santai.',
+        best: 'Ngobrol Santai, Foto Estetik, Pet-Friendly',
+        img: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1200&q=80'
+      },
+      rooftop: {
+        title: 'Sunset Rooftop View',
+        desc: 'Lantai atas dengan pemandangan langit senja terbuka dan temaram lampu gantung hangat saat matahari terbenam.',
+        best: 'Menikmati Senja, Live Acoustic Weekend, Kencan',
+        img: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1200&q=80'
+      }
+    };
+
+    function switchArea(areaKey) {
+      ['indoor', 'courtyard', 'rooftop'].forEach(k => {
+        const tab = document.getElementById('areaTab-' + k);
+        if (k === areaKey) {
+          tab.className = 'py-3.5 px-6 text-xs sm:text-sm font-semibold border-b-2 border-[#8A4B23] text-[#8A4B23] dark:text-[#E0A96D]';
+        } else {
+          tab.className = 'py-3.5 px-6 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-[#614F42] dark:text-[#C5B3A3]';
+        }
+      });
+      const data = SPACE_DATA[areaKey];
+      document.getElementById('spaceAreaTitle').textContent = data.title;
+      document.getElementById('spaceAreaDesc').textContent = data.desc;
+      document.getElementById('spaceAreaBest').textContent = data.best;
+      document.getElementById('spaceAreaImage').src = data.img;
+    }
+
+    /* Reservation Handler */
+    function handleReservationSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('resName').value.trim();
+      const phone = document.getElementById('resPhone').value.trim();
+      const guests = document.getElementById('resGuests').value;
+      const date = document.getElementById('resDate').value;
+      const time = document.getElementById('resTime').value;
+      const area = document.getElementById('resArea').value;
+      const notes = document.getElementById('resNotes').value.trim();
+      const code = 'KS-' + Math.floor(1000 + Math.random() * 9000);
+
+      // Update pass card
+      document.getElementById('passCode').textContent = code;
+      document.getElementById('passGuests').textContent = guests;
+      document.getElementById('passArea').textContent = area;
+      document.getElementById('passSchedule').textContent = `${date} · ${time}`;
+
+      const waMsg = `*Halo Kala Senja Coffee & Space!* 🌅\n` +
+        `Saya ingin konfirmasi reservasi meja:\n\n` +
+        `📌 *Kode Booking:* ${code}\n` +
+        `👤 *Nama:* ${name}\n` +
+        `📱 *No. WhatsApp:* ${phone}\n` +
+        `👥 *Tamu:* ${guests}\n` +
+        `📅 *Tanggal:* ${date}\n` +
+        `⏰ *Waktu:* ${time}\n` +
+        `📍 *Area:* ${area}\n` +
+        (notes ? `📝 *Catatan:* ${notes}\n\n` : `\n`) +
+        `Mohon konfirmasi ketersediaan mejanya ya. Terima kasih!`;
+
+      window.open(`https://wa.me/6281234567890?text=${encodeURIComponent(waMsg)}`, '_blank');
+    }
+
+    /* Utility Copy & Mobile Nav */
+    function copyPromoCode() {
+      navigator.clipboard.writeText('SENJAPAGI');
+      document.getElementById('btnPromoCopy').innerHTML = '<span class="text-emerald-300">✓ Tersalin!</span>';
+      setTimeout(() => {
+        document.getElementById('btnPromoCopy').innerHTML = '<span>KODE: SENJAPAGI</span>';
+      }, 2000);
+    }
+
+    function toggleMobileNav() {
+      document.getElementById('mobileNav').classList.toggle('hidden');
+    }
+
+    // Set default tomorrow date on datepicker
+    window.addEventListener('DOMContentLoaded', () => {
+      initTheme();
+      renderMenu();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('resDate').value = tomorrow.toISOString().split('T')[0];
+    });
+  </script>
+</body>
+</html>

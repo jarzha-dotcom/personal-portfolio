@@ -1,9 +1,16 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
+
+// Galeri demo (folder statis di public/demos/, di luar SPA). File HTML demo
+// besar (sampai ~4 MB) dan jarang dibuka offline, jadi navigasi ke sana tidak
+// ikut di-cache. demos.json dilayani network-first supaya demo baru langsung
+// muncul di galeri & DemoShowcaseNudge, bukan telat satu kunjungan.
+const DEMOS_PREFIX = '/demos/';
+const DEMOS_MANIFEST = '/demos/demos.json';
 
 // Rute client-side yang dilayani index.html (lihat ROUTES di hooks/usePathname.ts).
 // Kalau offline dan halaman ini belum pernah dibuka, jatuh ke app shell '/'
@@ -69,8 +76,10 @@ self.addEventListener('fetch', (event) => {
         event.respondWith(
             fetch(request)
                 .then((response) => {
-                    const clone = response.clone();
-                    caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                    if (!url.pathname.startsWith(DEMOS_PREFIX)) {
+                        const clone = response.clone();
+                        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                    }
                     return response;
                 })
                 .catch(() =>
@@ -86,6 +95,22 @@ self.addEventListener('fetch', (event) => {
                         })
                         .then((response) => response || caches.match(OFFLINE_URL))
                 )
+        );
+        return;
+    }
+
+    // Daftar demo → network-first, cache hanya sebagai cadangan saat offline.
+    if (url.pathname === DEMOS_MANIFEST) {
+        event.respondWith(
+            fetch(request)
+                .then((response) => {
+                    if (response.ok) {
+                        const clone = response.clone();
+                        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                    }
+                    return response;
+                })
+                .catch(() => caches.match(request).then((cached) => cached || Response.error()))
         );
         return;
     }

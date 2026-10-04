@@ -4,7 +4,9 @@ import {
   X,
   Sun,
   Moon,
-  Send
+  Send,
+  ChevronDown,
+  ExternalLink
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -26,7 +28,18 @@ interface NavItem {
   id: string;
   // true = halaman terpisah (pindah rute), false/undefined = anchor di beranda
   route?: boolean;
+  // true = halaman di luar aplikasi ini (dibuka di tab baru)
+  external?: boolean;
 }
+
+interface NavGroup {
+  id: string;
+  name: string;
+  children: NavItem[];
+}
+
+type NavEntry = NavItem | NavGroup;
+const isGroup = (e: NavEntry): e is NavGroup => 'children' in e;
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'Beranda', href: '#beranda', id: 'beranda' },
@@ -46,7 +59,29 @@ const navLinks = NAV_ITEMS.filter((l) => !l.route);
 // Link "Artikel" baru tampil kalau minimal satu artikel sudah dipublikasikan
 // — supaya tidak ada link ke halaman yang isinya kosong.
 const hasPublishedArticles = ARTICLES.some((a) => a.published);
-const visibleNavItems = NAV_ITEMS.filter((l) => l.id !== 'artikel' || hasPublishedArticles);
+
+// Halaman galeri contoh desain (statis, di public/demos)
+const DESIGN_GALLERY_URL = '/demos/index.html';
+
+// Grup dropdown "Karya": menggabungkan Portofolio, Hasil Kerja, dan Contoh Desain
+const KARYA_GROUP: NavGroup = {
+  id: 'karya',
+  name: 'Karya',
+  children: [
+    { name: 'Proyek', href: '#proyek', id: 'proyek' },
+    { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
+    { name: 'Contoh Desain', href: DESIGN_GALLERY_URL, id: 'contoh-desain', external: true },
+  ],
+};
+
+// Urutan tampil di navbar: grup Karya menggantikan posisi "Portofolio",
+// sedangkan "Hasil Kerja" masuk ke dalam grup. Scroll-spy tetap memakai navLinks.
+const NAV_ENTRIES: NavEntry[] = NAV_ITEMS.flatMap((item): NavEntry[] => {
+  if (item.id === 'proyek') return [KARYA_GROUP];
+  if (item.id === 'hasil-kerja') return [];
+  if (item.id === 'artikel' && !hasPublishedArticles) return [];
+  return [item];
+});
 
 // Class helper dipakai berulang di semua tombol/link interaktif supaya
 // keyboard user (Tab) selalu dapat indikasi fokus yang jelas — sebelumnya
@@ -59,6 +94,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
+  const [karyaOpen, setKaryaOpen] = useState(false);
+  const karyaRef = useRef<HTMLDivElement>(null);
+  const karyaBtnRef = useRef<HTMLButtonElement>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
   const location = useLocation();
   const pathname = location.pathname;
@@ -137,6 +175,34 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [mobileMenuOpen]);
 
+  // Dropdown Karya: tutup saat klik di luar, Escape, atau pindah rute
+  useEffect(() => {
+    if (!karyaOpen) return;
+    const onPointerDown = (e: MouseEvent | TouchEvent) => {
+      if (karyaRef.current && !karyaRef.current.contains(e.target as Node)) {
+        setKaryaOpen(false);
+      }
+    };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setKaryaOpen(false);
+        karyaBtnRef.current?.focus();
+      }
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [karyaOpen]);
+
+  useEffect(() => {
+    setKaryaOpen(false);
+  }, [pathname]);
+
   // Di halaman lain, anchor beranda diarahkan ke '/#anchor'
   const anchorHref = (href: string) => (isHome ? href : `/${href}`);
 
@@ -169,6 +235,30 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
       });
     }
   };
+
+  const isItemActive = (l: NavItem) =>
+    l.external ? false : l.route ? pathname === l.href : isHome && activeSection === l.id;
+
+  // Link eksternal membawa tema aktif supaya galeri tampil senada (terang/gelap)
+  const itemHref = (l: NavItem) =>
+    l.external
+      ? `${l.href}?theme=${darkMode ? 'dark' : 'light'}`
+      : l.route
+        ? l.href
+        : anchorHref(l.href);
+
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, l: NavItem) => {
+    setKaryaOpen(false);
+    if (l.external) {
+      setMobileMenuOpen(false);
+      return; // biarkan browser membuka tab baru
+    }
+    if (l.route) goToRoute(e, l.href);
+    else scrollToSection(e, l.href);
+  };
+
+  const externalProps = (l: NavItem) =>
+    l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   // Easter egg: klik logo 5x dalam rentang 2.5 detik akan membuka Mode CV
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -225,27 +315,82 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-4 lg:gap-6 text-sm font-medium">
-            {visibleNavItems.map((link) => {
-              const isActive = link.route
-                ? pathname === link.href
-                : isHome && activeSection === link.id;
+            {NAV_ENTRIES.map((entry) => {
+              const linkTone = (active: boolean) =>
+                active
+                  ? 'text-teal-600 dark:text-teal-400'
+                  : darkMode
+                    ? 'text-slate-400 hover:text-white'
+                    : 'text-slate-600 hover:text-slate-900';
+
+              if (isGroup(entry)) {
+                const groupActive = entry.children.some(isItemActive);
+                return (
+                  <div key={entry.id} ref={karyaRef} className="relative">
+                    <button
+                      ref={karyaBtnRef}
+                      id={`nav-link-${entry.id}`}
+                      type="button"
+                      aria-expanded={karyaOpen}
+                      aria-controls="nav-karya-menu"
+                      onClick={() => setKaryaOpen((o) => !o)}
+                      className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(groupActive || karyaOpen)}`}
+                    >
+                      {entry.name}
+                      <ChevronDown
+                        className={`w-3 h-3 transition-transform ${karyaOpen ? 'rotate-180' : ''}`}
+                      />
+                    </button>
+                    {karyaOpen && (
+                      <div
+                        id="nav-karya-menu"
+                        className={`absolute left-0 top-full mt-3 w-56 rounded-xl border p-1.5 shadow-xl ${
+                          darkMode
+                            ? 'bg-slate-900 border-slate-800 shadow-black/40'
+                            : 'bg-white border-slate-200 shadow-slate-200/80'
+                        }`}
+                      >
+                        {entry.children.map((child) => {
+                          const active = isItemActive(child);
+                          return (
+                            <a
+                              key={child.id}
+                              href={itemHref(child)}
+                              {...externalProps(child)}
+                              aria-current={active ? 'page' : undefined}
+                              onClick={(e) => handleItemClick(e, child)}
+                              className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium normal-case tracking-normal ${FOCUS_RING} ${
+                                active
+                                  ? darkMode
+                                    ? 'bg-teal-500/20 text-teal-400'
+                                    : 'bg-teal-50 text-teal-700'
+                                  : darkMode
+                                    ? 'text-slate-200 hover:bg-slate-800'
+                                    : 'text-slate-700 hover:bg-slate-100'
+                              }`}
+                            >
+                              <span>{child.name}</span>
+                              {child.external && <ExternalLink className="w-3.5 h-3.5 opacity-60" />}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                );
+              }
+
+              const isActive = isItemActive(entry);
               return (
                 <a
-                  key={link.id}
-                  id={`nav-link-${link.id}`}
-                  href={link.route ? link.href : anchorHref(link.href)}
+                  key={entry.id}
+                  id={`nav-link-${entry.id}`}
+                  href={itemHref(entry)}
                   aria-current={isActive ? 'page' : undefined}
-                  onClick={(e) =>
-                    link.route ? goToRoute(e, link.href) : scrollToSection(e, link.href)
-                  }
-                  className={`text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${isActive
-                    ? 'text-teal-600 dark:text-teal-400'
-                    : darkMode
-                      ? 'text-slate-400 hover:text-white'
-                      : 'text-slate-600 hover:text-slate-900'
-                    }`}
+                  onClick={(e) => handleItemClick(e, entry)}
+                  className={`text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(isActive)}`}
                 >
-                  {link.name}
+                  {entry.name}
                 </a>
               );
             })}
@@ -310,31 +455,46 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             }`}
         >
           <div className="flex flex-col space-y-1">
-            {visibleNavItems.map((link) => {
-              const isActive = link.route
-                ? pathname === link.href
-                : isHome && activeSection === link.id;
-              return (
-                <a
-                  key={link.id}
-                  href={link.route ? link.href : anchorHref(link.href)}
-                  aria-current={isActive ? 'page' : undefined}
-                  onClick={(e) =>
-                    link.route ? goToRoute(e, link.href) : scrollToSection(e, link.href)
-                  }
-                  className={`px-4 py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
-                    ? darkMode
-                      ? 'bg-teal-500/20 text-teal-400 font-semibold'
-                      : 'bg-teal-50 text-teal-700 font-semibold'
-                    : darkMode
-                      ? 'text-slate-200 hover:bg-slate-800'
-                      : 'text-slate-700 hover:bg-slate-100'
-                    }`}
-                >
-                  <span>{link.name}</span>
-                  {isActive && <span className="w-2 h-2 rounded-full bg-teal-500"></span>}
-                </a>
-              );
+            {NAV_ENTRIES.map((entry) => {
+              const drawerLink = (link: NavItem, nested: boolean) => {
+                const isActive = isItemActive(link);
+                return (
+                  <a
+                    key={link.id}
+                    href={itemHref(link)}
+                    {...externalProps(link)}
+                    aria-current={isActive ? 'page' : undefined}
+                    onClick={(e) => handleItemClick(e, link)}
+                    className={`${nested ? 'pl-8 pr-4' : 'px-4'} py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
+                      ? darkMode
+                        ? 'bg-teal-500/20 text-teal-400 font-semibold'
+                        : 'bg-teal-50 text-teal-700 font-semibold'
+                      : darkMode
+                        ? 'text-slate-200 hover:bg-slate-800'
+                        : 'text-slate-700 hover:bg-slate-100'
+                      }`}
+                  >
+                    <span>{link.name}</span>
+                    {link.external ? (
+                      <ExternalLink className="w-4 h-4 opacity-60" />
+                    ) : (
+                      isActive && <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+                    )}
+                  </a>
+                );
+              };
+
+              if (isGroup(entry)) {
+                return (
+                  <div key={entry.id} className="pt-1">
+                    <p className={`px-4 pt-2 pb-1 text-xs font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                      {entry.name}
+                    </p>
+                    {entry.children.map((child) => drawerLink(child, true))}
+                  </div>
+                );
+              }
+              return drawerLink(entry, false);
             })}
           </div>
 

@@ -1,6 +1,6 @@
 /**
  * Koordinator kecil untuk semua "nudge" melayang di app ini (bubble sambutan
- * Zannah, banner install PWA, kartu rekomendasi artikel — dan nudge lain di
+ * Zannah, banner install PWA, kartu rekomendasi artikel, kartu promosi demo — dan nudge lain di
  * masa depan). Tujuannya satu: supaya mereka tidak numpuk tampil bersamaan
  * dan berebut perhatian pengunjung di waktu yang sama.
  *
@@ -22,7 +22,7 @@
  * 'open-zannah-chat' di ZannahWelcomeNudge/ChatWidget).
  */
 
-export type NudgeId = 'zannah' | 'pwa-install' | 'article-recommendation';
+export type NudgeId = 'zannah' | 'pwa-install' | 'article-recommendation' | 'demo-showcase';
 
 const EVENT_NAME = 'attention-nudge-changed';
 
