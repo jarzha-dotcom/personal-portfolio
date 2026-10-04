@@ -123,7 +123,7 @@ export async function classifyResearchIntent(
     return null;
 }
 
-export const RESEARCH_INTENT_VERSION = 'intent-2026-10-04.5';
+export const RESEARCH_INTENT_VERSION = 'intent-2026-10-04.6';
 
 /** Debug (modal admin): jalankan klasifikator sekali dan ukur waktunya. */
 export async function probeClassifier(apiKey: string | undefined) {

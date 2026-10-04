@@ -3,7 +3,7 @@ import { getSystemInstruction, BotPersona } from './_lib/prompts.js';
 import { classifyResearchIntent, probeClassifier, RESEARCH_INTENT_VERSION } from './_lib/researchIntent.js';
 
 // Penanda versi file ini (muncul di modal admin supaya jelas versi mana yang sedang jalan).
-const CHAT_CODE_VERSION = 'chat-2026-10-04.5';
+const CHAT_CODE_VERSION = 'chat-2026-10-04.6';
 import {
     checkRateLimit,
     cleanupOldRateLimits,
@@ -432,6 +432,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const researchTopicVague: boolean =
             researchClarify || (researchWouldRun && topicWordCount(researchQuestion) === 0 && !priorUserTopicExists);
         const webResearchRequested: boolean = researchWouldRun && !researchTopicVague;
+        if (researchGate !== 'no') {
+            console.log(
+                `[chat.ts] riset web: gate=${researchGate} klasifikator/aturan->riset=${researchWouldRun} topikKabur=${researchTopicVague} => jalan=${webResearchRequested}`
+            );
+        }
 
         const enrichWithSummaryAttachment = (resData: any) => {
             if (!isSummaryRequested || !resData || rabTextAction) return resData;

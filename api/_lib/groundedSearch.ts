@@ -340,7 +340,13 @@ async function runGroundedResearchInner(
     }
 
     const candidates = (await getCandidateModels(apiKey)).filter((m) => (modelBlockedUntil.get(m) || 0) <= Date.now());
-    if (candidates.length === 0) return { ok: false, reason: 'quota' };
+    if (candidates.length === 0) {
+        const resting = [...modelBlockedUntil.entries()]
+            .filter(([, t]) => t > Date.now())
+            .map(([m, t]) => `${m}=${Math.ceil((t - Date.now()) / 60000)}mnt`);
+        console.warn(`[groundedSearch] tidak ada model siap pakai. Sedang istirahat: ${resting.join(', ') || '(daftar model kosong)'}`);
+        return { ok: false, reason: 'quota' };
+    }
 
     const capReason = checkAndConsumeLocalCaps(ip);
     if (capReason) return { ok: false, reason: capReason };
@@ -492,7 +498,15 @@ export async function runGroundedResearch(
     context: string,
     ip: string
 ): Promise<GroundedOutcome> {
+    const t0 = Date.now();
     const outcome = await runGroundedResearchInner(apiKey, question, context, ip);
+    // Satu baris ringkasan untuk SETIAP riset, termasuk yang gagal diam-diam sebelum ada panggilan API
+    // (batas harian/per-IP, semua model sedang istirahat, dst).
+    console.log(
+        outcome.ok
+            ? `[groundedSearch] selesai: OK model=${outcome.model}${outcome.cached ? ' (cache)' : ''} ${Date.now() - t0}ms`
+            : `[groundedSearch] selesai: GAGAL alasan=${outcome.reason} ${Date.now() - t0}ms | hari ini=${dayCount}/${DAILY_CAP}`
+    );
     const at = new Date().toISOString();
     if (outcome.ok) {
         if (outcome.cached) stats.cached += 1;
@@ -541,7 +555,7 @@ export function getGroundingDiagnostics() {
 
 
 // ── Debug: penanda versi + tes langsung (dipakai modal admin) ─────────────────────────────
-export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.5';
+export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.6';
 
 export interface ProbeRow {
     model: string;
