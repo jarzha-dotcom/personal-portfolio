@@ -57,6 +57,7 @@ export interface ProjectItem {
   role: string;
   year: string;
   demoUrl?: string;
+  coverImage?: string;
   githubUrl?: string;
   isFeatured?: boolean;
   colorScheme?: 'amber' | 'teal' | 'indigo' | 'emerald';

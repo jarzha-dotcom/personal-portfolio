@@ -38,123 +38,38 @@ import {
   Handshake,
 } from 'lucide-react';
 
+import { ARTICLE_IMAGES, type ArticleImageSet } from '../data/articleImages';
+
 // ---------------------------------------------------------------------------
-// Gambar artikel di-host di Vercel Blob (bukan lagi di-bundle oleh Vite).
+// Gambar artikel di-host di Vercel Blob (bukan di-bundle Vite, dan file
+// .jpeg-nya di-ignore Git). Daftar URL-nya DIBUAT OTOMATIS oleh
+// scripts/upload-images.ts ke src/data/articleImages.ts -- file ini tidak
+// perlu diedit saat menambah ilustrasi.
 //
-// 1. Jalankan `npx tsx --env-file=.env.local scripts/upload-images.ts`
-// 2. Salin "BLOB_BASE_URL" yang dicetak script itu ke konstanta di bawah.
+// CARA MENAMBAH ILUSTRASI ARTIKEL BARU
+//   1. Taruh <slug>.jpeg (TOP/hero) dan <slug>-2.jpeg (MIDDLE) di
+//      src/assets/images/. <slug> = slug artikel di src/data/articles.ts.
+//      Ukuran asli 1408x768. Keduanya wajib ada.
+//   2. Jalankan: npm run upload:images
+//      (opsi: -- --dry-run untuk lihat rencana, -- --prune untuk hapus gambar
+//      lama yang tak terpakai SETELAH deploy baru live)
+//   3. Commit src/data/articleImages.ts. File gambar tidak muncul di
+//      git status karena sudah di-ignore.
 //
-// Konvensi nama file: "Judul.jpeg" = gambar TOP (hero), "Judul 2.jpeg" = MIDDLE.
-// URL dibentuk dari nama file lewat slugify() -- fungsi ini HARUS sama persis
-// dengan slugify() di scripts/upload-images.ts, jadi tidak perlu salin 34 URL
-// satu per satu.
-//
-// Kenapa tanpa import.meta.env: scripts/prerender.ts jalan di luar Vite (lewat
-// tsx) dan ikut meng-import file ini, jadi file ini tidak boleh bergantung
-// pada fitur khusus Vite.
+// CATATAN
+//   - Mengganti gambar lama: timpa file lokalnya dengan nama yang sama lalu
+//     jalankan script lagi. URL baru otomatis dibuat (memuat hash isi file),
+//     jadi tidak ada masalah cache.
+//   - Tidak memakai import.meta.env/import.meta.glob karena
+//     scripts/prerender.ts jalan di luar Vite (lewat tsx) dan ikut meng-import
+//     file ini.
 // ---------------------------------------------------------------------------
-const BLOB_BASE_URL = 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles';
-
-const slugify = (filename: string): string =>
-  filename
-    .replace(/\.jpe?g$/i, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-export const blobImageUrl = (filename: string): string =>
-  `${BLOB_BASE_URL}/${slugify(filename)}.jpeg`;
-
-interface SlugImages {
-  top: string;
-  middle: string;
-}
-
-// Nama file ASLI (sebelum di-slugify) untuk tiap slug. Ini satu-satunya tempat
-// yang perlu diubah saat menambah/mengganti gambar artikel. Tetap di-export
-// untuk kompatibilitas dengan kode lama.
-export const SLUG_IMAGE_SOURCE_FILES: Record<string, SlugImages> = {
-  'cara-kerja-sistem-aset-pt-gmp': {
-    top: 'Cara Kerja Sistem Manajemen Aset PT Global Multiparts.jpeg',
-    middle: 'Cara Kerja Sistem Manajemen Aset PT Global Multiparts 2.jpeg',
-  },
-  'tanda-waktunya-migrasi-dari-apps-script': {
-    top: '5 Tanda Bisnismu Sudah Waktunya Migrasi.jpeg',
-    middle: '5 Tanda Bisnismu Sudah Waktunya Migrasi 2.jpeg',
-  },
-  'amankah-data-bisnis-di-google-sheets-drive': {
-    top: 'Amankah Data Bisnis Disimpan di Google Sheets-Drive.jpeg',
-    middle: 'Amankah Data Bisnis Disimpan di Google Sheets-Drive 2.jpeg',
-  },
-  'apa-itu-autonomous-agent-beda-chatbot-biasa': {
-    top: 'Apa Itu Autonomous Agent.jpeg',
-    middle: 'Apa Itu Autonomous Agent 2.jpeg',
-  },
-  'biaya-bikin-chatbot-custom-rincian': {
-    top: 'Berapa Biaya Sebenarnya Bikin Chatbot Custom.jpeg',
-    middle: 'Berapa Biaya Sebenarnya Bikin Chatbot Custom 2.jpeg',
-  },
-  'custom-chatbot-vs-chatbot-template': {
-    top: 'Custom Chatbot vs Chatbot Template.jpeg',
-    middle: 'Custom Chatbot vs Chatbot Template 2.jpeg',
-  },
-  'kenapa-google-apps-script-untuk-klien-kecil-menengah': {
-    top: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri.jpeg',
-    middle: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri 2.jpeg',
-  },
-  'arsitektur-multiplayer-real-time-b-games': {
-    top: 'Arsitektur Multiplayer Real-Time di B-Games.jpeg',
-    middle: 'Arsitektur Multiplayer Real-Time di B-Games 2.jpeg',
-  },
-  'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
-    top: '4 Sistem Saya, 4 Arsitektur Backend Berbeda.jpeg',
-    middle: '4 Sistem Saya, 4 Arsitektur Backend Berbeda 2.jpeg',
-  },
-  'apa-itu-cascade-ai-system': {
-    top: 'Apa Itu Cascade AI System.jpeg',
-    middle: 'Apa Itu Cascade AI System 2.jpeg',
-  },
-  'studi-kasus-devrab-proposal-30-detik': {
-    top: 'Di Balik Tombol Buatkan RAB.jpeg',
-    middle: 'Di Balik Tombol Buatkan RAB 2.jpeg',
-  },
-  'berapa-lama-bikin-website-aplikasi-bisnis-kecil': {
-    top: 'Berapa Lama Bikin Website.jpeg',
-    middle: 'Berapa Lama Bikin Website 2.jpeg',
-  },
-  '5-pertanyaan-sebelum-pakai-jasa-developer-freelance': {
-    top: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer.jpeg',
-    middle: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer 2.jpeg',
-  },
-  'web-app-vs-mobile-app-vs-pwa': {
-    top: 'Perbedaan Web App, Mobile App, dan PWA.jpeg',
-    middle: 'Perbedaan Web App, Mobile App, dan PWA 2.jpeg',
-  },
-  'kenapa-harga-proposal-bisa-beda-beda': {
-    top: 'Kenapa Harga Proposal Development Bisa.jpeg',
-    middle: 'Kenapa Harga Proposal Development Bisa 2.jpeg',
-  },
-  'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': {
-    top: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh.jpeg',
-    middle: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh 2.jpeg',
-  },
-  'checklist-sebelum-konsultasi-pertama-dengan-developer': {
-    top: 'Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama.jpeg',
-    middle: 'Checklist, Apa yang Perlu Disiapkan Sebelum Konsultasi Pertama 2.jpeg',
-  },
-};
 
 /**
  * URL absolut (Vercel Blob) per slug. Dipakai komponen ini dan juga
- * scripts/prerender.ts untuk og:image per-artikel -- cukup pakai nilai ini
- * langsung, tidak perlu lagi lookup ke dist/.vite/manifest.json.
+ * scripts/prerender.ts untuk og:image per-artikel.
  */
-export const SLUG_IMAGE_URLS: Record<string, SlugImages> = Object.fromEntries(
-  Object.entries(SLUG_IMAGE_SOURCE_FILES).map(([slug, files]) => [
-    slug,
-    { top: blobImageUrl(files.top), middle: blobImageUrl(files.middle) },
-  ]),
-);
+export const SLUG_IMAGE_URLS: Record<string, ArticleImageSet> = ARTICLE_IMAGES;
 
 const SLUG_IMAGES = SLUG_IMAGE_URLS;
 

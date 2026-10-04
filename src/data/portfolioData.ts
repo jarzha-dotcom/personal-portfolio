@@ -298,6 +298,38 @@ export const PROJECTS: ProjectItem[] = [
       'Ekspor Laporan PDF/Excel & Audit Trail'
     ]
   },
+  {
+    id: 'proj-design-gallery',
+    title: 'Galeri Contoh Desain',
+    tagline: 'Kumpulan contoh desain landing page dan aplikasi web.',
+    category: 'Web App',
+    badge: 'Contoh Desain',
+    description: 'Contoh desain landing page dan aplikasi web yang bisa dijelajahi langsung di tab baru. Seluruh nama dan data di dalamnya bersifat contoh.',
+    longDescription: 'Galeri berisi contoh desain landing page dan aplikasi web untuk menunjukkan gaya dan pendekatan desain. Setiap contoh berupa halaman mandiri dengan tampilan desktop dan mobile. Seluruh nama, kontak, dan konten adalah data contoh.',
+    highlights: [
+      'Contoh desain landing page dan aplikasi web',
+      'Setiap contoh dibuka langsung di tab baru',
+      'Tampilan responsif untuk desktop dan mobile',
+    ],
+    techStack: ['HTML', 'Tailwind CSS', 'JavaScript', 'Lucide Icons'],
+    role: 'UI Designer & Front-end Developer',
+    year: '2026',
+    demoUrl: '/demos/index.html',
+    coverImage: '/demos/thumbs/demo-galeri-seni.webp',
+    isFeatured: true,
+    colorScheme: 'amber',
+    businessCase: {
+      problem: 'Calon klien sering sulit membayangkan hasil akhir hanya dari deskripsi atau gambar statis.',
+      solution: 'Contoh desain yang bisa langsung dibuka dan dijelajahi, sehingga gaya dan alurnya terlihat nyata.',
+      impact: 'Diskusi kebutuhan jadi lebih cepat dan konkret karena klien bisa bereaksi pada tampilan nyata.',
+    },
+    architectureFlow: [
+      'Buka Galeri Contoh Desain',
+      'Pilih Contoh & Buka di Tab Baru',
+      'Jelajahi Desktop & Mobile',
+      'Diskusikan Kebutuhan via WhatsApp',
+    ],
+  },
 ];
 
 export const TECH_STACK_GROUPS: TechStackGroup[] = [

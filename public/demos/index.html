@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galeri Contoh Desain</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4ef;--card:#fff;--ink:#17181a;--sub:#62666d;--line:#e4e0d7;--accent:#0f766e;--accent-ink:#fff;--ph1:#d9d2c3;--ph2:#bfb5a0}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#111314;--card:#1a1d1f;--ink:#f1efe9;--sub:#a0a4a9;--line:#2a2e31;--accent:#2dd4bf;--accent-ink:#06201d;--ph1:#2b2f31;--ph2:#3a3f42}}
+*{box-sizing:border-box}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 16px/1.6 "Plus Jakarta Sans",system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 20px 64px}
+.back{display:inline-block;color:var(--sub);font-size:14px;text-decoration:none;margin-bottom:28px}
+.back:hover{color:var(--accent)}
+h1{font:600 clamp(32px,6vw,52px)/1.1 Fraunces,Georgia,serif;margin:0 0 12px;letter-spacing:-.01em}
+.lead{max-width:56ch;color:var(--sub);margin:0 0 20px}
+.note{display:inline-flex;gap:8px;align-items:center;font-size:13px;color:var(--sub);border:1px dashed var(--line);border-radius:10px;padding:6px 12px;margin-bottom:28px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.chip{font:500 13px "Plus Jakarta Sans",sans-serif;color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:20px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 28px rgba(0,0,0,.12)}
+.thumb{aspect-ratio:4/3;background:linear-gradient(135deg,var(--ph1),var(--ph2));display:grid;place-items:center;font:600 56px Fraunces,Georgia,serif;color:rgba(255,255,255,.7);overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.body{padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}
+.body h2{font:600 20px/1.25 Fraunces,Georgia,serif;margin:0}
+.body p{margin:0;color:var(--sub);font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:12px;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 8px}
+.go{margin-top:auto;align-self:flex-start;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;font-size:14px;padding:9px 16px;border-radius:10px}
+.go:hover{filter:brightness(1.1)}
+.empty{color:var(--sub);padding:40px 0}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <a class="back" href="/">← Kembali ke portofolio</a>
+  <h1>Galeri Contoh Desain</h1>
+  <p class="lead">Kumpulan draft desain web dan aplikasi yang aku buat sebagai contoh gaya dan kemampuan. Klik salah satu untuk membukanya di tab baru.</p>
+  <div class="note">Semua nama, kontak, dan isi di sini adalah data contoh (dummy).</div>
+  <div class="chips" id="chips" role="group" aria-label="Filter kategori"></div>
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>Belum ada contoh di kategori ini.</p>
+</main>
+<script>
+/* TAMBAH DEMO BARU: taruh file .html di folder ini, taruh screenshot di thumbs/, lalu tambah satu objek di bawah. */
+var DEMOS = [
+  {
+    file: "demo-galeri-seni.html",
+    thumb: "thumbs/demo-galeri-seni.webp",
+    title: "Landing Page Galeri & Pelukis",
+    desc: "Portofolio seniman dengan galeri karya, profil studio, info pameran, dan form pertanyaan koleksi.",
+    tags: ["Landing Page", "Seni"]
+  }
+];
+
+var active = "Semua";
+var chipsEl = document.getElementById("chips"), gridEl = document.getElementById("grid"), emptyEl = document.getElementById("empty");
+
+function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text) e.textContent = text; return e; }
+
+function allTags(){
+  var seen = {}, out = ["Semua"];
+  DEMOS.forEach(function(d){ d.tags.forEach(function(t){ if(!seen[t]){ seen[t] = 1; out.push(t); } }); });
+  return out;
+}
+
+function renderChips(){
+  chipsEl.textContent = "";
+  var tags = allTags();
+  chipsEl.hidden = tags.length <= 2;
+  tags.forEach(function(t){
+    var b = el("button", "chip", t);
+    b.type = "button";
+    b.setAttribute("aria-pressed", String(t === active));
+    b.onclick = function(){ active = t; renderChips(); renderCards(); };
+    chipsEl.appendChild(b);
+  });
+}
+
+function renderCards(){
+  gridEl.textContent = "";
+  var list = DEMOS.filter(function(d){ return active === "Semua" || d.tags.indexOf(active) > -1; });
+  emptyEl.hidden = list.length > 0;
+  list.forEach(function(d){
+    var card = el("article", "card");
+    var th = el("div", "thumb");
+    var img = new Image();
+    img.alt = "Cuplikan " + d.title;
+    img.loading = "lazy";
+    img.onerror = function(){ img.remove(); th.textContent = d.title.charAt(0); };
+    img.src = d.thumb;
+    th.appendChild(img);
+    var body = el("div", "body");
+    body.appendChild(el("h2", "", d.title));
+    body.appendChild(el("p", "", d.desc));
+    var tg = el("div", "tags");
+    d.tags.forEach(function(t){ tg.appendChild(el("span", "tag", t)); });
+    body.appendChild(tg);
+    var a = el("a", "go", "Lihat Demo");
+    a.href = d.file; a.target = "_blank"; a.rel = "noopener";
+    body.appendChild(a);
+    card.appendChild(th); card.appendChild(body);
+    gridEl.appendChild(card);
+  });
+}
+
+renderChips(); renderCards();
+</script>
+</body>
+</html>

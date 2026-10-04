@@ -408,6 +408,86 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
           <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredProjects.map((project) => {
               const isFeatured = project.isFeatured;
+
+              // Kartu tautan: seluruh kartu adalah link ke halaman demo (tanpa tombol)
+              if (project.coverImage && project.demoUrl) {
+                return (
+                  <a
+                    key={project.id}
+                    href={project.demoUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`Buka ${project.title} di tab baru`}
+                    className={`md:col-span-2 group block rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 ${
+                      darkMode
+                        ? 'bg-slate-900/90 border-slate-800 hover:border-teal-500/50 hover:shadow-xl hover:shadow-teal-500/5'
+                        : 'bg-white border-slate-200/90 shadow-sm hover:shadow-xl hover:border-teal-300'
+                    }`}
+                  >
+                    <div className="h-1.5 w-full bg-gradient-to-r from-amber-500 via-orange-400 to-amber-600" />
+                    <div className="flex flex-col sm:flex-row">
+                      <div className="sm:w-2/5 aspect-[4/3] sm:aspect-auto sm:min-h-[220px] overflow-hidden bg-gradient-to-br from-amber-100 to-orange-200 flex-shrink-0">
+                        <img
+                          src={project.coverImage}
+                          alt={`Cuplikan ${project.title}`}
+                          loading="lazy"
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                      <div className="p-5 sm:p-6 flex-1 flex flex-col justify-center gap-3">
+                        <div className="flex items-center justify-between gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 text-[11px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider border shadow-xs ${getBadgeClasses(
+                              project.colorScheme
+                            )}`}
+                          >
+                            {getIcon(project.iconType)}
+                            {project.badge}
+                          </span>
+                          <span
+                            className={`text-xs font-semibold px-2 py-0.5 rounded-md ${
+                              darkMode ? 'text-slate-400 bg-slate-800/60' : 'text-slate-500 bg-slate-100'
+                            }`}
+                          >
+                            {project.year}
+                          </span>
+                        </div>
+                        <h3
+                          className={`flex items-center gap-2 text-lg sm:text-xl font-bold tracking-tight transition-colors ${
+                            darkMode
+                              ? 'text-white group-hover:text-teal-300'
+                              : 'text-slate-900 group-hover:text-teal-700'
+                          }`}
+                        >
+                          {project.title}
+                          <ExternalLink className="w-4 h-4 opacity-60 group-hover:opacity-100" />
+                        </h3>
+                        <p className={`text-xs sm:text-sm leading-relaxed ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+                          {project.description}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {project.techStack.slice(0, 4).map((tech) => (
+                            <span
+                              key={tech}
+                              className={`text-[10px] sm:text-[11px] font-medium px-2.5 py-0.5 rounded-md border ${
+                                darkMode
+                                  ? 'bg-slate-800/80 border-slate-700 text-slate-300'
+                                  : 'bg-slate-100 border-slate-200 text-slate-700'
+                              }`}
+                            >
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                );
+              }
+
               return (
                 <div
                   key={project.id}
@@ -557,7 +637,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                               title={project.client ? 'Buka Assets Demo (lingkungan simulasi aman)' : 'Buka Demo Aplikasi di tab baru'}
                             >
                               <Play className="w-3 h-3 fill-current" />
-                              <span>{project.client ? 'Assets Demo' : 'Live Demo'}</span>
+                              <span>{project.client ? 'Assets Demo' : project.badge === 'Contoh Desain' ? 'Lihat Demo' : 'Live Demo'}</span>
                             </a>
                           )}
                           <button
@@ -1503,7 +1583,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
                       rel="noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white text-xs font-extrabold shadow-md transition-all duration-200 scale-100 hover:scale-105"
                     >
-                      <span>{activeModalProject.client ? 'Buka Assets Demo' : 'Buka Live Demo'}</span>
+                      <span>{activeModalProject.client ? 'Buka Assets Demo' : activeModalProject.badge === 'Contoh Desain' ? 'Lihat Demo' : 'Buka Live Demo'}</span>
                       <ExternalLink className="w-4 h-4" />
                     </a>
                   )}
