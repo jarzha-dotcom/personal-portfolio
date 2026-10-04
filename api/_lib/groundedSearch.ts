@@ -45,7 +45,7 @@ export type GroundedOutcome =
     | { ok: false; reason: GroundingFailReason };
 
 // Daftar cadangan kalau ListModels gagal/kosong. Model yang sudah tidak ada otomatis dilewati (404).
-const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-robotics-er-2-preview', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
 const MAX_CANDIDATES = 5;
 const MODEL_LIST_TTL_MS = 6 * 60 * 60 * 1000;
 
@@ -59,6 +59,7 @@ interface ParsedModel {
     lite: boolean;
     preview: boolean;
     gemma?: boolean;
+    robotics?: boolean;
 }
 
 function parseModelId(id: string): ParsedModel | null {
@@ -68,6 +69,10 @@ function parseModelId(id: string): ParsedModel | null {
     // antigravity, dst). Belum pasti mendukung tool google_search, jadi dicoba SETELAH keluarga 2.x dan
     // SEBELUM 3.x (grup Gemini 3 = 0/0). Kalau ditolak, otomatis diistirahatkan.
     // Hanya 26B-A4B: 31B terlalu lambat untuk batas waktu serverless.
+    // Gemini Robotics-ER (grup kuota "Default", Search grounding 1.5K/hari). TERBUKTI di tes langsung produksi:
+    // gemini-robotics-er-2-preview -> OK, 4 sumber, ~3,7 dtk, saat 2.5 = 404 dan Gemini 3 = 429 (kuota 0).
+    const robo = id.match(/^gemini-robotics-er-(\d+)(?:\.(\d+))?-preview$/i);
+    if (robo) return { id, major: Number(robo[1]), minor: Number(robo[2] || 0), lite: false, preview: true, robotics: true };
     // Opt-in (GROUNDING_ALLOW_GEMMA=1): di log produksi Gemma + google_search timeout berulang (11 dtk & 15 dtk).
     if (process.env.GROUNDING_ALLOW_GEMMA === '1' && /^gemma-4-26b-a4b-it$/i.test(id)) return { id, major: 4, minor: 0, lite: false, preview: false, gemma: true };
     if (/(tts|image|live|audio|native|robotics|embedding|computer|dialog|thinking)/i.test(id)) return null;
@@ -86,7 +91,8 @@ function rankModels(ids: string[]): string[] {
     // Jatah Search grounding tier gratis (dashboard AI Studio): grup Gemini 2.5 dan 2 = 1.5K/hari,
     // grup Gemini 3 = 0/0 (selalu ditolak). Jadi 2.5 dulu, lalu 2.0, 3.x paling akhir.
     // Model yang 404 ("no longer available to new users") otomatis diistirahatkan 24 jam.
-    const bucket = (p: ParsedModel) => (p.gemma ? 2 : p.major === 2 && p.minor === 5 ? 0 : p.major === 2 ? 1 : 3);
+    // 2.5 (404 untuk project baru, gagal cepat) -> Robotics-ER (terbukti jalan) -> 2.0 -> Gemma (opt-in) -> 3.x (kuota 0 di tier gratis)
+    const bucket = (p: ParsedModel) => (p.robotics ? 1 : p.gemma ? 3 : p.major === 2 && p.minor === 5 ? 0 : p.major === 2 ? 2 : 4);
     parsed.sort((a, b) => {
         if (bucket(a) !== bucket(b)) return bucket(a) - bucket(b);
         if (a.lite !== b.lite) return a.lite ? -1 : 1;
@@ -562,7 +568,7 @@ export function getGroundingDiagnostics() {
 
 
 // ── Debug: penanda versi + tes langsung (dipakai modal admin) ─────────────────────────────
-export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.7';
+export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.9';
 
 export interface ProbeRow {
     model: string;
@@ -613,7 +619,19 @@ async function probeOne(apiKey: string, model: string, timeoutMs: number): Promi
         row.status = res.status;
         if (!res.ok) {
             const body = (await res.text().catch(() => '')).replace(/\s+/g, ' ');
-            row.error = body.slice(0, 260);
+            // Untuk 429: tampilkan dulu kuota mana yang kena & nilainya (quotaValue "0" = jatah tier ini memang nol),
+            // karena bagian itu biasanya terpotong setelah tautan panjang di pesan asli.
+            const quotaIds = [...body.matchAll(/"quotaId":\s*"([^"]+)"/g)].map((m) => m[1]);
+            const quotaVal = body.match(/"quotaValue":\s*"?(\d+)"?/);
+            const lim = body.match(/limit:\s*(\d+)/i);
+            const head = [
+                quotaIds.length ? `quotaId=${[...new Set(quotaIds)].join(',')}` : '',
+                quotaVal ? `quotaValue=${quotaVal[1]}` : '',
+                lim ? `limit=${lim[1]}` : '',
+            ]
+                .filter(Boolean)
+                .join(' ');
+            row.error = (head ? `[${head}] ` : '') + body.slice(0, 260);
         } else {
             const data: any = await res.json();
             const cand = data?.candidates?.[0];
