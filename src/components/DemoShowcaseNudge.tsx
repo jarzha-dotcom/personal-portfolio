@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ExternalLink, LayoutGrid, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { useIsMobile } from '../hooks/useIsMobile';
 import { announceNudgeShown, announceNudgeDismissed, scheduleAttentionReveal } from '../utils/attentionNudge';
 
 interface DemoShowcaseNudgeProps {
@@ -23,10 +24,12 @@ interface DemoItem {
  */
 const DEMO_BASE = '/demos/';
 
-const ACTIVE_DELAY_MS = 60_000; // waktu AKTIF (tab terlihat, di beranda) sebelum muncul
-const ENGAGED_DELAY_MS = 30_000; // lebih cepat kalau pengunjung sudah scroll jauh
+const ACTIVE_DELAY_MS = 30_000; // waktu AKTIF (tab terlihat, di beranda) sebelum muncul
+const ENGAGED_DELAY_MS = 15_000; // lebih cepat kalau pengunjung sudah scroll jauh
 const ENGAGED_SCROLL_RATIO = 0.4;
 const ATTENTION_GRACE_MS = 6_000;
+const MOBILE_ACTIVE_DELAY_MS = 60_000; // mobile: setelah kartu artikel (detik ke-30); tanpa jalur cepat scroll
+const MOBILE_AUTO_HIDE_MS = 25_000; // mobile: kartu ringkas hilang sendiri (tanpa cooldown)
 const TICK_MS = 1_000;
 
 const DISMISS_KEY = 'demo-nudge-dismissed-until';
@@ -79,11 +82,14 @@ const pickDemo = (list: DemoItem[]): DemoItem => {
 
 /**
  * Kartu promosi galeri contoh desain: menampilkan satu demo acak + link ke
- * halaman galeri. Pojok kanan atas, desktop/tablet saja (`sm` ke atas).
+
+ * halaman galeri. Desktop: tengah atas (beda dari nudge artikel di kanan atas),
+ * desktop saja (`lg` ke atas) — di bawah itu lebarnya bisa menabrak kartu artikel.
  *
  * Beda dengan nudge artikel, ini bersifat promosi, jadi lebih disiplin:
  *  - Hitung waktu AKTIF saja: tab harus terlihat dan user sedang di beranda.
- *    Muncul setelah 60 detik, atau 30 detik kalau sudah scroll >40%.
+ *    Muncul setelah 30 detik, atau 15 detik kalau sudah scroll >40%.
+ *    Mobile (<640px): kartu ringkas di bawah banner, tepat di detik ke-60 aktif.
  *  - Cooldown lintas kunjungan lewat localStorage (3 hari setelah ditutup,
  *    7 hari setelah klik), seperti PWAInstallPrompt.
  *  - Tidak muncul kalau chat Zannah sudah dibuka di kunjungan ini.
@@ -94,6 +100,9 @@ const pickDemo = (list: DemoItem[]): DemoItem => {
  */
 export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, enabled }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  const isMobileRef = useRef(isMobile);
+  isMobileRef.current = isMobile;
 
   // Dicek sekali saat mount: kalau masih cooldown, komponen ini diam total.
   const [suppressed] = useState(isCoolingDown);
@@ -135,7 +144,11 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
 
       const scrollable = document.documentElement.scrollHeight - window.innerHeight;
       const engaged = scrollable > 0 && window.scrollY / scrollable >= ENGAGED_SCROLL_RATIO;
-      const threshold = engaged ? ENGAGED_DELAY_MS : ACTIVE_DELAY_MS;
+      const threshold = isMobileRef.current
+        ? MOBILE_ACTIVE_DELAY_MS
+        : engaged
+          ? ENGAGED_DELAY_MS
+          : ACTIVE_DELAY_MS;
 
       if (elapsedRef.current >= threshold) setReady(true);
     }, TICK_MS);
@@ -185,6 +198,12 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
     }
   }, [visible]);
 
+  useEffect(() => {
+    if (!visible || !isMobile) return;
+    const id = window.setTimeout(() => setVisible(false), MOBILE_AUTO_HIDE_MS);
+    return () => window.clearTimeout(id);
+  }, [visible, isMobile]);
+
   const dismiss = () => {
     startCooldown(DISMISS_DAYS);
     setVisible(false);
@@ -210,14 +229,102 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
 
   const showThumb = !!demo.thumb && !thumbFailed;
 
+  // Mobile: kartu ringkas (thumbnail kecil + dua link), di bawah navbar + banner.
+  if (isMobile) {
+    return (
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-label="Contoh desain"
+        aria-modal="false"
+        className={`fixed top-32 inset-x-3 z-[60] outline-none ${
+          prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-3 duration-300'
+        }`}
+      >
+        <div
+          className={`relative overflow-hidden rounded-2xl border ring-1 ${
+            darkMode
+              ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_18px_40px_-18px_rgba(45,212,191,0.3)]'
+              : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_18px_40px_-18px_rgba(13,148,136,0.35)]'
+          }`}
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-500" />
+          <button
+            type="button"
+            aria-label="Tutup contoh desain"
+            onClick={dismiss}
+            className={`absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
+              darkMode ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-400 hover:bg-slate-100'
+            }`}
+          >
+            <X className="h-4 w-4" />
+          </button>
+          <div className="flex gap-3 p-3 pr-10">
+            <div
+              className={`flex h-16 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg ${
+                darkMode ? 'bg-slate-800' : 'bg-slate-100'
+              }`}
+            >
+              {showThumb ? (
+                <img
+                  src={`${DEMO_BASE}${demo.thumb}`}
+                  alt=""
+                  loading="lazy"
+                  onError={() => setThumbFailed(true)}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <span className="text-2xl font-bold text-teal-500/70" aria-hidden="true">
+                  {demo.title.charAt(0)}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-teal-500">
+                Contoh Desain
+              </span>
+              <h3 className="line-clamp-2 text-[13px] font-bold leading-snug">{demo.title}</h3>
+              <div className="mt-1.5 flex items-center gap-3">
+                <a
+                  href={`${DEMO_BASE}${demo.file}`}
+                  target="_blank"
+                  rel="noopener"
+                  onClick={handleVisit}
+                  className={`inline-flex items-center gap-1 rounded-lg bg-teal-600 px-2.5 py-1 text-[11px] font-semibold text-white ${FOCUS_RING}`}
+                >
+                  Lihat demo
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                </a>
+                <a
+                  href={DEMO_BASE}
+                  target="_blank"
+                  rel="noopener"
+                  onClick={handleVisit}
+                  className={`text-[11px] font-semibold ${FOCUS_RING} ${darkMode ? 'text-teal-400' : 'text-teal-600'}`}
+                >
+                  Semua contoh
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
+    // Wrapper yang memusatkan kartu. Sengaja BUKAN `left-1/2 -translate-x-1/2`
+    // di elemen beranimasi: animate-in memakai `transform` sendiri dan akan
+    // menimpa translate itu, sehingga kartu melompat saat animasi masuk.
+    <div className="hidden lg:flex fixed inset-x-0 top-24 z-[60] justify-center pointer-events-none">
     <div
       ref={dialogRef}
       tabIndex={-1}
       role="dialog"
       aria-label="Contoh desain"
       aria-modal="false"
-      className={`hidden sm:block fixed top-24 right-6 z-[60] w-80 max-w-[calc(100vw-2rem)] outline-none ${
+      className={`pointer-events-auto w-80 max-w-[calc(100vw-2rem)] outline-none ${
         prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-3 zoom-in-95 duration-300'
       }`}
     >
@@ -327,6 +434,7 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

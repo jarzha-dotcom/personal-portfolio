@@ -1,5 +1,5 @@
 import React, { useId, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Mail, MessageCircle, type LucideIcon } from 'lucide-react';
+import { LayoutGrid, Mail, MessageCircle, type LucideIcon } from 'lucide-react';
 import { ARTICLES } from '../data/articles';
 import { CONTACT_INFO } from '../data/portfolioData';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
@@ -68,6 +68,16 @@ export const InfiniteBanner: React.FC<InfiniteBannerProps> = ({
       label: CONTACT_INFO.email,
       href: `mailto:${CONTACT_INFO.email}`,
       Icon: Mail,
+    },
+    // Galeri demo = halaman statis di luar SPA (public/demos/), jadi pakai
+    // <a> biasa + tab baru, bukan navigate(). Di mobile ini menggantikan
+    // DemoShowcaseNudge yang sengaja desktop-only.
+    {
+      kind: 'contact',
+      label: 'Lihat Galeri Contoh Desain',
+      href: '/demos/',
+      Icon: LayoutGrid,
+      external: true,
     },
     ...latestArticles.map((a) => ({
       kind: 'article' as const,

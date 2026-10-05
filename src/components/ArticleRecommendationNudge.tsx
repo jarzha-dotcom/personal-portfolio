@@ -5,7 +5,8 @@ import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { articleRoute } from '../routes';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { announceNudgeShown, announceNudgeDismissed, scheduleAttentionReveal } from '../utils/attentionNudge';
-import { ArticleIllustration } from './ArticleIllustration';
+import { ArticleIllustration, getArticleIcon } from './ArticleIllustration';
+import { useIsMobile } from '../hooks/useIsMobile';
 
 interface ArticleRecommendationNudgeProps {
   darkMode: boolean;
@@ -20,6 +21,8 @@ interface ArticleRecommendationNudgeProps {
 }
 
 const BASE_DELAY_MS = 10_000; // 10 detik pertama landing page dibuka
+const MOBILE_DELAY_MS = 30_000; // di mobile muncul lebih lambat: Zannah & PWA sudah lebih dulu
+const MOBILE_AUTO_HIDE_MS = 20_000; // di mobile kartu ringkas hilang sendiri (tanpa cooldown)
 const ATTENTION_GRACE_MS = 6_000; // jeda tambahan MAKSIMAL kalau nudge lain masih tampil di detik ke-10
 
 const FOCUS_RING =
@@ -51,6 +54,9 @@ export const ArticleRecommendationNudge: React.FC<ArticleRecommendationNudgeProp
 }) => {
   const { navigate } = useNavigationHistory();
   const prefersReducedMotion = usePrefersReducedMotion();
+  const isMobile = useIsMobile();
+  // Delay ditentukan sekali saat mount — memutar layar tidak me-reset timer.
+  const startedAsMobileRef = useRef(isMobile);
 
   const [visible, setVisible] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -75,7 +81,7 @@ export const ArticleRecommendationNudge: React.FC<ArticleRecommendationNudgeProp
 
   useEffect(() => {
     if (!article) return;
-    return scheduleAttentionReveal('article-recommendation', BASE_DELAY_MS, ATTENTION_GRACE_MS, () => {
+    return scheduleAttentionReveal('article-recommendation', startedAsMobileRef.current ? MOBILE_DELAY_MS : BASE_DELAY_MS, ATTENTION_GRACE_MS, () => {
       if (enabledRef.current) setVisible(true);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,6 +110,13 @@ export const ArticleRecommendationNudge: React.FC<ArticleRecommendationNudgeProp
 
   const dismiss = () => setVisible(false);
 
+  // Mobile: hilang sendiri supaya tidak bertumpuk dengan kartu demo di detik ke-60.
+  useEffect(() => {
+    if (!visible || !isMobile) return;
+    const id = window.setTimeout(() => setVisible(false), MOBILE_AUTO_HIDE_MS);
+    return () => window.clearTimeout(id);
+  }, [visible, isMobile]);
+
   useEffect(() => {
     if (!visible) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -122,6 +135,65 @@ export const ArticleRecommendationNudge: React.FC<ArticleRecommendationNudgeProp
     setVisible(false);
     navigate(articleRoute(article.slug));
   };
+
+  // Mobile: kartu ringkas satu baris, tepat di bawah navbar + banner.
+  if (isMobile) {
+    const Icon = getArticleIcon(article.slug, article.category);
+    return (
+      <div
+        ref={dialogRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-label="Rekomendasi artikel"
+        aria-modal="false"
+        className={`fixed top-32 inset-x-3 z-[60] outline-none ${
+          prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-3 duration-300'
+        }`}
+      >
+        <div
+          className={`relative overflow-hidden rounded-2xl border ring-1 py-3 pl-3 pr-10 ${
+            darkMode
+              ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_18px_40px_-18px_rgba(45,212,191,0.3)]'
+              : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_18px_40px_-18px_rgba(13,148,136,0.35)]'
+          }`}
+        >
+          <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-500" />
+          <a
+            href={articleRoute(article.slug)}
+            onClick={handleRead}
+            className={`flex min-w-0 items-center gap-3 rounded-xl ${FOCUS_RING}`}
+          >
+            <span
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${
+                darkMode ? 'bg-teal-500/15 text-teal-300' : 'bg-teal-500/10 text-teal-700'
+              }`}
+            >
+              <Icon className="h-5 w-5" aria-hidden="true" />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[10px] font-semibold uppercase tracking-wider text-teal-500">
+                Rekomendasi Bacaan
+              </span>
+              <span className="line-clamp-2 text-[13px] font-bold leading-snug">{article.title}</span>
+              <span className={`mt-0.5 block text-[11px] ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                {article.readMinutes} menit baca
+              </span>
+            </span>
+          </a>
+          <button
+            type="button"
+            aria-label="Tutup rekomendasi artikel"
+            onClick={dismiss}
+            className={`absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
+              darkMode ? 'text-slate-400 hover:bg-slate-800' : 'text-slate-400 hover:bg-slate-100'
+            }`}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
