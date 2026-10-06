@@ -1,0 +1,1709 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KosPro Manager - Dashboard Manajemen Kos-Kosan</title>
+  <meta name="description" content="Sistem operasional dan manajemen properti kos-kosan komersial modern dengan pemantauan okupansi, tagihan, dan data penyewa." />
+  <meta property="og:title" content="KosPro Manager - Dashboard Manajemen Kos-Kosan" />
+  <meta property="og:description" content="Sistem operasional dan manajemen properti kos-kosan komersial modern dengan pemantauan okupansi, tagihan, dan data penyewa." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Elegant Styles -->
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    .modal-enter {
+      animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.97) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
+
+  <!-- Mobile Top Header Bar -->
+  <div class="lg:hidden bg-slate-900 text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-slate-800 shadow-sm">
+    <div class="flex items-center gap-3">
+      <button onclick="toggleMobileSidebar()" class="p-2 text-slate-300 hover:text-white focus:outline-none" aria-label="Menu">
+        <i class="fa-solid fa-bars text-lg"></i>
+      </button>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+          <i class="fa-solid fa-building-user text-sm"></i>
+        </div>
+        <span class="font-bold text-base tracking-tight">KosPro<span class="text-emerald-400">.ID</span></span>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <button onclick="toggleNotificationDropdown()" class="relative p-2 text-slate-300 hover:text-white" aria-label="Notifikasi">
+        <i class="fa-regular fa-bell text-lg"></i>
+        <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-rose-500 rounded-full ring-2 ring-slate-900"></span>
+      </button>
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80" 
+           alt="Rajendra Wijaya" 
+           class="w-8 h-8 rounded-full border border-slate-700 object-cover"
+           referrerpolicy="no-referrer"
+           onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Rajendra+Wijaya&background=059669&color=fff';" />
+    </div>
+  </div>
+
+  <!-- SIDEBAR NAVIGASI (Kiri) -->
+  <aside id="sidebarNav" class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-900 text-slate-300 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col justify-between border-r border-slate-800 shadow-xl lg:shadow-none lg:static">
+    <!-- Top Brand & Menu -->
+    <div class="p-5 flex flex-col flex-1 overflow-y-auto">
+      <!-- Brand Logo -->
+      <div class="flex items-center justify-between pb-6 border-b border-slate-800/80 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-700 flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+            <i class="fa-solid fa-key text-base"></i>
+          </div>
+          <div>
+            <h1 class="text-white font-extrabold text-lg tracking-tight leading-none">KosPro<span class="text-emerald-400">.Manager</span></h1>
+            <p class="text-xs text-slate-400 mt-1 font-medium">Sistem Operasional Kos</p>
+          </div>
+        </div>
+        <button onclick="toggleMobileSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Properti Selector Quick Switch -->
+      <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/60 mb-6">
+        <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+          <span class="uppercase tracking-wider font-semibold text-[10px] text-slate-400">Properti Aktif</span>
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Aktif</span>
+        </div>
+        <div class="flex items-center justify-between text-white font-semibold text-sm">
+          <span class="truncate flex items-center gap-2">
+            <i class="fa-solid fa-house-chimney text-emerald-400 text-xs"></i>
+            Griya Asri Residence
+          </span>
+          <i class="fa-solid fa-chevron-down text-xs text-slate-400"></i>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-0.5">Jl. Kaliurang KM 5.2, Sleman</p>
+      </div>
+
+      <!-- Navigation Menu -->
+      <nav class="space-y-1">
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-3 mb-2">Menu Utama</p>
+        
+        <a href="#dashboard" onclick="setActiveNav(this, 'Dashboard Utama')" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium bg-emerald-600/90 text-white shadow-sm transition-all group">
+          <i class="fa-solid fa-chart-pie w-5 text-center text-emerald-200 group-hover:text-white"></i>
+          <span>Dashboard Utama</span>
+        </a>
+
+        <a href="#kamar" onclick="setActiveNav(this, 'Manajemen Kamar')" class="nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-door-open w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+            <span>Manajemen Kamar</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">20</span>
+        </a>
+
+        <a href="#penyewa" onclick="setActiveNav(this, 'Data Penyewa')" class="nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-users w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+            <span>Data Penyewa</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono">18</span>
+        </a>
+
+        <a href="#keuangan" onclick="setActiveNav(this, 'Keuangan & Tagihan')" class="nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-receipt w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+            <span>Keuangan & Tagihan</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono">2 Pending</span>
+        </a>
+
+        <a href="#maintenance" onclick="setActiveNav(this, 'Laporan Maintenance')" class="nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <div class="flex items-center gap-3">
+            <i class="fa-solid fa-wrench w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+            <span>Laporan Maintenance</span>
+          </div>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-mono">1 Tiket</span>
+        </a>
+
+        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400 px-3 pt-5 mb-2">Preferensi</p>
+
+        <a href="#pengaturan" onclick="setActiveNav(this, 'Pengaturan')" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <i class="fa-solid fa-gear w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+          <span>Pengaturan Sistem</span>
+        </a>
+
+        <a href="#bantuan" onclick="showToast('Pusat Bantuan KosPro siap melayani WhatsApp 0823-1231-2734', 'info')" class="nav-item flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group">
+          <i class="fa-solid fa-circle-question w-5 text-center text-slate-400 group-hover:text-emerald-400"></i>
+          <span>Bantuan & Panduan</span>
+        </a>
+      </nav>
+    </div>
+
+    <!-- Bottom User Profile Card -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/60">
+      <div class="flex items-center gap-3">
+        <div class="relative">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&h=200&q=80" 
+               alt="Rajendra Wijaya" 
+               class="w-10 h-10 rounded-xl object-cover border border-slate-700 shadow"
+               referrerpolicy="no-referrer"
+               onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Rajendra+Wijaya&background=059669&color=fff';" />
+          <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900"></span>
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-semibold text-white truncate">Rajendra Wijaya, S.E.</p>
+          <p class="text-xs text-slate-400 truncate">Pemilik Properti Kos</p>
+        </div>
+        <button onclick="showToast('Akun Anda dalam status Administrator Penuh', 'info')" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition-colors" title="Pengaturan Akun">
+          <i class="fa-solid fa-ellipsis-vertical text-sm"></i>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Mobile Sidebar Backdrop -->
+  <div id="sidebarBackdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+
+  <!-- MAIN VIEWPORT CONTENT (Kanan) -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto min-h-screen">
+
+    <!-- TOP BAR (Header Atas) -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-30 px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-[0_1px_3px_rgba(0,0,0,0.03)]">
+      
+      <!-- Left: Title & Property Breadcrumb -->
+      <div>
+        <div class="flex items-center gap-2 text-xs text-slate-500 mb-0.5">
+          <span>Griya Asri Residence</span>
+          <span class="text-slate-300">/</span>
+          <span class="text-emerald-700 font-medium">Kapasitas 20 Kamar</span>
+        </div>
+        <h2 id="pageTitle" class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+          Dashboard Utama
+          <span class="text-xs font-normal text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">
+            Oktober 2026
+          </span>
+        </h2>
+      </div>
+
+      <!-- Right: Search, Notifications & Quick Action CTAs -->
+      <div class="flex items-center gap-3">
+        <!-- Search Bar -->
+        <div class="relative flex-1 sm:w-64">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" 
+                 id="globalSearchInput" 
+                 oninput="handleSearch(this.value)" 
+                 placeholder="Cari kamar (101) atau nama..." 
+                 class="w-full bg-slate-50 hover:bg-slate-100 focus:bg-white text-sm text-slate-800 placeholder-slate-400 pl-9 pr-8 py-2 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" />
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Notification Bell Dropdown Button -->
+        <div class="relative">
+          <button onclick="toggleNotificationDropdown()" class="relative p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 hover:text-slate-900 transition-colors shadow-sm" title="Pemberitahuan">
+            <i class="fa-regular fa-bell text-sm"></i>
+            <span class="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white rounded-full text-[10px] font-bold flex items-center justify-center border-2 border-white">3</span>
+          </button>
+
+          <!-- Notification Dropdown Panel -->
+          <div id="notificationDropdown" class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border border-slate-200 py-3 z-50 modal-enter">
+            <div class="px-4 pb-2 border-b border-slate-100 flex items-center justify-between">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Pemberitahuan Sistem</h3>
+                <p class="text-xs text-slate-500">3 tagihan & peringatan mendesak</p>
+              </div>
+              <button onclick="markAllNotificationsRead()" class="text-xs text-emerald-600 hover:text-emerald-700 font-medium">Tandai Dibaca</button>
+            </div>
+            <div class="divide-y divide-slate-100 max-h-80 overflow-y-auto text-xs" id="notificationList">
+              <div class="p-3.5 hover:bg-amber-50/50 flex gap-3 transition-colors cursor-pointer" onclick="openWaReminder('Radit Nugraha', '103', 'Rp 1.900.000', '0823-1231-2734')">
+                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="font-semibold text-slate-800">Kamar 103 Jatuh Tempo Hari Ini</p>
+                  <p class="text-slate-500 mt-0.5">Radit Nugraha belum melunasi sewa Rp 1.900.000.</p>
+                  <span class="text-[10px] text-amber-600 font-medium inline-block mt-1">Klik untuk kirim WhatsApp pengingat</span>
+                </div>
+              </div>
+              <div class="p-3.5 hover:bg-rose-50/50 flex gap-3 transition-colors cursor-pointer" onclick="openWaReminder('Zannah Melati', '106', 'Rp 1.600.000', '082312312734')">
+                <div class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="font-semibold text-slate-800">Kamar 106 Menunggak 2 Hari</p>
+                  <p class="text-slate-500 mt-0.5">Zannah Melati belum melunasi sewa Rp 1.600.000.</p>
+                  <span class="text-[10px] text-rose-600 font-medium inline-block mt-1">Jatuh tempo 03 Okt 2026</span>
+                </div>
+              </div>
+              <div class="p-3.5 hover:bg-sky-50/50 flex gap-3 transition-colors cursor-pointer" onclick="openMaintenanceModal()">
+                <div class="w-8 h-8 rounded-lg bg-sky-100 text-sky-600 flex items-center justify-center shrink-0">
+                  <i class="fa-solid fa-wrench"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="font-semibold text-slate-800">Tiket Perbaikan AC Baru</p>
+                  <p class="text-slate-500 mt-0.5">Kamar 104: Unit AC bocor pipa pembuangan.</p>
+                  <span class="text-[10px] text-sky-600 font-medium inline-block mt-1">Dilaporkan 3 jam lalu</span>
+                </div>
+              </div>
+            </div>
+            <div class="px-4 pt-2.5 border-t border-slate-100 text-center">
+              <a href="#keuangan" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Lihat Semua Tagihan Bulan Ini &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Action 1: Catat Pembayaran -->
+        <button onclick="openPaymentModal()" class="hidden md:inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm hover:shadow transition-all active:scale-[0.98]">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Catat Pembayaran</span>
+        </button>
+
+        <!-- Quick Action 2: Tambah Penyewa -->
+        <button onclick="openAddTenantModal()" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold px-3.5 py-2 rounded-lg shadow-sm hover:shadow transition-all active:scale-[0.98]">
+          <i class="fa-solid fa-user-plus"></i>
+          <span>Tambah Penyewa</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY CONTAINER -->
+    <div class="p-6 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- SECTION: METRICS CARDS (Ringkasan Bisnis) -->
+      <section aria-label="Metrik Ringkasan Bisnis">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          <!-- Metrik 1: Total Okupansi -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Okupansi</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-2xl font-extrabold text-slate-900 tabular-nums">18</span>
+                  <span class="text-sm font-semibold text-slate-400">/ 20 Kamar</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base border border-emerald-100">
+                <i class="fa-solid fa-bed"></i>
+              </div>
+            </div>
+            <!-- Progress Bar -->
+            <div class="mt-4">
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <span class="font-medium text-emerald-700 flex items-center gap-1">
+                  <span class="badge-dot bg-emerald-500"></span> 90% Terisi
+                </span>
+                <span class="text-slate-400">2 Siap Huni</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div class="bg-emerald-500 h-2 rounded-full transition-all duration-500" style="width: 90%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrik 2: Pendapatan Bulan Ini -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Pendapatan Bulan Ini</p>
+                <div class="mt-2">
+                  <span class="text-2xl font-extrabold text-slate-900 tabular-nums font-mono">Rp 36.5M</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base border border-emerald-100">
+                <i class="fa-solid fa-wallet"></i>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs">
+              <span class="inline-flex items-center gap-1 font-semibold text-emerald-600">
+                <i class="fa-solid fa-arrow-trend-up"></i> +12% dari bln lalu
+              </span>
+              <span class="text-slate-400 font-mono">Target: Rp 40jt</span>
+            </div>
+          </div>
+
+          <!-- Metrik 3: Belum Lunas / Pending -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Belum Lunas / Pending</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-2xl font-extrabold text-amber-600 tabular-nums">2</span>
+                  <span class="text-sm font-semibold text-slate-500">Kamar Tertunggak</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base border border-amber-100">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs">
+              <span class="text-amber-700 font-medium">
+                Jatuh tempo minggu ini
+              </span>
+              <span class="font-semibold text-slate-700 font-mono">Rp 3.500.000</span>
+            </div>
+          </div>
+
+          <!-- Metrik 4: Tiket Maintenance -->
+          <div class="bg-white rounded-xl p-5 border border-slate-200/90 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-md transition-shadow cursor-pointer" onclick="openMaintenanceModal()">
+            <div class="flex items-start justify-between">
+              <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Tiket Pemeliharaan</p>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-2xl font-extrabold text-rose-600 tabular-nums">1</span>
+                  <span class="text-sm font-semibold text-slate-500">Permintaan Aktif</span>
+                </div>
+              </div>
+              <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base border border-rose-100">
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+              </div>
+            </div>
+            <div class="mt-4 flex items-center justify-between text-xs">
+              <span class="text-rose-700 font-medium truncate max-w-[170px]" title="AC bocor di Kamar 104">
+                <i class="fa-solid fa-snowflake text-[10px] mr-1"></i> AC bocor di Kamar 104
+              </span>
+              <span class="text-emerald-700 font-semibold hover:underline">Detail &rarr;</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SECTION: MAIN GRID LAYOUT (Kiri: Status Kamar | Kanan: Aktivitas & Reminder) -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- KOLOM KIRI (7/12 atau 8/12): Denah & Status Kamar (Visual Grid) -->
+        <div class="lg:col-span-8 space-y-4">
+          
+          <!-- Card Header & Filter Status Buttons -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-table-cells text-emerald-600 text-sm"></i>
+                Status & Denah Kamar
+              </h3>
+              <p class="text-xs text-slate-500 mt-0.5">Lantai 1 • Griya Asri Residence (8 Unit Sampel)</p>
+            </div>
+
+            <!-- Segmented Filter Controls -->
+            <div class="flex items-center gap-1 p-1 bg-slate-100 rounded-lg text-xs font-medium overflow-x-auto">
+              <button onclick="filterRooms('all', this)" class="room-filter-btn px-3 py-1.5 rounded-md bg-white text-slate-900 font-semibold shadow-xs transition-colors whitespace-nowrap">
+                Semua (8)
+              </button>
+              <button onclick="filterRooms('lunas', this)" class="room-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap">
+                <span class="badge-dot bg-emerald-500 mr-1.5"></span>Lunas (5)
+              </button>
+              <button onclick="filterRooms('pending', this)" class="room-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap">
+                <span class="badge-dot bg-amber-500 mr-1.5"></span>Pending (2)
+              </button>
+              <button onclick="filterRooms('kosong', this)" class="room-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap">
+                <span class="badge-dot bg-rose-500 mr-1.5"></span>Kosong (1)
+              </button>
+            </div>
+          </div>
+
+          <!-- Room Cards Visual Grid -->
+          <div id="roomCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-4 gap-3.5">
+            <!-- Room cards rendered dynamically by JavaScript for full interactive filtering & search -->
+          </div>
+
+          <!-- Empty search result alert -->
+          <div id="noRoomsMatch" class="hidden bg-white p-8 rounded-xl border border-slate-200 text-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center text-lg mb-2">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <p class="text-sm font-semibold text-slate-800">Tidak ada kamar yang cocok</p>
+            <p class="text-xs text-slate-500 mt-1">Coba sesuaikan kata kunci pencarian atau ganti filter status.</p>
+            <button onclick="resetFilters()" class="mt-3 text-xs text-emerald-600 font-semibold hover:underline">Reset Filter</button>
+          </div>
+
+        </div>
+
+        <!-- KOLOM KANAN (4/12): Aktivitas Terbaru & Pengingat WhatsApp Instan -->
+        <div class="lg:col-span-4 space-y-6">
+
+          <!-- Card: Pengingat Tagihan WhatsApp Otomatis -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+                  <i class="fa-brands fa-whatsapp text-sm"></i>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900 leading-tight">Pengingat Tagihan</h4>
+                  <p class="text-[11px] text-slate-400">Jatuh Tempo & Tunggakan</p>
+                </div>
+              </div>
+              <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                2 Tertunda
+              </span>
+            </div>
+
+            <!-- List Tagihan Tertunda -->
+            <div class="mt-3.5 space-y-3">
+              
+              <!-- Item 1: Kamar 103 -->
+              <div class="p-3 bg-amber-50/50 rounded-xl border border-amber-200/80 hover:bg-amber-50 transition-colors">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&h=100&q=80" 
+                         alt="Radit Nugraha" 
+                         class="w-9 h-9 rounded-full object-cover border border-amber-300"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Radit+Nugraha&background=d97706&color=fff';" />
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-xs text-slate-900">Kamar 103</span>
+                        <span class="text-[10px] text-amber-800 font-semibold bg-amber-100 px-1.5 py-0.2 rounded">H-1 Tempo</span>
+                      </div>
+                      <p class="text-xs text-slate-600">Radit Nugraha</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-extrabold text-slate-900 font-mono">Rp 1.900.000</span>
+                </div>
+                
+                <div class="mt-3 pt-2.5 border-t border-amber-200/60 flex items-center justify-between text-xs">
+                  <span class="text-[11px] text-slate-500">Jatuh Tempo: <strong>05 Okt 2026</strong></span>
+                  <button onclick="openWaReminder('Radit Nugraha', '103', 'Rp 1.900.000', '0823-1231-2734')" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-2.5 py-1 rounded-md text-[11px] transition-all shadow-xs">
+                    <i class="fa-brands fa-whatsapp text-xs"></i>
+                    Kirim WA
+                  </button>
+                </div>
+              </div>
+
+              <!-- Item 2: Kamar 106 -->
+              <div class="p-3 bg-rose-50/50 rounded-xl border border-rose-200/80 hover:bg-rose-50 transition-colors">
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&h=100&q=80" 
+                         alt="Zannah Melati" 
+                         class="w-9 h-9 rounded-full object-cover border border-rose-300"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=Zannah+Melati&background=e11d48&color=fff';" />
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <span class="font-bold text-xs text-slate-900">Kamar 106</span>
+                        <span class="text-[10px] text-rose-800 font-semibold bg-rose-100 px-1.5 py-0.2 rounded">Telat 2 Hari</span>
+                      </div>
+                      <p class="text-xs text-slate-600">Zannah Melati</p>
+                    </div>
+                  </div>
+                  <span class="text-xs font-extrabold text-slate-900 font-mono">Rp 1.600.000</span>
+                </div>
+                
+                <div class="mt-3 pt-2.5 border-t border-rose-200/60 flex items-center justify-between text-xs">
+                  <span class="text-[11px] text-slate-500">Jatuh Tempo: <strong>03 Okt 2026</strong></span>
+                  <button onclick="openWaReminder('Zannah Melati', '106', 'Rp 1.600.000', '082312312734')" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-2.5 py-1 rounded-md text-[11px] transition-all shadow-xs">
+                    <i class="fa-brands fa-whatsapp text-xs"></i>
+                    Kirim WA
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Card: Pembayaran Terbaru yang Masuk -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+              <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+                  <i class="fa-solid fa-arrow-down-left text-xs"></i>
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900 leading-tight">Pembayaran Terakhir</h4>
+                  <p class="text-[11px] text-slate-400">Penerimaan Sewa Masuk</p>
+                </div>
+              </div>
+              <button onclick="openPaymentModal()" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">
+                + Catat Baru
+              </button>
+            </div>
+
+            <!-- List Transaksi Masuk -->
+            <div class="divide-y divide-slate-100" id="recentPaymentsList">
+              <div class="py-2.5 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs font-mono">
+                    108
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Zannah Putri</p>
+                    <p class="text-[11px] text-slate-400">Transfer BCA • 25 mnt lalu</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-extrabold text-emerald-600 font-mono tabular-nums">+Rp 2.200.000</p>
+                  <span class="text-[10px] text-slate-400">Lunas 1 Bln</span>
+                </div>
+              </div>
+
+              <div class="py-2.5 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs font-mono">
+                    101
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Radit Pratama</p>
+                    <p class="text-[11px] text-slate-400">QRIS Statis • 2 jam lalu</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-extrabold text-emerald-600 font-mono tabular-nums">+Rp 1.900.000</p>
+                  <span class="text-[10px] text-slate-400">Lunas 1 Bln</span>
+                </div>
+              </div>
+
+              <div class="py-2.5 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs font-mono">
+                    107
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Arzha Fauzi</p>
+                    <p class="text-[11px] text-slate-400">Tunai Kasir • Kemarin</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-extrabold text-emerald-600 font-mono tabular-nums">+Rp 1.900.000</p>
+                  <span class="text-[10px] text-slate-400">Lunas 1 Bln</span>
+                </div>
+              </div>
+
+              <div class="py-2.5 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 font-bold text-xs font-mono">
+                    102
+                  </div>
+                  <div>
+                    <p class="font-semibold text-slate-800">Zannah Rahma</p>
+                    <p class="text-[11px] text-slate-400">Transfer Mandiri • 02 Okt</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <p class="font-extrabold text-emerald-600 font-mono tabular-nums">+Rp 1.900.000</p>
+                  <span class="text-[10px] text-slate-400">Lunas 1 Bln</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Export / Rekap button -->
+            <button onclick="showToast('Laporan kas bulan Oktober diekspor ke format Excel/PDF', 'success')" class="w-full mt-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-file-invoice text-slate-400"></i>
+              Unduh Rekapitulasi Keuangan
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- SECTION: TABEL DATA PENYEWA RINGKAS (Bagian Bawah) -->
+      <section class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" aria-label="Tabel Data Penyewa">
+        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-address-book text-emerald-600 text-sm"></i>
+              Daftar Penghuni Aktif Kos
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">Ringkasan status kontak, tanggal masuk, dan bukti pembayaran sewa</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500 font-medium">Total: <strong class="text-slate-800">18 Penghuni</strong></span>
+            <button onclick="openAddTenantModal()" class="inline-flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-xs transition-colors">
+              <i class="fa-solid fa-plus text-xs"></i>
+              Tambah Baru
+            </button>
+          </div>
+        </div>
+
+        <!-- Table Container Responsive -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs" id="tenantsTable">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th scope="col" class="py-3 px-4">Penyewa & Profil</th>
+                <th scope="col" class="py-3 px-4">No. Kamar</th>
+                <th scope="col" class="py-3 px-4">Tipe Kamar</th>
+                <th scope="col" class="py-3 px-4">Kontak WhatsApp</th>
+                <th scope="col" class="py-3 px-4">Tanggal Masuk</th>
+                <th scope="col" class="py-3 px-4">Status Pembayaran</th>
+                <th scope="col" class="py-3 px-4 text-right">Aksi Cepat</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700" id="tenantsTableBody">
+              <!-- Dynamically populated rows via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Table Footer Pagination / Info -->
+        <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2">
+          <span>Menampilkan <strong>7 penghuni aktif</strong> terdaftar di sistem</span>
+          <div class="flex items-center gap-1">
+            <button class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Sebelumnya</button>
+            <span class="px-2 font-semibold text-slate-800">Halaman 1 dari 1</span>
+            <button class="px-2.5 py-1 rounded border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 disabled:opacity-50" disabled>Selanjutnya</button>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== MODALS & INTERACTIVE OVERLAYS ==================== -->
+
+  <!-- MODAL: CATAT PEMBAYARAN BARU -->
+  <div id="paymentModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden modal-enter">
+      <div class="px-6 py-4 bg-emerald-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-receipt text-lg"></i>
+          <h3 class="font-bold text-base">Catat Pembayaran Sewa</h3>
+        </div>
+        <button onclick="closePaymentModal()" class="text-emerald-100 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="paymentForm" onsubmit="handlePaymentSubmit(event)" class="p-6 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Kamar & Penyewa *</label>
+          <select id="payRoomSelect" onchange="autoFillPaymentAmount(this.value)" required class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+            <option value="">-- Pilih Kamar --</option>
+            <option value="103" data-name="Radit Nugraha" data-price="1900000">Kamar 103 - Radit Nugraha (Jatuh Tempo Rp 1.900.000)</option>
+            <option value="106" data-name="Zannah Melati" data-price="1600000">Kamar 106 - Zannah Melati (Menunggak Rp 1.600.000)</option>
+            <option value="101" data-name="Radit Pratama" data-price="1900000">Kamar 101 - Radit Pratama (AC • Rp 1.900.000)</option>
+            <option value="102" data-name="Zannah Rahma" data-price="1900000">Kamar 102 - Zannah Rahma (AC • Rp 1.900.000)</option>
+            <option value="105" data-name="Arzhaning Santoso" data-price="1500000">Kamar 105 - Arzhaning Santoso (Standard • Rp 1.500.000)</option>
+            <option value="107" data-name="Arzha Fauzi" data-price="1900000">Kamar 107 - Arzha Fauzi (AC • Rp 1.900.000)</option>
+            <option value="108" data-name="Zannah Putri" data-price="2200000">Kamar 108 - Zannah Putri (Deluxe • Rp 2.200.000)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Nominal Pembayaran (Rp) *</label>
+          <input type="number" id="payAmountInput" required placeholder="1900000" class="w-full text-xs font-mono font-bold bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Metode Bayar *</label>
+            <select id="payMethodSelect" required class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="Transfer BCA">Transfer BCA</option>
+              <option value="Transfer Mandiri">Transfer Mandiri</option>
+              <option value="QRIS">QRIS</option>
+              <option value="Tunai">Tunai / Cash</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Bayar *</label>
+            <input type="date" id="payDateInput" required value="2026-10-05" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Catatan Tambahan (Opsional)</label>
+          <input type="text" id="payNoteInput" placeholder="Contoh: Pembayaran sewa periode Oktober 2026" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closePaymentModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors">Simpan & Terbitkan Kwitansi</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: TAMBAH PENYEWA BARU -->
+  <div id="addTenantModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden modal-enter">
+      <div class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-emerald-400 text-base"></i>
+          <h3 class="font-bold text-base">Registrasi Penghuni Baru</h3>
+        </div>
+        <button onclick="closeAddTenantModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <form id="addTenantForm" onsubmit="handleAddTenantSubmit(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap Penghuni *</label>
+            <input type="text" id="newTenantName" required placeholder="Contoh: Radit Pratama" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Nomor WhatsApp *</label>
+            <input type="tel" id="newTenantPhone" required placeholder="08123456789" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pilih Kamar *</label>
+            <select id="newTenantRoom" required class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+              <option value="104">Kamar 104 (Kosong - Rp 2.200.000/bln)</option>
+              <option value="201">Kamar 201 (Lantai 2 - Rp 1.900.000/bln)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Tanggal Mulai Sewa *</label>
+            <input type="date" id="newTenantDate" required value="2026-10-05" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Deposit Jaminan (Rp)</label>
+            <input type="number" id="newTenantDeposit" placeholder="500000" value="500000" class="w-full text-xs font-mono bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Pekerjaan / Instansi</label>
+            <input type="text" id="newTenantJob" placeholder="Mahasiswa UGM / Karyawan" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeAddTenantModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg transition-colors">Batal</button>
+          <button type="submit" class="px-4 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm transition-colors">Simpan & Onboard Penghuni</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: DETAIL KAMAR -->
+  <div id="roomDetailModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden modal-enter">
+      <div id="roomDetailHeader" class="px-6 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <h3 id="roomDetailTitle" class="font-bold text-base">Detail Kamar 101</h3>
+          <p id="roomDetailSubtitle" class="text-xs text-slate-300">Tipe AC • Kamar Mandi Dalam</p>
+        </div>
+        <button onclick="closeRoomDetailModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4">
+        <!-- Room Photo -->
+        <div class="rounded-xl overflow-hidden h-40 bg-slate-100 relative">
+          <img id="roomDetailImg" 
+               src="https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=600&h=400&q=80" 
+               alt="Foto Kamar" 
+               class="w-full h-full object-cover"
+               referrerpolicy="no-referrer" />
+          <div id="roomDetailBadge" class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow bg-emerald-600 text-white">
+            Terisi & Lunas
+          </div>
+        </div>
+
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Tarif Bulanan:</span>
+            <span id="roomDetailPrice" class="font-mono font-bold text-slate-900">Rp 1.900.000 / bln</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Penghuni Aktif:</span>
+            <span id="roomDetailTenant" class="font-semibold text-slate-900">Radit Pratama</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Fasilitas Unit:</span>
+            <span class="font-medium text-slate-700">AC 1/2 PK, KM Dalam, WiFi, Springbed</span>
+          </div>
+          <div class="flex justify-between py-1.5 border-b border-slate-100">
+            <span class="text-slate-500">Masa Sewa:</span>
+            <span id="roomDetailExpiry" class="text-emerald-700 font-semibold">Berakhir 29 Okt 2026 (Sisa 24 Hari)</span>
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-2">
+          <button id="roomDetailActionBtn" onclick="actionFromDetail()" class="flex-1 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors text-center">
+            Kirim WhatsApp
+          </button>
+          <button onclick="closeRoomDetailModal()" class="px-4 py-2 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MAINTENANCE TICKET DETAIL -->
+  <div id="maintenanceModal" class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-xs hidden items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden modal-enter">
+      <div class="px-6 py-4 bg-rose-600 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wrench text-base"></i>
+          <h3 class="font-bold text-base">Tiket Pemeliharaan Aktif</h3>
+        </div>
+        <button onclick="closeMaintenanceModal()" class="text-rose-100 hover:text-white p-1 rounded-lg">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 text-xs">
+        <div class="p-3.5 bg-rose-50 border border-rose-200 rounded-xl">
+          <div class="flex items-center justify-between mb-1">
+            <span class="font-bold text-rose-900 text-sm">Unit Kamar 104</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-200 text-rose-800">Prioritas Tinggi</span>
+          </div>
+          <p class="text-slate-600 font-medium">Masalah: Pipa pembuangan AC menetes ke lantai kamar mandi.</p>
+          <p class="text-[11px] text-slate-400 mt-1">Dilaporkan oleh: Inspeksi Kebersihan • 05 Okt 2026, 06:15 WIB</p>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block font-semibold text-slate-700">Tugaskan Teknisi:</label>
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg flex items-center justify-between">
+            <div>
+              <p class="font-bold text-slate-800">Pak Rajendra (Teknisi AC Berlangganan)</p>
+              <p class="text-slate-500 text-[11px]">0823-1231-2734</p>
+            </div>
+            <a href="https://wa.me/6282312312734?text=Halo%20Pak%20Rajendra,%20ada%20perbaikan%20AC%20bocor%20di%20Kos%20Griya%20Asri%20Kamar%20104.%20Mohon%20jadwal%20kedatangan." target="_blank" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold text-xs flex items-center gap-1">
+              <i class="fa-brands fa-whatsapp"></i> Hubungi
+            </a>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button onclick="resolveMaintenanceTicket()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg">
+            <i class="fa-solid fa-check mr-1"></i> Tandai Selesai Diperbaiki
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 pointer-events-none transition-all duration-300 max-w-sm w-full bg-slate-900 text-white px-4 py-3 rounded-xl shadow-xl border border-slate-700 flex items-center gap-3">
+    <div id="toastIcon" class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+      <i class="fa-solid fa-check text-sm"></i>
+    </div>
+    <div class="flex-1 min-w-0">
+      <p id="toastMessage" class="text-xs font-semibold text-slate-100 truncate">Operasi berhasil dilakukan!</p>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC & STATE ==================== -->
+  <script>
+    // 1. Data Store Kamar (8 Kamar Contoh Lengkap)
+    let roomsData = [
+      {
+        id: '101',
+        number: '101',
+        type: 'AC • Kamar Mandi Dalam',
+        price: 1900000,
+        status: 'lunas', // 'lunas', 'pending', 'kosong'
+        tenantName: 'Radit Pratama',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 24,
+        expiryDate: '29 Okt 2026',
+        roomPhoto: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '102',
+        number: '102',
+        type: 'AC • Kamar Mandi Dalam',
+        price: 1900000,
+        status: 'lunas',
+        tenantName: 'Zannah Rahma',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 18,
+        expiryDate: '23 Okt 2026',
+        roomPhoto: 'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '103',
+        number: '103',
+        type: 'AC • Kamar Mandi Dalam',
+        price: 1900000,
+        status: 'pending',
+        tenantName: 'Radit Nugraha',
+        tenantPhone: '0823-1231-2734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 0,
+        expiryDate: 'Jatuh Tempo Hari Ini (05 Okt)',
+        roomPhoto: 'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '104',
+        number: '104',
+        type: 'Deluxe King • AC & KM Dalam',
+        price: 2200000,
+        status: 'kosong',
+        tenantName: 'Belum Terisi',
+        tenantPhone: '',
+        tenantPhoto: '',
+        remainingDays: 0,
+        expiryDate: 'Siap Huni',
+        roomPhoto: 'https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '105',
+        number: '105',
+        type: 'Non-AC • KM Luar Bersih',
+        price: 1500000,
+        status: 'lunas',
+        tenantName: 'Arzhaning Santoso',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 28,
+        expiryDate: '02 Nov 2026',
+        roomPhoto: 'https://images.unsplash.com/photo-1540518614846-7ede433c4ef4?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '106',
+        number: '106',
+        type: 'Standard • AC & KM Luar',
+        price: 1600000,
+        status: 'pending',
+        tenantName: 'Zannah Melati',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: -2,
+        expiryDate: 'Telat 2 Hari (03 Okt)',
+        roomPhoto: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '107',
+        number: '107',
+        type: 'AC • Kamar Mandi Dalam',
+        price: 1900000,
+        status: 'lunas',
+        tenantName: 'Arzha Fauzi',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 15,
+        expiryDate: '20 Okt 2026',
+        roomPhoto: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=400&h=250&q=80'
+      },
+      {
+        id: '108',
+        number: '108',
+        type: 'Deluxe Queen • AC & KM Dalam',
+        price: 2200000,
+        status: 'lunas',
+        tenantName: 'Zannah Putri',
+        tenantPhone: '082312312734',
+        tenantPhoto: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&h=150&q=80',
+        remainingDays: 30,
+        expiryDate: '04 Nov 2026',
+        roomPhoto: 'https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=400&h=250&q=80'
+      }
+    ];
+
+    // 2. Data Store Penghuni Aktif
+    let tenantsList = [
+      {
+        id: 'T01',
+        name: 'Radit Pratama',
+        room: '101',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '15 Jan 2026',
+        roomType: 'AC + KM Dalam',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T02',
+        name: 'Zannah Rahma',
+        room: '102',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '23 Mar 2026',
+        roomType: 'AC + KM Dalam',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T03',
+        name: 'Radit Nugraha',
+        room: '103',
+        phone: '0823-1231-2734',
+        rawPhone: '0823-1231-2734',
+        entryDate: '05 Mei 2026',
+        roomType: 'AC + KM Dalam',
+        status: 'Jatuh Tempo',
+        photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T05',
+        name: 'Arzhaning Santoso',
+        room: '105',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '02 Feb 2026',
+        roomType: 'Non-AC + KM Luar',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T06',
+        name: 'Zannah Melati',
+        room: '106',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '03 Apr 2026',
+        roomType: 'Standard AC',
+        status: 'Menunggak 2 Hari',
+        photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T07',
+        name: 'Arzha Fauzi',
+        room: '107',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '20 Jun 2026',
+        roomType: 'AC + KM Dalam',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&h=120&q=80'
+      },
+      {
+        id: 'T08',
+        name: 'Zannah Putri',
+        room: '108',
+        phone: '0823-1231-2734',
+        rawPhone: '082312312734',
+        entryDate: '04 Agu 2026',
+        roomType: 'Deluxe Queen',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80'
+      }
+    ];
+
+    let currentFilter = 'all';
+    let searchQuery = '';
+    let selectedRoomForDetail = null;
+
+    // Format Rupiah Helper
+    function formatRp(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    // Render Room Cards
+    function renderRoomCards() {
+      const grid = document.getElementById('roomCardsGrid');
+      const emptyAlert = document.getElementById('noRoomsMatch');
+      grid.innerHTML = '';
+
+      const filtered = roomsData.filter(room => {
+        // Filter status
+        const matchesStatus = (currentFilter === 'all') || (room.status === currentFilter);
+        // Search query
+        const q = searchQuery.toLowerCase().trim();
+        const matchesSearch = !q || 
+                              room.number.toLowerCase().includes(q) || 
+                              room.tenantName.toLowerCase().includes(q) ||
+                              room.type.toLowerCase().includes(q);
+        return matchesStatus && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        emptyAlert.classList.remove('hidden');
+      } else {
+        emptyAlert.classList.add('hidden');
+      }
+
+      filtered.forEach(room => {
+        let badgeBg = '';
+        let badgeText = '';
+        let borderClass = '';
+        let statusKicker = '';
+
+        if (room.status === 'lunas') {
+          badgeBg = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          badgeText = 'Terisi & Lunas';
+          borderClass = 'hover:border-emerald-300';
+          statusKicker = `<span class="text-emerald-700 font-semibold text-[11px]"><i class="fa-regular fa-calendar-check mr-1"></i>Sisa ${room.remainingDays} hari sewa</span>`;
+        } else if (room.status === 'pending') {
+          badgeBg = 'bg-amber-50 text-amber-700 border-amber-200';
+          badgeText = 'Jatuh Tempo / Belum Bayar';
+          borderClass = 'hover:border-amber-300 border-amber-200 bg-amber-50/20';
+          statusKicker = `<span class="text-amber-800 font-bold text-[11px]"><i class="fa-solid fa-clock mr-1"></i>${room.expiryDate}</span>`;
+        } else {
+          badgeBg = 'bg-rose-50 text-rose-700 border-rose-200';
+          badgeText = 'Kosong (Siap Huni)';
+          borderClass = 'hover:border-rose-300 border-dashed border-rose-200 bg-rose-50/10';
+          statusKicker = `<span class="text-rose-700 font-semibold text-[11px]"><i class="fa-solid fa-key mr-1"></i>Kamar Bersih & Siap Huni</span>`;
+        }
+
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-xl p-4 border border-slate-200 transition-all duration-200 hover:shadow-md cursor-pointer flex flex-col justify-between ${borderClass}`;
+        card.onclick = () => openRoomDetail(room.id);
+
+        card.innerHTML = `
+          <div>
+            <!-- Header Kartu: No Kamar & Badge Status -->
+            <div class="flex items-start justify-between gap-2 mb-3">
+              <div>
+                <span class="text-xs text-slate-400 font-semibold">Unit</span>
+                <h4 class="text-lg font-black text-slate-900 tracking-tight font-mono">No. ${room.number}</h4>
+              </div>
+              <span class="inline-flex items-center text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg}">
+                ${badgeText}
+              </span>
+            </div>
+
+            <!-- Detail Penghuni atau Info Kamar Kosong -->
+            ${room.status !== 'kosong' ? `
+              <div class="flex items-center gap-2.5 py-2 px-2.5 bg-slate-50 rounded-lg mb-3 border border-slate-100">
+                <img src="${room.tenantPhoto}" 
+                     alt="${room.tenantName}" 
+                     class="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0"
+                     referrerpolicy="no-referrer"
+                     onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(room.tenantName)}&background=059669&color=fff';" />
+                <div class="min-w-0">
+                  <p class="text-xs font-bold text-slate-800 truncate">${room.tenantName}</p>
+                  <p class="text-[11px] text-slate-500 truncate">${room.type}</p>
+                </div>
+              </div>
+            ` : `
+              <div class="flex items-center gap-2.5 py-2 px-2.5 bg-rose-50/50 rounded-lg mb-3 border border-rose-100">
+                <div class="w-9 h-9 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center shrink-0 text-xs">
+                  <i class="fa-solid fa-door-closed"></i>
+                </div>
+                <div class="min-w-0">
+                  <p class="text-xs font-bold text-slate-800">Unit Kosong</p>
+                  <p class="text-[11px] text-slate-500">${room.type}</p>
+                </div>
+              </div>
+            `}
+
+            <!-- Info Harga & Fitur -->
+            <div class="flex items-center justify-between text-xs py-1 border-t border-slate-100">
+              <span class="text-slate-400 text-[11px]">Tarif:</span>
+              <span class="font-extrabold text-slate-900 font-mono">${formatRp(room.price)}<span class="text-[10px] font-normal text-slate-500">/bln</span></span>
+            </div>
+          </div>
+
+          <!-- Bottom Kicker & Quick Action -->
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between">
+            ${statusKicker}
+            <span class="text-xs text-slate-400 hover:text-emerald-600"><i class="fa-solid fa-angle-right"></i></span>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Render Tenants Table
+    function renderTenantsTable() {
+      const tbody = document.getElementById('tenantsTableBody');
+      tbody.innerHTML = '';
+
+      const filtered = tenantsList.filter(t => {
+        const q = searchQuery.toLowerCase().trim();
+        if (!q) return true;
+        return t.name.toLowerCase().includes(q) || t.room.toLowerCase().includes(q) || t.phone.includes(q);
+      });
+
+      filtered.forEach(t => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-50/80 transition-colors';
+
+        let badge = '';
+        if (t.status === 'Lunas') {
+          badge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Lunas</span>';
+        } else if (t.status === 'Jatuh Tempo') {
+          badge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Jatuh Tempo</span>';
+        } else {
+          badge = '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Menunggak</span>';
+        }
+
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-3">
+              <img src="${t.photo}" 
+                   alt="${t.name}" 
+                   class="w-8 h-8 rounded-full object-cover border border-slate-200 shadow-2xs shrink-0"
+                   referrerpolicy="no-referrer"
+                   onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=059669&color=fff';" />
+              <div>
+                <p class="font-bold text-slate-900 text-xs">${t.name}</p>
+                <p class="text-[11px] text-slate-400">ID: ${t.id}</p>
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-4 font-mono font-bold text-slate-800 text-xs">
+            Kamar ${t.room}
+          </td>
+          <td class="py-3 px-4 text-slate-600 text-xs">
+            ${t.roomType}
+          </td>
+          <td class="py-3 px-4 font-mono text-slate-600 text-xs">
+            <a href="https://wa.me/62${t.rawPhone.replace(/^0/, '')}" target="_blank" class="text-emerald-700 hover:underline flex items-center gap-1">
+              <i class="fa-brands fa-whatsapp text-emerald-600"></i> ${t.phone}
+            </a>
+          </td>
+          <td class="py-3 px-4 text-slate-500 text-xs">
+            ${t.entryDate}
+          </td>
+          <td class="py-3 px-4">
+            ${badge}
+          </td>
+          <td class="py-3 px-4 text-right">
+            <div class="inline-flex items-center gap-1.5">
+              <button onclick="openWaReminder('${t.name}', '${t.room}', 'Rp 1.900.000', '${t.rawPhone}')" class="p-1.5 rounded-md hover:bg-emerald-50 text-emerald-600 hover:text-emerald-700 transition-colors" title="Kirim WA">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+              </button>
+              <button onclick="openRoomDetail('${t.room}')" class="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Rincian Kamar">
+                <i class="fa-regular fa-eye text-sm"></i>
+              </button>
+              <button onclick="showToast('Kwitansi sewa untuk ${t.name} (Kamar ${t.room}) siap dicetak', 'success')" class="p-1.5 rounded-md hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors" title="Cetak Kwitansi">
+                <i class="fa-solid fa-receipt text-sm"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Filter Kamar Functions
+    function filterRooms(status, btnElement) {
+      currentFilter = status;
+      document.querySelectorAll('.room-filter-btn').forEach(btn => {
+        btn.className = 'room-filter-btn px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900 transition-colors whitespace-nowrap';
+      });
+      btnElement.className = 'room-filter-btn px-3 py-1.5 rounded-md bg-white text-slate-900 font-semibold shadow-xs transition-colors whitespace-nowrap';
+      renderRoomCards();
+    }
+
+    function resetFilters() {
+      currentFilter = 'all';
+      searchQuery = '';
+      document.getElementById('globalSearchInput').value = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      const firstBtn = document.querySelector('.room-filter-btn');
+      if (firstBtn) filterRooms('all', firstBtn);
+    }
+
+    // Search Functions
+    function handleSearch(val) {
+      searchQuery = val;
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (val) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+      renderRoomCards();
+      renderTenantsTable();
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('globalSearchInput');
+      input.value = '';
+      handleSearch('');
+      input.focus();
+    }
+
+    // Modal Control Functions
+    function openPaymentModal() {
+      document.getElementById('paymentModal').classList.remove('hidden');
+      document.getElementById('paymentModal').classList.add('flex');
+    }
+
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.add('hidden');
+      document.getElementById('paymentModal').classList.remove('flex');
+    }
+
+    function autoFillPaymentAmount(roomId) {
+      const select = document.getElementById('payRoomSelect');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.dataset.price) {
+        document.getElementById('payAmountInput').value = opt.dataset.price;
+      }
+    }
+
+    function handlePaymentSubmit(e) {
+      e.preventDefault();
+      const roomSelect = document.getElementById('payRoomSelect');
+      const opt = roomSelect.options[roomSelect.selectedIndex];
+      const amount = document.getElementById('payAmountInput').value;
+      const method = document.getElementById('payMethodSelect').value;
+      const roomId = roomSelect.value;
+      const tenantName = opt.dataset.name || 'Penghuni';
+
+      // Update local state if it matches a pending room
+      const targetRoom = roomsData.find(r => r.id === roomId);
+      if (targetRoom) {
+        targetRoom.status = 'lunas';
+        targetRoom.remainingDays = 30;
+        targetRoom.expiryDate = '05 Nov 2026';
+      }
+
+      const targetTenant = tenantsList.find(t => t.room === roomId);
+      if (targetTenant) {
+        targetTenant.status = 'Lunas';
+      }
+
+      // Add to recent payments list UI
+      const recentList = document.getElementById('recentPaymentsList');
+      const newPaymentItem = document.createElement('div');
+      newPaymentItem.className = 'py-2.5 flex items-center justify-between text-xs bg-emerald-50/50 p-2 rounded-lg';
+      newPaymentItem.innerHTML = `
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs font-mono">
+            ${roomId}
+          </div>
+          <div>
+            <p class="font-semibold text-slate-800">${tenantName}</p>
+            <p class="text-[11px] text-slate-400">${method} • Baru saja</p>
+          </div>
+        </div>
+        <div class="text-right">
+          <p class="font-extrabold text-emerald-600 font-mono tabular-nums">+${formatRp(amount)}</p>
+          <span class="text-[10px] text-emerald-700 font-semibold">Tercatat Lunas</span>
+        </div>
+      `;
+      recentList.prepend(newPaymentItem);
+
+      closePaymentModal();
+      renderRoomCards();
+      renderTenantsTable();
+      showToast(`Pembayaran ${formatRp(amount)} untuk Kamar ${roomId} (${tenantName}) berhasil dicatat!`, 'success');
+    }
+
+    function openAddTenantModal() {
+      document.getElementById('addTenantModal').classList.remove('hidden');
+      document.getElementById('addTenantModal').classList.add('flex');
+    }
+
+    function closeAddTenantModal() {
+      document.getElementById('addTenantModal').classList.add('hidden');
+      document.getElementById('addTenantModal').classList.remove('flex');
+    }
+
+    function handleAddTenantSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('newTenantName').value;
+      const phone = document.getElementById('newTenantPhone').value;
+      const room = document.getElementById('newTenantRoom').value;
+      const date = document.getElementById('newTenantDate').value;
+
+      // Update room state
+      const targetRoom = roomsData.find(r => r.id === room);
+      if (targetRoom) {
+        targetRoom.status = 'lunas';
+        targetRoom.tenantName = name;
+        targetRoom.tenantPhone = phone;
+        targetRoom.tenantPhoto = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80';
+        targetRoom.remainingDays = 30;
+        targetRoom.expiryDate = '05 Nov 2026';
+      }
+
+      // Add to tenants table
+      tenantsList.unshift({
+        id: 'T' + Math.floor(10 + Math.random() * 90),
+        name: name,
+        room: room,
+        phone: phone,
+        rawPhone: phone.replace(/[^0-9]/g, ''),
+        entryDate: date,
+        roomType: 'Deluxe AC',
+        status: 'Lunas',
+        photo: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&h=120&q=80'
+      });
+
+      closeAddTenantModal();
+      renderRoomCards();
+      renderTenantsTable();
+      showToast(`Penghuni baru ${name} berhasil ditempatkan di Kamar ${room}!`, 'success');
+    }
+
+    function openRoomDetail(roomId) {
+      const room = roomsData.find(r => r.id === roomId);
+      if (!room) return;
+      selectedRoomForDetail = room;
+
+      document.getElementById('roomDetailTitle').innerText = `Kamar No. ${room.number}`;
+      document.getElementById('roomDetailSubtitle').innerText = room.type;
+      document.getElementById('roomDetailPrice').innerText = `${formatRp(room.price)} / bulan`;
+      document.getElementById('roomDetailTenant').innerText = room.tenantName;
+      document.getElementById('roomDetailImg').src = room.roomPhoto;
+
+      const badge = document.getElementById('roomDetailBadge');
+      const actionBtn = document.getElementById('roomDetailActionBtn');
+      const expiry = document.getElementById('roomDetailExpiry');
+
+      if (room.status === 'lunas') {
+        badge.className = 'absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow bg-emerald-600 text-white';
+        badge.innerText = 'Terisi & Lunas';
+        actionBtn.innerText = 'Hubungi Penghuni (WA)';
+        actionBtn.className = 'flex-1 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors text-center';
+        expiry.innerText = `${room.expiryDate} (Sisa ${room.remainingDays} Hari)`;
+        expiry.className = 'text-emerald-700 font-semibold';
+      } else if (room.status === 'pending') {
+        badge.className = 'absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow bg-amber-500 text-white';
+        badge.innerText = 'Jatuh Tempo';
+        actionBtn.innerText = 'Kirim Pengingat WhatsApp';
+        actionBtn.className = 'flex-1 py-2 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow-sm transition-colors text-center';
+        expiry.innerText = room.expiryDate;
+        expiry.className = 'text-amber-700 font-bold';
+      } else {
+        badge.className = 'absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-bold shadow bg-rose-500 text-white';
+        badge.innerText = 'Kamar Kosong';
+        actionBtn.innerText = 'Check-in Penghuni Baru';
+        actionBtn.className = 'flex-1 py-2 text-xs font-semibold text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm transition-colors text-center';
+        expiry.innerText = 'Siap dihuni kapan saja';
+        expiry.className = 'text-slate-600 font-medium';
+      }
+
+      document.getElementById('roomDetailModal').classList.remove('hidden');
+      document.getElementById('roomDetailModal').classList.add('flex');
+    }
+
+    function closeRoomDetailModal() {
+      document.getElementById('roomDetailModal').classList.add('hidden');
+      document.getElementById('roomDetailModal').classList.remove('flex');
+    }
+
+    function actionFromDetail() {
+      if (!selectedRoomForDetail) return;
+      closeRoomDetailModal();
+      if (selectedRoomForDetail.status === 'kosong') {
+        openAddTenantModal();
+      } else {
+        openWaReminder(
+          selectedRoomForDetail.tenantName,
+          selectedRoomForDetail.number,
+          formatRp(selectedRoomForDetail.price),
+          selectedRoomForDetail.tenantPhone
+        );
+      }
+    }
+
+    // Maintenance Modal
+    function openMaintenanceModal() {
+      document.getElementById('maintenanceModal').classList.remove('hidden');
+      document.getElementById('maintenanceModal').classList.add('flex');
+    }
+
+    function closeMaintenanceModal() {
+      document.getElementById('maintenanceModal').classList.add('hidden');
+      document.getElementById('maintenanceModal').classList.remove('flex');
+    }
+
+    function resolveMaintenanceTicket() {
+      closeMaintenanceModal();
+      showToast('Tiket pemeliharaan AC Kamar 104 berhasil ditandai selesai!', 'success');
+    }
+
+    // WhatsApp Reminder Helper
+    function openWaReminder(tenantName, roomNumber, nominal, rawPhone) {
+      const cleanPhone = (rawPhone || '0823-1231-2734').replace(/[^0-9]/g, '').replace(/^0/, '62');
+      const message = `Halo Kak ${tenantName},\n\nSemoga sehat selalu. Kami dari manajemen *Griya Asri Residence* ingin menginformasikan tagihan sewa *Kamar ${roomNumber}* sebesar *${nominal}* yang telah memasuki masa jatuh tempo.\n\nPembayaran dapat ditransfer ke:\n- BCA: 8830-1928-33 a.n Rajendra Wijaya\n\nMohon kirimkan bukti transfer jika sudah melakukan pembayaran ya Kak. Terima kasih banyak atas kerjasamanya! 🙏`;
+      
+      const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+      showToast(`Pesan WhatsApp pengingat untuk ${tenantName} (Kamar ${roomNumber}) disiapkan!`, 'info');
+    }
+
+    // Toast Notification System
+    let toastTimeout = null;
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.innerText = message;
+
+      if (type === 'success') {
+        toastIcon.className = 'w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0';
+        toastIcon.innerHTML = '<i class="fa-solid fa-check text-sm"></i>';
+      } else if (type === 'info') {
+        toastIcon.className = 'w-7 h-7 rounded-lg bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0';
+        toastIcon.innerHTML = '<i class="fa-solid fa-circle-info text-sm"></i>';
+      } else {
+        toastIcon.className = 'w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0';
+        toastIcon.innerHTML = '<i class="fa-solid fa-triangle-exclamation text-sm"></i>';
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      if (toastTimeout) clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 4000);
+    }
+
+    // Toggle Mobile Sidebar
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('sidebarNav');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const isClosed = sidebar.classList.contains('-translate-x-full');
+
+      if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        backdrop.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+      }
+    }
+
+    // Toggle Notification Dropdown
+    function toggleNotificationDropdown() {
+      const dropdown = document.getElementById('notificationDropdown');
+      dropdown.classList.toggle('hidden');
+    }
+
+    function markAllNotificationsRead() {
+      const list = document.getElementById('notificationList');
+      list.innerHTML = `
+        <div class="p-6 text-center text-slate-400 text-xs">
+          <i class="fa-solid fa-bell-slash text-base mb-1 block"></i>
+          Tidak ada notifikasi baru yang tertunda.
+        </div>
+      `;
+      showToast('Semua notifikasi telah ditandai sebagai dibaca', 'info');
+      setTimeout(() => toggleNotificationDropdown(), 1000);
+    }
+
+    // Set Active Nav Item
+    function setActiveNav(element, title) {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.className = 'nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:bg-slate-800 hover:text-white transition-all group';
+      });
+      element.className = 'nav-item flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium bg-emerald-600/90 text-white shadow-sm transition-all group';
+      document.getElementById('pageTitle').innerHTML = `${title} <span class="text-xs font-normal text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200">Oktober 2026</span>`;
+      
+      // Close mobile sidebar on navigation
+      if (window.innerWidth < 1024) {
+        toggleMobileSidebar();
+      }
+    }
+
+    // Close popups on click outside
+    document.addEventListener('click', (e) => {
+      const notifBtn = e.target.closest('button[onclick="toggleNotificationDropdown()"]');
+      const dropdown = document.getElementById('notificationDropdown');
+      if (!notifBtn && dropdown && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+      }
+    });
+
+    // Initial Load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderRoomCards();
+      renderTenantsTable();
+    });
+  </script>
+</body>
+</html>

@@ -474,6 +474,8 @@ async function runGroundedResearchInner(
             const value = { ok: true as const, text: text.slice(0, 2800), sources, queries, model };
             if (cacheKey) cacheSet(cacheKey, value);
             console.log(`[groundedSearch][${model}] OK dalam ${Date.now() - callStartedAt}ms: ${sources.length} sumber, ${queries.length} query. Pemakaian lokal hari ini: ${dayCount}/${DAILY_CAP}`);
+            // Cuplikan teks yang diberikan ke model: untuk memeriksa dari mana sebuah angka/nama berasal bila ada yang janggal.
+            console.log(`[groundedSearch][${model}] teks: "${text.replace(/\s+/g, ' ').slice(0, 500)}"`);
             return value;
         } catch (err: any) {
             clearTimeout(timeoutId);
@@ -568,7 +570,7 @@ export function getGroundingDiagnostics() {
 
 
 // ── Debug: penanda versi + tes langsung (dipakai modal admin) ─────────────────────────────
-export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.9';
+export const GROUNDING_CODE_VERSION = 'grounding-2026-10-04.10';
 
 export interface ProbeRow {
     model: string;

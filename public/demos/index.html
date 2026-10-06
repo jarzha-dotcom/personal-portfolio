@@ -1,248 +1,1152 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<meta charset="UTF-8">
-<meta name="robots" content="noindex, nofollow">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Galeri Contoh Desain</title>
-<script>(function(){var r=document.documentElement,t="light";try{var q=new URLSearchParams(location.search).get("theme");if(q==="dark"||q==="light"){t=q;localStorage.setItem("demo-theme",q)}else{var v=localStorage.getItem("demo-theme");t=(v==="dark"||v==="light")?v:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}}catch(e){}r.setAttribute("data-theme",t)})()</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#f6f4ef;--card:#fff;--ink:#17181a;--sub:#5b6068;--line:#e4e0d7;--accent:#0f766e;--accent-ink:#fff;--glow:rgba(15,118,110,.13);--orb:rgba(15,118,110,.17);--orb2:rgba(6,150,182,.13);--ph:#e9e4d8}
-:root[data-theme=dark]{color-scheme:dark;--bg:#0a0f0f;--card:rgba(255,255,255,.035);--ink:#fff;--sub:#a8afb5;--line:rgba(255,255,255,.09);--accent:#2dd4bf;--accent-ink:#04201c;--glow:rgba(20,184,166,.2);--orb:rgba(20,184,166,.3);--orb2:rgba(6,182,212,.24);--ph:#121a1a}
-*{box-sizing:border-box;margin:0}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{min-height:100vh;background:var(--bg);color:var(--ink);font:400 16px/1.6 Inter,system-ui,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-.bg,.particles{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
-.bg i{position:absolute;border-radius:50%;background:radial-gradient(circle,var(--orb),transparent 70%);animation:float 26s ease-in-out infinite;will-change:transform}
-.bg i:nth-child(1){width:760px;height:760px;top:-20%;left:-14%}
-.bg i:nth-child(2){width:640px;height:640px;bottom:-22%;right:-12%;background:radial-gradient(circle,var(--orb2),transparent 70%);animation-duration:32s;animation-delay:-7s}
-.bg i:nth-child(3){width:480px;height:480px;top:42%;left:46%;animation-duration:28s;animation-delay:-13s}
-.p{position:absolute;bottom:0;border-radius:50%;background:var(--accent);opacity:0;animation:drift linear infinite}
-.glow{position:fixed;left:0;top:0;width:560px;height:560px;border-radius:50%;pointer-events:none;z-index:-1;background:radial-gradient(circle,var(--glow),transparent 70%);opacity:0;transition:opacity .4s}
-@keyframes float{25%{transform:translate(70px,-50px) scale(1.08)}50%{transform:translate(-40px,70px) scale(.95)}75%{transform:translate(50px,35px) scale(1.04)}}
-@keyframes drift{10%{opacity:.4}90%{opacity:.4}to{transform:translateY(-110vh)}}
-@keyframes shift{50%{background-position:100% 50%}}
-@keyframes pulse{50%{opacity:.4;transform:scale(.75)}}
-.wrap{max-width:1200px;margin:0 auto;padding:24px 20px 56px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.pill,.theme{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--card);color:var(--sub);border-radius:999px;font-size:14px;font-weight:500;text-decoration:none;cursor:pointer;transition:color .2s,border-color .2s}
-.pill{padding:9px 18px}
-.theme{width:40px;height:40px;justify-content:center;padding:0;color:var(--ink)}
-.pill:hover,.theme:hover{color:var(--accent);border-color:var(--accent)}
-.theme .sun{display:none}
-:root[data-theme=dark] .theme .sun{display:block}
-:root[data-theme=dark] .theme .moon{display:none}
-.hero{text-align:center;padding:64px 0 36px}
-.badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:600;margin-bottom:22px}
-.badge i{width:7px;height:7px;border-radius:50%;background:var(--accent);animation:pulse 2s ease-in-out infinite}
-h1{font:700 clamp(2.2rem,6vw,4rem)/1.1 "Space Grotesk",sans-serif;letter-spacing:-.03em;margin-bottom:16px}
-h1 span{background:linear-gradient(135deg,#14b8a6,#06b6d4,#5eead4,#14b8a6);background-size:250% 250%;animation:shift 8s ease-in-out infinite;-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{max-width:56ch;margin:0 auto 10px;color:var(--sub)}
-.note{font-size:13px;color:var(--sub);opacity:.85}
-.stats{display:flex;justify-content:center;gap:40px;margin:28px 0 32px}
-.stat{text-align:center}
-.stat b{display:block;font:700 1.9rem/1.2 "Space Grotesk",sans-serif;color:var(--accent)}
-.stat small{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--sub)}
-.chips{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:36px}
-.chip{font:500 14px Inter,sans-serif;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 18px;cursor:pointer;transition:color .2s,border-color .2s}
-.chip:hover{color:var(--ink);border-color:var(--accent)}
-.chip[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.chip em{font-style:normal;opacity:.65;margin-left:4px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:24px}
-.card{transform:perspective(900px) translateY(var(--ty,0)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));will-change:transform;display:flex;flex-direction:row;min-height:220px;color:inherit;text-decoration:none;background:var(--card);border:1px solid var(--line);border-radius:20px;overflow:hidden;transition:transform .18s ease-out,border-color .25s,box-shadow .25s;animation:up .5s ease-out backwards}
-.card[hidden]{display:none}
-.card:hover{--ty:-6px;border-color:var(--accent);box-shadow:0 18px 44px rgba(0,0,0,.18),0 0 32px var(--glow)}
-.thumb{position:relative;flex:0 0 44%;background:var(--ph);display:grid;place-items:center;font:700 3rem "Space Grotesk",sans-serif;color:var(--accent);overflow:hidden}
-.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
-.card:hover .thumb img{transform:scale(1.05)}
-.info{display:flex;flex-direction:column;gap:8px;padding:20px 22px;flex:1;min-width:0}
-.tags{display:flex;flex-wrap:wrap;gap:6px}
-.tag{font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
-.info h2{font:700 1.15rem/1.3 "Space Grotesk",sans-serif;display:-webkit-box;-webkit-line-clamp:2;line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.info p{font-size:14px;color:var(--sub);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.cta{margin-top:auto;padding-top:6px;font-size:14px;font-weight:600;color:var(--accent)}
-.cta svg{vertical-align:-2px;margin-left:4px;transition:transform .2s}
-.card:hover .cta svg{transform:translateX(4px)}
-.msg{text-align:center;color:var(--sub);padding:56px 0}
-.foot{text-align:center;color:var(--sub);font-size:13px;margin-top:56px}
-.foot a{color:var(--accent);text-decoration:none}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-@keyframes up{from{opacity:0;transform:translateY(16px)}}
-.pager{display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-top:36px}
-.pager[hidden]{display:none}
-.pager button{min-width:40px;height:40px;padding:0 14px;font:500 14px Inter,sans-serif;color:var(--sub);background:var(--card);border:1px solid var(--line);border-radius:999px;cursor:pointer;transition:color .2s,border-color .2s}
-.pager button:hover:not(:disabled){color:var(--ink);border-color:var(--accent)}
-.pager button[aria-current=page]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
-.pager button:disabled{opacity:.4;cursor:default}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-@media(max-width:600px){.hero{padding:44px 0 28px}.stats{gap:28px}.card{flex-direction:column;min-height:0}.thumb{flex:none;aspect-ratio:16/10}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.particles,.glow{display:none}}
-</style>
-</head>
-<body>
-<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
-<div class="particles" id="particles" aria-hidden="true"></div>
-<div class="glow" id="glow" aria-hidden="true"></div>
-<main class="wrap">
-  <div class="top">
-    <a class="pill" href="/">← Kembali ke portofolio</a>
-    <button class="theme" id="theme" type="button" aria-label="Ganti mode gelap/terang">
-      <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
-      <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
-  </div>
-
-  <section class="hero">
-    <div class="badge"><i></i>Galeri Desain</div>
-    <h1>Galeri Contoh <span>Desain</span></h1>
-    <p class="lead">Kumpulan draft desain web dan aplikasi yang aku buat sebagai contoh gaya dan kemampuan. Klik salah satu untuk membukanya di tab baru.</p>
-    <p class="note">Semua nama, kontak, dan isi di sini adalah data contoh (dummy).</p>
-  </section>
-
-  <div class="stats" id="stats" hidden>
-    <div class="stat"><b id="statTotal">0</b><small>Contoh desain</small></div>
-    <div class="stat"><b id="statInd">0</b><small>Jenis usaha</small></div>
-  </div>
-
-  <div class="chips" id="chips" role="group" aria-label="Filter jenis usaha"></div>
-  <div id="grid" class="grid"></div>
-  <nav class="pager" id="pager" aria-label="Halaman galeri" hidden></nav>
-  <p class="msg" id="msg">Memuat galeri…</p>
-
-  <p class="foot"><a href="/">Kembali ke beranda</a></p>
-</main>
-<script>
-/* Data ada di demos.json (dipakai juga oleh nudge di portofolio).
-   Konvensi tags: tag pertama = jenis halaman (mis. "Landing Page"),
-   tag berikutnya = jenis usaha. Filter hanya memakai tag jenis usaha. */
-var PER_PAGE = 8; // pagination hanya aktif di filter "Semua"; filter lain menampilkan semua hasil
-var pager = document.getElementById("pager");
-var grid = document.getElementById("grid"), msg = document.getElementById("msg"), chipsEl = document.getElementById("chips");
-var NS = "http://www.w3.org/2000/svg";
-
-function el(tag, cls, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text) e.textContent = text; return e; }
-
-function arrow(){
-  var s = document.createElementNS(NS, "svg");
-  s.setAttribute("width", "14"); s.setAttribute("height", "14"); s.setAttribute("viewBox", "0 0 24 24");
-  s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "2.5");
-  s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round"); s.setAttribute("aria-hidden", "true");
-  var p = document.createElementNS(NS, "path"); p.setAttribute("d", "M5 12h14M13 6l6 6-6 6"); s.appendChild(p);
-  return s;
-}
-
-var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
-var mouse = matchMedia("(hover: hover) and (pointer: fine)").matches;
-
-if (!calm) {
-  var pc = document.getElementById("particles");
-  for (var n = 0; n < 28; n++) {
-    var p = el("div", "p"), z = 1 + Math.random() * 2;
-    p.style.left = Math.random() * 100 + "%"; p.style.width = p.style.height = z + "px";
-    p.style.animationDuration = 10 + Math.random() * 16 + "s"; p.style.animationDelay = -Math.random() * 20 + "s";
-    pc.appendChild(p);
-  }
-}
-if (!calm && mouse) {
-  var glow = document.getElementById("glow");
-  document.addEventListener("mousemove", function(e){
-    glow.style.opacity = 1;
-    glow.style.transform = "translate3d(" + e.clientX + "px," + e.clientY + "px,0) translate(-50%,-50%)";
-  });
-}
-function tilt(a){
-  a.addEventListener("mousemove", function(e){
-    var r = a.getBoundingClientRect();
-    a.style.setProperty("--ry", ((e.clientX - r.left - r.width / 2) / 24).toFixed(2) + "deg");
-    a.style.setProperty("--rx", (-(e.clientY - r.top - r.height / 2) / 24).toFixed(2) + "deg");
-  });
-  a.addEventListener("mouseleave", function(){ a.style.removeProperty("--rx"); a.style.removeProperty("--ry"); });
-}
-
-function card(d, i){
-  var a = el("a", "card"); a.href = d.file; a.target = "_blank"; a.rel = "noopener";
-  a.style.animationDelay = Math.min(i, 8) * 0.06 + "s";
-  a.dataset.tags = (d.tags || []).slice(1).join("|");
-  var th = el("div", "thumb");
-  if (d.thumb) {
-    var img = new Image(); img.alt = "Cuplikan " + d.title; img.loading = "lazy";
-    img.onerror = function(){ img.remove(); th.textContent = d.title.charAt(0); };
-    img.src = d.thumb; th.appendChild(img);
-  } else th.textContent = d.title.charAt(0);
-  var info = el("div", "info"), tg = el("div", "tags");
-  (d.tags || []).forEach(function(t){ tg.appendChild(el("span", "tag", t)); });
-  var cta = el("span", "cta", "Buka demo"); cta.appendChild(arrow());
-  info.appendChild(tg); info.appendChild(el("h2", "", d.title)); info.appendChild(el("p", "", d.desc || "")); info.appendChild(cta);
-  a.appendChild(th); a.appendChild(info);
-  if (!calm && mouse) tilt(a);
-  return a;
-}
-
-function render(data){
-  var counts = {}, order = [];
-  data.forEach(function(d){ (d.tags || []).slice(1).forEach(function(t){ if(!counts[t]){ counts[t] = 0; order.push(t); } counts[t]++; }); });
-  order.sort(function(a, b){ return counts[b] - counts[a]; });
-
-  document.getElementById("statTotal").textContent = data.length;
-  document.getElementById("statInd").textContent = order.length;
-  document.getElementById("stats").hidden = false;
-
-  var cards = data.map(function(d, i){ var c = card(d, i); grid.appendChild(c); return c; });
-  var active = "Semua", page = 1;
-
-  function drawPager(pages){
-    pager.textContent = ""; pager.hidden = pages <= 1;
-    if (pages <= 1) return;
-    function btn(label, go, o){
-      var b = el("button", "", label); b.type = "button"; o = o || {};
-      if (o.aria) b.setAttribute("aria-label", o.aria);
-      if (o.cur) b.setAttribute("aria-current", "page");
-      if (o.off) b.disabled = true; else b.onclick = function(){ page = go; apply(true); };
-      pager.appendChild(b);
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Galeri Contoh Desain</title>
+  <script>(function () { var r = document.documentElement, t = "light"; try { var q = new URLSearchParams(location.search).get("theme"); if (q === "dark" || q === "light") { t = q; localStorage.setItem("demo-theme", q) } else { var v = localStorage.getItem("demo-theme"); t = (v === "dark" || v === "light") ? v : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") } } catch (e) { } r.setAttribute("data-theme", t) })()</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f4ef;
+      --card: #fff;
+      --ink: #17181a;
+      --sub: #5b6068;
+      --line: #e4e0d7;
+      --accent: #0f766e;
+      --accent-ink: #fff;
+      --glow: rgba(15, 118, 110, .13);
+      --orb: rgba(15, 118, 110, .17);
+      --orb2: rgba(6, 150, 182, .13);
+      --ph: #e9e4d8
     }
-    btn("←", page - 1, { off: page === 1, aria: "Halaman sebelumnya" });
-    for (var n = 1; n <= pages; n++) btn(String(n), n, { cur: n === page, aria: "Halaman " + n });
-    btn("→", page + 1, { off: page === pages, aria: "Halaman berikutnya" });
-  }
 
-  function apply(scroll){
-    var all = active === "Semua";
-    var hits = cards.filter(function(c){ return all || c.dataset.tags.split("|").indexOf(active) > -1; });
-    var pages = all ? Math.ceil(hits.length / PER_PAGE) : 1;
-    if (page > pages) page = Math.max(pages, 1);
-    var from = all ? (page - 1) * PER_PAGE : 0, to = all ? from + PER_PAGE : hits.length;
-    cards.forEach(function(c){ c.hidden = true; });
-    hits.slice(from, to).forEach(function(c, k){ c.hidden = false; c.style.animationDelay = Math.min(k, 8) * 0.06 + "s"; });
-    msg.textContent = "Belum ada contoh di kategori ini."; msg.hidden = hits.length > 0;
-    Array.prototype.forEach.call(chipsEl.children, function(b){ b.setAttribute("aria-pressed", String(b.dataset.f === active)); });
-    drawPager(all ? pages : 1);
-    if (scroll === true) window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - 110, behavior: calm ? "auto" : "smooth" });
-  }
+    :root[data-theme=dark] {
+      color-scheme: dark;
+      --bg: #0a0f0f;
+      --card: rgba(255, 255, 255, .035);
+      --ink: #fff;
+      --sub: #a8afb5;
+      --line: rgba(255, 255, 255, .09);
+      --accent: #2dd4bf;
+      --accent-ink: #04201c;
+      --glow: rgba(20, 184, 166, .2);
+      --orb: rgba(20, 184, 166, .3);
+      --orb2: rgba(6, 182, 212, .24);
+      --ph: #121a1a
+    }
 
-  if (order.length > 1) {
-    ["Semua"].concat(order).forEach(function(t){
-      var b = el("button", "chip", t); b.type = "button"; b.dataset.f = t;
-      if (t !== "Semua") b.appendChild(el("em", "", String(counts[t])));
-      b.onclick = function(){ active = t; page = 1; apply(); };
-      chipsEl.appendChild(b);
-    });
-  }
-  apply(); msg.hidden = true;
-}
+    * {
+      box-sizing: border-box;
+      margin: 0
+    }
 
-fetch("demos.json", { cache: "no-cache" })
-  .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
-  .then(function(d){ d = (Array.isArray(d) ? d : []).filter(function(x){ return x && x.file && x.title; }); if(!d.length) throw new Error("kosong"); render(d); })
-  .catch(function(){ msg.textContent = "Daftar contoh gagal dimuat. Coba muat ulang halaman."; });
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
 
-document.getElementById("theme").onclick = function(){
-  var r = document.documentElement, n = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
-  r.setAttribute("data-theme", n);
-  try { localStorage.setItem("demo-theme", n); } catch(e) {}
-};
-</script>
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font: 400 16px/1.6 Inter, system-ui, sans-serif;
+      padding: env(safe-area-inset-top, 0px) 0 env(safe-area-inset-bottom, 0px)
+    }
+
+    .bg,
+    .particles {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .bg i {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--orb), transparent 70%);
+      animation: float 26s ease-in-out infinite;
+      will-change: transform
+    }
+
+    .bg i:nth-child(1) {
+      width: 760px;
+      height: 760px;
+      top: -20%;
+      left: -14%
+    }
+
+    .bg i:nth-child(2) {
+      width: 640px;
+      height: 640px;
+      bottom: -22%;
+      right: -12%;
+      background: radial-gradient(circle, var(--orb2), transparent 70%);
+      animation-duration: 32s;
+      animation-delay: -7s
+    }
+
+    .bg i:nth-child(3) {
+      width: 480px;
+      height: 480px;
+      top: 42%;
+      left: 46%;
+      animation-duration: 28s;
+      animation-delay: -13s
+    }
+
+    .p {
+      position: absolute;
+      bottom: 0;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0;
+      animation: drift linear infinite
+    }
+
+    .glow {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 560px;
+      height: 560px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: -1;
+      background: radial-gradient(circle, var(--glow), transparent 70%);
+      opacity: 0;
+      transition: opacity .4s
+    }
+
+    @keyframes float {
+      25% {
+        transform: translate(70px, -50px) scale(1.08)
+      }
+
+      50% {
+        transform: translate(-40px, 70px) scale(.95)
+      }
+
+      75% {
+        transform: translate(50px, 35px) scale(1.04)
+      }
+    }
+
+    @keyframes drift {
+      10% {
+        opacity: .4
+      }
+
+      90% {
+        opacity: .4
+      }
+
+      to {
+        transform: translateY(-110vh)
+      }
+    }
+
+    @keyframes shift {
+      50% {
+        background-position: 100% 50%
+      }
+    }
+
+    @keyframes pulse {
+      50% {
+        opacity: .4;
+        transform: scale(.75)
+      }
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 88px 20px 56px
+    }
+
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
+      padding-top: env(safe-area-inset-top, 0px);
+      background: rgba(255, 255, 255, .9);
+      border-bottom: 1px solid #e2e8f0;
+      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px)
+    }
+
+    :root[data-theme=dark] .nav {
+      background: rgba(2, 6, 23, .92);
+      border-bottom-color: #1e293b
+    }
+
+    .nav-in {
+      max-width: 1280px;
+      margin: 0 auto;
+      height: 64px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px
+    }
+
+    @media(min-width:640px) {
+      .nav-in {
+        padding: 0 24px
+      }
+    }
+
+    @media(min-width:1024px) {
+      .nav-in {
+        padding: 0 32px
+      }
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 8px
+    }
+
+    .brand img {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .12)
+    }
+
+    .bn {
+      font: 700 18px/1 Inter, sans-serif;
+      letter-spacing: -.02em;
+      color: #1e293b;
+      transition: color .2s
+    }
+
+    :root[data-theme=dark] .bn {
+      color: #fff
+    }
+
+    .brand:hover .bn {
+      color: var(--accent)
+    }
+
+    .bt {
+      display: none;
+      font: 600 11px/1 Inter, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-left: 2px
+    }
+
+    @media(min-width:640px) {
+      .bt {
+        display: inline-block
+      }
+    }
+
+    .links {
+      display: none;
+      align-items: center;
+      gap: 16px
+    }
+
+    @media(min-width:768px) {
+      .links {
+        display: flex
+      }
+    }
+
+    @media(min-width:1024px) {
+      .links {
+        gap: 24px
+      }
+    }
+
+    .links>a,
+    .grp-btn {
+      font: 600 12px/1 Inter, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #475569;
+      text-decoration: none;
+      background: none;
+      border: 0;
+      padding: 2px;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: color .2s
+    }
+
+    :root[data-theme=dark] .links>a,
+    :root[data-theme=dark] .grp-btn {
+      color: #94a3b8
+    }
+
+    .links>a:hover,
+    .grp-btn:hover {
+      color: #0f172a
+    }
+
+    :root[data-theme=dark] .links>a:hover,
+    :root[data-theme=dark] .grp-btn:hover {
+      color: #fff
+    }
+
+    .grp-btn.on,
+    .grp-btn[aria-expanded=true] {
+      color: var(--accent) !important
+    }
+
+    .grp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .chev {
+      transition: transform .2s
+    }
+
+    .grp-btn[aria-expanded=true] .chev {
+      transform: rotate(180deg)
+    }
+
+    .grp {
+      position: relative
+    }
+
+    .menu {
+      position: absolute;
+      left: 0;
+      top: 100%;
+      margin-top: 12px;
+      width: 224px;
+      padding: 6px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, .14)
+    }
+
+    :root[data-theme=dark] .menu {
+      background: #0f172a;
+      border-color: #1e293b;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, .4)
+    }
+
+    .menu[hidden] {
+      display: none
+    }
+
+    .menu a {
+      display: block;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font: 500 14px/1.4 Inter, sans-serif;
+      color: #334155;
+      text-decoration: none
+    }
+
+    :root[data-theme=dark] .menu a {
+      color: #e2e8f0
+    }
+
+    .menu a:hover {
+      background: #f1f5f9
+    }
+
+    :root[data-theme=dark] .menu a:hover {
+      background: #1e293b
+    }
+
+    .menu a.cur {
+      color: var(--accent);
+      background: rgba(20, 184, 166, .12)
+    }
+
+    .acts {
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .theme {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: color .2s, border-color .2s
+    }
+
+    .nav .theme {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 8px;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      color: #334155
+    }
+
+    :root[data-theme=dark] .nav .theme {
+      background: #0f172a;
+      border-color: #1e293b;
+      color: #fcd34d
+    }
+
+    :root[data-theme=dark] .nav .burger {
+      color: #e2e8f0
+    }
+
+    .nav .theme:hover {
+      color: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .theme .sun {
+      display: none
+    }
+
+    :root[data-theme=dark] .theme .sun {
+      display: block
+    }
+
+    :root[data-theme=dark] .theme .moon {
+      display: none
+    }
+
+    .burger {
+      display: inline-flex
+    }
+
+    @media(min-width:768px) {
+      .burger {
+        display: none
+      }
+    }
+
+    .burger .i-x {
+      display: none
+    }
+
+    .burger[aria-expanded=true] .i-x {
+      display: block
+    }
+
+    .burger[aria-expanded=true] .i-menu {
+      display: none
+    }
+
+    .drawer {
+      padding: 8px 16px 20px;
+      background: rgba(255, 255, 255, .98);
+      border-top: 1px solid #e2e8f0;
+      box-shadow: 0 12px 24px rgba(15, 23, 42, .12)
+    }
+
+    :root[data-theme=dark] .drawer {
+      background: rgba(15, 23, 42, .98);
+      border-top-color: #1e293b
+    }
+
+    .drawer[hidden] {
+      display: none
+    }
+
+    @media(min-width:768px) {
+      .drawer {
+        display: none !important
+      }
+    }
+
+    .drawer a {
+      display: block;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font: 500 16px/1.4 Inter, sans-serif;
+      color: #334155;
+      text-decoration: none
+    }
+
+    :root[data-theme=dark] .drawer a {
+      color: #e2e8f0
+    }
+
+    .drawer a:hover {
+      background: #f1f5f9
+    }
+
+    :root[data-theme=dark] .drawer a:hover {
+      background: #1e293b
+    }
+
+    .drawer a.sub {
+      padding-left: 32px
+    }
+
+    .drawer a.cur {
+      color: var(--accent);
+      font-weight: 600;
+      background: rgba(20, 184, 166, .12)
+    }
+
+    .drawer p {
+      padding: 10px 16px 2px;
+      font: 600 12px Inter, sans-serif;
+      color: #94a3b8
+    }
+
+    .drawer .cta-btn {
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      color: #fff !important;
+      background: linear-gradient(90deg, #0d9488, #4f46e5)
+    }
+
+    .nav a:focus-visible,
+    .nav button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px
+    }
+
+    .hero {
+      text-align: center;
+      padding: 64px 0 36px
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 22px
+    }
+
+    .badge i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite
+    }
+
+    h1 {
+      font: 700 clamp(2.2rem, 6vw, 4rem)/1.1 "Space Grotesk", sans-serif;
+      letter-spacing: -.03em;
+      margin-bottom: 16px
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, #14b8a6, #06b6d4, #5eead4, #14b8a6);
+      background-size: 250% 250%;
+      animation: shift 8s ease-in-out infinite;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent
+    }
+
+    .lead {
+      max-width: 56ch;
+      margin: 0 auto 10px;
+      color: var(--sub)
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--sub);
+      opacity: .85
+    }
+
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin: 28px 0 32px
+    }
+
+    .stat {
+      text-align: center
+    }
+
+    .stat b {
+      display: block;
+      font: 700 1.9rem/1.2 "Space Grotesk", sans-serif;
+      color: var(--accent)
+    }
+
+    .stat small {
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--sub)
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 36px
+    }
+
+    .chip {
+      font: 500 14px Inter, sans-serif;
+      color: var(--sub);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: color .2s, border-color .2s
+    }
+
+    .chip:hover {
+      color: var(--ink);
+      border-color: var(--accent)
+    }
+
+    .chip[aria-pressed=true] {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent)
+    }
+
+    .chip em {
+      font-style: normal;
+      opacity: .65;
+      margin-left: 4px
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px
+    }
+
+    .card {
+      transform: perspective(900px) translateY(var(--ty, 0)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+      will-change: transform;
+      display: flex;
+      flex-direction: row;
+      min-height: 220px;
+      color: inherit;
+      text-decoration: none;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform .18s ease-out, border-color .25s, box-shadow .25s;
+      animation: up .5s ease-out backwards
+    }
+
+    .card[hidden] {
+      display: none
+    }
+
+    .card:hover {
+      --ty: -6px;
+      border-color: var(--accent);
+      box-shadow: 0 18px 44px rgba(0, 0, 0, .18), 0 0 32px var(--glow)
+    }
+
+    .thumb {
+      position: relative;
+      flex: 0 0 44%;
+      background: var(--ph);
+      display: grid;
+      place-items: center;
+      font: 700 3rem "Space Grotesk", sans-serif;
+      color: var(--accent);
+      overflow: hidden
+    }
+
+    .thumb img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s
+    }
+
+    .card:hover .thumb img {
+      transform: scale(1.05)
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 20px 22px;
+      flex: 1;
+      min-width: 0
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 10px
+    }
+
+    .info h2 {
+      font: 700 1.15rem/1.3 "Space Grotesk", sans-serif;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden
+    }
+
+    .info p {
+      font-size: 14px;
+      color: var(--sub);
+      line-height: 1.55;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden
+    }
+
+    .cta {
+      margin-top: auto;
+      padding-top: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent)
+    }
+
+    .cta svg {
+      vertical-align: -2px;
+      margin-left: 4px;
+      transition: transform .2s
+    }
+
+    .card:hover .cta svg {
+      transform: translateX(4px)
+    }
+
+    .msg {
+      text-align: center;
+      color: var(--sub);
+      padding: 56px 0
+    }
+
+    .foot {
+      text-align: center;
+      color: var(--sub);
+      font-size: 13px;
+      margin-top: 56px
+    }
+
+    .foot a {
+      color: var(--accent);
+      text-decoration: none
+    }
+
+    .foot a:hover {
+      text-decoration: underline
+    }
+
+    .foot nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 6px 14px;
+      margin-top: 10px
+    }
+
+    .foot nav a {
+      color: var(--sub)
+    }
+
+    .foot nav a:hover {
+      color: var(--accent)
+    }
+
+    .foot small {
+      display: block;
+      margin-top: 10px;
+      font-size: 12px;
+      opacity: .8
+    }
+
+    .foot {
+      border-top: 1px solid var(--line);
+      padding-top: 24px
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px
+    }
+
+    @keyframes up {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+    }
+
+    .pager {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 36px
+    }
+
+    .pager[hidden] {
+      display: none
+    }
+
+    .pager button {
+      min-width: 40px;
+      height: 40px;
+      padding: 0 14px;
+      font: 500 14px Inter, sans-serif;
+      color: var(--sub);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: color .2s, border-color .2s
+    }
+
+    .pager button:hover:not(:disabled) {
+      color: var(--ink);
+      border-color: var(--accent)
+    }
+
+    .pager button[aria-current=page] {
+      background: var(--accent);
+      color: var(--accent-ink);
+      border-color: var(--accent)
+    }
+
+    .pager button:disabled {
+      opacity: .4;
+      cursor: default
+    }
+
+    @media(max-width:900px) {
+      .grid {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:600px) {
+      .hero {
+        padding: 44px 0 28px
+      }
+
+      .stats {
+        gap: 28px
+      }
+
+      .card {
+        flex-direction: column;
+        min-height: 0
+      }
+
+      .thumb {
+        flex: none;
+        aspect-ratio: 16/10
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important
+      }
+
+      .particles,
+      .glow {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="nav" id="main-navbar">
+    <div class="nav-in">
+      <a class="brand" href="/">
+        <img src="/icons/icon-512.png" alt="" width="36" height="36">
+        <span class="bn">Arzha</span>
+        <span class="bt">Dev &amp; Digital Services</span>
+      </a>
+      <nav class="links" aria-label="Navigasi utama">
+        <a href="/#beranda">Beranda</a>
+        <a href="/#tentang">Tentang</a>
+        <div class="grp">
+          <button type="button" class="grp-btn on" id="karyaBtn" aria-expanded="false" aria-controls="karyaMenu">Karya
+            <svg class="chev" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m6 9 6 6 6-6" />
+            </svg></button>
+          <div class="menu" id="karyaMenu" hidden>
+            <a href="/#proyek">Proyek</a>
+            <a href="/hasil-kerja">Hasil Kerja</a>
+            <a href="/demos/index.html" aria-current="page" class="cur">Contoh Desain</a>
+          </div>
+        </div>
+        <a href="/#layanan">Layanan</a>
+        <a href="/#keahlian">Keahlian</a>
+        <a href="/#kontak">Kontak</a>
+      </nav>
+      <div class="acts">
+        <button class="theme" id="theme" type="button" aria-label="Ganti mode gelap/terang">
+          <svg class="moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+          </svg>
+          <svg class="sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path
+              d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+          </svg>
+        </button>
+        <button class="theme burger" id="burger" type="button" aria-label="Toggle menu navigasi" aria-expanded="false"
+          aria-controls="drawer">
+          <svg class="i-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+          <svg class="i-x" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" aria-hidden="true">
+            <path d="M6 6l12 12M18 6 6 18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="drawer" id="drawer" hidden>
+      <a href="/#beranda">Beranda</a>
+      <a href="/#tentang">Tentang</a>
+      <p>Karya</p>
+      <a class="sub" href="/#proyek">Proyek</a>
+      <a class="sub" href="/hasil-kerja">Hasil Kerja</a>
+      <a class="sub cur" href="/demos/index.html" aria-current="page">Contoh Desain</a>
+      <a href="/#layanan">Layanan</a>
+      <a href="/#keahlian">Keahlian</a>
+      <a href="/#kontak">Kontak</a>
+      <a class="cta-btn" href="/#kontak">Hubungi Saya Sekarang</a>
+    </div>
+  </header>
+  <div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+  <div class="particles" id="particles" aria-hidden="true"></div>
+  <div class="glow" id="glow" aria-hidden="true"></div>
+  <main class="wrap">
+    <section class="hero">
+      <div class="badge"><i></i>Galeri Desain</div>
+      <h1>Galeri Contoh <span>Desain</span></h1>
+      <p class="lead">Kumpulan draft desain web dan aplikasi yang aku buat sebagai contoh gaya dan kemampuan. Klik salah
+        satu untuk membukanya di tab baru.</p>
+      <p class="note">Semua nama, kontak, dan isi di sini adalah data contoh (dummy).</p>
+    </section>
+
+    <div class="stats" id="stats" hidden>
+      <div class="stat"><b id="statTotal">0</b><small>Contoh desain</small></div>
+      <div class="stat"><b id="statInd">0</b><small>Jenis usaha</small></div>
+    </div>
+
+    <div class="chips" id="chips" role="group" aria-label="Filter jenis usaha"></div>
+    <div id="grid" class="grid"></div>
+    <nav class="pager" id="pager" aria-label="Halaman galeri" hidden></nav>
+    <p class="msg" id="msg">Memuat galeri…</p>
+
+    <footer class="foot">
+      <a href="/">Kembali ke beranda</a>
+      <nav aria-label="Legal">
+        <a href="/privacy-policy/">Kebijakan Privasi</a>
+        <a href="/terms/">Syarat &amp; Ketentuan</a>
+      </nav>
+      <small>© 2026 K. Arzhaning Jagad. All rights reserved.</small>
+    </footer>
+  </main>
+  <script>
+    /* Data ada di demos.json (dipakai juga oleh nudge di portofolio).
+       Konvensi tags: tag pertama = jenis halaman (mis. "Landing Page"),
+       tag berikutnya = jenis usaha. Filter hanya memakai tag jenis usaha. */
+    var PER_PAGE = 8; // pagination hanya aktif di filter "Semua"; filter lain menampilkan semua hasil
+    var pager = document.getElementById("pager");
+    var grid = document.getElementById("grid"), msg = document.getElementById("msg"), chipsEl = document.getElementById("chips");
+    var NS = "http://www.w3.org/2000/svg";
+
+    function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+
+    function arrow() {
+      var s = document.createElementNS(NS, "svg");
+      s.setAttribute("width", "14"); s.setAttribute("height", "14"); s.setAttribute("viewBox", "0 0 24 24");
+      s.setAttribute("fill", "none"); s.setAttribute("stroke", "currentColor"); s.setAttribute("stroke-width", "2.5");
+      s.setAttribute("stroke-linecap", "round"); s.setAttribute("stroke-linejoin", "round"); s.setAttribute("aria-hidden", "true");
+      var p = document.createElementNS(NS, "path"); p.setAttribute("d", "M5 12h14M13 6l6 6-6 6"); s.appendChild(p);
+      return s;
+    }
+
+    var calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var mouse = matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+    if (!calm) {
+      var pc = document.getElementById("particles");
+      for (var n = 0; n < 28; n++) {
+        var p = el("div", "p"), z = 1 + Math.random() * 2;
+        p.style.left = Math.random() * 100 + "%"; p.style.width = p.style.height = z + "px";
+        p.style.animationDuration = 10 + Math.random() * 16 + "s"; p.style.animationDelay = -Math.random() * 20 + "s";
+        pc.appendChild(p);
+      }
+    }
+    if (!calm && mouse) {
+      var glow = document.getElementById("glow");
+      document.addEventListener("mousemove", function (e) {
+        glow.style.opacity = 1;
+        glow.style.transform = "translate3d(" + e.clientX + "px," + e.clientY + "px,0) translate(-50%,-50%)";
+      });
+    }
+    function tilt(a) {
+      a.addEventListener("mousemove", function (e) {
+        var r = a.getBoundingClientRect();
+        a.style.setProperty("--ry", ((e.clientX - r.left - r.width / 2) / 24).toFixed(2) + "deg");
+        a.style.setProperty("--rx", (-(e.clientY - r.top - r.height / 2) / 24).toFixed(2) + "deg");
+      });
+      a.addEventListener("mouseleave", function () { a.style.removeProperty("--rx"); a.style.removeProperty("--ry"); });
+    }
+
+    function card(d, i) {
+      var a = el("a", "card"); a.href = d.file; a.target = "_blank"; a.rel = "noopener";
+      a.style.animationDelay = Math.min(i, 8) * 0.06 + "s";
+      a.dataset.tags = (d.tags || []).slice(1).join("|");
+      var th = el("div", "thumb");
+      if (d.thumb) {
+        var img = new Image(); img.alt = "Cuplikan " + d.title; img.loading = "lazy";
+        img.onerror = function () { img.remove(); th.textContent = d.title.charAt(0); };
+        img.src = d.thumb; th.appendChild(img);
+      } else th.textContent = d.title.charAt(0);
+      var info = el("div", "info"), tg = el("div", "tags");
+      (d.tags || []).forEach(function (t) { tg.appendChild(el("span", "tag", t)); });
+      var cta = el("span", "cta", "Buka demo"); cta.appendChild(arrow());
+      info.appendChild(tg); info.appendChild(el("h2", "", d.title)); info.appendChild(el("p", "", d.desc || "")); info.appendChild(cta);
+      a.appendChild(th); a.appendChild(info);
+      if (!calm && mouse) tilt(a);
+      return a;
+    }
+
+    function render(data) {
+      var counts = {}, order = [];
+      data.forEach(function (d) { (d.tags || []).slice(1).forEach(function (t) { if (!counts[t]) { counts[t] = 0; order.push(t); } counts[t]++; }); });
+      order.sort(function (a, b) { return counts[b] - counts[a]; });
+
+      document.getElementById("statTotal").textContent = data.length;
+      document.getElementById("statInd").textContent = order.length;
+      document.getElementById("stats").hidden = false;
+
+      var cards = data.map(function (d, i) { var c = card(d, i); grid.appendChild(c); return c; });
+      var active = "Semua", page = 1;
+
+      function drawPager(pages) {
+        pager.textContent = ""; pager.hidden = pages <= 1;
+        if (pages <= 1) return;
+        function btn(label, go, o) {
+          var b = el("button", "", label); b.type = "button"; o = o || {};
+          if (o.aria) b.setAttribute("aria-label", o.aria);
+          if (o.cur) b.setAttribute("aria-current", "page");
+          if (o.off) b.disabled = true; else b.onclick = function () { page = go; apply(true); };
+          pager.appendChild(b);
+        }
+        btn("←", page - 1, { off: page === 1, aria: "Halaman sebelumnya" });
+        for (var n = 1; n <= pages; n++) btn(String(n), n, { cur: n === page, aria: "Halaman " + n });
+        btn("→", page + 1, { off: page === pages, aria: "Halaman berikutnya" });
+      }
+
+      function apply(scroll) {
+        var all = active === "Semua";
+        var hits = cards.filter(function (c) { return all || c.dataset.tags.split("|").indexOf(active) > -1; });
+        var pages = all ? Math.ceil(hits.length / PER_PAGE) : 1;
+        if (page > pages) page = Math.max(pages, 1);
+        var from = all ? (page - 1) * PER_PAGE : 0, to = all ? from + PER_PAGE : hits.length;
+        cards.forEach(function (c) { c.hidden = true; });
+        hits.slice(from, to).forEach(function (c, k) { c.hidden = false; c.style.animationDelay = Math.min(k, 8) * 0.06 + "s"; });
+        msg.textContent = "Belum ada contoh di kategori ini."; msg.hidden = hits.length > 0;
+        Array.prototype.forEach.call(chipsEl.children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.f === active)); });
+        drawPager(all ? pages : 1);
+        if (scroll === true) window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - 110, behavior: calm ? "auto" : "smooth" });
+      }
+
+      if (order.length > 1) {
+        ["Semua"].concat(order).forEach(function (t) {
+          var b = el("button", "chip", t); b.type = "button"; b.dataset.f = t;
+          if (t !== "Semua") b.appendChild(el("em", "", String(counts[t])));
+          b.onclick = function () { active = t; page = 1; apply(); };
+          chipsEl.appendChild(b);
+        });
+      }
+      apply(); msg.hidden = true;
+    }
+
+    fetch("demos.json", { cache: "no-cache" })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (d) { d = (Array.isArray(d) ? d : []).filter(function (x) { return x && x.file && x.title; }); if (!d.length) throw new Error("kosong"); render(d); })
+      .catch(function () { msg.textContent = "Daftar contoh gagal dimuat. Coba muat ulang halaman."; });
+
+    document.getElementById("theme").onclick = function () {
+      var r = document.documentElement, n = r.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      r.setAttribute("data-theme", n);
+      try { localStorage.setItem("demo-theme", n); } catch (e) { }
+    };
+
+    (function () {
+      var btn = document.getElementById("karyaBtn"), menu = document.getElementById("karyaMenu"),
+        bg = document.getElementById("burger"), dr = document.getElementById("drawer");
+      function setMenu(o) { btn.setAttribute("aria-expanded", o); menu.hidden = !o }
+      function setDrawer(o) { bg.setAttribute("aria-expanded", o); dr.hidden = !o }
+      btn.onclick = function (e) { e.stopPropagation(); setMenu(menu.hidden) };
+      bg.onclick = function (e) { e.stopPropagation(); setDrawer(dr.hidden) };
+      document.addEventListener("click", function (e) {
+        if (!menu.contains(e.target) && e.target !== btn) setMenu(false);
+        if (!dr.contains(e.target) && !bg.contains(e.target)) setDrawer(false);
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") { setMenu(false); setDrawer(false) }
+      });
+    })();
+  </script>
 </body>
+
 </html>

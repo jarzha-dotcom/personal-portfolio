@@ -1,0 +1,1213 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>KosPro Suite - Manajemen Kos-Kosan Modern & Mobile Friendly</title>
+  <meta name="description" content="Aplikasi pengelolaan kos-kosan komersial yang responsif, cepat, dan ramah smartphone." />
+  
+  <!-- Typography: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
+    }
+    /* Smooth touch scrolling */
+    .touch-scroll {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .touch-scroll::-webkit-scrollbar {
+      display: none;
+    }
+    /* Safe padding for bottom navigation bar on mobile */
+    .pb-safe-bottom {
+      padding-bottom: calc(4.5rem + env(safe-area-inset-bottom, 16px));
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #printReceiptArea, #printReceiptArea * {
+        visibility: visible;
+      }
+      #printReceiptArea {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: block !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white pb-safe-bottom md:pb-6">
+
+  <!-- ================= TOP APP BAR ================= -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
+      
+      <!-- Top Row: Brand & Profile -->
+      <div class="flex items-center justify-between h-14 sm:h-16 gap-3">
+        
+        <!-- Left: Logo & Property Badge -->
+        <div class="flex items-center gap-2 sm:gap-4 min-w-0">
+          <div class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-700 flex items-center justify-center text-white shadow-sm font-bold shrink-0">
+            <i class="fa-solid fa-hotel text-xs sm:text-sm"></i>
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5">
+              <span class="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 truncate">KosPro<span class="text-indigo-600">.Suite</span></span>
+              <span class="text-[9px] font-bold bg-indigo-50 text-indigo-700 px-1 py-0.2 rounded border border-indigo-100">PRO</span>
+            </div>
+            <p class="text-[10px] sm:text-xs text-slate-500 truncate flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+              Griya Asri Sleman (20 Kamar)
+            </p>
+          </div>
+        </div>
+
+        <!-- Center: Desktop Search Bar -->
+        <div class="flex-1 max-w-xs md:max-w-md hidden md:block">
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" 
+                   oninput="handleGlobalSearch(this.value)"
+                   placeholder="Cari kamar (101), penghuni, atau kontak..." 
+                   class="w-full pl-8 pr-10 py-1.5 bg-slate-50 hover:bg-slate-100 focus:bg-white text-xs text-slate-800 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+          </div>
+        </div>
+
+        <!-- Right: Actions & User Avatar -->
+        <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+          
+          <!-- Mobile Search Toggle -->
+          <button onclick="toggleMobileSearch()" class="md:hidden w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-50" aria-label="Cari">
+            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+          </button>
+
+          <!-- Desktop Quick Payment Button -->
+          <button onclick="openModal('modalCatatBayar')" class="hidden sm:inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-1.5 sm:py-2 rounded-lg shadow-sm transition-all active:scale-95">
+            <i class="fa-solid fa-circle-plus"></i>
+            <span>Catat Bayar</span>
+          </button>
+
+          <!-- Notification Bell -->
+          <div class="relative">
+            <button onclick="toggleNotifPanel()" class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-slate-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-slate-50 relative" aria-label="Notifikasi">
+              <i class="fa-regular fa-bell text-xs"></i>
+              <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full"></span>
+            </button>
+            
+            <!-- Notif Dropdown -->
+            <div id="notifPanel" class="hidden absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-xl shadow-xl border border-slate-200 p-3 z-50">
+              <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+                <span class="font-bold text-slate-800">Pemberitahuan Mendesak</span>
+                <span class="text-indigo-600 text-[11px] font-semibold cursor-pointer" onclick="toggleNotifPanel()">Tutup</span>
+              </div>
+              <div class="space-y-2 py-2 text-xs">
+                <div class="p-2 bg-amber-50 rounded-lg border border-amber-100 flex items-start gap-2">
+                  <i class="fa-solid fa-clock text-amber-600 mt-0.5"></i>
+                  <div>
+                    <p class="font-bold text-slate-800">Kamar 103 Jatuh Tempo</p>
+                    <p class="text-slate-500 text-[11px]">Radit Nugraha belum bayar sewa Rp 1.900.000.</p>
+                  </div>
+                </div>
+                <div class="p-2 bg-rose-50 rounded-lg border border-rose-100 flex items-start gap-2">
+                  <i class="fa-solid fa-wrench text-rose-600 mt-0.5"></i>
+                  <div>
+                    <p class="font-bold text-slate-800">Tiket AC Bocor</p>
+                    <p class="text-slate-500 text-[11px]">Kamar 104 butuh teknisi hari ini.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profile Avatar -->
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&h=100&q=80" 
+               alt="Owner" 
+               class="w-8 h-8 sm:w-9 sm:h-9 rounded-full object-cover border border-slate-200" 
+               onerror="this.src='https://ui-avatars.com/api/?name=Rajendra+W&background=4f46e5&color=fff';" />
+
+        </div>
+
+      </div>
+
+      <!-- Mobile Search Bar Expander -->
+      <div id="mobileSearchBox" class="hidden md:hidden pb-3 pt-1">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input type="text" 
+                 id="mobileSearchInput"
+                 oninput="handleGlobalSearch(this.value)"
+                 placeholder="Cari nomor kamar, nama, atau kontak..." 
+                 class="w-full pl-8 pr-8 py-2 bg-slate-100 text-xs text-slate-800 rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white" />
+          <button onclick="toggleMobileSearch()" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Desktop Horizontal Navigation Tabs -->
+      <nav class="hidden md:flex space-x-2 lg:space-x-4 border-t border-slate-100 py-2 text-xs font-semibold">
+        <button onclick="switchTab('overview', this)" class="nav-tab text-indigo-600 bg-indigo-50/80 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap font-bold">
+          <i class="fa-solid fa-gauge-high"></i> Ringkasan Eksekutif
+        </button>
+        <button onclick="switchTab('denah', this)" class="nav-tab text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap">
+          <i class="fa-solid fa-table-cells-large"></i> Denah & Status Kamar
+        </button>
+        <button onclick="switchTab('penyewa', this)" class="nav-tab text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap">
+          <i class="fa-solid fa-users"></i> Data Penyewa
+        </button>
+        <button onclick="switchTab('keuangan', this)" class="nav-tab text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap">
+          <i class="fa-solid fa-file-invoice-dollar"></i> Buku Kas & Tagihan
+        </button>
+        <button onclick="switchTab('maintenance', this)" class="nav-tab text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap">
+          <i class="fa-solid fa-screwdriver-wrench"></i> Tiket Perbaikan
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN BODY CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+
+    <!-- ================= TAB 1: RINGKASAN EKSEKUTIF (OVERVIEW) ================= -->
+    <div id="tab-overview" class="tab-content space-y-4 sm:space-y-6">
+      
+      <!-- 4 EXECUTIVE KPI METRICS -->
+      <section class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+        
+        <!-- Okupansi -->
+        <div class="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+            <span class="font-semibold uppercase tracking-wider text-[10px] sm:text-[11px]">Okupansi</span>
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-bed"></i></span>
+          </div>
+          <div class="my-2 sm:my-3">
+            <div class="flex items-baseline gap-1.5">
+              <span class="text-xl sm:text-2xl font-black text-slate-900 font-mono">18</span>
+              <span class="text-[11px] sm:text-xs text-slate-400 font-medium">/ 20 Unit</span>
+            </div>
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-100 rounded-full h-1.5 sm:h-2 mt-2">
+              <div class="bg-emerald-500 h-1.5 sm:h-2 rounded-full" style="width: 90%"></div>
+            </div>
+          </div>
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 border-t border-slate-100 pt-1.5 sm:pt-2">
+            <span class="text-emerald-700 font-bold">90% Terisi</span>
+            <span>2 Kosong</span>
+          </div>
+        </div>
+
+        <!-- Omzet Bulan Ini -->
+        <div class="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+            <span class="font-semibold uppercase tracking-wider text-[10px] sm:text-[11px]">Pemasukan</span>
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xs"><i class="fa-solid fa-wallet"></i></span>
+          </div>
+          <div class="my-2 sm:my-3">
+            <p class="text-lg sm:text-2xl font-black text-slate-900 font-mono">Rp 36.5M</p>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1 truncate">Target: Rp 40.0M</p>
+          </div>
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 border-t border-slate-100 pt-1.5 sm:pt-2">
+            <span class="text-indigo-700 font-bold">+12% vs bln lalu</span>
+            <span class="hidden sm:inline">Tercapai 91%</span>
+          </div>
+        </div>
+
+        <!-- Piutang / Pending -->
+        <div class="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+            <span class="font-semibold uppercase tracking-wider text-[10px] sm:text-[11px]">Tertunda</span>
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs"><i class="fa-solid fa-hourglass-half"></i></span>
+          </div>
+          <div class="my-2 sm:my-3">
+            <p class="text-lg sm:text-2xl font-black text-amber-600 font-mono">Rp 3.5M</p>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1">2 Penyewa</p>
+          </div>
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 border-t border-slate-100 pt-1.5 sm:pt-2">
+            <span class="text-amber-800 font-bold">1 Tempo • 1 Telat</span>
+            <button onclick="switchTab('denah')" class="text-indigo-600 font-semibold hover:underline">Tagih &rarr;</button>
+          </div>
+        </div>
+
+        <!-- Laba Bersih -->
+        <div class="bg-white p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex flex-col justify-between">
+          <div class="flex items-center justify-between text-[11px] sm:text-xs text-slate-500">
+            <span class="font-semibold uppercase tracking-wider text-[10px] sm:text-[11px]">Laba Bersih</span>
+            <span class="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs"><i class="fa-solid fa-coins"></i></span>
+          </div>
+          <div class="my-2 sm:my-3">
+            <p class="text-lg sm:text-2xl font-black text-emerald-600 font-mono">Rp 31.2M</p>
+            <p class="text-[10px] sm:text-xs text-slate-400 mt-0.5 sm:mt-1 truncate">Biaya: Rp 5.2M</p>
+          </div>
+          <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-500 border-t border-slate-100 pt-1.5 sm:pt-2">
+            <span class="text-emerald-700 font-bold">Margin 85.6%</span>
+            <span class="hidden sm:inline">Bersih</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 2 COLUMN SPLIT: JADWAL PENAGIHAN WA & ARUS KAS CEPAT -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+
+        <!-- KIRI (7 Kolom): PUSAT PENAGIHAN WHATSAPP -->
+        <div class="lg:col-span-7 bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs space-y-3.5">
+          <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm flex items-center gap-1.5">
+                <i class="fa-brands fa-whatsapp text-emerald-600 text-sm sm:text-base"></i>
+                Pengingat Tagihan WhatsApp
+              </h3>
+              <p class="text-[11px] text-slate-500">Kirim pesan resmi otomatis dengan rincian rekening</p>
+            </div>
+            <span class="px-2 py-0.5 text-[10px] sm:text-xs font-bold rounded-full bg-amber-50 text-amber-800 border border-amber-200">
+              2 Menunggu
+            </span>
+          </div>
+
+          <!-- Kartu Penagihan 1: Radit Nugraha (Kamar 103) -->
+          <div class="p-3 sm:p-4 bg-amber-50/50 rounded-xl border border-amber-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80" 
+                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-amber-300 shrink-0" alt="Radit" />
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-slate-900 text-xs">Radit Nugraha</span>
+                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-amber-200/60 text-amber-900 rounded">Kmr 103</span>
+                  <span class="text-[10px] text-amber-700 font-semibold">Tempo Hari Ini</span>
+                </div>
+                <p class="text-[11px] text-slate-600 mt-0.5 font-mono">Rp 1.900.000 • AC Standar</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="kirimWaOtomatis('Radit Nugraha', '103', 'Rp 1.900.000', '0823-1231-2734', 'hari-h')" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 sm:py-1.5 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors">
+                <i class="fa-brands fa-whatsapp"></i> <span>Kirim WA</span>
+              </button>
+              <button onclick="quickPay('103')" class="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs px-3 py-2 sm:py-1.5 rounded-lg font-semibold transition-colors shrink-0" title="Tandai Sudah Lunas">
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Kartu Penagihan 2: Zannah Melati (Kamar 106) -->
+          <div class="p-3 sm:p-4 bg-rose-50/50 rounded-xl border border-rose-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&h=120&q=80" 
+                   class="w-9 h-9 sm:w-10 sm:h-10 rounded-full object-cover border border-rose-300 shrink-0" alt="Zannah" />
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  <span class="font-bold text-slate-900 text-xs">Zannah Melati</span>
+                  <span class="text-[10px] font-mono font-bold px-1.5 py-0.2 bg-rose-200/60 text-rose-900 rounded">Kmr 106</span>
+                  <span class="text-[10px] text-rose-700 font-semibold">Telat 2 Hari</span>
+                </div>
+                <p class="text-[11px] text-slate-600 mt-0.5 font-mono">Rp 1.600.000 • Standard AC</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+              <button onclick="kirimWaOtomatis('Zannah Melati', '106', 'Rp 1.600.000', '6282312312734', 'terlambat')" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold py-2 px-3 sm:py-1.5 rounded-lg flex items-center justify-center gap-1.5 shadow-xs transition-colors">
+                <i class="fa-brands fa-whatsapp"></i> <span>Kirim Teguran</span>
+              </button>
+              <button onclick="quickPay('106')" class="border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs px-3 py-2 sm:py-1.5 rounded-lg font-semibold transition-colors shrink-0" title="Tandai Sudah Lunas">
+                <i class="fa-solid fa-check"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KANAN (5 Kolom): LOG ARUS KAS TERBARU -->
+        <div class="lg:col-span-5 bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+          <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+            <div>
+              <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Riwayat Transaksi Terbaru</h3>
+              <p class="text-[11px] text-slate-500">Pemasukan sewa & beban operasional</p>
+            </div>
+            <button onclick="openModal('modalCatatBayar')" class="text-xs font-semibold text-indigo-600 hover:underline">+ Catat</button>
+          </div>
+
+          <!-- Daftar Transaksi -->
+          <div class="divide-y divide-slate-100 text-xs" id="quickHistory">
+            
+            <div class="py-2.5 flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center font-mono text-xs shrink-0">108</span>
+                <div class="min-w-0">
+                  <p class="font-bold text-slate-800 text-xs truncate">Zannah Putri</p>
+                  <p class="text-[10px] text-slate-400">Transfer BCA • Hari ini</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-bold text-emerald-600 font-mono text-xs">+Rp 2.200.000</p>
+                <button onclick="cetakKwitansi('Zannah Putri', '108', 'Rp 2.200.000', 'Transfer BCA', 'INV-2026-108')" class="text-[10px] text-indigo-600 hover:underline">Kwitansi</button>
+              </div>
+            </div>
+
+            <div class="py-2.5 flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-emerald-50 text-emerald-600 font-bold flex items-center justify-center font-mono text-xs shrink-0">101</span>
+                <div class="min-w-0">
+                  <p class="font-bold text-slate-800 text-xs truncate">Radit Pratama</p>
+                  <p class="text-[10px] text-slate-400">QRIS Statis • Hari ini</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-bold text-emerald-600 font-mono text-xs">+Rp 1.900.000</p>
+                <button onclick="cetakKwitansi('Radit Pratama', '101', 'Rp 1.900.000', 'QRIS', 'INV-2026-101')" class="text-[10px] text-indigo-600 hover:underline">Kwitansi</button>
+              </div>
+            </div>
+
+            <div class="py-2.5 flex items-center justify-between">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-rose-50 text-rose-600 font-bold flex items-center justify-center text-xs shrink-0"><i class="fa-solid fa-wifi text-[10px]"></i></span>
+                <div class="min-w-0">
+                  <p class="font-bold text-slate-800 text-xs truncate">Internet Biznet 100M</p>
+                  <p class="text-[10px] text-slate-400">03 Okt • Pengeluaran</p>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="font-bold text-rose-600 font-mono text-xs">-Rp 475.000</p>
+                <span class="text-[10px] text-slate-400">Lunas</span>
+              </div>
+            </div>
+
+          </div>
+
+          <button onclick="switchTab('keuangan')" class="w-full py-2.5 border border-slate-200 text-xs font-semibold text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-center block">
+            Lihat Semua Buku Kas &rarr;
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================= TAB 2: DENAH & STATUS KAMAR ================= -->
+    <div id="tab-denah" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <!-- Top Floor Plan Controller -->
+      <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-1.5">
+              <i class="fa-solid fa-map-location-dot text-indigo-600"></i>
+              Denah Properti & Status Kamar
+            </h3>
+            <p class="text-[11px] sm:text-xs text-slate-500">Pilih lantai dan status untuk memfilter kamar</p>
+          </div>
+        </div>
+
+        <!-- Filter Controls Touch-Friendly Scrollable -->
+        <div class="flex items-center gap-2 overflow-x-auto touch-scroll pb-1">
+          <!-- Floor Select -->
+          <div class="flex items-center p-1 bg-slate-100 rounded-lg text-xs font-semibold shrink-0">
+            <button onclick="filterFloor('all', this)" class="floor-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-2xs">Semua Lantai</button>
+            <button onclick="filterFloor('1', this)" class="floor-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">Lantai 1</button>
+            <button onclick="filterFloor('2', this)" class="floor-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">Lantai 2</button>
+          </div>
+
+          <!-- Status Select -->
+          <div class="flex items-center p-1 bg-slate-100 rounded-lg text-xs font-semibold shrink-0">
+            <button onclick="filterRoomStatus('all', this)" class="room-status-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-2xs">Semua</button>
+            <button onclick="filterRoomStatus('lunas', this)" class="room-status-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block mr-1"></span>Lunas</button>
+            <button onclick="filterRoomStatus('pending', this)" class="room-status-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900"><span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block mr-1"></span>Pending</button>
+            <button onclick="filterRoomStatus('kosong', this)" class="room-status-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900"><span class="w-1.5 h-1.5 rounded-full bg-rose-500 inline-block mr-1"></span>Kosong</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRID KAMAR VISUAL (Optimized for Mobile: 2 cols on mobile, 4 on desktop) -->
+      <div id="fullRoomGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <!-- Rendered by JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- ================= TAB 3: DATA PENYEWA ================= -->
+    <div id="tab-penyewa" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-slate-900 text-sm sm:text-base">Daftar Penghuni Aktif</h3>
+          <p class="text-[11px] sm:text-xs text-slate-500">Kontak WhatsApp langsung dan tanggal masuk</p>
+        </div>
+        <button onclick="openModal('modalTambahPenyewa')" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm shrink-0">
+          <i class="fa-solid fa-user-plus"></i> <span class="hidden sm:inline">Tambah Penyewa</span><span class="sm:hidden">+ Baru</span>
+        </button>
+      </div>
+
+      <!-- Mobile Cards for Tenants (Mobile Friendly alternative to rigid table) -->
+      <div id="mobileTenantCards" class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:hidden">
+        <!-- Filled via JS -->
+      </div>
+
+      <!-- Desktop Table -->
+      <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
+              <tr>
+                <th class="py-3 px-4">Nama Penghuni</th>
+                <th class="py-3 px-4">Kamar</th>
+                <th class="py-3 px-4">Nomor WhatsApp</th>
+                <th class="py-3 px-4">Tanggal Masuk</th>
+                <th class="py-3 px-4">Deposit Jaminan</th>
+                <th class="py-3 px-4">Status Sewa</th>
+                <th class="py-3 px-4 text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="fullTenantTableBody" class="divide-y divide-slate-100 text-slate-700">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TAB 4: BUKU KAS & TAGIHAN ================= -->
+    <div id="tab-keuangan" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs">
+          <p class="text-[11px] sm:text-xs text-slate-500 font-semibold">Total Pemasukan Kas</p>
+          <p class="text-xl sm:text-2xl font-black text-emerald-600 font-mono mt-1">+Rp 36.500.000</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1">Penerimaan sewa bulan berjalan</p>
+        </div>
+        <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs">
+          <p class="text-[11px] sm:text-xs text-slate-500 font-semibold">Total Pengeluaran Kas</p>
+          <p class="text-xl sm:text-2xl font-black text-rose-600 font-mono mt-1">-Rp 5.250.000</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1">WiFi, listrik & sampah</p>
+        </div>
+        <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs">
+          <p class="text-[11px] sm:text-xs text-slate-500 font-semibold">Saldo Kas Bersih</p>
+          <p class="text-xl sm:text-2xl font-black text-indigo-600 font-mono mt-1">Rp 31.250.000</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-400 mt-1">Di rekening penampung BCA</p>
+        </div>
+      </div>
+
+      <!-- Mobile Kas Cards -->
+      <div class="md:hidden space-y-2.5">
+        <div class="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold text-slate-900">Zannah Putri (Sewa Bln Okt)</p>
+            <p class="text-[10px] text-slate-400">05 Okt • Transfer BCA</p>
+          </div>
+          <span class="font-mono font-bold text-emerald-600">+Rp 2.200.000</span>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold text-slate-900">Radit Pratama (Sewa Bln Okt)</p>
+            <p class="text-[10px] text-slate-400">05 Okt • QRIS Statis</p>
+          </div>
+          <span class="font-mono font-bold text-emerald-600">+Rp 1.900.000</span>
+        </div>
+        <div class="p-3 bg-white rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+          <div>
+            <p class="font-bold text-slate-900">Biznet Fiber 100Mbps</p>
+            <p class="text-[10px] text-slate-400">03 Okt • Tagihan Internet</p>
+          </div>
+          <span class="font-mono font-bold text-rose-600">-Rp 475.000</span>
+        </div>
+      </div>
+
+      <!-- Desktop Table Buku Kas -->
+      <div class="hidden md:block bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h4 class="font-bold text-slate-900 text-sm">Jurnal Arus Kas Masuk & Keluar</h4>
+          <button onclick="alert('Laporan Kas diekspor ke PDF/Excel')" class="text-xs font-semibold text-indigo-600 hover:underline">
+            <i class="fa-solid fa-file-excel mr-1"></i> Ekspor Laporan
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <tr>
+                <th class="py-2.5 px-4">Tanggal</th>
+                <th class="py-2.5 px-4">Kategori / Keterangan</th>
+                <th class="py-2.5 px-4">No. Kamar / Pihak</th>
+                <th class="py-2.5 px-4">Metode</th>
+                <th class="py-2.5 px-4 text-right">Nominal (Rp)</th>
+                <th class="py-2.5 px-4 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 text-slate-700">
+              <tr>
+                <td class="py-2.5 px-4 font-mono">05 Okt 2026</td>
+                <td class="py-2.5 px-4 font-semibold text-slate-900">Pembayaran Sewa Bulanan (Zannah Putri)</td>
+                <td class="py-2.5 px-4 font-mono">Kamar 108</td>
+                <td class="py-2.5 px-4">Transfer BCA</td>
+                <td class="py-2.5 px-4 text-right font-mono font-bold text-emerald-600">+2.200.000</td>
+                <td class="py-2.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-[10px]">Terkonfirmasi</span></td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-mono">05 Okt 2026</td>
+                <td class="py-2.5 px-4 font-semibold text-slate-900">Pembayaran Sewa Bulanan (Radit Pratama)</td>
+                <td class="py-2.5 px-4 font-mono">Kamar 101</td>
+                <td class="py-2.5 px-4">QRIS Statis</td>
+                <td class="py-2.5 px-4 text-right font-mono font-bold text-emerald-600">+1.900.000</td>
+                <td class="py-2.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-bold text-[10px]">Terkonfirmasi</span></td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-4 font-mono">03 Okt 2026</td>
+                <td class="py-2.5 px-4 font-semibold text-rose-700">Tagihan Internet Biznet Fiber 100Mbps</td>
+                <td class="py-2.5 px-4 font-mono">Seluruh Area</td>
+                <td class="py-2.5 px-4">Auto-Debit BCA</td>
+                <td class="py-2.5 px-4 text-right font-mono font-bold text-rose-600">-475.000</td>
+                <td class="py-2.5 px-4 text-center"><span class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold text-[10px]">Lunas</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ================= TAB 5: TIKET PEMELIHARAAN ================= -->
+    <div id="tab-maintenance" class="tab-content hidden space-y-4 sm:space-y-6">
+      
+      <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
+        <div>
+          <h3 class="font-bold text-slate-900 text-sm sm:text-base">Pusat Tiket Perbaikan</h3>
+          <p class="text-[11px] sm:text-xs text-slate-500">Keluhan fasilitas dan penugasan teknisi</p>
+        </div>
+        <button onclick="buatTiketBaru()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-plus"></i> <span class="hidden sm:inline">Tiket Baru</span><span class="sm:hidden">+ Tiket</span>
+        </button>
+      </div>
+
+      <!-- Tiket Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+        
+        <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-rose-200 shadow-xs space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-rose-100 text-rose-800">#TCK-089</span>
+            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] bg-amber-100 text-amber-800">Sedang Dikerjakan</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs sm:text-sm">Kamar 104: Pipa Pembuangan AC Bocor</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Air menetes ke lantai kamar mandi. Perlu pembersihan selang & cek freon.</p>
+          </div>
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs">
+            <div>
+              <p class="font-semibold text-slate-800 text-xs">Pak Rajendra (Teknisi AC)</p>
+              <p class="text-slate-400 text-[10px]">0823-1231-2734</p>
+            </div>
+            <a href="https://wa.me/6282312312734" target="_blank" class="px-2.5 py-1.5 bg-emerald-600 text-white rounded-lg font-semibold text-xs flex items-center gap-1">
+              <i class="fa-brands fa-whatsapp"></i> Hubungi
+            </a>
+          </div>
+          <button onclick="selesaikanTiket(this)" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition-colors">
+            Tandai Selesai Diperbaiki
+          </button>
+        </div>
+
+        <div class="bg-white p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-xs space-y-3 opacity-80">
+          <div class="flex items-center justify-between">
+            <span class="px-2 py-0.5 rounded font-mono font-bold text-[10px] bg-slate-100 text-slate-700">#TCK-088</span>
+            <span class="px-2 py-0.5 rounded-full font-bold text-[10px] bg-emerald-100 text-emerald-800">Selesai</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 text-xs sm:text-sm">Kamar 102: Ganti Lampu LED Kamar Mandi</h4>
+            <p class="text-[11px] sm:text-xs text-slate-500 mt-1">Lampu Philips 9 Watt putus, sudah diganti baru oleh penjaga kos.</p>
+          </div>
+          <div class="p-2.5 sm:p-3 bg-slate-50 rounded-xl text-[11px] text-slate-500">
+            Selesai: 03 Okt 2026 • Biaya Rp 35.000
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= MOBILE FLOATING ACTION BUTTON (FAB) ================= -->
+  <div class="md:hidden fixed right-4 bottom-20 z-40">
+    <button onclick="openModal('modalCatatBayar')" class="w-13 h-13 rounded-full bg-indigo-600 text-white shadow-xl shadow-indigo-600/30 flex items-center justify-center font-bold text-lg active:scale-95 transition-transform" aria-label="Catat Pembayaran Baru">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+  </div>
+
+  <!-- ================= MOBILE BOTTOM NAVIGATION BAR ================= -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 z-40 px-2 py-1 shadow-lg">
+    <div class="grid grid-cols-5 text-center">
+      
+      <button onclick="switchTabMobile('overview', this)" class="mobile-nav-btn active flex flex-col items-center justify-center py-1.5 text-indigo-600 transition-colors">
+        <i class="fa-solid fa-gauge-high text-base"></i>
+        <span class="text-[10px] font-bold mt-1">Ringkasan</span>
+      </button>
+
+      <button onclick="switchTabMobile('denah', this)" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+        <i class="fa-solid fa-table-cells-large text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Kamar</span>
+      </button>
+
+      <button onclick="switchTabMobile('penyewa', this)" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+        <i class="fa-solid fa-users text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Penyewa</span>
+      </button>
+
+      <button onclick="switchTabMobile('keuangan', this)" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+        <i class="fa-solid fa-file-invoice-dollar text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Buku Kas</span>
+      </button>
+
+      <button onclick="switchTabMobile('maintenance', this)" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors">
+        <i class="fa-solid fa-wrench text-base"></i>
+        <span class="text-[10px] font-semibold mt-1">Tiket</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ================= MODALS INTERAKTIF (MOBILE BOTTOM SHEET & DESKTOP POPUP) ================= -->
+
+  <!-- MODAL: CATAT PEMBAYARAN -->
+  <div id="modalCatatBayar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-2xs hidden items-end sm:items-center justify-center sm:p-4 z-50">
+    <div class="bg-white rounded-t-3xl sm:rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[90vh] flex flex-col">
+      <div class="px-5 py-4 bg-indigo-600 text-white flex items-center justify-between shrink-0">
+        <h4 class="font-bold text-sm flex items-center gap-2">
+          <i class="fa-solid fa-receipt"></i> Catat Pembayaran Sewa
+        </h4>
+        <button onclick="closeModal('modalCatatBayar')" class="text-indigo-200 hover:text-white p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <form onsubmit="handleSimpanBayar(event)" class="p-5 space-y-3.5 text-xs overflow-y-auto">
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Pilih Kamar / Penghuni *</label>
+          <select id="inputKamar" onchange="autoFillPrice(this.value)" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-medium text-sm sm:text-xs" required>
+            <option value="">-- Pilih Kamar --</option>
+            <option value="103" data-name="Radit Nugraha" data-price="1900000">Kamar 103 - Radit Nugraha (Rp 1.900.000)</option>
+            <option value="106" data-name="Zannah Melati" data-price="1600000">Kamar 106 - Zannah Melati (Rp 1.600.000)</option>
+            <option value="101" data-name="Radit Pratama" data-price="1900000">Kamar 101 - Radit Pratama (Rp 1.900.000)</option>
+            <option value="102" data-name="Zannah Rahma" data-price="1900000">Kamar 102 - Zannah Rahma (Rp 1.900.000)</option>
+            <option value="105" data-name="Arzhaning Santoso" data-price="1500000">Kamar 105 - Arzhaning Santoso (Rp 1.500.000)</option>
+            <option value="107" data-name="Arzha Fauzi" data-price="1900000">Kamar 107 - Arzha Fauzi (Rp 1.900.000)</option>
+            <option value="108" data-name="Zannah Putri" data-price="2200000">Kamar 108 - Zannah Putri (Rp 2.200.000)</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-700 font-semibold mb-1">Nominal Pembayaran (Rp) *</label>
+          <input type="number" id="inputNominal" class="w-full border border-slate-300 rounded-lg p-2.5 font-mono font-bold text-slate-900 bg-slate-50 text-sm sm:text-xs" required placeholder="1900000" />
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Metode Bayar *</label>
+            <select id="inputMetode" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 font-medium text-sm sm:text-xs">
+              <option value="Transfer BCA">Transfer BCA</option>
+              <option value="Transfer Mandiri">Transfer Mandiri</option>
+              <option value="QRIS Statis">QRIS Statis</option>
+              <option value="Tunai / Kasir">Tunai / Kasir</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-700 font-semibold mb-1">Tanggal Terima *</label>
+            <input type="date" id="inputTanggal" value="2026-10-05" class="w-full border border-slate-300 rounded-lg p-2.5 bg-slate-50 text-sm sm:text-xs" required />
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeModal('modalCatatBayar')" class="px-4 py-2.5 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-50">Batal</button>
+          <button type="submit" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm">Simpan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: KWITANSI RESMI (PRINT-READY) -->
+  <div id="modalKwitansi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-2xs hidden items-center justify-center p-3 sm:p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col">
+      <!-- Printable Receipt Wrapper -->
+      <div id="printReceiptArea" class="p-5 sm:p-6 bg-white text-slate-900 space-y-3.5 overflow-y-auto">
+        
+        <!-- Header Kwitansi -->
+        <div class="flex items-start justify-between border-b-2 border-slate-900 pb-3">
+          <div>
+            <h3 class="font-extrabold text-sm sm:text-base tracking-tight text-indigo-700">GRIYA ASRI RESIDENCE</h3>
+            <p class="text-[10px] sm:text-[11px] text-slate-500">Jl. Kaliurang KM 5.2, Sleman, Yogyakarta</p>
+            <p class="text-[10px] sm:text-[11px] text-slate-500">WhatsApp: 0823-1231-2734</p>
+          </div>
+          <div class="text-right">
+            <span class="px-2 py-0.5 bg-indigo-50 text-indigo-700 font-bold text-[10px] rounded border border-indigo-200">KWITANSI RESMI</span>
+            <p id="recInv" class="font-mono text-[11px] sm:text-xs font-bold text-slate-900 mt-1">INV-2026-103</p>
+            <p class="text-[10px] text-slate-400">05 Oktober 2026</p>
+          </div>
+        </div>
+
+        <!-- Detail Pembayaran -->
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Diterima Dari:</span>
+            <span id="recName" class="font-bold text-slate-900">Radit Nugraha</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Unit Kamar:</span>
+            <span id="recRoom" class="font-bold font-mono text-slate-900">Kamar 103</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Keterangan:</span>
+            <span class="font-medium text-slate-800">Sewa Periode Oktober 2026</span>
+          </div>
+          <div class="flex justify-between py-1 border-b border-slate-100">
+            <span class="text-slate-500">Metode:</span>
+            <span id="recMethod" class="font-medium text-slate-800">Transfer BCA</span>
+          </div>
+          <div class="flex justify-between py-2 border-b-2 border-slate-900 font-bold">
+            <span class="text-xs">Jumlah Dibayar:</span>
+            <span id="recAmount" class="font-mono text-indigo-700 font-black text-sm sm:text-base">Rp 1.900.000</span>
+          </div>
+        </div>
+
+        <!-- Footer Tanda Tangan -->
+        <div class="flex items-end justify-between pt-2 text-xs">
+          <div class="text-[10px] text-slate-400">
+            <p>Terima kasih atas pembayaran Anda.</p>
+          </div>
+          <div class="text-center">
+            <p class="text-[10px] text-slate-400 mb-5">Pengelola Kos</p>
+            <p class="font-bold text-slate-900 underline text-xs">Rajendra Wijaya, S.E.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-2 text-xs shrink-0">
+        <button type="button" onclick="closeModal('modalKwitansi')" class="px-3.5 py-2 border border-slate-200 rounded-lg text-slate-600 hover:bg-slate-100">Tutup</button>
+        <button type="button" onclick="window.print()" class="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-print"></i> Cetak / Simpan PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT STATE & ENGINE -->
+  <script>
+    let rooms = [
+      { no: '101', floor: '1', name: 'Radit Pratama', type: 'AC • KM Dalam', status: 'lunas', price: 1900000, days: 24, kwh: 34.2, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '102', floor: '1', name: 'Zannah Rahma', type: 'AC • KM Dalam', status: 'lunas', price: 1900000, days: 18, kwh: 19.5, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '103', floor: '1', name: 'Radit Nugraha', type: 'AC • KM Dalam', status: 'pending', price: 1900000, days: 0, kwh: 8.4, phone: '0823-1231-2734', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '104', floor: '1', name: 'Kosong', type: 'Deluxe King • AC & KM', status: 'kosong', price: 2200000, days: 0, kwh: 0, phone: '', avatar: '' },
+      { no: '105', floor: '1', name: 'Arzhaning Santoso', type: 'Non-AC • KM Bersih', status: 'lunas', price: 1500000, days: 28, kwh: 45.0, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '106', floor: '1', name: 'Zannah Melati', type: 'Standard AC', status: 'pending', price: 1600000, days: -2, kwh: 5.1, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '107', floor: '1', name: 'Arzha Fauzi', type: 'AC • KM Dalam', status: 'lunas', price: 1900000, days: 15, kwh: 22.8, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=120&h=120&q=80' },
+      { no: '108', floor: '1', name: 'Zannah Putri', type: 'Deluxe Queen', status: 'lunas', price: 2200000, days: 30, kwh: 58.6, phone: '6282312312734', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&h=120&q=80' }
+    ];
+
+    let currentFloorFilter = 'all';
+    let currentStatusFilter = 'all';
+    let currentSearchTerm = '';
+
+    function formatRupiah(num) {
+      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num);
+    }
+
+    // Switch Desktop Tab
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-tab').forEach(b => {
+        b.className = 'nav-tab text-slate-600 hover:text-slate-900 hover:bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap';
+      });
+      if (btn) {
+        btn.className = 'nav-tab text-indigo-600 bg-indigo-50/80 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors whitespace-nowrap font-bold';
+      }
+
+      // Sync mobile bottom nav
+      document.querySelectorAll('.mobile-nav-btn').forEach(mb => {
+        mb.className = 'mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors';
+      });
+    }
+
+    // Switch Mobile Bottom Nav Tab
+    function switchTabMobile(tabId, btn) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      const target = document.getElementById(`tab-${tabId}`);
+      if (target) target.classList.remove('hidden');
+
+      document.querySelectorAll('.mobile-nav-btn').forEach(b => {
+        b.className = 'mobile-nav-btn flex flex-col items-center justify-center py-1.5 text-slate-400 hover:text-slate-700 transition-colors';
+      });
+      btn.className = 'mobile-nav-btn active flex flex-col items-center justify-center py-1.5 text-indigo-600 transition-colors font-bold';
+
+      // Scroll top smoothly
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Render Denah Kamar
+    function renderRooms() {
+      const container = document.getElementById('fullRoomGrid');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const filtered = rooms.filter(r => {
+        const matchFloor = (currentFloorFilter === 'all') || (r.floor === currentFloorFilter);
+        const matchStatus = (currentStatusFilter === 'all') || (r.status === currentStatusFilter);
+        const matchSearch = !currentSearchTerm || 
+                            r.no.includes(currentSearchTerm) || 
+                            r.name.toLowerCase().includes(currentSearchTerm.toLowerCase());
+        return matchFloor && matchStatus && matchSearch;
+      });
+
+      filtered.forEach(r => {
+        let badgeColor = '';
+        let badgeText = '';
+        let borderHighlight = '';
+
+        if (r.status === 'lunas') {
+          badgeColor = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+          badgeText = 'Lunas';
+          borderHighlight = 'border-slate-200 hover:border-indigo-300';
+        } else if (r.status === 'pending') {
+          badgeColor = 'bg-amber-50 text-amber-800 border-amber-200';
+          badgeText = r.days < 0 ? 'Telat 2 Hari' : 'Jatuh Tempo';
+          borderHighlight = 'border-amber-300 bg-amber-50/20';
+        } else {
+          badgeColor = 'bg-rose-50 text-rose-700 border-rose-200';
+          badgeText = 'Siap Huni';
+          borderHighlight = 'border-dashed border-rose-300 bg-rose-50/10';
+        }
+
+        const card = document.createElement('div');
+        card.className = `bg-white rounded-xl sm:rounded-2xl p-3.5 sm:p-4 border transition-all duration-200 hover:shadow-md flex flex-col justify-between ${borderHighlight}`;
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between mb-2 sm:mb-3">
+              <div>
+                <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kamar</span>
+                <h4 class="text-lg sm:text-xl font-black text-slate-900 font-mono tracking-tight leading-none">#${r.no}</h4>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${badgeText}</span>
+            </div>
+
+            ${r.status !== 'kosong' ? `
+              <div class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg sm:rounded-xl mb-2 sm:mb-3 border border-slate-100">
+                <img src="${r.avatar}" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full object-cover border border-slate-200 shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=${r.name}';" />
+                <div class="min-w-0">
+                  <p class="font-bold text-slate-900 text-xs truncate">${r.name}</p>
+                  <p class="text-[10px] text-slate-400 truncate">${r.type}</p>
+                </div>
+              </div>
+            ` : `
+              <div class="p-2.5 sm:p-3 bg-rose-50/50 rounded-lg sm:rounded-xl mb-2 sm:mb-3 border border-rose-100 text-center">
+                <p class="font-bold text-rose-700 text-xs">Kamar Siap Huni</p>
+                <p class="text-[10px] text-slate-500">${r.type}</p>
+              </div>
+            `}
+
+            <!-- Metrics Listrik & Tarif -->
+            <div class="space-y-1 text-[10px] sm:text-[11px] border-t border-slate-100 pt-2 text-slate-500">
+              <div class="flex justify-between">
+                <span>Tarif:</span>
+                <span class="font-mono font-bold text-slate-800">${formatRupiah(r.price)}</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Listrik:</span>
+                <span class="font-mono font-semibold text-indigo-700">${r.kwh > 0 ? r.kwh + ' kWh' : '-'}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
+            ${r.status === 'pending' ? `
+              <span class="text-[10px] font-bold text-amber-700">Perlu Tagih</span>
+              <button onclick="kirimWaOtomatis('${r.name}', '${r.no}', '${formatRupiah(r.price)}', '${r.phone}', 'hari-h')" class="text-xs text-emerald-700 font-bold hover:underline flex items-center gap-1">
+                <i class="fa-brands fa-whatsapp"></i> Tagih
+              </button>
+            ` : r.status === 'lunas' ? `
+              <span class="text-[10px] text-emerald-700 font-semibold">Sisa ${r.days} Hari</span>
+              <button onclick="cetakKwitansi('${r.name}', '${r.no}', '${formatRupiah(r.price)}', 'Transfer Bank', 'INV-2026-${r.no}')" class="text-[11px] text-indigo-600 hover:underline">
+                Kwitansi &rarr;
+              </button>
+            ` : `
+              <span class="text-[10px] text-slate-400">Kosong</span>
+              <button onclick="alert('Form onboarding penghuni baru Kamar ${r.no}')" class="text-[11px] text-indigo-600 font-bold hover:underline">
+                Check-in &rarr;
+              </button>
+            `}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // Render Tenants Directory (Mobile Cards & Desktop Table)
+    function renderTenants() {
+      const tbody = document.getElementById('fullTenantTableBody');
+      const mobileContainer = document.getElementById('mobileTenantCards');
+      if (tbody) tbody.innerHTML = '';
+      if (mobileContainer) mobileContainer.innerHTML = '';
+
+      rooms.filter(r => r.status !== 'kosong').forEach(r => {
+        // Desktop Row
+        if (tbody) {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-slate-50 transition-colors';
+          tr.innerHTML = `
+            <td class="py-3 px-4">
+              <div class="flex items-center gap-2.5">
+                <img src="${r.avatar}" class="w-8 h-8 rounded-full object-cover border border-slate-200" onerror="this.src='https://ui-avatars.com/api/?name=${r.name}';" />
+                <div>
+                  <p class="font-bold text-slate-900">${r.name}</p>
+                  <p class="text-[11px] text-slate-400">KTP Terverifikasi</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 font-mono font-bold text-slate-800">Kamar ${r.no}</td>
+            <td class="py-3 px-4">
+              <a href="https://wa.me/${r.phone}" target="_blank" class="text-emerald-700 font-semibold hover:underline flex items-center gap-1">
+                <i class="fa-brands fa-whatsapp"></i> +${r.phone}
+              </a>
+            </td>
+            <td class="py-3 px-4 text-slate-500 font-mono">15 Jan 2026</td>
+            <td class="py-3 px-4 font-mono text-slate-700">Rp 500.000</td>
+            <td class="py-3 px-4">
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${r.status === 'lunas' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}">
+                ${r.status === 'lunas' ? 'Lunas' : 'Jatuh Tempo'}
+              </span>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <div class="flex items-center justify-end gap-1.5">
+                <button onclick="kirimWaOtomatis('${r.name}', '${r.no}', '${formatRupiah(r.price)}', '${r.phone}', 'hari-h')" class="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="WhatsApp">
+                  <i class="fa-brands fa-whatsapp text-sm"></i>
+                </button>
+                <button onclick="cetakKwitansi('${r.name}', '${r.no}', '${formatRupiah(r.price)}', 'Transfer', 'INV-2026-${r.no}')" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded" title="Kwitansi">
+                  <i class="fa-solid fa-receipt text-sm"></i>
+                </button>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        }
+
+        // Mobile Card
+        if (mobileContainer) {
+          const card = document.createElement('div');
+          card.className = 'bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center justify-between gap-3';
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <img src="${r.avatar}" class="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0" onerror="this.src='https://ui-avatars.com/api/?name=${r.name}';" />
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <p class="font-bold text-slate-900 text-xs truncate">${r.name}</p>
+                  <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 bg-slate-100 rounded">Kmr ${r.no}</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mt-0.5 truncate">Deposit Rp 500rb • ${r.status === 'lunas' ? '<span class="text-emerald-600 font-bold">Lunas</span>' : '<span class="text-amber-600 font-bold">Tempo</span>'}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 shrink-0">
+              <button onclick="kirimWaOtomatis('${r.name}', '${r.no}', '${formatRupiah(r.price)}', '${r.phone}', 'hari-h')" class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <i class="fa-brands fa-whatsapp text-sm"></i>
+              </button>
+              <button onclick="cetakKwitansi('${r.name}', '${r.no}', '${formatRupiah(r.price)}', 'Transfer', 'INV-2026-${r.no}')" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center">
+                <i class="fa-solid fa-receipt text-xs"></i>
+              </button>
+            </div>
+          `;
+          mobileContainer.appendChild(card);
+        }
+      });
+    }
+
+    // Filter controls
+    function filterFloor(fl, btn) {
+      currentFloorFilter = fl;
+      document.querySelectorAll('.floor-btn').forEach(b => b.className = 'floor-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900');
+      btn.className = 'floor-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-2xs font-bold';
+      renderRooms();
+    }
+
+    function filterRoomStatus(st, btn) {
+      currentStatusFilter = st;
+      document.querySelectorAll('.room-status-btn').forEach(b => b.className = 'room-status-btn px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900');
+      btn.className = 'room-status-btn px-2.5 py-1 rounded-md bg-white text-slate-900 shadow-2xs font-bold';
+      renderRooms();
+    }
+
+    function handleGlobalSearch(val) {
+      currentSearchTerm = val.trim();
+      renderRooms();
+    }
+
+    function toggleMobileSearch() {
+      const box = document.getElementById('mobileSearchBox');
+      box.classList.toggle('hidden');
+      if (!box.classList.contains('hidden')) {
+        document.getElementById('mobileSearchInput').focus();
+      }
+    }
+
+    // WhatsApp Engine
+    function kirimWaOtomatis(nama, noKamar, nominal, phone, tipe) {
+      let pesan = '';
+      if (tipe === 'terlambat') {
+        pesan = `Halo Kak ${nama},\n\nMohon maaf mengganggu. Kami menginformasikan tagihan sewa *Kamar ${noKamar}* di *Griya Asri Residence* sebesar *${nominal}* telah melewati batas jatuh tempo (terlambat 2 hari).\n\nPembayaran dapat ditransfer ke rekening BCA: 8830-1928-33 a.n Rajendra Wijaya.\n\nMohon konfirmasi dan kirimkan bukti transfer jika sudah ya Kak. Terima kasih banyak. 🙏`;
+      } else {
+        pesan = `Halo Kak ${nama},\n\nSemoga sehat selalu. Mengingatkan tagihan sewa bulanan *Kamar ${noKamar}* di *Griya Asri Residence* sebesar *${nominal}* jatuh tempo pada hari ini.\n\nPembayaran via transfer ke BCA: 8830-1928-33 a.n Rajendra Wijaya.\n\nTerima kasih atas kerjasamanya! 🙏`;
+      }
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(pesan)}`, '_blank');
+    }
+
+    function quickPay(roomId) {
+      const room = rooms.find(r => r.no === roomId);
+      if (room) {
+        room.status = 'lunas';
+        room.days = 30;
+      }
+      renderRooms();
+      renderTenants();
+      alert(`Kamar ${roomId} berhasil ditandai LUNAS!`);
+    }
+
+    function autoFillPrice(roomId) {
+      const select = document.getElementById('inputKamar');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.dataset.price) {
+        document.getElementById('inputNominal').value = opt.dataset.price;
+      }
+    }
+
+    function handleSimpanBayar(e) {
+      e.preventDefault();
+      const roomId = document.getElementById('inputKamar').value;
+      const nominal = document.getElementById('inputNominal').value;
+      const target = rooms.find(r => r.no === roomId);
+      if (target) {
+        target.status = 'lunas';
+        target.days = 30;
+      }
+      closeModal('modalCatatBayar');
+      renderRooms();
+      renderTenants();
+      alert(`Pembayaran Rp ${Number(nominal).toLocaleString('id-ID')} untuk Kamar ${roomId} berhasil dicatat.`);
+    }
+
+    function cetakKwitansi(nama, noKamar, nominal, metode, inv) {
+      document.getElementById('recName').innerText = nama;
+      document.getElementById('recRoom').innerText = `Kamar ${noKamar}`;
+      document.getElementById('recAmount').innerText = nominal;
+      document.getElementById('recMethod').innerText = metode;
+      document.getElementById('recInv').innerText = inv;
+      openModal('modalKwitansi');
+    }
+
+    function selesaikanTiket(btn) {
+      btn.parentElement.classList.add('opacity-50');
+      btn.disabled = true;
+      btn.innerText = 'Sudah Selesai Diperbaiki';
+      alert('Tiket perbaikan AC Kamar 104 telah diselesaikan.');
+    }
+
+    function buatTiketBaru() {
+      const kamar = prompt('Masukkan nomor kamar yang mengajukan keluhan:', '105');
+      const keluhan = prompt('Deskripsi masalah / keluhan perbaikan:');
+      if (kamar && keluhan) {
+        alert(`Tiket perbaikan untuk Kamar ${kamar} ("${keluhan}") berhasil dibuat!`);
+      }
+    }
+
+    function toggleNotifPanel() {
+      document.getElementById('notifPanel').classList.toggle('hidden');
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    // Initialize View
+    renderRooms();
+    renderTenants();
+  </script>
+</body>
+</html>

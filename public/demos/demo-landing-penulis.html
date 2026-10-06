@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="id" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Radit Arzhaning | Noxa & Tales - Web Novel & Cerpen</title>
+  <meta name="description" content="Landing page modern dan portal baca web novel & cerpen karya Radit Arzhaning. Menampilkan bab gratis, sinopsis memikat, update bab terbaru, dan komunitas pembaca.">
+  <meta property="og:title" content="Radit Arzhaning | Noxa & Tales - Web Novel & Cerpen">
+  <meta property="og:description" content="Landing page modern dan portal baca web novel & cerpen karya Radit Arzhaning. Menampilkan bab gratis, sinopsis memikat, update bab terbaru, dan komunitas pembaca.">
+  <meta property="og:type" content="website">
+
+  <!-- Google Fonts: Playfair Display, Cinzel, Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            display: ['Cinzel', 'Georgia', 'serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              dark: '#090a0f',
+              surface: '#111219',
+              border: '#242633',
+              purple: '#9333ea',
+              accent: '#a855f7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #090a0f;
+      color: #e4e4e7;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-x: hidden;
+    }
+    .font-serif-literary {
+      font-family: 'Playfair Display', Georgia, serif;
+    }
+    .font-display-title {
+      font-family: 'Cinzel', Georgia, serif;
+    }
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+    .book-card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .book-card-3d:hover {
+      transform: translateY(-8px) rotateY(-8deg) rotateX(4deg);
+    }
+    .book-spine-shadow {
+      box-shadow: -8px 12px 30px -4px rgba(0, 0, 0, 0.8), inset 4px 0 10px rgba(255, 255, 255, 0.1);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090a0f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #3f3f46;
+    }
+  </style>
+</head>
+<body class="selection:bg-purple-900/60 selection:text-purple-200">
+
+  <!-- ==================== HEADER & STICKY NAVBAR ==================== -->
+  <header id="main-header" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 bg-[#090a0f]/90 backdrop-blur-md border-b border-zinc-800/80 py-3.5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between">
+        <!-- Zone 1: Brand Wordmark -->
+        <a href="#" class="flex items-center gap-2.5 text-zinc-100 hover:text-purple-300 transition-colors group">
+          <span class="w-8 h-8 rounded-lg bg-purple-950/60 border border-purple-500/30 flex items-center justify-center text-purple-400 group-hover:border-purple-400/60 transition-colors">
+            <i class="fa-solid fa-book-open text-xs"></i>
+          </span>
+          <span class="font-serif-literary text-lg sm:text-xl font-bold tracking-wide">
+            Radit Arzhaning <span class="text-xs font-sans text-purple-400 font-normal hidden sm:inline">| Web Novelist</span>
+          </span>
+        </a>
+
+        <!-- Zone 2: Navigation Links -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-zinc-400">
+          <a href="#beranda" class="hover:text-purple-300 transition-colors">Beranda</a>
+          <a href="#daftar-novel" class="hover:text-purple-300 transition-colors">Daftar Novel</a>
+          <a href="#bab-terbaru" class="hover:text-purple-300 transition-colors">Bab Terbaru</a>
+          <button onclick="openReader('the-crimson-whisper', 1)" class="hover:text-purple-300 transition-colors text-left">Koleksi Cerpen</button>
+          <a href="#komunitas" class="hover:text-purple-300 transition-colors">Komunitas</a>
+        </nav>
+
+        <!-- Zone 3: Primary Actions -->
+        <div class="flex items-center gap-3">
+          <!-- Ambiance Sound Toggle Button -->
+          <button id="ambiance-btn" onclick="toggleAmbiance()" title="Putar Suasana Hujan & Membaca" class="p-2 sm:px-3 rounded-lg border border-zinc-800 bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 text-xs font-medium flex items-center gap-2 transition-colors">
+            <i id="ambiance-icon" class="fa-solid fa-volume-xmark"></i>
+            <span id="ambiance-label" class="hidden sm:inline font-mono">Suasana Baca</span>
+          </button>
+
+          <!-- Support CTA -->
+          <button onclick="openSupportModal()" class="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 rounded-lg shadow-md shadow-purple-950/50 transition-all flex items-center gap-2 whitespace-nowrap active:scale-95">
+            <i class="fa-solid fa-heart text-purple-200 text-xs"></i>
+            <span>Dukung di Karyakarsa</span>
+          </button>
+
+          <!-- Mobile Hamburger -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2 text-zinc-400 hover:text-zinc-200" aria-label="Menu">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Panel -->
+    <div id="mobile-menu" class="hidden md:hidden border-b border-zinc-800 bg-[#090a0f]/95 backdrop-blur-lg px-4 pt-3 pb-5 space-y-2 mt-2">
+      <a href="#beranda" onclick="toggleMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 rounded-md">Beranda</a>
+      <a href="#daftar-novel" onclick="toggleMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 rounded-md">Daftar Novel</a>
+      <a href="#bab-terbaru" onclick="toggleMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 rounded-md">Bab Terbaru</a>
+      <button onclick="toggleMobileMenu(); openReader('the-crimson-whisper', 1)" class="w-full text-left px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 rounded-md">Koleksi Cerpen</button>
+      <a href="#komunitas" onclick="toggleMobileMenu()" class="block px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-800/50 rounded-md">Komunitas & Newsletter</a>
+    </div>
+  </header>
+
+  <!-- ==================== HERO SECTION ==================== -->
+  <section id="beranda" class="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+    <div class="absolute top-1/4 left-1/2 -translate-x-1/2 w-[700px] h-[450px] bg-gradient-to-tr from-purple-900/20 via-indigo-900/15 to-transparent blur-[120px] pointer-events-none -z-10"></div>
+    <div class="absolute top-20 right-10 w-[350px] h-[350px] bg-indigo-950/20 blur-[100px] pointer-events-none -z-10"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        
+        <!-- Sisi Kiri: Slogan, Subheadline, Tombol Ganda, dan Social Proof -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+          <div class="flex items-center gap-2 text-xs sm:text-sm font-medium text-purple-400">
+            <i class="fa-solid fa-sparkles text-xs"></i>
+            <span>Dark Fantasy</span>
+            <span aria-hidden="true" class="text-zinc-600">·</span>
+            <span>Cyberpunk Thriller</span>
+            <span aria-hidden="true" class="text-zinc-600">·</span>
+            <span>Gothic Mystery</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl lg:text-6xl font-serif-literary font-bold tracking-tight text-white leading-[1.18]">
+            Menembus Batas Realita, <br>
+            <span class="bg-gradient-to-r from-purple-300 via-indigo-200 to-purple-400 bg-clip-text text-transparent">
+              Menjelajahi Semesta Fiksi.
+            </span>
+          </h1>
+
+          <p class="text-base sm:text-lg text-zinc-300 max-w-2xl leading-relaxed">
+            Selamat datang di portal resmi karya <strong class="text-zinc-100 font-semibold">Radit Arzhaning</strong>. Nikmati puluhan bab gratis, narasi berkecepatan tinggi dengan <em class="italic text-purple-300 font-serif-literary">cliffhanger</em> tak terduga, dan jelajahi semesta fiksi orisinal langsung dari layar Anda.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <button onclick="openReader('chronicles-of-void', 0)" class="px-6 py-3.5 rounded-lg text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-all shadow-lg shadow-purple-900/40 hover:shadow-purple-800/60 flex items-center gap-2.5 group cursor-pointer">
+              <i class="fa-solid fa-book-open text-purple-200 group-hover:translate-x-0.5 transition-transform"></i>
+              <span>Mulai Baca Gratis (Bab 1)</span>
+            </button>
+
+            <a href="#bab-terbaru" class="px-6 py-3.5 rounded-lg text-sm font-medium text-zinc-300 hover:text-white bg-zinc-900/80 hover:bg-zinc-800/80 border border-zinc-700/80 active:scale-95 transition-all flex items-center gap-2 cursor-pointer">
+              <i class="fa-solid fa-list-ol text-zinc-400"></i>
+              <span>Lihat Daftar Bab</span>
+            </a>
+          </div>
+
+          <div class="pt-6 border-t border-zinc-800/80 grid grid-cols-3 gap-4 max-w-lg">
+            <div>
+              <div class="text-xl sm:text-2xl font-bold font-mono text-zinc-100 tabular-nums">1.4M+</div>
+              <div class="text-xs text-zinc-400 mt-0.5">Total Pembaca</div>
+            </div>
+            <div>
+              <div class="text-xl sm:text-2xl font-bold font-mono text-purple-400 tabular-nums">48.000+</div>
+              <div class="text-xs text-zinc-400 mt-0.5">Pembaca Setia</div>
+            </div>
+            <div>
+              <div class="text-xl sm:text-2xl font-bold font-mono text-amber-400 flex items-center gap-1 tabular-nums">
+                <i class="fa-solid fa-star text-amber-400 text-sm"></i>
+                <span>4.95</span>
+              </div>
+              <div class="text-xs text-zinc-400 mt-0.5">Rating Karya</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sisi Kanan: Mockup Visual Sampul Buku 3D Vertikal -->
+        <div class="lg:col-span-5 flex justify-center lg:justify-end">
+          <div class="relative perspective-1000 group">
+            
+            <div class="absolute -top-3.5 -right-3 sm:-right-4 z-20 bg-zinc-900/95 border border-purple-500/40 text-purple-200 px-3.5 py-1.5 rounded-md shadow-xl text-xs font-medium flex items-center gap-2 backdrop-blur-md">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Update: Bab 48 Rilis!</span>
+            </div>
+
+            <div onclick="openReader('chronicles-of-void', 0)" class="book-card-3d relative w-[250px] sm:w-[290px] h-[360px] sm:h-[410px] rounded-xl overflow-hidden cursor-pointer book-spine-shadow border border-zinc-700/50">
+              <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" alt="Chronicles of Void Book Cover" class="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105" loading="eager">
+
+              <div class="absolute inset-y-0 left-0 w-4 bg-gradient-to-r from-black/70 to-transparent pointer-events-none"></div>
+
+              <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/95 via-black/60 to-transparent p-5 text-left">
+                <div class="text-xs font-semibold text-purple-400 uppercase tracking-widest">Dark Fantasy</div>
+                <h3 class="text-lg font-serif-literary font-bold text-white mt-1">Chronicles of Void</h3>
+                <div class="flex items-center justify-between text-xs text-zinc-300 mt-2">
+                  <span class="flex items-center gap-1.5 text-zinc-400">
+                    <i class="fa-solid fa-eye text-xs"></i> 620K Dibaca
+                  </span>
+                  <span class="text-purple-300 group-hover:underline flex items-center gap-1 font-medium">
+                    Baca Bab 1 <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="w-[85%] h-6 bg-purple-950/40 blur-xl rounded-full mx-auto mt-2"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION NOVEL UNGGULAN & ONGOING ==================== -->
+  <section id="daftar-novel" class="py-20 bg-zinc-950/60 border-t border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 tracking-wider uppercase mb-2">
+            <i class="fa-solid fa-sparkles text-xs"></i>
+            <span>Koleksi & Serial Unggulan</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-serif-literary font-bold text-white tracking-tight">
+            Serial Web Novel & Kumpulan Cerpen
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-2 max-w-xl">
+            Pilih kisah yang ingin Anda selami. Setiap judul dilengkapi dengan bab pembuka gratis tanpa perlu registrasi akun.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-1.5 p-1 bg-zinc-900 border border-zinc-800 rounded-lg self-start md:self-auto">
+          <button onclick="filterNovels('all')" class="filter-tab active px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors bg-purple-900/60 text-purple-200 border border-purple-500/40" data-cat="all">Semua Karya</button>
+          <button onclick="filterNovels('fantasy')" class="filter-tab px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors text-zinc-400 hover:text-zinc-200" data-cat="fantasy">Dark Fantasy</button>
+          <button onclick="filterNovels('scifi')" class="filter-tab px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors text-zinc-400 hover:text-zinc-200" data-cat="scifi">Cyberpunk</button>
+          <button onclick="filterNovels('mystery')" class="filter-tab px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors text-zinc-400 hover:text-zinc-200" data-cat="mystery">Gothic Horor</button>
+          <button onclick="filterNovels('romance')" class="filter-tab px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors text-zinc-400 hover:text-zinc-200" data-cat="romance">Urban Fantasy</button>
+        </div>
+      </div>
+
+      <div id="novels-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Book 1: Chronicles of Void -->
+        <div class="novel-card bg-zinc-900/60 border border-zinc-800/90 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl hover:shadow-purple-950/20" data-category="fantasy">
+          <div onclick="openReader('chronicles-of-void', 0)" class="relative aspect-[3/4] w-full overflow-hidden bg-zinc-950 cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" alt="Chronicles of Void" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-zinc-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">Dark Fantasy</span>
+                <span class="flex items-center gap-1 text-xs font-mono font-medium text-amber-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+                  <i class="fa-solid fa-star text-[10px]"></i> 4.95
+                </span>
+              </div>
+              <div class="text-xs text-purple-200 font-medium">620K Dibaca</div>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <span class="text-purple-400 font-medium">Ongoing · Bab 48</span>
+                <span aria-hidden="true" class="text-zinc-600">·</span>
+                <span class="font-mono text-zinc-400">185.000 Kata</span>
+              </div>
+              <h3 onclick="openReader('chronicles-of-void', 0)" class="text-lg font-serif-literary font-bold text-zinc-100 group-hover:text-purple-300 transition-colors line-clamp-1 cursor-pointer">
+                Chronicles of Void
+              </h3>
+              <p class="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                Arkael terbangun di tengah reruntuhan Katedral Valenoria tanpa ingatan, namun lengan kirinya terbakar oleh segel pemanggil kehampaan terkutuk.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-zinc-800/80 space-y-2">
+              <button onclick="openReader('chronicles-of-void', 0)" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-purple-900/30">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                <span>Baca Bab 1 (Gratis)</span>
+              </button>
+              <button onclick="openSupportModal()" class="w-full py-2 px-3 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/70 hover:bg-zinc-700/70 border border-zinc-700/60 active:scale-95 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-lock text-amber-400 text-xs"></i>
+                <span>Akses Penuh VIP</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-zinc-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 2: Protocol 09 -->
+        <div class="novel-card bg-zinc-900/60 border border-zinc-800/90 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl hover:shadow-purple-950/20" data-category="scifi">
+          <div onclick="openReader('protocol-09', 0)" class="relative aspect-[3/4] w-full overflow-hidden bg-zinc-950 cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&auto=format&fit=crop&q=80" alt="Protocol 09" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-zinc-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">Cyberpunk</span>
+                <span class="flex items-center gap-1 text-xs font-mono font-medium text-amber-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+                  <i class="fa-solid fa-star text-[10px]"></i> 4.88
+                </span>
+              </div>
+              <div class="text-xs text-purple-200 font-medium">410K Dibaca</div>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <span class="text-purple-400 font-medium">Ongoing · Bab 34</span>
+                <span aria-hidden="true" class="text-zinc-600">·</span>
+                <span class="font-mono text-zinc-400">132.000 Kata</span>
+              </div>
+              <h3 onclick="openReader('protocol-09', 0)" class="text-lg font-serif-literary font-bold text-zinc-100 group-hover:text-purple-300 transition-colors line-clamp-1 cursor-pointer">
+                Protocol 09: Neon Retribution
+              </h3>
+              <p class="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                Kaelen menemukan chip ingatan ilegal milik CEO megakorporasi yang mati dibunuh. Isinya membuktikan 90% warga Sektor 4 adalah klona yang dijadwalkan musnah.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-zinc-800/80 space-y-2">
+              <button onclick="openReader('protocol-09', 0)" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-purple-900/30">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                <span>Baca Bab 1 (Gratis)</span>
+              </button>
+              <button onclick="openSupportModal()" class="w-full py-2 px-3 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/70 hover:bg-zinc-700/70 border border-zinc-700/60 active:scale-95 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-lock text-amber-400 text-xs"></i>
+                <span>Akses Penuh VIP</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-zinc-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 3: The Crimson Whisper -->
+        <div class="novel-card bg-zinc-900/60 border border-zinc-800/90 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl hover:shadow-purple-950/20" data-category="mystery">
+          <div onclick="openReader('the-crimson-whisper', 1)" class="relative aspect-[3/4] w-full overflow-hidden bg-zinc-950 cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=800&auto=format&fit=crop&q=80" alt="The Crimson Whisper" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-zinc-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">Gothic Horor</span>
+                <span class="flex items-center gap-1 text-xs font-mono font-medium text-amber-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+                  <i class="fa-solid fa-star text-[10px]"></i> 4.97
+                </span>
+              </div>
+              <div class="text-xs text-purple-200 font-medium">295K Dibaca</div>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <span class="text-emerald-400 font-medium">Tamat · 12 Cerita</span>
+                <span aria-hidden="true" class="text-zinc-600">·</span>
+                <span class="font-mono text-zinc-400">84.000 Kata</span>
+              </div>
+              <h3 onclick="openReader('the-crimson-whisper', 1)" class="text-lg font-serif-literary font-bold text-zinc-100 group-hover:text-purple-300 transition-colors line-clamp-1 cursor-pointer">
+                The Crimson Whisper & Tales
+              </h3>
+              <p class="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                Dua belas malam di sebuah rumah peristirahatan terbengkalai di perbukitan teh, di mana setiap lonceng berdentang tanpa tali pemukul.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-zinc-800/80 space-y-2">
+              <button onclick="openReader('the-crimson-whisper', 1)" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-purple-900/30">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                <span>Baca Kisah 1 (Gratis)</span>
+              </button>
+              <button onclick="openSupportModal()" class="w-full py-2 px-3 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/70 hover:bg-zinc-700/70 border border-zinc-700/60 active:scale-95 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-lock text-amber-400 text-xs"></i>
+                <span>Akses Penuh VIP</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-zinc-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Book 4: Midnight Solace -->
+        <div class="novel-card bg-zinc-900/60 border border-zinc-800/90 rounded-xl overflow-hidden flex flex-col group hover:border-zinc-700 transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-xl hover:shadow-purple-950/20" data-category="romance">
+          <div onclick="openReader('midnight-solace', 0)" class="relative aspect-[3/4] w-full overflow-hidden bg-zinc-950 cursor-pointer">
+            <img src="https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80" alt="Midnight Solace" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent flex flex-col justify-between p-4 pointer-events-none">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-medium text-zinc-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">Urban Fantasy</span>
+                <span class="flex items-center gap-1 text-xs font-mono font-medium text-amber-300 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded border border-white/10">
+                  <i class="fa-solid fa-star text-[10px]"></i> 4.91
+                </span>
+              </div>
+              <div class="text-xs text-purple-200 font-medium">340K Dibaca</div>
+            </div>
+          </div>
+          <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 text-xs text-zinc-400">
+                <span class="text-purple-400 font-medium">Ongoing · Bab 26</span>
+                <span aria-hidden="true" class="text-zinc-600">·</span>
+                <span class="font-mono text-zinc-400">98.000 Kata</span>
+              </div>
+              <h3 onclick="openReader('midnight-solace', 0)" class="text-lg font-serif-literary font-bold text-zinc-100 group-hover:text-purple-300 transition-colors line-clamp-1 cursor-pointer">
+                Midnight Solace: Resonansi
+              </h3>
+              <p class="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+                Setiap tengah malam, frekuensi radio antik di observatorium Nara menyiarkan suara pria yang mengaku tinggal di kota yang sama—tetapi 50 tahun di masa depan.
+              </p>
+            </div>
+            <div class="pt-2 border-t border-zinc-800/80 space-y-2">
+              <button onclick="openReader('midnight-solace', 0)" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm shadow-purple-900/30">
+                <i class="fa-solid fa-book-open text-xs"></i>
+                <span>Baca Bab 1 (Gratis)</span>
+              </button>
+              <button onclick="openSupportModal()" class="w-full py-2 px-3 rounded-lg text-xs font-medium text-zinc-300 hover:text-white bg-zinc-800/70 hover:bg-zinc-700/70 border border-zinc-700/60 active:scale-95 transition-colors flex items-center justify-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-lock text-amber-400 text-xs"></i>
+                <span>Akses Penuh VIP</span>
+                <i class="fa-solid fa-chevron-right text-[10px] text-zinc-500"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== SECTION BAB TERBARU ==================== -->
+  <section id="bab-terbaru" class="py-20 bg-[#090a0f] border-t border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div>
+          <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 tracking-wider uppercase mb-2">
+            <i class="fa-solid fa-sparkles text-xs"></i>
+            <span>Update Rutin Mingguan</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-serif-literary font-bold text-white tracking-tight">
+            Pembaruan Bab Terbaru
+          </h2>
+          <p class="text-zinc-400 text-sm sm:text-base mt-2 max-w-xl">
+            Jadwal rilis reguler setiap Selasa & Jumat pukul 20:00 WIB. Klik langsung pada baris bab untuk membuka ruang baca.
+          </p>
+        </div>
+
+        <button id="notify-btn" onclick="toggleNotification()" class="px-4 py-2.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-700 hover:text-white flex items-center gap-2 transition-all cursor-pointer">
+          <i id="notify-icon" class="fa-solid fa-bell text-purple-400 text-xs"></i>
+          <span id="notify-text">Nyalakan Notifikasi Rilis</span>
+        </button>
+      </div>
+
+      <div class="space-y-3">
+        <!-- Chapter item 1 -->
+        <div onclick="openReader('chronicles-of-void', 48)" class="group p-4 sm:p-5 rounded-xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-800/80 hover:border-purple-500/40 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer">
+          <div class="space-y-1.5 flex-1 text-left">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+              <span class="font-semibold text-purple-300">Chronicles of Void</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span>Dark Fantasy</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span class="font-mono text-zinc-400">2.450 kata</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-serif-literary font-semibold text-zinc-100 group-hover:text-purple-300 transition-colors flex items-center gap-2">
+              <span>Bab 48: Bayangan di Balik Kabut Valenoria</span>
+              <span class="text-[11px] font-sans font-medium text-emerald-400 bg-emerald-950/60 border border-emerald-500/30 px-2 py-0.5 rounded">Terbaru</span>
+            </h3>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-4 shrink-0">
+            <div class="flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
+              <i class="fa-regular fa-clock text-zinc-500"></i>
+              <span>2 jam yang lalu</span>
+            </div>
+            <div class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 group-hover:text-white bg-zinc-800/80 group-hover:bg-purple-600 transition-all flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-book-open text-xs"></i>
+              <span>Baca Bab</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter item 2 -->
+        <div onclick="openReader('protocol-09', 34)" class="group p-4 sm:p-5 rounded-xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-800/80 hover:border-purple-500/40 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer">
+          <div class="space-y-1.5 flex-1 text-left">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+              <span class="font-semibold text-purple-300">Protocol 09</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span>Cyberpunk Sci-Fi</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span class="font-mono text-zinc-400">2.100 kata</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-serif-literary font-semibold text-zinc-100 group-hover:text-purple-300 transition-colors">
+              Bab 34: Overdrive di Sektor Glitch
+            </h3>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-4 shrink-0">
+            <div class="flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
+              <i class="fa-regular fa-clock text-zinc-500"></i>
+              <span>5 jam yang lalu</span>
+            </div>
+            <div class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 group-hover:text-white bg-zinc-800/80 group-hover:bg-purple-600 transition-all flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-book-open text-xs"></i>
+              <span>Baca Bab</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chapter item 3 -->
+        <div onclick="openReader('chronicles-of-void', 47)" class="group p-4 sm:p-5 rounded-xl bg-zinc-900/40 hover:bg-zinc-900/80 border border-zinc-800/80 hover:border-purple-500/40 transition-all duration-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer">
+          <div class="space-y-1.5 flex-1 text-left">
+            <div class="flex flex-wrap items-center gap-2 text-xs text-zinc-400">
+              <span class="font-semibold text-purple-300">Chronicles of Void</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span>Dark Fantasy</span>
+              <span aria-hidden="true" class="text-zinc-600">·</span>
+              <span class="font-mono text-zinc-400">2.300 kata</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-serif-literary font-semibold text-zinc-100 group-hover:text-purple-300 transition-colors">
+              Bab 47: Nyanyian Bintang Hitam
+            </h3>
+          </div>
+          <div class="flex items-center justify-between sm:justify-end gap-4 shrink-0">
+            <div class="flex items-center gap-1.5 text-xs text-zinc-400 font-mono">
+              <i class="fa-regular fa-clock text-zinc-500"></i>
+              <span>Kemarin</span>
+            </div>
+            <div class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-zinc-200 group-hover:text-white bg-zinc-800/80 group-hover:bg-purple-600 transition-all flex items-center gap-1.5 whitespace-nowrap">
+              <i class="fa-solid fa-book-open text-xs"></i>
+              <span>Baca Bab</span>
+              <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TENTANG PENULIS ==================== -->
+  <section class="py-20 bg-zinc-950/60 border-t border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <!-- Author Portrait -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="relative group max-w-sm w-full">
+            <div class="relative rounded-2xl overflow-hidden border border-zinc-700/80 shadow-2xl aspect-square">
+              <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&auto=format&fit=crop&q=80" alt="Radit Arzhaning - Penulis Web Novel" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
+              <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none"></div>
+              <div class="absolute bottom-4 left-4 right-4 text-left">
+                <div class="text-xs text-purple-400 font-mono">Penulis & Worldbuilder</div>
+                <h3 class="text-xl font-serif-literary font-bold text-white">Radit Arzhaning</h3>
+              </div>
+            </div>
+            <div class="w-[85%] h-8 bg-purple-900/30 blur-xl rounded-full mx-auto mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Author Bio & Stats -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+          <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 tracking-wider uppercase">
+            <i class="fa-solid fa-pen-nib text-xs"></i>
+            <span>Di Balik Pena Radit Arzhaning</span>
+          </div>
+
+          <h2 class="text-2xl sm:text-4xl font-serif-literary font-bold text-white tracking-tight">
+            "Kisah Terbaik Adalah yang Menghantui Pikiranmu Setelah Layar Dipadamkan."
+          </h2>
+
+          <p class="text-sm sm:text-base text-zinc-300 leading-relaxed">
+            Mulai menulis fiksi spekulatif sejak 2018 di sudut kafe kota yang temaram, Radit Arzhaning memadukan kegelapan mitologi klasik, keputusasaan distopia masa depan, dan detak jantung emosional manusia yang rentan.
+          </p>
+
+          <p class="text-sm sm:text-base text-zinc-400 leading-relaxed">
+            Sebagai kreator independen penuh waktu, seluruh naskah didistribusikan secara mandiri untuk menjamin kemurnian visi kreatif. Komunitas pembaca di Karyakarsa dan Patreon adalah nyawa utama terciptanya semesta ini.
+          </p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-zinc-800">
+            <div class="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80">
+              <div class="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+                <i class="fa-regular fa-clock text-purple-400"></i>
+                <span>Jadwal Rilis</span>
+              </div>
+              <div class="text-xs text-zinc-400 mt-1">Selasa & Jumat, 20:00 WIB</div>
+            </div>
+            <div class="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80">
+              <div class="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+                <i class="fa-solid fa-compass text-purple-400"></i>
+                <span>Fokus Genre</span>
+              </div>
+              <div class="text-xs text-zinc-400 mt-1">High Fantasy & Sci-Fi</div>
+            </div>
+            <div class="p-3 rounded-lg bg-zinc-900/60 border border-zinc-800/80">
+              <div class="flex items-center gap-2 text-xs font-semibold text-zinc-300">
+                <i class="fa-solid fa-mug-hot text-purple-400"></i>
+                <span>Total Fiksi Terbit</span>
+              </div>
+              <div class="text-xs font-mono text-zinc-400 mt-1">500.000+ Kata</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== EKOSISTEM PEMBACA / KOMUNITAS (LEAD MAGNET) ==================== -->
+  <section id="komunitas" class="py-20 bg-zinc-950/80 border-t border-zinc-800/80 relative overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-purple-900/15 blur-[120px] pointer-events-none -z-10"></div>
+
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="p-8 sm:p-12 rounded-2xl bg-gradient-to-b from-zinc-900/90 to-zinc-900/40 border border-purple-500/30 shadow-2xl relative">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          
+          <div class="md:col-span-7 space-y-4 text-left">
+            <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-widest">
+              <i class="fa-solid fa-sparkles text-xs"></i>
+              <span>Ekosistem Pembaca Setia · Noxa & Tales</span>
+            </div>
+
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-serif-literary font-bold text-white tracking-tight">
+              Dapatkan Ilustrasi Karakter Eksklusif & Bab Prolog Rahasia
+            </h2>
+
+            <p class="text-sm sm:text-base text-zinc-300 leading-relaxed">
+              Bergabunglah dengan buletin bulanan Radit Arzhaning. Anda akan menerima kartu ilustrasi karakter beresolusi tinggi, peta semesta Valenoria & Neo-Batavia, serta naskah prolog yang belum dipublikasikan ke publik.
+            </p>
+
+            <form id="newsletter-form" onsubmit="handleNewsletter(event)" class="pt-2 space-y-3">
+              <div class="flex flex-col sm:flex-row gap-2 max-w-md">
+                <div class="relative flex-1">
+                  <i class="fa-regular fa-envelope text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 text-sm"></i>
+                  <input type="email" id="newsletter-email" required placeholder="Ketik alamat email Anda..." class="w-full pl-10 pr-4 py-3 rounded-lg text-sm bg-zinc-950/80 border border-zinc-700/80 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-purple-400 transition-colors">
+                </div>
+                <button type="submit" class="px-5 py-3 rounded-lg text-sm font-semibold text-white bg-purple-600 hover:bg-purple-500 active:scale-95 transition-colors flex items-center justify-center gap-2 shrink-0 cursor-pointer shadow-md shadow-purple-900/30">
+                  <span>Klaim Hadiah</span>
+                </button>
+              </div>
+              <div class="flex items-center gap-1.5 text-xs text-zinc-500">
+                <i class="fa-solid fa-shield-halved text-zinc-400"></i>
+                <span>Bebas spam. Berhenti berlangganan kapan saja dalam satu klik.</span>
+              </div>
+            </form>
+            <div id="newsletter-success" class="hidden p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/50 text-emerald-200 text-xs">
+              <i class="fa-solid fa-circle-check text-emerald-400 mr-1.5"></i>
+              <span>Terima kasih! Tautan unduhan berkas ilustrasi dan bab prolog rahasia telah dikirimkan ke email Anda.</span>
+            </div>
+          </div>
+
+          <!-- Right Channels (Discord & Telegram) -->
+          <div class="md:col-span-5 flex flex-col gap-3 p-5 rounded-xl bg-zinc-950/70 border border-zinc-800">
+            <div class="text-xs font-semibold text-zinc-400 uppercase tracking-wider text-left">
+              Ruang Komunitas & Diskusi
+            </div>
+
+            <a href="https://discord.com" target="_blank" class="p-3.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 hover:border-indigo-500/50 transition-colors flex items-center justify-between group">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-indigo-950/60 border border-indigo-500/40 flex items-center justify-center text-indigo-400">
+                  <i class="fa-brands fa-discord"></i>
+                </div>
+                <div class="text-left">
+                  <div class="text-xs font-semibold text-zinc-200 group-hover:text-indigo-300">Discord "The Abyss"</div>
+                  <div class="text-[11px] text-zinc-400">Teori pembaca, spoiler, & fanart</div>
+                </div>
+              </div>
+              <span class="text-xs text-indigo-400 font-medium group-hover:translate-x-1 transition-transform">Gabung →</span>
+            </a>
+
+            <a href="https://telegram.org" target="_blank" class="p-3.5 rounded-lg bg-zinc-900/90 hover:bg-zinc-800/90 border border-zinc-800 hover:border-sky-500/50 transition-colors flex items-center justify-between group">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-sky-950/60 border border-sky-500/40 flex items-center justify-center text-sky-400">
+                  <i class="fa-brands fa-telegram"></i>
+                </div>
+                <div class="text-left">
+                  <div class="text-xs font-semibold text-zinc-200 group-hover:text-sky-300">Telegram Rilis Instan</div>
+                  <div class="text-[11px] text-zinc-400">Notifikasi detik pertama rilis bab baru</div>
+                </div>
+              </div>
+              <span class="text-xs text-sky-400 font-medium group-hover:translate-x-1 transition-transform">Gabung →</span>
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== TESTIMONIAL PEMBACA SETIA ==================== -->
+  <section class="py-20 bg-[#090a0f] border-t border-zinc-800/80">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center max-w-2xl mx-auto mb-14 space-y-2">
+        <div class="text-xs font-semibold text-purple-400 tracking-wider uppercase">Suara Komunitas</div>
+        <h2 class="text-2xl sm:text-4xl font-serif-literary font-bold text-white tracking-tight">Apa Kata Pembaca Setia</h2>
+        <p class="text-zinc-400 text-sm sm:text-base">Ulasan nyata pembaca dari Karyakarsa, Wattpad, dan forum novel daring.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Review 1 -->
+        <div class="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-colors flex flex-col justify-between space-y-5 text-left">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1 text-amber-400 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <i class="fa-solid fa-quote-right text-zinc-600"></i>
+            </div>
+            <p class="text-sm text-zinc-300 leading-relaxed italic font-serif-literary">
+              "Plot twist di Bab 42 bener-bener di luar nalar! Worldbuilding-nya sedalam novel terjemahan high fantasy legendaris. Selalu standby tiap Radit Arzhaning update malam Minggu!"
+            </p>
+          </div>
+          <div class="pt-4 border-t border-zinc-800/70 flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80" alt="Zannah" class="w-10 h-10 rounded-full object-cover border border-zinc-700/80">
+            <div>
+              <h4 class="text-xs sm:text-sm font-semibold text-zinc-100">Zannah D.</h4>
+              <div class="text-[11px] text-zinc-400">Pembaca VIP · <span class="text-purple-400">Chronicles of Void</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 2 -->
+        <div class="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-colors flex flex-col justify-between space-y-5 text-left">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1 text-amber-400 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <i class="fa-solid fa-quote-right text-zinc-600"></i>
+            </div>
+            <p class="text-sm text-zinc-300 leading-relaxed italic font-serif-literary">
+              "Jarang banget ada penulis web novel Indonesia yang bisa eksekusi nuansa gritty cyberpunk sebaik ini. Pacing adegan aksinya kinetik banget, berasa nonton film aksi Hollywood!"
+            </p>
+          </div>
+          <div class="pt-4 border-t border-zinc-800/70 flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80" alt="Radit" class="w-10 h-10 rounded-full object-cover border border-zinc-700/80">
+            <div>
+              <h4 class="text-xs sm:text-sm font-semibold text-zinc-100">Radit Fahrezi</h4>
+              <div class="text-[11px] text-zinc-400">Penikmat Sci-Fi · <span class="text-purple-400">Protocol 09</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Review 3 -->
+        <div class="p-6 rounded-xl bg-zinc-900/40 border border-zinc-800/80 hover:border-zinc-700 transition-colors flex flex-col justify-between space-y-5 text-left">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-1 text-amber-400 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <i class="fa-solid fa-quote-right text-zinc-600"></i>
+            </div>
+            <p class="text-sm text-zinc-300 leading-relaxed italic font-serif-literary">
+              "Cerita Kisah 1 Lonceng Perkebunan Teh bikin merinding semalaman. Deskripsi sastranya elegan, puitis tapi menusuk langsung ke rasa takut terdalam manusia."
+            </p>
+          </div>
+          <div class="pt-4 border-t border-zinc-800/70 flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80" alt="Zannah" class="w-10 h-10 rounded-full object-cover border border-zinc-700/80">
+            <div>
+              <h4 class="text-xs sm:text-sm font-semibold text-zinc-100">Zannah Lathifah</h4>
+              <div class="text-[11px] text-zinc-400">Booktuber · <span class="text-purple-400">The Crimson Whisper</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-[#06070a] border-t border-zinc-800/80 pt-16 pb-12 text-zinc-400 text-sm text-left">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+        
+        <div class="md:col-span-5 space-y-4">
+          <div class="flex items-center gap-2.5 text-zinc-100 font-serif-literary text-xl font-bold">
+            <span class="w-7 h-7 rounded-lg bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-400">
+              <i class="fa-solid fa-book-open text-xs"></i>
+            </span>
+            <span>Radit Arzhaning · Noxa & Tales</span>
+          </div>
+          <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed max-w-sm">
+            Situs portal fiksi spekulatif, web novel berseri, dan kumpulan cerita pendek independen.
+          </p>
+          <div class="text-xs text-zinc-500 font-serif-literary italic">
+            "Menembus Batas Realita, Menjelajahi Semesta Fiksi."
+          </div>
+        </div>
+
+        <div class="md:col-span-2 space-y-3">
+          <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider">Karya Fiksi</h4>
+          <ul class="space-y-2 text-xs">
+            <li><button onclick="openReader('chronicles-of-void', 0)" class="hover:text-purple-300">Chronicles of Void</button></li>
+            <li><button onclick="openReader('protocol-09', 0)" class="hover:text-purple-300">Protocol 09</button></li>
+            <li><button onclick="openReader('the-crimson-whisper', 1)" class="hover:text-purple-300">The Crimson Whisper</button></li>
+            <li><button onclick="openReader('midnight-solace', 0)" class="hover:text-purple-300">Midnight Solace</button></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-2 space-y-3">
+          <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider">Publikasi & Dukung</h4>
+          <ul class="space-y-2 text-xs">
+            <li><button onclick="openSupportModal()" class="text-purple-400 hover:text-purple-300"><i class="fa-solid fa-heart text-[10px] mr-1"></i>Karyakarsa (VIP)</button></li>
+            <li><a href="https://trakteer.id" target="_blank" class="hover:text-purple-300">Trakteer.id</a></li>
+            <li><a href="https://wattpad.com" target="_blank" class="hover:text-purple-300">Wattpad (@aidengray)</a></li>
+            <li><a href="https://patreon.com" target="_blank" class="hover:text-purple-300">Patreon</a></li>
+          </ul>
+        </div>
+
+        <div class="md:col-span-3 space-y-3">
+          <h4 class="text-xs font-semibold text-zinc-200 uppercase tracking-wider">Media Sosial</h4>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <a href="https://instagram.com" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white"><i class="fa-brands fa-instagram mr-1"></i>Instagram</a>
+            <a href="https://x.com" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white"><i class="fa-brands fa-x-twitter mr-1"></i>Twitter</a>
+            <a href="https://tiktok.com" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white"><i class="fa-brands fa-tiktok mr-1"></i>TikTok</a>
+            <a href="https://discord.com" target="_blank" class="px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-300 hover:text-white"><i class="fa-brands fa-discord mr-1"></i>Discord</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 border-t border-zinc-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+        <div>© 2026 Radit Arzhaning. Seluruh Hak Cipta Dilindungi.</div>
+        <a href="#beranda" class="hover:text-zinc-300 flex items-center gap-1">Kembali ke Atas <i class="fa-solid fa-arrow-up text-[10px]"></i></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL BACA INTERAKTIF (READER MODAL) ==================== -->
+  <div id="reader-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-0 sm:p-4 bg-black/85 backdrop-blur-md">
+    <div id="reader-sheet" class="w-full max-w-4xl h-full sm:h-[92vh] sm:rounded-2xl border border-zinc-800 bg-[#0e0f14] text-zinc-200 shadow-2xl flex flex-col overflow-hidden transition-colors duration-200">
+      
+      <div class="w-full h-1 bg-zinc-800/40">
+        <div id="reader-progress" class="h-full bg-gradient-to-r from-purple-500 to-indigo-500 w-0 transition-all duration-150"></div>
+      </div>
+
+      <div id="reader-toolbar" class="px-4 sm:px-6 py-3 border-b border-zinc-800/80 bg-zinc-950/60 flex items-center justify-between gap-3 shrink-0">
+        <div class="truncate text-left">
+          <span id="reader-novel-tag" class="text-xs font-semibold text-purple-400 uppercase tracking-wider hidden sm:inline mr-2"></span>
+          <span id="reader-chapter-title" class="text-xs sm:text-sm font-medium truncate"></span>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <div class="flex items-center gap-1 p-0.5 rounded-lg border border-zinc-700/40 text-xs">
+            <button onclick="setReaderTheme('dark')" title="Mode Malam Gelap" class="w-6 h-6 rounded flex items-center justify-center bg-zinc-800 text-white font-bold">●</button>
+            <button onclick="setReaderTheme('sepia')" title="Mode Kertas Sepia" class="w-6 h-6 rounded flex items-center justify-center text-zinc-500 hover:text-amber-300">■</button>
+            <button onclick="setReaderTheme('light')" title="Mode Terang" class="w-6 h-6 rounded flex items-center justify-center text-zinc-500 hover:text-white">○</button>
+          </div>
+
+          <div class="flex items-center border border-zinc-700/40 rounded text-xs font-mono">
+            <button onclick="setReaderFontSize('sm')" class="px-1.5 py-1 text-zinc-400 hover:text-white">A-</button>
+            <button onclick="setReaderFontSize('md')" class="px-1.5 py-1 text-white bg-purple-600 font-bold">A</button>
+            <button onclick="setReaderFontSize('lg')" class="px-1.5 py-1 text-zinc-400 hover:text-white">A+</button>
+          </div>
+
+          <button onclick="closeReader()" class="p-1.5 rounded-lg hover:bg-white/10 text-zinc-400 hover:text-zinc-100 transition-colors cursor-pointer" title="Tutup Pembaca (ESC)">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="reader-body" onscroll="updateReaderProgress(event)" class="flex-1 overflow-y-auto px-6 sm:px-12 md:px-20 py-8 md:py-12 space-y-6 select-text text-left">
+        <div class="text-center max-w-xl mx-auto pb-6 border-b border-current/10 space-y-2">
+          <span id="reader-inner-category" class="text-xs uppercase tracking-widest text-purple-400 font-semibold"></span>
+          <h2 id="reader-inner-title" class="text-2xl sm:text-3xl font-serif-literary font-bold tracking-tight"></h2>
+          <div id="reader-inner-meta" class="flex items-center justify-center gap-3 text-xs opacity-75 font-mono"></div>
+        </div>
+
+        <div id="reader-paragraphs" class="max-w-2xl mx-auto space-y-5 text-justify font-serif-literary text-base sm:text-lg leading-relaxed"></div>
+
+        <div class="max-w-2xl mx-auto pt-10 border-t border-current/10 space-y-6">
+          <div class="flex items-center justify-between gap-4">
+            <button id="like-btn" onclick="toggleLike()" class="px-3.5 py-2 rounded-lg text-xs font-medium border border-current/20 hover:border-current/40 flex items-center gap-2 cursor-pointer transition-colors">
+              <i id="like-icon" class="fa-regular fa-heart"></i>
+              <span id="like-count">342 Suka</span>
+            </button>
+            <div class="flex items-center gap-2">
+              <button onclick="navigateChapter(-1)" id="prev-ch-btn" class="px-3 py-2 rounded-lg border border-current/20 text-xs font-medium hover:border-current/50 transition-colors">← Sebelumnya</button>
+              <button onclick="navigateChapter(1)" id="next-ch-btn" class="px-3 py-2 rounded-lg border border-current/20 text-xs font-medium hover:border-current/50 transition-colors">Selanjutnya →</button>
+            </div>
+          </div>
+
+          <div class="p-6 rounded-xl border border-purple-800/40 bg-purple-950/20 text-purple-100 space-y-3">
+            <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-wider">
+              <i class="fa-solid fa-sparkles text-xs"></i>
+              <span>Ingin Tahu Kelanjutan Cerita?</span>
+            </div>
+            <h4 class="text-lg font-serif-literary font-bold">Buka Akses 5 Bab di Muka di Karyakarsa & Trakteer</h4>
+            <p class="text-xs sm:text-sm opacity-85 leading-relaxed">Dukungan Anda memberikan energi bagi Radit Arzhaning untuk terus berkarya. Nikmati bab VIP, ilustrasi karakter eksklusif, dan voting alur cerita mendatang.</p>
+            <div class="pt-2 flex flex-wrap items-center gap-3">
+              <button onclick="closeReader(); openSupportModal();" class="px-4 py-2 text-xs font-semibold text-white bg-purple-600 hover:bg-purple-500 rounded-lg shadow transition-colors flex items-center gap-2 cursor-pointer">
+                <i class="fa-solid fa-lock text-xs"></i>
+                <span>Dukung & Baca Bab Berikutnya</span>
+              </button>
+              <button onclick="closeReader()" class="px-4 py-2 text-xs font-medium border border-current/20 hover:border-current/40 rounded-lg transition-colors cursor-pointer">Kembali ke Beranda</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DUKUNGAN & VIP (SUPPORT MODAL) ==================== -->
+  <div id="support-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/85 backdrop-blur-md">
+    <div class="w-full max-w-2xl bg-zinc-950 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 relative max-h-[92vh] overflow-y-auto text-left">
+      <button onclick="closeSupportModal()" class="absolute top-4 right-4 p-2 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/60 transition-colors cursor-pointer">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="space-y-2">
+        <div class="flex items-center gap-2 text-xs font-semibold text-purple-400 uppercase tracking-wider">
+          <i class="fa-solid fa-heart text-purple-400"></i>
+          <span>Dukung Perjalanan Menulis Independen</span>
+        </div>
+        <h3 class="text-2xl font-serif-literary font-bold text-white tracking-tight">Pilihan Paket Dukungan & Akses VIP</h3>
+        <p class="text-xs sm:text-sm text-zinc-400 leading-relaxed">Dukungan Anda memungkinkan Radit Arzhaning fokus menghasilkan karya web novel berkualitas tanpa batas. Pilih metode dan paket yang paling sesuai.</p>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-purple-300">
+              <i class="fa-solid fa-mug-hot"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-zinc-100">Traktir Kopi Menulis</h4>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span class="text-lg font-bold font-mono text-white">Rp 15.000</span>
+                <span class="text-[11px] text-zinc-400">/sekali</span>
+              </div>
+            </div>
+            <ul class="space-y-2 text-xs text-zinc-400 pt-2 border-t border-zinc-800/70">
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Akses bab baru 2 hari lebih awal</span></li>
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Lencana pendukung di komentar</span></li>
+            </ul>
+          </div>
+          <a href="https://karyakarsa.com" target="_blank" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 flex items-center justify-center gap-1.5">
+            <span>Dukung di Karyakarsa</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+
+        <div class="p-4 rounded-xl border border-purple-500/50 bg-purple-950/20 shadow-lg shadow-purple-950/40 relative flex flex-col justify-between space-y-4">
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-purple-600 text-white text-[10px] font-semibold uppercase px-2.5 py-0.5 rounded-full">Paling Diminati</div>
+          <div class="space-y-3">
+            <div class="w-8 h-8 rounded-lg bg-purple-900/60 border border-purple-500/40 flex items-center justify-center text-purple-300">
+              <i class="fa-solid fa-crown"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-zinc-100">Pembaca VIP Bulanan</h4>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span class="text-lg font-bold font-mono text-white">Rp 35.000</span>
+                <span class="text-[11px] text-zinc-400">/bulan</span>
+              </div>
+            </div>
+            <ul class="space-y-2 text-xs text-zinc-400 pt-2 border-t border-zinc-800/70">
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>5 Bab di muka semua serial aktif</span></li>
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Ilustrasi karakter resolusi 4K</span></li>
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Voting alur cerita mendatang</span></li>
+            </ul>
+          </div>
+          <a href="https://karyakarsa.com" target="_blank" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold bg-purple-600 hover:bg-purple-500 text-white shadow-md shadow-purple-900/40 flex items-center justify-center gap-1.5">
+            <span>Pilih Paket VIP</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+
+        <div class="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 hover:border-zinc-700 flex flex-col justify-between space-y-4">
+          <div class="space-y-3">
+            <div class="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-purple-300">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-semibold text-zinc-100">Archmage Patron</h4>
+              <div class="mt-1 flex items-baseline gap-1">
+                <span class="text-lg font-bold font-mono text-white">Rp 75.000</span>
+                <span class="text-[11px] text-zinc-400">/bulan</span>
+              </div>
+            </div>
+            <ul class="space-y-2 text-xs text-zinc-400 pt-2 border-t border-zinc-800/70">
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Seluruh benefit Pembaca VIP</span></li>
+              <li class="flex items-start gap-1.5"><i class="fa-solid fa-check text-purple-400 text-xs mt-0.5"></i><span>Nama tercatat di buku cetak</span></li>
+            </ul>
+          </div>
+          <a href="https://trakteer.id" target="_blank" class="w-full py-2.5 px-3 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 hover:text-white border border-zinc-700 flex items-center justify-center gap-1.5">
+            <span>Dukung di Trakteer</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-center gap-2 text-xs text-zinc-500 pt-2 border-t border-zinc-800/80">
+        <i class="fa-solid fa-shield-halved text-zinc-400"></i>
+        <span>Pembayaran aman via QRIS, GoPay, OVO, ShopeePay, Bank Transfer, & Kartu Kredit.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+  <script>
+    const NOVELS = {
+      'chronicles-of-void': {
+        title: 'Chronicles of Void',
+        genre: 'Dark Fantasy',
+        chapters: [
+          {
+            number: 0,
+            title: 'Prolog: Nyala Api di Ujung Kehampaan',
+            time: '4 menit baca',
+            date: '3 bulan lalu',
+            content: [
+              'Hujan abu tidak pernah berbau tanah. Abu selalu berbau logam terbakar dan doa-doa yang terlambat dipanjatkan.',
+              'Arkael menarik napas berat. Udara dingin pegunungan Valenoria mengiris paru-parunya bagai serpihan kaca tipis. Di hadapannya, gerbang besi katedral kuno telah terpuntir oleh kekuatan tak kasat mata—baja setebal lengan manusia remuk layaknya lilin lunak di bawah terik neraka.',
+              '"Kau terlambat, Pembawa Segel," bisik sebuah suara di balik tirai kabut lembayung.',
+              'Suara itu tidak datang melalui telinga, melainkan berdentang langsung di dasar tempurung kepalanya. Arkael menatap lengan kirinya. Di balik perban linen kasar yang telah basah oleh getah hitam, tato berbentuk sulur obsidian berdenyut seirama detak jantungnya.',
+              'Setiap kali segel itu berpendar, dunia di sekitarnya kehilangan warna: rumput memutih, bebatuan menjadi abu, dan waktu melambat hingga tetesan air hujan tergantung di udara layaknya kristal muram.',
+              '"Aku tidak datang untuk menyelamatkan mereka," jawab Arkael pelan, mencabut pedang pendek bermata gergaji dari sarung pinggangnya. "Aku datang untuk memastikan tak ada yang tersisa untuk dibangkitkan."'
+            ]
+          },
+          {
+            number: 47,
+            title: 'Bab 47: Nyanyian Bintang Hitam',
+            time: '7 menit baca',
+            date: 'Kemarin',
+            content: [
+              'Langit di atas benteng Arandor terbelah menjadi tiga warna: ungu pekat, perak menyengat, dan hitam mutlak.',
+              '"Jika kita menyeberangi parit ini," kata Veyra sembari mengisi selongsong panah bertuah terakhirnya, "gerbang mundur akan tertutup selamanya. Kau tahu apa konsekuensi dari mantra pembalik gravitasinya, kan?"',
+              'Arkael mengangguk lambat. Getaran di bawah telapak kakinya semakin liar. Menara tertinggi Arandor mulai runtuh ke angkasa, melayang melawan hukum alam.',
+              'Langkah kaki ribuan makhluk bayangan terdengar bagai dentuman drum kematian di balik dinding tebing.'
+            ]
+          },
+          {
+            number: 48,
+            title: 'Bab 48: Bayangan di Balik Kabut Valenoria',
+            time: '8 menit baca',
+            date: '2 jam lalu',
+            content: [
+              'Ketika kabut tebal menyapu lembah, siluet raksasa setinggi pohon cemara purba melangkah keluar dari kehampaan. Mata makhluk itu bukan sekadar bola api biasa, melainkan pusaran lubang hitam yang menelan cahaya lentera para pengintai di puncak benteng.',
+              '"Posisikan meriam arkanum ke koordinat empat!" teriak kapten jaga sebelum suaranya terputus oleh desisan dingin yang menggetarkan kaca helm bajanya.',
+              'Arkael menatap ke atas. Di sana, di antara tanduk raksasa sang makhluk kehampaan, sesosok wanita bertopeng perak berdiri tersenyum mengejek.',
+              '"Akhirnya kita bertemu kembali, saudaraku yang tersesat..."'
+            ]
+          }
+        ]
+      },
+      'protocol-09': {
+        title: 'Protocol 09: Neon Retribution',
+        genre: 'Cyberpunk Sci-Fi',
+        chapters: [
+          {
+            number: 0,
+            title: 'Prolog: Hujan Asam & Dosa Neural',
+            time: '4 menit baca',
+            date: '2 bulan lalu',
+            content: [
+              'Layar optik implan Kaelen berkedip merah: BATERAI SINTESIS 14%.',
+              'Di gang sempit Level 2 Neo-Batavia, bau ozone dan mie instan sintetis berbaur dengan uap got yang berdesis hangat. Papan neon holografik raksasa di atas kepala memproyeksikan wajah tersenyum gubernur korporat dengan slogan yang menjijikkan: "Masa Depanmu Adalah Investasi Kami."',
+              '"Kael, dia sudah tidak bernapas," desis Rika melalui tautan radio enkripsi di telinganya. "Bawa neuromodulatornya keluar sebelum drone pembersih Enlil Corp memindai sidik bio-metrikmu."',
+              'Kaelen berlutut di sebelah tubuh pria berjas mahal yang terkapar di genangan air kotor. Tangan kirinya yang telah diganti prostetik karbon membuka soket di belakang tengkuk sang mayat. Jarum antarmuka berdengung halus saat menembus lapisan pelindung titanium.',
+              'Lalu data mentah itu menyengat korteks otaknya.',
+              'Bukan sekadar transaksi rekening rahasia. Yang ia lihat adalah daftar kepunahan terencana: 2,4 juta jiwa di Sector 4 dijadwalkan untuk dihapus dalam 72 jam.'
+            ]
+          },
+          {
+            number: 34,
+            title: 'Bab 34: Overdrive di Sektor Glitch',
+            time: '6 menit baca',
+            date: '5 jam lalu',
+            content: [
+              'Menara transmisi pusat Neo-Batavia berguncang saat gelombang empas EMP dilepaskan oleh generator darurat Kaelen.',
+              'Lampu-lampu kota padam serentak, menenggelamkan distrik megah itu ke dalam kegelapan mutlak untuk pertama kalinya dalam lima puluh tahun. Namun di langit yang gelap, armada drone pemburu bertenaga reaktor surya mulai menyalakan lampu sorot ultraviolet mereka.',
+              '"Waktu kita hanya tiga menit sebelum sistem cadangan menyala!" teriak Kaelen sembari menancapkan kabel bypass ke terminal induk.'
+            ]
+          }
+        ]
+      },
+      'the-crimson-whisper': {
+        title: 'The Crimson Whisper & Other Tales',
+        genre: 'Gothic Horor',
+        chapters: [
+          {
+            number: 1,
+            title: 'Kisah 1: Lonceng Perkebunan Teh Malabar',
+            time: '5 menit baca',
+            date: '4 bulan lalu',
+            content: [
+              'Kabut di perkebunan Malabar tidak pernah turun secara perlahan; kabut itu merayap bagai jemari basah mayat yang meraba-raba kaca jendela kamar tamu.',
+              'Tuan Willem tidak pernah percaya pada takhayul para pemetik teh pribumi. Baginya, bunyi dentang lonceng tembaga di bukit selatan setiap pukul dua pagi adalah ulah para pencuri getah karet atau angin gunung yang mengayunkan rantai gudang penyimpanan.',
+              'Malam itu, ia memutuskan membuktikannya sendiri dengan membawa senapan buru dan lentera karbida.',
+              'Namun saat ia tiba di tiang lonceng yang telah berkarat dan ditumbuhi lumut kerak, ia menyadari satu hal yang membuat darahnya mendidih menjadi es: pemukul lonceng telah dilepas sejak tiga puluh tahun lalu. Dan dari dalam rongga tembaga lonceng yang berdentang itu, tergantung seikat rambut hitam panjang perempuan yang meneteskan minyak melati.'
+            ]
+          }
+        ]
+      },
+      'midnight-solace': {
+        title: 'Midnight Solace: Resonansi Bintang',
+        genre: 'Urban Fantasy Romance',
+        chapters: [
+          {
+            number: 0,
+            title: 'Prolog: Gelombang Radio Pukul 00:03',
+            time: '4 menit baca',
+            date: '1 bulan lalu',
+            content: [
+              'Hening di dalam kubah teleskop bintang selalu terasa suci bagi Nara.',
+              'Ketika seluruh kota tidur di bawah selimut lampu jalanan sodium kuning, Nara duduk bersila ditemani secangkir teh chamomile dingin. Di atas meja kerjanya yang penuh peta rasi bintang, perangkat radio tabung buatan tahun 1960 peninggalan kakeknya tiba-tiba berdesis pelan.',
+              'Kresek statis itu berubah menjadi pola ketukan berulang: tiga pendek, dua panjang.',
+              'Lalu sebuah suara pria terdengar, jernih dan sedikit serak, seolah tengah berbisik agar tidak membangunkan seseorang di kamar sebelah.',
+              '"Apakah ada yang mendengarkan di observatorium Sektor 12? Hujan meteor Perseid malam ini tampak indah dari lantai sembilan puluh... jika saja gedung-gedung ini tidak menelan langitmu."'
+            ]
+          }
+        ]
+      }
+    };
+
+    let currentNovelId = 'chronicles-of-void';
+    let currentChapterIndex = 0;
+    let isLiked = false;
+    let likeCount = 342;
+    let isAmbiancePlaying = false;
+    let audioCtx = null;
+    let noiseNode = null;
+    let gainNode = null;
+
+    function openReader(novelId, chapterNum = 0) {
+      currentNovelId = novelId;
+      const novel = NOVELS[novelId] || NOVELS['chronicles-of-void'];
+      const chIdx = novel.chapters.findIndex(c => c.number === chapterNum);
+      currentChapterIndex = chIdx !== -1 ? chIdx : 0;
+      renderChapter();
+      document.getElementById('reader-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('reader-body').scrollTop = 0;
+    }
+
+    function closeReader() {
+      document.getElementById('reader-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function renderChapter() {
+      const novel = NOVELS[currentNovelId];
+      const ch = novel.chapters[currentChapterIndex] || novel.chapters[0];
+
+      document.getElementById('reader-novel-tag').textContent = novel.title;
+      document.getElementById('reader-chapter-title').textContent = ch.title;
+      document.getElementById('reader-inner-category').textContent = `${novel.genre} · ${novel.title}`;
+      document.getElementById('reader-inner-title').textContent = ch.title;
+      document.getElementById('reader-inner-meta').innerHTML = `<span>${ch.time}</span> <span class="text-zinc-600">·</span> <span>${ch.date}</span>`;
+
+      const pContainer = document.getElementById('reader-paragraphs');
+      pContainer.innerHTML = '';
+      ch.content.forEach(pText => {
+        const p = document.createElement('p');
+        p.className = 'indent-6 sm:indent-8 leading-relaxed';
+        p.textContent = pText;
+        pContainer.appendChild(p);
+      });
+
+      document.getElementById('prev-ch-btn').disabled = currentChapterIndex === 0;
+      document.getElementById('next-ch-btn').disabled = currentChapterIndex >= novel.chapters.length - 1;
+      document.getElementById('prev-ch-btn').style.opacity = currentChapterIndex === 0 ? '0.4' : '1';
+      document.getElementById('next-ch-btn').style.opacity = currentChapterIndex >= novel.chapters.length - 1 ? '0.4' : '1';
+    }
+
+    function navigateChapter(direction) {
+      const novel = NOVELS[currentNovelId];
+      const newIdx = currentChapterIndex + direction;
+      if (newIdx >= 0 && newIdx < novel.chapters.length) {
+        currentChapterIndex = newIdx;
+        renderChapter();
+        document.getElementById('reader-body').scrollTop = 0;
+      }
+    }
+
+    function updateReaderProgress(e) {
+      const el = e.target;
+      const progress = (el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100;
+      document.getElementById('reader-progress').style.width = `${Math.min(100, Math.max(0, progress))}%`;
+    }
+
+    function setReaderTheme(theme) {
+      const sheet = document.getElementById('reader-sheet');
+      const toolbar = document.getElementById('reader-toolbar');
+      if (theme === 'sepia') {
+        sheet.className = 'w-full max-w-4xl h-full sm:h-[92vh] sm:rounded-2xl border border-[#d8ccb4] bg-[#f4ecd8] text-[#3d3224] shadow-2xl flex flex-col overflow-hidden transition-colors duration-200';
+        toolbar.className = 'px-4 sm:px-6 py-3 border-b border-[#dfd3bc] bg-[#efe5cf] flex items-center justify-between gap-3 shrink-0';
+      } else if (theme === 'light') {
+        sheet.className = 'w-full max-w-4xl h-full sm:h-[92vh] sm:rounded-2xl border border-zinc-200 bg-[#fafafa] text-zinc-900 shadow-2xl flex flex-col overflow-hidden transition-colors duration-200';
+        toolbar.className = 'px-4 sm:px-6 py-3 border-b border-zinc-200 bg-white flex items-center justify-between gap-3 shrink-0';
+      } else {
+        sheet.className = 'w-full max-w-4xl h-full sm:h-[92vh] sm:rounded-2xl border border-zinc-800 bg-[#0e0f14] text-zinc-200 shadow-2xl flex flex-col overflow-hidden transition-colors duration-200';
+        toolbar.className = 'px-4 sm:px-6 py-3 border-b border-zinc-800/80 bg-zinc-950/60 flex items-center justify-between gap-3 shrink-0';
+      }
+    }
+
+    function setReaderFontSize(size) {
+      const p = document.getElementById('reader-paragraphs');
+      p.className = size === 'sm' ? 'max-w-2xl mx-auto space-y-5 text-justify font-serif-literary text-sm sm:text-base leading-relaxed'
+        : size === 'lg' ? 'max-w-2xl mx-auto space-y-5 text-justify font-serif-literary text-lg sm:text-xl leading-loose'
+        : 'max-w-2xl mx-auto space-y-5 text-justify font-serif-literary text-base sm:text-lg leading-relaxed';
+    }
+
+    function toggleLike() {
+      isLiked = !isLiked;
+      likeCount = isLiked ? likeCount + 1 : likeCount - 1;
+      document.getElementById('like-count').textContent = `${likeCount} Suka`;
+      const icon = document.getElementById('like-icon');
+      if (isLiked) {
+        icon.className = 'fa-solid fa-heart text-rose-500';
+      } else {
+        icon.className = 'fa-regular fa-heart';
+      }
+    }
+
+    function openSupportModal() {
+      document.getElementById('support-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeSupportModal() {
+      document.getElementById('support-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+    }
+
+    function filterNovels(cat) {
+      document.querySelectorAll('.filter-tab').forEach(btn => {
+        if (btn.getAttribute('data-cat') === cat) {
+          btn.className = 'filter-tab active px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors bg-purple-900/60 text-purple-200 border border-purple-500/40';
+        } else {
+          btn.className = 'filter-tab px-3.5 py-1.5 text-xs font-medium rounded-md transition-colors text-zinc-400 hover:text-zinc-200';
+        }
+      });
+
+      document.querySelectorAll('.novel-card').forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-category') === cat) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function handleNewsletter(e) {
+      e.preventDefault();
+      const email = document.getElementById('newsletter-email').value;
+      if (email) {
+        document.getElementById('newsletter-form').classList.add('hidden');
+        document.getElementById('newsletter-success').classList.remove('hidden');
+      }
+    }
+
+    let isNotified = false;
+    function toggleNotification() {
+      isNotified = !isNotified;
+      const btn = document.getElementById('notify-btn');
+      const text = document.getElementById('notify-text');
+      const icon = document.getElementById('notify-icon');
+      if (isNotified) {
+        btn.className = 'px-4 py-2.5 rounded-lg text-xs font-medium border border-emerald-500/50 bg-emerald-950/40 text-emerald-300 flex items-center gap-2 transition-all cursor-pointer';
+        text.textContent = 'Notifikasi Aktif (Bab Baru)';
+        icon.className = 'fa-solid fa-check text-emerald-400 text-xs';
+      } else {
+        btn.className = 'px-4 py-2.5 rounded-lg text-xs font-medium border border-zinc-800 bg-zinc-900 text-zinc-300 hover:border-zinc-700 hover:text-white flex items-center gap-2 transition-all cursor-pointer';
+        text.textContent = 'Nyalakan Notifikasi Rilis';
+        icon.className = 'fa-solid fa-bell text-purple-400 text-xs';
+      }
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    function toggleAmbiance() {
+      const btn = document.getElementById('ambiance-btn');
+      const icon = document.getElementById('ambiance-icon');
+      const label = document.getElementById('ambiance-label');
+
+      if (isAmbiancePlaying) {
+        if (noiseNode) {
+          try { noiseNode.stop(); } catch(err){}
+        }
+        if (audioCtx) {
+          try { audioCtx.close(); } catch(err){}
+        }
+        audioCtx = null;
+        noiseNode = null;
+        isAmbiancePlaying = false;
+        icon.className = 'fa-solid fa-volume-xmark';
+        label.textContent = 'Suasana Baca';
+        btn.className = 'p-2 sm:px-3 rounded-lg border border-zinc-800 bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 text-xs font-medium flex items-center gap-2 transition-colors';
+      } else {
+        try {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AudioContextClass();
+          const bufferSize = 2 * audioCtx.sampleRate;
+          const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const output = noiseBuffer.getChannelData(0);
+          let lastOut = 0.0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            output[i] = (lastOut + (0.02 * white)) / 1.02;
+            lastOut = output[i];
+            output[i] *= 3.2;
+          }
+          noiseNode = audioCtx.createBufferSource();
+          noiseNode.buffer = noiseBuffer;
+          noiseNode.loop = true;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.value = 850;
+
+          gainNode = audioCtx.createGain();
+          gainNode.gain.setValueAtTime(0.22, audioCtx.currentTime);
+
+          noiseNode.connect(filter);
+          filter.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          noiseNode.start();
+
+          isAmbiancePlaying = true;
+          icon.className = 'fa-solid fa-volume-high text-purple-400 animate-pulse';
+          label.textContent = 'Suasana Hujan';
+          btn.className = 'p-2 sm:px-3 rounded-lg border border-purple-500/50 bg-purple-950/60 text-purple-300 text-xs font-medium flex items-center gap-2 transition-colors';
+        } catch (e) {
+          alert('Audio ambient diaktifkan!');
+        }
+      }
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeReader();
+        closeSupportModal();
+      }
+    });
+  </script>
+</body>
+</html>

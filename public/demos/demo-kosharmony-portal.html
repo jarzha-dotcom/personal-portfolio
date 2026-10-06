@@ -1,0 +1,1400 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KosHarmony - Tenant Portal Dashboard</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857',
+              900: '#064e3b',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col lg:flex-row selection:bg-emerald-500 selection:text-white">
+
+  <!-- ==================== SIDEBAR NAVIGASI KIRI ==================== -->
+  <aside class="hidden lg:flex w-72 flex-col bg-slate-900 text-slate-200 border-r border-slate-800 shrink-0 select-none">
+    <!-- Brand / Logo KosHarmony -->
+    <div class="p-6 border-b border-slate-800">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-inner">
+          <i class="fa-solid fa-hotel text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-bold text-lg text-white tracking-tight">KosHarmony</span>
+            <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+          </div>
+          <p class="text-[11px] text-slate-400 uppercase tracking-wider font-semibold">Tenant Portal Hub</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Menu Navigasi Utama -->
+    <nav class="p-4 flex-1 space-y-1.5 custom-scrollbar overflow-y-auto">
+      <div class="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
+        Navigasi Penghuni
+      </div>
+
+      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all bg-emerald-600 text-white shadow-sm shadow-emerald-950/40">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-table-columns w-4 text-center"></i>
+          <span>Dashboard</span>
+        </div>
+        <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
+      </button>
+
+      <button onclick="switchTab('tagihan')" id="nav-tagihan" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-receipt w-4 text-center"></i>
+          <span>Tagihan & Pembayaran</span>
+        </div>
+        <span id="sidebar-bill-badge" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30">
+          1 Pending
+        </span>
+      </button>
+
+      <button onclick="switchTab('kerusakan')" id="nav-kerusakan" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-screwdriver-wrench w-4 text-center"></i>
+          <span>Lapor Kerusakan</span>
+        </div>
+        <span id="sidebar-ticket-count" class="text-[11px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
+          1
+        </span>
+      </button>
+
+      <button onclick="switchTab('aturan')" id="nav-aturan" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-book-bookmark w-4 text-center"></i>
+          <span>Aturan & Info Kos</span>
+        </div>
+      </button>
+
+      <button onclick="switchTab('profil')" id="nav-profil" class="nav-item w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:bg-slate-800 hover:text-white">
+        <div class="flex items-center gap-3">
+          <i class="fa-solid fa-user-check w-4 text-center"></i>
+          <span>Profil Penghuni</span>
+        </div>
+      </button>
+    </nav>
+
+    <!-- Informasi Kamar Aktif di Bagian Bawah Sidebar -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/60">
+      <div class="rounded-xl bg-slate-800/80 p-3.5 border border-slate-700/60 transition-all hover:border-slate-600">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+              <i class="fa-solid fa-key text-xs"></i>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white tracking-tight">Kamar 204 - Lantai 2</h4>
+              <p class="text-xs text-slate-400">Tipe Deluxe · Sayap Barat</p>
+            </div>
+          </div>
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20" title="Kamar Aktif"></span>
+        </div>
+
+        <div class="mt-3 pt-2.5 border-t border-slate-700/50 flex items-center justify-between text-[11px] text-slate-300 font-medium">
+          <span>Kontrak Bulanan</span>
+          <span class="font-mono text-emerald-400 font-bold">Rp 1.500.000</span>
+        </div>
+      </div>
+
+      <div class="mt-3 flex items-center justify-between px-1 text-xs text-slate-400">
+        <a href="https://wa.me/6282312312734" target="_blank" class="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+          <i class="fa-brands fa-whatsapp text-emerald-400"></i>
+          <span>Hubungi Pengelola</span>
+        </a>
+        <span class="text-slate-600 font-mono text-[10px]">v2.4</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== HEADER MOBILE ==================== -->
+  <header class="lg:hidden bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-40 px-4 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+        <i class="fa-solid fa-hotel"></i>
+      </div>
+      <div>
+        <span class="font-bold text-base text-white tracking-tight">KosHarmony</span>
+        <span class="text-[10px] text-emerald-400 block -mt-0.5">Kamar 204 (Lantai 2)</span>
+      </div>
+    </div>
+
+    <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-slate-800 text-slate-300 hover:text-white focus:outline-none">
+      <i class="fa-solid fa-bars text-lg"></i>
+    </button>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div id="mobile-drawer" class="hidden lg:hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex flex-col">
+    <div class="bg-slate-900 border-b border-slate-800 p-4 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+          <i class="fa-solid fa-hotel"></i>
+        </div>
+        <span class="font-bold text-base text-white">KosHarmony Hub</span>
+      </div>
+      <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-slate-800 text-slate-300">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+    <div class="p-4 space-y-2 bg-slate-900 flex-1">
+      <button onclick="switchTab('dashboard'); toggleMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold text-slate-200 hover:bg-slate-800">
+        <i class="fa-solid fa-table-columns text-emerald-400"></i>
+        <span>Dashboard</span>
+      </button>
+      <button onclick="switchTab('tagihan'); toggleMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold text-slate-200 hover:bg-slate-800">
+        <i class="fa-solid fa-receipt text-emerald-400"></i>
+        <span>Tagihan & Pembayaran</span>
+      </button>
+      <button onclick="switchTab('kerusakan'); toggleMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold text-slate-200 hover:bg-slate-800">
+        <i class="fa-solid fa-screwdriver-wrench text-emerald-400"></i>
+        <span>Lapor Kerusakan</span>
+      </button>
+      <button onclick="switchTab('aturan'); toggleMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold text-slate-200 hover:bg-slate-800">
+        <i class="fa-solid fa-book-bookmark text-emerald-400"></i>
+        <span>Aturan & Info Kos</span>
+      </button>
+      <button onclick="switchTab('profil'); toggleMobileMenu()" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-semibold text-slate-200 hover:bg-slate-800">
+        <i class="fa-solid fa-user-check text-emerald-400"></i>
+        <span>Profil Penghuni</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== AREA KONTEN UTAMA ==================== -->
+  <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+    <!-- Header Sapaan Penyewa -->
+    <header class="bg-white border-b border-slate-200 px-6 py-5 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-7xl mx-auto w-full">
+        <div>
+          <div class="flex flex-wrap items-center gap-2.5">
+            <h1 class="text-xl lg:text-2xl font-bold text-slate-900 tracking-tight">
+              Halo, Radit Pratama 👋
+            </h1>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+              Kamar 204 - Tipe Deluxe
+            </span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            Selamat datang di Portal Penghuni KosHarmony. Hari ini <span id="current-date-text" class="font-medium text-slate-700">Selasa, 6 Oktober 2026</span>.
+          </p>
+        </div>
+
+        <!-- Profil & Kontak Cepat -->
+        <div class="flex items-center gap-3">
+          <a href="https://wa.me/6282312312734?text=Halo%20Pengelola%20KosHarmony,%20saya%20Radit%20Kamar%20204" target="_blank" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 text-slate-700 bg-white text-xs font-semibold hover:bg-slate-50 transition-colors">
+            <i class="fa-brands fa-whatsapp text-emerald-600 text-sm"></i>
+            <span>CS Pengelola (Pak Rajendra)</span>
+          </a>
+
+          <div class="flex items-center gap-3 pl-2 sm:border-l sm:border-slate-200">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80" alt="Avatar Radit Pratama" class="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500/20 border border-slate-200" referrerpolicy="no-referrer">
+            <div class="hidden xl:block text-left text-xs">
+              <p class="font-bold text-slate-900 leading-tight">Radit Pratama</p>
+              <p class="text-slate-400">Penghuni Aktif</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Container Konten Dinamis Tab -->
+    <div class="p-6 lg:p-8 space-y-8 max-w-7xl w-full mx-auto">
+
+      <!-- ==================== TAB 1: DASHBOARD UTAMA ==================== -->
+      <section id="tab-dashboard" class="space-y-8">
+
+        <!-- 1. BANNER / KARTU STATUS TAGIHAN (SANGAT MENONJOL) -->
+        <div id="billing-hero-card" class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-850 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-slate-800 transition-all">
+          <div class="absolute -right-16 -top-16 w-72 h-72 rounded-full blur-3xl pointer-events-none opacity-20 bg-amber-500" id="billing-hero-glow"></div>
+
+          <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-3">
+              <div class="flex flex-wrap items-center gap-2.5">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Tagihan Sewa Bulan Ini
+                </span>
+                <span class="text-xs text-slate-500">·</span>
+                <span class="text-xs text-slate-300">Periode Oktober 2026</span>
+
+                <!-- Badge Status -->
+                <div id="billing-badge-container">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                    <i class="fa-regular fa-clock"></i>
+                    Belum Lunas / Jatuh Tempo 12 Oktober 2026
+                  </span>
+                </div>
+              </div>
+
+              <!-- Rincian Nominal -->
+              <div class="flex flex-wrap items-baseline gap-3">
+                <span id="billing-nominal-display" class="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-white">
+                  Rp 1.500.000
+                </span>
+                <span id="billing-helper-text" class="text-xs text-slate-400">
+                  Sisa 6 hari lagi sebelum tenggat jatuh tempo
+                </span>
+              </div>
+
+              <!-- Breakdown Ringkas -->
+              <div class="flex flex-wrap items-center gap-y-1 gap-x-4 text-xs text-slate-300 pt-1">
+                <span class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Sewa Kamar: <strong class="font-mono text-white">Rp 1.400.000</strong>
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Iuran Sampah & Kebersihan: <strong class="font-mono text-white">Rp 50.000</strong>
+                </span>
+                <span class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                  Wi-Fi Dedicated 100 Mbps: <strong class="font-mono text-white">Rp 50.000</strong>
+                </span>
+              </div>
+            </div>
+
+            <!-- Tombol Aksi Cepat -->
+            <div id="billing-action-container" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 shrink-0">
+              <button onclick="openPaymentModal()" class="flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/25 active:scale-95">
+                <i class="fa-solid fa-qrcode text-base"></i>
+                <span>Bayar Sekarang via QRIS / Transfer</span>
+              </button>
+              <button onclick="switchTab('tagihan')" class="flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl bg-slate-800 hover:bg-slate-750 text-slate-200 font-semibold text-sm transition-all border border-slate-700">
+                <span>Rincian Tagihan</span>
+                <i class="fa-solid fa-chevron-right text-xs"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. GRID FITUR CEPAT & INFORMASI PENTING (3 KOLOM) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          <!-- KOTAK 1: Info Token Listrik / Wi-Fi -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                    <i class="fa-solid fa-bolt"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Token Listrik Kamar</h3>
+                    <p class="text-xs text-slate-400">PLN Prabayar Kamar 204</p>
+                  </div>
+                </div>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-100">
+                  Normal
+                </span>
+              </div>
+
+              <!-- Meteran PLN -->
+              <div class="mt-4 p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                <div class="text-xs text-slate-500 mb-1">Nomor Meteran / ID Pelanggan:</div>
+                <div class="flex items-center justify-between">
+                  <span id="pln-number" class="font-mono text-base font-bold text-slate-900 tracking-wider">
+                    5421-9082-3114
+                  </span>
+                  <button onclick="copyText('542190823114', 'Nomor Meteran PLN')" class="flex items-center gap-1 px-2.5 py-1 rounded bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold transition-colors">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>Salin</span>
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-2">
+                  Dapat diisi melalui m-Banking (BCA, Mandiri, BRI) atau minimarket.
+                </p>
+              </div>
+
+              <!-- Wi-Fi Kamar -->
+              <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                  <i class="fa-solid fa-wifi text-emerald-600"></i>
+                  <span>Wi-Fi Kamar (Lantai 2)</span>
+                </div>
+                <div class="text-xs space-y-1.5">
+                  <div class="flex items-center justify-between text-slate-600">
+                    <span>SSID:</span>
+                    <span class="font-mono font-semibold text-slate-900">KosHarmony-LT2-HighSpeed</span>
+                  </div>
+                  <div class="flex items-center justify-between text-slate-600">
+                    <span>Password:</span>
+                    <div class="flex items-center gap-1.5">
+                      <span id="wifi-password-display" class="font-mono font-bold text-slate-900">••••••••••••</span>
+                      <button onclick="toggleWifiPassword()" class="text-slate-400 hover:text-slate-600 p-1" title="Tampilkan/Sembunyikan">
+                        <i id="wifi-toggle-icon" class="fa-regular fa-eye"></i>
+                      </button>
+                      <button onclick="copyText('HarmoniKamar204!', 'Password Wi-Fi')" class="text-slate-400 hover:text-emerald-600 p-1" title="Salin Password">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- KOTAK 2: Pengumuman Pengelola Kos -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <i class="fa-solid fa-bullhorn"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Pengumuman Pengelola</h3>
+                    <p class="text-xs text-slate-400">Pemberitahuan resmi pengurus</p>
+                  </div>
+                </div>
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-blue-50 text-blue-700">
+                  Update
+                </span>
+              </div>
+
+              <!-- List Catatan / Pengumuman -->
+              <div class="mt-4 space-y-3.5">
+                <!-- Pengumuman 1 (Tandon Air) -->
+                <div class="p-3.5 rounded-xl bg-amber-50/80 border border-amber-200/80">
+                  <div class="flex items-start gap-2.5">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-sm"></i>
+                    <div>
+                      <h4 class="text-xs font-bold text-amber-950">
+                        Pemberitahuan Pembersihan Tandon Air
+                      </h4>
+                      <p class="text-xs text-amber-900/90 mt-1 leading-relaxed">
+                        Hari <strong>Rabu, 7 Oktober 2026 jam 10.00 WIB</strong> akan dilakukan kuras tandon air utama. Aliran air sementara dimatikan selama 2 jam. Mohon tampung air secukupnya.
+                      </p>
+                      <span class="inline-block mt-2 text-[10px] font-semibold text-amber-800">
+                        Oleh: Pak Rajendra (Manajer Operasional)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pengumuman 2 (Piket Sampah) -->
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                  <div class="font-semibold text-slate-800 flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash-can text-slate-400"></i>
+                    <span>Jadwal Pengambilan Sampah Pagi</span>
+                  </div>
+                  <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">
+                    Petugas kebersihan mengambil sampah setiap hari pukul <strong>08.00 WIB</strong> di depan pintu kamar masing-masing.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <button onclick="switchTab('aturan')" class="text-xs text-emerald-700 font-semibold hover:underline flex items-center gap-1">
+                <span>Buka Seluruh Tata Tertib & Info Kos</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- KOTAK 3: Riwayat Pembayaran Terakhir -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                  </div>
+                  <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Riwayat Pembayaran</h3>
+                    <p class="text-xs text-slate-400">Status Lunas (Verified)</p>
+                  </div>
+                </div>
+                <span class="text-xs font-semibold text-slate-400">3 Bulan Lalu</span>
+              </div>
+
+              <!-- Daftar Ringkas Pembayaran -->
+              <div class="mt-4 divide-y divide-slate-100">
+                <div class="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-bold text-slate-800">September 2026</p>
+                    <p class="text-[11px] text-slate-400">10 Sep 2026 · QRIS BCA</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-bold font-mono text-slate-900 block">Rp 1.500.000</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                      <i class="fa-solid fa-check-circle"></i> Lunas
+                    </span>
+                  </div>
+                </div>
+
+                <div class="py-2.5 flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-bold text-slate-800">Agustus 2026</p>
+                    <p class="text-[11px] text-slate-400">11 Ags 2026 · Transfer Mandiri</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-bold font-mono text-slate-900 block">Rp 1.500.000</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                      <i class="fa-solid fa-check-circle"></i> Lunas
+                    </span>
+                  </div>
+                </div>
+
+                <div class="py-2.5 flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-bold text-slate-800">Juli 2026</p>
+                    <p class="text-[11px] text-slate-400">09 Jul 2026 · QRIS GoPay</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-xs font-bold font-mono text-slate-900 block">Rp 1.500.000</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                      <i class="fa-solid fa-check-circle"></i> Lunas
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-slate-100">
+              <button onclick="switchTab('tagihan')" class="w-full py-2 text-center text-xs font-semibold text-slate-700 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 rounded-xl transition-colors">
+                Lihat Arsip Kuitansi Lengkap
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 3. BAGIAN TIKET PERAWATAN / LAPORAN KERUSAKAN (MAINTENANCE WIDGET) -->
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 lg:p-7">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-bold text-slate-900 tracking-tight">
+                  Tiket Perawatan & Lapor Kerusakan
+                </h2>
+                <span id="ticket-badge-count" class="px-2 py-0.5 rounded text-xs font-bold bg-slate-100 text-slate-600 font-mono">
+                  2 Laporan
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">
+                Pantau proses perbaikan fasilitas kamar atau ajukan permintaan servis ke tim pengelola.
+              </p>
+            </div>
+
+            <!-- Tombol Interaktif Tambah Tiket -->
+            <button onclick="openNewTicketModal()" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold shadow-sm transition-all active:scale-95 shrink-0">
+              <i class="fa-solid fa-plus text-emerald-400"></i>
+              <span>+ Buat Laporan Kerusakan Baru</span>
+            </button>
+          </div>
+
+          <!-- Daftar Laporan Aktif Penghuni -->
+          <div id="tickets-container" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Tiket 1 (Aktif: Sedang Diproses) -->
+            <div class="ticket-card rounded-xl border border-slate-200 p-5 hover:border-slate-300 transition-all bg-white flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-slate-500">TKT-2026-089</span>
+                    <span class="text-slate-300">·</span>
+                    <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                      Plumbing & Air
+                    </span>
+                  </div>
+
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    Sedang Diproses
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900">Keran air wastafel bocor</h4>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Air terus menetes dari leher sambungan keran wastafel kamar mandi meskipun putaran tuas sudah ditutup rapat.
+                  </p>
+                </div>
+
+                <!-- Foto Bukti Terlampir (Unsplash Stabil) -->
+                <div class="flex items-center gap-3 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=200&q=80" alt="Keran Bocor" class="w-14 h-14 rounded-lg object-cover border border-slate-200 shrink-0" referrerpolicy="no-referrer">
+                  <div class="text-xs">
+                    <p class="font-bold text-slate-700">Foto Bukti Kerusakan</p>
+                    <p class="text-slate-400 text-[11px]">Area: Kamar Mandi Dalam</p>
+                  </div>
+                </div>
+
+                <!-- Catatan Teknisi -->
+                <div class="text-xs p-3 rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
+                  <div class="flex items-center gap-1.5 font-bold text-slate-800">
+                    <i class="fa-solid fa-wrench text-slate-400"></i>
+                    <span>Teknisi Ditugaskan: Pak Radit</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-1 italic">
+                    "Sparepart seal karet sudah dibeli. Dijadwalkan pemasangan sore ini pukul 16.30 WIB."
+                  </p>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Dilaporkan: 5 Okt 2026, 14:20 WIB</span>
+                <span class="font-semibold text-slate-600">Prioritas: Normal</span>
+              </div>
+            </div>
+
+            <!-- Tiket 2 (Selesai) -->
+            <div class="ticket-card rounded-xl border border-slate-200 p-5 hover:border-slate-300 transition-all bg-white flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono font-bold text-slate-500">TKT-2026-074</span>
+                    <span class="text-slate-300">·</span>
+                    <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                      AC & Sirkulasi
+                    </span>
+                  </div>
+
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    <i class="fa-solid fa-check-circle text-emerald-600"></i>
+                    Selesai
+                  </span>
+                </div>
+
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900">Pembersihan filter & cuci unit AC berkala</h4>
+                  <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                    Layanan pembersihan saringan udara dan pengecekan freon rutin triwulanan.
+                  </p>
+                </div>
+
+                <div class="text-xs p-3 rounded-xl bg-slate-50 text-slate-600 border border-slate-100">
+                  <div class="flex items-center gap-1.5 font-bold text-slate-800">
+                    <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                    <span>Selesai oleh Mitra Sejuk Dingin</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500 mt-1">
+                    AC telah dicuci tuntas dan hembusan dingin kembali optimal.
+                  </p>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+                <span>Dilaporkan: 22 Sep 2026</span>
+                <span class="font-semibold text-slate-600">Lokasi: Kamar Utama</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. SHOWCASE PROPERTI & KAMAR KOS (UNSPLASH STABIL) -->
+        <div class="bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 text-white p-6 sm:p-8">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div class="lg:col-span-7 space-y-3">
+              <span class="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                Fasilitas Kamar 204
+              </span>
+              <h3 class="text-xl sm:text-2xl font-bold tracking-tight text-white">
+                Kamar Deluxe Studio — Hunian Tenang & Nyaman
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Dilengkapi dengan kasur Queen-size premium, meja kerja luas dengan colokan ergonomis, smart air conditioner, kamar mandi dalam dengan water heater, dan akses smart door lock.
+              </p>
+
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 text-xs">
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-shower text-emerald-400"></i>
+                  <span>K. Mandi Dalam</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-temperature-arrow-up text-emerald-400"></i>
+                  <span>Water Heater</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-snowflake text-emerald-400"></i>
+                  <span>AC Inverter 1 PK</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-laptop text-emerald-400"></i>
+                  <span>Meja & Kursi Kerja</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-wifi text-emerald-400"></i>
+                  <span>Wi-Fi Dedicated</span>
+                </div>
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <i class="fa-solid fa-id-card-clip text-emerald-400"></i>
+                  <span>Smart Access Card</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Galeri Foto Unsplash Stabil -->
+            <div class="lg:col-span-5 grid grid-cols-2 gap-3">
+              <div class="relative overflow-hidden rounded-xl aspect-4/3 group">
+                <img src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80" alt="Interior Kamar Kos" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" referrerpolicy="no-referrer">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-2.5">
+                  <span class="text-[11px] font-semibold text-white">Interior Kamar 204</span>
+                </div>
+              </div>
+              <div class="relative overflow-hidden rounded-xl aspect-4/3 group">
+                <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" alt="Gedung KosHarmony" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" referrerpolicy="no-referrer">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-2.5">
+                  <span class="text-[11px] font-semibold text-white">Gedung KosHarmony</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ==================== TAB 2: TAGIHAN & PEMBAYARAN ==================== -->
+      <section id="tab-tagihan" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Rincian Tagihan & Pembayaran Sewa</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Kelola pembayaran bulanan kamar, lihat nomor rekening resmi, atau unduh arsip kuitansi.
+          </p>
+        </div>
+
+        <!-- Kartu Rekening Resmi KosHarmony -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-sm text-slate-900">Bank Central Asia (BCA)</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">Rekening Resmi</span>
+            </div>
+            <p class="text-xs text-slate-500">Nomor Rekening:</p>
+            <div class="flex items-center justify-between mt-1">
+              <span class="font-mono text-base font-bold text-slate-900">8012-4410-291</span>
+              <button onclick="copyText('80124410291', 'No. Rekening BCA')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> Salin
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">a/n Rajendra Wijaya (Pengelola KosHarmony)</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-sm text-slate-900">Bank Mandiri</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700">Rekening Resmi</span>
+            </div>
+            <p class="text-xs text-slate-500">Nomor Rekening:</p>
+            <div class="flex items-center justify-between mt-1">
+              <span class="font-mono text-base font-bold text-slate-900">1370-0291-8841-2</span>
+              <button onclick="copyText('1370029188412', 'No. Rekening Mandiri')" class="text-xs px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold flex items-center gap-1">
+                <i class="fa-regular fa-copy"></i> Salin
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1">a/n KosHarmony Residence</p>
+          </div>
+        </div>
+
+        <!-- Tabel Riwayat Pembayaran -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-sm text-slate-900">Daftar Kuitansi Elektronik</h3>
+            <span class="text-xs text-slate-400">Semua Data Terverifikasi</span>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="p-4">No. Invoice</th>
+                  <th class="p-4">Periode</th>
+                  <th class="p-4">Nominal</th>
+                  <th class="p-4">Metode Pembayaran</th>
+                  <th class="p-4">Waktu Diterima</th>
+                  <th class="p-4">Status</th>
+                  <th class="p-4 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr class="hover:bg-slate-50/70">
+                  <td class="p-4 font-mono font-bold text-slate-800">KH-INV-202609-0204</td>
+                  <td class="p-4 font-semibold text-slate-900">September 2026</td>
+                  <td class="p-4 font-mono font-bold text-slate-900">Rp 1.500.000</td>
+                  <td class="p-4 text-slate-600">QRIS BCA</td>
+                  <td class="p-4 text-slate-500">10 Sep 2026, 08:35 WIB</td>
+                  <td class="p-4">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      LUNAS
+                    </span>
+                  </td>
+                  <td class="p-4 text-right">
+                    <button onclick="showMockReceipt('KH-INV-202609-0204', 'September 2026')" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold">
+                      Unduh
+                    </button>
+                  </td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="p-4 font-mono font-bold text-slate-800">KH-INV-202608-0204</td>
+                  <td class="p-4 font-semibold text-slate-900">Agustus 2026</td>
+                  <td class="p-4 font-mono font-bold text-slate-900">Rp 1.500.000</td>
+                  <td class="p-4 text-slate-600">Transfer Mandiri</td>
+                  <td class="p-4 text-slate-500">11 Ags 2026, 19:12 WIB</td>
+                  <td class="p-4">
+                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      LUNAS
+                    </span>
+                  </td>
+                  <td class="p-4 text-right">
+                    <button onclick="showMockReceipt('KH-INV-202608-0204', 'Agustus 2026')" class="px-3 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold">
+                      Unduh
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: LAPOR KERUSAKAN ==================== -->
+      <section id="tab-kerusakan" class="hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Pusat Laporan & Perawatan Fasilitas</h2>
+            <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+              Laporkan kerusakan air, listrik, AC, atau fasilitas kos lainnya secara online.
+            </p>
+          </div>
+          <button onclick="openNewTicketModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm">
+            <i class="fa-solid fa-plus"></i>
+            <span>+ Buat Laporan Baru</span>
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="p-5 rounded-2xl bg-white border border-slate-200">
+            <span class="text-xs text-slate-400 font-semibold">Total Laporan Diajukan</span>
+            <div class="text-2xl font-bold font-mono text-slate-900 mt-1">2</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200">
+            <span class="text-xs text-amber-600 font-semibold">Sedang Ditangani Teknisi</span>
+            <div class="text-2xl font-bold font-mono text-amber-600 mt-1">1</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-white border border-slate-200">
+            <span class="text-xs text-emerald-600 font-semibold">Terselesaikan</span>
+            <div class="text-2xl font-bold font-mono text-emerald-600 mt-1">1</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 4: ATURAN & INFO KOS ==================== -->
+      <section id="tab-aturan" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Tata Tertib & Fasilitas Bersama KosHarmony</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Panduan hidup bersama yang aman, tenteram, dan nyaman untuk seluruh penghuni.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+              <i class="fa-solid fa-door-open text-emerald-600 text-base"></i>
+              <h3 class="font-bold text-sm text-slate-900">Akses Pintu & Jam Bertamu</h3>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
+              <li>Pintu gerbang utama dilengkapi smart access card 24 jam penuh untuk penghuni.</li>
+              <li>Tamu lawan jenis hanya diperkenankan di ruang tamu bersama lantai 1 maksimal hingga pukul 21:30 WIB.</li>
+              <li>Keluarga kandung yang bermaksud menginap wajib melapor ke pengelola minimal 1x24 jam sebelumnya.</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+              <i class="fa-solid fa-kitchen-set text-blue-600 text-base"></i>
+              <h3 class="font-bold text-sm text-slate-900">Dapur Bersama & Sampah</h3>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
+              <li>Peralatan memasak wajib langsung dicuci dan dikeringkan setelah dipakai.</li>
+              <li>Wadah makanan di kulkas bersama wajib diberi label nama dan nomor kamar.</li>
+              <li>Sampah harian ditaruh di depan kamar sebelum pukul 08:00 WIB dalam kantong tertutup.</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+              <i class="fa-solid fa-volume-xmark text-amber-600 text-base"></i>
+              <h3 class="font-bold text-sm text-slate-900">Ketenangan & Larangan</h3>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-2 list-disc list-inside leading-relaxed">
+              <li>Dilarang merokok/vape di dalam kamar tidur (tersedia smoking area di balkon dan rooftop).</li>
+              <li>Jaga ketenangan suara musik/obrolan terutama setelah pukul 22:00 WIB.</li>
+              <li>Dilarang membawa hewan peliharaan tanpa izin tertulis dari manajemen kos.</li>
+            </ul>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
+            <div class="flex items-center gap-2.5 pb-3 border-b border-slate-100">
+              <i class="fa-solid fa-phone-volume text-purple-600 text-base"></i>
+              <h3 class="font-bold text-sm text-slate-900">Kontak Darurat Properti</h3>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                <div>
+                  <p class="font-bold text-slate-800">Pak Rajendra (Pengelola Kos)</p>
+                  <p class="text-slate-400 font-mono text-[11px]">0823-1231-2734</p>
+                </div>
+                <a href="https://wa.me/6282312312734" target="_blank" class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold hover:bg-emerald-500">
+                  Chat WA
+                </a>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+                <div>
+                  <p class="font-bold text-slate-800">Pak Radit (Teknisi / Keamanan)</p>
+                  <p class="text-slate-400 font-mono text-[11px]">0823-1231-2734</p>
+                </div>
+                <a href="tel:082312312734" class="px-3 py-1.5 rounded-lg bg-slate-800 text-white font-bold hover:bg-slate-700">
+                  Telepon
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 5: PROFIL PENGHUNI ==================== -->
+      <section id="tab-profil" class="hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900 tracking-tight">Data Profil Penghuni & Kontrak</h2>
+          <p class="text-xs sm:text-sm text-slate-500 mt-0.5">
+            Informasi identitas resmi penyewa dan rincian perjanjian sewa aktif.
+          </p>
+        </div>
+
+        <div class="bg-white rounded-2xl p-6 lg:p-8 border border-slate-200 shadow-sm">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-5 pb-6 border-b border-slate-100">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=200&q=80" alt="Radit Pratama" class="w-20 h-20 rounded-2xl object-cover ring-4 ring-emerald-500/10 border border-slate-200" referrerpolicy="no-referrer">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <h3 class="text-xl font-bold text-slate-900">Radit Pratama</h3>
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  Penghuni Terdaftar
+                </span>
+              </div>
+              <p class="text-xs text-slate-500">KTP NIK: 3271************ · Terverifikasi</p>
+              <p class="text-xs text-slate-500">Pekerjaan: Software Engineer · Jakarta Selatan</p>
+            </div>
+          </div>
+
+          <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div class="space-y-3">
+              <h4 class="font-bold text-sm text-slate-900">Data Hunian & Sewa</h4>
+              <div class="space-y-2 border-t border-slate-100 pt-2">
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Nomor Kamar:</span>
+                  <span class="font-bold text-slate-800">Kamar 204 (Lantai 2)</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Tipe Kamar:</span>
+                  <span class="font-bold text-slate-800">Deluxe Studio</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Masa Kontrak:</span>
+                  <span class="font-bold text-emerald-700">1 Feb 2026 - 31 Jan 2027</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Deposit Jaminan:</span>
+                  <span class="font-mono font-bold text-slate-800">Rp 1.000.000</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-3">
+              <h4 class="font-bold text-sm text-slate-900">Kontak & Kendaraan</h4>
+              <div class="space-y-2 border-t border-slate-100 pt-2">
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">WhatsApp:</span>
+                  <span class="font-mono font-bold text-slate-800">0823-1231-2734</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Kendaraan:</span>
+                  <span class="font-bold text-slate-800">Honda Vario 160 (B 4219 KZX)</span>
+                </div>
+                <div class="flex justify-between py-1 border-b border-slate-50">
+                  <span class="text-slate-500">Slot Parkir:</span>
+                  <span class="font-bold text-slate-800">Slot M-14 (Area Timur)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- ==================== MODAL BAYAR SEKARANG (QRIS / TRANSFER) ==================== -->
+  <div id="payment-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closePaymentModal()" class="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 bg-slate-100 transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <!-- View 1: Pilihan Metode -->
+      <div id="payment-view-options" class="space-y-5">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Bayar Tagihan Sewa</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Periode Oktober 2026 · Kamar 204</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+          <span class="text-xs text-slate-600 font-medium">Total yang harus dibayar:</span>
+          <span class="text-xl font-bold font-mono text-emerald-600">Rp 1.500.000</span>
+        </div>
+
+        <div class="space-y-3">
+          <button onclick="showPaymentQRIS()" class="w-full p-4 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/30 flex items-center justify-between transition-all group text-left">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                <i class="fa-solid fa-qrcode text-lg"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-slate-900 group-hover:text-emerald-700">QRIS (Instant Otomatis)</p>
+                <p class="text-xs text-slate-500">Scan via BCA, GoPay, OVO, ShopeePay, Dana</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-emerald-600"></i>
+          </button>
+
+          <button onclick="showPaymentVA()" class="w-full p-4 rounded-xl border border-slate-200 hover:border-emerald-500 hover:bg-emerald-50/30 flex items-center justify-between transition-all group text-left">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                <i class="fa-regular fa-credit-card text-lg"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-slate-900 group-hover:text-emerald-700">Transfer Virtual Account</p>
+                <p class="text-xs text-slate-500">BCA, Mandiri, BRI, BNI Virtual Account</p>
+              </div>
+            </div>
+            <i class="fa-solid fa-chevron-right text-slate-400 group-hover:text-emerald-600"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- View 2: Scan QRIS -->
+      <div id="payment-view-qris" class="hidden space-y-5 text-center">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Scan QRIS KosHarmony</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Buka aplikasi mobile banking atau e-wallet pilihan Anda</p>
+        </div>
+
+        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block mx-auto">
+          <div class="bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center">
+            <div class="w-44 h-44 bg-slate-900 rounded-lg p-2 flex items-center justify-center">
+              <div class="w-full h-full bg-white rounded flex items-center justify-center p-2 relative">
+                <div class="grid grid-cols-6 gap-1 w-full h-full p-1 border-2 border-slate-900">
+                  <div class="bg-slate-900 rounded-[2px]"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div>
+                  <div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-slate-900 rounded-[2px]"></div>
+                  <div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-white"></div>
+                  <div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-slate-900 rounded-[2px]"></div>
+                  <div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-white"></div>
+                  <div class="bg-slate-900 rounded-[2px]"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div><div class="bg-white"></div><div class="bg-slate-900 rounded-[2px]"></div>
+                </div>
+                <div class="absolute inset-0 m-auto w-9 h-9 rounded bg-white border border-slate-300 flex items-center justify-center text-emerald-600">
+                  <i class="fa-solid fa-hotel"></i>
+                </div>
+              </div>
+            </div>
+            <span class="text-xs font-bold text-slate-800 mt-2.5">NMID: ID1029384759281</span>
+            <span class="text-[11px] text-slate-400">KosHarmony Residence Jakarta</span>
+          </div>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between text-left text-xs">
+          <div>
+            <span class="text-slate-500 block">Total Pembayaran:</span>
+            <span class="font-mono text-base font-bold text-slate-900">Rp 1.500.000</span>
+          </div>
+          <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded">
+            Bebas Admin
+          </span>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="backToPaymentOptions()" class="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">
+            Kembali
+          </button>
+          <button onclick="simulatePaymentSuccess()" class="flex-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md">
+            Konfirmasi Telah Membayar
+          </button>
+        </div>
+      </div>
+
+      <!-- View 3: Virtual Account -->
+      <div id="payment-view-va" class="hidden space-y-5">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Transfer Virtual Account</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Salin nomor VA dan bayar sebelum batas waktu</p>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 space-y-3">
+          <div class="text-xs text-slate-500">Nomor BCA Virtual Account:</div>
+          <div class="flex items-center justify-between">
+            <span class="font-mono text-lg font-bold text-slate-900">8277-0204-1500-0000</span>
+            <button onclick="copyText('8277020415000000', 'Nomor Virtual Account')" class="px-2.5 py-1 text-xs font-semibold bg-white border border-slate-200 rounded-lg hover:bg-slate-100 flex items-center gap-1">
+              <i class="fa-regular fa-copy"></i> Salin
+            </button>
+          </div>
+          <p class="text-[11px] text-slate-400">Atas Nama: <strong>KosHarmony - Radit Pratama</strong></p>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="backToPaymentOptions()" class="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">
+            Kembali
+          </button>
+          <button onclick="simulatePaymentSuccess()" class="flex-2 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-md">
+            Konfirmasi Telah Transfer
+          </button>
+        </div>
+      </div>
+
+      <!-- View 4: Berhasil / Lunas -->
+      <div id="payment-view-success" class="hidden text-center py-4 space-y-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto ring-8 ring-emerald-50">
+          <i class="fa-solid fa-check text-2xl"></i>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-slate-900">Pembayaran Berhasil!</h3>
+          <p class="text-xs text-slate-500 mt-1">
+            Status tagihan bulan Oktober 2026 Anda kini telah Lunas & Terverifikasi.
+          </p>
+        </div>
+
+        <button onclick="closePaymentModal()" class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors">
+          Kembali ke Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL FORM BUAT LAPORAN KERUSAKAN ==================== -->
+  <div id="ticket-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeNewTicketModal()" class="absolute top-5 right-5 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 bg-slate-100 transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="mb-5">
+        <h3 class="text-lg font-bold text-slate-900">Buat Laporan Kerusakan Baru</h3>
+        <p class="text-xs text-slate-500 mt-0.5">
+          Kamar 204 · Teknisi bertugas setiap hari pukul 08.00 - 18.00 WIB
+        </p>
+      </div>
+
+      <form onsubmit="handleFormNewTicket(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Pilih Kategori Kerusakan</label>
+          <select id="form-category" class="w-full text-xs p-3 rounded-xl border border-slate-200 bg-white focus:outline-emerald-500 text-slate-800">
+            <option value="Plumbing & Air">Plumbing & Pipa Air (Keran, Wastafel, Kloset, Bocor)</option>
+            <option value="Kelistrikan">Kelistrikan & Saklar (Lampu Mati, MCB, Colokan)</option>
+            <option value="AC & Sirkulasi">AC & Sirkulasi (AC Kurang Dingin, Menetes, Remote)</option>
+            <option value="Pintu & Kunci">Pintu & Kunci (Smart Door Lock, Gagang, Engsel)</option>
+            <option value="Furnitur & Lainnya">Furnitur, Plafon & Dinding</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Judul Kerusakan</label>
+          <input type="text" id="form-title" required placeholder="Contoh: Saluran pembuangan shower tersumbat" class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-emerald-500 text-slate-800">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Keterangan & Gejala Kerusakan</label>
+          <textarea id="form-desc" rows="3" required placeholder="Jelaskan secara singkat letak dan kondisi kerusakan agar teknisi siap membawa peralatan..." class="w-full text-xs p-3 rounded-xl border border-slate-200 focus:outline-emerald-500 text-slate-800"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Unggah Foto Bukti (Opsional)</label>
+          <div class="p-3.5 rounded-xl border border-dashed border-slate-300 bg-slate-50 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=150&q=80" alt="Sample" class="w-12 h-12 rounded-lg object-cover border border-slate-200" referrerpolicy="no-referrer">
+              <div class="text-xs">
+                <p class="font-bold text-slate-700">Foto Siap Dilampirkan</p>
+                <p class="text-[11px] text-slate-400">Format JPG/PNG (Maks 5 MB)</p>
+              </div>
+            </div>
+            <span class="text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-1 rounded">
+              Lampiran Siap
+            </span>
+          </div>
+        </div>
+
+        <div class="pt-3 flex gap-3">
+          <button type="button" onclick="closeNewTicketModal()" class="flex-1 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs">
+            Batal
+          </button>
+          <button type="submit" class="flex-2 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md">
+            Kirim Laporan Kerusakan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notifikasi Ringan -->
+  <div id="toast" class="hidden fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-2.5 text-xs font-semibold">
+    <i class="fa-solid fa-circle-check text-emerald-400"></i>
+    <span id="toast-text">Teks berhasil disalin!</span>
+  </div>
+
+  <!-- ==================== LOGIKA JAVASCRIPT STANDALONE ==================== -->
+  <script>
+    // Tab switching
+    function switchTab(tabName) {
+      const tabs = ['dashboard', 'tagihan', 'kerusakan', 'aturan', 'profil'];
+      tabs.forEach(t => {
+        const el = document.getElementById('tab-' + t);
+        const nav = document.getElementById('nav-' + t);
+        if (el) el.classList.add('hidden');
+        if (nav) {
+          nav.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm', 'shadow-emerald-950/40');
+          nav.classList.add('text-slate-300');
+        }
+      });
+
+      const activeEl = document.getElementById('tab-' + tabName);
+      const activeNav = document.getElementById('nav-' + tabName);
+      if (activeEl) activeEl.classList.remove('hidden');
+      if (activeNav) {
+        activeNav.classList.remove('text-slate-300');
+        activeNav.classList.add('bg-emerald-600', 'text-white', 'shadow-sm', 'shadow-emerald-950/40');
+      }
+    }
+
+    // Toggle Mobile Drawer
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobile-drawer');
+      drawer.classList.toggle('hidden');
+    }
+
+    // Copy to clipboard with toast
+    function copyText(text, label) {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast(label + ' berhasil disalin ke clipboard!');
+      }).catch(() => {
+        showToast(label + ' berhasil disalin!');
+      });
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastText = document.getElementById('toast-text');
+      toastText.innerText = message;
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2500);
+    }
+
+    // Wi-Fi Password Toggle
+    let wifiVisible = false;
+    function toggleWifiPassword() {
+      wifiVisible = !wifiVisible;
+      const display = document.getElementById('wifi-password-display');
+      const icon = document.getElementById('wifi-toggle-icon');
+      if (wifiVisible) {
+        display.innerText = 'HarmoniKamar204!';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        display.innerText = '••••••••••••';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+
+    // Payment Modal Functions
+    function openPaymentModal() {
+      document.getElementById('payment-modal').classList.remove('hidden');
+      backToPaymentOptions();
+    }
+    function closePaymentModal() {
+      document.getElementById('payment-modal').classList.add('hidden');
+    }
+    function backToPaymentOptions() {
+      document.getElementById('payment-view-options').classList.remove('hidden');
+      document.getElementById('payment-view-qris').classList.add('hidden');
+      document.getElementById('payment-view-va').classList.add('hidden');
+      document.getElementById('payment-view-success').classList.add('hidden');
+    }
+    function showPaymentQRIS() {
+      document.getElementById('payment-view-options').classList.add('hidden');
+      document.getElementById('payment-view-qris').classList.remove('hidden');
+    }
+    function showPaymentVA() {
+      document.getElementById('payment-view-options').classList.add('hidden');
+      document.getElementById('payment-view-va').classList.remove('hidden');
+    }
+    function simulatePaymentSuccess() {
+      document.getElementById('payment-view-qris').classList.add('hidden');
+      document.getElementById('payment-view-va').classList.add('hidden');
+      document.getElementById('payment-view-success').classList.remove('hidden');
+
+      // Update UI Banner to LUNAS
+      const badgeContainer = document.getElementById('billing-badge-container');
+      badgeContainer.innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+          <i class="fa-solid fa-circle-check"></i>
+          Lunas (Verified)
+        </span>
+      `;
+
+      document.getElementById('billing-helper-text').innerText = 'Terbayar pada 06 Okt 2026, 10:14 WIB';
+      document.getElementById('billing-action-container').innerHTML = `
+        <button onclick="showToast('Kuitansi resmi telah diunduh dalam format PDF.')" class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition-all border border-white/10">
+          <i class="fa-solid fa-file-invoice text-emerald-400"></i>
+          <span>Unduh Kuitansi Lunas</span>
+        </button>
+      `;
+
+      const sidebarBadge = document.getElementById('sidebar-bill-badge');
+      if (sidebarBadge) {
+        sidebarBadge.classList.remove('bg-amber-400/20', 'text-amber-300', 'border-amber-400/30');
+        sidebarBadge.classList.add('bg-emerald-400/20', 'text-emerald-300', 'border-emerald-400/30');
+        sidebarBadge.innerText = 'Lunas';
+      }
+    }
+
+    // New Ticket Modal Functions
+    function openNewTicketModal() {
+      document.getElementById('ticket-modal').classList.remove('hidden');
+    }
+    function closeNewTicketModal() {
+      document.getElementById('ticket-modal').classList.add('hidden');
+    }
+
+    function handleFormNewTicket(e) {
+      e.preventDefault();
+      const title = document.getElementById('form-title').value;
+      const category = document.getElementById('form-category').value;
+      const desc = document.getElementById('form-desc').value;
+
+      if (!title) return;
+
+      const newId = 'TKT-2026-' + Math.floor(100 + Math.random() * 900);
+      const container = document.getElementById('tickets-container');
+
+      const card = document.createElement('div');
+      card.className = 'ticket-card rounded-xl border border-slate-200 p-5 hover:border-slate-300 transition-all bg-white flex flex-col justify-between space-y-4';
+      card.innerHTML = `
+        <div class="space-y-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold text-slate-500">${newId}</span>
+              <span class="text-slate-300">·</span>
+              <span class="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-0.5 rounded">${category}</span>
+            </div>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+              <i class="fa-regular fa-clock text-slate-500"></i> Menunggu Konfirmasi
+            </span>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-slate-900">${title}</h4>
+            <p class="text-xs text-slate-500 mt-1 leading-relaxed">${desc}</p>
+          </div>
+        </div>
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <span>Dilaporkan: Baru Saja</span>
+          <span class="font-semibold text-slate-600">Lokasi: Kamar 204</span>
+        </div>
+      `;
+
+      container.insertBefore(card, container.firstChild);
+      closeNewTicketModal();
+      showToast('Laporan kerusakan ' + newId + ' berhasil dikirim ke pengelola!');
+    }
+
+    function showMockReceipt(invNo, period) {
+      showToast('Kuitansi ' + invNo + ' (' + period + ') sedang diunduh...');
+    }
+  </script>
+</body>
+</html>

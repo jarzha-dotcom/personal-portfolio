@@ -1,0 +1,697 @@
+﻿<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<style>
+/* jz-wm: copyright watermark — jangan dihapus */
+#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
+#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
+</style>
+<script>
+(function(){
+  var ID='__jzwm',LABEL='© Demo · arzhaning.my.id';
+  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode(' '+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
+  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
+  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
+  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
+  (function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+})();
+</script>
+<!-- @jz-wm-end -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Resmi Penulis Mandiri - K. Arzhaning Jagad</title>
+  <meta name="description" content="Website resmi dan landing page buku penulis mandiri K. Arzhaning Jagad. Temukan novel best-seller, cuplikan bab gratis, dan esai sastra.">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Playfair Display, Newsreader & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            editorial: ['"Newsreader"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Efek Buku 3D Realistis */
+    .perspective-1000 {
+      perspective: 1200px;
+    }
+    .book-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .book-3d:hover {
+      transform: rotateY(-14deg) rotateX(4deg) translateY(-8px);
+    }
+    .book-spine-shine {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 24px;
+      background: linear-gradient(to right, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.05) 50%, rgba(0,0,0,0.25) 100%);
+      pointer-events: none;
+    }
+    .book-edge {
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      right: -10px;
+      width: 12px;
+      background: repeating-linear-gradient(to right, #f4efe6, #f4efe6 1px, #e8dfd2 1px, #e8dfd2 2px);
+      border-radius: 0 3px 3px 0;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.15);
+      transform: skewY(5deg);
+    }
+    .reader-scroll::-webkit-scrollbar {
+      width: 6px;
+    }
+    .reader-scroll::-webkit-scrollbar-thumb {
+      background: rgba(160, 160, 160, 0.3);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-[#FAF8F5] text-stone-900 dark:bg-[#121110] dark:text-stone-100 font-sans transition-colors duration-300 antialiased selection:bg-amber-200 selection:text-amber-950">
+
+  <!-- Header & Sticky Navbar -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-[#FAF8F5]/90 dark:bg-[#121110]/90 border-b border-stone-200 dark:border-stone-800 transition-colors">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <!-- Nama Pena Penulis -->
+      <a href="#" class="font-serif text-2xl font-bold tracking-tight text-stone-900 dark:text-stone-100 flex items-center gap-2 group">
+        <i class="fa-solid fa-feather-pointed text-amber-700 dark:text-amber-400 group-hover:rotate-12 transition-transform"></i>
+        <span>K. Arzhaning Jagad</span>
+      </a>
+
+      <!-- Menu Navigasi Desktop -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600 dark:text-stone-300">
+        <a href="#tentang" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Tentang Saya</a>
+        <a href="#buku" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Karya Buku</a>
+        <a href="#newsletter" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Bab Sampel & Hadiah</a>
+        <a href="#ulasan" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Ulasan Pembaca</a>
+        <a href="#jurnal" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Jurnal Penulis</a>
+        <a href="#kontak" class="hover:text-amber-800 dark:hover:text-amber-400 transition-colors">Kontak</a>
+      </nav>
+
+      <!-- Action Area: Dark Mode Toggle & CTA -->
+      <div class="flex items-center gap-3">
+        <button id="themeToggle" class="p-2.5 rounded-full text-stone-700 dark:text-stone-200 hover:bg-stone-200/70 dark:hover:bg-stone-800 transition" aria-label="Ganti Mode Tampilan" title="Ganti Mode Terang / Gelap">
+          <i class="fa-solid fa-moon text-stone-700 dark:hidden text-sm"></i>
+          <i class="fa-solid fa-sun text-amber-400 hidden dark:inline text-sm"></i>
+        </button>
+
+        <a href="#buku" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 bg-stone-900 hover:bg-amber-800 text-white dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 text-xs font-semibold rounded-lg transition shadow-sm">
+          <i class="fa-solid fa-bag-shopping"></i>
+          <span>Beli Buku Terbaru</span>
+        </a>
+
+        <!-- Hamburger Menu Button -->
+        <button id="mobileMenuBtn" class="md:hidden p-2 text-stone-700 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-stone-800 rounded-lg">
+          <i class="fa-solid fa-bars text-lg"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Dropdown Menu -->
+    <div id="mobileMenu" class="hidden md:hidden border-b border-stone-200 dark:border-stone-800 bg-[#FAF8F5] dark:bg-[#121110] px-6 py-4 space-y-3">
+      <a href="#tentang" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Tentang Saya</a>
+      <a href="#buku" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Karya Buku</a>
+      <a href="#newsletter" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Bab Sampel & Hadiah</a>
+      <a href="#ulasan" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Ulasan Pembaca</a>
+      <a href="#jurnal" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Jurnal Penulis</a>
+      <a href="#kontak" class="block py-2 text-stone-700 dark:text-stone-200 font-medium hover:text-amber-700">Kontak</a>
+    </div>
+  </header>
+
+  <!-- Hero Section (Split Screen) -->
+  <section class="relative overflow-hidden pt-12 pb-20 md:py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <!-- Kolom Kiri -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-medium bg-amber-100 dark:bg-amber-950/70 text-amber-900 dark:text-amber-300 border border-amber-300/40 dark:border-amber-800/60">
+            <i class="fa-solid fa-bookmark text-amber-700 dark:text-amber-400"></i>
+            <span>Penulis Best-Seller Indie · Koleksi Karya 2026</span>
+          </div>
+
+          <h1 class="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-stone-950 dark:text-stone-50 leading-[1.12]" style="text-wrap: balance;">
+            Menghidupkan Imajinasi Lewat Kata-Kata yang Menembus Jiwa.
+          </h1>
+
+          <p class="text-lg text-stone-600 dark:text-stone-300 font-editorial leading-relaxed max-w-2xl">
+            Menjelajahi batas antara misteri pikiran manusia, keajaiban yang tersembunyi di sudut kota, dan takdir yang bertaut dalam sunyi. Membawa pembaca menyelami kisah-kisah yang membekas lama setelah halaman terakhir ditutup.
+          </p>
+
+          <div class="flex flex-wrap items-center gap-4 pt-2">
+            <button onclick="openBookStore('Bayang di Ujung Senja', 'Rp 98.000', 'Misteri Psikologis')" class="px-6 py-3.5 bg-stone-950 hover:bg-amber-800 text-white dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 font-semibold rounded-xl shadow-md transition flex items-center gap-2 group cursor-pointer">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>Beli Buku Terbaru</span>
+              <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+            </button>
+            <button onclick="openSampleReader(0)" class="px-6 py-3.5 border border-stone-300 dark:border-stone-700 hover:border-amber-800 dark:hover:border-amber-400 text-stone-800 dark:text-stone-200 font-semibold rounded-xl transition flex items-center gap-2 bg-white/60 dark:bg-stone-900/60 cursor-pointer">
+              <i class="fa-solid fa-book-open text-amber-700 dark:text-amber-400"></i>
+              <span>Baca Bab Sampel Gratis</span>
+            </button>
+          </div>
+
+          <!-- Social Proof Bar -->
+          <div class="pt-8 border-t border-stone-200 dark:border-stone-800 flex flex-wrap items-center gap-6 text-sm text-stone-600 dark:text-stone-400">
+            <div class="flex items-center gap-2">
+              <div class="text-amber-500 flex gap-0.5">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+              </div>
+              <span class="font-semibold text-stone-900 dark:text-stone-200">4.9 / 5</span>
+              <span class="text-xs">di Goodreads</span>
+            </div>
+            <span>·</span>
+            <div class="font-medium text-stone-700 dark:text-stone-300">18.000+ Eksemplar Terjual</div>
+            <span>·</span>
+            <div>3x Cetak Ulang Nasional</div>
+          </div>
+        </div>
+
+        <!-- Kolom Kanan: Visual Mockup 3D Buku -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+          <div class="perspective-1000 relative">
+            <div class="book-3d relative w-64 sm:w-72 rounded-r-xl shadow-2xl cursor-pointer group" onclick="openSampleReader(0)">
+              <div class="relative overflow-hidden rounded-r-xl border border-stone-800/40 bg-stone-950 aspect-[3/4]">
+                <img
+                  src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=800&q=80"
+                  alt="Bayang di Ujung Senja"
+                  class="w-full h-full object-cover rounded-r-xl shadow-inner"
+                />
+                <div class="book-spine-shine"></div>
+                <div class="book-edge"></div>
+                <!-- Gradient Text Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-stone-950/90 via-transparent to-transparent flex flex-col justify-end p-5 text-white">
+                  <span class="text-[11px] uppercase tracking-widest text-amber-300 font-semibold mb-1">Terbaru · Best Seller</span>
+                  <h3 class="font-serif text-xl font-bold leading-tight">Bayang di Ujung Senja</h3>
+                  <p class="text-xs text-stone-300 mt-1 line-clamp-1">Misteri Psikologis · 384 Halaman</p>
+                </div>
+              </div>
+              <!-- Bookmark Ribbon -->
+              <div class="absolute -top-2 right-6 w-5 h-12 bg-amber-600 shadow-md flex items-end justify-center pb-1">
+                <div class="w-0 h-0 border-x-4 border-x-transparent border-b-4 border-b-white"></div>
+              </div>
+            </div>
+
+            <div class="mt-8 flex items-center justify-center gap-3">
+              <button onclick="openSampleReader(0)" class="px-4 py-2 text-xs font-semibold bg-stone-900 text-white dark:bg-stone-800 hover:bg-amber-800 rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-book-open text-amber-400"></i>
+                <span>Buka Cuplikan Bab</span>
+              </button>
+              <button onclick="openBookStore('Bayang di Ujung Senja', 'Rp 98.000', 'Misteri Psikologis')" class="px-4 py-2 text-xs font-semibold bg-amber-600 hover:bg-amber-500 text-white rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-bag-shopping"></i>
+                <span>Beli Rp 98.000</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tentang Penulis Section (Author Bio) -->
+  <section id="tentang" class="py-20 bg-stone-100/70 dark:bg-stone-900/40 border-y border-stone-200 dark:border-stone-800">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Foto Profil Penulis -->
+        <div class="lg:col-span-5 flex justify-center">
+          <div class="relative w-72 h-72 sm:w-84 sm:h-84 rounded-2xl overflow-hidden shadow-xl border-4 border-white dark:border-stone-800 bg-stone-200">
+            <img
+              src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+              alt="K. Arzhaning Jagad di ruang kerjanya"
+              class="w-full h-full object-cover"
+            />
+            <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-stone-950/80 to-transparent p-4 text-white text-center">
+              <p class="font-serif text-sm font-bold">K. Arzhaning Jagad</p>
+              <p class="text-[11px] text-amber-300">Yogyakarta, Indonesia</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Narasi & Filosofi -->
+        <div class="lg:col-span-7 space-y-6">
+          <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+            <i class="fa-solid fa-feather"></i>
+            <span>Tentang Sang Penulis</span>
+          </div>
+
+          <h2 class="font-serif text-3xl sm:text-4xl font-bold text-stone-950 dark:text-stone-50 leading-tight">
+            Menemukan Keabadian di Sela Kalimat yang Bersahaja
+          </h2>
+
+          <div class="space-y-4 text-stone-700 dark:text-stone-300 font-editorial text-lg leading-relaxed">
+            <p>
+              Halo, saya Arzan. Saya percaya bahwa setiap cerita yang baik berawal dari sebuah pertanyaan yang enggan dijawab oleh kenyataan sehari-hari. Sejak pertama kali menulis di bangku kuliah sastra di Yogyakarta, saya terpikat pada bagaimana kata-kata dapat menyembuhkan duka yang tak terucapkan.
+            </p>
+            <p>
+              Sebagai penulis mandiri (independent author), saya mengontrol setiap aspek karya saya—mulai dari riset lapangan berbulan-bulan, pemilihan kertas buku fisik yang ramah mata, hingga rancangan tata letak yang memberi ruang bagi napas pembaca.
+            </p>
+          </div>
+
+          <!-- Personal Quote Card -->
+          <div class="p-6 rounded-2xl bg-amber-50/90 dark:bg-stone-800/80 border border-amber-200/60 dark:border-stone-700 relative">
+            <i class="fa-solid fa-quote-left text-3xl text-amber-600/30 absolute top-4 right-4"></i>
+            <p class="font-serif italic text-lg sm:text-xl text-stone-900 dark:text-stone-100 leading-snug">
+              "Menulis adalah cara kita berbicara tanpa menyela kesunyian orang lain. Bila sebuah kalimat mampu memeluk hatimu di malam hari, maka tugas saya telah purna."
+            </p>
+            <div class="mt-3 text-xs font-semibold text-amber-800 dark:text-amber-400">
+              — Filosofi Menulis K. Arzhaning Jagad
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Etalase Karya Buku (Books Showcase) -->
+  <section id="buku" class="py-24 max-w-7xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 block mb-2">
+          Katalog Novel Resmi
+        </span>
+        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-stone-950 dark:text-stone-50">
+          Etalase Karya Buku Pilihan
+        </h2>
+        <p class="text-stone-600 dark:text-stone-400 mt-2 font-editorial text-lg max-w-xl">
+          Setiap buku dicetak dengan standar mutu tinggi dan juga tersedia dalam format digital untuk berbagai aplikasi e-reader.
+        </p>
+      </div>
+    </div>
+
+    <!-- Grid 3 Buku -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Buku 1: Terbaru / Best Seller -->
+      <div class="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between">
+        <div class="aspect-[3/4] bg-stone-950 overflow-hidden relative cursor-pointer group" onclick="openSampleReader(0)">
+          <img
+            src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=800&q=80"
+            alt="Bayang di Ujung Senja"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <span class="absolute top-3 right-3 text-[11px] font-bold uppercase px-3 py-1 bg-amber-600/90 backdrop-blur-md text-white rounded-full shadow">Terbaru · Best Seller</span>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs text-stone-500 font-medium">Misteri Psikologis · 384 Halaman</span>
+            <h3 class="font-serif text-2xl font-bold text-stone-900 dark:text-stone-100">Bayang di Ujung Senja</h3>
+          </div>
+          <p class="text-sm font-editorial text-stone-600 dark:text-stone-300 leading-relaxed">
+            Sebuah mercusuar terbengkalai di pesisir barat Jawa menyimpan catatan harian penjaga yang lenyap 20 tahun silam. Batas antara ilusi masa lalu dan kejahatan nyata mulai mengabur.
+          </p>
+          <div class="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs font-semibold">
+            <span>Cetak: Rp 98.000</span>
+            <span class="text-amber-700 dark:text-amber-400">E-Book: Rp 69.000</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <button onclick="openSampleReader(0)" class="py-2.5 px-3 rounded-lg border border-stone-300 dark:border-stone-700 text-xs font-semibold hover:border-stone-900 dark:hover:border-stone-300 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-book-open text-amber-600"></i>
+              <span>Baca Sampel</span>
+            </button>
+            <button onclick="openBookStore('Bayang di Ujung Senja', 'Rp 98.000', 'Misteri Psikologis')" class="py-2.5 px-3 rounded-lg bg-stone-900 hover:bg-amber-800 dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>Beli Buku</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buku 2 -->
+      <div class="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between">
+        <div class="aspect-[3/4] bg-stone-950 overflow-hidden relative cursor-pointer group" onclick="openSampleReader(1)">
+          <img
+            src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=800&q=80"
+            alt="Kala Hujan Berhenti"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <span class="absolute top-3 right-3 text-[11px] font-bold uppercase px-3 py-1 bg-teal-700/90 backdrop-blur-md text-white rounded-full shadow">Pilihan Pembaca 2025</span>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs text-stone-500 font-medium">Realisme & Romansa · 312 Halaman</span>
+            <h3 class="font-serif text-2xl font-bold text-stone-900 dark:text-stone-100">Kala Hujan Berhenti</h3>
+          </div>
+          <p class="text-sm font-editorial text-stone-600 dark:text-stone-300 leading-relaxed">
+            Dua orang asing terjebak dalam badai petir di sebuah kedai buku barang antik di Jalan Braga. Di antara aroma kertas tua dan teh melati hangat, mereka belajar memeluk luka lama.
+          </p>
+          <div class="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs font-semibold">
+            <span>Cetak: Rp 88.000</span>
+            <span class="text-amber-700 dark:text-amber-400">E-Book: Rp 59.000</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <button onclick="openSampleReader(1)" class="py-2.5 px-3 rounded-lg border border-stone-300 dark:border-stone-700 text-xs font-semibold hover:border-stone-900 dark:hover:border-stone-300 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-book-open text-amber-600"></i>
+              <span>Baca Sampel</span>
+            </button>
+            <button onclick="openBookStore('Kala Hujan Berhenti', 'Rp 88.000', 'Realisme & Romansa')" class="py-2.5 px-3 rounded-lg bg-stone-900 hover:bg-amber-800 dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>Beli Buku</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buku 3 -->
+      <div class="rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 overflow-hidden shadow-sm hover:shadow-xl transition-all flex flex-col justify-between">
+        <div class="aspect-[3/4] bg-stone-950 overflow-hidden relative cursor-pointer group" onclick="openSampleReader(2)">
+          <img
+            src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=800&q=80"
+            alt="Kronika Kota Kaca"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+          <span class="absolute top-3 right-3 text-[11px] font-bold uppercase px-3 py-1 bg-purple-700/90 backdrop-blur-md text-white rounded-full shadow">Nomine Karya Terbaik</span>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="space-y-1">
+            <span class="text-xs text-stone-500 font-medium">Fantasi Magis · 440 Halaman</span>
+            <h3 class="font-serif text-2xl font-bold text-stone-900 dark:text-stone-100">Kronika Kota Kaca</h3>
+          </div>
+          <p class="text-sm font-editorial text-stone-600 dark:text-stone-300 leading-relaxed">
+            Di kota kubah kristal kuno, bayangan manusia mencuri memori pemiliknya setiap mentari terbenam. Hanya seorang pembuat jam buta yang tahu cara memutar balik waktu.
+          </p>
+          <div class="pt-4 border-t border-stone-100 dark:border-stone-800 flex items-center justify-between text-xs font-semibold">
+            <span>Cetak: Rp 108.000</span>
+            <span class="text-amber-700 dark:text-amber-400">E-Book: Rp 75.000</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 pt-2">
+            <button onclick="openSampleReader(2)" class="py-2.5 px-3 rounded-lg border border-stone-300 dark:border-stone-700 text-xs font-semibold hover:border-stone-900 dark:hover:border-stone-300 transition flex items-center justify-center gap-1.5 cursor-pointer">
+              <i class="fa-solid fa-book-open text-amber-600"></i>
+              <span>Baca Sampel</span>
+            </button>
+            <button onclick="openBookStore('Kronika Kota Kaca', 'Rp 108.000', 'Fantasi Magis')" class="py-2.5 px-3 rounded-lg bg-stone-900 hover:bg-amber-800 dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 text-white text-xs font-semibold transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>Beli Buku</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lead Magnet & Newsletter (Hadiah Bab Gratis) -->
+  <section id="newsletter" class="py-20 bg-amber-900 text-white relative overflow-hidden">
+    <div class="max-w-4xl mx-auto px-6 text-center space-y-6 relative z-10">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-medium bg-amber-800/80 border border-amber-700 text-amber-200">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>Hadiah Spesial untuk Pembaca Baru</span>
+      </div>
+
+      <h2 class="font-serif text-3xl sm:text-5xl font-bold tracking-tight">
+        Dapatkan Bab 1 & Cerpen Eksklusif Gratis Langsung di Email Anda
+      </h2>
+
+      <p class="text-amber-100 font-editorial text-lg max-w-2xl mx-auto leading-relaxed">
+        Bergabunglah dengan 6.400+ pembaca setia di Klub Renjana Kata. Saya akan mengirimkan cerpen lepasan "Surat dari Masa Lalu" beserta akses awal bab pertama novel terbaru langsung ke kotak masuk Anda.
+      </p>
+
+      <form id="newsletterForm" onsubmit="handleNewsletter(event)" class="max-w-xl mx-auto space-y-3">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input type="text" id="nlName" placeholder="Nama Anda" required class="px-4 py-3.5 rounded-xl bg-amber-950/60 border border-amber-700 text-white placeholder-amber-300/60 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 sm:w-1/3">
+          <input type="email" id="nlEmail" placeholder="Alamat Email Utama" required class="px-4 py-3.5 rounded-xl bg-amber-950/60 border border-amber-700 text-white placeholder-amber-300/60 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 flex-1">
+          <button type="submit" class="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-sm rounded-xl transition shadow-lg flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Kirimkan Saya Cerpen Gratis</span>
+          </button>
+        </div>
+        <p class="text-[11px] text-amber-300/70">Bebas spam. Berhenti berlangganan kapan saja dengan 1 klik.</p>
+      </form>
+      <div id="newsletterSuccess" class="hidden p-6 rounded-2xl bg-amber-800 border border-amber-600 max-w-lg mx-auto">
+        <i class="fa-solid fa-circle-check text-4xl text-emerald-400 mb-2"></i>
+        <h3 class="font-serif text-xl font-bold">Terima Kasih, Sahabat Pembaca!</h3>
+        <p class="text-xs text-amber-100 mt-1">Tautan cerpen dan Bab 1 telah kami kirimkan ke email Anda.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ulasan Pembaca & Liputan Media -->
+  <section id="ulasan" class="py-24 max-w-7xl mx-auto px-6">
+    <div class="text-center max-w-2xl mx-auto mb-16 space-y-3">
+      <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">Apresiasi & Resonansi</span>
+      <h2 class="font-serif text-3xl sm:text-4xl font-bold text-stone-950 dark:text-stone-50">Apa Kata Pembaca & Kritikus Sastra</h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+      <div class="p-8 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
+        <div class="text-amber-500 flex gap-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="font-editorial text-stone-700 dark:text-stone-300 italic">"K. Arzhaning Jagad memiliki kepekaan rasa bahasa yang langka di kalangan penulis seangkatannya. 'Bayang di Ujung Senja' bukan sekadar misteri, tapi refleksi batin yang menghanyutkan."</p>
+        <div class="pt-4 border-t border-stone-100 dark:border-stone-800 text-xs">
+          <strong class="font-serif text-stone-900 dark:text-stone-100 text-sm block">Rajendra Wijaya</strong>
+          <span class="text-stone-500">Kurator Rubrik Sastra & Esais Budaya</span>
+        </div>
+      </div>
+      <div class="p-8 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
+        <div class="text-amber-500 flex gap-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="font-editorial text-stone-700 dark:text-stone-300 italic">"Saya menghabiskan 'Kala Hujan Berhenti' hanya dalam satu malam. Deskripsi aroma buku tua dan hujan di Braga begitu hidup hingga saya merasa benar-benar duduk di toko buku itu."</p>
+        <div class="pt-4 border-t border-stone-100 dark:border-stone-800 text-xs">
+          <strong class="font-serif text-stone-900 dark:text-stone-100 text-sm block">Dinda Kirana</strong>
+          <span class="text-stone-500">Bookstagrammer & Founder Klub Buku Bandung</span>
+        </div>
+      </div>
+      <div class="p-8 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-4 shadow-sm">
+        <div class="text-amber-500 flex gap-1"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+        <p class="font-editorial text-stone-700 dark:text-stone-300 italic">"Kekuatan novel Arzan terletak pada karakternya yang tidak hitam-putih. Setiap tokoh memiliki kerapuhan yang membuat kita merasa dipahami. Penulis indie kelas dunia!"</p>
+        <div class="pt-4 border-t border-stone-100 dark:border-stone-800 text-xs">
+          <strong class="font-serif text-stone-900 dark:text-stone-100 text-sm block">Zannah Amelia</strong>
+          <span class="text-stone-500">Goodreads Top Reviewer Indonesia</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Jurnal & Esai Penulis -->
+  <section id="jurnal" class="py-20 bg-stone-100/60 dark:bg-stone-900/40 border-y border-stone-200 dark:border-stone-800">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center max-w-xl mx-auto mb-12 space-y-2">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">Catatan Di Balik Halaman</span>
+        <h2 class="font-serif text-3xl font-bold text-stone-950 dark:text-stone-50">Jurnal & Esai Penulis</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <article class="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-3 shadow-sm">
+          <span class="text-xs text-stone-500">Proses Kreatif · 6 menit baca</span>
+          <h3 class="font-serif text-xl font-bold text-stone-900 dark:text-stone-100">Proses Riset 14 Bulan di Balik Novel "Bayang di Ujung Senja"</h3>
+          <p class="text-stone-600 dark:text-stone-300 font-editorial text-sm">Menghabiskan tiga pekan tinggal bersama penjaga mercusuar sungguhan di pesisir barat dan menelusuri arsip maritim kolonial.</p>
+        </article>
+        <article class="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-3 shadow-sm">
+          <span class="text-xs text-stone-500">Tips Menulis · 5 menit baca</span>
+          <h3 class="font-serif text-xl font-bold text-stone-900 dark:text-stone-100">Ritual 1.000 Kata Setiap Pagi: Menaklukkan Writer’s Block</h3>
+          <p class="text-stone-600 dark:text-stone-300 font-editorial text-sm">Inspirasi adalah tamu yang sombong; ia hanya akan datang jika Anda sudah duduk rapi di meja kerja sebelum ia mengetuk pintu.</p>
+        </article>
+        <article class="p-6 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 space-y-3 shadow-sm">
+          <span class="text-xs text-stone-500">Esai Sastra · 7 menit baca</span>
+          <h3 class="font-serif text-xl font-bold text-stone-900 dark:text-stone-100">Mengapa Karakter yang Cacat Moral Justru Lebih Dicintai Pembaca?</h3>
+          <p class="text-stone-600 dark:text-stone-300 font-editorial text-sm">Pembaca tidak mencari pahlawan tanpa noda untuk dipuja, melainkan cermin retak yang merefleksikan kegamangan manusiawi.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontak & Undangan Kerjasama -->
+  <section id="kontak" class="py-24 max-w-7xl mx-auto px-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      <div class="lg:col-span-5 space-y-4">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">Hubungi Langsung</span>
+        <h2 class="font-serif text-3xl font-bold text-stone-950 dark:text-stone-50">Ruang Diskusi & Kerjasama</h2>
+        <p class="text-stone-600 dark:text-stone-300 font-editorial text-lg leading-relaxed">
+          Tertarik mengundang untuk bedah buku, workshop kepenulisan kreatif, wawancara media, atau pertanyaan terkait hak terjemahan? Tinggalkan pesan di sini.
+        </p>
+        <div class="pt-4 space-y-2 text-sm text-stone-600 dark:text-stone-400">
+          <p><i class="fa-solid fa-envelope text-amber-700 mr-2"></i> admin@arzhaning.my.id</p>
+          <p><i class="fa-solid fa-location-dot text-amber-700 mr-2"></i> Kotagede, DI Yogyakarta, Indonesia</p>
+        </div>
+      </div>
+      <div class="lg:col-span-7">
+        <form onsubmit="handleContact(event)" class="p-8 rounded-2xl bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 shadow-sm space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold mb-1">Nama Lengkap</label>
+              <input type="text" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold mb-1">Alamat Email</label>
+              <input type="email" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Pesan Anda</label>
+            <textarea rows="4" required class="w-full px-4 py-2.5 rounded-lg border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+          </div>
+          <button type="submit" class="w-full py-3 bg-stone-950 hover:bg-amber-800 text-white dark:bg-amber-500 dark:text-stone-950 dark:hover:bg-amber-400 font-semibold rounded-lg text-sm transition flex items-center justify-center gap-2 cursor-pointer">
+            <i class="fa-solid fa-paper-plane"></i>
+            <span>Kirimkan Pesan ke Penulis</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer Profesional -->
+  <footer class="py-12 bg-stone-950 text-stone-400 border-t border-stone-800 text-sm">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-2 font-serif text-lg font-bold text-stone-200">
+        <i class="fa-solid fa-feather-pointed text-amber-500"></i>
+        <span>K. Arzhaning Jagad</span>
+      </div>
+      <div class="flex items-center gap-4 text-base">
+        <a href="https://goodreads.com" class="hover:text-amber-400"><i class="fa-brands fa-goodreads"></i></a>
+        <a href="https://instagram.com" class="hover:text-amber-400"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://x.com" class="hover:text-amber-400"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="https://tiktok.com" class="hover:text-amber-400"><i class="fa-brands fa-tiktok"></i></a>
+      </div>
+      <p class="text-xs text-stone-500">© 2026 K. Arzhaning Jagad. Hak Cipta Dilindungi.</p>
+    </div>
+  </footer>
+
+  <!-- Modal Cuplikan Bab (Sample Chapter Reader) -->
+  <div id="sampleModal" class="hidden fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-[#F4EFE6] text-[#2C241D] w-full max-w-2xl max-h-[85vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+      <div class="p-4 bg-[#EFE8DC] border-b border-[#E2D6C3] flex items-center justify-between">
+        <span id="modalBookTitle" class="font-bold text-sm">Cuplikan Bab</span>
+        <button onclick="closeModal('sampleModal')" class="p-1 text-stone-600 hover:text-stone-950"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <div id="modalBookContent" class="p-8 overflow-y-auto reader-scroll font-editorial text-lg leading-relaxed space-y-4 flex-1">
+        <!-- Konten Bab Dimuat Dinamis -->
+      </div>
+      <div class="p-4 bg-[#EFE8DC] border-t border-[#E2D6C3] text-center">
+        <button onclick="closeModal('sampleModal')" class="px-5 py-2 bg-stone-900 text-white rounded-lg text-xs font-semibold cursor-pointer">Tutup Pratinjau</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Pilihan Toko Pembelian (Bookstore Selector) -->
+  <div id="storeModal" class="hidden fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800">
+        <div>
+          <h3 id="storeBookTitle" class="font-serif text-lg font-bold">Pesan Buku</h3>
+          <p id="storeBookPrice" class="text-xs text-amber-700 dark:text-amber-400 font-semibold"></p>
+        </div>
+        <button onclick="closeModal('storeModal')" class="text-stone-500 hover:text-stone-900"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+      <p class="text-xs text-stone-500">Pilih marketplace atau platform resmi untuk pemesanan langsung:</p>
+      <div class="space-y-2">
+        <a href="#" onclick="alert('Membuka Gramedia Online'); return false;" class="p-3 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 flex items-center justify-between text-xs font-semibold">
+          <span>Gramedia Official (Buku Fisik & Bonus)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-stone-400"></i>
+        </a>
+        <a href="#" onclick="alert('Membuka Shopee Mall Resmi'); return false;" class="p-3 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 flex items-center justify-between text-xs font-semibold">
+          <span>Shopee Mall Penulis (Free Ongkir)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-stone-400"></i>
+        </a>
+        <a href="#" onclick="alert('Membuka Tokopedia Official'); return false;" class="p-3 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 flex items-center justify-between text-xs font-semibold">
+          <span>Tokopedia Official Store</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-stone-400"></i>
+        </a>
+        <a href="#" onclick="alert('Membuka Google Play Books'); return false;" class="p-3 rounded-lg border border-stone-200 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-800 flex items-center justify-between text-xs font-semibold">
+          <span>Google Play Books (E-Book Instan)</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-stone-400"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Interaktif -->
+  <script>
+    // Theme Switcher Logic dengan LocalStorage
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+    themeToggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    });
+
+    // Mobile Hamburger Menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    mobileMenuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    // Data Bab Sampel Buku
+    const chapters = [
+      {
+        title: "Bayang di Ujung Senja - Bab 1: Dentang Lonceng di Bawah Kabut",
+        content: "<p>Kabut senja turun lebih cepat dari biasanya di Tanjung Lesung. Di kejauhan, menara mercusuar berkarat itu berdiri seperti bayang-bayang raksasa yang kelelahan menjaga rahasia lautan.</p><p>Arga merapatkan mantel kanvasnya. Angin asin menampar pipinya dengan aroma garam dan kayu lapuk. Di tangannya, selembar surat berkertas kusam bergetar pelan: 'Jangan pernah menyalakan lentera di lantai empat bila kau belum siap melihat siapa yang duduk di sampingmu.'</p><p>Di atas meja bundar di lantai dasar, sebuah cangkir enamel masih menyisakan bubuk kopi tua. Lilin merah di sampingnya baru saja padam, asap putih tipis masih meliuk-liuk di udara dingin...</p>"
+      },
+      {
+        title: "Kala Hujan Berhenti - Bab 1: Menunggu Badai Mereda",
+        content: "<p>Hujan di Bandung sore itu tidak jatuh perlahan; ia tumpah layaknya amarah langit yang ditahan sepanjang kemarau. Di balik jendela kaca buram Toko Buku Samudera di Braga, Kinan memperhatikan tetes-tetes air yang berkejaran.</p><p>Lonceng tembaga di atas pintu berdenting. Seorang pria dengan jaket basah kuyup melangkah masuk, membawa aroma dedaunan basah dan aspal panas yang tersiram hujan.</p><p>'Buka sampai jam berapa?' suara pria itu parau namun hangat.</p><p>'Sampai badai ini bosan,' jawab Kinan tanpa mengalihkan pandangan dari buku di tangannya...</p>"
+      },
+      {
+        title: "Kronika Kota Kaca - Bab 1: Jam Tangan Tanpa Jarum",
+        content: "<p>Tidak ada jam yang berdetak dengan benar di Sylvaria. Waktu di sini tidak dihitung dengan detik, melainkan dengan ketebalan debu kristal yang jatuh dari kubah langit.</p><p>Elias meraba roda gerigi kuningan yang tergeletak di atas meja beludru hitamnya. Meskipun matanya telah diselubungi kegelapan sejak ia berumur tujuh tahun, ujung jarinya dapat merasakan getaran terkecil dari setiap detik yang terbuang.</p><p>'Bayanganmu tidak berdiri di belakangmu, Elias,' kata gadis kecil di ambang pintu bengkelnya. 'Bayanganmu sedang meraba tengkukmu...'</p>"
+      }
+    ];
+
+    function openSampleReader(index) {
+      const chapter = chapters[index];
+      document.getElementById('modalBookTitle').textContent = chapter.title;
+      document.getElementById('modalBookContent').innerHTML = chapter.content;
+      document.getElementById('sampleModal').classList.remove('hidden');
+    }
+
+    function openBookStore(title, price, genre) {
+      document.getElementById('storeBookTitle').textContent = title;
+      document.getElementById('storeBookPrice').textContent = price + ' (' + genre + ')';
+      document.getElementById('storeModal').classList.remove('hidden');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+    }
+
+    function handleNewsletter(e) {
+      e.preventDefault();
+      document.getElementById('newsletterForm').classList.add('hidden');
+      document.getElementById('newsletterSuccess').classList.remove('hidden');
+    }
+
+    function handleContact(e) {
+      e.preventDefault();
+      alert('Terima kasih! Pesan Anda telah dikirimkan langsung ke ruang kerja K. Arzhaning Jagad.');
+    }
+  </script>
+</body>
+</html>

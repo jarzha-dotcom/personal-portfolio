@@ -3,7 +3,7 @@
 > **Halo! Saya K. Arzhaning Jagad (biasa dipanggil Arzha).**  
 > *Indie Developer & Data/System Specialist dengan pengalaman 7+ tahun di operasional dan audit korporat, kini membangun aplikasi dan sistem berbasis cloud.*  
 > 📍 Berdomisili di Cibitung, Bekasi, Jawa Barat  
-> 🌐 Website Utama: [arzhaning.my.id](https://arzhaning.my.id) | 💬 Konsultasi Langsung via WhatsApp: [0823-1231-2734](https://wa.me/6282312312734) | ✉️ Email: [admin@arzhaning.my.id](mailto:admin@arzhaning.my.id)
+> 🌐 Website Utama: [arzhaning.my.id](https://arzhaning.my.id) | 📚 Artikel: [arzhaning.my.id/artikel](https://arzhaning.my.id/artikel) | 💬 Konsultasi WhatsApp: [0823-1231-2734](https://wa.me/6282312312734) | ✉️ Email: [admin@arzhaning.my.id](mailto:admin@arzhaning.my.id)
 
 ---
 
@@ -39,11 +39,19 @@ Saya merancang asisten kecerdasan buatan (AI) interaktif agar calon klien dan pe
 
 ---
 
-### 2. 🗣️ Fitur Suara Alami Manusia (AI Bisa Berbicara Bahasa Indonesia)
-Saya tidak menggunakan suara robot yang kaku. Saya menyematkan teknologi sintesis suara alami (*Google Cloud WaveNet*):
-*   **Intonasi Hangat & Ramah**: Asisten AI dapat membacakan jawabannya dalam bahasa Indonesia dengan artikulasi jernih selayaknya berbicara dengan rekan kerja.
-*   **Fasih Mengeja Angka**: Mampu menyebutkan nominal rupiah (misal: "Rp 1.500.000"), tanggal, persentase, serta singkatan istilah bisnis dengan tepat.
-*   **Animasi Gelombang Suara (*Voice Bars*)**: Dilengkapi indikator visual dinamis saat asisten sedang berbicara.
+### 2. 🗣️ Fitur Suara Alami Manusia (AI Bisa Berbicara Bahasa Indonesia — Chirp 3 HD & WaveNet)
+Saya tidak menggunakan suara robot yang kaku. Saya merancang arsitektur sintesis suara alami berjenjang (*Cascaded Neural TTS Architecture*) kelas industri:
+*   **Generasi Terbaru Google Cloud Chirp 3 HD**: Didukung model suara AI generasi mutakhir Google (`id-ID-Chirp3-HD-Aoede` & `Charon`) yang menghasilkan artikulasi bahasa Indonesia sangat jernih, intonasi hangat, nafas alami, dan ekspresi bicara yang hidup selayaknya berbicara langsung dengan rekan kerja.
+*   **Arsitektur Cadangan Berjenjang (*Multi-Tier Fallback*)**:
+    *   **Tier 0 (Chirp 3 HD)**: Kualitas suara ultra-natural definisi tinggi (jatah kuota gratis 1 juta karakter/bulan).
+    *   **Tier 1 (WaveNet)**: Otomatis beralih ke Google Cloud WaveNet (jatah kuota gratis 4 juta karakter/bulan) jika kapasitas tier utama mendekati batas.
+    *   **Tier 2 (Web Speech API Browser)**: Cadangan darurat lokal di browser pengunjung jika terjadi pemadaman koneksi cloud tanpa membebani biaya server sama sekali.
+*   **Konsistensi Gender Persona (*Gender-Preserved Switching*)**:
+    *   Konsultan solusi wanita (**Zannah**) otomatis berbicara dengan suara wanita ramah (`Aoede` ➔ `WaveNet-A/D`).
+    *   Konsultan arsitek pria (**Rajendra**) otomatis berbicara dengan suara pria analitis berwibawa (`Charon/Puck` ➔ `WaveNet-B/C`).
+*   **Proteksi Biaya & Pelacakan Kuota Real-Time**: Dilengkapi sistem gerbang kuota (*Quota Gate*) berbasis Upstash Redis yang memantau pemakaian karakter per bulan secara transparan demi menjamin arsitektur bebas biaya server (*Zero Server Cost*). Pengunjung bahkan dapat membuka modal statistik kuota suara secara transparan.
+*   **Fasih Mengeja Nominal Angka & Singkatan**: Mampu mengonversi dan melafalkan nominal rupiah (misal: "Rp 1.500.000" dieja fasih "satu juta lima ratus ribu rupiah"), persentase, tanggal, serta istilah teknis bisnis secara natural.
+*   **Animasi Gelombang Suara (*Voice Speaking Bars*)**: Dilengkapi indikator visual dinamis yang bergerak selaras dengan ritme vokal saat asisten AI maupun pemutar audio artikel sedang berbicara.
 
 ---
 
@@ -67,16 +75,20 @@ Saya menerapkan arsitektur **Cadangan Bertingkat (*Cascade AI System*)**:
 
 ---
 
-### 5. 🎨 Galeri Demo Desain Landing Page
+### 5. 🎨 Galeri Demo Desain & Aplikasi Web Interaktif
 *Kunjungi: [arzhaning.my.id/demos](https://arzhaning.my.id/demos)*
 
-Saya menyediakan galeri **prototipe desain landing page** orisinal untuk berbagai jenis bisnis sebagai referensi nyata kualitas pengerjaan saya:
+Saya menyediakan galeri **30 prototipe desain dan aplikasi web interaktif** orisinal sebagai referensi nyata atas fleksibilitas dan kualitas pengerjaan saya:
 
-*   **16+ Kategori Bisnis**: Bengkel, klinik estetika, klinik gigi, bimbel, gym, kedai kopi, salon, petshop, ekspedisi, wedding organizer, galeri seni, laundry, rental mobil, kontraktor, toko kue, distributor sparepart.
-*   **Desain Premium & Responsif**: Setiap prototipe dibangun dengan standar desain modern — dark/light mode, animasi halus, dan 100% mobile-friendly.
-*   **Self-Contained Single File**: Masing-masing demo adalah satu file HTML mandiri — tidak ada dependensi eksternal yang harus diinstal.
+*   **18 Kategori Industri Nyata**:
+    *   **Aplikasi Kasir (POS) Interaktif**: WarungKU POS (UMKM Kuliner), BrewSpace POS (Kedai Kopi & Cafe), ThreadPOS (Toko Fashion & Busana), MartExpress POS (Minimarket) — lengkap dengan scan barcode kamera, manajemen laci kasir/shift, varian produk, struk cetak instan, dan retur transaksi.
+    *   **Sistem Manajemen & Dashboard**: AbsenPro HRIS (Presensi, Cuti & Penggajian), KosPro Suite & Manager (Manajemen Kamar, Tagihan & Pembukuan Kos), Portal Penghuni Kos (Tenant Self-Service).
+    *   **Landing Page & Profil Bisnis Terkurasi**: Bengkel otomotif, klinik estetika & anti-aging, klinik gigi keluarga, bimbingan belajar, gym & pusat kebugaran, salon kecantikan, barbershop pria, petshop & klinik hewan, ekspedisi logistik kargo, wedding organizer mewah, galeri seni & art marketplace, laundry modern, rental mobil eksekutif, kontraktor sipil, toko kue & patisserie, distributor sparepart B2B, kursus mengemudi kilat, dan website portofolio penulis mandiri.
+*   **Navigasi Global Terpadu**: Terkoneksi mulus dengan bilah navigasi utama portofolio (`Beranda`, `Tentang`, `Karya`, `Layanan`, `Keahlian`, `Kontak`), pemilih tema visual (Dark/Light mode), drawer menu responsif, dan tautan legal.
+*   **Identitas Melekat Penuh**: Seluruh data contoh, kontak WhatsApp, email, dan nama representasi staf/klien telah diselaraskan penuh dengan ekosistem portofolio (*K. Arzhaning Jagad, Arzha, Radit, Zannah, Rajendra*).
+*   **Self-Contained Single File**: Masing-masing demo adalah file mandiri yang teroptimasi tanpa dependensi rumit luar, menjamin kecepatan muat seketika (*instant preview*).
 
-> ⚠️ **Perlindungan Hak Cipta**: Seluruh file desain di `public/demos/` dilindungi hak cipta penuh. Setiap file tertanam *watermark* berlapis (visual badge, MutationObserver respawn, meta tag, dan console banner) yang tidak dapat dihapus tanpa melanggar lisensi. Lihat bagian [Lisensi & Hak Cipta](#️-lisensi--hak-cipta) di bawah.
+> ⚠️ **Perlindungan Hak Cipta**: Seluruh 30 file prototipe di `public/demos/` dilindungi hak cipta penuh. Setiap file tertanam *watermark* berlapis (visual badge, MutationObserver respawn, meta tag, dan console banner) yang tidak dapat dihapus tanpa melanggar lisensi. Lihat bagian [Lisensi & Hak Cipta](#️-lisensi--hak-cipta) di bawah.
 
 ---
 
@@ -107,7 +119,22 @@ Saya lebih percaya pada bukti nyata daripada sekadar janji. Berikut adalah beber
 
 ---
 
-### 6. 🎨 Desain Modern, Responsif & Sangat Cepat
+### 7. 📚 Pusat Edukasi & Artikel Wawasan Bisnis/Teknologi (Audio-Enabled)
+*Kunjungi & Baca: [arzhaning.my.id/artikel](https://arzhaning.my.id/artikel)*
+
+Website ini dilengkapi portal publikasi artikel edukatif yang membedah arsitektur teknologi, efisiensi operasional, dan solusi nyata dilema digital para pemilik bisnis:
+
+*   **17+ Artikel Mendalam & Studi Kasus Nyata**:
+    *   **Panduan Bisnis & Klien**: Checklist persiapan sebelum konsultasi pertama dengan developer, transparansi kenapa estimasi harga proposal bisa berbeda-beda, komparasi praktis *Web App vs Mobile App vs PWA*, durasi pengerjaan website bisnis, hingga 5 pertanyaan krusial sebelum merekrut developer freelance.
+    *   **Teknologi Hemat Biaya (*Zero Server Cost*)**: Pemanfaatan Google Apps Script & Google Sheets untuk UMKM, tanda-tanda kapan saatnya migrasi, serta evaluasi keamanan data bisnis di Google Drive.
+    *   **Kecerdasan Buatan (AI) & Otomatisasi**: Menyelami arsitektur *Cascade AI System*, perbedaan mendasar *Autonomous Agent* vs chatbot template biasa, rincian komponen biaya custom chatbot, dan studi kasus platform proposal otomatis DevRAB.
+    *   **Keamanan Data & Integritas Sistem**: Mengapa bisnis membutuhkan *audit trail* digital anti-manipulasi data, arsitektur backend 4 proyek nyata, dan studi kasus sistem inventaris aset PT GMP.
+*   🎙️ **Pemutar Audio Interaktif (*Article Audio Player*)**: Dilengkapi kontrol pemutar audio naratif sehingga pengunjung dapat mendengarkan ulasan artikel layaknya podcast pendek tanpa harus membaca teks manual.
+*   **Optimalisasi SEO & Prerender SSG**: Seluruh artikel di-generate secara statis (*Static Site Generation*) dengan metadata OpenGraph lengkap dan performa akses instan.
+
+---
+
+### 8. 🎨 Desain Modern, Responsif & Sangat Cepat
 *   **Mode Gelap & Terang (Dark / Light Theme)**: Pengunjung bebas memilih mode tampilan yang paling nyaman di mata.
 *   **100% Mobile Friendly**: Tampilan menyesuaikan secara proporsional di layar smartphone, tablet, maupun layar laptop.
 *   **Bisa Diinstal di Layar Utama Ponsel (PWA)**: Website dapat disimpan langsung ke layar HP Anda layaknya aplikasi bawaan tanpa perlu mengunduh lewat Play Store/App Store.
@@ -124,10 +151,11 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 | **Kecerdasan Buatan (AI Engine)** | **Gemini Series & Gemma 4** | Jawaban cerdas, analitis, dan memiliki ketahanan 24/7 berkat kuota harian cadangan raksasa (14.400 panggilan/hari). |
 | **Otomatisasi Proposal & RAB** | **DevRAB Cloud Engine & Client Portal** | Terhubung langsung dengan asisten AI Zannah untuk menerbitkan portal proposal interaktif, lengkap dengan SOW, persetujuan tanda tangan digital, dan pembayaran otomatis. |
 | **Analisis Berkas Cerdas** | **Google Antigravity (Interactions API)** | Chatbot mampu memeriksa dan menganalisis berkas yang Anda unggah (sketsa desain, dokumen PDF, tabel data) secara mendalam. |
-| **Suara Alami (Voice TTS)** | **Google Cloud WaveNet Audio** | Memberikan kesan mewah dan humanis bagi pelanggan bisnis Anda dengan suara narasi berbahasa Indonesia yang ramah. |
+| **Suara Alami (Voice TTS)** | **Google Cloud Chirp 3 HD & WaveNet** | Sintesis vokal AI generasi terbaru ultra-natural dengan fallback berjenjang (Chirp 3 HD ➔ WaveNet ➔ Web Speech) dan pelindung kuota gratis otomatis via Redis. |
 | **Infrastruktur Cloud (Backend)** | **Vercel Serverless Architecture** | **Hemat Anggaran Server**: Anda tidak perlu pusing membayar biaya sewa server bulanan yang mahal. Server hanya aktif saat ada pengunjung, kuat menampung ribuan pengguna sekaligus. |
 | **Keamanan & Privasi Obrolan** | **IndexedDB Local Storage** | Riwayat obrolan tersimpan aman di browser masing-masing pengunjung sehingga kerahasiaan data percakapan bisnis Anda terjamin 100%. |
 | **Transaksi & Pembayaran** | **Xendit Payment Gateway** | Menerima pembayaran instan dari pelanggan Anda lewat QRIS (semua bank & e-wallet) dengan konfirmasi otomatis tanpa verifikasi manual. |
+| **Pusat Artikel & Audio Narasi** | **Static Site Generation (SSG) & Custom Audio Player** | Akses artikel super cepat dan ramah SEO Google, dilengkapi fitur dengarkan artikel naratif layaknya podcast interaktif. |
 
 ---
 
@@ -135,42 +163,13 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 
 Repository ini berstatus **publik untuk tujuan evaluasi portofolio** — bukan open source. Seluruh konten dilindungi di bawah lisensi **Proprietary & Confidential** (lihat file [LICENSE](./LICENSE)).
 
-### File Demo Desain (`public/demos/`)
-File-file desain landing page di folder ini adalah **karya orisinal eksklusif** K. Arzhaning Jagad:
+### File Demo Desain & Aplikasi Web (`public/demos/`)
+Sebanyak 30 file desain landing page dan aplikasi web mandiri di folder ini adalah **karya orisinal eksklusif** K. Arzhaning Jagad:
 - ❌ **Dilarang** menyalin, mendistribusikan, menggunakan sebagai template, atau menjual ulang
 - ❌ **Dilarang** menghapus, memodifikasi, atau mengelak dari watermark hak cipta
 - ✅ **Diizinkan** melihat sebagai referensi kualitas untuk tujuan evaluasi jasa
 
 Pelanggaran akan ditindaklanjuti melalui **DMCA takedown** dan jalur hukum yang berlaku.
-
----
-
-## 🔧 Developer Notes (Untuk Pengembang)
-
-### Menjalankan Project Secara Lokal
-```bash
-npm install
-npm run dev
-```
-
-### Script yang Tersedia
-| Script | Perintah | Keterangan |
-| :--- | :--- | :--- |
-| Dev server | `npm run dev` | Jalankan di `localhost:3000` |
-| Build produksi | `npm run build` | Output ke `/dist` |
-| Prerender SSG | `npm run prerender` | Dijalankan otomatis setelah build |
-| Lint TypeScript | `npm run lint` | Cek tipe tanpa emit |
-| Unit test | `npm run test` | Jalankan Vitest |
-| **Watermark demo** | **`npm run demo:watermark`** | **Inject watermark ke semua `demo-*.html` baru** |
-| Watermark (force) | `npm run demo:watermark -- --force` | Update ulang watermark di semua file demo |
-
-> **Setelah menambahkan file demo baru**, selalu jalankan `npm run demo:watermark` sebelum commit.
-
-### Variabel Environment
-Salin `.env.example` menjadi `.env.local` dan isi nilai yang diperlukan:
-```bash
-cp .env.example .env.local
-```
 
 ---
 

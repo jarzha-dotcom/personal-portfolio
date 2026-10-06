@@ -5,8 +5,7 @@ import {
   Sun,
   Moon,
   Send,
-  ChevronDown,
-  ExternalLink
+  ChevronDown
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { useFocusTrap } from '../hooks/useFocusTrap';
@@ -28,7 +27,7 @@ interface NavItem {
   id: string;
   // true = halaman terpisah (pindah rute), false/undefined = anchor di beranda
   route?: boolean;
-  // true = halaman di luar aplikasi ini (dibuka di tab baru)
+  // true = halaman statis di luar aplikasi React ini (pindah halaman penuh di tab yang sama)
   external?: boolean;
 }
 
@@ -251,14 +250,11 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
     setKaryaOpen(false);
     if (l.external) {
       setMobileMenuOpen(false);
-      return; // biarkan browser membuka tab baru
+      return; // biarkan browser pindah halaman di tab yang sama
     }
     if (l.route) goToRoute(e, l.href);
     else scrollToSection(e, l.href);
   };
-
-  const externalProps = (l: NavItem) =>
-    l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {};
 
   // Easter egg: klik logo 5x dalam rentang 2.5 detik akan membuka Mode CV
   const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -356,7 +352,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                             <a
                               key={child.id}
                               href={itemHref(child)}
-                              {...externalProps(child)}
                               aria-current={active ? 'page' : undefined}
                               onClick={(e) => handleItemClick(e, child)}
                               className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium normal-case tracking-normal ${FOCUS_RING} ${
@@ -370,7 +365,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                               }`}
                             >
                               <span>{child.name}</span>
-                              {child.external && <ExternalLink className="w-3.5 h-3.5 opacity-60" />}
                             </a>
                           );
                         })}
@@ -462,7 +456,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                   <a
                     key={link.id}
                     href={itemHref(link)}
-                    {...externalProps(link)}
                     aria-current={isActive ? 'page' : undefined}
                     onClick={(e) => handleItemClick(e, link)}
                     className={`${nested ? 'pl-8 pr-4' : 'px-4'} py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
@@ -475,11 +468,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                       }`}
                   >
                     <span>{link.name}</span>
-                    {link.external ? (
-                      <ExternalLink className="w-4 h-4 opacity-60" />
-                    ) : (
-                      isActive && <span className="w-2 h-2 rounded-full bg-teal-500"></span>
-                    )}
+                    {isActive && <span className="w-2 h-2 rounded-full bg-teal-500"></span>}
                   </a>
                 );
               };

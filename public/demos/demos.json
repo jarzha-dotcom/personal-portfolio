@@ -1,5 +1,45 @@
 [
   {
+    "file": "demo-warungku-pos.html",
+    "thumb": "thumbs/demo-warungku-pos.webp",
+    "title": "Aplikasi Kasir (POS) UMKM Kuliner",
+    "desc": "Aplikasi kasir untuk warung dan kedai dengan katalog menu berfilter dan pencarian, keranjang pesanan, makan di tempat atau bungkus, pembayaran tunai/QRIS/debit, stok otomatis, riwayat transaksi, dan cetak struk.",
+    "tags": [
+      "Aplikasi Web",
+      "Kuliner"
+    ]
+  },
+  {
+    "file": "demo-brewspace-pos.html",
+    "thumb": "thumbs/demo-brewspace-pos.webp",
+    "title": "Aplikasi Kasir (POS) Kedai Kopi",
+    "desc": "Sistem kasir kedai kopi bertema gelap dengan katalog menu berfilter dan pencarian, modifier minuman, dine-in atau take away, status meja, open bill, pembayaran tunai/QRIS/kartu, laci kasir, laporan shift, dan cetak struk.",
+    "tags": [
+      "Aplikasi Web",
+      "Kuliner"
+    ]
+  },
+  {
+    "file": "demo-threadpos.html",
+    "thumb": "thumbs/demo-threadpos.webp",
+    "title": "Aplikasi Kasir (POS) Toko Fashion",
+    "desc": "Aplikasi kasir toko pakaian dengan pilihan varian ukuran dan warna, scan barcode, program member dan poin, pembayaran tunai/QRIS/debit, retur barang, hold transaksi, manajemen shift, dan cetak struk.",
+    "tags": [
+      "Aplikasi Web",
+      "Retail"
+    ]
+  },
+  {
+    "file": "demo-martexpress-pos.html",
+    "thumb": "thumbs/demo-martexpress-pos.webp",
+    "title": "Aplikasi Kasir (POS) Minimarket",
+    "desc": "Aplikasi kasir minimarket dengan scan barcode, katalog produk berfilter, program member dan poin, promo dan diskon, pembayaran tunai/QRIS/debit, retur barang, hold transaksi, manajemen shift, dan cetak struk.",
+    "tags": [
+      "Aplikasi Web",
+      "Retail"
+    ]
+  },
+  {
     "file": "demo-galeri-seni.html",
     "thumb": "thumbs/demo-galeri-seni.webp",
     "title": "Landing Page Galeri & Pelukis",
@@ -157,6 +197,106 @@
     "tags": [
       "Landing Page",
       "Otomotif"
+    ]
+  },
+  {
+    "file": "demo-kursus-setir-kilat.html",
+    "thumb": "thumbs/demo-kursus-setir-kilat.webp",
+    "title": "Landing Page Kursus Setir & Biro Jasa",
+    "desc": "Kursus setir mobil manual dan matic plus biro jasa SIM/STNK, dengan kalkulator paket, daftar armada, alur belajar, testimoni, dan booking ke WhatsApp.",
+    "tags": [
+      "Landing Page",
+      "Pendidikan"
+    ]
+  },
+  {
+    "file": "demo-barbershop-gentlemens-cave.html",
+    "thumb": "thumbs/demo-barbershop-gentlemens-cave.webp",
+    "title": "Landing Page Barbershop & Grooming",
+    "desc": "Barbershop pria bernuansa industrial vintage dengan daftar layanan dan harga, booking jadwal dan pilihan barber ke WhatsApp, galeri gaya rambut berfilter, testimoni, dan mode gelap/terang.",
+    "tags": [
+      "Landing Page",
+      "Perawatan Pria"
+    ]
+  },
+  {
+    "file": "demo-absenpro-hris.html",
+    "thumb": "thumbs/demo-absenpro-hris.webp",
+    "title": "Aplikasi Absensi & HRIS Mobile",
+    "desc": "Aplikasi absensi karyawan dalam tampilan smartphone dengan check-in geofence GPS, pengajuan cuti, slip gaji, profil karyawan, dan mode gelap/terang.",
+    "tags": [
+      "Aplikasi Web",
+      "HRIS"
+    ]
+  },
+  {
+    "file": "demo-landing-penulis.html",
+    "thumb": "thumbs/demo-landing-penulis.webp",
+    "title": "Landing Page Penulis & Web Novel",
+    "desc": "Portal penulis web novel dan cerpen dengan daftar novel unggulan, bab terbaru, pembaca bab interaktif, suasana baca bergema hujan, komunitas pembaca, dan modal dukungan ke Karyakarsa/Trakteer.",
+    "tags": [
+      "Landing Page",
+      "Penulis"
+    ]
+  },
+  {
+    "file": "demo-website-penulis-mandiri.html",
+    "thumb": "thumbs/demo-website-penulis-mandiri.webp",
+    "title": "Website Penulis Mandiri & Etalase Buku",
+    "desc": "Website penulis indie dengan etalase buku bergaya 3D, cuplikan bab interaktif, pilihan toko pembelian, hadiah bab gratis via newsletter, ulasan pembaca, jurnal esai, dan mode gelap/terang.",
+    "tags": [
+      "Landing Page",
+      "Penulis"
+    ]
+  },
+  {
+    "file": "demo-kospro-manager.html",
+    "thumb": "thumbs/demo-kospro-manager.webp",
+    "title": "Dashboard Manajemen Kos-Kosan",
+    "desc": "Dashboard pengelola kos dengan ringkasan okupansi dan pendapatan, denah status kamar, data penyewa, tagihan dengan pengingat WhatsApp, pencatatan pembayaran, dan laporan maintenance.",
+    "tags": [
+      "Aplikasi Web",
+      "Properti"
+    ]
+  },
+  {
+    "file": "demo-atelier-kinetik.html",
+    "thumb": "thumbs/demo-atelier-kinetik.webp",
+    "title": "Toko Online Seni & Room Decor",
+    "desc": "Toko karya seni dan room decor anak muda dengan katalog drop berfilter, keranjang belanja, cek sertifikat orisinalitas (CoA), checkout ke WhatsApp, dan mode gelap/terang.",
+    "tags": [
+      "Website Bisnis",
+      "Seni"
+    ]
+  },
+  {
+    "file": "demo-kospro-suite.html",
+    "thumb": "thumbs/demo-kospro-suite.webp",
+    "title": "Aplikasi Manajemen Kos Mobile-Friendly",
+    "desc": "Aplikasi kelola kos yang responsif untuk HP dengan ringkasan eksekutif, denah dan status kamar, data penyewa, buku kas, pengingat tagihan WhatsApp, kwitansi cetak, dan tiket perbaikan.",
+    "tags": [
+      "Aplikasi Web",
+      "Properti"
+    ]
+  },
+  {
+    "file": "demo-atelier-niskala.html",
+    "thumb": "thumbs/demo-atelier-niskala.webp",
+    "title": "Galeri Seni & Art Marketplace",
+    "desc": "Galeri seni rupa kurasi dengan katalog karya berfilter dan pencarian, detail karya, sertifikat orisinalitas (CoA), keranjang, checkout ke WhatsApp, konsultasi kurator, dan mode gelap/terang.",
+    "tags": [
+      "Website Bisnis",
+      "Seni"
+    ]
+  },
+  {
+    "file": "demo-kosharmony-portal.html",
+    "thumb": "thumbs/demo-kosharmony-portal.webp",
+    "title": "Portal Penghuni Kos (Tenant Dashboard)",
+    "desc": "Portal untuk penghuni kos dengan ringkasan tagihan dan token listrik, pengumuman pengelola, pembayaran via QRIS atau virtual account, kuitansi elektronik, laporan kerusakan fasilitas, tata tertib, dan profil kontrak.",
+    "tags": [
+      "Aplikasi Web",
+      "Properti"
     ]
   }
 ]
