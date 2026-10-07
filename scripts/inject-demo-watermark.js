@@ -50,22 +50,9 @@ function buildSnippet() {
 <meta name="author" content="K. Arzhaning Jagad (Arzha)">
 <meta name="copyright" content="\u00a9 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
 <meta name="robots" content="noindex, nofollow">
-<style>
-/* jz-wm: copyright watermark \u2014 jangan dihapus */
-#__jzwm{position:fixed!important;bottom:14px!important;right:16px!important;z-index:2147483647!important;display:flex!important;align-items:center!important;gap:6px!important;background:rgba(10,10,10,.78)!important;color:#e5e7eb!important;font:600 10.5px/1 system-ui,-apple-system,sans-serif!important;padding:6px 11px 6px 9px!important;border-radius:8px!important;letter-spacing:.03em!important;pointer-events:none!important;user-select:none!important;backdrop-filter:blur(8px)!important;-webkit-backdrop-filter:blur(8px)!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 4px 16px rgba(0,0,0,.45)!important;white-space:nowrap!important}
-#__jzwm span{display:inline-block!important;width:6px!important;height:6px!important;border-radius:50%!important;background:#2dd4bf!important;flex-shrink:0!important}
-</style>
 <script>
-(function(){
-  var ID='__jzwm',LABEL='\u00a9 Demo \u00b7 arzhaning.my.id';
-  function mk(){var d=document.createElement('div');d.id=ID;var s=document.createElement('span');d.appendChild(s);d.appendChild(document.createTextNode('\u00a0'+LABEL));d.setAttribute('aria-hidden','true');d.setAttribute('role','presentation');return d}
-  function ins(){if(!document.getElementById(ID)&&document.body)document.body.appendChild(mk())}
-  var ob=new MutationObserver(function(ml){for(var i=0;i<ml.length;i++){var m=ml[i];if(m.removedNodes.length){for(var j=0;j<m.removedNodes.length;j++){if(m.removedNodes[j].id===ID){ins();break}}}}});
-  function init(){ins();ob.observe(document.body||document.documentElement,{childList:true,subtree:true})}
-  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init)}else{init()}
-  ${CONSOLE_BANNER}
-})();
-<\/script>
+${CONSOLE_BANNER}
+</script>
 ${MARKER_END}`;
 }
 

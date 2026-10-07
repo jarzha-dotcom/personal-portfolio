@@ -742,6 +742,49 @@
       }
     }
 
+    .search-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex: 1 1 220px;
+      min-width: 180px
+    }
+
+    .search-wrap > span {
+      font: 600 11px Inter, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--sub)
+    }
+
+    .search-input {
+      font: 500 14px Inter, sans-serif;
+      color: var(--ink);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 16px;
+      width: 100%;
+      transition: border-color .2s
+    }
+
+    .search-input::placeholder {
+      color: var(--sub);
+      opacity: .7
+    }
+
+    .search-input:hover,
+    .search-input:focus-visible {
+      border-color: var(--accent);
+      outline: none
+    }
+
+    @media(max-width:600px) {
+      .search-wrap {
+        flex: 1 1 100%
+      }
+    }
+
     .card[hidden] {
       display: none
     }
@@ -1119,6 +1162,9 @@
     </div>
 
     <div class="filters" id="filters" role="group" aria-label="Filter galeri" hidden>
+      <label class="search-wrap"><span>Cari</span>
+        <input class="search-input" id="fSearch" type="search" placeholder="Judul atau kata kunci…" autocomplete="off">
+      </label>
       <label class="field"><span>Jenis produk</span>
         <div class="sel"><select id="fType"></select></div>
       </label>
@@ -1149,7 +1195,7 @@
        kartu di urutan teratas tanpa harus memindah posisi entri di JSON. */
     var PER_PAGE = 8; // pagination hanya aktif di filter "Semua"; filter lain menampilkan semua hasil
     var pager = document.getElementById("pager");
-    var grid = document.getElementById("grid"), msg = document.getElementById("msg"), filtersEl = document.getElementById("filters"), fType = document.getElementById("fType"), fInd = document.getElementById("fInd"), fReset = document.getElementById("fReset"), fCount = document.getElementById("fCount");
+    var grid = document.getElementById("grid"), msg = document.getElementById("msg"), filtersEl = document.getElementById("filters"), fType = document.getElementById("fType"), fInd = document.getElementById("fInd"), fSearch = document.getElementById("fSearch"), fReset = document.getElementById("fReset"), fCount = document.getElementById("fCount");
     var yr = document.getElementById("yr"); if (yr) yr.textContent = new Date().getFullYear();
 
     /* Nomor WhatsApp diisi build (prerender.ts). Kalau belum terisi, tombol WA tidak dibuat. */
@@ -1221,6 +1267,8 @@
       a.style.animationDelay = Math.min(i, 8) * 0.06 + "s";
       a.dataset.type = (d.tags || [])[0] || "";
       a.dataset.tags = (d.tags || []).slice(1).join("|");
+      a.dataset.title = (d.title || "").toLowerCase();
+      a.dataset.desc = (d.desc || "").toLowerCase();
       /* Tautan utama dipisah dari tombol WA karena <a> tidak boleh bersarang di dalam <a>. */
       var main = el("a", "main"); main.href = d.file; main.target = "_blank"; main.rel = "noopener";
       var th = el("div", "thumb");
@@ -1273,10 +1321,13 @@
       }
 
       function apply(scroll) {
-        var all = active === "Semua" && activeType === "Semua";
+        var q = (fSearch.value || "").trim().toLowerCase();
+        var all = active === "Semua" && activeType === "Semua" && !q;
         var hits = cards.filter(function (c) {
-          return (active === "Semua" || c.dataset.tags.split("|").indexOf(active) > -1) &&
-            (activeType === "Semua" || c.dataset.type === activeType);
+          var matchType = activeType === "Semua" || c.dataset.type === activeType;
+          var matchInd = active === "Semua" || c.dataset.tags.split("|").indexOf(active) > -1;
+          var matchQ = !q || (c.dataset.title || "").toLowerCase().indexOf(q) > -1 || (c.dataset.desc || "").toLowerCase().indexOf(q) > -1;
+          return matchType && matchInd && matchQ;
         });
         var pages = all ? Math.ceil(hits.length / PER_PAGE) : 1;
         if (page > pages) page = Math.max(pages, 1);
@@ -1288,6 +1339,7 @@
         fReset.hidden = all;
         fCount.textContent = all ? "" : "Menampilkan " + hits.length + " dari " + cards.length + " contoh";
         drawPager(all ? pages : 1);
+        pushUrlParams(activeType, active, fSearch.value);
         if (scroll === true) window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - 110, behavior: calm ? "auto" : "smooth" });
       }
 
@@ -1299,9 +1351,29 @@
       fill(fInd, "Semua usaha", order, counts);
       fType.onchange = function () { activeType = fType.value; page = 1; apply(); };
       fInd.onchange = function () { active = fInd.value; page = 1; apply(); };
-      fReset.onclick = function () { active = "Semua"; activeType = "Semua"; page = 1; apply(); fType.focus(); };
+      fSearch.addEventListener("input", function () { page = 1; apply(); });
+      fReset.onclick = function () { active = "Semua"; activeType = "Semua"; fSearch.value = ""; page = 1; apply(); fType.focus(); };
       filtersEl.hidden = !(torder.length > 1 || order.length > 1);
+      /* Restore URL params */
+      var init = readUrlParams();
+      if (init.type !== "Semua") { activeType = init.type; }
+      if (init.ind !== "Semua") { active = init.ind; }
+      if (init.q) { fSearch.value = init.q; }
       apply(); msg.hidden = true;
+    }
+
+    /* Baca state dari URL params supaya link terfilter bisa dibagikan */
+    function readUrlParams() {
+      var p = new URLSearchParams(location.search);
+      return { type: p.get("jenis") || "Semua", ind: p.get("usaha") || "Semua", q: p.get("q") || "" };
+    }
+    function pushUrlParams(type, ind, q) {
+      var p = new URLSearchParams();
+      if (type && type !== "Semua") p.set("jenis", type);
+      if (ind && ind !== "Semua") p.set("usaha", ind);
+      if (q && q.trim()) p.set("q", q.trim());
+      var qs = p.toString();
+      history.replaceState(null, "", qs ? location.pathname + "?" + qs : location.pathname);
     }
 
     fetch("demos.json", { cache: "no-cache" })
