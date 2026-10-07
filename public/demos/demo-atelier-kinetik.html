@@ -51,40 +51,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS via CDN with Youth Palette Config -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['"Syne"', 'sans-serif'],
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-          },
-          colors: {
-            darkbg: {
-              950: '#09090b',
-              900: '#111115',
-              800: '#18181f',
-              700: '#262630',
-              600: '#3a3a48'
-            },
-            neon: {
-              lime: '#bef264',
-              yellow: '#facc15',
-              cyan: '#38bdf8',
-              orange: '#fb923c'
-            },
-            lightbg: {
-              canvas: '#fafaf9',
-              card: '#f4f4f2',
-              border: '#e5e5e0'
-            }
-          }
-        }
-      }
-    }
-  </script>
+  
   
   <style>
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -93,6 +60,8 @@
     ::-webkit-scrollbar-thumb:hover { background: rgba(180, 180, 180, 0.45); }
     .font-tabular { font-variant-numeric: tabular-nums; }
   </style>
+  <!-- @jz-tw-css -->
+  <link rel="stylesheet" href="./css/demo-atelier-kinetik.css">
 </head>
 <body class="bg-lightbg-canvas text-neutral-900 dark:bg-darkbg-950 dark:text-neutral-100 font-sans antialiased transition-colors duration-300 min-h-screen flex flex-col selection:bg-neon-lime selection:text-black">
 <!-- @jz-bar-start -->

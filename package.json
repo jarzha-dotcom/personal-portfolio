@@ -18,7 +18,9 @@
     "demo:watermark": "node scripts/inject-demo-watermark.js",
     "demo:bar": "node scripts/inject-demo-back-bar.mjs",
     "demo:thumbs": "npx tsx scripts/generate-demo-thumbs.ts",
-    "demo:health": "npx tsx scripts/check-demo-health.ts"
+    "demo:health": "npx tsx scripts/check-demo-health.ts",
+    "demo:og": "npx tsx scripts/generate-demos-og.ts",
+    "demo:css": "node scripts/compile-demo-css.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
