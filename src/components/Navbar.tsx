@@ -340,11 +340,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                     {karyaOpen && (
                       <div
                         id="nav-karya-menu"
-                        className={`absolute left-0 top-full mt-3 w-56 rounded-xl border p-1.5 shadow-xl ${
-                          darkMode
+                        className={`absolute left-0 top-full mt-3 w-56 rounded-xl border p-1.5 shadow-xl ${darkMode
                             ? 'bg-slate-900 border-slate-800 shadow-black/40'
                             : 'bg-white border-slate-200 shadow-slate-200/80'
-                        }`}
+                          }`}
                       >
                         {entry.children.map((child) => {
                           const active = isItemActive(child);
@@ -354,15 +353,14 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                               href={itemHref(child)}
                               aria-current={active ? 'page' : undefined}
                               onClick={(e) => handleItemClick(e, child)}
-                              className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium normal-case tracking-normal ${FOCUS_RING} ${
-                                active
+                              className={`flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm font-medium normal-case tracking-normal ${FOCUS_RING} ${active
                                   ? darkMode
                                     ? 'bg-teal-500/20 text-teal-400'
                                     : 'bg-teal-50 text-teal-700'
                                   : darkMode
                                     ? 'text-slate-200 hover:bg-slate-800'
                                     : 'text-slate-700 hover:bg-slate-100'
-                              }`}
+                                }`}
                             >
                               <span>{child.name}</span>
                             </a>

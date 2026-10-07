@@ -3,7 +3,17 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
+  <meta name="description"
+    content="Galeri contoh desain website dan aplikasi web: landing page bisnis, aplikasi kasir (POS), dashboard, dan toko online. Semua data di dalamnya adalah data contoh.">
+  <link rel="canonical" href="https://arzhaning.my.id/demos/index.html">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Galeri Contoh Desain | K. Arzhaning Jagad (Arzha)">
+  <meta property="og:description"
+    content="Contoh landing page, aplikasi kasir (POS), dashboard, dan toko online untuk berbagai jenis usaha.">
+  <meta property="og:url" content="https://arzhaning.my.id/demos/index.html">
+  <!-- Nomor WhatsApp diisi otomatis dari CONTACT_INFO.phone oleh scripts/prerender.ts saat build. Selama masih __WA_NUMBER__ (mis. saat dev), tombol WhatsApp di kartu otomatis disembunyikan. -->
+  <meta name="wa-number" content="__WA_NUMBER__">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Galeri Contoh Desain</title>
   <script>(function () { var r = document.documentElement, t = "light"; try { var q = new URLSearchParams(location.search).get("theme"); if (q === "dark" || q === "light") { t = q; localStorage.setItem("demo-theme", q) } else { var v = localStorage.getItem("demo-theme"); t = (v === "dark" || v === "light") ? v : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") } } catch (e) { } r.setAttribute("data-theme", t) })()</script>
@@ -604,42 +614,6 @@
       color: var(--sub)
     }
 
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 36px
-    }
-
-    .chip {
-      font: 500 14px Inter, sans-serif;
-      color: var(--sub);
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      padding: 8px 18px;
-      cursor: pointer;
-      transition: color .2s, border-color .2s
-    }
-
-    .chip:hover {
-      color: var(--ink);
-      border-color: var(--accent)
-    }
-
-    .chip[aria-pressed=true] {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent)
-    }
-
-    .chip em {
-      font-style: normal;
-      opacity: .65;
-      margin-left: 4px
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -662,8 +636,155 @@
       animation: up .5s ease-out backwards
     }
 
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 12px 14px;
+      margin-bottom: 36px
+    }
+
+    .filters[hidden] {
+      display: none
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 200px
+    }
+
+    .field>span {
+      font: 600 11px Inter, sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--sub)
+    }
+
+    .sel {
+      position: relative
+    }
+
+    .sel::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 8px;
+      height: 8px;
+      margin-top: -6px;
+      border-right: 2px solid var(--sub);
+      border-bottom: 2px solid var(--sub);
+      transform: rotate(45deg);
+      pointer-events: none
+    }
+
+    .sel select {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      font: 500 14px Inter, sans-serif;
+      color: var(--ink);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 40px 10px 16px;
+      cursor: pointer;
+      transition: border-color .2s
+    }
+
+    .sel select:hover,
+    .sel select:focus-visible {
+      border-color: var(--accent);
+      outline: none
+    }
+
+    .sel select option {
+      color: #17181a;
+      background: #fff
+    }
+
+    .freset {
+      font: 600 13px Inter, sans-serif;
+      color: var(--accent);
+      background: none;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer
+    }
+
+    .freset:hover {
+      border-color: var(--accent)
+    }
+
+    .freset[hidden] {
+      display: none
+    }
+
+    .fcount {
+      flex-basis: 100%;
+      text-align: center;
+      font-size: 13px;
+      color: var(--sub);
+      min-height: 1.4em
+    }
+
+    @media(max-width:600px) {
+      .field {
+        flex: 1 1 100%
+      }
+
+      .freset {
+        flex: 1 1 100%
+      }
+    }
+
     .card[hidden] {
       display: none
+    }
+
+    .card .main {
+      display: flex;
+      flex: 1;
+      min-width: 0;
+      color: inherit;
+      text-decoration: none
+    }
+
+    .card .info {
+      padding-bottom: 62px
+    }
+
+    .wa {
+      position: absolute;
+      left: calc(44% + 22px);
+      bottom: 16px;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 13px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--sub);
+      font: 600 13px/1.2 Inter, sans-serif;
+      text-decoration: none;
+      transition: color .2s, border-color .2s, background .2s
+    }
+
+    .wa:hover,
+    .wa:focus-visible {
+      color: var(--accent-ink);
+      background: var(--accent);
+      border-color: var(--accent)
+    }
+
+    .wa svg {
+      flex: none
     }
 
     .card:hover {
@@ -884,6 +1005,14 @@
         min-height: 0
       }
 
+      .card .main {
+        flex-direction: column
+      }
+
+      .wa {
+        left: 22px
+      }
+
       .thumb {
         flex: none;
         aspect-ratio: 16/10
@@ -928,6 +1057,7 @@
           </div>
         </div>
         <a href="/#layanan">Layanan</a>
+        <!-- PRERENDER:DEMOS_NAV_ARTICLES:START --><!-- PRERENDER:DEMOS_NAV_ARTICLES:END -->
         <a href="/#keahlian">Keahlian</a>
         <a href="/#kontak">Kontak</a>
       </nav>
@@ -965,6 +1095,7 @@
       <a class="sub" href="/hasil-kerja">Hasil Kerja</a>
       <a class="sub cur" href="/demos/index.html" aria-current="page">Contoh Desain</a>
       <a href="/#layanan">Layanan</a>
+      <!-- PRERENDER:DEMOS_DRAWER_ARTICLES:START --><!-- PRERENDER:DEMOS_DRAWER_ARTICLES:END -->
       <a href="/#keahlian">Keahlian</a>
       <a href="/#kontak">Kontak</a>
       <a class="cta-btn" href="/#kontak">Hubungi Saya Sekarang</a>
@@ -987,7 +1118,16 @@
       <div class="stat"><b id="statInd">0</b><small>Jenis usaha</small></div>
     </div>
 
-    <div class="chips" id="chips" role="group" aria-label="Filter jenis usaha"></div>
+    <div class="filters" id="filters" role="group" aria-label="Filter galeri" hidden>
+      <label class="field"><span>Jenis produk</span>
+        <div class="sel"><select id="fType"></select></div>
+      </label>
+      <label class="field"><span>Jenis usaha</span>
+        <div class="sel"><select id="fInd"></select></div>
+      </label>
+      <button class="freset" id="fReset" type="button" hidden>Reset filter</button>
+      <p class="fcount" id="fCount" aria-live="polite"></p>
+    </div>
     <div id="grid" class="grid"></div>
     <nav class="pager" id="pager" aria-label="Halaman galeri" hidden></nav>
     <p class="msg" id="msg">Memuat galeri…</p>
@@ -998,16 +1138,23 @@
         <a href="/privacy-policy/">Kebijakan Privasi</a>
         <a href="/terms/">Syarat &amp; Ketentuan</a>
       </nav>
-      <small>© 2026 K. Arzhaning Jagad. All rights reserved.</small>
+      <small>© <span id="yr">2026</span> K. Arzhaning Jagad. All rights reserved.</small>
     </footer>
   </main>
   <script>
     /* Data ada di demos.json (dipakai juga oleh nudge di portofolio).
-       Konvensi tags: tag pertama = jenis halaman (mis. "Landing Page"),
-       tag berikutnya = jenis usaha. Filter hanya memakai tag jenis usaha. */
+       Konvensi tags: tag pertama = jenis produk (mis. "Landing Page", "Aplikasi Web"),
+       tag berikutnya = jenis usaha. Ada dua baris filter: jenis produk + jenis usaha
+       (keduanya digabung dengan AND). Field opsional "featured": true menyematkan
+       kartu di urutan teratas tanpa harus memindah posisi entri di JSON. */
     var PER_PAGE = 8; // pagination hanya aktif di filter "Semua"; filter lain menampilkan semua hasil
     var pager = document.getElementById("pager");
-    var grid = document.getElementById("grid"), msg = document.getElementById("msg"), chipsEl = document.getElementById("chips");
+    var grid = document.getElementById("grid"), msg = document.getElementById("msg"), filtersEl = document.getElementById("filters"), fType = document.getElementById("fType"), fInd = document.getElementById("fInd"), fReset = document.getElementById("fReset"), fCount = document.getElementById("fCount");
+    var yr = document.getElementById("yr"); if (yr) yr.textContent = new Date().getFullYear();
+
+    /* Nomor WhatsApp diisi build (prerender.ts). Kalau belum terisi, tombol WA tidak dibuat. */
+    var waMeta = document.querySelector('meta[name="wa-number"]');
+    var WA = waMeta ? waMeta.content.replace(/[^0-9]/g, "") : "";
     var NS = "http://www.w3.org/2000/svg";
 
     function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
@@ -1049,10 +1196,33 @@
       a.addEventListener("mouseleave", function () { a.style.removeProperty("--rx"); a.style.removeProperty("--ry"); });
     }
 
+    function waIcon() {
+      var s = document.createElementNS(NS, "svg");
+      s.setAttribute("width", "14"); s.setAttribute("height", "14"); s.setAttribute("viewBox", "0 0 24 24");
+      s.setAttribute("fill", "currentColor"); s.setAttribute("aria-hidden", "true");
+      var p = document.createElementNS(NS, "path");
+      p.setAttribute("d", "M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.27-1.38A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.3 15l-.3-.18-3.1.8.83-3.02-.2-.31A8.1 8.1 0 0 1 12.04 3.8zm-3.1 3.9c-.2 0-.5.07-.76.35-.26.28-1 .98-1 2.4s1.03 2.78 1.17 2.97c.14.2 2 3.2 4.93 4.36 2.44.96 2.93.77 3.46.72.53-.05 1.7-.7 1.94-1.37.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.55-.34-.29-.14-1.7-.84-1.96-.93-.27-.1-.46-.14-.65.14-.19.29-.74.93-.9 1.12-.17.2-.34.22-.63.07-.29-.14-1.22-.45-2.32-1.43-.86-.76-1.44-1.7-1.6-1.99-.17-.29-.02-.44.12-.58.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.2.05-.36-.02-.5-.07-.15-.65-1.57-.9-2.15-.23-.56-.47-.48-.65-.49h-.55z");
+      s.appendChild(p); return s;
+    }
+
+    function waLink(d) {
+      if (!WA) return null;
+      var a = el("a", "wa");
+      var text = "Halo Arzha, saya tertarik dengan demo \"" + d.title + "\". Boleh diskusi untuk dibuatkan yang seperti ini?";
+      a.href = "https://wa.me/" + WA + "?text=" + encodeURIComponent(text);
+      a.target = "_blank"; a.rel = "noopener noreferrer";
+      a.setAttribute("aria-label", "Tanya via WhatsApp tentang " + d.title);
+      a.appendChild(waIcon()); a.appendChild(document.createTextNode("Mau seperti ini?"));
+      return a;
+    }
+
     function card(d, i) {
-      var a = el("a", "card"); a.href = d.file; a.target = "_blank"; a.rel = "noopener";
+      var a = el("article", "card");
       a.style.animationDelay = Math.min(i, 8) * 0.06 + "s";
+      a.dataset.type = (d.tags || [])[0] || "";
       a.dataset.tags = (d.tags || []).slice(1).join("|");
+      /* Tautan utama dipisah dari tombol WA karena <a> tidak boleh bersarang di dalam <a>. */
+      var main = el("a", "main"); main.href = d.file; main.target = "_blank"; main.rel = "noopener";
       var th = el("div", "thumb");
       if (d.thumb) {
         var img = new Image(); img.alt = "Cuplikan " + d.title; img.loading = "lazy";
@@ -1063,13 +1233,20 @@
       (d.tags || []).forEach(function (t) { tg.appendChild(el("span", "tag", t)); });
       var cta = el("span", "cta", "Buka demo"); cta.appendChild(arrow());
       info.appendChild(tg); info.appendChild(el("h2", "", d.title)); info.appendChild(el("p", "", d.desc || "")); info.appendChild(cta);
-      a.appendChild(th); a.appendChild(info);
+      main.appendChild(th); main.appendChild(info);
+      a.appendChild(main);
+      var wa = waLink(d); if (wa) a.appendChild(wa);
       if (!calm && mouse) tilt(a);
       return a;
     }
 
     function render(data) {
-      var counts = {}, order = [];
+      data = data.map(function (d, i) { return { d: d, i: i }; })
+        .sort(function (a, b) { return (b.d.featured ? 1 : 0) - (a.d.featured ? 1 : 0) || a.i - b.i; })
+        .map(function (x) { return x.d; });
+      var counts = {}, order = [], tcounts = {}, torder = [];
+      data.forEach(function (d) { var t = (d.tags || [])[0]; if (t) { if (!tcounts[t]) { tcounts[t] = 0; torder.push(t); } tcounts[t]++; } });
+      torder.sort(function (a, b) { return tcounts[b] - tcounts[a]; });
       data.forEach(function (d) { (d.tags || []).slice(1).forEach(function (t) { if (!counts[t]) { counts[t] = 0; order.push(t); } counts[t]++; }); });
       order.sort(function (a, b) { return counts[b] - counts[a]; });
 
@@ -1078,7 +1255,7 @@
       document.getElementById("stats").hidden = false;
 
       var cards = data.map(function (d, i) { var c = card(d, i); grid.appendChild(c); return c; });
-      var active = "Semua", page = 1;
+      var active = "Semua", activeType = "Semua", page = 1;
 
       function drawPager(pages) {
         pager.textContent = ""; pager.hidden = pages <= 1;
@@ -1096,27 +1273,34 @@
       }
 
       function apply(scroll) {
-        var all = active === "Semua";
-        var hits = cards.filter(function (c) { return all || c.dataset.tags.split("|").indexOf(active) > -1; });
+        var all = active === "Semua" && activeType === "Semua";
+        var hits = cards.filter(function (c) {
+          return (active === "Semua" || c.dataset.tags.split("|").indexOf(active) > -1) &&
+            (activeType === "Semua" || c.dataset.type === activeType);
+        });
         var pages = all ? Math.ceil(hits.length / PER_PAGE) : 1;
         if (page > pages) page = Math.max(pages, 1);
         var from = all ? (page - 1) * PER_PAGE : 0, to = all ? from + PER_PAGE : hits.length;
         cards.forEach(function (c) { c.hidden = true; });
         hits.slice(from, to).forEach(function (c, k) { c.hidden = false; c.style.animationDelay = Math.min(k, 8) * 0.06 + "s"; });
         msg.textContent = "Belum ada contoh di kategori ini."; msg.hidden = hits.length > 0;
-        Array.prototype.forEach.call(chipsEl.children, function (b) { b.setAttribute("aria-pressed", String(b.dataset.f === active)); });
+        fType.value = activeType; fInd.value = active;
+        fReset.hidden = all;
+        fCount.textContent = all ? "" : "Menampilkan " + hits.length + " dari " + cards.length + " contoh";
         drawPager(all ? pages : 1);
         if (scroll === true) window.scrollTo({ top: grid.getBoundingClientRect().top + window.scrollY - 110, behavior: calm ? "auto" : "smooth" });
       }
 
-      if (order.length > 1) {
-        ["Semua"].concat(order).forEach(function (t) {
-          var b = el("button", "chip", t); b.type = "button"; b.dataset.f = t;
-          if (t !== "Semua") b.appendChild(el("em", "", String(counts[t])));
-          b.onclick = function () { active = t; page = 1; apply(); };
-          chipsEl.appendChild(b);
-        });
+      function fill(sel, allLabel, list, cnt) {
+        sel.appendChild(new Option(allLabel + " (" + cards.length + ")", "Semua"));
+        list.forEach(function (t) { sel.appendChild(new Option(t + " (" + cnt[t] + ")", t)); });
       }
+      fill(fType, "Semua jenis", torder, tcounts);
+      fill(fInd, "Semua usaha", order, counts);
+      fType.onchange = function () { activeType = fType.value; page = 1; apply(); };
+      fInd.onchange = function () { active = fInd.value; page = 1; apply(); };
+      fReset.onclick = function () { active = "Semua"; activeType = "Semua"; page = 1; apply(); fType.focus(); };
+      filtersEl.hidden = !(torder.length > 1 || order.length > 1);
       apply(); msg.hidden = true;
     }
 

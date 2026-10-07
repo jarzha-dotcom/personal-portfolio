@@ -36,6 +36,9 @@ Saya merancang asisten kecerdasan buatan (AI) interaktif agar calon klien dan pe
     Rajendra dirancang dengan karakter formal dan analitis. Anda bisa mengajaknya berdiskusi seputar arsitektur sistem, keamanan data, integrasi API, alur inventaris, hingga pemilihan model AI Google terbaru (Gemini 3.8 Flash, Gemma 4, dan lainnya melalui dropdown model).
 *   **⚡ Radit (Asisten Penjawab Cepat FAQ)**  
     Bekerja secara cerdas di balik layar untuk menjawab pertanyaan umum seputar jasa dan portofolio saya dalam hitungan detik tanpa membebani kuota internet.
+*   **🔒 Privasi Terjaga & Integrasi Ringkasan WhatsApp yang Transparan**  
+    *   **Penyimpanan Lokal Mandiri (Default)**: Seluruh riwayat percakapan dan berkas konsultasi secara default hanya tersimpan di memori browser lokal perangkat Anda (IndexedDB) — **tidak disimpan ke database server pengembang**. Anda memegang kendali penuh untuk membuat sesi baru, menghapus riwayat obrolan kapan saja, atau mengekspor dokumen ringkasan diskusi resmi secara mandiri (otomatis dibersihkan oleh sistem > 30 hari).
+    *   **Tautan Ringkasan WhatsApp (Retensi 7 Hari di Server)**: Saat Anda memutuskan untuk melanjutkan diskusi dengan menekan tombol **"Chat via WhatsApp"**, sistem secara *opt-in* membuat tautan ringkasan transkrip percakapan sesi tersebut dan menyimpannya sementara di server (Upstash Redis) selama maksimum **7 hari** (setelah itu otomatis terhapus permanen). Tautan privat ini otomatis dilampirkan pada pesan WhatsApp ke Mas Arzha agar beliau dapat langsung membaca konteks lengkap kebutuhan proyek sebelum membalas. Halaman ringkasan dilindungi tag *noindex* (tidak dapat ditemukan di mesin pencari Google), sepenuhnya selaras dengan [Kebijakan Privasi](/privacy-policy/) resmi situs.
 
 ---
 
@@ -153,7 +156,7 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 | **Analisis Berkas Cerdas** | **Google Antigravity (Interactions API)** | Chatbot mampu memeriksa dan menganalisis berkas yang Anda unggah (sketsa desain, dokumen PDF, tabel data) secara mendalam. |
 | **Suara Alami (Voice TTS)** | **Google Cloud Chirp 3 HD & WaveNet** | Sintesis vokal AI generasi terbaru ultra-natural dengan fallback berjenjang (Chirp 3 HD ➔ WaveNet ➔ Web Speech) dan pelindung kuota gratis otomatis via Redis. |
 | **Infrastruktur Cloud (Backend)** | **Vercel Serverless Architecture** | **Hemat Anggaran Server**: Anda tidak perlu pusing membayar biaya sewa server bulanan yang mahal. Server hanya aktif saat ada pengunjung, kuat menampung ribuan pengguna sekaligus. |
-| **Keamanan & Privasi Obrolan** | **IndexedDB Local Storage** | Riwayat obrolan tersimpan aman di browser masing-masing pengunjung sehingga kerahasiaan data percakapan bisnis Anda terjamin 100%. |
+| **Keamanan & Privasi Obrolan** | **Hybrid: Client IndexedDB & Ephemeral 7-Day Server Summary** | **Privasi Maksimal & Ramah Klien**: Riwayat obrolan default tersimpan di IndexedDB browser lokal pengunjung (dibersihkan > 30 hari / kontrol hapus mandiri). Khusus saat pengunjung menekan tombol "Chat via WhatsApp", tautan ringkasan transkrip sesi disimpan sementara di server dengan retensi otomatis 7 hari (Upstash Redis TTL) dan otomatis dilampirkan di WhatsApp agar Mas Arzha dapat membaca konteks proyek sebelum membalas. Dilindungi header *noindex* selaras Kebijakan Privasi. |
 | **Transaksi & Pembayaran** | **Xendit Payment Gateway** | Menerima pembayaran instan dari pelanggan Anda lewat QRIS (semua bank & e-wallet) dengan konfirmasi otomatis tanpa verifikasi manual. |
 | **Pusat Artikel & Audio Narasi** | **Static Site Generation (SSG) & Custom Audio Player** | Akses artikel super cepat dan ramah SEO Google, dilengkapi fitur dengarkan artikel naratif layaknya podcast interaktif. |
 

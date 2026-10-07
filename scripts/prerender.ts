@@ -17,7 +17,7 @@
 // Jalankan manual: npm run prerender (setelah ada dist/index.html)
 // Otomatis: npm run build (lihat "postbuild" di package.json)
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -43,6 +43,10 @@ const ROOT_DIR = join(__dirname, '..');
 const DIST_DIR = join(ROOT_DIR, 'dist');
 const VERCEL_JSON_PATH = join(ROOT_DIR, 'vercel.json');
 const INDEX_HTML_PATH = join(DIST_DIR, 'index.html');
+// Galeri contoh desain: folder statis di luar SPA (lihat catatan DEMOS_PREFIX di public/sw.js).
+const DEMOS_SRC_DIR = join(ROOT_DIR, 'public', 'demos');
+const DEMOS_DIST_INDEX = join(DIST_DIR, 'demos', 'index.html');
+const DEMOS_GALLERY_PATH = '/demos/index.html';
 
 // CANONICAL_BASE sekarang diimpor dari src/routes.ts (satu-satunya sumber),
 // bukan didefinisikan ulang di sini.
@@ -102,7 +106,7 @@ const fillMarkedBlock = (html: string, name: string, content: string): string =>
   if (!pattern.test(html)) {
     throw new Error(
       `[prerender] Penanda ${start} ... ${end} tidak ditemukan di dist/index.html. ` +
-        `Pastikan index.html sumber masih memuat kedua komentar penanda itu.`
+      `Pastikan index.html sumber masih memuat kedua komentar penanda itu.`
     );
   }
   // Pakai fungsi (bukan string) supaya "$" di dalam konten tidak ditafsirkan khusus oleh replace().
@@ -149,7 +153,7 @@ const readBaseHtml = (): string => {
   if (!existsSync(path)) {
     throw new Error(
       `[prerender] dist/index.html tidak ditemukan di ${path}. ` +
-        `Jalankan "vite build" dulu sebelum prerender (script ini butuh HTML hasil build, bukan index.html sumber).`
+      `Jalankan "vite build" dulu sebelum prerender (script ini butuh HTML hasil build, bukan index.html sumber).`
     );
   }
   baseHtmlCache = fillHomeArticleBlocks(readFileSync(path, 'utf-8'));
@@ -200,7 +204,7 @@ const applyHead = (html: string, opts: HeadOptions): string => {
     if (!pattern.test(html)) {
       throw new Error(
         `[prerender] Tag head yang diharapkan tidak ditemukan di dist/index.html (pola: ${pattern}). ` +
-          `Kemungkinan struktur index.html sumber berubah — sesuaikan REQUIRED_HEAD_ANCHORS/applyHead di scripts/prerender.ts.`
+        `Kemungkinan struktur index.html sumber berubah — sesuaikan REQUIRED_HEAD_ANCHORS/applyHead di scripts/prerender.ts.`
       );
     }
   }
@@ -287,7 +291,7 @@ const replaceRootShell = (html: string, innerHtml: string): string => {
   if (rootOpenIdx === -1 || splashIdx === -1) {
     throw new Error(
       '[prerender] Penanda <div id="root"> atau komentar "Menyembunyikan splash" tidak ditemukan di dist/index.html. ' +
-        'Struktur index.html sumber kemungkinan berubah — sesuaikan replaceRootShell di scripts/prerender.ts.'
+      'Struktur index.html sumber kemungkinan berubah — sesuaikan replaceRootShell di scripts/prerender.ts.'
     );
   }
   const contentStart = rootOpenIdx + ROOT_OPEN_TAG.length;
@@ -363,38 +367,35 @@ const buildHasilKerjaPage = () => {
           </h3>
           <p style="${styleMetaText}">${escapeHtml(project.badge)} &bull; ${escapeHtml(project.year)} &bull; ${escapeHtml(project.role)}</p>
           <p style="${styleBodyText}">${escapeHtml(project.description)}</p>
-          ${
-            bc
-              ? `
+          ${bc
+        ? `
           <div style="margin-top: 0.75rem; display: grid; gap: 0.5rem;">
             <p style="${styleBodyText}"><strong style="color: #0f172a;">Masalah:</strong> ${escapeHtml(bc.problem)}</p>
             <p style="${styleBodyText}"><strong style="color: #0f172a;">Solusi:</strong> ${escapeHtml(bc.solution)}</p>
             <p style="${styleBodyText}"><strong style="color: #0f172a;">Hasil:</strong> ${escapeHtml(bc.impact)}</p>
           </div>`
-              : ''
-          }
+        : ''
+      }
           <ul style="margin: 0.75rem 0 0 0; padding-left: 1.1rem; color: #475569;">
             ${project.highlights.map((h) => `<li style="margin-bottom: 0.25rem;">${escapeHtml(h)}</li>`).join('\n            ')}
           </ul>
           <p style="margin-top: 0.75rem; font-size: 0.8rem; color: #94a3b8;">
             ${project.techStack.map(escapeHtml).join(' &bull; ')}
           </p>
-          ${
-            testimonial
-              ? `
+          ${testimonial
+        ? `
           <blockquote style="margin: 1rem 0 0 0; padding: 0.75rem 1rem; border-left: 3px solid #0d9488; background: #f0fdfa; color: #334155; font-style: italic;">
             &ldquo;${escapeHtml(testimonial.quote)}&rdquo;
             <footer style="margin-top: 0.5rem; font-style: normal; font-size: 0.85rem; color: #64748b;">
               &mdash; ${escapeHtml(testimonial.author)}${testimonial.role ? `, ${escapeHtml(testimonial.role)}` : ''}${testimonial.company ? ` (${escapeHtml(testimonial.company)})` : ''}
             </footer>
           </blockquote>`
-              : ''
-          }
-          ${
-            project.demoUrl
-              ? `<p style="margin-top: 0.75rem;"><a href="${escapeHtml(project.demoUrl)}" target="_blank" rel="noopener noreferrer" style="color: #0d9488; font-weight: 600;">Coba demo langsung &rarr;</a></p>`
-              : ''
-          }
+        : ''
+      }
+          ${project.demoUrl
+        ? `<p style="margin-top: 0.75rem;"><a href="${escapeHtml(project.demoUrl)}" target="_blank" rel="noopener noreferrer" style="color: #0d9488; font-weight: 600;">Coba demo langsung &rarr;</a></p>`
+        : ''
+      }
         </article>`;
   };
 
@@ -405,10 +406,10 @@ const buildHasilKerjaPage = () => {
 
   const inner = `
     <div id="prerendered-shell">${pageHeader(
-      title,
-      description,
-      'Hasil Kerja'
-    )}
+    title,
+    description,
+    'Hasil Kerja'
+  )}
       <main style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">
         <section style="${styleSection}">
           <h2 style="${styleH2}">Proyek</h2>
@@ -612,8 +613,8 @@ const buildArticlePage = async (article: Article) => {
       // untuk crawler; tampilan asli dirender komponen ArticlePage.
       const template = block.template?.length
         ? `<div style="${styleCard} margin: 0 0 1rem 0; background: #f8fafc;">${block.template
-            .map((line) => `<p style="${styleBodyText} margin: 0 0 0.5rem 0;">${escapeHtml(line)}</p>`)
-            .join('')}</div>`
+          .map((line) => `<p style="${styleBodyText} margin: 0 0 0.5rem 0;">${escapeHtml(line)}</p>`)
+          .join('')}</div>`
         : '';
       return `${heading}\n            ${paragraphs}${template ? `\n            ${template}` : ''}`;
     })
@@ -648,26 +649,25 @@ const buildArticlePage = async (article: Article) => {
         <article>
             ${bodyHtml}
         </article>
-        ${
-          prev || next
-            ? `
+        ${prev || next
+      ? `
         <nav aria-label="Navigasi artikel" style="display: flex; gap: 1rem; margin-top: 2rem;">
           ${navLink(prev, 'Artikel sebelumnya', 'left')}
           ${navLink(next, 'Artikel selanjutnya', 'right')}
         </nav>`
-            : ''
-        }
+      : ''
+    }
         ${(() => {
-          const related = getRelatedArticles(article.slug, 3);
-          if (!related.length) return '';
-          return `
+      const related = getRelatedArticles(article.slug, 3);
+      if (!related.length) return '';
+      return `
         <section aria-label="Artikel terkait" style="margin-top: 2.5rem;">
           <h2 style="${styleH2}">Artikel Terkait</h2>
           <ul style="padding: 0; margin: 1rem 0 0 0;">
             ${related.map(renderArticleListItem).join('\n            ')}
           </ul>
         </section>`;
-        })()}
+    })()}
       </main>${pageFooter()}
     </div>`;
 
@@ -720,6 +720,9 @@ const today = (): string => new Date().toISOString().slice(0, 10);
 const STATIC_SITEMAP_ENTRIES: SitemapEntry[] = [
   { loc: `${CANONICAL_BASE}/`, lastmod: today(), changefreq: 'weekly', priority: '1.0' },
   { loc: `${CANONICAL_BASE}${ROUTES.caseStudy}`, lastmod: today(), changefreq: 'monthly', priority: '0.8' },
+  // Galeri contoh desain (halaman statis di public/demos). Halaman demo individualnya
+  // sengaja TIDAK dimasukkan sitemap: isinya data contoh (dummy) dan berukuran besar.
+  { loc: `${CANONICAL_BASE}${DEMOS_GALLERY_PATH}`, lastmod: today(), changefreq: 'monthly', priority: '0.5' },
   // Tanggal 2 halaman ini TIDAK di-auto-update (bukan berasal dari data
   // artikel) — ubah manual kalau isi privacy-policy/terms memang direvisi.
   { loc: `${CANONICAL_BASE}/privacy-policy/`, lastmod: '2026-09-20', changefreq: 'yearly', priority: '0.3' },
@@ -760,7 +763,7 @@ const buildSitemap = (paginationInfo: { totalPages: number; pageUrl: (page: numb
     });
   }
 
-  const allEntries = [...STATIC_SITEMAP_ENTRIES.slice(0, 2), ...articleEntries, ...paginationEntries, ...STATIC_SITEMAP_ENTRIES.slice(2)];
+  const allEntries = [...STATIC_SITEMAP_ENTRIES.slice(0, 3), ...articleEntries, ...paginationEntries, ...STATIC_SITEMAP_ENTRIES.slice(3)];
 
   const xml =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -811,8 +814,8 @@ const checkIndexHtmlCanonicalDrift = () => {
   if (mismatches.length) {
     console.warn(
       `\n[prerender] PERINGATAN: dist/index.html (homepage) tidak sinkron dengan CANONICAL_BASE ("${CANONICAL_BASE}") di src/routes.ts:\n` +
-        mismatches.map((m) => `  - ${m}`).join('\n') +
-        `\n  index.html tidak ikut diimpor otomatis (bukan modul JS) — update og:url dan <link rel="canonical"> di index.html secara manual supaya cocok.\n`
+      mismatches.map((m) => `  - ${m}`).join('\n') +
+      `\n  index.html tidak ikut diimpor otomatis (bukan modul JS) — update og:url dan <link rel="canonical"> di index.html secara manual supaya cocok.\n`
     );
   }
 };
@@ -834,15 +837,15 @@ const checkVercelRewriteDrift = (publishedSlugs: string[], totalPages: number) =
   if (missing.length) {
     console.warn(
       `\n[prerender] PERINGATAN: ${missing.length} artikel published belum punya rewrite exact-match di vercel.json:\n` +
-        missing.map((s) => `  - ${s}`).join('\n') +
-        `\n  Tambahkan entri { "source": "/artikel/${missing[0]}", "destination": "/artikel/${missing[0]}/index.html" } (letakkan sebelum rewrite catch-all SPA), atau halaman ini akan tetap ke-fallback ke shell generik homepage untuk crawler.\n`
+      missing.map((s) => `  - ${s}`).join('\n') +
+      `\n  Tambahkan entri { "source": "/artikel/${missing[0]}", "destination": "/artikel/${missing[0]}/index.html" } (letakkan sebelum rewrite catch-all SPA), atau halaman ini akan tetap ke-fallback ke shell generik homepage untuk crawler.\n`
     );
   }
   if (stale.length) {
     console.warn(
       `\n[prerender] PERINGATAN: vercel.json punya rewrite artikel yang slug-nya sudah tidak published (atau sudah tidak ada) di articles.ts:\n` +
-        stale.map((s) => `  - ${s}`).join('\n') +
-        `\n  Aman dibiarkan (cuma jadi rewrite mati), tapi sebaiknya dihapus biar tidak membingungkan.\n`
+      stale.map((s) => `  - ${s}`).join('\n') +
+      `\n  Aman dibiarkan (cuma jadi rewrite mati), tapi sebaiknya dihapus biar tidak membingungkan.\n`
     );
   }
 
@@ -860,10 +863,139 @@ const checkVercelRewriteDrift = (publishedSlugs: string[], totalPages: number) =
   if (missingPages.length) {
     console.warn(
       `\n[prerender] PERINGATAN: ${missingPages.length} halaman /artikel?page=N belum punya rewrite "has query" di vercel.json:\n` +
-        missingPages.map((p) => `  - /artikel?page=${p}`).join('\n') +
-        `\n  Tambahkan entri { "source": "/artikel", "has": [{ "type": "query", "key": "page", "value": "${missingPages[0]}" }], "destination": "/artikel/page/${missingPages[0]}/index.html" }.\n`
+      missingPages.map((p) => `  - /artikel?page=${p}`).join('\n') +
+      `\n  Tambahkan entri { "source": "/artikel", "has": [{ "type": "query", "key": "page", "value": "${missingPages[0]}" }], "destination": "/artikel/page/${missingPages[0]}/index.html" }.\n`
     );
   }
+};
+
+// ---------------------------------------------------------------------------
+// Galeri contoh desain (public/demos) — validasi demos.json + isi otomatis.
+//
+// demos.json diedit manual dan jumlahnya terus bertambah, jadi salah ketik nama
+// file baru ketahuan setelah kartunya rusak di produksi. Pemeriksaan ini jalan
+// tiap build, dengan pola yang sama seperti guard lain di file ini:
+//   - GAGAL build : JSON tidak valid, field wajib kosong, file HTML tidak ada,
+//                   atau nama file dobel (kartu rusak / ambigu).
+//   - PERINGATAN  : thumbnail belum ada, tag kurang, file demo/thumbnail yatim
+//                   (ada di folder tapi tidak terdaftar).
+// ---------------------------------------------------------------------------
+
+interface DemoManifestEntry {
+  file?: string;
+  thumb?: string;
+  title?: string;
+  desc?: string;
+  tags?: string[];
+  featured?: boolean;
+}
+
+const stripQuery = (path: string) => path.split(/[?#]/)[0];
+
+const checkDemosManifest = () => {
+  const manifestPath = join(DEMOS_SRC_DIR, 'demos.json');
+  if (!existsSync(manifestPath)) return;
+
+  let entries: DemoManifestEntry[];
+  try {
+    entries = JSON.parse(readFileSync(manifestPath, 'utf-8'));
+  } catch (err) {
+    throw new Error(`[prerender] public/demos/demos.json bukan JSON valid: ${String(err)}`);
+  }
+  if (!Array.isArray(entries)) {
+    throw new Error('[prerender] public/demos/demos.json harus berupa array.');
+  }
+
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const seen = new Set<string>();
+  const listedFiles = new Set<string>();
+  const listedThumbs = new Set<string>();
+
+  entries.forEach((entry, i) => {
+    const where = `#${i + 1} (${entry.file ?? entry.title ?? '?'})`;
+    for (const field of ['file', 'title', 'desc'] as const) {
+      if (!entry[field] || typeof entry[field] !== 'string') errors.push(`${where}: field "${field}" kosong`);
+    }
+    if (!Array.isArray(entry.tags) || entry.tags.length === 0) {
+      errors.push(`${where}: "tags" harus berisi minimal 1 tag (tag pertama = jenis produk)`);
+    } else if (entry.tags.length < 2) {
+      warnings.push(`${where}: hanya 1 tag — tidak akan muncul di filter jenis usaha`);
+    }
+
+    if (entry.file) {
+      if (seen.has(entry.file)) errors.push(`${where}: nama file dobel`);
+      seen.add(entry.file);
+      listedFiles.add(entry.file);
+      if (!existsSync(join(DEMOS_SRC_DIR, entry.file))) {
+        errors.push(`${where}: file HTML tidak ditemukan di public/demos/${entry.file}`);
+      }
+    }
+    if (!entry.thumb) {
+      warnings.push(`${where}: belum punya field "thumb"`);
+    } else {
+      const thumbFile = stripQuery(entry.thumb);
+      listedThumbs.add(thumbFile);
+      if (!existsSync(join(DEMOS_SRC_DIR, thumbFile))) {
+        warnings.push(`${where}: thumbnail belum ada di public/demos/${thumbFile} (kartu tampil huruf placeholder)`);
+      }
+    }
+  });
+
+  // File yatim: ada di folder tapi tidak terdaftar di demos.json
+  for (const f of readdirSync(DEMOS_SRC_DIR)) {
+    if (/^demo-.*\.html$/.test(f) && !listedFiles.has(f)) warnings.push(`public/demos/${f} tidak terdaftar di demos.json`);
+  }
+  const thumbsDir = join(DEMOS_SRC_DIR, 'thumbs');
+  if (existsSync(thumbsDir)) {
+    for (const f of readdirSync(thumbsDir)) {
+      if (!listedThumbs.has(`thumbs/${f}`)) warnings.push(`public/demos/thumbs/${f} tidak dipakai oleh entri manapun`);
+    }
+  }
+
+  if (errors.length) {
+    throw new Error(
+      `[prerender] demos.json bermasalah (${errors.length}):\n` + errors.map((e) => `  - ${e}`).join('\n')
+    );
+  }
+  if (warnings.length) {
+    console.warn(
+      `\n[prerender] PERINGATAN: ${warnings.length} catatan di galeri demo:\n` + warnings.map((w) => `  - ${w}`).join('\n') + '\n'
+    );
+  }
+  console.log(`[prerender] demos.json OK: ${entries.length} entri.`);
+};
+
+// Mengisi dist/demos/index.html (hasil salinan public/demos oleh Vite) dengan data yang
+// hanya diketahui build: nomor WhatsApp (dari CONTACT_INFO.phone), canonical/og:url
+// (dari CANONICAL_BASE), dan link "Artikel" di navbar galeri (hanya kalau ada artikel
+// published — sama seperti Navbar.tsx). Idempoten: aman dijalankan berulang.
+const fillDemosGallery = (hasPublishedArticles: boolean): string | null => {
+  if (!existsSync(DEMOS_DIST_INDEX)) {
+    console.warn('[prerender] dist/demos/index.html tidak ditemukan — isi galeri demo dilewati.');
+    return null;
+  }
+  let html = readFileSync(DEMOS_DIST_INDEX, 'utf-8');
+
+  const waDigits = String(CONTACT_INFO.phone ?? '').replace(/[^0-9]/g, '');
+  if (!waDigits) {
+    console.warn('[prerender] CONTACT_INFO.phone kosong — tombol WhatsApp di galeri demo akan disembunyikan.');
+  }
+  const waPattern = /<meta name="wa-number" content="[^"]*">/;
+  if (!waPattern.test(html)) throw new Error('[prerender] <meta name="wa-number"> tidak ditemukan di public/demos/index.html.');
+  html = html.replace(waPattern, () => `<meta name="wa-number" content="${waDigits || '__WA_NUMBER__'}">`);
+
+  const galleryUrl = `${CANONICAL_BASE}${DEMOS_GALLERY_PATH}`;
+  html = html
+    .replace(/<link rel="canonical" href="[^"]*">/, () => `<link rel="canonical" href="${galleryUrl}">`)
+    .replace(/<meta property="og:url" content="[^"]*">/, () => `<meta property="og:url" content="${galleryUrl}">`);
+
+  const link = hasPublishedArticles ? `<a href="${ROUTES.articles}">Artikel</a>` : '';
+  html = fillMarkedBlock(html, 'DEMOS_NAV_ARTICLES', link);
+  html = fillMarkedBlock(html, 'DEMOS_DRAWER_ARTICLES', link);
+
+  writeFileSync(DEMOS_DIST_INDEX, html, 'utf-8');
+  return DEMOS_DIST_INDEX;
 };
 
 // ---------------------------------------------------------------------------
@@ -872,6 +1004,9 @@ const checkVercelRewriteDrift = (publishedSlugs: string[], totalPages: number) =
 
 const main = async () => {
   const written: string[] = [];
+
+  // Validasi galeri demo lebih dulu: kalau demos.json rusak, build gagal sebelum menulis apapun.
+  checkDemosManifest();
 
   written.push(buildHasilKerjaPage());
 
@@ -887,6 +1022,9 @@ const main = async () => {
   // sudah terisi dari data (lihat fillHomeArticleBlocks).
   writeFileSync(INDEX_HTML_PATH, readBaseHtml(), 'utf-8');
   written.push(INDEX_HTML_PATH);
+
+  const demosGalleryPath = fillDemosGallery(published.length > 0);
+  if (demosGalleryPath) written.push(demosGalleryPath);
 
   const sitemapPath = buildSitemap({ totalPages, pageUrl });
   written.push(sitemapPath);
