@@ -109,7 +109,25 @@ const main = async () => {
 
   console.log(`[thumbs] ${todo.length} thumbnail akan dibuat...`);
   const { server, origin } = await startServer();
-  const browser = await chromium.launch();
+
+  const launchBrowser = async () => {
+    try {
+      return await chromium.launch();
+    } catch {
+      for (const channel of ['chrome', 'msedge']) {
+        try {
+          return await chromium.launch({ channel });
+        } catch {
+          // coba channel berikutnya
+        }
+      }
+      throw new Error(
+        'Tidak dapat menemukan browser. Jalankan "npx playwright install chromium" atau pastikan Chrome / Edge terinstall.'
+      );
+    }
+  };
+
+  const browser = await launchBrowser();
   const context = await browser.newContext({
     viewport: { width: WIDTH, height: HEIGHT },
     deviceScaleFactor: 1,

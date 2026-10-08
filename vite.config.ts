@@ -134,6 +134,25 @@ function localTtsDevPlugin(): Plugin {
   };
 }
 
+function localStaticRoutesPlugin(): Plugin {
+  return {
+    name: 'local-static-routes',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const rawUrl = req.url || '';
+        const pathOnly = rawUrl.split('?')[0];
+        if (pathOnly === '/zhanotes' || pathOnly === '/zhanotes/') {
+          req.url = '/zhanotes/index.html' + (rawUrl.includes('?') ? rawUrl.slice(rawUrl.indexOf('?')) : '');
+        } else if (pathOnly === '/demos' || pathOnly === '/demos/') {
+          req.url = '/demos/index.html' + (rawUrl.includes('?') ? rawUrl.slice(rawUrl.indexOf('?')) : '');
+        }
+        next();
+      });
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   // Handler api/*.ts membaca process.env langsung (persis seperti di Vercel), jadi
@@ -148,7 +167,7 @@ export default defineConfig(({ mode }) => {
   const buildId = `${Date.now()}`;
 
   return {
-    plugins: [react(), tailwindcss(), localChatDevPlugin(), localTtsDevPlugin()],
+    plugins: [react(), tailwindcss(), localChatDevPlugin(), localTtsDevPlugin(), localStaticRoutesPlugin()],
     define: {
       // Tersedia sebagai konstanta global di semua komponen React
       __CHAT_BUILD_ID__: JSON.stringify(buildId),

@@ -44,6 +44,11 @@
       "source": "/demos",
       "destination": "/demos/",
       "permanent": false
+    },
+    {
+      "source": "/zhanotes",
+      "destination": "/zhanotes/",
+      "permanent": false
     }
   ],
   "rewrites": [
@@ -129,7 +134,7 @@
       "destination": "/artikel/cara-kerja-sistem-aset-pt-gmp/index.html"
     },
     {
-      "source": "/((?!assets/|icons/|demos/|sw\\.js|manifest\\.json|offline\\.html).*)",
+      "source": "/((?!assets/|icons/|demos/|zhanotes/|sw\\.js|manifest\\.json|offline\\.html).*)",
       "destination": "/index.html"
     }
   ]

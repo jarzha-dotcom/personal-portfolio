@@ -7,6 +7,7 @@ import {
   GraduationCap,
   FileSpreadsheet,
   BarChart3,
+  BookOpen,
   X,
   ChevronRight,
   Layers,
@@ -289,6 +290,9 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
         return <FileSpreadsheet className="w-4 h-4" />;
       case 'BarChart3':
         return <BarChart3 className="w-4 h-4" />;
+      case 'Notebook':
+      case 'BookOpen':
+        return <BookOpen className="w-4 h-4" />;
       default:
         return <Code2 className="w-4 h-4" />;
     }

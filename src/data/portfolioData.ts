@@ -299,6 +299,41 @@ export const PROJECTS: ProjectItem[] = [
     ]
   },
   {
+    id: 'proj-zhanotes',
+    title: 'ZhaNotes — Personal Knowledge Management & Canvas Workspace',
+    tagline: 'Aplikasi pencatatan visual offline-first: Rich Text, Freeform Canvas, PDF Annotator, Audio Memo & Ekspor Word/PDF.',
+    category: 'Web App',
+    badge: 'Produktivitas & PKM',
+    description: 'Workspace catatan visual modern berbasis web yang berjalan 100% di browser tanpa backend (Zero Server Cost). Dilengkapi editor halaman, kanvas coretan bebas (pressure sensitivity), annotator PDF, perekam audio berpenanda waktu, wiki backlinks [[ ]], dan ekspor Word (.docx)/PDF murni client-side.',
+    longDescription: 'ZhaNotes lahir dari kebutuhan mencatat ide, riset, serta sketsa sistem yang terstruktur tanpa ketergantungan pada server pihak ketiga maupun biaya langganan bulanan. Mengusung arsitektur Local-First berbasis IndexedDB, seluruh data teks, coretan tangan, rekaman suara, dan file PDF tersimpan aman di perangkat lokal pengguna. Mendukung 4 jenis lembar kerja fleksibel: Halaman Rich-Text dengan bi-directional linking [[ ]] otomatis; Kanvas Bebas (Infinite Canvas) dengan deteksi tekanan pena stylus, pan-zoom, dan floating text boxes; Lembar Riset terstruktur untuk kurasi tautan web, kutipan, dan tangkapan layar; serta PDF Annotator terintegrasi ditenagai PDF.js dan PDF-Lib untuk membaca sekaligus mengekspor PDF beranotasi. Dilengkapi perekam audio dengan penanda momen penting (Markers), version history snapshot dengan perbandingan diff visual, pencarian fuzzy berbobot skor (Ctrl+K), quick capture (Alt+J), expiring notes, tema Gelap/Terang adaptif, serta ekspor format lengkap (Markdown, TXT, HTML, Word .docx via JSZip, PDF, JSON, PNG, SVG, dan backup ZIP utuh).',
+    highlights: [
+      'Arsitektur Local-First & Zero Server Cost: Berjalan 100% offline via IndexedDB, privasi data aman di perangkat tanpa server atau biaya bulanan',
+      '4 Mode Catatan Fleksibel: Halaman Rich-Text, Kanvas Bebas (Stylus/Touch + Zoom 20%-600%), Riset Terstruktur, & PDF Reader/Annotator',
+      'Wiki Backlinks [[ ]] & Rename Otomatis: Hubungkan catatan dengan sintaks wiki, auto-suggest, pelacakan backlink, dan refactor judul otomatis',
+      'Perekam Audio Terintegrasi & Penanda Momen: Rekam suara via MediaRecorder langsung ke IndexedDB dengan tombol penanda momen penting (📍 Markers)',
+      'Mesin Ekspor Klien Terlengkap: Hasilkan Word (.docx) murni via JSZip, PDF beranotasi via PDF-Lib, Markdown, JSON, SVG, dan cadangan penuh .ZIP'
+    ],
+    techStack: ['HTML5 Canvas', 'IndexedDB', 'PDF.js', 'PDF-Lib', 'JSZip', 'Web Audio API', 'MediaRecorder', 'Local-First PWA', 'Zero Server Cost'],
+    role: 'Solo Creator (Architecture, Canvas Engine, Client-side Export, UI/UX)',
+    year: '2026',
+    demoUrl: '/zhanotes/index.html',
+    isFeatured: true,
+    colorScheme: 'emerald',
+    iconType: 'Notebook',
+    businessCase: {
+      problem: 'Aplikasi pencatatan populer umumnya menuntut langganan berbayar, memerlukan koneksi internet untuk sinkronisasi, serta mengunci data pengguna (vendor lock-in) tanpa opsi ekspor dokumen mandiri yang fleksibel.',
+      solution: 'Workspace catatan visual all-in-one yang berjalan 100% di browser tanpa backend (Zero Server Cost), menyimpan data secara lokal di IndexedDB, dan menyediakan mesin ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown).',
+      impact: 'Privasi data pengguna terjamin 100%, akses kerja tanpa hambatan internet (full offline), nol biaya infrastruktur server, dan kebebasan mengunduh seluruh data kapan saja dalam format standar industri.'
+    },
+    architectureFlow: [
+      'Pilih Lembar: Halaman, Kanvas, Riset, atau PDF',
+      'Pencatatan & Anotasi (Stylus, Teks, Audio)',
+      'Wiki Backlinks [[ ]] & Indexing Pencarian',
+      'Penyimpanan Lokal IndexedDB (Auto-Save & Diff)',
+      'Ekspor Klien (Word, PDF, ZIP, Markdown)'
+    ]
+  },
+  {
     id: 'proj-design-gallery',
     title: 'Galeri Contoh Desain',
     tagline: 'Kumpulan contoh desain landing page dan aplikasi web.',
