@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v5';
+const CACHE_VERSION = 'v7';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -44,7 +44,14 @@ const APP_SHELL_FILES = [
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(APP_SHELL_CACHE).then((cache) => cache.addAll(APP_SHELL_FILES))
+        caches.open(APP_SHELL_CACHE).then(async (cache) => {
+            await cache.addAll(APP_SHELL_FILES);
+            // ZhaNotes: simpan juga di awal supaya bisa dibuka offline sejak
+            // kunjungan pertama (navigasi pertama terjadi sebelum SW aktif,
+            // jadi tidak pernah masuk runtime cache). Best-effort: kalau gagal
+            // (mis. offline/404) instalasi SW tidak ikut batal.
+            await cache.add(ZHANOTES_CANONICAL).catch(() => {});
+        })
     );
     // Sengaja TIDAK skipWaiting() otomatis di sini — biar tab yang lagi aktif
     // nggak ke-reload paksa. Update baru dipasang setelah user klik "Muat ulang"
@@ -80,6 +87,10 @@ self.addEventListener('fetch', (event) => {
     // Request cross-origin (Google Fonts, dsb) dibiarkan apa adanya — jangan
     // ikut cache/intercept biar tidak ada masalah CORS dengan cache API.
     if (url.origin !== self.location.origin) return;
+
+    // API (mis. /api/zhanotes-cloud: indeks sinkron, status) jangan pernah di-cache:
+    // indeks usang membuat sinkron salah mendeteksi perubahan dari perangkat lain.
+    if (url.pathname.startsWith('/api/')) return;
 
     // Navigasi halaman (buka link / reload) → network-first, fallback ke cache,
     // fallback terakhir ke halaman offline.

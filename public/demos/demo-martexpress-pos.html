@@ -163,7 +163,7 @@
     .mx-confirm-body h3 { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
     .mx-confirm-body p { font-size: 12.5px; color: #64748b; margin-top: 8px; line-height: 1.55; }
 
-    .mx-toast { padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(15,23,42,.35); border: 1px solid; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; max-width: 340px; transition: opacity .3s, transform .3s; animation: mxin .25s ease; pointer-events: auto; }
+    .mx-toast { padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; box-shadow: 0 10px 30px rgba(15,23,42,.35); border: 1px solid; display: flex; align-items: flex-start; gap: 8px; line-height: 1.4; max-width: 340px; transition: opacity .3s, transform .3s; animation: mxin .25s ease; pointer-events: none; }
     .mx-toast i { margin-top: 2px; }
     .mx-toast.success { background: #065f46; border-color: #10b981; color: #fff; } .mx-toast.success i { color: #6ee7b7; }
     .mx-toast.info { background: #0f172a; border-color: #334155; color: #f1f5f9; } .mx-toast.info i { color: #38bdf8; }
@@ -177,12 +177,59 @@
     .mx-low { color: #e11d48; font-weight: 700; }
 
 
+    /* ===== Fallback utilitas Tailwind berangka desimal (tidak ikut ter-build pada css lama) ===== */
+    .p-2\.5{padding:calc(var(--spacing,.25rem)*2.5)} .p-3\.5{padding:calc(var(--spacing,.25rem)*3.5)}
+    .pl-2\.5{padding-left:calc(var(--spacing,.25rem)*2.5)} .pl-3\.5{padding-left:calc(var(--spacing,.25rem)*3.5)} .pr-2\.5{padding-right:calc(var(--spacing,.25rem)*2.5)} .pt-1\.5{padding-top:calc(var(--spacing,.25rem)*1.5)}
+    .px-1\.5{padding-inline:calc(var(--spacing,.25rem)*1.5)} .px-2\.5{padding-inline:calc(var(--spacing,.25rem)*2.5)}
+    .py-0\.5{padding-block:calc(var(--spacing,.25rem)*.5)} .py-1\.5{padding-block:calc(var(--spacing,.25rem)*1.5)} .py-2\.5{padding-block:calc(var(--spacing,.25rem)*2.5)} .py-3\.5{padding-block:calc(var(--spacing,.25rem)*3.5)}
+    .gap-0\.5{gap:calc(var(--spacing,.25rem)*.5)} .gap-1\.5{gap:calc(var(--spacing,.25rem)*1.5)} .gap-2\.5{gap:calc(var(--spacing,.25rem)*2.5)} .gap-3\.5{gap:calc(var(--spacing,.25rem)*3.5)}
+    .h-0\.5{height:calc(var(--spacing,.25rem)*.5)} .mb-0\.5{margin-bottom:calc(var(--spacing,.25rem)*.5)} .mt-0\.5{margin-top:calc(var(--spacing,.25rem)*.5)} .mt-2\.5{margin-top:calc(var(--spacing,.25rem)*2.5)}
+    .space-y-0\.5>:not(:last-child){margin-block-end:calc(var(--spacing,.25rem)*.5)} .space-y-1\.5>:not(:last-child){margin-block-end:calc(var(--spacing,.25rem)*1.5)}
+    @media (min-width:40rem){ .sm\:space-y-2\.5>:not(:last-child){margin-block-end:calc(var(--spacing,.25rem)*2.5)} }
+    @media (hover:hover){ .hover\:-translate-y-0\.5:hover{translate:0 calc(var(--spacing,.25rem)*-.5)} }
+    .flex-wrap{flex-wrap:wrap} .grow{flex-grow:1} .border-emerald-500{border-color:var(--color-emerald-500,#10b981)} .text-sky-400{color:var(--color-sky-400,#38bdf8)}
+    .transition{transition-property:color,background-color,border-color,outline-color,fill,stroke,opacity,box-shadow,transform,translate,scale,rotate,filter,backdrop-filter;transition-timing-function:cubic-bezier(.4,0,.2,1);transition-duration:.15s}
+
+    /* ===== Fitur lanjutan: edit qty, tukar poin, stok, kas laci, cek harga, WhatsApp ===== */
+    #toast-container { top: 64px !important; bottom: auto !important; }
+    .mx-qty { width: 38px; text-align: center; font: 700 12px 'JetBrains Mono', monospace; border: 0; background: transparent; color: #0f172a; outline: none; padding: 0; -moz-appearance: textfield; }
+    .mx-qty::-webkit-inner-spin-button, .mx-qty::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .mx-qty:focus { background: #ecfdf5; border-radius: 4px; }
+    .mx-redeem { padding: 7px 9px; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; font-size: 11px; color: #92400e; }
+    .mx-redeem label { display: flex; gap: 8px; align-items: center; cursor: pointer; line-height: 1.35; }
+    .mx-redeem input { width: 15px; height: 15px; accent-color: #d97706; flex: none; }
+    .mx-check { display: flex; gap: 8px; align-items: center; font-size: 12px; color: #475569; cursor: pointer; }
+    .mx-check input { width: 15px; height: 15px; accent-color: #059669; flex: none; }
+    .mx-wabtn { flex: none; padding: 0 12px; border-radius: 12px; border: 1px solid #a7f3d0; background: #ecfdf5; color: #047857; font: 700 12px 'Plus Jakarta Sans', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .mx-wabtn:hover { background: #d1fae5; }
+    .mx-info { margin-top: 10px; padding: 12px; border-radius: 12px; background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .mx-info .nm { font-weight: 800; font-size: 13px; color: #0f172a; }
+    .mx-info .pr { font: 800 20px 'JetBrains Mono', monospace; color: #047857; margin-top: 2px; }
+    .mx-info .pr s { font-size: 12px; color: #94a3b8; margin-left: 6px; font-weight: 600; }
+    .mx-info .mt { font-size: 11px; color: #64748b; margin-top: 3px; }
+    .mx-stockqty { display: flex; gap: 6px; align-items: center; justify-content: flex-end; margin-top: 6px; }
+    .mx-stockqty input { width: 62px; padding: 5px 7px; border-radius: 8px; border: 1px solid #cbd5e1; font: 700 12px 'JetBrains Mono', monospace; text-align: center; outline: none; background: #fff; }
+    .mx-stockqty input:focus { border-color: #10b981; }
+    .mx-bigstock { font: 800 18px 'JetBrains Mono', monospace; color: #0f172a; line-height: 1; }
+    .mx-bigstock.low { color: #e11d48; }
+    .mx-bigstock small { display: block; font: 600 9.5px 'Plus Jakarta Sans', sans-serif; color: #94a3b8; margin-top: 2px; }
+    .mx-sumgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; }
+    .mx-sumgrid > div { padding: 9px 10px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 10px; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; }
+    .mx-sumgrid b { display: block; font: 800 15px 'JetBrains Mono', monospace; color: #0f172a; margin-top: 2px; text-transform: none; letter-spacing: 0; }
+    .mx-sumgrid > div.warn b { color: #d97706; } .mx-sumgrid > div.bad b { color: #e11d48; }
+    .mx-filter { display: flex; gap: 6px; margin: 8px 0 10px; flex-wrap: wrap; }
+    .mx-filter button { padding: 6px 12px; border-radius: 99px; border: 1px solid #cbd5e1; background: #fff; font: 700 11px 'Plus Jakarta Sans', sans-serif; color: #475569; cursor: pointer; }
+    .mx-filter button.on { background: #0f172a; border-color: #0f172a; color: #fff; }
+    @media (max-width: 520px) { .mx-sumgrid { grid-template-columns: repeat(2, 1fr); } }
+
     /* ===== MOBILE / TABLET (<1024px): satu kolom + tab bawah Produk | Keranjang ===== */
     #mx-mobtab { display: none; }
     @media (max-width: 1023px) {
-      body { padding-bottom: 102px !important; }
+      /* html body = spesifisitas lebih tinggi, agar tidak kalah oleh `body{padding-bottom:46px!important}` milik bar demo */
+      html body { padding-bottom: 102px !important; height: 100dvh !important; }
+      .mx-modal { max-height: calc(100dvh - 170px); }
       [id$="-modal"] { padding-bottom: 118px !important; }
-      #toast-container { bottom: 112px !important; right: 10px !important; left: 10px; align-items: flex-end; }
+      #toast-container { top: 62px !important; bottom: auto !important; right: 10px !important; left: 10px; align-items: flex-end; }
       /* header ringkas: hanya ikon */
       header { padding-left: 10px !important; padding-right: 10px !important; gap: 6px; }
       header button { padding: 8px 10px !important; min-height: 38px; }
@@ -195,6 +242,7 @@
       #mx-sec-cart { overflow-y: auto; }
       #mx-sec-cart #cart-items-container { flex: none !important; min-height: 150px; max-height: 38vh; }
       #search-input, .mx-btn { font-size: 16px; }
+      #mx-sec-cart .mx-payrow { position: sticky; bottom: 0; z-index: 5; background: #fff; margin: 4px -10px -10px; padding: 8px 10px 10px; border-top: 1px solid #e2e8f0; box-shadow: 0 -8px 16px rgba(15,23,42,.08); }
       /* tab bar bawah (di atas bar demo 46px) */
       #mx-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #0f172a; border-top: 1px solid #1e293b; padding: 6px 8px; gap: 8px; }
       #mx-mobtab button { flex: 1; border: 0; border-radius: 12px; background: transparent; color: #94a3b8; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
@@ -202,6 +250,10 @@
       #mx-mobtab .mx-tb-n { background: #10b981; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
       #mx-mobtab button.on .mx-tb-n { background: #fff; color: #047857; }
       #mx-mobtab .mx-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+    }
+
+    @media (min-width: 640px) and (max-width: 1023px) {
+      #mx-sec-cart .mx-payrow { margin: 4px -12px -12px; padding: 8px 12px 12px; }
     }
 
     @media print {
@@ -302,6 +354,12 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
 
     <!-- Top Action Buttons -->
     <div class="flex items-center gap-2">
+      <button onclick="mxOpenStock()" title="Stok &amp; Barang Masuk (F7)" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 transition-colors cursor-pointer">
+        <i class="fa-solid fa-boxes-packing text-emerald-400"></i>
+        <span class="mx-lbl">Stok</span>
+        <kbd class="hidden sm:inline-block px-1 bg-slate-900 text-[10px] text-slate-400 rounded">F7</kbd>
+      </button>
+
       <button onclick="openHeldModal()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium border border-slate-700 transition-colors cursor-pointer">
         <i class="fa-solid fa-pause text-amber-400"></i>
         <span class="mx-lbl">Ditahan</span>
@@ -439,6 +497,13 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             <span class="flex items-center gap-1"><i class="fa-solid fa-tag text-[10px]"></i> Diskon Promo Member</span>
             <span class="font-bold font-num" id="bill-discount">-Rp 0</span>
           </div>
+          <div id="mx-redeem-box" class="mx-redeem hidden">
+            <label><input type="checkbox" id="mx-redeem-chk" onchange="mxToggleRedeem(this.checked)"><span id="mx-redeem-text"></span></label>
+          </div>
+          <div class="flex justify-between text-emerald-600 font-medium hidden" id="bill-redeem-row">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-coins text-[10px]"></i> <span id="bill-redeem-label">Tukar Poin</span></span>
+            <span class="font-bold font-num" id="bill-redeem">-Rp 0</span>
+          </div>
           <div class="flex justify-between text-slate-600">
             <span>PPN (11%)</span>
             <span class="font-bold text-slate-800 font-num" id="bill-ppn">Rp 0</span>
@@ -555,6 +620,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         <button onclick="window.print()" class="flex-1 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer">
           <i class="fa-solid fa-print text-emerald-400"></i> Cetak Struk (Print)
         </button>
+        <button type="button" onclick="mxShareWA()" class="mx-wabtn" title="Kirim struk via WhatsApp"><i class="fa-brands fa-whatsapp"></i><span>WhatsApp</span></button>
         <button id="receipt-done-btn" onclick="finishReceipt()" class="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold cursor-pointer">
           Transaksi Baru
         </button>
@@ -579,6 +645,10 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         <input id="scanner-input" type="text" placeholder="Input kode barcode manual..." class="flex-1 px-3 py-2 text-xs font-mono rounded-lg border border-slate-300 outline-none">
         <button onclick="submitManualBarcode()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold cursor-pointer">Scan</button>
       </div>
+      <div style="padding:10px 16px 0">
+        <label class="mx-check"><input type="checkbox" id="mx-pricecheck" onchange="mxSetPriceCheck(this.checked)"><b>Mode Cek Harga</b><span style="color:#94a3b8">(lihat harga &amp; stok tanpa menambah ke keranjang)</span></label>
+        <div id="mx-scan-info" class="mx-info hidden"></div>
+      </div>
       <div class="p-4 space-y-2 overflow-y-auto max-h-56" id="quick-scan-list"></div>
     </div>
   </div>
@@ -593,6 +663,25 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       <div style="padding:14px 16px 4px"><input id="member-search" class="mx-input" placeholder="Cari nama / scan nomor kartu member..." oninput="renderMemberList()" onkeydown="memberSearchKey(event)" autocomplete="off"></div>
       <div class="p-4 space-y-2" id="member-list-container" style="max-height:46vh;overflow-y:auto"></div>
       <div class="mx-mfoot"><button type="button" class="mx-btn ghost grow" onclick="clearMember()"><i class="fa-regular fa-user"></i>Tanpa Member (Pelanggan Umum)</button></div>
+    </div>
+  </div>
+
+  <!-- STOCK MODAL -->
+  <div id="stock-modal" class="mx-overlay hidden">
+    <div class="mx-modal" style="max-width:600px">
+      <div class="mx-mhead">
+        <h3><i class="fa-solid fa-boxes-packing" style="color:#34d399"></i> Stok &amp; Barang Masuk</h3>
+        <button type="button" onclick="mxCloseStock()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mx-mbody">
+        <div id="stk-summary" class="mx-sumgrid"></div>
+        <input id="stk-search" class="mx-input" placeholder="Cari nama atau barcode..." oninput="mxRenderStock()" autocomplete="off">
+        <div class="mx-filter" id="stk-filter"></div>
+        <div id="stk-list"></div>
+        <span class="mx-label" style="margin-top:14px">Mutasi Stok Terakhir</span>
+        <div id="stk-log"></div>
+      </div>
+      <div class="mx-mfoot" style="font-size:11px;color:#64748b;align-items:center">+Masuk = terima barang dari supplier · Opname = samakan stok sistem dengan hitungan fisik rak.</div>
     </div>
   </div>
 
@@ -896,7 +985,7 @@ var transactions = [];
 var trxSeq = 0;
 var receiptReprint = false;
 var pmCard = 'debit';
-var shift = { open: true, number: 1, cashier: 'Zannah (POS-01)', openedAt: new Date(), openingCash: 500000, kicks: 0, closedAt: null, counted: null };
+var shift = { open: true, number: 1, cashier: 'Zannah (POS-01)', openedAt: new Date(), openingCash: 500000, kicks: 0, closedAt: null, counted: null, cashLog: [] };
 var OPENING_CASH = 500000;
 
 function formatRupiah(num) {
@@ -911,21 +1000,29 @@ function hm(d) { return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
 function productById(id) { return PRODUCTS.find(function(p) { return p.id === id; }); }
 function cloneLines(lines) { return lines.map(function(l) { return { productId: l.productId, quantity: l.quantity }; }); }
 
-function calcBill(lines, member, method) {
+var POINT_VALUE = 100, redeemOn = false, redeemFor = null, mxCurrentReceipt = null, mxPriceCheck = false, mxStockFilter = 'all', mxStockLog = [];
+function mxRedeemActive() { return !!(redeemOn && selectedMember && redeemFor === selectedMember.id); }
+function calcBill(lines, member, method, redeem) {
   var qty = 0, subtotal = 0;
   lines.forEach(function(l) {
     var p = productById(l.productId);
     if (p) { qty += l.quantity; subtotal += p.price * l.quantity; }
   });
   var discount = member ? Math.round(subtotal * (member.discount / 100)) : 0;
-  var taxable = Math.max(0, subtotal - discount);
+  var afterMember = Math.max(0, subtotal - discount);
+  var pointsUsed = 0, redeemAmt = 0;
+  if (redeem && member) {
+    pointsUsed = Math.max(0, Math.min(member.points, Math.floor(afterMember * 0.5 / POINT_VALUE)));
+    redeemAmt = pointsUsed * POINT_VALUE;
+  }
+  var taxable = Math.max(0, afterMember - redeemAmt);
   var ppn = Math.round(taxable * 0.11);
   var exact = taxable + ppn;
   // Pembulatan ke Rp100 terdekat khusus pembayaran tunai
   var rounding = (method === 'cash' && exact > 0) ? Math.round(exact / 100) * 100 - exact : 0;
-  return { qty: qty, subtotal: subtotal, discount: discount, ppn: ppn, rounding: rounding, exact: exact, total: exact + rounding };
+  return { qty: qty, subtotal: subtotal, discount: discount, pointsUsed: pointsUsed, redeemAmt: redeemAmt, ppn: ppn, rounding: rounding, exact: exact, total: exact + rounding };
 }
-function currentBill() { return calcBill(cart, selectedMember, paymentMethod); }
+function currentBill() { return calcBill(cart, selectedMember, paymentMethod, mxRedeemActive()); }
 
 /* ---------- Toast ---------- */
 function showToast(message, type) {
@@ -978,6 +1075,7 @@ function seedTransactions() {
     transactions.unshift(r);
   });
   shift.openedAt = new Date(Date.now() - 125 * 60000);
+  [['p10', 4], ['p12', 8], ['p15', 0]].forEach(function(x) { var q = productById(x[0]); if (q) q.stock = x[1]; });
   heldSeq = 1;
   heldOrders.push({ id: 'HLD-01', time: new Date(Date.now() - 6 * 60000), member: null, lines: [{ productId: 'p4', quantity: 6 }, { productId: 'p5', quantity: 2 }] });
 }
@@ -1185,7 +1283,7 @@ function renderCart() {
         '<div class="flex items-center gap-2 shrink-0">' +
           '<div class="flex items-center border border-slate-300 rounded overflow-hidden bg-slate-50">' +
             '<button onclick="updateCartQty(\x27' + p.id + '\x27, -1)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-200 text-xs cursor-pointer">-</button>' +
-            '<span class="w-7 text-center text-xs font-bold font-num">' + item.quantity + '</span>' +
+            '<input type="number" class="mx-qty" min="1" max="' + p.stock + '" value="' + item.quantity + '" aria-label="Jumlah" onfocus="this.select()" onchange="setCartQty(\x27' + p.id + '\x27, this.value)" />' +
             '<button onclick="updateCartQty(\x27' + p.id + '\x27, 1)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-200 text-xs cursor-pointer">+</button>' +
           '</div>' +
           '<div class="text-right text-xs font-bold font-num text-slate-900" style="min-width:74px">' + formatRupiah(p.price * item.quantity) + '</div>' +
@@ -1211,6 +1309,7 @@ function calculateBilling() {
   if (b.discount > 0) { discRow.classList.remove('hidden'); $('bill-discount').innerText = '-' + formatRupiah(b.discount); }
   else discRow.classList.add('hidden');
 
+  mxUpdateRedeemUI(b);
   $('bill-ppn').innerText = formatRupiah(b.ppn);
 
   var rRow = $('bill-rounding-row');
@@ -1320,10 +1419,10 @@ function nextReceiptNumber(d) {
 
 function makeReceipt(lines, member, method, paidAmount, date, extra) {
   extra = extra || {};
-  var b = calcBill(lines, member, method);
+  var b = calcBill(lines, member, method, extra.redeem);
   var items = lines.map(function(l) {
     var p = productById(l.productId);
-    return { productId: p.id, name: p.name, unit: p.unit, price: p.price, quantity: l.quantity, subtotal: p.price * l.quantity };
+    return { productId: p.id, name: p.name, unit: p.unit, price: p.price, orig: p.originalPrice || p.price, quantity: l.quantity, subtotal: p.price * l.quantity };
   });
   return {
     number: nextReceiptNumber(date), date: date, cashier: shift.cashier, member: member, items: items,
@@ -1334,6 +1433,7 @@ function makeReceipt(lines, member, method, paidAmount, date, extra) {
     cashPaid: method === 'cash' ? paidAmount : b.total,
     change: method === 'cash' ? Math.max(0, paidAmount - b.total) : 0,
     earnedPoints: member ? Math.floor(b.total / 10000) : 0,
+    pointsUsed: b.pointsUsed, redeemAmount: b.redeemAmt,
     voided: false
   };
 }
@@ -1419,10 +1519,13 @@ function buildQR(seedVal) {
 /* ---------- Commit transaksi ---------- */
 function commitPayment(extra) {
   var d = new Date();
+  extra = extra || {};
+  extra.redeem = mxRedeemActive();
   var r = makeReceipt(cart, selectedMember, paymentMethod, cashPaid, d, extra);
   // Kurangi stok & tambah poin member
   r.items.forEach(function(i) { var p = productById(i.productId); p.stock = Math.max(0, p.stock - i.quantity); });
-  if (selectedMember) selectedMember.points += r.earnedPoints;
+  if (selectedMember) selectedMember.points = Math.max(0, selectedMember.points - r.pointsUsed) + r.earnedPoints;
+  redeemOn = false;
   transactions.unshift(r);
   receiptReprint = false;
   renderProducts();
@@ -1433,6 +1536,7 @@ function commitPayment(extra) {
 
 /* ---------- Struk ---------- */
 function openReceiptModal(r) {
+  mxCurrentReceipt = r;
   var meta = '<div class="flex justify-between"><span>No. Struk:</span><span class="font-bold">' + r.number + '</span></div>' +
     '<div class="flex justify-between"><span>Tanggal:</span><span>' + r.date.toLocaleString('id-ID') + '</span></div>' +
     '<div class="flex justify-between"><span>Kasir:</span><span>' + esc(r.cashier) + '</span></div>' +
@@ -1454,11 +1558,13 @@ function openReceiptModal(r) {
   $('receipt-totals').innerHTML =
     '<div class="flex justify-between"><span>Subtotal:</span><span>' + formatRupiah(r.subtotal) + '</span></div>' +
     (r.discount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Diskon Member:</span><span>-' + formatRupiah(r.discount) + '</span></div>' : '') +
+    (r.pointsUsed > 0 ? '<div class="flex justify-between text-emerald-700"><span>Tukar Poin (' + r.pointsUsed + ' poin):</span><span>-' + formatRupiah(r.redeemAmount) + '</span></div>' : '') +
     '<div class="flex justify-between text-slate-600"><span>PPN 11%:</span><span>' + formatRupiah(r.tax) + '</span></div>' +
     (r.rounding !== 0 ? '<div class="flex justify-between text-slate-600"><span>Pembulatan:</span><span>' + (r.rounding > 0 ? '+' : '-') + formatRupiah(Math.abs(r.rounding)) + '</span></div>' : '') +
     '<div class="flex justify-between text-xs font-black pt-1 border-t border-slate-300">' +
       '<span>TOTAL:</span><span class="text-sm">' + formatRupiah(r.total) + '</span>' +
-    '</div>';
+    '</div>' +
+    (mxSaving(r) > 0 ? '<div class="flex justify-between text-emerald-700 font-semibold"><span>Total Hemat Anda:</span><span>' + formatRupiah(mxSaving(r)) + '</span></div>' : '');
 
   $('receipt-payment').innerHTML =
     '<div class="flex justify-between"><span>Metode:</span><span class="font-bold">' + esc(r.methodLabel) + '</span></div>' +
@@ -1602,7 +1708,7 @@ function voidTransaction(number) {
   askConfirm('Void transaksi ' + number + '?', 'Stok barang dikembalikan, poin member dikurangi, dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari laporan shift.', 'Ya, Void Transaksi', function() {
     t.voided = true;
     t.items.forEach(function(i) { var p = productById(i.productId); if (p) p.stock += i.quantity; });
-    if (t.member) t.member.points = Math.max(0, t.member.points - t.earnedPoints);
+    if (t.member) t.member.points = Math.max(0, t.member.points - t.earnedPoints) + (t.pointsUsed || 0);
     renderProducts(); renderMemberDisplay(); renderHistory();
     showToast(number + ' di-void. Stok dikembalikan.', 'warn');
   }, true);
@@ -1675,19 +1781,22 @@ function confirmReturn() {
    SHIFT
 ================================================================ */
 function shiftStats() {
-  var s = { refunded: 0, count: 0, voided: 0, subtotal: 0, discount: 0, tax: 0, rounding: 0, cash: 0, qris: 0, edc: 0, items: 0 };
+  var s = { top: {}, redeem: 0, cashIn: 0, cashOut: 0, refunded: 0, count: 0, voided: 0, subtotal: 0, discount: 0, tax: 0, rounding: 0, cash: 0, qris: 0, edc: 0, items: 0 };
   transactions.forEach(function(t) {
     if (t.voided) { s.voided++; return; }
     s.count++; s.subtotal += t.subtotal; s.discount += t.discount; s.tax += t.tax; s.rounding += t.rounding;
     s[t.method] += t.total;
     s.items += t.items.reduce(function(a, i) { return a + i.quantity; }, 0);
+    s.redeem += (t.redeemAmount || 0);
+    t.items.forEach(function(i) { s.top[i.name] = (s.top[i.name] || 0) + i.quantity - (i.returned || 0); });
     (t.refunds || []).forEach(function(r) {
       s[t.method] -= r.amount; s.refunded += r.amount;
       r.lines.forEach(function(l) { s.items -= l.qty; });
     });
   });
   s.sales = s.cash + s.qris + s.edc;
-  s.expectedCash = shift.openingCash + s.cash;
+  (shift.cashLog || []).forEach(function(e) { if (e.type === 'in') s.cashIn += e.amount; else s.cashOut += e.amount; });
+  s.expectedCash = shift.openingCash + s.cash + s.cashIn - s.cashOut;
   return s;
 }
 
@@ -1704,6 +1813,7 @@ function shiftRows(st) {
     '<div class="r"><span>Barang terjual</span><span>' + st.items + ' pcs</span></div>' +
     '<div class="r"><span>Penjualan kotor</span><span>' + formatRupiah(st.subtotal) + '</span></div>' +
     '<div class="r"><span>Diskon member</span><span>-' + formatRupiah(st.discount) + '</span></div>' +
+    '<div class="r"><span>Tukar poin member</span><span>-' + formatRupiah(st.redeem) + '</span></div>' +
     '<div class="r"><span>PPN 11%</span><span>' + formatRupiah(st.tax) + '</span></div>' +
     '<div class="r"><span>Retur barang (sudah dikurangkan)</span><span>-' + formatRupiah(st.refunded) + '</span></div>' +
     '<div class="r sec"><span>Per Metode Bayar</span><span></span></div>' +
@@ -1713,8 +1823,10 @@ function shiftRows(st) {
     '<div class="r strong"><span>Total Penjualan</span><span>' + formatRupiah(st.sales) + '</span></div>' +
     '<div class="r sec"><span>Laci Kasir</span><span></span></div>' +
     '<div class="r"><span>Kas awal</span><span>' + formatRupiah(shift.openingCash) + '</span></div>' +
-    '<div class="r"><span>Kas seharusnya (awal + tunai)</span><span>' + formatRupiah(st.expectedCash) + '</span></div>' +
+    '<div class="r"><span>Kas masuk / keluar (manual)</span><span>+' + formatRupiah(st.cashIn) + ' / -' + formatRupiah(st.cashOut) + '</span></div>' +
+    '<div class="r"><span>Kas seharusnya (awal + tunai + masuk - keluar)</span><span>' + formatRupiah(st.expectedCash) + '</span></div>' +
     '<div class="r"><span>Laci dibuka tanpa transaksi</span><span>' + shift.kicks + 'x</span></div>' +
+    '<div class="r sec"><span>Produk Terlaris Shift Ini</span><span></span></div>' + mxTopRows(st) +
   '</div>';
 }
 
@@ -1724,6 +1836,7 @@ function renderShift() {
   if (shift.open) {
     $('shift-title').textContent = 'Tutup Shift Kasir';
     body.innerHTML = shiftRows(st) +
+      mxCashUI() +
       '<span class="mx-label" style="margin-top:14px">Uang Fisik di Laci (hasil hitung)</span>' +
       '<input id="shift-counted" type="text" inputmode="numeric" class="mx-input num" placeholder="Rp 0" oninput="onShiftCount(this)">' +
       '<div id="shift-diff" class="mx-diff"><span>Selisih</span><b>-</b></div>';
@@ -1769,7 +1882,7 @@ function requestCloseShift() {
 }
 
 function startNewShift() {
-  shift = { open: true, number: shift.number + 1, cashier: shift.cashier, openedAt: new Date(), openingCash: OPENING_CASH, kicks: 0, closedAt: null, counted: null };
+  shift = { open: true, number: shift.number + 1, cashier: shift.cashier, openedAt: new Date(), openingCash: OPENING_CASH, kicks: 0, closedAt: null, counted: null, cashLog: [] };
   transactions = [];
   closeShiftModal();
   updateShiftUI();
@@ -1791,7 +1904,7 @@ function openScannerModal() {
   if (!container) return;
   container.innerHTML = '<p class="text-[10px] font-bold text-slate-400 uppercase" style="letter-spacing:.05em">Barcode contoh (klik untuk simulasi scan)</p>' +
     PRODUCTS.slice(0, 8).map(function(p) {
-      return '<button onclick="addToCart(\x27' + p.id + '\x27)" class="w-full p-2 border rounded-lg text-left hover:border-emerald-500 hover:bg-emerald-50 flex justify-between items-center text-xs cursor-pointer">' +
+      return '<button onclick="mxScanPick(\x27' + p.id + '\x27)" class="w-full p-2 border rounded-lg text-left hover:border-emerald-500 hover:bg-emerald-50 flex justify-between items-center text-xs cursor-pointer">' +
         '<div><p class="font-bold">' + esc(p.name) + '</p><p class="text-[10px] text-slate-400 font-mono">' + p.barcode + ' · ' + formatRupiah(p.price) + '</p></div>' +
         '<i class="fa-solid fa-barcode text-slate-500"></i>' +
       '</button>';
@@ -1805,6 +1918,7 @@ function submitManualBarcode() {
   var code = $('scanner-input').value.trim();
   if (!code) { showToast('Masukkan kode barcode terlebih dahulu.', 'warn'); return; }
   var p = PRODUCTS.find(function(prod) { return prod.barcode === code; });
+  if (p && mxPriceCheck) { mxShowPrice(p); $('scanner-input').value = ''; return; }
   if (p) {
     addToCart(p.id);
     $('scanner-input').value = '';
@@ -1887,7 +2001,7 @@ function clearMember() {
 /* ================================================================
    SHORTCUT & MODAL UMUM
 ================================================================ */
-var MODAL_ORDER = ['confirm-modal', 'return-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
+var MODAL_ORDER = ['confirm-modal', 'return-modal', 'stock-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
 function openModalId() {
   for (var i = 0; i < MODAL_ORDER.length; i++) {
     var el = $(MODAL_ORDER[i]);
@@ -1898,6 +2012,7 @@ function openModalId() {
 function closeModalById(id) {
   if (id === 'confirm-modal') confirmCancel();
   else if (id === 'return-modal') closeReturnModal();
+  else if (id === 'stock-modal') mxCloseStock();
   else if (id === 'payment-modal') closePaymentModal();
   else if (id === 'receipt-modal') finishReceipt();
   else if (id === 'scanner-modal') closeScannerModal();
@@ -1908,7 +2023,7 @@ function closeModalById(id) {
 }
 
 function setupKeyboardShortcuts() {
-  var keys = { F1: openScannerModal, F2: openMemberModal, F3: function() { $('search-input').focus(); }, F4: kickCashDrawer, F8: holdCurrent, F9: openHistoryModal, F12: executePayment };
+  var keys = { F1: openScannerModal, F2: openMemberModal, F3: function() { $('search-input').focus(); }, F4: kickCashDrawer, F8: holdCurrent, F7: mxOpenStock, F9: openHistoryModal, F12: executePayment };
   window.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') { var open = openModalId(); if (open) closeModalById(open); return; }
     if (keys[e.key]) {
@@ -1925,6 +2040,166 @@ function setupKeyboardShortcuts() {
   });
 }
 
+
+
+/* ================================================================
+   FITUR LANJUTAN
+================================================================ */
+/* ---------- Edit qty langsung ---------- */
+function setCartQty(productId, val) {
+  var item = cart.find(function(c) { return c.productId === productId; });
+  var p = productById(productId);
+  if (!item || !p) return;
+  var n = Math.floor(Number(val));
+  if (!n || n <= 0) { cart = cart.filter(function(c) { return c.productId !== productId; }); renderCart(); return; }
+  if (n > p.stock) { n = p.stock; showToast('Stok ' + p.name + ' hanya tersisa ' + p.stock + '.', 'warn'); }
+  item.quantity = n;
+  renderCart();
+}
+
+/* ---------- Tukar poin member ---------- */
+function mxToggleRedeem(on) {
+  redeemOn = on; redeemFor = selectedMember ? selectedMember.id : null;
+  calculateBilling();
+  if (on) { var b = currentBill(); showToast('Tukar ' + b.pointsUsed + ' poin = potongan ' + formatRupiah(b.redeemAmt) + '.', 'success'); }
+}
+function mxUpdateRedeemUI(b) {
+  var box = $('mx-redeem-box'), row = $('bill-redeem-row');
+  var m = selectedMember;
+  if (!m || cart.length === 0 || m.points < 10) { box.classList.add('hidden'); row.classList.add('hidden'); return; }
+  var maxPts = calcBill(cart, m, paymentMethod, true).pointsUsed;
+  box.classList.remove('hidden');
+  $('mx-redeem-chk').checked = mxRedeemActive();
+  $('mx-redeem-text').innerHTML = 'Tukar poin: punya <b>' + m.points + '</b> poin (1 poin = ' + formatRupiah(POINT_VALUE) + '). Bisa dipakai maks. <b>' + maxPts + '</b> poin = <b>' + formatRupiah(maxPts * POINT_VALUE) + '</b> (batas 50% belanja).';
+  if (b.pointsUsed > 0) { row.classList.remove('hidden'); $('bill-redeem-label').textContent = 'Tukar Poin (' + b.pointsUsed + ' poin)'; $('bill-redeem').innerText = '-' + formatRupiah(b.redeemAmt); }
+  else row.classList.add('hidden');
+}
+
+/* ---------- Struk: hemat & WhatsApp ---------- */
+function mxSaving(r) {
+  var promo = r.items.reduce(function(a, i) { return a + Math.max(0, (i.orig || i.price) - i.price) * i.quantity; }, 0);
+  return promo + (r.discount || 0) + (r.redeemAmount || 0);
+}
+function mxShareWA() {
+  var r = mxCurrentReceipt;
+  if (!r) return;
+  var L = [];
+  L.push('*MARTEXPRESS MINIMARKET*');
+  L.push('No: ' + r.number + ' · ' + r.date.toLocaleString('id-ID'));
+  L.push('Kasir: ' + r.cashier + (r.member ? ' · Member: ' + r.member.name : ''));
+  L.push('------------------------');
+  r.items.forEach(function(i) { L.push(i.quantity + ' x ' + i.name + '  ' + formatRupiah(i.subtotal)); });
+  L.push('------------------------');
+  L.push('Subtotal: ' + formatRupiah(r.subtotal));
+  if (r.discount > 0) L.push('Diskon Member: -' + formatRupiah(r.discount));
+  if (r.pointsUsed > 0) L.push('Tukar Poin: -' + formatRupiah(r.redeemAmount));
+  L.push('PPN 11%: ' + formatRupiah(r.tax));
+  if (r.rounding !== 0) L.push('Pembulatan: ' + (r.rounding > 0 ? '+' : '-') + formatRupiah(Math.abs(r.rounding)));
+  L.push('*TOTAL: ' + formatRupiah(r.total) + '*');
+  L.push('Bayar: ' + r.methodLabel + (r.method === 'cash' ? ' (kembali ' + formatRupiah(r.change) + ')' : ''));
+  if (mxSaving(r) > 0) L.push('Anda hemat ' + formatRupiah(mxSaving(r)) + '!');
+  if (r.member) L.push('Poin didapat: +' + r.earnedPoints);
+  L.push('Terima kasih sudah berbelanja!');
+  window.open('https://wa.me/?text=' + encodeURIComponent(L.join('\n')), '_blank');
+  showToast('Struk digital dibuka di WhatsApp.', 'success');
+}
+
+/* ---------- Cek harga ---------- */
+function mxSetPriceCheck(on) { mxPriceCheck = on; $('mx-scan-info').classList.add('hidden'); if (on) showToast('Mode cek harga aktif: scan tidak menambah ke keranjang.', 'info'); }
+function mxShowPrice(p) {
+  var info = $('mx-scan-info');
+  info.classList.remove('hidden');
+  info.innerHTML = '<div class="nm">' + esc(p.name) + '</div>' +
+    '<div class="pr">' + formatRupiah(p.price) + ' <small style="font-size:11px;color:#64748b">/ ' + esc(p.unit) + '</small>' + (p.originalPrice ? '<s>' + formatRupiah(p.originalPrice) + '</s>' : '') + '</div>' +
+    '<div class="mt">Barcode ' + p.barcode + ' · Stok: <b style="color:' + (p.stock <= 10 ? '#e11d48' : '#047857') + '">' + p.stock + '</b>' + (p.originalPrice ? ' · <b style="color:#e11d48">PROMO</b>' : '') + '</div>' +
+    '<div style="margin-top:8px"><button type="button" class="mx-btn green xs" onclick="addToCart(\x27' + p.id + '\x27); showToast(\x27' + p.name.replace(/'/g, '') + ' ditambahkan.\x27, \x27success\x27)"><i class="fa-solid fa-plus"></i>Tambah ke keranjang</button></div>';
+}
+function mxScanPick(id) {
+  var p = productById(id);
+  if (mxPriceCheck && p) mxShowPrice(p); else addToCart(id);
+}
+function mxHideInfo() { $('mx-scan-info').classList.add('hidden'); }
+
+/* ---------- Kas masuk / keluar & produk terlaris ---------- */
+function mxTopRows(st) {
+  var names = Object.keys(st.top).filter(function(n) { return st.top[n] > 0; }).sort(function(a, b) { return st.top[b] - st.top[a]; }).slice(0, 5);
+  if (!names.length) return '<div class="r"><span>Belum ada penjualan</span><span>-</span></div>';
+  return names.map(function(n, i) { return '<div class="r"><span>' + (i + 1) + '. ' + esc(n) + '</span><span>' + st.top[n] + ' pcs</span></div>'; }).join('');
+}
+function mxCashUI() {
+  var log = (shift.cashLog || []).slice(-5).reverse();
+  var list = log.map(function(e) {
+    return '<div class="r"><span>' + hm(e.time) + ' · ' + (e.type === 'in' ? 'Masuk' : 'Keluar') + ' · ' + esc(e.note) + '</span><span style="color:' + (e.type === 'in' ? '#047857' : '#e11d48') + ' !important">' + (e.type === 'in' ? '+' : '-') + formatRupiah(e.amount) + '</span></div>';
+  }).join('');
+  return '<span class="mx-label" style="margin-top:14px">Kas Masuk / Keluar Laci</span>' +
+    (list ? '<div class="mx-rows" style="margin-bottom:8px">' + list + '</div>' : '') +
+    '<div style="display:grid;grid-template-columns:120px 1fr;gap:8px"><select id="mx-cash-type" class="mx-input"><option value="out">Kas Keluar</option><option value="in">Kas Masuk</option></select>' +
+    '<input id="mx-cash-amt" type="number" min="1" class="mx-input num" placeholder="Nominal (Rp)"></div>' +
+    '<div style="display:flex;gap:8px;margin-top:8px"><input id="mx-cash-note" class="mx-input" placeholder="Keterangan (cth: beli es batu, tambahan modal)" autocomplete="off"><button type="button" class="mx-btn" onclick="mxAddCashLog()">Catat</button></div>';
+}
+function mxAddCashLog() {
+  if (!shiftGuard()) return;
+  var type = $('mx-cash-type').value, amt = Math.floor(Number($('mx-cash-amt').value) || 0), note = $('mx-cash-note').value.trim();
+  if (amt <= 0) { showToast('Masukkan nominal kas yang valid.', 'warn'); return; }
+  if (type === 'out' && amt > shiftStats().expectedCash) { showToast('Kas keluar melebihi saldo laci (' + formatRupiah(shiftStats().expectedCash) + ').', 'error'); return; }
+  shift.cashLog = shift.cashLog || [];
+  shift.cashLog.push({ type: type, amount: amt, note: note || (type === 'in' ? 'Kas masuk tambahan' : 'Kas keluar operasional'), time: new Date() });
+  renderShift();
+  showToast((type === 'in' ? 'Kas masuk ' : 'Kas keluar ') + formatRupiah(amt) + ' tercatat.', 'success');
+}
+
+/* ---------- Stok & barang masuk ---------- */
+function mxOpenStock() { mxRenderStock(); $('stock-modal').classList.remove('hidden'); }
+function mxCloseStock() { $('stock-modal').classList.add('hidden'); }
+function mxSetStockFilter(f) { mxStockFilter = f; mxRenderStock(); }
+function mxRenderStock() {
+  var q = ($('stk-search').value || '').toLowerCase().trim();
+  var low = PRODUCTS.filter(function(p) { return p.stock > 0 && p.stock <= 10; }).length;
+  var out = PRODUCTS.filter(function(p) { return p.stock <= 0; }).length;
+  var value = PRODUCTS.reduce(function(a, p) { return a + p.stock * p.price; }, 0);
+  $('stk-summary').innerHTML = '<div>Produk<b>' + PRODUCTS.length + '</b></div><div class="warn">Menipis<b>' + low + '</b></div><div class="bad">Habis<b>' + out + '</b></div><div>Nilai Stok<b>' + formatRupiah(value) + '</b></div>';
+  $('stk-filter').innerHTML = [['all', 'Semua'], ['low', 'Menipis (≤10)'], ['out', 'Habis']].map(function(f) {
+    return '<button type="button" class="' + (mxStockFilter === f[0] ? 'on' : '') + '" onclick="mxSetStockFilter(\x27' + f[0] + '\x27)">' + f[1] + '</button>';
+  }).join('');
+  var list = PRODUCTS.filter(function(p) {
+    var mq = !q || p.name.toLowerCase().indexOf(q) !== -1 || p.barcode.indexOf(q) !== -1;
+    var mf = mxStockFilter === 'all' || (mxStockFilter === 'low' && p.stock > 0 && p.stock <= 10) || (mxStockFilter === 'out' && p.stock <= 0);
+    return mq && mf;
+  }).sort(function(a, b) { return a.stock - b.stock; });
+  $('stk-list').innerHTML = list.length ? list.map(function(p) {
+    var tag = p.stock <= 0 ? '<span class="mx-tag red">Habis</span>' : p.stock <= 10 ? '<span class="mx-tag amber">Menipis</span>' : '<span class="mx-tag green">Aman</span>';
+    return '<div class="mx-card"><div class="main"><div class="top">' + esc(p.name) + ' ' + tag + '</div>' +
+      '<div class="sub">' + p.barcode + ' · ' + esc(p.unit) + ' · ' + formatRupiah(p.price) + '</div></div>' +
+      '<div class="side"><div class="mx-bigstock ' + (p.stock <= 10 ? 'low' : '') + '">' + p.stock + '<small>stok sistem</small></div>' +
+      '<div class="mx-stockqty"><input id="stk-q-' + p.id + '" type="number" min="0" placeholder="Qty" onkeydown="if(event.key===\x27Enter\x27)mxStockIn(\x27' + p.id + '\x27)">' +
+      '<button type="button" class="mx-btn green xs" onclick="mxStockIn(\x27' + p.id + '\x27)">+ Masuk</button>' +
+      '<button type="button" class="mx-btn ghost xs" onclick="mxStockSet(\x27' + p.id + '\x27)">Opname</button></div></div></div>';
+  }).join('') : '<div class="mx-empty"><i class="fa-solid fa-box-open"></i>Tidak ada produk pada filter ini.</div>';
+  $('stk-log').innerHTML = mxStockLog.length ? mxStockLog.slice(0, 6).map(function(l) {
+    return '<div class="mx-card" style="padding:8px 12px"><div class="main"><div class="top" style="font-weight:700">' + esc(l.name) + '</div><div class="meta">' + hm(l.time) + ' WIB · ' + l.kind + '</div></div><div class="side"><div class="money" style="color:' + (l.diff >= 0 ? '#047857' : '#e11d48') + '">' + (l.diff >= 0 ? '+' : '') + l.diff + '</div><div class="meta">jadi ' + l.after + '</div></div></div>';
+  }).join('') : '<div class="mx-empty" style="padding:14px">Belum ada mutasi stok pada sesi ini.</div>';
+}
+function mxStockIn(id) {
+  var p = productById(id), inp = $('stk-q-' + id);
+  var n = Math.floor(Number(inp.value) || 0);
+  if (n <= 0) { showToast('Masukkan jumlah barang masuk (lebih dari 0).', 'warn'); inp.focus(); return; }
+  p.stock += n;
+  mxStockLog.unshift({ name: p.name, kind: 'Barang masuk', diff: n, after: p.stock, time: new Date() });
+  renderProducts(); mxRenderStock();
+  showToast(p.name + ': +' + n + ' ' + p.unit.toLowerCase() + '. Stok sekarang ' + p.stock + '.', 'success');
+}
+function mxStockSet(id) {
+  var p = productById(id), inp = $('stk-q-' + id);
+  if (inp.value === '' || Number(inp.value) < 0) { showToast('Isi stok hasil hitung fisik (0 atau lebih) lalu tekan Opname.', 'warn'); inp.focus(); return; }
+  var n = Math.floor(Number(inp.value));
+  var cartItem = cart.find(function(c) { return c.productId === id; });
+  var diff = n - p.stock;
+  p.stock = n;
+  if (cartItem && cartItem.quantity > n) { cartItem.quantity = n; if (n <= 0) cart = cart.filter(function(c) { return c.productId !== id; }); renderCart(); }
+  mxStockLog.unshift({ name: p.name, kind: 'Stok opname', diff: diff, after: n, time: new Date() });
+  renderProducts(); mxRenderStock();
+  showToast(p.name + ': stok disesuaikan menjadi ' + n + (diff ? ' (selisih ' + (diff > 0 ? '+' : '') + diff + ')' : ' (sesuai)') + '.', diff ? 'warn' : 'success');
+}
 
   </script>
   <!-- TAB BAWAH MOBILE -->

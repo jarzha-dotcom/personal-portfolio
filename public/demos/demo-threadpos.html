@@ -102,6 +102,122 @@
       #tp-mobtab .tp-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
     }
 
+    /* ===== ThreadPOS extras (mandiri, tidak bergantung pada css Tailwind hasil compile) ===== */
+    [class*="tp-"].hidden { display: none !important; }
+
+    .tp-overlay { position: fixed; inset: 0; z-index: 55; background: rgba(2,6,23,.7); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .tp-overlay.top { z-index: 70; }
+    .tp-modal { width: 100%; max-width: 460px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 25px 60px rgba(0,0,0,.4); overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 100px); }
+    @media (max-width: 1023px) { .tp-modal { max-height: calc(100dvh - 170px); } }
+    .tp-mhead { padding: 14px 18px; background: #0f172a; color: #fff; display: flex; align-items: center; justify-content: space-between; flex: none; }
+    .tp-mhead h4 { font-size: 14px; font-weight: 700; display: flex; gap: 8px; align-items: center; }
+    .tp-mhead button { color: #94a3b8; background: none; border: 0; cursor: pointer; font-size: 15px; }
+    .tp-mhead button:hover { color: #fff; }
+    .tp-mbody { padding: 16px 18px; overflow-y: auto; min-height: 0; font-size: 12px; color: #334155; }
+    .tp-mfoot { padding: 12px 18px; border-top: 1px solid #e2e8f0; background: #f8fafc; display: flex; gap: 8px; justify-content: flex-end; flex: none; flex-wrap: wrap; }
+
+    .tp-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 9px 14px; border-radius: 10px; font: 700 12px 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: 0; transition: .15s; color: #fff; background: #0f172a; }
+    .tp-btn:hover { background: #1e293b; }
+    .tp-btn.xs { padding: 5px 9px; font-size: 11px; border-radius: 8px; }
+    .tp-btn.grow { flex: 1; }
+    .tp-btn.rose { background: #e11d48; } .tp-btn.rose:hover { background: #be123c; }
+    .tp-btn.green { background: #059669; } .tp-btn.green:hover { background: #047857; }
+    .tp-btn.amber { background: #f59e0b; color: #0f172a; } .tp-btn.amber:hover { background: #d97706; }
+    .tp-btn.ghost { background: #e2e8f0; color: #334155; } .tp-btn.ghost:hover { background: #cbd5e1; }
+    .tp-btn.rosesoft { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; } .tp-btn.rosesoft:hover { background: #ffe4e6; }
+    .tp-btn[disabled] { opacity: .4; cursor: not-allowed; }
+
+    .tp-payrow { display: flex; gap: 8px; }
+    .tp-payrow > #checkout-btn { flex: 1; min-width: 0; }
+    .tp-holdbtn { flex: none; padding: 0 14px; border-radius: 12px; border: 1px solid #cbd5e1; background: #fff; color: #334155; font: 700 11px 'Plus Jakarta Sans', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.1; }
+    .tp-holdbtn:hover { background: #fff1f2; border-color: #fb7185; color: #be123c; }
+    .tp-holdbtn small { font-size: 9px; font-weight: 600; color: #94a3b8; }
+    .tp-hbadge { font-style: normal; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; background: #e11d48; color: #fff; }
+    .tp-hbadge.zero { background: #334155; color: #94a3b8; }
+    .tp-vrow { display: flex; gap: 6px; align-items: center; }
+    .tp-vinput { flex: 1; min-width: 0; padding: 7px 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font: 600 11.5px 'JetBrains Mono', monospace; text-transform: uppercase; outline: none; color: #0f172a; }
+    .tp-vinput:focus { border-color: #f43f5e; background: #fff; }
+    .tp-vbtn { padding: 7px 12px; border-radius: 10px; border: 0; background: #0f172a; color: #fff; font: 700 11px 'Plus Jakarta Sans', sans-serif; cursor: pointer; }
+    .tp-vbtn:hover { background: #be123c; }
+    .tp-vnote { font-size: 10.5px; color: #e11d48; margin-top: 3px; }
+    .tp-vlink { font-size: 10px; font-weight: 700; color: #94a3b8; background: none; border: 0; cursor: pointer; text-decoration: underline; }
+
+    .tp-input { width: 100%; padding: 9px 11px; border-radius: 10px; border: 1px solid #cbd5e1; background: #f8fafc; font: 600 12.5px 'Plus Jakarta Sans', sans-serif; color: #0f172a; outline: none; }
+    .tp-input:focus { border-color: #f43f5e; background: #fff; box-shadow: 0 0 0 3px rgba(244,63,94,.12); }
+    .tp-input.num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 14px; }
+    .tp-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #64748b; margin: 14px 0 6px; }
+    .tp-label:first-child { margin-top: 0; }
+    .tp-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 4px; background: #f1f5f9; border-radius: 10px; }
+    .tp-seg button { padding: 8px; border-radius: 8px; border: 0; background: transparent; font: 700 12px 'Plus Jakarta Sans', sans-serif; color: #64748b; cursor: pointer; }
+    .tp-seg button.on { background: #fff; color: #be123c; box-shadow: 0 1px 2px rgba(0,0,0,.12); }
+    .tp-total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 12px; margin-bottom: 12px; }
+    .tp-total span { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #9f1239; letter-spacing: .04em; }
+    .tp-total strong { font: 800 21px 'JetBrains Mono', monospace; color: #be123c; }
+    .tp-note { margin-top: 12px; padding: 9px 11px; border-radius: 10px; background: #f8fafc; border: 1px dashed #cbd5e1; font-size: 11px; color: #64748b; line-height: 1.5; }
+    .tp-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tp-chip { padding: 5px 10px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; font: 700 10.5px 'JetBrains Mono', monospace; color: #475569; cursor: pointer; }
+    .tp-chip:hover { border-color: #f43f5e; color: #be123c; }
+
+    .tp-qrwrap { margin: 4px auto 8px; width: 210px; background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 10px 12px 12px; box-shadow: 0 4px 16px rgba(15,23,42,.1); }
+    .tp-qrwrap svg { display: block; width: 100%; height: auto; }
+    .tp-qrhead { text-align: center; font: 800 13px 'Plus Jakarta Sans', sans-serif; color: #111; letter-spacing: .12em; padding-bottom: 6px; }
+    .tp-center { text-align: center; }
+
+    .tp-card { display: flex; gap: 10px; justify-content: space-between; align-items: center; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 12px; background: #fff; }
+    .tp-card + .tp-card { margin-top: 7px; }
+    .tp-card.void { background: #fff1f2; border-color: #fecdd3; }
+    .tp-card.sel { border-color: #f43f5e; background: #fff1f2; }
+    .tp-card .main { min-width: 0; flex: 1; }
+    .tp-card .top { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; font-weight: 800; color: #0f172a; }
+    .tp-card .sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .tp-card .sub.cut { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .tp-card .meta { font-size: 10.5px; color: #94a3b8; margin-top: 2px; }
+    .tp-card .side { text-align: right; flex: none; }
+    .tp-card .money { font: 800 12.5px 'JetBrains Mono', monospace; color: #0f172a; }
+    .tp-card .acts { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; }
+    .tp-tag { font-size: 9.5px; padding: 2px 7px; border-radius: 99px; background: #f1f5f9; color: #475569; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+    .tp-tag.green { background: #d1fae5; color: #065f46; } .tp-tag.red { background: #ffe4e6; color: #be123c; } .tp-tag.blue { background: #dbeafe; color: #1d4ed8; } .tp-tag.amber { background: #fef3c7; color: #92400e; } .tp-tag.purple { background: #f3e8ff; color: #7e22ce; }
+    .tp-empty { text-align: center; padding: 30px 10px; color: #94a3b8; font-size: 12px; }
+    .tp-empty i { font-size: 30px; display: block; margin-bottom: 8px; color: #cbd5e1; }
+    .tp-banner { padding: 9px 11px; border-radius: 10px; font-size: 11.5px; line-height: 1.45; display: flex; gap: 8px; align-items: flex-start; margin-bottom: 10px; }
+    .tp-banner.ok { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .tp-banner.bad { background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
+    .tp-banner.warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .tp-banner i { margin-top: 2px; }
+    .tp-check { display: flex; gap: 8px; align-items: center; padding: 4px 0; font-size: 12px; color: #475569; cursor: pointer; }
+    .tp-check input { width: 15px; height: 15px; accent-color: #e11d48; }
+    .tp-ritem { display: flex; gap: 10px; align-items: flex-start; padding: 10px; border: 1px solid #e2e8f0; border-radius: 12px; }
+    .tp-ritem + .tp-ritem { margin-top: 7px; }
+    .tp-ritem.on { border-color: #f43f5e; background: #fff1f2; }
+    .tp-ritem input[type=checkbox] { margin-top: 3px; width: 16px; height: 16px; accent-color: #e11d48; }
+    .tp-ritem .nm { font-weight: 800; color: #0f172a; font-size: 12px; }
+    .tp-ritem .vr { font-size: 11px; color: #64748b; margin-top: 1px; }
+    .tp-ritem .ctl { margin-top: 7px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 11px; color: #475569; }
+    .tp-ritem select { padding: 5px 8px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; font: 600 11.5px 'Plus Jakarta Sans', sans-serif; }
+
+    .tp-rows { border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .tp-rows .r { display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; }
+    .tp-rows .r:last-child { border-bottom: 0; }
+    .tp-rows .r span:first-child { color: #64748b; }
+    .tp-rows .r span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #0f172a; text-align: right; }
+    .tp-rows .r.strong { background: #fff1f2; } .tp-rows .r.strong span { color: #be123c !important; font-weight: 800; }
+    .tp-rows .r.sec { background: #f1f5f9; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; font-weight: 800; padding: 5px 12px; }
+    .tp-rows .r.sec span { color: #64748b !important; font-family: inherit !important; }
+    .tp-diff { margin-top: 10px; padding: 10px 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 13px; background: #f1f5f9; color: #64748b; }
+    .tp-diff.ok { background: #ecfdf5; color: #047857; } .tp-diff.minus { background: #fff1f2; color: #e11d48; } .tp-diff.plus { background: #fffbeb; color: #b45309; }
+    .tp-diff b { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+    .tp-done { text-align: center; padding: 6px 0 10px; }
+    .tp-done .ic { width: 58px; height: 58px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 8px; background: #d1fae5; color: #059669; }
+    .tp-done.closed .ic { background: #ffe4e6; color: #e11d48; }
+    .tp-done h4 { font-size: 16px; font-weight: 800; color: #0f172a; }
+    .tp-done p { font-size: 11.5px; color: #64748b; margin-top: 3px; }
+    .tp-confirm-body { padding: 18px 20px; }
+    .tp-confirm-body h4 { font-size: 15px; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px; }
+    .tp-confirm-body p { font-size: 12.5px; color: #64748b; margin-top: 8px; line-height: 1.55; }
+
+    .tp-size-off { opacity: .4; text-decoration: line-through; cursor: not-allowed !important; }
+    .tp-low { color: #e11d48; }
+
     @media print {
       body * {
         visibility: hidden;
@@ -214,6 +330,13 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
 
     <!-- Quick Action Shortcut Buttons -->
     <div class="flex items-center gap-2">
+      <!-- Transaksi Ditahan -->
+      <button onclick="tpOpenHeld(); playAudio('click');" title="Transaksi Ditahan (Hold) - F8 untuk menahan" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-100 rounded-lg border border-slate-700 text-xs font-semibold transition-all cursor-pointer">
+        <i class="fa-solid fa-pause text-amber-400 text-xs"></i>
+        <span class="hidden sm:inline">Ditahan</span>
+        <i id="held-badge" class="tp-hbadge zero">0</i>
+      </button>
+
       <!-- Barcode Scanner -->
       <button onclick="openModal('scanner-modal'); playAudio('click');" title="Scan Barcode Produk (F2)" class="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 active:bg-slate-800 text-slate-200 text-xs font-semibold rounded-lg border border-slate-700/70 transition-all shadow-sm hover:border-slate-500 cursor-pointer">
         <i class="fa-solid fa-barcode text-rose-400 text-sm"></i>
@@ -392,6 +515,17 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             <span id="discount-val" class="font-mono font-bold">- Rp 0</span>
           </div>
 
+          <div class="tp-vrow">
+            <input id="voucher-input" class="tp-vinput" type="text" placeholder="Kode voucher (THREAD10 / HEMAT50)" onkeydown="if(event.key==='Enter')tpApplyVoucher()" autocomplete="off">
+            <button type="button" class="tp-vbtn" onclick="tpApplyVoucher()">Pakai</button>
+            <button type="button" id="voucher-remove" class="tp-vlink hidden" onclick="tpRemoveVoucher()">Lepas</button>
+          </div>
+          <div id="voucher-note" class="tp-vnote hidden"></div>
+          <div id="voucher-row" class="tp-vrow hidden" style="justify-content:space-between;color:#059669;font-weight:500">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-ticket text-[10px]"></i><span id="voucher-label">Voucher</span></span>
+            <span id="voucher-val" class="font-mono font-bold">- Rp 0</span>
+          </div>
+
           <div class="flex justify-between text-slate-600">
             <span>Pajak Restitusi / PPN (11%)</span>
             <span id="tax-val" class="font-mono text-slate-700">Rp 0</span>
@@ -452,7 +586,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
               <input
                 id="cash-tendered-input"
                 type="number"
-                value="700000"
+                value="" placeholder="0"
                 oninput="handleCashInput(this.value)"
                 class="w-28 text-right bg-white border border-slate-300 rounded px-2 py-1 font-mono font-bold text-slate-900 focus:outline-none focus:border-rose-500 text-xs"
               />
@@ -460,18 +594,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
           </div>
 
           <!-- Quick denomination chips -->
-          <div class="flex flex-wrap gap-1.5 pt-1">
-            <button
-              onclick="setExactCash()"
-              class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded text-[11px] font-medium text-slate-700 cursor-pointer"
-            >
-              Uang Pas
-            </button>
-            <button onclick="setQuickCash(100000)" class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded text-[11px] font-medium text-slate-700 font-mono cursor-pointer">100k</button>
-            <button onclick="setQuickCash(200000)" class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded text-[11px] font-medium text-slate-700 font-mono cursor-pointer">200k</button>
-            <button onclick="setQuickCash(500000)" class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded text-[11px] font-medium text-slate-700 font-mono cursor-pointer">500k</button>
-            <button onclick="setQuickCash(1000000)" class="px-2 py-1 bg-white hover:bg-slate-200 border border-slate-200 rounded text-[11px] font-medium text-slate-700 font-mono cursor-pointer">1 Juta</button>
-          </div>
+          <div id="cash-quick-chips" class="flex flex-wrap gap-1.5 pt-1"></div>
 
           <div class="flex justify-between items-center pt-1 border-t border-slate-200">
             <span class="text-slate-600 font-medium">Kembalian:</span>
@@ -504,6 +627,8 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         </div>
 
         <!-- Giant Action Button: PROSES PEMBAYARAN & CETAK STRUK -->
+        <div class="tp-payrow">
+          <button type="button" onclick="tpHold(); playAudio('click');" class="tp-holdbtn" title="Tahan transaksi (F8)"><i class="fa-solid fa-pause"></i><span>Tahan</span><small>F8</small></button>
         <button
           id="checkout-btn"
           onclick="processPayment()"
@@ -512,6 +637,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
           <i class="fa-solid fa-print text-base"></i>
           <span>Proses Pembayaran & Cetak Struk</span>
         </button>
+        </div>
       </div>
     </section>
   </main>
@@ -525,7 +651,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       <div class="p-4 bg-slate-900 text-white flex items-center justify-between no-print">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-receipt text-rose-400"></i>
-          <h4 class="font-bold text-sm">Struk Pembayaran Sukses</h4>
+          <h4 id="rcpt-title" class="font-bold text-sm">Struk Pembayaran Sukses</h4>
         </div>
         <button onclick="closeModal('receipt-modal')" class="text-slate-400 hover:text-white cursor-pointer">
           <i class="fa-solid fa-xmark"></i>
@@ -553,7 +679,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             </div>
             <div class="flex justify-between">
               <span>Kasir / Shift</span>
-              <span>Zannah Jagad (01)</span>
+              <span id="rcpt-cashier">Zannah Jagad (01)</span>
             </div>
             <div class="flex justify-between">
               <span>Tanggal & Jam</span>
@@ -564,6 +690,8 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
               <span id="rcpt-cust">Zannah Tan (SILVER)</span>
             </div>
           </div>
+
+          <div id="rcpt-stamp" class="hidden text-center font-bold text-[11px] tracking-widest" style="padding:6px 0 0"></div>
 
           <!-- Itemized List -->
           <div id="rcpt-items-list" class="py-3 border-b border-dashed border-slate-300 space-y-2">
@@ -579,6 +707,10 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             <div id="rcpt-discount-row" class="flex justify-between text-emerald-700">
               <span id="rcpt-discount-label">Diskon Member</span>
               <span id="rcpt-discount">- Rp 0</span>
+            </div>
+            <div id="rcpt-voucher-row" class="flex justify-between text-emerald-700" style="display:none">
+              <span id="rcpt-voucher-label">Voucher</span>
+              <span id="rcpt-voucher">- Rp 0</span>
             </div>
             <div class="flex justify-between">
               <span>PPN (11%)</span>
@@ -639,7 +771,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
           class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-sm"
         >
           <i class="fa-solid fa-cart-plus"></i>
-          <span>Transaksi Baru</span>
+          <span id="rcpt-done-text">Transaksi Baru</span>
         </button>
       </div>
     </div>
@@ -678,6 +810,14 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
           </div>
         </div>
 
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-2">Ketik / scan SKU:</label>
+          <div style="display:flex;gap:8px">
+            <input id="scan-input" type="text" class="tp-input num" style="font-size:13px;text-transform:uppercase" placeholder="SHR-001 atau TSH-002-L (SKU-ukuran)" onkeydown="if(event.key==='Enter')tpScanSubmit()" autocomplete="off">
+            <button type="button" onclick="tpScanSubmit()" class="tp-btn rose">Tambah</button>
+          </div>
+        </div>
+
         <!-- Quick Scan Clickable Tags -->
         <div>
           <label class="text-xs font-bold text-slate-700 block mb-2">
@@ -701,164 +841,95 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
   <!-- ======================================================== -->
   <!-- 5. MODAL: RETUR BARANG & PENUKARAN SIZE                    -->
   <!-- ======================================================== -->
-  <div id="return-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-rotate-left text-amber-400"></i>
-          <h4 class="font-bold text-sm">Retur & Penukaran Busana</h4>
-        </div>
-        <button onclick="closeModal('return-modal')" class="text-slate-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+    <div id="return-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:580px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-rotate-left" style="color:#fbbf24"></i><span id="ret-title">Retur &amp; Penukaran Busana</span></h4>
+        <button type="button" onclick="tpCloseReturn()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
       </div>
-
-      <div class="p-5 space-y-3 text-xs">
-        <div>
-          <label class="font-semibold text-slate-700 block mb-1">
-            Nomor Struk Pembelian Asli:
-          </label>
-          <div class="flex gap-2">
-            <input
-              type="text"
-              value="TRX-202610-8841"
-              class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg font-mono text-xs focus:outline-none focus:border-rose-500"
-            />
-            <button
-              onclick="playAudio('beep'); showToast('Struk ditemukan. Data diverifikasi.');"
-              class="px-3 py-2 bg-slate-900 text-white rounded-lg font-semibold hover:bg-slate-800 cursor-pointer"
-            >
-              Verifikasi
-            </button>
-          </div>
-        </div>
-
-        <div>
-          <label class="font-semibold text-slate-700 block mb-1">Alasan Retur / Tukar:</label>
-          <select class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:outline-none focus:border-rose-500">
-            <option>Tukar Ukuran (Size Kekecilan / Kebesaran)</option>
-            <option>Tukar Warna / Model Seharga</option>
-            <option>Cacat Jahitan / Defect Produksi Pabrik</option>
-            <option>Kado / Hadiah Salah Beli</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="font-semibold text-slate-700 block mb-1">Kondisi Fisik Pakaian:</label>
-          <div class="space-y-1 text-slate-600 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked class="rounded text-rose-600" />
-              <span>Hangtag baju masih utuh terpasang</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked class="rounded text-rose-600" />
-              <span>Belum pernah dicuci dan tidak berbau</span>
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer">
-              <input type="checkbox" checked class="rounded text-rose-600" />
-              <span>Masa retur ≤ 7 hari dari tanggal struk</span>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-        <button
-          onclick="closeModal('return-modal')"
-          class="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold cursor-pointer"
-        >
-          Batal
-        </button>
-        <button
-          onclick="finishReturn()"
-          class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg text-xs font-bold cursor-pointer"
-        >
-          Terbitkan Nota Retur
-        </button>
-      </div>
+      <div class="tp-mbody" id="ret-body"></div>
+      <div class="tp-mfoot" id="ret-foot"></div>
     </div>
   </div>
 
   <!-- ======================================================== -->
   <!-- 6. MODAL: RIWAYAT SHIFT & TUTUP KASIR                     -->
   <!-- ======================================================== -->
-  <div id="shift-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs hidden items-center justify-center p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-      <div class="p-4 bg-slate-900 text-white flex items-center justify-between">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-chart-pie text-rose-400"></i>
-          <h4 class="font-bold text-sm">Rekapitulasi Shift Kasir</h4>
-        </div>
-        <button onclick="closeModal('shift-modal')" class="text-slate-400 hover:text-white cursor-pointer">
-          <i class="fa-solid fa-xmark"></i>
-        </button>
+  <div id="shift-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:540px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-chart-pie" style="color:#fb7185"></i><span id="sh-title">Rekapitulasi Shift Kasir</span></h4>
+        <button type="button" onclick="tpCloseShift()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
       </div>
+      <div class="tp-mbody" id="sh-body"></div>
+      <div class="tp-mfoot" id="sh-foot"></div>
+    </div>
+  </div>
 
-      <div class="p-5 space-y-3 text-xs">
-        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1.5">
-          <div class="flex justify-between">
-            <span class="text-slate-500">Kasir Bertugas:</span>
-            <span class="font-bold text-slate-800">Zannah Jagad</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500">Shift & Cabang:</span>
-            <span>Shift Pagi · Grand Indonesia East Mall Lt. 2</span>
-          </div>
-          <div class="flex justify-between">
-            <span class="text-slate-500">Waktu Mulai:</span>
-            <span>08:00 WIB</span>
-          </div>
-        </div>
-
-        <div class="space-y-2 pt-1">
-          <div class="flex justify-between text-slate-600">
-            <span>Modal Awal Kasir:</span>
-            <span class="font-mono font-bold text-slate-800">Rp 1.000.000</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Penjualan Tunai (Cash):</span>
-            <span class="font-mono font-bold text-emerald-600" id="shift-cash-val">Rp 1.650.000</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Penjualan EDC (Debit/Kredit):</span>
-            <span class="font-mono font-bold text-blue-600" id="shift-edc-val">Rp 2.450.000</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Penjualan QRIS:</span>
-            <span class="font-mono font-bold text-purple-600" id="shift-qris-val">Rp 1.890.000</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Total Transaksi:</span>
-            <span class="font-bold text-slate-900" id="shift-trx-val">14 transaksi</span>
-          </div>
-          <div class="flex justify-between text-slate-600">
-            <span>Laci Terbuka (Kick Log):</span>
-            <span id="shift-drawer-val">6 kali</span>
-          </div>
-
-          <div class="pt-2 border-t border-slate-200 flex justify-between items-baseline">
-            <span class="font-bold text-slate-900">Total Omset Shift:</span>
-            <span class="text-base font-extrabold text-rose-600 font-mono" id="shift-total-val">
-              Rp 5.990.000
-            </span>
-          </div>
-        </div>
+  <!-- MODAL: TRANSAKSI DITAHAN -->
+  <div id="held-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:520px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-pause" style="color:#fbbf24"></i> Transaksi Ditahan (Fitting Room)</h4>
+        <button type="button" onclick="tpCloseHeld()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
       </div>
+      <div class="tp-mbody" id="held-body"></div>
+      <div class="tp-mfoot" style="justify-content:flex-start;font-size:11px;color:#64748b;align-items:center">Tekan <b style="color:#be123c">&nbsp;Panggil&nbsp;</b> untuk melanjutkan transaksi pelanggan di kasir.</div>
+    </div>
+  </div>
 
-      <div class="p-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
-        <button
-          onclick="playAudio('click'); window.print();"
-          class="px-3.5 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-semibold cursor-pointer flex items-center gap-1.5"
-        >
-          <i class="fa-solid fa-print"></i>
-          <span>Cetak Rekap</span>
-        </button>
-        <button
-          onclick="playAudio('success'); closeModal('shift-modal'); showToast('Shift berhasil diselesaikan (Handover Closed).');"
-          class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold cursor-pointer"
-        >
-          Tutup Shift & Handover
-        </button>
+  <!-- MODAL: QRIS -->
+  <div id="qris-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:400px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-qrcode" style="color:#fb7185"></i> Pembayaran QRIS</h4>
+        <button type="button" onclick="tpCloseQris()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody">
+        <div class="tp-total"><span>Total Dibayar</span><strong id="qris-amount">Rp 0</strong></div>
+        <div class="tp-qrwrap"><div class="tp-qrhead">QRIS</div><div id="qris-box"></div></div>
+        <p class="tp-center" style="font:500 11px 'JetBrains Mono',monospace;color:#64748b">ThreadPOS Boutique · NMID ID1020045566778</p>
+        <p class="tp-center" style="margin-top:6px;font-size:11.5px;color:#475569"><i class="fa-regular fa-clock" style="color:#f43f5e"></i> Berlaku <b id="qris-timer" style="font-family:'JetBrains Mono',monospace">05:00</b></p>
+        <div class="tp-note">Minta pelanggan scan dengan GoPay, OVO, DANA, ShopeePay atau m-banking. Tekan konfirmasi setelah notifikasi dana masuk.</div>
+      </div>
+      <div class="tp-mfoot">
+        <button type="button" class="tp-btn ghost" onclick="tpCloseQris()">Batal</button>
+        <button type="button" class="tp-btn green grow" onclick="tpConfirmQris()"><i class="fa-solid fa-check"></i>Konfirmasi QRIS Diterima</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDC -->
+  <div id="edc-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:400px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-credit-card" style="color:#60a5fa"></i> Pembayaran Kartu (EDC)</h4>
+        <button type="button" onclick="tpCloseEdc()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody">
+        <div class="tp-total"><span>Total Dibayar</span><strong id="edc-amount">Rp 0</strong></div>
+        <div class="tp-seg"><button type="button" id="edc-t-debit" class="on" onclick="tpSetEdcType('debit')">Kartu Debit</button><button type="button" id="edc-t-credit" onclick="tpSetEdcType('credit')">Kartu Kredit</button></div>
+        <span class="tp-label">Bank Penerbit</span>
+        <select id="edc-bank" class="tp-input"><option>BCA</option><option>Mandiri</option><option>BNI</option><option>BRI</option><option>CIMB Niaga</option><option>Permata</option></select>
+        <div class="tp-note">Minta pelanggan tap / insert / gesek kartu pada mesin EDC. Tekan konfirmasi setelah mesin menampilkan status APPROVED dan struk EDC tercetak.</div>
+      </div>
+      <div class="tp-mfoot">
+        <button type="button" class="tp-btn ghost" onclick="tpCloseEdc()">Batal</button>
+        <button type="button" class="tp-btn green grow" onclick="tpConfirmEdc()"><i class="fa-solid fa-check"></i>Konfirmasi EDC Approved</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG KONFIRMASI -->
+  <div id="confirm-modal" class="tp-overlay top hidden">
+    <div class="tp-modal" style="max-width:390px">
+      <div class="tp-confirm-body">
+        <h4><i id="cf-icon" class="fa-solid fa-circle-question" style="color:#f59e0b"></i><span id="cf-title">Konfirmasi</span></h4>
+        <p id="cf-msg"></p>
+      </div>
+      <div class="tp-mfoot">
+        <button type="button" class="tp-btn ghost" onclick="tpConfirmCancel()">Batal</button>
+        <button type="button" id="cf-ok" class="tp-btn rose" onclick="tpConfirmOk()">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
@@ -1828,6 +1899,943 @@ function tpTab(t){
   }).observe(nEl,{childList:true,characterData:true,subtree:true});
   window.addEventListener('resize',function(){ if(window.innerWidth>=1024) document.body.setAttribute('data-tab','produk'); });
 })();
+</script>
+<script>
+/* ================================================================
+   THREADPOS — PERBAIKAN & FITUR TAMBAHAN
+   (blok ini menimpa fungsi bermasalah dari skrip utama di atasnya)
+================================================================ */
+const tp$ = id => document.getElementById(id);
+const tpEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const tpPad = n => String(n).padStart(2, '0');
+const tpHM = d => tpPad(d.getHours()) + ':' + tpPad(d.getMinutes());
+const tpDMY = d => tpPad(d.getDate()) + '/' + tpPad(d.getMonth() + 1) + '/' + d.getFullYear();
+const tpProd = id => PRODUCTS.find(p => p.id === id);
+const TP_TIERS = { '0': 'NON-MEMBER', '0.05': 'SILVER', '0.1': 'GOLD', '0.15': 'PLATINUM' };
+const TP_VOUCHERS = {
+  THREAD10: { type: 'pct', value: 10, max: 100000, min: 300000, desc: 'Diskon 10% (maks Rp100.000, min belanja Rp300.000)' },
+  HEMAT50: { type: 'nom', value: 50000, min: 500000, desc: 'Potongan Rp50.000 (min belanja Rp500.000)' }
+};
+
+let tpVoucher = null;
+let tpHeld = [];
+let tpHeldSeq = 0;
+let tpTrx = [];
+let tpReturns = [];
+let tpRetSeq = 482;
+let tpSeq = 8841;
+let tpShift = { open: true, number: 1, openedAt: '08:00 WIB', openingCash: 1000000, kicks: 2, closedAt: null, counted: null };
+let tpPendingFinish = false;
+let tpReprint = false;
+let tpLastTotal = -1;
+let tpRet = null;
+let tpEdcType = 'debit';
+let tpQrisTimer = null;
+let tpQrisLeft = 300;
+let tpConfirmCb = null;
+let tpToastTimer = null;
+
+/* ---------- Toast & konfirmasi ---------- */
+function showToast(msg, type) {
+  const t = tp$('toast');
+  const icons = { success: ['fa-circle-check', '#6ee7b7'], info: ['fa-circle-info', '#7dd3fc'], warn: ['fa-triangle-exclamation', '#fcd34d'], error: ['fa-circle-xmark', '#fda4af'] };
+  const ic = icons[type] || ['fa-circle-check', '#fb7185'];
+  tp$('toast-text').textContent = msg;
+  const i = t.querySelector('i');
+  i.className = 'fa-solid ' + ic[0]; i.style.color = ic[1];
+  t.style.maxWidth = 'calc(100vw - 24px)';
+  t.classList.remove('hidden'); t.classList.add('flex');
+  clearTimeout(tpToastTimer);
+  tpToastTimer = setTimeout(() => { t.classList.add('hidden'); t.classList.remove('flex'); }, 3200);
+}
+function tpAsk(title, msg, okLabel, cb, danger) {
+  tp$('cf-title').textContent = title;
+  tp$('cf-msg').textContent = msg;
+  const ok = tp$('cf-ok'); ok.textContent = okLabel || 'Ya, Lanjutkan'; ok.className = 'tp-btn ' + (danger ? 'rose' : 'amber');
+  tp$('cf-icon').style.color = danger ? '#e11d48' : '#f59e0b';
+  tpConfirmCb = cb;
+  tp$('confirm-modal').classList.remove('hidden');
+}
+function tpConfirmOk() { const cb = tpConfirmCb; tpConfirmCb = null; tp$('confirm-modal').classList.add('hidden'); if (cb) cb(); }
+function tpConfirmCancel() { tpConfirmCb = null; tp$('confirm-modal').classList.add('hidden'); }
+
+function tpShiftGuard() {
+  if (!tpShift.open) { showToast('Shift sudah ditutup. Mulai shift baru untuk melayani transaksi.', 'warn'); return false; }
+  return true;
+}
+
+/* ================================================================
+   STOK PER VARIAN (WARNA x UKURAN)
+================================================================ */
+const tpVS = {};
+function tpInitStock() {
+  PRODUCTS.forEach((p, pi) => {
+    const cells = [];
+    p.colors.forEach((c, ci) => p.sizes.forEach((s, si) => cells.push({ c: c.name, s, zero: (ci * 5 + si * 3 + pi) % 7 === 0 })));
+    let live = cells.filter(x => !x.zero);
+    if (!live.length) live = cells;
+    const m = {};
+    cells.forEach(x => { (m[x.c] = m[x.c] || {})[x.s] = 0; });
+    for (let u = 0; u < p.stock; u++) { const cell = live[u % live.length]; m[cell.c][cell.s]++; }
+    tpVS[p.id] = m;
+  });
+  // pastikan varian pada keranjang awal tersedia
+  tpVS['prod-1']['Red Tartan']['L'] = Math.max(2, tpVS['prod-1']['Red Tartan']['L']);
+  tpVS['prod-3']['Deep Indigo']['32'] = Math.max(2, tpVS['prod-3']['Deep Indigo']['32']);
+  PRODUCTS.forEach(tpSyncStock);
+}
+const tpStock = (pid, color, size) => ((tpVS[pid] || {})[color] || {})[size] || 0;
+function tpSyncStock(p) { let t = 0; Object.values(tpVS[p.id]).forEach(o => Object.values(o).forEach(n => t += n)); p.stock = t; }
+function tpAddStock(pid, color, size, n) { tpVS[pid][color][size] += n; tpSyncStock(tpProd(pid)); }
+function tpColorStock(p, color) { return p.sizes.reduce((a, s) => a + tpStock(p.id, color, s), 0); }
+function tpCartQty(cartId) { const it = cart.find(i => i.cartId === cartId); return it ? it.qty : 0; }
+function tpFirstAvail(p, colorName) { return p.sizes.find(s => tpStock(p.id, colorName, s) > 0) || p.sizes[0]; }
+
+/* ================================================================
+   KATALOG
+================================================================ */
+function renderProducts() {
+  const container = tp$('products-container');
+  const q = searchQuery.toLowerCase();
+  const filtered = PRODUCTS.filter(p => {
+    const matchCat = selectedCategory === 'all' || p.category === selectedCategory;
+    return matchCat && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q));
+  });
+  if (filtered.length === 0) {
+    container.innerHTML = `<div class="tp-empty"><i class="fa-solid fa-shirt"></i><b style="color:#334155;font-size:14px">Tidak ada produk ditemukan</b><br>Coba kata kunci lain atau pilih kategori Semua Produk.<br><button onclick="resetFilter()" class="tp-btn rose xs" style="margin-top:12px">Reset Filter</button></div>`;
+    return;
+  }
+  container.innerHTML = `<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">${filtered.map(p => {
+    const v = activeVariants[p.id];
+    const vs = tpStock(p.id, v.color.name, v.size);
+    const inCart = tpCartQty(`${p.id}-${v.color.name}-${v.size}`);
+    const left = vs - inCart;
+    const soldOut = left <= 0;
+    return `
+    <div class="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden group">
+      <div class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
+        <img src="${p.image}" alt="${tpEsc(p.name)}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+        <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-md">
+          <i class="fa-solid fa-tag text-[9px] text-rose-400"></i><span>${p.sku}</span>
+        </div>
+        <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-xs text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded-md shadow-xs" title="Stok varian terpilih (total semua varian: ${p.stock})">
+          Stok: <span class="font-bold ${left <= 2 ? 'tp-low' : 'text-slate-900'}">${left}</span><span class="text-slate-400"> / ${p.stock}</span>
+        </div>
+      </div>
+      <div class="p-3.5 flex-1 flex flex-col justify-between">
+        <div>
+          <h4 class="font-bold text-slate-900 text-sm leading-snug line-clamp-1" title="${tpEsc(p.name)}">${tpEsc(p.name)}</h4>
+          <div class="mt-1 flex items-baseline justify-between">
+            <span class="text-base font-extrabold text-rose-600 font-mono">${formatRupiah(p.price)}</span>
+            <span class="text-[11px] text-slate-400 font-medium uppercase">${p.category}</span>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1.5"><span>Warna:</span><span class="font-semibold text-slate-800">${v.color.name}</span></div>
+            <div class="flex items-center gap-2">
+              ${p.colors.map(c => {
+                const sel = v.color.name === c.name;
+                const light = ['#f8fafc', '#fef3c7', '#d6cbbe', '#e2d9cc'].includes(c.hex);
+                const none = tpColorStock(p, c.name) === 0;
+                return `<button type="button" onclick="selectColor('${p.id}', '${c.name}', '${c.hex}')" title="${c.name}${none ? ' (habis)' : ''}" style="background-color: ${c.hex};${none ? 'opacity:.35;' : ''}" class="w-6 h-6 rounded-full border transition-all cursor-pointer relative ${sel ? 'ring-2 ring-rose-500 ring-offset-2 scale-110 border-white' : 'border-slate-300 hover:scale-105'}">${sel ? `<span class="absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-check text-[9px] ${light ? 'text-slate-900' : 'text-white'}"></i></span>` : ''}</button>`;
+              }).join('')}
+            </div>
+          </div>
+          <div class="mt-2.5">
+            <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1.5"><span>Ukuran:</span><span class="font-semibold text-slate-800">${v.size}</span></div>
+            <div class="flex flex-wrap gap-1.5">
+              ${p.sizes.map(s => {
+                const sel = v.size === s;
+                const n = tpStock(p.id, v.color.name, s);
+                return `<button type="button" onclick="selectSize('${p.id}', '${s}')" title="${n > 0 ? 'Stok ' + n : 'Habis'}" class="min-w-7 h-7 px-2 text-[11px] font-bold rounded-lg border transition-all cursor-pointer flex items-center justify-center ${n === 0 ? 'tp-size-off ' : ''}${sel ? 'bg-rose-50 border-rose-500 text-rose-700 ring-1 ring-rose-500' : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'}">${s}</button>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="mt-3.5 pt-2">
+          <button type="button" onclick="addToCart('${p.id}')" ${soldOut ? 'disabled' : ''} class="w-full py-2.5 px-3 text-white text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${soldOut ? 'bg-slate-300 cursor-not-allowed' : 'bg-slate-900 hover:bg-rose-600 active:bg-rose-700 cursor-pointer'}">
+            <i class="fa-solid ${soldOut ? 'fa-ban' : 'fa-plus'} text-xs"></i>
+            <span>${vs <= 0 ? 'Varian Habis' : (soldOut ? 'Maks. di Keranjang' : 'Tambah ke Keranjang')}</span>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function selectColor(prodId, name, hex) {
+  playAudio('click');
+  const p = tpProd(prodId), v = activeVariants[prodId];
+  v.color = { name, hex };
+  if (tpStock(prodId, name, v.size) === 0) v.size = tpFirstAvail(p, name);
+  renderProducts();
+}
+function selectSize(prodId, size) {
+  playAudio('click');
+  activeVariants[prodId].size = size;
+  renderProducts();
+}
+
+function addToCart(prodId) {
+  if (!tpShiftGuard()) return;
+  const prod = tpProd(prodId);
+  const v = activeVariants[prodId];
+  const cartId = `${prod.id}-${v.color.name}-${v.size}`;
+  const stock = tpStock(prodId, v.color.name, v.size);
+  if (stock <= 0) { showToast(`${prod.name} (${v.color.name} / ${v.size}) sedang habis. Pilih ukuran/warna lain.`, 'error'); return; }
+  const existing = cart.find(i => i.cartId === cartId);
+  if (existing && existing.qty >= stock) { showToast(`Stok ${v.color.name} / ${v.size} hanya ${stock} pcs.`, 'warn'); return; }
+  playAudio('beep');
+  if (existing) existing.qty += 1;
+  else cart.push({ cartId, product: prod, color: v.color, size: v.size, qty: 1, price: prod.price });
+  renderCart(); renderProducts();
+  showToast(`+1 ${prod.name} (${v.color.name} / ${v.size}) ditambahkan`, 'success');
+}
+
+function updateCartQty(cartId, delta) {
+  playAudio('click');
+  const item = cart.find(i => i.cartId === cartId);
+  if (!item) return;
+  if (delta > 0 && item.qty >= tpStock(item.product.id, item.color.name, item.size)) { showToast(`Stok varian ini hanya ${item.qty} pcs.`, 'warn'); return; }
+  item.qty += delta;
+  if (item.qty <= 0) cart = cart.filter(i => i.cartId !== cartId);
+  renderCart(); renderProducts();
+}
+function removeCartItem(cartId) { playAudio('click'); cart = cart.filter(i => i.cartId !== cartId); renderCart(); renderProducts(); }
+
+function clearCart() {
+  if (cart.length === 0) return;
+  tpAsk('Kosongkan keranjang?', 'Semua pakaian pada transaksi ini akan dihapus. Gunakan Tahan bila ingin melanjutkannya nanti.', 'Ya, Kosongkan', () => {
+    cart = []; tpVoucher = null; tp$('voucher-input').value = '';
+    renderCart(); renderProducts();
+    showToast('Keranjang pesanan dikosongkan.', 'warn');
+  }, true);
+}
+
+/* ================================================================
+   PERHITUNGAN (MEMBER + VOUCHER + PPN)
+================================================================ */
+function tpCalc(items, rate, code) {
+  const subtotal = items.reduce((a, i) => a + i.price * i.qty, 0);
+  const memberDisc = Math.round(subtotal * rate);
+  const after = subtotal - memberDisc;
+  const v = TP_VOUCHERS[code];
+  let voucherDisc = 0, note = '';
+  if (v) {
+    if (after >= v.min) voucherDisc = v.type === 'pct' ? Math.min(Math.round(after * v.value / 100), v.max) : Math.min(v.value, after);
+    else note = 'Voucher belum berlaku: min. belanja ' + formatRupiah(v.min) + ' (setelah diskon member).';
+  }
+  const taxable = after - voucherDisc;
+  const tax = Math.round(taxable * 0.11);
+  return { subtotal, memberDisc, voucherDisc, voucherNote: note, tax, total: taxable + tax };
+}
+
+function tpApplyVoucher() {
+  const code = tp$('voucher-input').value.trim().toUpperCase();
+  if (!code) { showToast('Masukkan kode voucher terlebih dahulu.', 'warn'); return; }
+  if (!TP_VOUCHERS[code]) { showToast('Kode voucher "' + code + '" tidak valid.', 'error'); return; }
+  if (cart.length === 0) { showToast('Tambahkan pakaian ke keranjang sebelum memakai voucher.', 'warn'); return; }
+  tpVoucher = code;
+  renderCart();
+  const c = tpCalc(cart, memberDiscountRate, tpVoucher);
+  showToast(c.voucherDisc > 0 ? 'Voucher ' + code + ' dipakai: hemat ' + formatRupiah(c.voucherDisc) : c.voucherNote, c.voucherDisc > 0 ? 'success' : 'warn');
+}
+function tpRemoveVoucher() { tpVoucher = null; tp$('voucher-input').value = ''; renderCart(); showToast('Voucher dilepas.', 'info'); }
+
+function handleTierChange(rate) { playAudio('click'); memberDiscountRate = parseFloat(rate); renderCart(); }
+
+/* ================================================================
+   KERANJANG & TAGIHAN
+================================================================ */
+function renderCart() {
+  const container = tp$('cart-list-container');
+  const totalQty = cart.reduce((a, b) => a + b.qty, 0);
+  tp$('cart-total-qty').innerText = `${totalQty} pcs`;
+
+  if (cart.length === 0) {
+    container.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400">
+      <div class="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-300 text-2xl mb-3 shadow-xs"><i class="fa-solid fa-basket-shopping"></i></div>
+      <h4 class="font-bold text-slate-700 text-sm">Keranjang Masih Kosong</h4>
+      <p class="text-xs text-slate-500 mt-1 max-w-xs">Pilih produk dari katalog atau gunakan barcode scanner untuk menambahkan belanjaan.</p></div>`;
+  } else {
+    container.innerHTML = `<div class="space-y-3">
+      <div class="flex items-center justify-between text-xs text-slate-500 pb-1">
+        <span class="font-semibold text-slate-700">Daftar Pakaian (${cart.length} varian)</span>
+        <button onclick="clearCart()" class="text-rose-600 hover:text-rose-700 font-semibold hover:underline flex items-center gap-1 cursor-pointer"><i class="fa-regular fa-trash-can text-[10px]"></i><span>Kosongkan</span></button>
+      </div>
+      ${cart.map(item => {
+        const max = tpStock(item.product.id, item.color.name, item.size);
+        return `<div class="p-3 bg-white rounded-xl border border-slate-200/90 shadow-xs flex items-center gap-3 transition-all hover:border-slate-300">
+          <div class="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200"><img src="${item.product.image}" alt="${tpEsc(item.product.name)}" class="w-full h-full object-cover"></div>
+          <div class="flex-1 min-w-0">
+            <h5 class="font-bold text-slate-900 text-xs truncate">${tpEsc(item.product.name)}</h5>
+            <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full inline-block border border-slate-300" style="background-color: ${item.color.hex};"></span><span>${item.color.name}</span></span>
+              <span>·</span><span class="font-semibold text-slate-700">Size ${item.size}</span>
+            </div>
+            <div class="text-xs font-mono font-bold text-rose-600 mt-1">${formatRupiah(item.price * item.qty)}<span class="text-[10px] text-slate-400 font-normal ml-1">(@ ${formatRupiah(item.price)})</span>${item.qty >= max ? '<span class="text-[10px] text-amber-600 font-semibold ml-1">stok maks</span>' : ''}</div>
+          </div>
+          <div class="flex flex-col items-end gap-1.5 flex-shrink-0">
+            <div class="flex items-center bg-slate-100 rounded-lg border border-slate-200 p-0.5">
+              <button onclick="updateCartQty('${item.cartId}', -1)" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-md text-xs font-bold transition cursor-pointer" title="Kurangi"><i class="fa-solid fa-minus text-[10px]"></i></button>
+              <span class="w-7 text-center text-xs font-mono font-bold text-slate-800">${item.qty}</span>
+              <button onclick="updateCartQty('${item.cartId}', 1)" class="w-6 h-6 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded-md text-xs font-bold transition cursor-pointer" title="Tambah"><i class="fa-solid fa-plus text-[10px]"></i></button>
+            </div>
+            <button onclick="removeCartItem('${item.cartId}')" class="text-slate-400 hover:text-rose-600 text-xs transition p-1 cursor-pointer" title="Hapus dari keranjang"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+  }
+
+  const c = tpCalc(cart, memberDiscountRate, tpVoucher);
+  currentGrandTotal = c.total;
+  if (c.total !== tpLastTotal) { tpLastTotal = c.total; cashTendered = 0; const ci = tp$('cash-tendered-input'); if (ci) ci.value = ''; }
+
+  tp$('subtotal-val').innerText = formatRupiah(c.subtotal);
+  tp$('discount-label').innerText = `Diskon Member (${Math.round(memberDiscountRate * 100)}%)`;
+  tp$('discount-val').innerText = `- ${formatRupiah(c.memberDisc)}`;
+  tp$('discount-row').style.display = c.memberDisc > 0 ? 'flex' : 'none';
+
+  const vrow = tp$('voucher-row');
+  if (tpVoucher && c.voucherDisc > 0) { vrow.classList.remove('hidden'); tp$('voucher-label').textContent = 'Voucher ' + tpVoucher; tp$('voucher-val').textContent = '- ' + formatRupiah(c.voucherDisc); }
+  else vrow.classList.add('hidden');
+  const vnote = tp$('voucher-note');
+  if (tpVoucher && c.voucherNote) { vnote.textContent = c.voucherNote; vnote.classList.remove('hidden'); } else vnote.classList.add('hidden');
+  tp$('voucher-remove').classList.toggle('hidden', !tpVoucher);
+
+  tp$('tax-val').innerText = formatRupiah(c.tax);
+  tp$('grandtotal-val').innerText = formatRupiah(c.total);
+  tpRenderQuick(c.total);
+  updateChangeDisplay();
+  tpRefreshCheckout();
+}
+
+function tpRefreshCheckout() {
+  const btn = tp$('checkout-btn');
+  if (!btn) return;
+  const ok = cart.length > 0 && tpShift.open && (paymentMethod !== 'cash' || cashTendered >= currentGrandTotal);
+  btn.disabled = !ok;
+  btn.className = ok
+    ? 'w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2.5 shadow-md cursor-pointer bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-rose-600/30 hover:shadow-lg'
+    : 'w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2.5 bg-slate-300 text-slate-500 cursor-not-allowed shadow-none';
+}
+
+/* ---------- Tunai ---------- */
+function tpRenderQuick(total) {
+  const box = tp$('cash-quick-chips');
+  if (!box) return;
+  if (total <= 0) { box.innerHTML = ''; return; }
+  const set = new Set();
+  [10000, 50000, 100000, 200000, 500000, 1000000].forEach(s => { const v = Math.ceil(total / s) * s; if (v > total) set.add(v); });
+  const sug = [...set].sort((a, b) => a - b).slice(0, 4);
+  const cls = on => 'px-2 py-1 border rounded text-[11px] font-medium font-mono cursor-pointer ' + (on ? 'bg-rose-50 border-rose-400 text-rose-700' : 'bg-white hover:bg-slate-200 border-slate-200 text-slate-700');
+  box.innerHTML = `<button onclick="setExactCash()" class="${cls(cashTendered === total)}" style="font-family:inherit">Uang Pas</button>` +
+    sug.map(v => `<button onclick="setQuickCash(${v})" class="${cls(cashTendered === v)}">${v >= 1000000 ? (v / 1000000) + ' Juta' : (v / 1000) + 'k'}</button>`).join('');
+}
+function handleCashInput(val) { cashTendered = Math.max(0, Number(val) || 0); tpRenderQuick(currentGrandTotal); updateChangeDisplay(); tpRefreshCheckout(); }
+function setExactCash() { playAudio('click'); cashTendered = currentGrandTotal; tp$('cash-tendered-input').value = cashTendered; tpRenderQuick(currentGrandTotal); updateChangeDisplay(); tpRefreshCheckout(); }
+function setQuickCash(amt) { playAudio('click'); cashTendered = amt; tp$('cash-tendered-input').value = cashTendered; tpRenderQuick(currentGrandTotal); updateChangeDisplay(); tpRefreshCheckout(); }
+function updateChangeDisplay() {
+  const el = tp$('change-display');
+  if (cashTendered === 0) { el.innerText = 'Rp 0'; el.className = 'font-mono font-bold text-sm text-slate-400'; }
+  else if (cashTendered < currentGrandTotal) { el.innerText = `Kurang ${formatRupiah(currentGrandTotal - cashTendered)}`; el.className = 'font-mono font-bold text-sm text-rose-600'; }
+  else { el.innerText = formatRupiah(cashTendered - currentGrandTotal); el.className = 'font-mono font-bold text-sm text-emerald-600'; }
+}
+
+function setPaymentMethod(method) {
+  playAudio('click');
+  paymentMethod = method;
+  document.querySelectorAll('.pay-method-btn').forEach(b => {
+    b.className = 'pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600';
+  });
+  tp$(`pay-btn-${method}`).className = 'pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-rose-50 border-rose-500 text-rose-700 shadow-xs';
+  tp$('cash-panel').style.display = method === 'cash' ? 'block' : 'none';
+  tp$('qris-panel').classList.toggle('hidden', method !== 'qris'); tp$('qris-panel').classList.toggle('flex', method === 'qris');
+  tp$('edc-panel').classList.toggle('hidden', method !== 'edc'); tp$('edc-panel').classList.toggle('flex', method === 'edc');
+  tpRefreshCheckout();
+}
+
+/* ================================================================
+   PEMBAYARAN
+================================================================ */
+function processPayment() {
+  if (!tpShiftGuard()) return;
+  if (cart.length === 0) { showToast('Keranjang belanja masih kosong.', 'warn'); return; }
+  // validasi stok terakhir
+  const bad = cart.find(i => i.qty > tpStock(i.product.id, i.color.name, i.size));
+  if (bad) { showToast(`Stok ${bad.product.name} (${bad.color.name}/${bad.size}) tidak mencukupi.`, 'error'); return; }
+  if (paymentMethod === 'cash') {
+    if (cashTendered <= 0) { showToast('Pilih atau masukkan nominal uang yang diterima.', 'warn'); tp$('cash-tendered-input').focus(); return; }
+    if (cashTendered < currentGrandTotal) { showToast('Uang diterima kurang ' + formatRupiah(currentGrandTotal - cashTendered) + '.', 'error'); return; }
+    tpCommit('cash', {});
+  } else if (paymentMethod === 'qris') tpOpenQris();
+  else tpOpenEdc();
+}
+
+/* ---------- QRIS ---------- */
+function tpBuildQR(seedVal) {
+  const n = 29; let seed = 0; const s = String(seedVal) + tpSeq;
+  for (let k = 0; k < s.length; k++) seed = (seed * 31 + s.charCodeAt(k)) >>> 0;
+  const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
+  const zones = [[0, 0], [n - 7, 0], [0, n - 7]];
+  const finder = (x, y) => {
+    for (const [fx, fy] of zones) {
+      const dx = x - fx, dy = y - fy;
+      if (dx >= -1 && dx <= 7 && dy >= -1 && dy <= 7) { if (dx < 0 || dy < 0 || dx > 6 || dy > 6) return false; return Math.max(Math.abs(dx - 3), Math.abs(dy - 3)) !== 2; }
+    }
+    return null;
+  };
+  let rects = '';
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { const f = finder(x, y); if (f === null ? rnd() > 0.5 : f) rects += `<rect x="${x}" y="${y}" width="1" height="1"/>`; }
+  return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"><rect width="${n}" height="${n}" fill="#fff"/><g fill="#111">${rects}</g></svg>`;
+}
+function tpOpenQris() {
+  tp$('qris-amount').textContent = formatRupiah(currentGrandTotal);
+  tp$('qris-box').innerHTML = tpBuildQR(currentGrandTotal);
+  tpQrisLeft = 300;
+  const tick = () => { tp$('qris-timer').textContent = tpPad(Math.floor(tpQrisLeft / 60)) + ':' + tpPad(tpQrisLeft % 60); };
+  tick(); clearInterval(tpQrisTimer);
+  tpQrisTimer = setInterval(() => {
+    tpQrisLeft--;
+    if (tpQrisLeft <= 0) { tpCloseQris(); showToast('QRIS kedaluwarsa. Silakan ulangi pembayaran.', 'warn'); return; }
+    tick();
+  }, 1000);
+  tp$('qris-modal').classList.remove('hidden');
+}
+function tpCloseQris() { clearInterval(tpQrisTimer); tpQrisTimer = null; tp$('qris-modal').classList.add('hidden'); }
+function tpConfirmQris() { tpCloseQris(); tpCommit('qris', { ref: 'QR' + String(Date.now()).slice(-8), label: 'QRIS' }); }
+
+/* ---------- EDC ---------- */
+function tpOpenEdc() { tpSetEdcType('debit'); tp$('edc-amount').textContent = formatRupiah(currentGrandTotal); tp$('edc-modal').classList.remove('hidden'); }
+function tpCloseEdc() { tp$('edc-modal').classList.add('hidden'); }
+function tpSetEdcType(t) { tpEdcType = t; tp$('edc-t-debit').classList.toggle('on', t === 'debit'); tp$('edc-t-credit').classList.toggle('on', t === 'credit'); }
+function tpConfirmEdc() {
+  const bank = tp$('edc-bank').value;
+  tpCloseEdc();
+  tpCommit('edc', { ref: String(Math.floor(100000 + Math.random() * 900000)), label: 'KARTU ' + (tpEdcType === 'debit' ? 'DEBIT ' : 'KREDIT ') + bank.toUpperCase() });
+}
+
+/* ---------- Commit transaksi ---------- */
+function tpMakeTrx(items, o) {
+  const c = tpCalc(items, o.rate, o.voucher);
+  return {
+    no: o.no, ts: o.ts, shiftNo: o.shiftNo, customer: o.customer, rate: o.rate, tierName: TP_TIERS[String(o.rate)] || 'MEMBER',
+    items: items.map(i => ({ pid: i.product.id, name: i.product.name, sku: i.product.sku, colorName: i.color.name, colorHex: i.color.hex, size: i.size, qty: i.qty, price: i.price, returned: 0 })),
+    subtotal: c.subtotal, memberDisc: c.memberDisc, voucherCode: c.voucherDisc > 0 ? o.voucher : null, voucherDisc: c.voucherDisc, tax: c.tax, total: c.total,
+    method: o.method, methodLabel: o.label || (o.method === 'cash' ? 'TUNAI' : o.method === 'qris' ? 'QRIS' : 'KARTU EDC'),
+    tendered: o.method === 'cash' ? o.tendered : c.total, change: o.method === 'cash' ? Math.max(0, o.tendered - c.total) : 0,
+    ref: o.ref || null, voided: false
+  };
+}
+
+function tpCommit(method, extra) {
+  const no = tp$('trx-id-display').innerText;
+  const trx = tpMakeTrx(cart, {
+    no, ts: new Date(), shiftNo: tpShift.number, customer: tp$('cust-name-input').value.trim() || 'Pelanggan Walk-In',
+    rate: memberDiscountRate, voucher: tpVoucher, method, tendered: cashTendered, label: extra.label, ref: extra.ref
+  });
+  cart.forEach(i => { tpVS[i.product.id][i.color.name][i.size] = Math.max(0, tpStock(i.product.id, i.color.name, i.size) - i.qty); tpSyncStock(i.product); });
+  tpTrx.unshift(trx);
+  tpSeq++;
+  tpPendingFinish = true; tpReprint = false;
+  playAudio('success');
+  tpRenderReceipt(trx);
+  renderProducts();
+  tpUpdateBadges();
+  showToast(`Pembayaran ${trx.methodLabel} berhasil · ${formatRupiah(trx.total)}`, 'success');
+}
+
+/* ---------- Struk ---------- */
+function tpRenderReceipt(trx) {
+  tp$('rcpt-no').innerText = trx.no;
+  tp$('rcpt-time').innerText = tpDMY(trx.ts) + ' ' + tpHM(trx.ts) + ' WIB';
+  tp$('rcpt-cashier').innerText = `Zannah Jagad (${tpPad(trx.shiftNo)})`;
+  tp$('rcpt-cust').innerText = `${trx.customer} (${trx.tierName})`;
+  tp$('rcpt-subtotal').innerText = formatRupiah(trx.subtotal);
+  tp$('rcpt-discount').innerText = `- ${formatRupiah(trx.memberDisc)}`;
+  tp$('rcpt-discount-label').innerText = `Diskon Member (${Math.round(trx.rate * 100)}%)`;
+  tp$('rcpt-discount-row').style.display = trx.memberDisc > 0 ? 'flex' : 'none';
+  tp$('rcpt-voucher-row').style.display = trx.voucherDisc > 0 ? 'flex' : 'none';
+  tp$('rcpt-voucher-label').innerText = 'Voucher ' + (trx.voucherCode || '');
+  tp$('rcpt-voucher').innerText = `- ${formatRupiah(trx.voucherDisc)}`;
+  tp$('rcpt-tax').innerText = formatRupiah(trx.tax);
+  tp$('rcpt-grandtotal').innerText = formatRupiah(trx.total);
+  tp$('rcpt-payment-type').innerText = trx.methodLabel;
+
+  const chg = tp$('rcpt-change-row');
+  if (trx.method === 'cash') {
+    tp$('rcpt-tendered-label').innerText = 'Tunai Diterima'; tp$('rcpt-tendered').innerText = formatRupiah(trx.tendered);
+    chg.style.display = 'flex'; tp$('rcpt-change').innerText = formatRupiah(trx.change);
+  } else {
+    tp$('rcpt-tendered-label').innerText = trx.method === 'qris' ? 'Ref QRIS' : 'Approval Code';
+    tp$('rcpt-tendered').innerText = trx.ref || '-';
+    chg.style.display = 'none';
+  }
+
+  tp$('rcpt-items-list').innerHTML = trx.items.map(item => `
+    <div class="text-[11px]">
+      <div class="font-bold">${tpEsc(item.name)}</div>
+      <div class="text-[10px] text-slate-500 flex justify-between"><span>Var: ${item.colorName} / ${item.size}</span><span>${item.qty}x @ ${formatRupiah(item.price)}</span></div>
+      <div class="text-right font-bold">${formatRupiah(item.price * item.qty)}</div>
+      ${item.returned ? `<div class="text-right text-[10px] text-amber-700">Diretur/ditukar: ${item.returned} pcs</div>` : ''}
+    </div>`).join('');
+
+  const stamp = tp$('rcpt-stamp');
+  if (trx.voided) { stamp.textContent = '*** VOID / DIBATALKAN ***'; stamp.style.color = '#e11d48'; stamp.classList.remove('hidden'); }
+  else if (tpReprint) { stamp.textContent = '** SALINAN STRUK **'; stamp.style.color = '#64748b'; stamp.classList.remove('hidden'); }
+  else stamp.classList.add('hidden');
+
+  tp$('rcpt-title').textContent = tpReprint ? (trx.voided ? 'Struk (VOID)' : 'Salinan Struk') : 'Struk Pembayaran Sukses';
+  tp$('rcpt-done-text').textContent = tpReprint ? 'Tutup' : 'Transaksi Baru';
+  openModal('receipt-modal');
+}
+
+function tpViewReceipt(no) {
+  const t = tpTrx.find(x => x.no === no);
+  if (!t) return;
+  tpReprint = true;
+  tpCloseShift(); tpCloseReturn();
+  tpRenderReceipt(t);
+}
+
+function tpResetOrder() {
+  cart = []; tpVoucher = null; tpLastTotal = -1; cashTendered = 0;
+  tp$('trx-id-display').innerText = 'TRX-' + new Date().getFullYear() + tpPad(new Date().getMonth() + 1) + '-' + tpSeq;
+  tp$('cust-name-input').value = 'Pelanggan Walk-In';
+  tp$('member-tier-select').value = '0'; memberDiscountRate = 0;
+  tp$('voucher-input').value = ''; tp$('cash-tendered-input').value = '';
+  setPaymentMethod('cash');
+}
+function startNewOrder() {
+  playAudio('click');
+  tpPendingFinish = false; tpReprint = false;
+  tp$('receipt-modal').classList.add('hidden'); tp$('receipt-modal').classList.remove('flex');
+  tpResetOrder(); renderCart(); renderProducts();
+  if (window.innerWidth < 1024 && typeof tpTab === 'function') tpTab('produk');
+  showToast('Siap untuk transaksi baru.', 'info');
+}
+
+/* ---------- Modal umum ---------- */
+function openModal(id) {
+  const el = tp$(id);
+  if (!el) return;
+  el.classList.remove('hidden'); el.classList.add('flex');
+  if (id === 'return-modal') tpRenderReturn();
+  if (id === 'shift-modal') tpRenderShift();
+  if (id === 'scanner-modal') setTimeout(() => { const s = tp$('scan-input'); if (s) s.focus(); }, 60);
+}
+function closeModal(id) {
+  playAudio('click');
+  if (id === 'receipt-modal') {
+    tp$('receipt-modal').classList.add('hidden'); tp$('receipt-modal').classList.remove('flex');
+    if (tpPendingFinish) { tpPendingFinish = false; tpResetOrder(); renderCart(); renderProducts(); showToast('Siap untuk transaksi baru.', 'info'); }
+    tpReprint = false;
+    return;
+  }
+  const el = tp$(id);
+  if (el) { el.classList.add('hidden'); el.classList.remove('flex'); }
+}
+
+/* ================================================================
+   SCANNER, TAHAN, LACI
+================================================================ */
+function tpScanSubmit() {
+  const inp = tp$('scan-input');
+  const code = inp.value.trim().toUpperCase();
+  if (!code) { showToast('Masukkan kode SKU terlebih dahulu.', 'warn'); return; }
+  let p = PRODUCTS.find(x => x.sku === code), size = null;
+  if (!p) {
+    const m = code.match(/^(.+)-([A-Z0-9]+)$/);
+    if (m) { p = PRODUCTS.find(x => x.sku === m[1]); if (p && p.sizes.map(s => s.toUpperCase()).indexOf(m[2]) !== -1) size = p.sizes.find(s => s.toUpperCase() === m[2]); }
+  }
+  if (!p) { showToast('SKU ' + code + ' tidak ditemukan.', 'error'); return; }
+  if (size) activeVariants[p.id].size = size;
+  addToCart(p.id);
+  inp.value = '';
+  closeModal('scanner-modal');
+}
+
+function openCashDrawer() { playAudio('drawer'); tpShift.kicks += 1; showToast('Laci Kasir #1 Terbuka (Cash Drawer Popped)', 'success'); }
+
+function tpUpdateBadges() { const b = tp$('held-badge'); if (b) { b.textContent = tpHeld.length; b.classList.toggle('zero', tpHeld.length === 0); } }
+
+function tpHold() {
+  if (!tpShiftGuard()) return false;
+  if (cart.length === 0) { showToast('Keranjang kosong, tidak ada transaksi untuk ditahan.', 'warn'); return false; }
+  tpHeldSeq++;
+  const id = 'HLD-' + tpPad(tpHeldSeq);
+  tpHeld.push({ id, time: new Date(), customer: tp$('cust-name-input').value.trim() || 'Pelanggan Walk-In', rate: memberDiscountRate, voucher: tpVoucher, cart: cart.map(i => ({ ...i })) });
+  tpResetOrder(); renderCart(); renderProducts(); tpUpdateBadges();
+  showToast('Transaksi ditahan sebagai ' + id + '. Silakan layani pelanggan berikutnya.', 'success');
+  return true;
+}
+function tpOpenHeld() { tpRenderHeld(); tp$('held-modal').classList.remove('hidden'); }
+function tpCloseHeld() { tp$('held-modal').classList.add('hidden'); }
+function tpRenderHeld() {
+  const box = tp$('held-body');
+  if (tpHeld.length === 0) { box.innerHTML = '<div class="tp-empty"><i class="fa-regular fa-folder-open"></i>Tidak ada transaksi yang ditahan.<br>Tekan <b>Tahan</b> di panel keranjang untuk menyimpan transaksi pelanggan yang sedang mencoba pakaian.</div>'; return; }
+  box.innerHTML = tpHeld.map(h => {
+    const c = tpCalc(h.cart, h.rate, h.voucher);
+    const qty = h.cart.reduce((a, i) => a + i.qty, 0);
+    return `<div class="tp-card"><div class="main"><div class="top">${h.id}<span class="tp-tag">${tpEsc(h.customer)}</span>${h.rate > 0 ? `<span class="tp-tag purple">${TP_TIERS[String(h.rate)]}</span>` : ''}</div>
+      <div class="sub cut">${tpEsc(h.cart.map(i => i.qty + 'x ' + i.product.name + ' (' + i.color.name + '/' + i.size + ')').join(', '))}</div>
+      <div class="meta">Ditahan ${tpHM(h.time)} WIB · ${qty} pcs</div></div>
+      <div class="side"><div class="money">${formatRupiah(c.total)}</div><div class="acts">
+        <button type="button" class="tp-btn green xs" onclick="tpRecall('${h.id}')"><i class="fa-solid fa-rotate-left"></i>Panggil</button>
+        <button type="button" class="tp-btn rosesoft xs" onclick="tpDeleteHeld('${h.id}')" aria-label="Hapus"><i class="fa-regular fa-trash-can"></i></button></div></div></div>`;
+  }).join('');
+}
+function tpRecall(id) {
+  if (!tpShiftGuard()) return;
+  const h = tpHeld.find(x => x.id === id);
+  if (!h) return;
+  const load = () => {
+    cart = h.cart.map(i => ({ ...i, qty: Math.min(i.qty, tpStock(i.product.id, i.color.name, i.size)) })).filter(i => i.qty > 0);
+    tpHeld = tpHeld.filter(x => x.id !== id);
+    tp$('cust-name-input').value = h.customer;
+    tp$('member-tier-select').value = String(h.rate); memberDiscountRate = h.rate;
+    tpVoucher = h.voucher; tp$('voucher-input').value = h.voucher || '';
+    tpLastTotal = -1; cashTendered = 0; tp$('cash-tendered-input').value = '';
+    renderCart(); renderProducts(); tpUpdateBadges(); tpCloseHeld();
+    showToast(id + ' dipanggil ke kasir.', 'success');
+  };
+  if (cart.length > 0) tpAsk('Keranjang masih berisi pakaian', 'Transaksi yang sedang aktif akan ditahan otomatis sebelum ' + id + ' dipanggil.', 'Tahan & Panggil', () => { if (tpHold()) load(); });
+  else load();
+}
+function tpDeleteHeld(id) {
+  tpAsk('Hapus transaksi ditahan?', id + ' akan dihapus permanen.', 'Ya, Hapus', () => { tpHeld = tpHeld.filter(x => x.id !== id); tpUpdateBadges(); tpRenderHeld(); showToast(id + ' dihapus.', 'warn'); }, true);
+}
+
+/* ================================================================
+   SHIFT, RIWAYAT & VOID
+================================================================ */
+function tpShiftStats() {
+  const s = { count: 0, voided: 0, subtotal: 0, memberDisc: 0, voucherDisc: 0, tax: 0, cash: 0, qris: 0, edc: 0, items: 0, refunds: 0, refundCash: 0, exchanges: 0 };
+  tpTrx.filter(t => t.shiftNo === tpShift.number).forEach(t => {
+    if (t.voided) { s.voided++; return; }
+    s.count++; s.subtotal += t.subtotal; s.memberDisc += t.memberDisc; s.voucherDisc += t.voucherDisc; s.tax += t.tax; s[t.method] += t.total;
+    s.items += t.items.reduce((a, i) => a + i.qty, 0);
+  });
+  tpReturns.filter(r => r.shiftNo === tpShift.number).forEach(r => {
+    if (r.mode === 'refund') { s[r.method] -= r.amount; s.refunds += r.amount; if (r.method === 'cash') s.refundCash += r.amount; }
+    else s.exchanges++;
+  });
+  s.sales = s.cash + s.qris + s.edc;
+  s.expectedCash = tpShift.openingCash + s.cash;
+  return s;
+}
+
+function tpShiftRows(s) {
+  return `<div class="tp-rows">
+    <div class="r"><span>Kasir</span><span>Zannah Jagad</span></div>
+    <div class="r"><span>Shift #${tpShift.number} · dibuka</span><span>${tpShift.openedAt}</span></div>
+    ${tpShift.closedAt ? `<div class="r"><span>Shift ditutup</span><span>${tpShift.closedAt}</span></div>` : ''}
+    <div class="r sec"><span>Penjualan</span><span></span></div>
+    <div class="r"><span>Transaksi sah / void</span><span>${s.count} / ${s.voided}</span></div>
+    <div class="r"><span>Pakaian terjual</span><span>${s.items} pcs</span></div>
+    <div class="r"><span>Penjualan kotor</span><span>${formatRupiah(s.subtotal)}</span></div>
+    <div class="r"><span>Diskon member / voucher</span><span>-${formatRupiah(s.memberDisc)} / -${formatRupiah(s.voucherDisc)}</span></div>
+    <div class="r"><span>PPN 11%</span><span>${formatRupiah(s.tax)}</span></div>
+    <div class="r"><span>Retur refund / tukar barang</span><span>-${formatRupiah(s.refunds)} / ${s.exchanges}x</span></div>
+    <div class="r sec"><span>Per Metode Bayar (bersih)</span><span></span></div>
+    <div class="r"><span>Tunai (Cash)</span><span>${formatRupiah(s.cash)}</span></div>
+    <div class="r"><span>EDC (Debit/Kredit)</span><span>${formatRupiah(s.edc)}</span></div>
+    <div class="r"><span>QRIS</span><span>${formatRupiah(s.qris)}</span></div>
+    <div class="r strong"><span>Total Omset Shift</span><span>${formatRupiah(s.sales)}</span></div>
+    <div class="r sec"><span>Laci Kasir</span><span></span></div>
+    <div class="r"><span>Modal awal</span><span>${formatRupiah(tpShift.openingCash)}</span></div>
+    <div class="r"><span>Kas seharusnya (modal + tunai bersih)</span><span>${formatRupiah(s.expectedCash)}</span></div>
+    <div class="r"><span>Laci dibuka manual</span><span>${tpShift.kicks}x</span></div>
+  </div>`;
+}
+
+function tpRenderShift() {
+  const s = tpShiftStats();
+  const body = tp$('sh-body'), foot = tp$('sh-foot');
+  if (tpShift.open) {
+    tp$('sh-title').textContent = 'Rekapitulasi Shift Kasir';
+    const list = tpTrx.filter(t => t.shiftNo === tpShift.number).slice(0, 8);
+    body.innerHTML = tpShiftRows(s) +
+      '<span class="tp-label">Transaksi Shift Ini</span>' +
+      (list.length ? list.map(t => `<div class="tp-card ${t.voided ? 'void' : ''}"><div class="main"><div class="top"><span style="font-family:'JetBrains Mono',monospace">${t.no}</span>${t.voided ? '<span class="tp-tag red">VOID</span>' : ''}${t.items.some(i => i.returned) ? '<span class="tp-tag amber">RETUR</span>' : ''}<span class="tp-tag ${t.method === 'cash' ? 'green' : t.method === 'qris' ? 'purple' : 'blue'}">${tpEsc(t.methodLabel)}</span></div><div class="meta">${tpHM(t.ts)} WIB · ${tpEsc(t.customer)}</div></div>
+        <div class="side"><div class="money" ${t.voided ? 'style="text-decoration:line-through;color:#94a3b8"' : ''}>${formatRupiah(t.total)}</div><div class="acts"><button type="button" class="tp-btn ghost xs" onclick="tpViewReceipt('${t.no}')"><i class="fa-solid fa-print"></i>Struk</button>${!t.voided && !t.items.some(i => i.returned) ? `<button type="button" class="tp-btn rosesoft xs" onclick="tpVoid('${t.no}')">Void</button>` : ''}</div></div></div>`).join('') : '<div class="tp-empty" style="padding:14px">Belum ada transaksi pada shift ini.</div>') +
+      '<span class="tp-label">Uang Fisik di Laci (hasil hitung, untuk tutup shift)</span>' +
+      '<input id="sh-counted" type="text" inputmode="numeric" class="tp-input num" placeholder="Rp 0" oninput="tpOnCount(this)">' +
+      '<div id="sh-diff" class="tp-diff"><span>Selisih</span><b>-</b></div>';
+    foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="playAudio(\'click\'); window.print();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
+      '<button type="button" id="sh-close-btn" class="tp-btn rose" disabled onclick="tpRequestCloseShift()"><i class="fa-solid fa-lock"></i>Tutup Shift &amp; Handover</button>';
+  } else {
+    tp$('sh-title').textContent = 'Laporan Shift #' + tpShift.number + ' (Ditutup)';
+    const diff = tpShift.counted - s.expectedCash;
+    body.innerHTML = '<div class="tp-done closed"><div class="ic"><i class="fa-solid fa-lock"></i></div><h4>Shift Telah Ditutup</h4><p>Laporan di bawah sudah final dan siap diserahterimakan.</p></div>' + tpShiftRows(s) +
+      `<div class="tp-rows" style="margin-top:10px"><div class="r"><span>Uang fisik dihitung</span><span>${formatRupiah(tpShift.counted)}</span></div></div>
+       <div class="tp-diff ${diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus'}"><span>${diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih'}</span><b>${diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))}</b></div>`;
+    foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="playAudio(\'click\'); window.print();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
+      '<button type="button" class="tp-btn green" onclick="tpStartNewShift()"><i class="fa-solid fa-play"></i>Mulai Shift Baru</button>';
+  }
+}
+function tpCloseShift() { tp$('shift-modal').classList.add('hidden'); tp$('shift-modal').classList.remove('flex'); }
+
+function tpOnCount(inp) {
+  const num = Number(String(inp.value).replace(/\D/g, '')) || 0;
+  inp.value = num ? num.toLocaleString('id-ID') : '';
+  const d = tp$('sh-diff'), btn = tp$('sh-close-btn');
+  if (!num) { d.className = 'tp-diff'; d.innerHTML = '<span>Selisih</span><b>-</b>'; btn.disabled = true; return; }
+  const diff = num - tpShiftStats().expectedCash;
+  d.className = 'tp-diff ' + (diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus');
+  d.innerHTML = `<span>${diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih'}</span><b>${diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))}</b>`;
+  btn.disabled = false; btn.dataset.counted = num;
+}
+function tpRequestCloseShift() {
+  const counted = Number(tp$('sh-close-btn').dataset.counted) || 0;
+  if (!counted) return;
+  const doClose = () => {
+    tpShift.open = false; tpShift.closedAt = tpHM(new Date()) + ' WIB'; tpShift.counted = counted;
+    playAudio('success'); tpUpdateShiftUI(); tpRenderShift();
+    showToast('Shift #' + tpShift.number + ' ditutup. Handover selesai.', 'success');
+  };
+  if (cart.length > 0 || tpHeld.length > 0) tpAsk('Masih ada transaksi belum selesai', 'Ada keranjang aktif atau transaksi ditahan. Tetap tutup shift?', 'Ya, Tutup Shift', doClose, true);
+  else doClose();
+}
+function tpStartNewShift() {
+  tpShift = { open: true, number: tpShift.number + 1, openedAt: tpHM(new Date()) + ' WIB', openingCash: 1000000, kicks: 0, closedAt: null, counted: null };
+  tpCloseShift(); tpUpdateShiftUI();
+  showToast('Shift #' + tpShift.number + ' dimulai dengan modal awal ' + formatRupiah(1000000) + '.', 'success');
+}
+function tpUpdateShiftUI() { tpRefreshCheckout(); }
+
+function tpVoid(no) {
+  const t = tpTrx.find(x => x.no === no);
+  if (!t || t.voided) return;
+  tpAsk('Void transaksi ' + no + '?', `Stok pakaian dikembalikan dan nilai ${formatRupiah(t.total)} dikeluarkan dari laporan shift${t.method === 'cash' ? ' (uang dikembalikan dari laci)' : ''}.`, 'Ya, Void Transaksi', () => {
+    t.voided = true;
+    t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
+    renderProducts(); tpRenderShift();
+    showToast(no + ' di-void. Stok dikembalikan.', 'warn');
+  }, true);
+}
+
+/* ================================================================
+   RETUR & PENUKARAN (NYATA)
+================================================================ */
+const TP_REASONS = ['Tukar Ukuran (Size Kekecilan / Kebesaran)', 'Tukar Warna / Model Seharga', 'Cacat Jahitan / Defect Produksi Pabrik', 'Kado / Hadiah Salah Beli'];
+function tpDaysSince(d) { return Math.floor((Date.now() - d.getTime()) / 86400000); }
+function tpCloseReturn() { tp$('return-modal').classList.add('hidden'); tp$('return-modal').classList.remove('flex'); tpRet = null; }
+function tpRetBack() { tpRet = null; tpRenderReturn(); }
+
+function tpRenderReturn() {
+  const body = tp$('ret-body'), foot = tp$('ret-foot');
+  if (!tpShift.open) { body.innerHTML = '<div class="tp-empty"><i class="fa-solid fa-lock"></i>Shift sudah ditutup.<br>Mulai shift baru untuk memproses retur.</div>'; foot.innerHTML = '<button class="tp-btn ghost" onclick="tpCloseReturn()">Tutup</button>'; return; }
+
+  if (tpRet && tpRet.done) {
+    const r = tpRet.done;
+    tp$('ret-title').textContent = 'Nota ' + r.no;
+    body.innerHTML = `<div class="tp-done"><div class="ic"><i class="fa-solid fa-check"></i></div><h4>${r.mode === 'refund' ? 'Refund Berhasil' : 'Penukaran Berhasil'}</h4><p>${r.no} · atas struk ${r.trxNo}</p></div>
+      <div class="tp-rows">${r.lines.map(l => `<div class="r"><span>${tpEsc(l.name)} (${l.colorName}/${l.size}) x${l.qty}</span><span>${l.nv ? '→ ' + l.nv.color + '/' + l.nv.size : '&nbsp;'}</span></div>`).join('')}
+      <div class="r"><span>Alasan</span><span style="font-family:inherit;font-weight:600">${tpEsc(r.reason)}</span></div>
+      <div class="r strong"><span>${r.mode === 'refund' ? 'Total Refund' + (r.method === 'cash' ? ' (tunai dari laci)' : ' via ' + r.methodLabel) : 'Selisih Bayar'}</span><span>${r.mode === 'refund' ? formatRupiah(r.amount) : 'Rp 0'}</span></div></div>
+      ${r.defect ? '<div class="tp-note">Barang cacat tidak dimasukkan kembali ke stok jual (dicatat untuk klaim ke supplier).</div>' : ''}`;
+    foot.innerHTML = '<button class="tp-btn ghost" onclick="playAudio(\'click\'); showToast(\'Nota retur dikirim ke printer.\', \'success\')"><i class="fa-solid fa-print"></i>Cetak Nota</button><button class="tp-btn rose" onclick="tpCloseReturn()">Selesai</button>';
+    return;
+  }
+
+  if (!tpRet) {
+    tp$('ret-title').textContent = 'Retur & Penukaran Busana';
+    const recent = tpTrx.filter(t => !t.voided).slice(0, 8);
+    body.innerHTML = `<span class="tp-label">Nomor Struk Pembelian Asli</span>
+      <div style="display:flex;gap:8px"><input id="ret-no" class="tp-input num" style="font-size:13px" placeholder="TRX-202610-8840" onkeydown="if(event.key==='Enter')tpFindReturn()"><button class="tp-btn" onclick="tpFindReturn()"><i class="fa-solid fa-magnifying-glass"></i>Cari</button></div>
+      <span class="tp-label">Struk Terbaru (ketuk untuk memilih)</span>
+      <div class="tp-chips">${recent.map(t => `<button class="tp-chip" onclick="tp$('ret-no').value='${t.no}'; tpFindReturn()">${t.no} · ${tpDaysSince(t.ts) === 0 ? 'hari ini' : tpDaysSince(t.ts) + ' hari lalu'}</button>`).join('')}</div>
+      <div class="tp-note">Kebijakan: tukar/retur maksimal 7 hari dengan struk asli dan hangtag utuh. Barang cacat produksi tidak dikembalikan ke stok jual.</div>`;
+    foot.innerHTML = '<button class="tp-btn ghost" onclick="tpCloseReturn()">Tutup</button>';
+    return;
+  }
+
+  const t = tpRet.trx;
+  tp$('ret-title').textContent = 'Retur · ' + t.no;
+  const days = tpDaysSince(t.ts), within = days <= 7;
+  const defect = tpRet.reason === TP_REASONS[2];
+  const selected = tpRet.sel.map((s, i) => ({ s, i, item: t.items[i] })).filter(x => x.s.checked);
+  const amount = Math.round(selected.reduce((a, x) => a + x.item.price * x.s.qty, 0) * (t.total / t.subtotal));
+  if (tpRet.mode === 'exchange') tpRet.sel.forEach((s, i) => { if (s.checked && !s.nv) { const o = tpVariantOptions(t.items[i]); if (o.length) s.nv = o[0].v; } });
+  const err = tpRetError();
+
+  body.innerHTML = `
+    <div class="tp-banner ${within ? 'ok' : 'bad'}"><i class="fa-solid ${within ? 'fa-circle-check' : 'fa-circle-xmark'}"></i><span>Dibeli ${tpDMY(t.ts)} ${tpHM(t.ts)} (${days === 0 ? 'hari ini' : days + ' hari lalu'}) · ${tpEsc(t.customer)} · ${tpEsc(t.methodLabel)} · ${formatRupiah(t.total)}.<br><b>${within ? 'Masih dalam masa retur 7 hari.' : 'Masa retur 7 hari sudah lewat — retur tidak dapat diproses.'}</b></span></div>
+    <span class="tp-label">Pilih Pakaian yang Diretur / Ditukar</span>
+    ${t.items.map((it, i) => {
+      const rem = it.qty - it.returned, s = tpRet.sel[i];
+      if (rem <= 0) return `<div class="tp-ritem" style="opacity:.6"><div><div class="nm">${tpEsc(it.name)}</div><div class="vr">${it.colorName} / ${it.size} · sudah diretur seluruhnya</div></div></div>`;
+      let ctl = '';
+      if (s.checked) {
+        ctl = `<div class="ctl">Jumlah: <select onchange="tpRet.sel[${i}].qty=Number(this.value); tpRenderReturn()">${Array.from({ length: rem }, (_, k) => `<option value="${k + 1}" ${s.qty === k + 1 ? 'selected' : ''}>${k + 1}</option>`).join('')}</select>`;
+        if (tpRet.mode === 'exchange') {
+          const opts = tpVariantOptions(it);
+          if (!s.nv && opts.length) s.nv = opts[0].v;
+          ctl += opts.length ? ` Ganti ke: <select onchange="tpRet.sel[${i}].nv=JSON.parse(this.value); tpRenderReturn()">${opts.map(o => `<option value='${JSON.stringify(o.v)}' ${s.nv && s.nv.color === o.v.color && s.nv.size === o.v.size ? 'selected' : ''}>${o.label}</option>`).join('')}</select>` : ' <b style="color:#e11d48">Tidak ada varian pengganti yang tersedia</b>';
+        }
+        ctl += '</div>';
+      }
+      return `<div class="tp-ritem ${s.checked ? 'on' : ''}"><input type="checkbox" ${s.checked ? 'checked' : ''} onchange="tpRet.sel[${i}].checked=this.checked; tpRenderReturn()"><div style="flex:1"><div class="nm">${tpEsc(it.name)}</div><div class="vr">${it.colorName} / ${it.size} · ${formatRupiah(it.price)} · sisa ${rem} dari ${it.qty} pcs</div>${ctl}</div></div>`;
+    }).join('')}
+    <span class="tp-label">Jenis Penyelesaian</span>
+    <div class="tp-seg"><button type="button" class="${tpRet.mode === 'refund' ? 'on' : ''}" onclick="tpRet.mode='refund'; tpRenderReturn()">Refund Uang</button><button type="button" class="${tpRet.mode === 'exchange' ? 'on' : ''}" onclick="tpRet.mode='exchange'; tpRenderReturn()">Tukar Barang</button></div>
+    <span class="tp-label">Alasan Retur / Tukar</span>
+    <select class="tp-input" onchange="tpRet.reason=this.value; tpRenderReturn()">${TP_REASONS.map(r => `<option ${tpRet.reason === r ? 'selected' : ''}>${r}</option>`).join('')}</select>
+    <span class="tp-label">Kondisi Fisik Pakaian</span>
+    <label class="tp-check"><input type="checkbox" ${tpRet.c1 ? 'checked' : ''} onchange="tpRet.c1=this.checked; tpRenderReturn()"> Hangtag baju masih utuh terpasang</label>
+    <label class="tp-check"><input type="checkbox" ${tpRet.c2 ? 'checked' : ''} onchange="tpRet.c2=this.checked; tpRenderReturn()"> Belum pernah dicuci dan tidak berbau</label>
+    <label class="tp-check"><input type="checkbox" ${within ? 'checked' : ''} disabled> Masa retur ≤ 7 hari dari tanggal struk (otomatis)</label>
+    ${err ? `<div class="tp-banner warn" style="margin-top:10px"><i class="fa-solid fa-triangle-exclamation"></i><span>${err}</span></div>` : ''}
+    <div class="tp-diff ${amount > 0 || tpRet.mode === 'exchange' ? 'ok' : ''}"><span>${tpRet.mode === 'refund' ? 'Total Refund' + (t.method === 'cash' ? ' (tunai dari laci)' : ' (ke ' + tpEsc(t.methodLabel) + ')') : 'Selisih Bayar (produk sama)'}</span><b>${tpRet.mode === 'refund' ? formatRupiah(amount) : 'Rp 0'}</b></div>
+    ${defect ? '<div class="tp-note">Alasan cacat produksi: barang tidak masuk stok jual kembali.</div>' : ''}`;
+  foot.innerHTML = '<button class="tp-btn ghost" onclick="tpRetBack()"><i class="fa-solid fa-arrow-left"></i>Cari Struk Lain</button>' +
+    `<button class="tp-btn amber" ${err || !selected.length ? 'disabled' : ''} onclick="tpConfirmReturn()"><i class="fa-solid fa-file-circle-check"></i>Terbitkan Nota Retur</button>`;
+}
+
+function tpVariantOptions(it) {
+  const p = tpProd(it.pid), out = [];
+  p.colors.forEach(c => p.sizes.forEach(s => {
+    if (c.name === it.colorName && s === it.size) return;
+    const n = tpStock(p.id, c.name, s);
+    if (n > 0) out.push({ v: { color: c.name, size: s }, label: `${c.name} / ${s} (stok ${n})` });
+  }));
+  return out;
+}
+
+function tpRetError() {
+  const t = tpRet.trx;
+  if (tpDaysSince(t.ts) > 7) return 'Masa retur sudah lewat 7 hari.';
+  if (!tpRet.sel.some(s => s.checked)) return 'Pilih minimal satu pakaian yang diretur.';
+  if (!tpRet.c1 || !tpRet.c2) return 'Kondisi pakaian belum memenuhi syarat (hangtag utuh & belum dicuci).';
+  if (tpRet.mode === 'exchange') {
+    for (let i = 0; i < tpRet.sel.length; i++) {
+      const s = tpRet.sel[i];
+      if (s.checked && !s.nv) return 'Pilih varian pengganti untuk setiap pakaian yang ditukar.';
+    }
+    // cek stok pengganti agregat
+    const need = {};
+    tpRet.sel.forEach((s, i) => { if (s.checked && s.nv) { const k = t.items[i].pid + '|' + s.nv.color + '|' + s.nv.size; need[k] = (need[k] || 0) + s.qty; } });
+    for (const k in need) { const [pid, c, sz] = k.split('|'); if (tpStock(pid, c, sz) < need[k]) return 'Stok pengganti ' + c + '/' + sz + ' tidak mencukupi.'; }
+  } else {
+    if (t.method === 'cash') {
+      const amount = Math.round(tpRet.sel.reduce((a, s, i) => a + (s.checked ? t.items[i].price * s.qty : 0), 0) * (t.total / t.subtotal));
+      if (amount > tpShiftStats().expectedCash) return 'Saldo laci kasir tidak cukup untuk refund tunai ' + formatRupiah(amount) + '.';
+    }
+  }
+  return '';
+}
+
+function tpFindReturn() {
+  const no = (tp$('ret-no').value || '').trim().toUpperCase();
+  if (!no) { showToast('Masukkan nomor struk terlebih dahulu.', 'warn'); return; }
+  const t = tpTrx.find(x => x.no.toUpperCase() === no);
+  if (!t) { showToast('Struk ' + no + ' tidak ditemukan.', 'error'); return; }
+  if (t.voided) { showToast('Struk ' + no + ' sudah di-void.', 'error'); return; }
+  playAudio('beep');
+  tpRet = { trx: t, sel: t.items.map(() => ({ checked: false, qty: 1, nv: null })), mode: 'refund', reason: TP_REASONS[0], c1: true, c2: true, done: null };
+  tpRenderReturn();
+  showToast('Struk ditemukan. Data diverifikasi.', 'success');
+}
+
+function tpConfirmReturn() {
+  const err = tpRetError();
+  if (err) { showToast(err, 'error'); return; }
+  const t = tpRet.trx, defect = tpRet.reason === TP_REASONS[2];
+  const lines = [];
+  tpRet.sel.forEach((s, i) => { if (s.checked) { const it = t.items[i]; lines.push({ idx: i, pid: it.pid, name: it.name, colorName: it.colorName, size: it.size, qty: s.qty, nv: tpRet.mode === 'exchange' ? s.nv : null }); } });
+  const amount = tpRet.mode === 'refund' ? Math.round(lines.reduce((a, l) => a + t.items[l.idx].price * l.qty, 0) * (t.total / t.subtotal)) : 0;
+  lines.forEach(l => {
+    t.items[l.idx].returned += l.qty;
+    if (!defect) tpAddStock(l.pid, l.colorName, l.size, l.qty);
+    if (l.nv) { tpVS[l.pid][l.nv.color][l.nv.size] -= l.qty; tpSyncStock(tpProd(l.pid)); }
+  });
+  const rec = { no: 'RET-' + String(++tpRetSeq).padStart(4, '0'), trxNo: t.no, mode: tpRet.mode, reason: tpRet.reason, defect, lines, amount, method: t.method, methodLabel: t.methodLabel, shiftNo: tpShift.number, ts: new Date() };
+  tpReturns.push(rec);
+  tpRet.done = rec;
+  playAudio('success');
+  renderProducts();
+  tpRenderReturn();
+  showToast(rec.no + (rec.mode === 'refund' ? ' · refund ' + formatRupiah(amount) : ' · penukaran dicatat'), 'success');
+}
+
+/* ================================================================
+   SEED, SHORTCUT, INISIALISASI
+================================================================ */
+function tpSeed() {
+  const v = (pid, ci, size, qty) => { const p = tpProd(pid); return { cartId: `${pid}-${p.colors[ci].name}-${size}`, product: p, color: p.colors[ci], size, qty, price: p.price }; };
+  const defs = [
+    { ago: 9 * 1440, shift: 0, items: [v('prod-8', 1, 'S', 1)], method: 'qris', cust: 'Maya', rate: 0, ref: 'QR55120931', label: 'QRIS' },
+    { ago: 5 * 1440, shift: 0, items: [v('prod-6', 0, 'M', 1)], method: 'cash', tender: 400000, cust: 'Sinta', rate: 0.05 },
+    { ago: 185, shift: 1, items: [v('prod-2', 0, 'M', 2), v('prod-10', 0, 'All Size', 1)], method: 'cash', tender: 500000, cust: 'Pelanggan Walk-In', rate: 0 },
+    { ago: 150, shift: 1, items: [v('prod-7', 0, 'S', 1)], method: 'qris', cust: 'Rania', rate: 0.05, ref: 'QR71920384', label: 'QRIS' },
+    { ago: 118, shift: 1, items: [v('prod-5', 0, 'L', 1)], method: 'edc', cust: 'Pak Hendra', rate: 0.1, ref: '482915', label: 'KARTU DEBIT BCA' },
+    { ago: 92, shift: 1, items: [v('prod-4', 1, 'M', 1), v('prod-2', 1, 'L', 1)], method: 'cash', tender: 700000, cust: 'Pelanggan Walk-In', rate: 0 },
+    { ago: 61, shift: 1, items: [v('prod-9', 0, 'All Size', 1)], method: 'qris', cust: 'Pelanggan Walk-In', rate: 0, ref: 'QR71921177', label: 'QRIS' },
+    { ago: 27, shift: 1, items: [v('prod-3', 0, '32', 1), v('prod-11', 0, 'M', 1)], method: 'cash', tender: 1000000, cust: 'Dimas', rate: 0.05 }
+  ];
+  let n = 8832;
+  defs.forEach(d => {
+    const ts = new Date(Date.now() - d.ago * 60000);
+    const no = 'TRX-' + ts.getFullYear() + tpPad(ts.getMonth() + 1) + '-' + (n++);
+    tpTrx.unshift(tpMakeTrx(d.items, { no, ts, shiftNo: d.shift, customer: d.cust, rate: d.rate, voucher: null, method: d.method, tendered: d.tender || 0, label: d.label, ref: d.ref }));
+  });
+  tpHeldSeq = 1;
+  const hp = tpProd('prod-7');
+  tpHeld.push({ id: 'HLD-01', time: new Date(Date.now() - 8 * 60000), customer: 'Bu Lestari', rate: 0.1, voucher: null,
+    cart: [{ cartId: 'prod-7-Navy Bloom-M', product: hp, color: hp.colors[2], size: 'M', qty: 1, price: hp.price }, { cartId: 'prod-8-Jet Black-S', product: tpProd('prod-8'), color: tpProd('prod-8').colors[2], size: 'S', qty: 1, price: tpProd('prod-8').price }] });
+}
+
+window.addEventListener('keydown', e => {
+  const order = ['confirm-modal', 'edc-modal', 'qris-modal', 'held-modal', 'return-modal', 'shift-modal', 'scanner-modal', 'receipt-modal'];
+  const open = order.find(id => { const el = tp$(id); return el && !el.classList.contains('hidden'); });
+  if (e.key === 'Escape' && open) {
+    if (open === 'confirm-modal') tpConfirmCancel();
+    else if (open === 'edc-modal') tpCloseEdc();
+    else if (open === 'qris-modal') tpCloseQris();
+    else if (open === 'held-modal') tpCloseHeld();
+    else if (open === 'return-modal') tpCloseReturn();
+    else if (open === 'shift-modal') tpCloseShift();
+    else closeModal(open);
+    return;
+  }
+  if (['F2', 'F8', 'F12'].indexOf(e.key) !== -1) {
+    e.preventDefault();
+    if (open) return;
+    if (e.key === 'F2') openModal('scanner-modal');
+    if (e.key === 'F8') tpHold();
+    if (e.key === 'F12') processPayment();
+  }
+});
+document.addEventListener('mousedown', e => {
+  const id = e.target.id;
+  if (id === 'held-modal') tpCloseHeld();
+  else if (id === 'return-modal') tpCloseReturn();
+  else if (id === 'shift-modal') tpCloseShift();
+  else if (id === 'qris-modal') tpCloseQris();
+  else if (id === 'edc-modal') tpCloseEdc();
+  else if (id === 'scanner-modal') closeModal('scanner-modal');
+});
+tp$('search-input').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const q = e.target.value.trim().toUpperCase();
+  const p = PRODUCTS.find(x => x.sku === q);
+  if (p) { addToCart(p.id); clearSearch(); }
+});
+tp$('cash-tendered-input').addEventListener('keydown', e => { if (e.key === 'Enter') processPayment(); });
+
+/* ---------- Inisialisasi ulang ---------- */
+tpInitStock();
+PRODUCTS.forEach(p => { const v = activeVariants[p.id]; v.size = tpFirstAvail(p, v.color.name); });
+tpSeed();
+tpSeq = 8841;
+tp$('trx-id-display').innerText = 'TRX-' + new Date().getFullYear() + tpPad(new Date().getMonth() + 1) + '-' + tpSeq;
+cashTendered = 0;
+tp$('cash-tendered-input').value = '';
+initScannerList();
+renderProducts();
+renderCart();
+tpUpdateBadges();
+
 </script>
 </body>
 </html>
