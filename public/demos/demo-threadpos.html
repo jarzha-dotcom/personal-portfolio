@@ -73,6 +73,35 @@
     }
 
     /* Thermal Receipt Print Styles */
+
+    /* toast sebelumnya tertutup bar demo (46px) */
+    #toast { bottom: 62px !important; }
+    [id$="-modal"] { padding-bottom: 62px !important; }
+    #tp-mobtab { display: none; }
+    /* ===== MOBILE / TABLET (<1024px): satu kolom + tab bawah Katalog | Keranjang ===== */
+    @media (max-width: 1023px) {
+      html body { height: 100dvh; overflow: hidden; padding-bottom: 102px !important; }
+      [id$="-modal"] { padding-bottom: 118px !important; }
+      #toast { bottom: 112px !important; max-width: calc(100vw - 20px); }
+      header { padding: 8px 10px !important; }
+      header > div:last-child { gap: 4px !important; }
+      header button { padding: 8px 10px !important; min-height: 38px; }
+      header button span, header span.uppercase, header div.text-xs.text-slate-400 { display: none !important; }
+      main { display: grid !important; height: auto !important; flex: 1 1 0; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+      main > section { display: none !important; border: 0 !important; }
+      body[data-tab="produk"] #tp-sec-produk,
+      body[data-tab="cart"] #tp-sec-cart { display: flex !important; }
+      #tp-sec-cart { overflow-y: auto !important; }
+      #tp-sec-cart #cart-list-container { flex: none !important; min-height: 150px; max-height: 36vh; }
+      #search-input, #cust-name-input, #member-tier-select, #cash-tendered-input { font-size: 16px; }
+      #tp-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #0f172a; border-top: 1px solid #1e293b; padding: 6px 8px; gap: 8px; }
+      #tp-mobtab button { flex: 1; border: 0; border-radius: 12px; background: transparent; color: #94a3b8; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+      #tp-mobtab button.on { background: #e11d48; color: #fff; }
+      #tp-mobtab .tp-tb-n { background: #e11d48; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
+      #tp-mobtab button.on .tp-tb-n { background: #fff; color: #be123c; }
+      #tp-mobtab .tp-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+    }
+
     @media print {
       body * {
         visibility: hidden;
@@ -98,7 +127,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased font-sans select-none min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
+<body data-tab="produk" class="bg-slate-100 text-slate-800 antialiased font-sans select-none min-h-screen flex flex-col selection:bg-rose-500 selection:text-white">
 <!-- @jz-bar-start -->
 <style>
 /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -219,7 +248,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     <!-- ------------------------------------------------------ -->
     <!-- KOLOM KIRI (7/12 cols): KATALOG PRODUK & VARIAN        -->
     <!-- ------------------------------------------------------ -->
-    <section class="lg:col-span-7 xl:col-span-8 flex flex-col h-full bg-slate-50 border-r border-slate-200/80 overflow-hidden">
+    <section id="tp-sec-produk" class="lg:col-span-7 xl:col-span-8 flex flex-col h-full bg-slate-50 border-r border-slate-200/80 overflow-hidden">
       
       <!-- Search Bar & Filter Strip -->
       <div class="p-4 bg-white border-b border-slate-200/80 space-y-3 shadow-xs">
@@ -288,7 +317,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     <!-- ------------------------------------------------------ -->
     <!-- KOLOM KANAN (5/12 cols): KERANJANG PESANAN & CHECKOUT  -->
     <!-- ------------------------------------------------------ -->
-    <section class="lg:col-span-5 xl:col-span-4 flex flex-col h-full bg-white overflow-hidden shadow-lg border-l border-slate-200/80">
+    <section id="tp-sec-cart" class="lg:col-span-5 xl:col-span-4 flex flex-col h-full bg-white overflow-hidden shadow-lg border-l border-slate-200/80">
       
       <!-- Order Header & Member Info -->
       <div class="p-4 bg-slate-900 text-white border-b border-slate-800">
@@ -1116,6 +1145,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     let paymentMethod = 'cash';
     let cashTendered = 700000;
     let currentGrandTotal = 0;
+    let paying = false; // cegah klik ganda saat transaksi diproses
 
     let shiftData = {
       cashierName: 'Zannah Jagad',
@@ -1551,7 +1581,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     }
 
     function handleCashInput(val) {
-      cashTendered = Number(val) || 0;
+      cashTendered = Math.max(0, Number(val) || 0);
       updateChangeDisplay();
     }
 
@@ -1597,6 +1627,11 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         return;
       }
 
+      if (paying) return;
+      paying = true;
+      const snapCart = cart.map(i => ({ ...i }));
+      const snapGrand = currentGrandTotal, snapMethod = paymentMethod, snapCash = cashTendered, snapRate = memberDiscountRate;
+
       playAudio('beep');
 
       const checkoutBtn = document.getElementById('checkout-btn');
@@ -1606,6 +1641,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       `;
 
       setTimeout(() => {
+        paying = false;
         playAudio('success');
         checkoutBtn.innerHTML = `
           <i class="fa-solid fa-print text-base"></i>
@@ -1614,9 +1650,9 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
 
         // Update shift statistics
         shiftData.totalTransactions += 1;
-        if (paymentMethod === 'cash') shiftData.cashSales += currentGrandTotal;
-        if (paymentMethod === 'edc') shiftData.edcSales += currentGrandTotal;
-        if (paymentMethod === 'qris') shiftData.qrisSales += currentGrandTotal;
+        if (snapMethod === 'cash') shiftData.cashSales += snapGrand;
+        if (snapMethod === 'edc') shiftData.edcSales += snapGrand;
+        if (snapMethod === 'qris') shiftData.qrisSales += snapGrand;
         
         document.getElementById('shift-cash-val').innerText = formatRupiah(shiftData.cashSales);
         document.getElementById('shift-edc-val').innerText = formatRupiah(shiftData.edcSales);
@@ -1629,39 +1665,39 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         document.getElementById('rcpt-time').innerText = new Date().toLocaleDateString('id-ID') + ' ' + (document.getElementById('live-clock').innerText || 'WIB');
         
         const tierSelect = document.getElementById('member-tier-select');
-        const tierText = tierSelect.options[tierSelect.selectedIndex].text.split(' ')[1] || 'NON-MEMBER';
+        const tierText = Number(tierSelect.value) === 0 ? 'Non-Member' : (tierSelect.options[tierSelect.selectedIndex].text.split(' ')[1] || 'Member');
         const custName = document.getElementById('cust-name-input').value || 'Pelanggan Walk-In';
         document.getElementById('rcpt-cust').innerText = `${custName} (${tierText.toUpperCase()})`;
         
-        const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
-        const discount = Math.round(subtotal * memberDiscountRate);
+        const subtotal = snapCart.reduce((acc, item) => acc + item.price * item.qty, 0);
+        const discount = Math.round(subtotal * snapRate);
         const tax = Math.round(Math.max(0, subtotal - discount) * 0.11);
         const grandTotal = subtotal - discount + tax;
 
         document.getElementById('rcpt-subtotal').innerText = formatRupiah(subtotal);
         document.getElementById('rcpt-discount').innerText = `- ${formatRupiah(discount)}`;
-        document.getElementById('rcpt-discount-label').innerText = `Diskon Member (${Math.round(memberDiscountRate * 100)}%)`;
+        document.getElementById('rcpt-discount-label').innerText = `Diskon Member (${Math.round(snapRate * 100)}%)`;
         document.getElementById('rcpt-discount-row').style.display = discount > 0 ? 'flex' : 'none';
         document.getElementById('rcpt-tax').innerText = formatRupiah(tax);
         document.getElementById('rcpt-grandtotal').innerText = formatRupiah(grandTotal);
 
-        document.getElementById('rcpt-payment-type').innerText = paymentMethod.toUpperCase();
-        if (paymentMethod === 'cash') {
+        document.getElementById('rcpt-payment-type').innerText = snapMethod.toUpperCase();
+        if (snapMethod === 'cash') {
           document.getElementById('rcpt-tendered-label').innerText = 'Tunai Diterima';
-          document.getElementById('rcpt-tendered').innerText = formatRupiah(cashTendered);
+          document.getElementById('rcpt-tendered').innerText = formatRupiah(snapCash);
           document.getElementById('rcpt-change-row').style.display = 'flex';
-          document.getElementById('rcpt-change').innerText = formatRupiah(Math.max(0, cashTendered - grandTotal));
-        } else if (paymentMethod === 'qris') {
+          document.getElementById('rcpt-change').innerText = formatRupiah(Math.max(0, snapCash - grandTotal));
+        } else if (snapMethod === 'qris') {
           document.getElementById('rcpt-tendered-label').innerText = 'Status QRIS';
           document.getElementById('rcpt-tendered').innerText = 'LUNAS / BERHASIL';
           document.getElementById('rcpt-change-row').style.display = 'none';
-        } else if (paymentMethod === 'edc') {
+        } else if (snapMethod === 'edc') {
           document.getElementById('rcpt-tendered-label').innerText = 'Approval Code';
           document.getElementById('rcpt-tendered').innerText = 'AUTH-983174 (BCA)';
           document.getElementById('rcpt-change-row').style.display = 'none';
         }
 
-        document.getElementById('rcpt-items-list').innerHTML = cart.map(item => `
+        document.getElementById('rcpt-items-list').innerHTML = snapCart.map(item => `
           <div class="text-[11px]">
             <div class="font-bold">${item.product.name}</div>
             <div class="text-[10px] text-slate-500 flex justify-between">
@@ -1683,8 +1719,12 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       document.getElementById('cust-name-input').value = 'Pelanggan Walk-In';
       document.getElementById('member-tier-select').value = '0';
       memberDiscountRate = 0;
+      cashTendered = 0;
+      document.getElementById('cash-tendered-input').value = '';
+      setPaymentMethod('cash');
       closeModal('receipt-modal');
       renderCart();
+      if (window.innerWidth < 1024 && typeof tpTab === 'function') tpTab('produk');
       showToast('Siap untuk transaksi baru.');
     }
 
@@ -1758,5 +1798,36 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       initScannerList();
     });
   </script>
+<nav id="tp-mobtab" aria-label="Navigasi kasir">
+  <button type="button" id="tp-tab-produk" class="on" onclick="tpTab('produk')"><i class="fa-solid fa-shirt"></i><span>Katalog</span></button>
+  <button type="button" id="tp-tab-cart" onclick="tpTab('cart')"><i class="fa-solid fa-bag-shopping"></i><span>Keranjang</span><span class="tp-tb-n" id="tp-tb-n">0</span><span class="tp-tb-t" id="tp-tb-t">Rp 0</span></button>
+</nav>
+<script>
+function tpTab(t){
+  document.body.setAttribute('data-tab', t);
+  document.getElementById('tp-tab-produk').classList.toggle('on', t==='produk');
+  document.getElementById('tp-tab-cart').classList.toggle('on', t==='cart');
+}
+(function(){
+  var nEl=document.getElementById('tp-tb-n'), tEl=document.getElementById('tp-tb-t'), last=0;
+  function sync(){
+    var q=document.getElementById('cart-total-qty'), g=document.getElementById('grandtotal-val');
+    if(q) nEl.textContent=(q.textContent.match(/\d+/)||['0'])[0];
+    if(g) tEl.textContent=g.textContent.trim();
+  }
+  ['cart-total-qty','grandtotal-val'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true});
+  });
+  sync(); last=parseInt(nEl.textContent,10)||0;
+  var tb=document.getElementById('tp-tab-cart');
+  new MutationObserver(function(){
+    var n=parseInt(nEl.textContent,10)||0;
+    if(n>last && document.body.getAttribute('data-tab')==='produk'){ tb.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:350}); }
+    last=n;
+  }).observe(nEl,{childList:true,characterData:true,subtree:true});
+  window.addEventListener('resize',function(){ if(window.innerWidth>=1024) document.body.setAttribute('data-tab','produk'); });
+})();
+</script>
 </body>
 </html>

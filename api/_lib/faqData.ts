@@ -161,7 +161,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
     keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 4 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
+    answer: 'Ada 5 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server), 5) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
   },
   {
     id: 'portfolio-bgames',
@@ -183,6 +183,13 @@ export const FAQ_ITEMS: FAQItem[] = [
     quickLabel: 'Tentang proyek Assets (Klien)?',
     keywords: ['assets', 'assets demo', 'klien', 'pt global multiparts', 'gmp', 'manajemen aset', 'inventaris', 'sistem internal'],
     answer: 'Assets DEMO adalah sistem manajemen inventaris aset korporat multi-platform untuk klien PT Global Multiparts dengan arsitektur Serverless Zero-Cost (Google Apps Script + Google Sheets/Drive). Fitur: QR/Barcode scanner via kamera fisik, depresiasi garis lurus otomatis, multi-foto kompresi cerdas, offline queue, dan ekspor laporan resmi PDF/Excel otomatis ke email. Versi publik simulasi: assets.arzhaning.my.id',
+  },
+  {
+    id: 'portfolio-zhanotes',
+    categoryId: 'portfolio',
+    quickLabel: 'Tentang proyek ZhaNotes?',
+    keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator'],
+    answer: 'ZhaNotes adalah workspace pencatatan visual & PKM modern yang beroperasi 100% di browser tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan kartu teks bebas dipindah & diubah ukurannya, Riset Terstruktur, PDF Reader/Annotator), Wiki Backlinks [[ ]] otomatis, perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip serta cetak PDF. Coba langsung di: arzhaning.my.id/zhanotes/',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

@@ -79,6 +79,132 @@
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(0, 0, 0, 0.25);
     }
+    /* ===== WarungKU extras (mandiri, tidak bergantung pada css Tailwind hasil compile) ===== */
+    [id$="-modal"] { padding-bottom: 62px !important; }
+    [class*="wk-"].hidden { display: none !important; }
+
+    .wk-overlay { position: fixed; inset: 0; z-index: 55; background: rgba(23,23,23,.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .wk-overlay.top { z-index: 70; }
+    .wk-modal { width: 100%; max-width: 440px; background: #fff; border: 1px solid #e5e5e5; border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,.3); overflow: hidden; display: flex; flex-direction: column; max-height: calc(100vh - 100px); }
+    .wk-mhead { padding: 14px 20px; border-bottom: 1px solid #e5e5e5; background: #fafafa; display: flex; align-items: center; justify-content: space-between; flex: none; }
+    .wk-mhead h3 { font-size: 15px; font-weight: 700; color: #171717; display: flex; align-items: center; gap: 10px; }
+    .wk-mhead .ic { width: 32px; height: 32px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; }
+    .wk-mhead small { display: block; font-size: 11px; font-weight: 500; color: #737373; margin-top: 1px; }
+    .wk-x { color: #a3a3a3; background: none; border: 0; cursor: pointer; font-size: 15px; padding: 4px 6px; border-radius: 8px; }
+    .wk-x:hover { color: #404040; background: #f5f5f5; }
+    .wk-mbody { padding: 16px 20px; overflow-y: auto; min-height: 0; font-size: 12px; color: #404040; }
+    .wk-mfoot { padding: 14px 20px; border-top: 1px solid #e5e5e5; background: #fafafa; display: flex; gap: 10px; flex: none; }
+
+    .wk-btn { display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 14px; border-radius: 12px; font: 700 12px 'Plus Jakarta Sans', sans-serif; cursor: pointer; border: 0; transition: .15s; color: #fff; background: #171717; }
+    .wk-btn.grow { flex: 1; }
+    .wk-btn.xs { padding: 6px 10px; font-size: 11px; border-radius: 8px; }
+    .wk-btn:hover { background: #262626; }
+    .wk-btn.amber { background: #f59e0b; } .wk-btn.amber:hover { background: #d97706; }
+    .wk-btn.green { background: #059669; } .wk-btn.green:hover { background: #047857; }
+    .wk-btn.ghost { background: #f5f5f5; color: #404040; } .wk-btn.ghost:hover { background: #e5e5e5; }
+    .wk-btn.red { background: #e11d48; } .wk-btn.red:hover { background: #be123c; }
+    .wk-btn.redsoft { background: #fff1f2; color: #e11d48; border: 1px solid #fecdd3; } .wk-btn.redsoft:hover { background: #ffe4e6; }
+    .wk-btn[disabled] { opacity: .4; cursor: not-allowed; }
+    .wk-payrow { display: flex; gap: 8px; }
+    .wk-payrow > #btn-process-checkout { flex: 1; min-width: 0; }
+    .wk-holdbtn { flex: none; padding: 0 14px; border-radius: 12px; border: 1px solid #d4d4d4; background: #fff; color: #404040; font: 700 11px 'Plus Jakarta Sans', sans-serif; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.1; }
+    .wk-holdbtn:hover { background: #fffbeb; border-color: #f59e0b; color: #b45309; }
+    .wk-holdbtn small { font-size: 9px; font-weight: 600; color: #a3a3a3; }
+    .wk-link { font-size: 10.5px; font-weight: 700; color: #d97706; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 1px 7px; cursor: pointer; }
+    .wk-link:hover { background: #fef3c7; }
+    .wk-hbadge { font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; border-radius: 99px; display: inline-flex; align-items: center; justify-content: center; padding: 0 5px; background: #f59e0b; color: #fff; }
+    .wk-hbadge.zero { background: #e5e5e5; color: #737373; }
+    .wk-row { display: flex; gap: 8px; }
+
+    .wk-input { width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid #e5e5e5; background: #fafafa; font: 600 13px 'Plus Jakarta Sans', sans-serif; color: #171717; outline: none; }
+    .wk-input:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px rgba(245,158,11,.15); background: #fff; }
+    .wk-input.num { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 15px; }
+    .wk-label { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; color: #737373; margin: 14px 0 6px; }
+    .wk-label:first-child { margin-top: 0; }
+    .wk-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 4px; background: #f5f5f5; border-radius: 12px; }
+    .wk-seg button { padding: 8px; border-radius: 9px; border: 0; background: transparent; font: 700 12px 'Plus Jakarta Sans', sans-serif; color: #737373; cursor: pointer; }
+    .wk-seg button.on { background: #fff; color: #171717; box-shadow: 0 1px 2px rgba(0,0,0,.1); }
+    .wk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .wk-chip { padding: 6px 11px; border-radius: 9px; border: 1px solid #e5e5e5; background: #fafafa; font: 700 11px 'JetBrains Mono', monospace; color: #404040; cursor: pointer; }
+    .wk-chip:hover { border-color: #f59e0b; color: #b45309; }
+    .wk-total { display: flex; justify-content: space-between; align-items: baseline; padding: 12px 14px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 14px; margin-bottom: 12px; }
+    .wk-total span { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #92400e; letter-spacing: .04em; }
+    .wk-total strong { font: 800 22px 'JetBrains Mono', monospace; color: #b45309; }
+    .wk-note { margin-top: 12px; padding: 9px 11px; border-radius: 10px; background: #fafafa; border: 1px dashed #d4d4d4; font-size: 11px; color: #737373; line-height: 1.5; }
+    .wk-acc { padding: 12px 14px; border-radius: 12px; background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; line-height: 1.6; }
+    .wk-acc b { font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+
+    .wk-card { display: flex; gap: 12px; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e5e5e5; border-radius: 16px; background: #fff; }
+    .wk-card + .wk-card { margin-top: 8px; }
+    .wk-card.void { background: #fff1f2; border-color: #fecdd3; }
+    .wk-card .main { min-width: 0; flex: 1; }
+    .wk-card .top { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; font-size: 12px; font-weight: 800; color: #171717; }
+    .wk-card .sub { font-size: 11px; color: #737373; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .wk-card .meta { font-size: 10.5px; color: #a3a3a3; margin-top: 2px; }
+    .wk-card .side { text-align: right; flex: none; }
+    .wk-card .money { font: 800 13px 'JetBrains Mono', monospace; color: #171717; }
+    .wk-card .acts { display: flex; gap: 6px; margin-top: 6px; justify-content: flex-end; }
+    .wk-tag { font-size: 9.5px; padding: 2px 7px; border-radius: 99px; background: #f5f5f5; color: #525252; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+    .wk-tag.green { background: #d1fae5; color: #065f46; } .wk-tag.red { background: #ffe4e6; color: #be123c; } .wk-tag.blue { background: #dbeafe; color: #1d4ed8; } .wk-tag.amber { background: #fef3c7; color: #92400e; }
+    .wk-empty { text-align: center; padding: 34px 10px; color: #a3a3a3; font-size: 12px; }
+    .wk-empty i { font-size: 32px; display: block; margin-bottom: 8px; color: #d4d4d4; }
+
+    .wk-rows { border: 1px solid #e5e5e5; border-radius: 14px; overflow: hidden; }
+    .wk-rows .r { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border-bottom: 1px solid #f5f5f5; font-size: 12px; }
+    .wk-rows .r:last-child { border-bottom: 0; }
+    .wk-rows .r span:first-child { color: #737373; }
+    .wk-rows .r span:last-child { font-family: 'JetBrains Mono', monospace; font-weight: 700; color: #171717; text-align: right; }
+    .wk-rows .r.strong { background: #fffbeb; } .wk-rows .r.strong span { color: #b45309 !important; font-weight: 800; }
+    .wk-rows .r.sec { background: #f5f5f5; font-size: 10px; text-transform: uppercase; letter-spacing: .05em; font-weight: 800; padding: 6px 12px; }
+    .wk-rows .r.sec span { color: #737373 !important; font-family: inherit !important; }
+    .wk-diff { margin-top: 10px; padding: 10px 12px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 13px; background: #f5f5f5; color: #737373; }
+    .wk-diff.ok { background: #ecfdf5; color: #047857; } .wk-diff.minus { background: #fff1f2; color: #e11d48; } .wk-diff.plus { background: #fffbeb; color: #b45309; }
+    .wk-diff b { font-family: 'JetBrains Mono', monospace; font-size: 15px; }
+    .wk-closed { text-align: center; padding: 4px 0 14px; }
+    .wk-closed .ic { width: 56px; height: 56px; border-radius: 50%; background: #ffe4e6; color: #e11d48; display: inline-flex; align-items: center; justify-content: center; font-size: 24px; margin-bottom: 8px; }
+    .wk-closed h4 { font-size: 16px; font-weight: 800; color: #171717; }
+    .wk-closed p { font-size: 11.5px; color: #737373; margin-top: 3px; }
+    .wk-confirm-body { padding: 18px 20px; }
+    .wk-confirm-body h3 { font-size: 15px; font-weight: 800; color: #171717; display: flex; align-items: center; gap: 8px; }
+    .wk-confirm-body p { font-size: 12.5px; color: #737373; margin-top: 8px; line-height: 1.55; }
+
+    .wk-toastbox { position: fixed; top: 76px; right: 16px; z-index: 2147483000; display: flex; flex-direction: column; gap: 8px; pointer-events: none; max-width: 360px; }
+    .wk-toast { display: flex; align-items: flex-start; gap: 10px; padding: 11px 14px; border-radius: 14px; font-size: 12.5px; font-weight: 600; line-height: 1.4; color: #fff; background: #262626; box-shadow: 0 10px 30px rgba(0,0,0,.35); animation: wkin .25s ease; transition: opacity .3s, transform .3s; }
+    .wk-toast i { margin-top: 2px; }
+    .wk-toast.out { opacity: 0; transform: translateX(20px); }
+    .wk-toast.success { background: #065f46; } .wk-toast.success i { color: #6ee7b7; }
+    .wk-toast.info { background: #1e293b; } .wk-toast.info i { color: #38bdf8; }
+    .wk-toast.warn { background: #92400e; } .wk-toast.warn i { color: #fcd34d; }
+    .wk-toast.error { background: #9f1239; } .wk-toast.error i { color: #fda4af; }
+    @keyframes wkin { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
+
+
+    /* ===== MOBILE / TABLET (<1024px): satu kolom + tab bawah Menu | Pesanan ===== */
+    #wk-mobtab { display: none; }
+    @media (max-width: 1023px) {
+      html body { padding-bottom: 102px !important; }
+      [id$="-modal"] { padding-bottom: 118px !important; }
+      .wk-toastbox { top: 70px !important; left: 10px; right: 10px !important; max-width: none !important; align-items: flex-end; }
+      header { padding-left: 10px !important; padding-right: 10px !important; }
+      header > div:last-child { gap: 4px !important; }
+      header button { padding: 8px 10px !important; min-height: 38px; }
+      header button span:not(.wk-hbadge):not(#history-badge), header h1 + span { display: none !important; }
+      header > div:first-child p { display: none !important; }
+      main > section, main > aside { width: 100% !important; flex: 1 1 auto; min-height: 0; border: 0 !important; display: none !important; }
+      body[data-tab="produk"] #wk-sec-produk,
+      body[data-tab="cart"] #wk-sec-cart { display: flex !important; }
+      #wk-sec-cart { overflow-y: auto !important; }
+      #wk-sec-cart #cart-list { flex: none !important; min-height: 150px; max-height: 38vh; }
+      #search-input, #customer-name, #custom-cash-input, #table-number { font-size: 16px; }
+      #wk-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #171717; border-top: 1px solid #262626; padding: 6px 8px; gap: 8px; }
+      #wk-mobtab button { flex: 1; border: 0; border-radius: 12px; background: transparent; color: #a3a3a3; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+      #wk-mobtab button.on { background: #f59e0b; color: #fff; }
+      #wk-mobtab .wk-tb-n { background: #f59e0b; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
+      #wk-mobtab button.on .wk-tb-n { background: #fff; color: #b45309; }
+      #wk-mobtab .wk-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+    }
+    @media (max-width: 520px) { header > div:first-child > div:last-child { display: none !important; } }
+
     @media print {
       body * {
         visibility: hidden !important;
@@ -106,7 +232,7 @@
     }
   </style>
 </head>
-<body class="bg-neutral-100 text-neutral-900 h-screen w-screen flex flex-col overflow-hidden select-none">
+<body data-tab="produk" class="bg-neutral-100 text-neutral-900 h-screen w-screen flex flex-col overflow-hidden select-none">
 <!-- @jz-bar-start -->
 <style>
 /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -172,7 +298,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     <div class="hidden lg:flex items-center gap-5 text-neutral-600 bg-neutral-50 px-3.5 py-1.5 rounded-lg border border-neutral-200/70">
       <div class="flex items-center gap-2 text-xs font-medium">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span class="text-emerald-700 font-semibold">Shift Aktif</span>
+        <span id="shift-status-label" class="text-emerald-700 font-semibold">Shift Aktif</span>
         <span class="text-neutral-300">|</span>
         <i class="fa-regular fa-user text-neutral-400"></i>
         <span id="topbar-shift-cashier">Radit Pratama</span>
@@ -187,6 +313,12 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
 
     <!-- Zone 3: Quick Action Buttons -->
     <div class="flex items-center gap-2">
+      <button onclick="wkOpenHeld()" type="button" title="Pesanan Tersimpan (Hold)" class="relative flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-xs font-semibold text-neutral-700 cursor-pointer transition-colors">
+        <i class="fa-solid fa-pause text-amber-600"></i>
+        <span class="hidden sm:inline">Tersimpan</span>
+        <span id="held-badge" class="wk-hbadge zero">0</span>
+      </button>
+
       <button onclick="openCashDrawerModal()" type="button" title="Buka Laci Kasir" class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer border border-neutral-200/60">
         <i class="fa-solid fa-coins text-amber-600"></i>
         <span class="hidden sm:inline">Laci Kasir</span>
@@ -213,7 +345,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
   <main class="flex-1 flex overflow-hidden">
 
     <!-- ========== KOLOM KIRI (KATALOG MENU & KATEGORI) ========== -->
-    <section class="flex-1 flex flex-col h-full overflow-hidden bg-neutral-100/60 p-4 gap-4">
+    <section id="wk-sec-produk" class="flex-1 flex flex-col h-full overflow-hidden bg-neutral-100/60 p-4 gap-4">
       <!-- Search & Category Filters -->
       <div class="flex flex-col gap-3 shrink-0">
         <div class="relative">
@@ -245,7 +377,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     </section>
 
     <!-- ========== KOLOM KANAN (KERANJANG / ORDER SUMMARY) ========== -->
-    <aside class="w-96 lg:w-[420px] bg-white border-l border-neutral-200 flex flex-col h-full overflow-hidden select-none shrink-0 shadow-sm">
+    <aside id="wk-sec-cart" class="w-96 lg:w-[420px] bg-white border-l border-neutral-200 flex flex-col h-full overflow-hidden select-none shrink-0 shadow-sm">
       <!-- Top Order Header -->
       <div class="p-3.5 border-b border-neutral-200 flex flex-col gap-2.5 bg-neutral-50/50">
         <div class="flex items-center justify-between">
@@ -308,6 +440,10 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             <span>Subtotal</span>
             <span id="bill-subtotal" class="font-mono tabular-nums font-semibold">Rp 0</span>
           </div>
+          <div id="discount-row" class="flex justify-between text-neutral-600 items-center">
+            <span class="flex items-center gap-1.5"><span id="bill-discount-label">Diskon</span><button type="button" onclick="wkOpenDiscount()" class="wk-link">Atur</button></span>
+            <span id="bill-discount" class="font-mono tabular-nums font-semibold">Rp 0</span>
+          </div>
           <div id="tax-row" class="flex justify-between text-neutral-600">
             <span id="tax-label">PB1 (10%)</span>
             <span id="bill-tax" class="font-mono tabular-nums font-semibold">Rp 0</span>
@@ -340,13 +476,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
             <span class="font-semibold">Uang Diterima:</span>
             <span id="cash-tendered-display" class="font-mono tabular-nums font-bold text-neutral-800">Rp 0</span>
           </div>
-          <div class="flex flex-wrap gap-1.5">
-            <button onclick="setQuickCash('exact')" type="button" class="text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 cursor-pointer">Uang Pas</button>
-            <button onclick="setQuickCash(20000)" type="button" class="text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 cursor-pointer">20.000</button>
-            <button onclick="setQuickCash(50000)" type="button" class="text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 cursor-pointer">50.000</button>
-            <button onclick="setQuickCash(100000)" type="button" class="text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 cursor-pointer">100.000</button>
-            <button onclick="setQuickCash(200000)" type="button" class="text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100 cursor-pointer">200.000</button>
-          </div>
+          <div id="quick-cash-chips" class="flex flex-wrap gap-1.5"></div>
           <div class="flex items-center gap-1.5 mt-1">
             <span class="text-[10px] text-neutral-400 font-mono">Rp</span>
             <input type="number" id="custom-cash-input" oninput="handleCustomCashInput(this.value)" placeholder="Nominal uang kustom..." class="flex-1 text-xs py-1 px-2 border border-neutral-200 rounded-lg font-mono focus:outline-none focus:ring-1 focus:ring-amber-500" />
@@ -358,6 +488,8 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         </div>
 
         <!-- Big Checkout CTA Button -->
+        <div class="wk-payrow">
+          <button type="button" onclick="wkHold()" class="wk-holdbtn" title="Simpan pesanan (F8)"><i class="fa-solid fa-pause"></i><span>Simpan</span><small>F8</small></button>
         <button 
           id="btn-process-checkout"
           onclick="handleProcessCheckout()"
@@ -367,6 +499,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
           <span>Proses Pembayaran (Cetak Struk)</span>
           <i class="fa-solid fa-arrow-right"></i>
         </button>
+        </div>
       </div>
     </aside>
   </main>
@@ -377,7 +510,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       <div class="px-5 py-4 bg-emerald-600 text-white flex items-center justify-between">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-circle-check text-emerald-200 text-lg"></i>
-          <h3 class="font-bold text-base">Pembayaran Berhasil!</h3>
+          <h3 id="receipt-title" class="font-bold text-base">Pembayaran Berhasil!</h3>
         </div>
         <button onclick="closeReceiptModal()" class="p-1 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-700/50 transition-colors cursor-pointer">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -422,7 +555,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
         </div>
         <button onclick="newOrder()" type="button" class="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs cursor-pointer">
           <i class="fa-solid fa-rotate-right"></i>
-          <span>Selesai & Transaksi Baru</span>
+          <span id="receipt-done-text">Selesai & Transaksi Baru</span>
         </button>
       </div>
     </div>
@@ -623,7 +756,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       </div>
       <div id="drawer-logs-container" class="flex-1 overflow-y-auto p-4 flex flex-col gap-2"></div>
       <div class="p-4 bg-neutral-50 border-t border-neutral-200 flex justify-end">
-        <button onclick="closeCashDrawerModal()" class="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-semibold cursor-pointer">Tutup</button>
+        <div class="wk-row"><button type="button" onclick="wkOpenShift()" class="wk-btn redsoft"><i class="fa-solid fa-lock"></i>Tutup Shift</button><button onclick="closeCashDrawerModal()" class="px-4 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-semibold cursor-pointer">Tutup</button></div>
       </div>
     </div>
   </div>
@@ -743,6 +876,88 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       </div>
     </div>
   </div>
+
+  <!-- ================= MODAL PESANAN TERSIMPAN (HOLD) ================= -->
+  <div id="held-modal" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:540px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#fef3c7;color:#b45309"><i class="fa-solid fa-pause"></i></span><span>Pesanan Tersimpan<small>Bill meja yang belum dibayar</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseHeld()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="held-body"></div>
+      <div class="wk-mfoot" style="font-size:11px;color:#737373;align-items:center">Tekan <b style="color:#b45309">&nbsp;Panggil&nbsp;</b> untuk melanjutkan pesanan di kasir dan membayar.</div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DISKON ================= -->
+  <div id="discount-modal" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:380px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#d1fae5;color:#047857"><i class="fa-solid fa-tags"></i></span><span>Atur Diskon<small>Berlaku sebelum pajak</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseDiscount()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody">
+        <div class="wk-seg"><button type="button" id="disc-t-pct" class="on" onclick="wkSetDiscType('pct')">Persen (%)</button><button type="button" id="disc-t-nom" onclick="wkSetDiscType('nominal')">Nominal (Rp)</button></div>
+        <span class="wk-label">Besar Diskon</span>
+        <input id="disc-value" type="number" min="0" class="wk-input num" placeholder="0" oninput="wkPreviewDiscount()">
+        <div id="disc-presets" class="wk-chips" style="margin-top:10px"></div>
+        <div id="disc-preview" class="wk-note">Subtotal Rp 0 · Diskon Rp 0</div>
+      </div>
+      <div class="wk-mfoot">
+        <button type="button" class="wk-btn redsoft" onclick="wkClearDiscount()">Hapus Diskon</button>
+        <button type="button" class="wk-btn amber grow" onclick="wkApplyDiscount()"><i class="fa-solid fa-check"></i>Terapkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL DEBIT / TRANSFER ================= -->
+  <div id="transfer-modal" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:400px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#dbeafe;color:#1d4ed8"><i class="fa-solid fa-credit-card"></i></span><span>Debit / Transfer<small>Konfirmasi setelah dana diterima</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseTransfer()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody">
+        <div class="wk-total"><span>Total Dibayar</span><strong id="tf-amount">Rp 0</strong></div>
+        <div class="wk-seg"><button type="button" id="tf-t-transfer" class="on" onclick="wkSetTfType('transfer')">Transfer Bank</button><button type="button" id="tf-t-edc" onclick="wkSetTfType('edc')">Kartu Debit (EDC)</button></div>
+        <span class="wk-label">Bank</span>
+        <select id="tf-bank" class="wk-input" onchange="wkRenderTfInfo()"><option>BCA</option><option>Mandiri</option><option>BNI</option><option>BRI</option><option>CIMB Niaga</option></select>
+        <div id="tf-info" style="margin-top:12px"></div>
+      </div>
+      <div class="wk-mfoot">
+        <button type="button" class="wk-btn ghost" onclick="wkCloseTransfer()">Batal</button>
+        <button type="button" id="tf-confirm" class="wk-btn green grow" onclick="wkConfirmTransfer()"><i class="fa-solid fa-check"></i><span>Konfirmasi Diterima</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL TUTUP SHIFT ================= -->
+  <div id="shift-modal" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:460px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#ffe4e6;color:#e11d48"><i class="fa-solid fa-lock"></i></span><span id="sh-title">Tutup Shift Kasir</span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseShift()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="sh-body"></div>
+      <div class="wk-mfoot" id="sh-foot"></div>
+    </div>
+  </div>
+
+  <!-- ================= DIALOG KONFIRMASI ================= -->
+  <div id="confirm-modal" class="wk-overlay top hidden">
+    <div class="wk-modal" style="max-width:390px">
+      <div class="wk-confirm-body">
+        <h3><i id="cf-icon" class="fa-solid fa-circle-question" style="color:#f59e0b"></i><span id="cf-title">Konfirmasi</span></h3>
+        <p id="cf-msg"></p>
+      </div>
+      <div class="wk-mfoot" style="justify-content:flex-end">
+        <button type="button" class="wk-btn ghost" onclick="wkConfirmCancel()">Batal</button>
+        <button type="button" id="cf-ok" class="wk-btn amber" onclick="wkConfirmOk()">Ya, Lanjutkan</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="wk-toast" class="wk-toastbox" aria-live="polite"></div>
 
   <!-- ================= JAVASCRIPT ENGINE ================= -->
   <script>
@@ -1794,5 +2009,911 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     renderProducts();
     renderCart();
   </script>
+<script>
+/* ================================================================
+   WARUNGKU — PERBAIKAN & FITUR TAMBAHAN
+   (blok ini menimpa fungsi bermasalah dari skrip utama di atasnya)
+================================================================ */
+const wk$ = id => document.getElementById(id);
+const wkEsc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const wkPad = n => String(n).padStart(2, '0');
+const wkHM = d => wkPad(d.getHours()) + ':' + wkPad(d.getMinutes());
+const wkProduct = id => PRODUCTS.find(p => p.id === id);
+
+let wkDiscount = { type: 'pct', value: 0 };
+let wkDiscType = 'pct';
+let wkHeld = [];
+let wkHeldSeq = 0;
+let wkShift = { open: true, number: 1, openedAt: '08:00 WIB', closedAt: null, counted: null, kicks: 0 };
+let wkPendingFinish = false;
+let wkReceiptReprint = false;
+let wkQrisTimer = null;
+let wkQrisLeft = 300;
+let wkLastTotal = -1;
+let wkTrxSeq = 0;
+let wkTfType = 'transfer';
+let wkTables = [];
+
+/* ---------- Toast & konfirmasi ---------- */
+function wkToast(msg, type) {
+  type = type || 'info';
+  const icons = { success: 'fa-circle-check', info: 'fa-circle-info', warn: 'fa-triangle-exclamation', error: 'fa-circle-xmark' };
+  const el = document.createElement('div');
+  el.className = 'wk-toast ' + type;
+  const i = document.createElement('i'); i.className = 'fa-solid ' + (icons[type] || icons.info);
+  const s = document.createElement('span'); s.textContent = msg;
+  el.appendChild(i); el.appendChild(s);
+  wk$('wk-toast').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 320); }, 3200);
+}
+let wkConfirmCb = null;
+function wkAsk(title, msg, okLabel, cb, danger) {
+  wk$('cf-title').textContent = title;
+  wk$('cf-msg').textContent = msg;
+  const ok = wk$('cf-ok');
+  ok.textContent = okLabel || 'Ya, Lanjutkan';
+  ok.className = 'wk-btn ' + (danger ? 'red' : 'amber');
+  wk$('cf-icon').style.color = danger ? '#e11d48' : '#f59e0b';
+  wkConfirmCb = cb;
+  wk$('confirm-modal').classList.remove('hidden');
+}
+function wkConfirmOk() { const cb = wkConfirmCb; wkConfirmCb = null; wk$('confirm-modal').classList.add('hidden'); if (cb) cb(); }
+function wkConfirmCancel() { wkConfirmCb = null; wk$('confirm-modal').classList.add('hidden'); }
+
+function wkShiftGuard() {
+  if (!wkShift.open) { wkToast('Shift sudah ditutup. Mulai shift baru untuk melayani pesanan.', 'warn'); return false; }
+  return true;
+}
+
+/* ================================================================
+   PERHITUNGAN TAGIHAN (DISKON + PAJAK)
+================================================================ */
+function wkCalc(items, disc, taxOn, taxRate) {
+  const subtotal = items.reduce((a, it) => a + it.price * it.quantity, 0);
+  let discount = disc.type === 'pct' ? Math.round(subtotal * Math.min(100, disc.value) / 100) : Math.min(disc.value, subtotal);
+  discount = Math.max(0, discount);
+  const taxable = subtotal - discount;
+  const tax = taxOn ? Math.round(taxable * taxRate) : 0;
+  return { subtotal, discount, tax, total: taxable + tax };
+}
+const wkCurrent = () => wkCalc(cart, wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate);
+
+function calculateTotals() {
+  const t = wkCurrent();
+  // Nominal uang diterima direset bila total tagihan berubah (agar kembalian tidak salah)
+  if (t.total !== wkLastTotal) {
+    wkLastTotal = t.total;
+    cashTendered = 0;
+    const ci = wk$('custom-cash-input'); if (ci) ci.value = '';
+  }
+  wk$('bill-subtotal').innerText = formatRupiah(t.subtotal);
+
+  const dLabel = wk$('bill-discount-label');
+  dLabel.textContent = t.discount > 0 ? (wkDiscount.type === 'pct' ? 'Diskon (' + wkDiscount.value + '%)' : 'Diskon') : 'Diskon';
+  const dVal = wk$('bill-discount');
+  dVal.textContent = t.discount > 0 ? '-' + formatRupiah(t.discount) : 'Rp 0';
+  dVal.style.color = t.discount > 0 ? '#059669' : '';
+
+  const taxRow = wk$('tax-row');
+  if (storeSettings.isTaxEnabled) {
+    taxRow.classList.remove('hidden');
+    wk$('tax-label').innerText = 'PB1 (' + Math.round(storeSettings.taxRate * 100) + '%)';
+    wk$('bill-tax').innerText = formatRupiah(t.tax);
+  } else taxRow.classList.add('hidden');
+
+  wk$('bill-total').innerText = formatRupiah(t.total);
+
+  if (paymentMethod === 'cash') {
+    wkRenderQuick(t.total);
+    wk$('cash-tendered-display').innerText = formatRupiah(cashTendered);
+    const ch = wk$('cash-change-display');
+    if (cashTendered === 0) { ch.innerText = 'Rp 0'; ch.className = 'font-mono font-bold text-neutral-400 text-sm tabular-nums'; }
+    else if (cashTendered < t.total) { ch.innerText = 'Kurang ' + formatRupiah(t.total - cashTendered); ch.className = 'font-mono font-bold text-rose-600 text-sm tabular-nums'; }
+    else { ch.innerText = formatRupiah(cashTendered - t.total); ch.className = 'font-mono font-bold text-emerald-700 text-sm tabular-nums'; }
+  }
+
+  const btn = wk$('btn-process-checkout');
+  const ok = cart.length > 0 && wkShift.open && (paymentMethod !== 'cash' || cashTendered >= t.total);
+  btn.disabled = !ok;
+  btn.className = ok
+    ? 'w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white flex items-center justify-center gap-2 shadow-md shadow-emerald-600/25 transition-all cursor-pointer active:scale-[0.99]'
+    : 'w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-neutral-300 text-neutral-500 cursor-not-allowed flex items-center justify-center gap-2';
+  return t;
+}
+
+function wkRenderQuick(total) {
+  const box = wk$('quick-cash-chips');
+  if (!box) return;
+  if (total <= 0) { box.innerHTML = ''; return; }
+  const set = new Set();
+  [5000, 10000, 20000, 50000, 100000].forEach(s => { const v = Math.ceil(total / s) * s; if (v > total) set.add(v); });
+  const sug = [...set].sort((a, b) => a - b).slice(0, 4);
+  const cls = on => 'text-[10px] font-mono font-semibold px-2 py-1 rounded-lg border cursor-pointer ' + (on ? 'bg-amber-50 text-amber-700 border-amber-400' : 'bg-neutral-50 text-neutral-700 border-neutral-200 hover:bg-neutral-100');
+  box.innerHTML = '<button onclick="setQuickCash(\'exact\')" type="button" class="' + cls(cashTendered === total) + '">Uang Pas</button>' +
+    sug.map(v => '<button onclick="setQuickCash(' + v + ')" type="button" class="' + cls(cashTendered === v) + '">' + v.toLocaleString('id-ID') + '</button>').join('');
+}
+
+function setQuickCash(amount) {
+  const t = wkCurrent();
+  cashTendered = amount === 'exact' ? t.total : amount;
+  const ci = wk$('custom-cash-input'); if (ci) ci.value = '';
+  calculateTotals();
+}
+function handleCustomCashInput(val) {
+  const num = parseInt(val, 10);
+  cashTendered = isNaN(num) ? 0 : Math.max(0, num);
+  calculateTotals();
+}
+
+function setPaymentMethod(method) {
+  paymentMethod = method;
+  const on = 'flex flex-col items-center justify-center py-2 px-1 rounded-xl text-[11px] font-bold border border-amber-600 bg-amber-500 text-white shadow-xs cursor-pointer';
+  const off = 'flex flex-col items-center justify-center py-2 px-1 rounded-xl text-[11px] font-bold border border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-100 cursor-pointer';
+  wk$('pay-cash-btn').className = method === 'cash' ? on : off;
+  wk$('pay-qris-btn').className = method === 'qris' ? on : off;
+  wk$('pay-tf-btn').className = method === 'bank_transfer' ? on : off;
+  wk$('cash-calculator-box').classList.toggle('hidden', method !== 'cash');
+  calculateTotals();
+}
+
+/* ================================================================
+   KERANJANG
+================================================================ */
+function addToCart(itemId) {
+  if (!wkShiftGuard()) return;
+  const product = wkProduct(itemId);
+  if (!product) return;
+  const existing = cart.find(c => c.id === itemId);
+  const cur = existing ? existing.quantity : 0;
+  if (cur >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
+  if (existing) existing.quantity += 1;
+  else cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1, notes: '' });
+  playBeep();
+  renderCart();
+  renderProducts();
+}
+
+function updateCartQty(itemId, delta) {
+  const item = cart.find(c => c.id === itemId);
+  const product = wkProduct(itemId);
+  if (!item) return;
+  if (delta > 0 && product && item.quantity >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
+  item.quantity += delta;
+  if (item.quantity <= 0) cart = cart.filter(c => c.id !== itemId);
+  playBeep();
+  renderCart();
+  renderProducts();
+}
+
+function clearCart() {
+  if (cart.length === 0) { wkToast('Keranjang sudah kosong.', 'info'); return; }
+  wkAsk('Kosongkan pesanan?', 'Semua menu pada pesanan ini akan dihapus. Gunakan Simpan bila ingin melanjutkannya nanti.', 'Ya, Kosongkan', () => {
+    wkResetOrder(); renderCart(); renderProducts();
+    wkToast('Pesanan dikosongkan.', 'warn');
+  }, true);
+}
+
+function renderCart() {
+  const list = wk$('cart-list');
+  const totalItems = cart.reduce((acc, it) => acc + it.quantity, 0);
+  wk$('cart-count-badge').innerText = totalItems + ' item';
+
+  if (cart.length === 0) {
+    list.innerHTML = `
+      <div class="flex-1 flex flex-col items-center justify-center text-center p-6 text-neutral-400">
+        <div class="w-14 h-14 rounded-2xl bg-neutral-100 flex items-center justify-center text-neutral-300 mb-3"><i class="fa-solid fa-basket-shopping text-2xl"></i></div>
+        <p class="text-sm font-semibold text-neutral-700">Keranjang Masih Kosong</p>
+        <p class="text-xs text-neutral-400 mt-1 max-w-[220px]">Klik pada menu di sebelah kiri untuk menambahkan pesanan ke keranjang.</p>
+      </div>`;
+    calculateTotals();
+    return;
+  }
+
+  list.innerHTML = cart.map(item => `
+    <div class="pt-2.5 first:pt-0 flex flex-col gap-1.5">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex-1 min-w-0">
+          <h4 class="font-bold text-xs text-neutral-900 truncate">${wkEsc(item.name)}</h4>
+          <p class="text-[11px] text-neutral-500 font-mono tabular-nums">${formatRupiah(item.price)}</p>
+        </div>
+        <span class="font-bold text-xs text-neutral-900 font-mono tabular-nums">${formatRupiah(item.price * item.quantity)}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="openNoteModal('${item.id}')" type="button" class="text-[11px] flex items-center gap-1 px-1.5 py-0.5 rounded transition cursor-pointer ${item.notes ? 'text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium' : 'text-neutral-400 hover:text-neutral-600'}">
+          <i class="fa-regular fa-comment-dots text-xs"></i>
+          <span class="max-w-[170px] truncate">${item.notes ? wkEsc(item.notes) : '+ Catatan khusus'}</span>
+        </button>
+      </div>
+      <div class="flex items-center justify-between mt-1">
+        <div class="flex items-center gap-1.5 bg-neutral-100 p-0.5 rounded-lg border border-neutral-200/60">
+          <button onclick="updateCartQty('${item.id}', -1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-minus text-[10px]"></i></button>
+          <span class="w-7 text-center font-bold text-xs font-mono tabular-nums text-neutral-900">${item.quantity}</span>
+          <button onclick="updateCartQty('${item.id}', 1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-plus text-[10px]"></i></button>
+        </div>
+        <button onclick="removeCartItem('${item.id}')" type="button" class="p-1 text-neutral-400 hover:text-rose-600 transition cursor-pointer"><i class="fa-regular fa-trash-can text-xs"></i></button>
+      </div>
+    </div>`).join('');
+  calculateTotals();
+}
+
+/* ---------- Form pesanan ---------- */
+function wkRenderTableOptions() {
+  const sel = wk$('table-number');
+  const prev = sel.value;
+  sel.innerHTML = wkTables.map(t => {
+    const occupied = wkHeld.some(h => h.orderType === 'dine_in' && h.table === t);
+    return '<option value="' + wkEsc(t) + '">' + wkEsc(t) + (occupied ? ' (Terisi)' : '') + '</option>';
+  }).join('');
+  if (prev && wkTables.indexOf(prev) !== -1) sel.value = prev;
+}
+function wkFirstFreeTable() {
+  return wkTables.find(t => !wkHeld.some(h => h.orderType === 'dine_in' && h.table === t)) || wkTables[0];
+}
+function wkResetOrder() {
+  cart = [];
+  cashTendered = 0;
+  wkDiscount = { type: 'pct', value: 0 };
+  wkLastTotal = -1;
+  wk$('customer-name').value = '';
+  const ci = wk$('custom-cash-input'); if (ci) ci.value = '';
+  setOrderType('dine_in');
+  wkRenderTableOptions();
+  wk$('table-number').value = wkFirstFreeTable();
+  setPaymentMethod('cash');
+}
+
+/* ================================================================
+   DISKON
+================================================================ */
+function wkOpenDiscount() {
+  if (cart.length === 0) { wkToast('Tambahkan menu dulu sebelum memberi diskon.', 'warn'); return; }
+  wkDiscType = wkDiscount.type;
+  wk$('disc-value').value = wkDiscount.value || '';
+  wkSetDiscType(wkDiscType, true);
+  wk$('discount-modal').classList.remove('hidden');
+  setTimeout(() => wk$('disc-value').focus(), 50);
+}
+function wkCloseDiscount() { wk$('discount-modal').classList.add('hidden'); }
+function wkSetDiscType(t, keep) {
+  wkDiscType = t;
+  wk$('disc-t-pct').classList.toggle('on', t === 'pct');
+  wk$('disc-t-nom').classList.toggle('on', t === 'nominal');
+  if (!keep) wk$('disc-value').value = '';
+  const presets = t === 'pct' ? [5, 10, 15, 20] : [2000, 5000, 10000, 20000];
+  wk$('disc-presets').innerHTML = presets.map(v => '<button type="button" class="wk-chip" onclick="wkPickDisc(' + v + ')">' + (t === 'pct' ? v + '%' : v.toLocaleString('id-ID')) + '</button>').join('');
+  wkPreviewDiscount();
+}
+function wkPickDisc(v) { wk$('disc-value').value = v; wkPreviewDiscount(); }
+function wkPreviewDiscount() {
+  const val = Math.max(0, Number(wk$('disc-value').value) || 0);
+  const sub = cart.reduce((a, it) => a + it.price * it.quantity, 0);
+  const d = wkCalc(cart, { type: wkDiscType, value: val }, false, 0).discount;
+  wk$('disc-preview').innerHTML = 'Subtotal <b>' + formatRupiah(sub) + '</b> · Diskon <b style="color:#059669">-' + formatRupiah(d) + '</b> · Setelah diskon <b>' + formatRupiah(sub - d) + '</b>' +
+    (wkDiscType === 'pct' && val > 100 ? '<br><span style="color:#e11d48">Persentase maksimum 100%.</span>' : '') +
+    (wkDiscType === 'nominal' && val > sub ? '<br><span style="color:#e11d48">Diskon dibatasi sebesar subtotal.</span>' : '');
+}
+function wkApplyDiscount() {
+  const val = Math.max(0, Number(wk$('disc-value').value) || 0);
+  if (wkDiscType === 'pct' && val > 100) { wkToast('Persentase diskon maksimal 100%.', 'error'); return; }
+  wkDiscount = { type: wkDiscType, value: val };
+  calculateTotals();
+  wkCloseDiscount();
+  wkToast(val > 0 ? 'Diskon diterapkan.' : 'Diskon dihapus.', 'success');
+}
+function wkClearDiscount() {
+  wkDiscount = { type: 'pct', value: 0 };
+  calculateTotals(); wkCloseDiscount();
+  wkToast('Diskon dihapus.', 'info');
+}
+
+/* ================================================================
+   HOLD / PESANAN TERSIMPAN
+================================================================ */
+function wkUpdateBadges() {
+  const b = wk$('held-badge');
+  if (b) { b.textContent = wkHeld.length; b.classList.toggle('zero', wkHeld.length === 0); }
+  const active = transactions.filter(t => !t.voided).length;
+  wk$('history-badge').innerText = active;
+}
+
+function wkHold() {
+  if (!wkShiftGuard()) return false;
+  if (cart.length === 0) { wkToast('Keranjang kosong, tidak ada pesanan untuk disimpan.', 'warn'); return false; }
+  const tbl = wk$('table-number').value;
+  if (orderType === 'dine_in') {
+    const other = wkHeld.find(h => h.orderType === 'dine_in' && h.table === tbl);
+    if (other) { wkToast(tbl + ' masih punya pesanan tersimpan (' + other.id + '). Pilih meja lain.', 'warn'); return false; }
+  }
+  wkHeldSeq++;
+  const id = 'HLD-' + wkPad(wkHeldSeq);
+  wkHeld.push({ id, orderType, table: tbl, customer: wk$('customer-name').value.trim(), cart: JSON.parse(JSON.stringify(cart)), discount: { ...wkDiscount }, time: new Date() });
+  wkResetOrder(); renderCart(); renderProducts(); wkUpdateBadges();
+  wkToast('Pesanan disimpan sebagai ' + id + '. Silakan layani pelanggan berikutnya.', 'success');
+  return true;
+}
+
+function wkOpenHeld() { wkRenderHeld(); wk$('held-modal').classList.remove('hidden'); }
+function wkCloseHeld() { wk$('held-modal').classList.add('hidden'); }
+
+function wkRenderHeld() {
+  const box = wk$('held-body');
+  if (wkHeld.length === 0) {
+    box.innerHTML = '<div class="wk-empty"><i class="fa-regular fa-folder-open"></i>Belum ada pesanan tersimpan.<br>Tekan <b>Simpan</b> di panel pesanan untuk menyimpan bill meja.</div>';
+    return;
+  }
+  box.innerHTML = wkHeld.map(h => {
+    const qty = h.cart.reduce((a, c) => a + c.quantity, 0);
+    const names = h.cart.map(c => c.quantity + 'x ' + c.name).join(', ');
+    const tot = wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate).total;
+    return '<div class="wk-card"><div class="main"><div class="top">' + h.id +
+      '<span class="wk-tag ' + (h.orderType === 'dine_in' ? 'amber' : 'blue') + '">' + (h.orderType === 'dine_in' ? wkEsc(h.table) : 'Takeaway') + '</span>' +
+      (h.customer ? '<span class="wk-tag">' + wkEsc(h.customer) + '</span>' : '') + '</div>' +
+      '<div class="sub">' + wkEsc(names) + '</div><div class="meta">Disimpan ' + wkHM(h.time) + ' WIB · ' + qty + ' item</div></div>' +
+      '<div class="side"><div class="money">' + formatRupiah(tot) + '</div><div class="acts">' +
+      '<button type="button" class="wk-btn amber xs" onclick="wkRecall(\'' + h.id + '\')"><i class="fa-solid fa-rotate-left"></i>Panggil</button>' +
+      '<button type="button" class="wk-btn redsoft xs" onclick="wkDeleteHeld(\'' + h.id + '\')" aria-label="Hapus"><i class="fa-regular fa-trash-can"></i></button></div></div></div>';
+  }).join('');
+}
+
+function wkRecall(id) {
+  if (!wkShiftGuard()) return;
+  const h = wkHeld.find(x => x.id === id);
+  if (!h) return;
+  const load = () => {
+    cart = h.cart.map(c => { const p = wkProduct(c.id); return { ...c, quantity: Math.min(c.quantity, p ? p.stock : c.quantity) }; }).filter(c => c.quantity > 0);
+    wkHeld = wkHeld.filter(x => x.id !== id);
+    wkDiscount = { ...h.discount };
+    wkLastTotal = -1; cashTendered = 0;
+    setOrderType(h.orderType);
+    wkRenderTableOptions();
+    if (h.orderType === 'dine_in') wk$('table-number').value = h.table;
+    wk$('customer-name').value = h.customer || '';
+    setPaymentMethod('cash');
+    renderCart(); renderProducts(); wkUpdateBadges(); wkCloseHeld();
+    wkToast(id + ' dipanggil ke kasir.', 'success');
+  };
+  if (cart.length > 0) {
+    wkAsk('Pesanan aktif masih ada', 'Pesanan yang sedang dibuat akan disimpan otomatis sebelum ' + id + ' dipanggil.', 'Simpan & Panggil', () => { if (wkHold()) load(); });
+  } else load();
+}
+
+function wkDeleteHeld(id) {
+  wkAsk('Hapus pesanan tersimpan?', id + ' akan dihapus permanen.', 'Ya, Hapus', () => {
+    wkHeld = wkHeld.filter(x => x.id !== id);
+    wkRenderTableOptions(); wkUpdateBadges(); wkRenderHeld();
+    wkToast(id + ' dihapus.', 'warn');
+  }, true);
+}
+
+/* ================================================================
+   PEMBAYARAN
+================================================================ */
+function handleProcessCheckout() {
+  if (!wkShiftGuard()) return;
+  if (cart.length === 0) { wkToast('Keranjang masih kosong.', 'warn'); return; }
+  const t = wkCurrent();
+  if (orderType === 'dine_in') {
+    const tbl = wk$('table-number').value;
+    const other = wkHeld.find(h => h.orderType === 'dine_in' && h.table === tbl);
+    if (other) { wkToast(tbl + ' masih punya pesanan tersimpan (' + other.id + '). Panggil pesanan itu atau pilih meja lain.', 'warn'); return; }
+  }
+  if (paymentMethod === 'cash') {
+    if (cashTendered <= 0) { wkToast('Pilih atau masukkan nominal uang yang diterima.', 'warn'); return; }
+    if (cashTendered < t.total) { wkToast('Uang diterima kurang ' + formatRupiah(t.total - cashTendered) + '.', 'error'); return; }
+    finishCheckout('cash', cashTendered, {});
+  } else if (paymentMethod === 'qris') {
+    wkOpenQris(t);
+  } else {
+    wkOpenTransfer(t);
+  }
+}
+
+/* ---------- QRIS dengan timer ---------- */
+function wkOpenQris(t) {
+  wk$('qris-store-name').innerText = storeSettings.storeName;
+  wk$('qris-amount').innerText = formatRupiah(t.total);
+  wkQrisLeft = 300;
+  const tick = () => {
+    const m = Math.floor(wkQrisLeft / 60), s = wkQrisLeft % 60;
+    wk$('qris-timer').innerText = wkPad(m) + ':' + wkPad(s);
+  };
+  tick();
+  clearInterval(wkQrisTimer);
+  wkQrisTimer = setInterval(() => {
+    wkQrisLeft--;
+    if (wkQrisLeft <= 0) { closeQrisModal(); wkToast('QRIS kedaluwarsa. Silakan ulangi pembayaran.', 'warn'); return; }
+    tick();
+  }, 1000);
+  const m = wk$('qris-modal'); m.classList.remove('hidden'); m.classList.add('flex');
+}
+function closeQrisModal() {
+  clearInterval(wkQrisTimer); wkQrisTimer = null;
+  const m = wk$('qris-modal'); m.classList.add('hidden'); m.classList.remove('flex');
+}
+function confirmQrisSuccess() {
+  const t = wkCurrent();
+  closeQrisModal();
+  finishCheckout('qris', t.total, { label: 'QRIS', ref: 'QR' + String(Date.now()).slice(-8) });
+}
+
+/* ---------- Debit / Transfer ---------- */
+function wkOpenTransfer(t) {
+  wk$('tf-amount').textContent = formatRupiah(t.total);
+  wkSetTfType('transfer');
+  wk$('transfer-modal').classList.remove('hidden');
+}
+function wkCloseTransfer() { wk$('transfer-modal').classList.add('hidden'); }
+function wkSetTfType(t) {
+  wkTfType = t;
+  wk$('tf-t-transfer').classList.toggle('on', t === 'transfer');
+  wk$('tf-t-edc').classList.toggle('on', t === 'edc');
+  wkRenderTfInfo();
+}
+function wkRenderTfInfo() {
+  const bank = wk$('tf-bank').value;
+  const tot = wkCurrent().total;
+  wk$('tf-info').innerHTML = wkTfType === 'transfer'
+    ? '<div class="wk-acc">Transfer ke rekening <b>' + wkEsc(bank) + '</b><br><b>8820 1234 5678</b><br>a.n. ' + wkEsc(storeSettings.storeName) + '<br>Nominal tepat: <b>' + formatRupiah(tot) + '</b></div><div class="wk-note">Tekan konfirmasi setelah bukti transfer / notifikasi dana masuk terlihat.</div>'
+    : '<div class="wk-note" style="margin-top:0">Minta pelanggan tap / insert kartu pada mesin EDC <b>' + wkEsc(bank) + '</b>. Tekan konfirmasi setelah mesin menampilkan status APPROVED.</div>';
+}
+function wkConfirmTransfer() {
+  const bank = wk$('tf-bank').value;
+  const isTf = wkTfType === 'transfer';
+  const extra = { label: (isTf ? 'TRANSFER ' : 'DEBIT ') + bank.toUpperCase(), ref: isTf ? 'TF' + String(Date.now()).slice(-8) : String(Math.floor(100000 + Math.random() * 900000)), refLabel: isTf ? 'Ref Transfer' : 'Approval' };
+  wkCloseTransfer();
+  finishCheckout('bank_transfer', wkCurrent().total, extra);
+}
+
+/* ---------- Commit transaksi ---------- */
+function wkMakeTrx(items, method, tendered, date, opts) {
+  opts = opts || {};
+  const t = wkCalc(items, opts.discount || wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate);
+  const type = opts.orderType || orderType;
+  return {
+    orderNumber: 'TRX-' + (240500 + (++wkTrxSeq)),
+    dateStr: date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }),
+    timeStr: wkHM(date),
+    items: JSON.parse(JSON.stringify(items)),
+    subtotal: t.subtotal, discount: t.discount, tax: t.tax, total: t.total,
+    taxPct: Math.round(storeSettings.taxRate * 100),
+    orderType: type,
+    tableNumber: type === 'dine_in' ? (opts.table != null ? opts.table : wk$('table-number').value) : 'Takeaway',
+    customerName: opts.customer != null ? opts.customer : wk$('customer-name').value.trim(),
+    paymentMethod: method,
+    methodLabel: opts.label || (method === 'cash' ? 'TUNAI (CASH)' : method === 'qris' ? 'QRIS STANDAR' : 'TRANSFER BANK'),
+    ref: opts.ref || null, refLabel: opts.refLabel || (method === 'qris' ? 'Ref QRIS' : 'Ref'),
+    cashTendered: method === 'cash' ? tendered : t.total,
+    change: method === 'cash' ? Math.max(0, tendered - t.total) : 0,
+    cashierName: storeSettings.cashierName,
+    voided: false
+  };
+}
+
+function finishCheckout(method, tendered, extra) {
+  playRegisterBell();
+  const trx = wkMakeTrx(cart, method, tendered, new Date(), extra);
+  cart.forEach(c => { const p = wkProduct(c.id); if (p) p.stock = Math.max(0, p.stock - c.quantity); });
+  transactions.unshift(trx);
+  if (method === 'cash') {
+    drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'penjualan', amount: trx.total, note: 'Penjualan Tunai #' + trx.orderNumber, timestamp: trx.timeStr + ' WIB' });
+  }
+  updateDrawerStats();
+  wkUpdateBadges();
+  currentReceiptTrx = trx;
+  wkPendingFinish = true;
+  wkReceiptReprint = false;
+  populateReceiptModal(trx);
+  renderProducts();
+  wkToast('Pembayaran ' + trx.methodLabel + ' berhasil · ' + formatRupiah(trx.total), 'success');
+}
+
+/* ---------- Struk ---------- */
+function populateReceiptModal(trx) {
+  wk$('rc-store-name').innerText = storeSettings.storeName.toUpperCase();
+  wk$('rc-branch-name').innerText = storeSettings.branchName;
+  wk$('rc-address').innerText = storeSettings.address;
+  wk$('rc-phone').innerText = 'Telp: ' + storeSettings.phone;
+  wk$('rc-footer').innerText = storeSettings.footerMessage;
+
+  wk$('receipt-meta').innerHTML = `
+    <div class="flex justify-between"><span>No. Struk</span><span class="font-bold text-neutral-900">${trx.orderNumber}</span></div>
+    <div class="flex justify-between"><span>Waktu</span><span>${trx.dateStr} ${trx.timeStr}</span></div>
+    <div class="flex justify-between"><span>Kasir</span><span>${wkEsc(trx.cashierName)}</span></div>
+    <div class="flex justify-between"><span>Jenis</span><span class="font-bold">${trx.orderType === 'dine_in' ? 'DINE IN (' + wkEsc(trx.tableNumber) + ')' : 'TAKEAWAY (Bungkus)'}</span></div>
+    ${trx.customerName ? `<div class="flex justify-between"><span>Pelanggan</span><span>${wkEsc(trx.customerName)}</span></div>` : ''}
+    ${trx.voided ? '<div class="text-center font-extrabold" style="color:#e11d48;letter-spacing:.15em;padding-top:4px">*** VOID / DIBATALKAN ***</div>' : ''}
+    ${wkReceiptReprint && !trx.voided ? '<div class="text-center font-bold text-neutral-500" style="padding-top:4px">** SALINAN STRUK **</div>' : ''}`;
+
+  wk$('receipt-items').innerHTML = trx.items.map(it => `
+    <div class="flex flex-col">
+      <div class="font-semibold text-neutral-900">${wkEsc(it.name)}</div>
+      <div class="flex justify-between text-neutral-600"><span>${it.quantity} x ${formatRupiah(it.price)}</span><span class="font-semibold text-neutral-900">${formatRupiah(it.quantity * it.price)}</span></div>
+      ${it.notes ? `<div class="text-[9px] text-neutral-500 italic pl-1">* ${wkEsc(it.notes)}</div>` : ''}
+    </div>`).join('');
+
+  wk$('receipt-totals').innerHTML = `
+    <div class="flex justify-between"><span>Subtotal</span><span>${formatRupiah(trx.subtotal)}</span></div>
+    ${trx.discount > 0 ? `<div class="flex justify-between"><span>Diskon</span><span>-${formatRupiah(trx.discount)}</span></div>` : ''}
+    ${trx.tax > 0 ? `<div class="flex justify-between"><span>PB1 (${trx.taxPct}%)</span><span>${formatRupiah(trx.tax)}</span></div>` : ''}
+    <div class="flex justify-between font-bold text-xs pt-1 border-t border-neutral-300 text-neutral-900"><span>TOTAL</span><span>${formatRupiah(trx.total)}</span></div>`;
+
+  wk$('receipt-payment').innerHTML = `
+    <div class="flex justify-between"><span>Metode Bayar</span><span class="font-semibold uppercase">${wkEsc(trx.methodLabel)}</span></div>
+    ${trx.paymentMethod === 'cash' ? `
+      <div class="flex justify-between"><span>Diterima</span><span>${formatRupiah(trx.cashTendered)}</span></div>
+      <div class="flex justify-between font-semibold"><span>Kembalian</span><span>${formatRupiah(trx.change)}</span></div>` : ''}
+    ${trx.ref ? `<div class="flex justify-between"><span>${wkEsc(trx.refLabel)}</span><span>${wkEsc(trx.ref)}</span></div>` : ''}`;
+
+  wk$('receipt-title').textContent = wkReceiptReprint ? (trx.voided ? 'Struk (VOID)' : 'Salinan Struk') : 'Pembayaran Berhasil!';
+  wk$('receipt-done-text').textContent = wkReceiptReprint ? 'Tutup' : 'Selesai & Transaksi Baru';
+  const m = wk$('receipt-modal'); m.classList.remove('hidden'); m.classList.add('flex');
+}
+
+function closeReceiptModal() {
+  const m = wk$('receipt-modal'); m.classList.add('hidden'); m.classList.remove('flex');
+  wkReceiptReprint = false;
+  if (wkPendingFinish) {
+    wkPendingFinish = false;
+    wkResetOrder(); renderCart(); renderProducts();
+    wkToast('Siap untuk pesanan baru.', 'info');
+  }
+}
+function newOrder() { closeReceiptModal(); }
+
+function viewPastReceipt(orderNum) {
+  const trx = transactions.find(t => t.orderNumber === orderNum);
+  if (!trx) return;
+  currentReceiptTrx = trx;
+  wkReceiptReprint = true;
+  closeHistoryModal();
+  populateReceiptModal(trx);
+}
+
+/* ================================================================
+   RIWAYAT & VOID
+================================================================ */
+function renderHistoryList() {
+  const q = (wk$('hist-search-input').value || '').toLowerCase().trim();
+  const container = wk$('history-items-container');
+  const valid = transactions.filter(t => !t.voided);
+  const totalOmset = valid.reduce((s, t) => s + t.total, 0);
+  wk$('hist-total-omset').innerText = formatRupiah(totalOmset);
+  wk$('hist-total-trx').innerText = valid.length + ' Transaksi';
+  wk$('hist-avg-order').innerText = formatRupiah(valid.length ? Math.round(totalOmset / valid.length) : 0);
+
+  const filtered = transactions.filter(t => {
+    const matchQ = !q || t.orderNumber.toLowerCase().includes(q) || t.tableNumber.toLowerCase().includes(q) || (t.customerName && t.customerName.toLowerCase().includes(q));
+    return matchQ && (historyFilter === 'all' || t.paymentMethod === historyFilter);
+  });
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="wk-empty"><i class="fa-solid fa-receipt"></i>' + (transactions.length ? 'Tidak ada transaksi yang cocok.' : 'Belum ada riwayat transaksi.') + '</div>';
+    return;
+  }
+  const tagColor = { cash: 'green', qris: 'blue', bank_transfer: 'amber' };
+  container.innerHTML = filtered.map(trx => `
+    <div class="wk-card ${trx.voided ? 'void' : ''}">
+      <div class="main">
+        <div class="top"><span class="font-mono">${trx.orderNumber}</span>
+          <span class="wk-tag ${tagColor[trx.paymentMethod]}">${wkEsc(trx.methodLabel)}</span>
+          ${trx.voided ? '<span class="wk-tag red">VOID</span>' : ''}
+          <span style="font-weight:500;color:#737373">${trx.orderType === 'dine_in' ? wkEsc(trx.tableNumber) : 'Takeaway'}</span></div>
+        <div class="sub">${wkEsc(trx.items.map(i => i.quantity + 'x ' + i.name).join(', '))}</div>
+        <div class="meta">${trx.dateStr} · ${trx.timeStr} · ${trx.items.length} menu ${trx.customerName ? '· a/n ' + wkEsc(trx.customerName) : ''}</div>
+      </div>
+      <div class="side">
+        <div class="money" ${trx.voided ? 'style="text-decoration:line-through;color:#a3a3a3"' : ''}>${formatRupiah(trx.total)}</div>
+        <div class="acts">
+          <button type="button" class="wk-btn ghost xs" onclick="viewPastReceipt('${trx.orderNumber}')"><i class="fa-solid fa-print"></i>Struk</button>
+          ${!trx.voided && wkShift.open ? `<button type="button" class="wk-btn redsoft xs" onclick="wkVoid('${trx.orderNumber}')">Void</button>` : ''}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function wkVoid(no) {
+  const t = transactions.find(x => x.orderNumber === no);
+  if (!t || t.voided) return;
+  wkAsk('Void transaksi ' + no + '?', 'Stok menu dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari omset serta laporan shift' + (t.paymentMethod === 'cash' ? ' (uang dikembalikan dari laci).' : '.'), 'Ya, Void Transaksi', () => {
+    t.voided = true;
+    t.items.forEach(i => { const p = wkProduct(i.id); if (p) p.stock += i.quantity; });
+    if (t.paymentMethod === 'cash') drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'void', amount: t.total, note: 'Void #' + no + ' (uang dikembalikan)', timestamp: wkHM(new Date()) + ' WIB' });
+    renderHistoryList(); renderProducts(); updateDrawerStats(); wkUpdateBadges();
+    wkToast(no + ' di-void. Stok dikembalikan.', 'warn');
+  }, true);
+}
+
+/* ================================================================
+   LACI KASIR
+================================================================ */
+function updateDrawerStats() {
+  const cashSales = transactions.filter(t => !t.voided && t.paymentMethod === 'cash').reduce((s, t) => s + t.total, 0);
+  const masuk = drawerLogs.filter(l => l.type === 'kas_masuk').reduce((s, l) => s + l.amount, 0);
+  const keluar = drawerLogs.filter(l => l.type === 'kas_keluar').reduce((s, l) => s + l.amount, 0);
+  const net = masuk - keluar;
+  wk$('drawer-total-display').innerText = formatRupiah(initialCash + cashSales + net);
+  wk$('drawer-cash-sales-stat').innerText = '+' + formatRupiah(cashSales);
+  wk$('drawer-net-inout-stat').innerText = (net >= 0 ? '+' : '-') + formatRupiah(Math.abs(net));
+}
+
+function renderDrawerLogs() {
+  const c = wk$('drawer-logs-container');
+  if (drawerLogs.length === 0) { c.innerHTML = '<div class="wk-empty">Belum ada aktivitas mutasi kas.</div>'; return; }
+  const icon = { kas_masuk: 'fa-arrow-down text-emerald-600', kas_keluar: 'fa-arrow-up text-rose-600', void: 'fa-rotate-left text-rose-600' };
+  c.innerHTML = drawerLogs.map(l => {
+    const neg = l.type === 'kas_keluar' || l.type === 'void';
+    return `<div class="flex items-center justify-between p-2.5 rounded-xl border border-neutral-200 text-xs">
+      <div class="flex items-center gap-2"><i class="fa-solid ${icon[l.type] || 'fa-coins text-amber-600'}"></i>
+        <div><div class="font-semibold text-neutral-800">${wkEsc(l.note)}</div><div class="text-[10px] text-neutral-400 font-mono">${wkEsc(l.timestamp)}</div></div></div>
+      <span class="font-mono font-bold tabular-nums ${neg ? 'text-rose-600' : 'text-emerald-700'}">${neg ? '-' : '+'}${formatRupiah(l.amount)}</span>
+    </div>`;
+  }).join('');
+}
+
+function wkDrawerCash() {
+  const s = wkShiftStats();
+  return s.expectedCash;
+}
+
+function saveDrawerEntry() {
+  const amountInput = wk$('drawer-entry-amount'), noteInput = wk$('drawer-entry-note');
+  const amount = parseInt(amountInput.value, 10);
+  if (isNaN(amount) || amount <= 0) { wkToast('Masukkan jumlah yang valid.', 'warn'); return; }
+  if (currentDrawerEntryType === 'kas_keluar' && amount > wkDrawerCash()) { wkToast('Kas keluar melebihi saldo laci (' + formatRupiah(wkDrawerCash()) + ').', 'error'); return; }
+  drawerLogs.unshift({ id: 'dl-' + Date.now(), type: currentDrawerEntryType, amount,
+    note: noteInput.value.trim() || (currentDrawerEntryType === 'kas_masuk' ? 'Kas Masuk Tambahan' : 'Kas Keluar Operasional'),
+    timestamp: wkHM(new Date()) + ' WIB' });
+  amountInput.value = ''; noteInput.value = '';
+  toggleDrawerEntryForm(); updateDrawerStats(); renderDrawerLogs(); playRegisterBell();
+  wkToast('Mutasi kas tercatat.', 'success');
+}
+
+function kickPhysicalDrawer() {
+  wkShift.kicks++;
+  playRegisterBell();
+  const btn = wk$('btn-kick-drawer');
+  btn.innerHTML = '<i class="fa-solid fa-check text-emerald-600"></i><span>Laci Terbuka!</span>';
+  setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-lock-open text-amber-600"></i><span>Buka Laci Sekarang</span>'; }, 2000);
+}
+
+/* ================================================================
+   SHIFT
+================================================================ */
+function wkShiftStats() {
+  const s = { count: 0, voided: 0, subtotal: 0, discount: 0, tax: 0, cash: 0, qris: 0, bank_transfer: 0, items: 0 };
+  transactions.forEach(t => {
+    if (t.voided) { s.voided++; return; }
+    s.count++; s.subtotal += t.subtotal; s.discount += t.discount; s.tax += t.tax; s[t.paymentMethod] += t.total;
+    s.items += t.items.reduce((a, i) => a + i.quantity, 0);
+  });
+  s.sales = s.cash + s.qris + s.bank_transfer;
+  s.masuk = drawerLogs.filter(l => l.type === 'kas_masuk').reduce((a, l) => a + l.amount, 0);
+  s.keluar = drawerLogs.filter(l => l.type === 'kas_keluar').reduce((a, l) => a + l.amount, 0);
+  s.expectedCash = initialCash + s.cash + s.masuk - s.keluar;
+  return s;
+}
+
+function wkShiftRows(s) {
+  return '<div class="wk-rows">' +
+    '<div class="r"><span>Kasir</span><span>' + wkEsc(storeSettings.cashierName) + '</span></div>' +
+    '<div class="r"><span>Shift dibuka</span><span>' + wkEsc(wkShift.openedAt) + '</span></div>' +
+    (wkShift.closedAt ? '<div class="r"><span>Shift ditutup</span><span>' + wkEsc(wkShift.closedAt) + '</span></div>' : '') +
+    '<div class="r sec"><span>Penjualan</span><span></span></div>' +
+    '<div class="r"><span>Transaksi sah / void</span><span>' + s.count + ' / ' + s.voided + '</span></div>' +
+    '<div class="r"><span>Porsi terjual</span><span>' + s.items + '</span></div>' +
+    '<div class="r"><span>Penjualan kotor</span><span>' + formatRupiah(s.subtotal) + '</span></div>' +
+    '<div class="r"><span>Diskon</span><span>-' + formatRupiah(s.discount) + '</span></div>' +
+    '<div class="r"><span>Pajak PB1</span><span>' + formatRupiah(s.tax) + '</span></div>' +
+    '<div class="r sec"><span>Per Metode Bayar</span><span></span></div>' +
+    '<div class="r"><span>Tunai</span><span>' + formatRupiah(s.cash) + '</span></div>' +
+    '<div class="r"><span>QRIS</span><span>' + formatRupiah(s.qris) + '</span></div>' +
+    '<div class="r"><span>Debit / Transfer</span><span>' + formatRupiah(s.bank_transfer) + '</span></div>' +
+    '<div class="r strong"><span>Total Penjualan</span><span>' + formatRupiah(s.sales) + '</span></div>' +
+    '<div class="r sec"><span>Laci Kasir</span><span></span></div>' +
+    '<div class="r"><span>Kas awal</span><span>' + formatRupiah(initialCash) + '</span></div>' +
+    '<div class="r"><span>Kas masuk / keluar</span><span>+' + formatRupiah(s.masuk) + ' / -' + formatRupiah(s.keluar) + '</span></div>' +
+    '<div class="r"><span>Kas seharusnya</span><span>' + formatRupiah(s.expectedCash) + '</span></div>' +
+    '<div class="r"><span>Laci dibuka manual</span><span>' + wkShift.kicks + 'x</span></div>' +
+  '</div>';
+}
+
+function wkOpenShift() {
+  closeCashDrawerModal();
+  wkRenderShift();
+  wk$('shift-modal').classList.remove('hidden');
+}
+function wkCloseShift() { wk$('shift-modal').classList.add('hidden'); }
+
+function wkRenderShift() {
+  const s = wkShiftStats();
+  const body = wk$('sh-body'), foot = wk$('sh-foot');
+  if (wkShift.open) {
+    wk$('sh-title').textContent = 'Tutup Shift Kasir';
+    body.innerHTML = wkShiftRows(s) +
+      '<span class="wk-label" style="margin-top:14px">Uang Fisik di Laci (hasil hitung)</span>' +
+      '<input id="sh-counted" type="text" inputmode="numeric" class="wk-input num" placeholder="Rp 0" oninput="wkOnCount(this)">' +
+      '<div id="sh-diff" class="wk-diff"><span>Selisih</span><b>-</b></div>';
+    foot.innerHTML = '<button type="button" class="wk-btn ghost" onclick="wkCloseShift()">Batal</button>' +
+      '<button type="button" id="sh-close-btn" class="wk-btn red grow" disabled onclick="wkRequestCloseShift()"><i class="fa-solid fa-lock"></i><span>Tutup Shift & Cetak Laporan</span></button>';
+  } else {
+    wk$('sh-title').textContent = 'Laporan Shift #' + wkShift.number;
+    const diff = wkShift.counted - s.expectedCash;
+    body.innerHTML = '<div class="wk-closed"><div class="ic"><i class="fa-solid fa-lock"></i></div><h4>Shift Telah Ditutup</h4><p>Laporan di bawah sudah final.</p></div>' + wkShiftRows(s) +
+      '<div class="wk-rows" style="margin-top:10px"><div class="r"><span>Uang fisik dihitung</span><span>' + formatRupiah(wkShift.counted) + '</span></div></div>' +
+      '<div class="wk-diff ' + (diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus') + '"><span>' + (diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih') + '</span><b>' + (diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))) + '</b></div>';
+    foot.innerHTML = '<button type="button" class="wk-btn ghost" onclick="wkToast(\'Laporan shift dikirim ke printer.\', \'success\')"><i class="fa-solid fa-print"></i>Cetak</button>' +
+      '<button type="button" class="wk-btn green grow" onclick="wkStartNewShift()"><i class="fa-solid fa-play"></i><span>Mulai Shift Baru</span></button>';
+  }
+}
+
+function wkOnCount(inp) {
+  const num = Number(String(inp.value).replace(/\D/g, '')) || 0;
+  inp.value = num ? num.toLocaleString('id-ID') : '';
+  const d = wk$('sh-diff'), btn = wk$('sh-close-btn');
+  if (!num) { d.className = 'wk-diff'; d.innerHTML = '<span>Selisih</span><b>-</b>'; btn.disabled = true; return; }
+  const diff = num - wkShiftStats().expectedCash;
+  d.className = 'wk-diff ' + (diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus');
+  d.innerHTML = '<span>' + (diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih') + '</span><b>' + (diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))) + '</b>';
+  btn.disabled = false; btn.dataset.counted = num;
+}
+
+function wkRequestCloseShift() {
+  const counted = Number(wk$('sh-close-btn').dataset.counted) || 0;
+  if (!counted) return;
+  const doClose = () => {
+    wkShift.open = false; wkShift.closedAt = wkHM(new Date()) + ' WIB'; wkShift.counted = counted;
+    wkUpdateShiftUI(); wkRenderShift();
+    wkToast('Shift #' + wkShift.number + ' ditutup. Laporan siap dicetak.', 'success');
+  };
+  if (cart.length > 0 || wkHeld.length > 0) wkAsk('Masih ada pesanan belum selesai', 'Ada keranjang aktif atau pesanan tersimpan. Tetap tutup shift?', 'Ya, Tutup Shift', doClose, true);
+  else doClose();
+}
+
+function wkStartNewShift() {
+  wkShift = { open: true, number: wkShift.number + 1, openedAt: wkHM(new Date()) + ' WIB', closedAt: null, counted: null, kicks: 0 };
+  transactions = [];
+  drawerLogs = [{ id: 'dl-' + Date.now(), type: 'kas_awal', amount: initialCash, note: 'Modal Awal Kasir Shift #' + wkShift.number, timestamp: wkShift.openedAt }];
+  wkCloseShift(); wkUpdateShiftUI(); wkUpdateBadges(); updateDrawerStats();
+  wkToast('Shift #' + wkShift.number + ' dimulai dengan kas awal ' + formatRupiah(initialCash) + '.', 'success');
+}
+
+function wkUpdateShiftUI() {
+  const l = wk$('shift-status-label');
+  if (l) {
+    l.textContent = wkShift.open ? 'Shift Aktif' : 'Shift Ditutup';
+    l.className = wkShift.open ? 'text-emerald-700 font-semibold' : 'text-rose-600 font-semibold';
+  }
+  calculateTotals();
+}
+
+/* ================================================================
+   PENGATURAN, SEED, SHORTCUT
+================================================================ */
+function resetSettingsToDefault() {
+  wkAsk('Kembalikan pengaturan awal?', 'Nilai pada formulir akan diisi ulang ke pengaturan default. Tekan "Simpan Perubahan" untuk menerapkan.', 'Ya, Reset', () => {
+    wk$('set-store-name').value = 'WarungKU Rasa Nusantara';
+    wk$('set-branch-name').value = 'Cabang Utama (Pusat)';
+    wk$('set-cashier-name').value = 'Radit Pratama';
+    wk$('set-phone').value = '0823-1231-2734';
+    wk$('set-address').value = 'Jl. Boulevard Kuliner No. 88, Jakarta Selatan';
+    wk$('set-tax-enabled').checked = true;
+    wk$('set-tax-rate').value = 10;
+    wk$('set-footer-msg').value = 'Terima kasih atas kunjungan Anda!\nSemoga hari Anda menyenangkan.';
+    wk$('set-sound-enabled').checked = true;
+  });
+}
+
+function wkSeed() {
+  const defs = [
+    { min: 140, items: [['m1', 2], ['m5', 2]], method: 'cash', paid: 100000, table: 'Meja 02', cust: 'Pak Joko' },
+    { min: 112, items: [['m3', 1], ['m7', 1]], method: 'qris', table: 'Meja 06', cust: '', label: 'QRIS', ref: 'QR71920384' },
+    { min: 85, items: [['m11', 2]], method: 'cash', paid: 100000, type: 'takeaway', cust: 'Mbak Rina' },
+    { min: 51, items: [['m2', 1], ['m6', 1], ['m8', 1]], method: 'bank_transfer', table: 'Meja 03', cust: '', label: 'DEBIT BCA', ref: '482915', refLabel: 'Approval' },
+    { min: 22, items: [['m4', 1], ['m5', 1]], method: 'cash', paid: 50000, table: 'Meja 01', cust: '' }
+  ];
+  defs.forEach(d => {
+    const items = d.items.map(([id, q]) => { const p = wkProduct(id); return { id: p.id, name: p.name, price: p.price, quantity: q, notes: '' }; });
+    const when = new Date(Date.now() - d.min * 60000);
+    const trx = wkMakeTrx(items, d.method, d.paid || 0, when, { discount: { type: 'pct', value: 0 }, orderType: d.type || 'dine_in', table: d.table || '', customer: d.cust, label: d.label, ref: d.ref, refLabel: d.refLabel });
+    items.forEach(i => { const p = wkProduct(i.id); p.stock = Math.max(0, p.stock - i.quantity); });
+    transactions.unshift(trx);
+    if (d.method === 'cash') drawerLogs.unshift({ id: 'dl-s' + wkTrxSeq, type: 'penjualan', amount: trx.total, note: 'Penjualan Tunai #' + trx.orderNumber, timestamp: trx.timeStr + ' WIB' });
+  });
+  // satu pesanan tersimpan sebagai contoh
+  wkHeldSeq = 1;
+  wkHeld.push({ id: 'HLD-01', orderType: 'dine_in', table: 'Meja 05', customer: 'Keluarga Bu Sari', time: new Date(Date.now() - 9 * 60000),
+    cart: [{ id: 'm11', name: wkProduct('m11').name, price: wkProduct('m11').price, quantity: 3, notes: 'Sambal dipisah' }, { id: 'm5', name: wkProduct('m5').name, price: wkProduct('m5').price, quantity: 3, notes: '' }],
+    discount: { type: 'pct', value: 0 } });
+}
+
+window.addEventListener('keydown', e => {
+  const open = ['confirm-modal', 'discount-modal', 'transfer-modal', 'held-modal', 'shift-modal'].find(id => !wk$(id).classList.contains('hidden'));
+  if (e.key === 'Escape') {
+    if (open === 'confirm-modal') wkConfirmCancel();
+    else if (open === 'discount-modal') wkCloseDiscount();
+    else if (open === 'transfer-modal') wkCloseTransfer();
+    else if (open === 'held-modal') wkCloseHeld();
+    else if (open === 'shift-modal') wkCloseShift();
+    return;
+  }
+  if (e.key === 'F8') { e.preventDefault(); if (!open) wkHold(); }
+  if (e.key === 'F12') { e.preventDefault(); if (!open) handleProcessCheckout(); }
+});
+document.addEventListener('mousedown', e => {
+  const t = e.target;
+  if (t.id === 'held-modal') wkCloseHeld();
+  else if (t.id === 'discount-modal') wkCloseDiscount();
+  else if (t.id === 'transfer-modal') wkCloseTransfer();
+  else if (t.id === 'shift-modal') wkCloseShift();
+  else if (t.id === 'history-modal') closeHistoryModal();
+  else if (t.id === 'drawer-modal') closeCashDrawerModal();
+  else if (t.id === 'settings-modal') closeSettingsModal();
+  else if (t.id === 'note-modal') closeNoteModal();
+});
+wk$('search-input').addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const q = e.target.value.toLowerCase().trim();
+  if (!q) return;
+  const hit = PRODUCTS.find(p => p.sku.toLowerCase() === q) || PRODUCTS.filter(p => (activeCategory === 'semua' || p.category === activeCategory) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)))[0];
+  if (hit) { addToCart(hit.id); e.target.value = ''; renderProducts(); }
+  else wkToast('Menu "' + e.target.value + '" tidak ditemukan.', 'warn');
+});
+wk$('settings-modal').querySelector('form').addEventListener('submit', () => setTimeout(() => wkToast('Pengaturan disimpan.', 'success'), 0));
+
+/* ---------- Inisialisasi ulang ---------- */
+wkTables = [...document.querySelectorAll('#table-number option')].map(o => o.value);
+wkSeed();
+wkRenderTableOptions();
+wk$('table-number').value = wkFirstFreeTable();
+wkShift.openedAt = '08:00 WIB';
+renderCategories();
+renderProducts();
+renderCart();
+wkUpdateBadges();
+updateDrawerStats();
+wkUpdateShiftUI();
+
+</script>
+<nav id="wk-mobtab" aria-label="Navigasi kasir">
+  <button type="button" id="wk-tab-produk" class="on" onclick="wkTab('produk')"><i class="fa-solid fa-utensils"></i><span>Menu</span></button>
+  <button type="button" id="wk-tab-cart" onclick="wkTab('cart')"><i class="fa-solid fa-bag-shopping"></i><span>Pesanan</span><span class="wk-tb-n" id="wk-tb-n">0</span><span class="wk-tb-t" id="wk-tb-t">Rp 0</span></button>
+</nav>
+<script>
+function wkTab(t){
+  document.body.setAttribute('data-tab', t);
+  document.getElementById('wk-tab-produk').classList.toggle('on', t==='produk');
+  document.getElementById('wk-tab-cart').classList.toggle('on', t==='cart');
+}
+(function(){
+  var nEl=document.getElementById('wk-tb-n'), tEl=document.getElementById('wk-tb-t'), last=0;
+  function sync(){
+    var b=document.getElementById('cart-count-badge'), g=document.getElementById('bill-total');
+    if(b) nEl.textContent=(b.textContent.match(/\d+/)||['0'])[0];
+    if(g) tEl.textContent=g.textContent;
+  }
+  ['cart-count-badge','bill-total'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true});
+  });
+  sync();
+  // animasi singkat tab Pesanan saat item bertambah
+  var tb=document.getElementById('wk-tab-cart');
+  new MutationObserver(function(){
+    var n=parseInt(nEl.textContent,10)||0;
+    if(n>last && document.body.getAttribute('data-tab')==='produk'){ tb.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:350}); }
+    last=n;
+  }).observe(nEl,{childList:true,characterData:true,subtree:true});
+  // setelah struk transaksi baru ditutup, kembali ke Menu
+  var f=window.closeReceiptModal;
+  if(typeof f==='function'){
+    window.closeReceiptModal=function(){
+      var fin=(typeof wkPendingFinish!=='undefined')&&wkPendingFinish;
+      var r=f.apply(this,arguments);
+      if(fin && window.innerWidth<1024) wkTab('produk');
+      return r;
+    };
+  }
+  window.addEventListener('resize',function(){ if(window.innerWidth>=1024) document.body.setAttribute('data-tab','produk'); });
+})();
+</script>
 </body>
 </html>

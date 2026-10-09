@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -19,6 +19,17 @@ const SPA_ROUTES = ['/hasil-kerja', '/artikel'];
 // Artikel pakai slug dinamis (/artikel/xxx) — dicek lewat prefix, bukan
 // daftar tetap seperti SPA_ROUTES di atas.
 const SPA_ROUTE_PREFIXES = ['/artikel/'];
+
+// ZhaNotes: aplikasi statis terpisah di /zhanotes/ (satu index.html besar).
+// Alamat /zhanotes, /zhanotes/ dan /zhanotes/index.html dianggap halaman yang
+// sama: disimpan di satu kunci cache kanonik supaya offline tetap jalan
+// walau dibuka lewat alamat yang berbeda dari kunjungan pertama.
+const ZHANOTES_PREFIX = '/zhanotes';
+const ZHANOTES_CANONICAL = '/zhanotes/';
+const isZhaNotesPage = (pathname) =>
+    pathname === ZHANOTES_PREFIX ||
+    pathname === ZHANOTES_CANONICAL ||
+    pathname === ZHANOTES_CANONICAL + 'index.html';
 
 // File minimal yang wajib ada biar halaman tetap bisa dibuka waktu offline.
 // Sengaja tidak precache semua asset JS/CSS hasil build (nama file berubah
@@ -78,7 +89,11 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (!url.pathname.startsWith(DEMOS_PREFIX)) {
                         const clone = response.clone();
-                        caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                        const zhaClone = response.ok && isZhaNotesPage(url.pathname) ? response.clone() : null;
+                        caches.open(RUNTIME_CACHE).then((cache) => {
+                            cache.put(request, clone);
+                            if (zhaClone) cache.put(ZHANOTES_CANONICAL, zhaClone);
+                        });
                     }
                     return response;
                 })
@@ -87,6 +102,7 @@ self.addEventListener('fetch', (event) => {
                         .match(request)
                         .then((cached) => {
                             if (cached) return cached;
+                            if (isZhaNotesPage(url.pathname)) return caches.match(ZHANOTES_CANONICAL);
                             const path = url.pathname.replace(/\/+$/, '') || '/';
                             const isSpaRoute =
                                 SPA_ROUTES.includes(path) ||

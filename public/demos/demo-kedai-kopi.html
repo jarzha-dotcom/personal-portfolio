@@ -71,6 +71,21 @@
     ::-webkit-scrollbar-thumb { background: #C4B5A5; border-radius: 9999px; }
     html.dark ::-webkit-scrollbar-track { background: #1C140E; }
     html.dark ::-webkit-scrollbar-thumb { background: #473628; }
+
+    /* ===== Perbaikan mobile: elemen fixed tidak tertutup bar demo (46px) ===== */
+    #cartDrawer > div { padding-bottom: 46px; }
+    #itemModal { padding-bottom: 62px !important; }
+    #itemModal { align-items: flex-start !important; }
+    #itemModal > div { margin: auto; }
+    #itemModal > div > div:nth-child(2) { max-height: max(160px, calc(100dvh - 360px)) !important; }
+    div.fixed.bottom-5.right-5 { bottom: 62px !important; }
+    @media (max-width: 640px) {
+      /* target sentuh minimal ~36px untuk tombol qty & hapus di keranjang */
+      #cartBody button[onclick^="changeCartQty"] { width: 36px !important; height: 36px !important; font-size: 16px; }
+      #cartBody button[onclick^="removeCartItem"] { padding: 6px 10px; margin: -6px -8px 0 0; font-size: 14px; }
+      #cartFooter { padding: 16px; }
+      #cartDrawer input, #cartDrawer textarea, #itemModal input, #itemModal textarea, #itemModal select { font-size: 16px; }
+    }
   </style>
   
   <!-- @jz-tw-css -->
@@ -1212,6 +1227,10 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     }
 
     /* Cart Drawer Logic */
+    function escHtml(v) {
+      return String(v).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
     function updateCartBadge() {
       const badge = document.getElementById('cartBadge');
       const count = cart.reduce((sum, i) => sum + i.qty, 0);
@@ -1250,7 +1269,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
                 <p class="text-[11px] text-[#7A695C] dark:text-[#A8988B] mt-0.5">
                   ${ci.temp} · Gula ${ci.sugar} ${ci.item.allowsMilk ? '· ' + ci.milk : ''} ${ci.extraShot ? '· +Shot' : ''}
                 </p>
-                ${ci.notes ? `<p class="text-[10px] text-[#8A4B23] italic">"${ci.notes}"</p>` : ''}
+                ${ci.notes ? `<p class="text-[10px] text-[#8A4B23] italic">"${escHtml(ci.notes)}"</p>` : ''}
                 <div class="flex justify-between items-center mt-2 pt-1 border-t border-[#F2ECE1] dark:border-[#332217]">
                   <span class="font-bold tabular-nums">Rp ${itemTotal.toLocaleString('id-ID')}</span>
                   <div class="flex items-center gap-2">

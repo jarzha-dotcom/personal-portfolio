@@ -172,6 +172,35 @@
     .bx-tx .m { font: 600 11px 'JetBrains Mono', monospace; color: #e7e5e4; text-align: right; }
     .bx-tx .m small { display: block; font-family: 'Plus Jakarta Sans', sans-serif; }
 
+
+    #bx-mobtab { display: none; }
+    /* ===== MOBILE / TABLET (<1024px): satu kolom + tab bawah Menu | Pesanan ===== */
+    @media (max-width: 1023px) {
+      html body { height: 100dvh; padding-bottom: 102px !important; }
+      [id^="modal-"] { padding-bottom: 118px !important; }
+      [id^="modal-"] > div { max-height: calc(100dvh - 150px) !important; }
+      #modal-checkout > div { overflow-y: auto !important; flex-direction: column !important; }
+      #modal-checkout > div > div { overflow: visible !important; flex: none !important; width: 100% !important; }
+      .bx-toastbox { left: 10px; right: 10px !important; max-width: none !important; align-items: flex-end; }
+      header { padding-left: 10px !important; padding-right: 10px !important; }
+      header > div:last-child { gap: 4px !important; }
+      header button { padding: 8px 10px !important; min-height: 38px; }
+      header button span:not(#tables-count):not(#openbill-count), header span.uppercase, header p.text-xs { display: none !important; }
+      #bx-main > section, #bx-main > aside { display: none !important; width: 100% !important; border: 0 !important; flex: 1 1 auto; min-height: 0; }
+      body[data-tab="produk"] #bx-sec-produk,
+      body[data-tab="cart"] #bx-sec-cart { display: flex !important; }
+      #bx-sec-cart { overflow-y: auto; }
+      #bx-sec-cart #cart-list { flex: none !important; min-height: 150px; max-height: 36vh; }
+      html body input, html body textarea, html body select { font-size: 16px; }
+      #bx-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #1c1917; border-top: 1px solid #292524; padding: 6px 8px; gap: 8px; }
+      #bx-mobtab button { flex: 1; border: 0; border-radius: 12px; background: transparent; color: #a8a29e; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+      #bx-mobtab button.on { background: #d97706; color: #fff; }
+      #bx-mobtab .bx-tb-n { background: #d97706; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
+      #bx-mobtab button.on .bx-tb-n { background: #fff; color: #b45309; }
+      #bx-mobtab .bx-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+    }
+    @media (max-width: 520px) { header > div:first-child > div:first-child > div:last-child { display: none !important; } }
+
     @media print {
       body * { visibility: hidden; }
       #printable-receipt, #printable-receipt * { visibility: visible; }
@@ -188,7 +217,7 @@
     }
   </style>
 </head>
-<body class="bg-[#121110] text-[#E7E5E4] font-sans antialiased selection:bg-amber-600 selection:text-white h-screen w-screen overflow-hidden flex flex-col select-none">
+<body data-tab="produk" class="bg-[#121110] text-[#E7E5E4] font-sans antialiased selection:bg-amber-600 selection:text-white h-screen w-screen overflow-hidden flex flex-col select-none">
 <!-- @jz-bar-start -->
 <style>
 /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -283,9 +312,9 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
   </header>
 
   <!-- MAIN TWO-COLUMN LAYOUT -->
-  <div class="flex-1 flex overflow-hidden">
+  <div id="bx-main" class="flex-1 flex overflow-hidden">
     <!-- LEFT: CATALOG -->
-    <section class="flex-1 flex flex-col min-w-0 bg-[#161412] border-r border-[#26221F]">
+    <section id="bx-sec-produk" class="flex-1 flex flex-col min-w-0 bg-[#161412] border-r border-[#26221F]">
       <!-- Search & Filters -->
       <div class="p-4 border-b border-[#26221F] flex flex-wrap gap-3 items-center justify-between bg-[#191613]">
         <div class="relative flex-1 min-w-[240px] max-w-md">
@@ -330,7 +359,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     </section>
 
     <!-- RIGHT: CART & BILLING -->
-    <aside class="w-[380px] xl:w-[420px] bg-[#1A1714] flex flex-col shrink-0 border-l border-[#26221F] shadow-2xl z-20">
+    <aside id="bx-sec-cart" class="w-[380px] xl:w-[420px] bg-[#1A1714] flex flex-col shrink-0 border-l border-[#26221F] shadow-2xl z-20">
       <!-- Order Info Header -->
       <div class="p-4 border-b border-[#26221F] bg-[#1E1A16]">
         <div class="flex items-center justify-between mb-3">
@@ -1634,5 +1663,41 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     renderProducts();
     renderCart();
   </script>
+<nav id="bx-mobtab" aria-label="Navigasi kasir">
+  <button type="button" id="bx-tab-produk" class="on" onclick="bxTab('produk')"><i class="fa-solid fa-mug-hot"></i><span>Menu</span></button>
+  <button type="button" id="bx-tab-cart" onclick="bxTab('cart')"><i class="fa-solid fa-basket-shopping"></i><span>Pesanan</span><span class="bx-tb-n" id="bx-tb-n">0</span><span class="bx-tb-t" id="bx-tb-t">Rp 0</span></button>
+</nav>
+<script>
+function bxTab(t){
+  document.body.setAttribute('data-tab', t);
+  document.getElementById('bx-tab-produk').classList.toggle('on', t==='produk');
+  document.getElementById('bx-tab-cart').classList.toggle('on', t==='cart');
+}
+(function(){
+  var nEl=document.getElementById('bx-tb-n'), tEl=document.getElementById('bx-tb-t'), last=0;
+  function sync(){
+    var n=0; try{ n=cart.reduce(function(a,c){return a+c.qty;},0); }catch(e){}
+    nEl.textContent=n;
+    var g=document.getElementById('bill-total'); if(g) tEl.textContent=g.textContent.trim();
+  }
+  ['bill-total','cart-list'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true});
+  });
+  sync(); last=parseInt(nEl.textContent,10)||0;
+  var tb=document.getElementById('bx-tab-cart');
+  new MutationObserver(function(){
+    var n=parseInt(nEl.textContent,10)||0;
+    if(n>last && document.body.getAttribute('data-tab')==='produk'){ tb.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:350}); }
+    last=n;
+  }).observe(nEl,{childList:true,characterData:true,subtree:true});
+  // setelah transaksi selesai, kembali ke Menu
+  var f=window.finishOrder;
+  if(typeof f==='function'){
+    window.finishOrder=function(){ var r=f.apply(this,arguments); if(window.innerWidth<1024) bxTab('produk'); return r; };
+  }
+  window.addEventListener('resize',function(){ if(window.innerWidth>=1024) document.body.setAttribute('data-tab','produk'); });
+})();
+</script>
 </body>
 </html>

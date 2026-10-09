@@ -60,6 +60,7 @@ export function printConsoleGreeting(): void {
         '- B-Games (game papan multiplayer)  https://bgames.arzhaning.my.id',
         '- Rajendra Pintar (edukasi anak)    https://rapin.arzhaning.my.id',
         '- Assets DEMO (inventaris aset)     https://assets.arzhaning.my.id',
+        '- ZhaNotes (PKM & canvas workspace) https://arzhaning.my.id/zhanotes/',
         '',
         'Punya proyek, atau cuma mau ngobrol sesama pengoprek?',
         '',

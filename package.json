@@ -20,6 +20,7 @@
     "demo:thumbs": "npx tsx scripts/generate-demo-thumbs.ts",
     "demo:health": "npx tsx scripts/check-demo-health.ts",
     "demo:og": "npx tsx scripts/generate-demos-og.ts",
+    "zhanotes:og": "npx tsx scripts/generate-zhanotes-og.ts",
     "demo:css": "node scripts/compile-demo-css.mjs"
   },
   "dependencies": {

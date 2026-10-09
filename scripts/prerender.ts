@@ -720,7 +720,7 @@ const today = (): string => new Date().toISOString().slice(0, 10);
 const STATIC_SITEMAP_ENTRIES: SitemapEntry[] = [
   { loc: `${CANONICAL_BASE}/`, lastmod: today(), changefreq: 'weekly', priority: '1.0' },
   { loc: `${CANONICAL_BASE}${ROUTES.caseStudy}`, lastmod: today(), changefreq: 'monthly', priority: '0.8' },
-  { loc: `${CANONICAL_BASE}/zhanotes/`, lastmod: today(), changefreq: 'monthly', priority: '0.7' },
+  { loc: `${CANONICAL_BASE}/zhanotes/`, lastmod: today(), changefreq: 'weekly', priority: '0.8' },
   // Galeri contoh desain (halaman statis di public/demos). Halaman demo individualnya
   // sengaja TIDAK dimasukkan sitemap: isinya data contoh (dummy) dan berukuran besar.
   { loc: `${CANONICAL_BASE}${DEMOS_GALLERY_PATH}`, lastmod: today(), changefreq: 'monthly', priority: '0.5' },
@@ -779,6 +779,8 @@ const buildSitemap = (paginationInfo: { totalPages: number; pageUrl: (page: numb
 
   const outPath = join(DIST_DIR, 'sitemap.xml');
   writeFileSync(outPath, xml, 'utf-8');
+  const pubPath = join(ROOT_DIR, 'public', 'sitemap.xml');
+  writeFileSync(pubPath, xml, 'utf-8');
   return outPath;
 };
 
