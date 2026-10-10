@@ -2957,7 +2957,7 @@ const SKIP=['v','o','ox','oy','z'];
 const spay=n=>{const o={};for(const k of Object.keys(n))if(!SKIP.includes(k))o[k]=n[k];return o};
 async function csig(n){if(typeof byId==='function'&&byId(n.id)===n)sprep(n);const b=await crypto.subtle.digest('SHA-1',TE.encode(stab(spay(n))));let s='';new Uint8Array(b).forEach(x=>s+=String.fromCharCode(x));return btoa(s)}
 const b64=u=>{let s='';u.forEach(x=>s+=String.fromCharCode(x));return btoa(s)},unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function skey(pw,saltB64){const m=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:unb64(saltB64),iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+const SITER=600000,sit=c=>{const n=Number(c&&c.iter);return Number.isInteger(n)&&n>=250000&&n<=2000000?n:250000}; async function skey(pw,saltB64,iter){const m=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:unb64(saltB64),iterations:iter||250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
 async function senc(buf,key){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key||SY.key,buf)),o=new Uint8Array(15+ct.length);o.set([90,83,49]);o.set(iv,3);o.set(ct,15);return o}
 async function sdec(u,key){if(u.length<31||u[0]!==90||u[1]!==83||u[2]!==49)throw new Error('format data awan tidak dikenal');try{return await crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(3,15)},key||SY.key,u.slice(15))}catch(e){throw new Error('kata sandi enkripsi salah atau data rusak')}}
 async function sapi(action,o={}){const h={'x-zhanotes-token':o.t!==undefined?o.t:SY.t};let body;if(o.json){h['content-type']='application/json';body=JSON.stringify(o.json)}else if(o.body){h['content-type']='application/octet-stream';body=o.body}
@@ -3017,7 +3017,7 @@ async function spass(){if(!SY.on)return;if(SY.busy){SY.again=true;slog('D','puta
 try{let g=0;do{SY.again=false;await spass1()}while(SY.again&&++g<6);SY.last=now()}
 catch(e){SY.err=(e&&e.status===401)?'Token akses ditolak server':(e instanceof TypeError||(navigator.onLine===false))?'Menunggu koneksi internet':(e&&e.message)||String(e);slog(e instanceof TypeError||navigator.onLine===false?'W':'E','putaran','Putaran gagal: '+SY.err,{err:e,tertunda:SY.pend.length,saat:SY.ctx||undefined})}
 finally{SY.busy=false;await spersist();sbadge();slog('I','putaran','Selesai '+(SY.err?'dengan galat':'ok'),{ms:Math.round(performance.now()-t0),tertunda:SY.pend.length+SY.del.length,konflik:SY.conf.length})}}
-async function spass1(){const {docs}=await sapi('sync-index'),rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks','Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length});
+async function spass1(){const ir=await sapi('sync-index',{q:(SY.ix&&SY.sq!=null)?'&since='+SY.sq:''});let docs;if(ir.unchanged&&SY.ix)docs=SY.ix;else{docs=ir.docs;if(ir.seq!=null){SY.ix=docs;SY.sq=ir.seq}else{SY.ix=null;SY.sq=null}}const rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks',ir.unchanged?'Indeks cloud tidak berubah':'Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length,seq:ir.seq});
 if(!SY.seeded){if(rk.some(k=>!docs[k].deleted)){const sd=S.notes.filter(isSeed);slog('I','awal','Cloud sudah berisi catatan; membuang contoh bawaan lokal',{jumlah:sd.length});sd.forEach(sdropLocal)}SY.seeded=1}
 SY.conf=SY.conf.filter(c=>docs[c.k]&&docs[c.k].rev===c.rev);const have=new Set(SY.conf.map(c=>c.k));
 for(const k of rk){const d=docs[k],id=k.slice(2),r=SY.rev[k]||0;if(d.rev<=r||have.has(k))continue;SY.ctx={fase:'tarik',id,rev:d.rev};
@@ -3186,10 +3186,10 @@ modal(`<b>☁ Sinkron awan</b><p id=syst>${sstat()}</p>${msg?`<p>${esc(msg)}</p>
 async function syncEnable(){const t=(($('#syt')||{}).value||'').trim(),p=($('#syp')||{}).value||'',p2=($('#syp2')||{}).value||'';
 if(!t)return toast('Isi token akses dulu');if(p.length<8)return toast('Kata sandi enkripsi minimal 8 karakter');
 try{toast('Memeriksa…');let cfg=(await sapi('sync-config',{t})).config,key;
-if(cfg){key=await skey(p,cfg.salt);try{const ok=TD.decode(await sdec(unb64(cfg.check),key));if(ok!=='zhanotes-ok')throw 0}catch(e){slog('W','aktivasi','Kata sandi enkripsi salah');return toast('Kata sandi enkripsi salah')}}
-else{if(p!==p2)return toast('Kata sandi tidak sama dengan ulangannya');const salt=b64(crypto.getRandomValues(new Uint8Array(16)));key=await skey(p,salt);const check=b64(await senc(TE.encode('zhanotes-ok'),key));
-try{await sapi('sync-config',{t,method:'POST',json:{salt,check}});cfg={salt,check}}catch(e){if(e.status===409&&e.data&&e.data.config){cfg=e.data.config;key=await skey(p,cfg.salt);try{await sdec(unb64(cfg.check),key)}catch(x){return toast('Kata sandi enkripsi salah')}}else throw e}}
-SY.t=t;SY.key=key;SY.salt=cfg.salt;SY.on=true;SY.rev={};SY.sig={};SY.del=[];SY.delb=[];SY.bin={};SY.msig='';SY.seeded=0;SY.conf=[];SY.err='';SY.last=0;
+if(cfg){key=await skey(p,cfg.salt,sit(cfg));try{const ok=TD.decode(await sdec(unb64(cfg.check),key));if(ok!=='zhanotes-ok')throw 0}catch(e){slog('W','aktivasi','Kata sandi enkripsi salah');return toast('Kata sandi enkripsi salah')}}
+else{if(p!==p2)return toast('Kata sandi tidak sama dengan ulangannya');const salt=b64(crypto.getRandomValues(new Uint8Array(16)));key=await skey(p,salt,SITER);const check=b64(await senc(TE.encode('zhanotes-ok'),key));
+try{await sapi('sync-config',{t,method:'POST',json:{salt,check,iter:SITER}});cfg={salt,check,iter:SITER}}catch(e){if(e.status===409&&e.data&&e.data.config){cfg=e.data.config;key=await skey(p,cfg.salt,sit(cfg));try{await sdec(unb64(cfg.check),key)}catch(x){return toast('Kata sandi enkripsi salah')}}else throw e}}
+SY.t=t;SY.key=key;SY.salt=cfg.salt;SY.on=true;SY.ix=null;SY.sq=null;SY.rev={};SY.sig={};SY.del=[];SY.delb=[];SY.bin={};SY.msig='';SY.seeded=0;SY.conf=[];SY.err='';SY.last=0;
 SY.pend=S.notes.filter(n=>!isSeed(n)).map(n=>n.id);
 await idb('put','synckey',key);await spersist();slog('I','aktivasi','Sinkron diaktifkan',{pending:SY.pend.length});sbadge();spass();syncUI('✅ Sinkron diaktifkan. Catatan di perangkat ini mulai diunggah.')}
 catch(e){slog('E','aktivasi','Gagal mengaktifkan sinkron',{err:e});toast('Gagal: '+(e&&e.message||''))}}
