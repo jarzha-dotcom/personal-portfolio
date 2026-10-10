@@ -17,7 +17,8 @@
 // Jalankan manual: npm run prerender (setelah ada dist/index.html)
 // Otomatis: npm run build (lihat "postbuild" di package.json)
 
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -47,6 +48,12 @@ const INDEX_HTML_PATH = join(DIST_DIR, 'index.html');
 const DEMOS_SRC_DIR = join(ROOT_DIR, 'public', 'demos');
 const DEMOS_DIST_INDEX = join(DIST_DIR, 'demos', 'index.html');
 const DEMOS_GALLERY_PATH = '/demos/index.html';
+// ZhaNotes: aplikasi statis mandiri (satu file HTML) di public/zhanotes, di luar SPA
+// (rewrite catch-all di vercel.json sudah mengecualikan zhanotes/).
+const ZHANOTES_SRC_DIR = join(ROOT_DIR, 'public', 'zhanotes');
+const ZHANOTES_SRC_INDEX = join(ZHANOTES_SRC_DIR, 'index.html');
+const ZHANOTES_DIST_INDEX = join(DIST_DIR, 'zhanotes', 'index.html');
+const ZHANOTES_PATH = '/zhanotes/';
 
 // CANONICAL_BASE sekarang diimpor dari src/routes.ts (satu-satunya sumber),
 // bukan didefinisikan ulang di sini.
@@ -99,13 +106,13 @@ const breadcrumbJsonLd = (items: { name: string; url: string }[]) => ({
 // /artikel dan sitemap.xml, hanya tidak ikut di-link dari beranda.
 const HOME_ARTICLE_LIMIT = 20;
 
-const fillMarkedBlock = (html: string, name: string, content: string): string => {
+const fillMarkedBlock = (html: string, name: string, content: string, label = 'dist/index.html'): string => {
   const start = `<!-- PRERENDER:${name}:START -->`;
   const end = `<!-- PRERENDER:${name}:END -->`;
   const pattern = new RegExp(`${start}[\\s\\S]*?${end}`);
   if (!pattern.test(html)) {
     throw new Error(
-      `[prerender] Penanda ${start} ... ${end} tidak ditemukan di dist/index.html. ` +
+      `[prerender] Penanda ${start} ... ${end} tidak ditemukan di ${label}. ` +
       `Pastikan index.html sumber masih memuat kedua komentar penanda itu.`
     );
   }
@@ -717,10 +724,30 @@ interface SitemapEntry {
 
 const today = (): string => new Date().toISOString().slice(0, 10);
 
+// lastmod berdasarkan perubahan nyata file: coba tanggal commit git terakhir, lalu mtime file,
+// lalu hari ini. (Di CI mtime = waktu checkout, jadi git lebih akurat bila riwayat tersedia.)
+const fileLastmod = (absPath: string): string => {
+  try {
+    const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', absPath], {
+      cwd: ROOT_DIR,
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    }).trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(out)) return out;
+  } catch {
+    /* git tidak tersedia / bukan repo: lanjut ke mtime */
+  }
+  try {
+    return statSync(absPath).mtime.toISOString().slice(0, 10);
+  } catch {
+    return today();
+  }
+};
+
 const STATIC_SITEMAP_ENTRIES: SitemapEntry[] = [
   { loc: `${CANONICAL_BASE}/`, lastmod: today(), changefreq: 'weekly', priority: '1.0' },
   { loc: `${CANONICAL_BASE}${ROUTES.caseStudy}`, lastmod: today(), changefreq: 'monthly', priority: '0.8' },
-  { loc: `${CANONICAL_BASE}/zhanotes/`, lastmod: today(), changefreq: 'weekly', priority: '0.8' },
+  { loc: `${CANONICAL_BASE}${ZHANOTES_PATH}`, lastmod: fileLastmod(ZHANOTES_SRC_INDEX), changefreq: 'weekly', priority: '0.8' },
   // Galeri contoh desain (halaman statis di public/demos). Halaman demo individualnya
   // sengaja TIDAK dimasukkan sitemap: isinya data contoh (dummy) dan berukuran besar.
   { loc: `${CANONICAL_BASE}${DEMOS_GALLERY_PATH}`, lastmod: today(), changefreq: 'monthly', priority: '0.5' },
@@ -1002,6 +1029,136 @@ const fillDemosGallery = (hasPublishedArticles: boolean): string | null => {
 };
 
 // ---------------------------------------------------------------------------
+// ZhaNotes (public/zhanotes) — validasi aset + isi otomatis SEO.
+// Sumber tunggal teks SEO ada di sini (bukan di index.html), supaya tidak basi.
+// index.html sumber wajib memuat tiga penanda komentar:
+//   PRERENDER:ZHANOTES_HEAD     (di <head>)  -> canonical, og:*, twitter:*, JSON-LD
+//   PRERENDER:ZHANOTES_NOSCRIPT (di <body>)  -> isi statis untuk crawler/tanpa JS
+// plus <title> dan <meta name="description">. Idempoten: aman dijalankan berulang.
+// ---------------------------------------------------------------------------
+
+const ZHANOTES_META = {
+  name: 'ZhaNotes',
+  title: 'ZhaNotes — Catatan, Kanvas & Anotasi PDF Offline, Gratis Tanpa Iklan',
+  description:
+    'ZhaNotes: aplikasi catatan, kanvas, dan anotasi PDF yang gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Data tersimpan di perangkat Anda.',
+  features: [
+    'Editor teks kaya dengan checklist, tabel, kotak catatan, dan perintah cepat /',
+    'Kanvas bebas dengan pena peka tekanan, bentuk, kartu teks, dan konektor',
+    'Pembaca dan anotator PDF: stabilo teks, coretan, kartu catatan, ekspor PDF beranotasi',
+    'Riset dan kliping terstruktur: tautan, kutipan, tangkapan layar, catatan pribadi',
+    'Wiki backlinks [[ ]] dan peta grafis antar catatan',
+    'Perekam suara dengan penanda waktu',
+    'Ekspor ke Word, PDF, Markdown, HTML, PNG, dan SVG tanpa backend',
+    'Cadangan ZIP lengkap; sinkron awan terenkripsi tersedia pada edisi kustom',
+  ],
+};
+
+const checkZhanotesAssets = () => {
+  if (!existsSync(ZHANOTES_SRC_INDEX)) {
+    throw new Error(`[prerender] ${ZHANOTES_SRC_INDEX} tidak ditemukan — halaman /zhanotes/ akan 404.`);
+  }
+  const optional = ['manifest.webmanifest', 'og-image.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+  for (const f of optional) {
+    if (!existsSync(join(ZHANOTES_SRC_DIR, f))) {
+      console.warn(`[prerender] PERINGATAN: public/zhanotes/${f} tidak ada (dirujuk manifest/og:image/PWA).`);
+    }
+  }
+  try {
+    const vercel = JSON.parse(readFileSync(VERCEL_JSON_PATH, 'utf-8'));
+    const catchAll = (vercel.rewrites ?? []).find((r: { destination?: string }) => r.destination === '/index.html');
+    if (catchAll && !String(catchAll.source).includes('zhanotes/')) {
+      console.warn(
+        '[prerender] PERINGATAN: rewrite catch-all di vercel.json tidak mengecualikan zhanotes/ — /zhanotes/ bisa jatuh ke SPA.'
+      );
+    }
+  } catch {
+    /* vercel.json diperiksa fungsi lain; abaikan di sini */
+  }
+};
+
+const fillZhaNotesPage = (): string | null => {
+  if (!existsSync(ZHANOTES_DIST_INDEX)) {
+    console.warn('[prerender] dist/zhanotes/index.html tidak ditemukan — SEO ZhaNotes dilewati.');
+    return null;
+  }
+  let html = readFileSync(ZHANOTES_DIST_INDEX, 'utf-8');
+  const url = `${CANONICAL_BASE}${ZHANOTES_PATH}`;
+  const hasOg = existsSync(join(ZHANOTES_SRC_DIR, 'og-image.png'));
+  const image = `${CANONICAL_BASE}${ZHANOTES_PATH}og-image.png`;
+  const { title, description, features, name } = ZHANOTES_META;
+
+  const titlePattern = /<title>[\s\S]*?<\/title>/;
+  const descPattern = /<meta name="description" content="[^"]*">/;
+  if (!titlePattern.test(html) || !descPattern.test(html)) {
+    throw new Error('[prerender] <title> atau <meta name="description"> tidak ditemukan di public/zhanotes/index.html.');
+  }
+  html = html
+    .replace(titlePattern, () => `<title>${escapeHtml(title)}</title>`)
+    .replace(descPattern, () => `<meta name="description" content="${escapeHtml(description)}">`);
+
+  const og = (p: string, v: string) => `<meta property="${p}" content="${escapeHtml(v)}">`;
+  const tw = (n: string, v: string) => `<meta name="${n}" content="${escapeHtml(v)}">`;
+  const app = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name,
+    url,
+    description,
+    inLanguage: 'id',
+    applicationCategory: 'ProductivityApplication',
+    operatingSystem: 'Web (Chrome, Edge, Safari, Firefox)',
+    browserRequirements: 'Memerlukan JavaScript dan IndexedDB',
+    isAccessibleForFree: true,
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'IDR' },
+    featureList: features,
+    author: { '@type': 'Person', name: 'K. Arzhaning Jagad', url: `${CANONICAL_BASE}/` },
+    ...(hasOg ? { image } : {}),
+  };
+  const head = [
+    `<link rel="canonical" href="${url}">`,
+    og('og:type', 'website'),
+    og('og:site_name', name),
+    og('og:locale', 'id_ID'),
+    og('og:title', title),
+    og('og:description', description),
+    og('og:url', url),
+    ...(hasOg ? [og('og:image', image), tw('twitter:image', image)] : []),
+    tw('twitter:card', hasOg ? 'summary_large_image' : 'summary'),
+    tw('twitter:title', title),
+    tw('twitter:description', description),
+    jsonLdScript(app),
+    jsonLdScript(
+      breadcrumbJsonLd([
+        { name: 'Beranda', url: `${CANONICAL_BASE}/` },
+        { name, url },
+      ])
+    ),
+  ]
+    .map((l) => `\n  ${l}`)
+    .join('');
+  html = fillMarkedBlock(html, 'ZHANOTES_HEAD', head + '\n  ', 'public/zhanotes/index.html');
+
+  const waDigits = String(CONTACT_INFO.phone ?? '').replace(/[^0-9]/g, '');
+  const wa = waDigits ? ` &bull; <a href="https://wa.me/${waDigits}">WhatsApp</a>` : '';
+  const shell = `
+<noscript>
+  <div style="padding:24px;max-width:720px;margin:0 auto;font:16px/1.6 system-ui,sans-serif;grid-column:1/-1;overflow:auto">
+    <h1>${escapeHtml(name)}</h1>
+    <p>${escapeHtml(description)}</p>
+    <p><b>Aplikasi ini membutuhkan JavaScript.</b> Aktifkan JavaScript di peramban Anda untuk membuka ${escapeHtml(name)}.</p>
+    <ul>${features.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
+    <p>Dibuat oleh ${escapeHtml(SITE_SUFFIX)}. Edisi kustom (nama, logo, dan desain sendiri) tersedia: <a href="${CANONICAL_BASE}/">${CANONICAL_BASE.replace(/^https?:\/\//, '')}</a>${wa}</p>
+  </div>
+</noscript>
+`;
+  html = fillMarkedBlock(html, 'ZHANOTES_NOSCRIPT', shell, 'public/zhanotes/index.html');
+
+  writeFileSync(ZHANOTES_DIST_INDEX, html, 'utf-8');
+  return ZHANOTES_DIST_INDEX;
+};
+
+// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
@@ -1010,6 +1167,8 @@ const main = async () => {
 
   // Validasi galeri demo lebih dulu: kalau demos.json rusak, build gagal sebelum menulis apapun.
   checkDemosManifest();
+
+  checkZhanotesAssets();
 
   written.push(buildHasilKerjaPage());
 
@@ -1028,6 +1187,9 @@ const main = async () => {
 
   const demosGalleryPath = fillDemosGallery(published.length > 0);
   if (demosGalleryPath) written.push(demosGalleryPath);
+
+  const zhanotesPath = fillZhaNotesPage();
+  if (zhanotesPath) written.push(zhanotesPath);
 
   const sitemapPath = buildSitemap({ totalPages, pageUrl });
   written.push(sitemapPath);

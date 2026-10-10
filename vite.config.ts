@@ -134,6 +134,74 @@ function localTtsDevPlugin(): Plugin {
   };
 }
 
+// ── Dev middleware untuk /api/zhanotes-cloud (sinkron awan ZhaNotes) ─────────
+// Tanpa ini, `vite dev` menyajikan file api/zhanotes-cloud.ts sebagai JavaScript
+// (bukan menjalankan fungsinya), sehingga sinkron terbaca "belum aktif" di lokal.
+// Handler produksi dijalankan APA ADANYA, jadi perilaku dev = produksi. Env
+// (ZHANOTES_TOKEN, BLOB_READ_WRITE_TOKEN, Upstash/KV) dibaca dari .env / .env.local.
+// Beda dengan chat/tts: body bisa biner (potongan terenkripsi), jadi dibaca sebagai
+// Buffer lalu diberikan seperti Vercel (JSON -> objek, selain itu -> Buffer).
+function localZhaNotesCloudDevPlugin(): Plugin {
+  return {
+    name: 'local-zhanotes-cloud-dev-middleware',
+    apply: 'serve', // HANYA aktif saat dev server (vite dev), tidak dipanggil saat build
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (!/^\/api\/zhanotes-cloud(?:\?|$)/.test(req.url || '')) return next();
+
+        const chunks: Buffer[] = [];
+        req.on('data', (c: Buffer) => chunks.push(Buffer.from(c)));
+        req.on('end', async () => {
+          try {
+            const raw = Buffer.concat(chunks);
+            const url = new URL(req.url || '', 'http://localhost');
+            const ctype = String(req.headers['content-type'] || '');
+            let body: unknown = undefined;
+            if (raw.length) {
+              if (ctype.includes('application/json')) {
+                try {
+                  body = JSON.parse(raw.toString('utf8'));
+                } catch (_) {
+                  body = {};
+                }
+              } else {
+                body = raw;
+              }
+            }
+            (req as any).query = Object.fromEntries(url.searchParams);
+            (req as any).body = body;
+
+            // Adapt Node ServerResponse ke interface VercelResponse
+            const vercelRes = res as any;
+            vercelRes.status = function (statusCode: number) {
+              this.statusCode = statusCode;
+              return this;
+            };
+            vercelRes.json = function (data: any) {
+              this.setHeader('Content-Type', 'application/json');
+              this.end(JSON.stringify(data));
+              return this;
+            };
+            vercelRes.send = function (data: any) {
+              if (!this.getHeader('Content-Type')) this.setHeader('Content-Type', 'application/octet-stream');
+              this.end(Buffer.isBuffer(data) ? data : typeof data === 'string' ? data : JSON.stringify(data));
+              return this;
+            };
+
+            const { default: cloudHandler } = await server.ssrLoadModule('/api/zhanotes-cloud.ts');
+            await cloudHandler(req as any, vercelRes);
+          } catch (err: any) {
+            console.error('[Local Dev ZhaNotes Cloud API] Error:', err);
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'INTERNAL_SERVER_ERROR', detail: err?.message || 'Server error' }));
+          }
+        });
+      });
+    },
+  };
+}
+
 function localStaticRoutesPlugin(): Plugin {
   return {
     name: 'local-static-routes',
@@ -167,7 +235,7 @@ export default defineConfig(({ mode }) => {
   const buildId = `${Date.now()}`;
 
   return {
-    plugins: [react(), tailwindcss(), localChatDevPlugin(), localTtsDevPlugin(), localStaticRoutesPlugin()],
+    plugins: [react(), tailwindcss(), localChatDevPlugin(), localTtsDevPlugin(), localZhaNotesCloudDevPlugin(), localStaticRoutesPlugin()],
     define: {
       // Tersedia sebagai konstanta global di semua komponen React
       __CHAT_BUILD_ID__: JSON.stringify(buildId),

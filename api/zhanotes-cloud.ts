@@ -66,6 +66,15 @@ const redisUrl = () => process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST
 const redisToken = () => process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '';
 const isConfigured = () =>
     Boolean(process.env.ZHANOTES_TOKEN && process.env.BLOB_READ_WRITE_TOKEN && redisUrl() && redisToken());
+// Hanya NAMA variabel yang belum terisi (tidak pernah nilainya) — membantu diagnosis saat sinkron "belum aktif".
+const missingEnv = (): string[] => {
+    const m: string[] = [];
+    if (!process.env.ZHANOTES_TOKEN) m.push('ZHANOTES_TOKEN');
+    if (!process.env.BLOB_READ_WRITE_TOKEN) m.push('BLOB_READ_WRITE_TOKEN');
+    if (!redisUrl()) m.push('UPSTASH_REDIS_REST_URL (atau KV_REST_API_URL)');
+    if (!redisToken()) m.push('UPSTASH_REDIS_REST_TOKEN (atau KV_REST_API_TOKEN)');
+    return m;
+};
 
 async function redis(commands: (string | number)[][]): Promise<unknown[]> {
     const r = await fetch(`${redisUrl().replace(/\/+$/, '')}/pipeline`, {
@@ -162,7 +171,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }) as typeof res.status;
 
         if (req.method === 'GET' && action === 'status') {
-            return res.status(200).json({ configured: isConfigured(), maxMb: MAX_MB });
+            return res.status(200).json({ configured: isConfigured(), maxMb: MAX_MB, missing: isConfigured() ? [] : missingEnv() });
         }
 
         if (!isConfigured()) return res.status(503).json({ error: 'NOT_CONFIGURED', detail: 'Sinkron awan belum dikonfigurasi di server ini.' });

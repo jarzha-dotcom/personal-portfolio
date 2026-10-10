@@ -14,3 +14,6 @@ Tanpa variabel itu, tombol "Sinkron awan" menampilkan "belum aktif" dan aplikasi
 
 Aktivasi: Data → Sinkron awan → isi token + kata sandi enkripsi. Perangkat pertama membuat kata sandi enkripsi
 (isi dua kali); perangkat lain cukup memasukkan kata sandi yang sama. Kata sandi tidak disimpan di server.
+
+## Jika layar Sinkron awan bilang "belum aktif"
+Server sekarang menyebut nama variabel yang belum terisi (hanya nama, tidak pernah nilainya). Isi variabel itu di Vercel untuk lingkungan **Production**, lalu **deploy ulang**: variabel baru tidak terbaca oleh deployment yang sudah berjalan.

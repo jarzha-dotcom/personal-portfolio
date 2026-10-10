@@ -192,8 +192,8 @@
 
     /* ===== Fitur lanjutan: edit qty, tukar poin, stok, kas laci, cek harga, WhatsApp ===== */
     #toast-container { top: 64px !important; bottom: auto !important; }
-    .mx-qty { width: 38px; text-align: center; font: 700 12px 'JetBrains Mono', monospace; border: 0; background: transparent; color: #0f172a; outline: none; padding: 0; -moz-appearance: textfield; }
-    .mx-qty::-webkit-inner-spin-button, .mx-qty::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .mx-qty { width: 38px; text-align: center; font: 700 12px 'JetBrains Mono', monospace; border: 0; background: transparent; color: #0f172a; outline: none; padding: 0; -moz-appearance: textfield; appearance: textfield; }
+    .mx-qty::-webkit-inner-spin-button, .mx-qty::-webkit-outer-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
     .mx-qty:focus { background: #ecfdf5; border-radius: 4px; }
     .mx-redeem { padding: 7px 9px; border-radius: 10px; background: #fffbeb; border: 1px solid #fde68a; font-size: 11px; color: #92400e; }
     .mx-redeem label { display: flex; gap: 8px; align-items: center; cursor: pointer; line-height: 1.35; }
@@ -230,17 +230,31 @@
       .mx-modal { max-height: calc(100dvh - 170px); }
       [id$="-modal"] { padding-bottom: 118px !important; }
       #toast-container { top: 62px !important; bottom: auto !important; right: 10px !important; left: 10px; align-items: flex-end; }
-      /* header ringkas: hanya ikon */
-      header { padding-left: 10px !important; padding-right: 10px !important; gap: 6px; }
-      header button { padding: 8px 10px !important; min-height: 38px; }
+      /* kunci lebar halaman: tanpa ini Chrome Android memperkecil (zoom-out) tampilan bila ada elemen yang melebihi layar */
+      html, body { max-width: 100vw; overflow-x: hidden; }
+      /* header 2 baris: baris 1 = brand, baris 2 = semua tombol ikon berbagi lebar penuh (tidak pernah meluber) */
+      header { height: auto !important; flex-wrap: wrap !important; padding: 8px 10px !important; gap: 8px 6px; }
+      header > div:first-child { flex: 1 1 auto; min-width: 0; }
+      header > div:first-child h1 { font-size: 14px; white-space: nowrap; }
+      header > div:last-child { order: 3; flex: 1 1 100%; width: 100%; gap: 6px; }
+      header > div:last-child button { flex: 1 1 0; min-width: 0; justify-content: center; padding: 0 !important; min-height: 40px; position: relative; }
       header button span:not(.mx-hbtn-badge), header button kbd { display: none !important; }
       header > div:first-child p, header .font-extrabold + span { display: none !important; }
+      header .mx-hbtn-badge { position: absolute; top: -5px; right: -3px; min-width: 16px; height: 16px; font-size: 9px; }
+      /* bar status di bawah daftar produk: sembunyikan petunjuk keyboard */
+      #product-count-label { white-space: nowrap; }
+      #product-count-label + div { display: none !important; }
       /* satu kolom, ganti lewat tab */
       main > section { width: 100% !important; flex: 1 1 auto; min-height: 0; border: 0 !important; display: none !important; }
       body[data-tab="produk"] #mx-sec-produk,
       body[data-tab="cart"] #mx-sec-cart { display: flex !important; }
       #mx-sec-cart { overflow-y: auto; }
       #mx-sec-cart #cart-items-container { flex: none !important; min-height: 150px; max-height: 38vh; }
+      /* baris keranjang menumpuk: nama penuh (maks 2 baris) di atas, stepper + harga di bawah */
+      #cart-items-container > div { flex-wrap: wrap; row-gap: 6px; }
+      #cart-items-container > div > div:first-child { flex: 1 1 100%; }
+      #cart-items-container > div > div:last-child { flex: 1 1 100%; width: 100%; justify-content: space-between; }
+      #cart-items-container h4 { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
       #search-input, .mx-btn { font-size: 16px; }
       #mx-sec-cart .mx-payrow { position: sticky; bottom: 0; z-index: 5; background: #fff; margin: 4px -10px -10px; padding: 8px 10px 10px; border-top: 1px solid #e2e8f0; box-shadow: 0 -8px 16px rgba(15,23,42,.08); }
       /* tab bar bawah (di atas bar demo 46px) */
@@ -249,11 +263,23 @@
       #mx-mobtab button.on { background: #059669; color: #fff; }
       #mx-mobtab .mx-tb-n { background: #10b981; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
       #mx-mobtab button.on .mx-tb-n { background: #fff; color: #047857; }
-      #mx-mobtab .mx-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+      #mx-mobtab .mx-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; white-space: nowrap; }
+      #mx-mobtab button { gap: 5px !important; padding: 0 4px; white-space: nowrap; min-width: 0; }
+      @media (max-width: 380px) { #mx-mobtab .mx-tb-t { font-size: 10px; } }
     }
 
     @media (min-width: 640px) and (max-width: 1023px) {
       #mx-sec-cart .mx-payrow { margin: 4px -12px -12px; padding: 8px 12px 12px; }
+    }
+
+    /* header desktop: jangan sampai melebihi lebar layar (laptop kecil / tablet landscape) */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      header button span:not(.mx-hbtn-badge), header button kbd { display: none !important; }
+      header { padding-left: 12px !important; padding-right: 12px !important; }
+      header > div:last-child { gap: 6px; }
+    }
+    @media (min-width: 1280px) and (max-width: 1439px) {
+      header button kbd { display: none !important; }
     }
 
     @media print {

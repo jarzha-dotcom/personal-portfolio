@@ -301,36 +301,38 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'proj-zhanotes',
     title: 'ZhaNotes — Personal Knowledge Management & Canvas Workspace',
-    tagline: 'Aplikasi pencatatan visual offline-first: Rich Text, Freeform Canvas, PDF Annotator, Audio Memo & Ekspor Word/PDF.',
+    tagline: 'Catatan, kanvas & anotasi PDF yang gratis, offline, dan tanpa iklan pihak ketiga. Tersedia edisi kustom beli putus.',
     category: 'Web App',
     badge: 'Produktivitas & PKM',
-    description: 'Workspace catatan visual modern berbasis web yang berjalan 100% di browser tanpa backend (Zero Server Cost). Dilengkapi editor halaman, kanvas coretan bebas (pressure sensitivity), annotator PDF, perekam audio berpenanda waktu, wiki backlinks [[ ]], dan ekspor Word (.docx)/PDF murni client-side.',
-    longDescription: 'ZhaNotes lahir dari kebutuhan mencatat ide, riset, serta sketsa sistem yang terstruktur tanpa ketergantungan pada server pihak ketiga maupun biaya langganan bulanan. Mengusung arsitektur Local-First berbasis IndexedDB, seluruh data teks, coretan tangan, rekaman suara, dan file PDF tersimpan aman di perangkat lokal pengguna. Mendukung 4 jenis lembar kerja fleksibel: Halaman Rich-Text dengan bi-directional linking [[ ]] otomatis; Kanvas Bebas (Infinite Canvas) dengan deteksi tekanan pena stylus, pan-zoom, dan floating text boxes; Lembar Riset terstruktur untuk kurasi tautan web, kutipan, dan tangkapan layar; serta PDF Annotator terintegrasi ditenagai PDF.js dan PDF-Lib untuk membaca sekaligus mengekspor PDF beranotasi. Dilengkapi perekam audio dengan penanda momen penting (Markers), version history snapshot dengan perbandingan diff visual, pencarian fuzzy berbobot skor (Ctrl+K), quick capture (Alt+J), expiring notes, tema Gelap/Terang adaptif, serta ekspor format lengkap (Markdown, TXT, HTML, Word .docx via JSZip, PDF, JSON, PNG, SVG, dan backup ZIP utuh).',
+    description: 'Workspace catatan visual berbasis web yang berjalan 100% di browser tanpa backend (Zero Server Cost): gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Dilengkapi editor halaman, kanvas coretan bebas (pressure sensitivity), annotator PDF, perekam audio berpenanda waktu, wiki backlinks [[ ]], dan ekspor Word (.docx)/PDF murni client-side. Tersedia edisi kustom (nama, logo, dan desain sendiri) dengan opsi sinkron awan terenkripsi.',
+    longDescription: 'ZhaNotes lahir dari kebutuhan mencatat ide, riset, serta sketsa sistem yang terstruktur tanpa ketergantungan pada server pihak ketiga maupun biaya langganan bulanan. Mengusung arsitektur Local-First berbasis IndexedDB, seluruh data teks, coretan tangan, rekaman suara, dan file PDF tersimpan aman di perangkat lokal pengguna. Mendukung 4 jenis lembar kerja fleksibel: Halaman Rich-Text dengan bi-directional linking [[ ]] otomatis; Kanvas Bebas (Infinite Canvas) dengan deteksi tekanan pena stylus, pan-zoom, dan floating text boxes; Lembar Riset terstruktur untuk kurasi tautan web, kutipan, dan tangkapan layar; serta PDF Annotator terintegrasi ditenagai PDF.js dan PDF-Lib untuk membaca sekaligus mengekspor PDF beranotasi. Dilengkapi perekam audio dengan penanda momen penting (Markers), version history snapshot dengan perbandingan diff visual, pencarian fuzzy berbobot skor (Ctrl+K), quick capture (Alt+J), expiring notes, tema Gelap/Terang adaptif, serta ekspor format lengkap (Markdown, TXT, HTML, Word .docx via JSZip, PDF, JSON, PNG, SVG, dan backup ZIP utuh). Untuk bisnis yang membutuhkannya, tersedia edisi kustom beli putus (tanpa langganan) dengan branding pelanggan dan sinkron awan otomatis antar perangkat: isi catatan, PDF, dan rekaman dienkripsi AES-GCM di peramban sebelum diunggah, dengan penggabungan otomatis saat satu catatan diubah di dua perangkat, dan penyimpanan di akun Vercel milik pelanggan sendiri. Versi umum tetap gratis dan sepenuhnya lokal. Aplikasi membawa contoh bawaan: laporan audit PDF beranotasi, diagram kanvas alur rekonsiliasi bank, dan catatan riset arsitektur.',
     highlights: [
-      'Arsitektur Local-First & Zero Server Cost: Berjalan 100% offline via IndexedDB, privasi data aman di perangkat tanpa server atau biaya bulanan',
-      '4 Mode Catatan Fleksibel: Halaman Rich-Text, Kanvas Bebas (Stylus/Touch + Zoom 20%-600%), Riset Terstruktur, & PDF Reader/Annotator',
-      'Wiki Backlinks [[ ]] & Rename Otomatis: Hubungkan catatan dengan sintaks wiki, auto-suggest, pelacakan backlink, dan refactor judul otomatis',
+      'Gratis, Offline & Tanpa Iklan Pihak Ketiga: Berjalan 100% di browser via IndexedDB, tanpa akun, tanpa pelacak, tanpa langganan; privasi data aman di perangkat',
+      '4 Mode Catatan Fleksibel: Halaman Rich-Text, Kanvas Bebas (Stylus/Touch + Zoom 20%-600%), Riset Terstruktur, & PDF Reader/Annotator dengan stabilo teks',
+      'Wiki Backlinks [[ ]] & Rename Otomatis: Hubungkan catatan dengan sintaks wiki, auto-suggest, pelacakan backlink, peta grafis (Alt+G), dan refactor judul otomatis',
       'Perekam Audio Terintegrasi & Penanda Momen: Rekam suara via MediaRecorder langsung ke IndexedDB dengan tombol penanda momen penting (📍 Markers)',
-      'Mesin Ekspor Klien Terlengkap: Hasilkan Word (.docx) murni via JSZip, PDF beranotasi via PDF-Lib, Markdown, JSON, SVG, dan cadangan penuh .ZIP'
+      'Mesin Ekspor Klien Terlengkap: Hasilkan Word (.docx) murni via JSZip, PDF beranotasi via PDF-Lib, Markdown, JSON, SVG, dan cadangan penuh .ZIP',
+      'Edisi Kustom Beli Putus: Nama, logo, dan desain sesuai bisnis pelanggan, opsional dengan sinkron awan terenkripsi (E2EE, AES-GCM) di akun Vercel/penyimpanan milik pelanggan sendiri'
     ],
-    techStack: ['HTML5 Canvas', 'IndexedDB', 'PDF.js', 'PDF-Lib', 'JSZip', 'Web Audio API', 'MediaRecorder', 'Local-First PWA', 'Zero Server Cost'],
+    techStack: ['HTML5 Canvas', 'IndexedDB', 'PDF.js', 'PDF-Lib', 'JSZip', 'Web Audio API', 'MediaRecorder', 'Web Crypto (AES-GCM)', 'Local-First PWA', 'Zero Server Cost'],
     role: 'Solo Creator (Architecture, Canvas Engine, Client-side Export, UI/UX)',
     year: '2026',
-    demoUrl: '/zhanotes/index.html',
+    demoUrl: '/zhanotes/',
     isFeatured: true,
     colorScheme: 'emerald',
     iconType: 'Notebook',
     businessCase: {
       problem: 'Aplikasi pencatatan populer umumnya menuntut langganan berbayar, memerlukan koneksi internet untuk sinkronisasi, serta mengunci data pengguna (vendor lock-in) tanpa opsi ekspor dokumen mandiri yang fleksibel.',
-      solution: 'Workspace catatan visual all-in-one yang berjalan 100% di browser tanpa backend (Zero Server Cost), menyimpan data secara lokal di IndexedDB, dan menyediakan mesin ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown).',
-      impact: 'Privasi data pengguna terjamin 100%, akses kerja tanpa hambatan internet (full offline), nol biaya infrastruktur server, dan kebebasan mengunduh seluruh data kapan saja dalam format standar industri.'
+      solution: 'Workspace catatan visual all-in-one yang berjalan 100% di browser tanpa backend (Zero Server Cost), menyimpan data secara lokal di IndexedDB, dan menyediakan mesin ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown). Bagi bisnis yang butuh kerja lintas perangkat, tersedia edisi kustom dengan sinkron awan terenkripsi end-to-end di akun milik pelanggan sendiri, tanpa biaya langganan.',
+      impact: 'Privasi data pengguna terjamin, akses kerja tanpa hambatan internet (full offline), biaya infrastruktur server mendekati nol, dan kebebasan mengunduh seluruh data kapan saja dalam format standar industri. Edisi kustom memberi pelanggan kepemilikan penuh atas aplikasi dan datanya.'
     },
     architectureFlow: [
       'Pilih Lembar: Halaman, Kanvas, Riset, atau PDF',
       'Pencatatan & Anotasi (Stylus, Teks, Audio)',
       'Wiki Backlinks [[ ]] & Indexing Pencarian',
       'Penyimpanan Lokal IndexedDB (Auto-Save & Diff)',
-      'Ekspor Klien (Word, PDF, ZIP, Markdown)'
+      'Ekspor Klien (Word, PDF, ZIP, Markdown)',
+      'Opsional (edisi kustom): Sinkron Awan Terenkripsi AES-GCM + Gabung Otomatis Antar Perangkat'
     ]
   },
   {

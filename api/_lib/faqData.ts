@@ -188,8 +188,15 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'portfolio-zhanotes',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek ZhaNotes?',
-    keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator'],
-    answer: 'ZhaNotes adalah workspace pencatatan visual & PKM modern yang beroperasi 100% di browser tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan kartu teks bebas dipindah & diubah ukurannya, Riset Terstruktur, PDF Reader/Annotator), Wiki Backlinks [[ ]] otomatis, perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip serta cetak PDF. Coba langsung di: arzhaning.my.id/zhanotes/',
+    keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator', 'aplikasi catatan gratis', 'catatan offline', 'anotasi pdf'],
+    answer: 'ZhaNotes adalah aplikasi catatan, kanvas, dan anotasi PDF yang gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Berjalan 100% di browser (IndexedDB) tanpa server penyimpan data. Fitur: 4 mode (Halaman rich-text, Kanvas bebas dengan pena peka tekanan, Riset & Kliping, PDF Reader/Annotator dengan stabilo), Wiki Backlinks [[ ]] + peta grafis, perekam suara berpenanda waktu, ekspor Word/PDF/Markdown, dan cadangan ZIP. Ada contoh PDF beranotasi bawaan buat dicoba. Coba langsung di: arzhaning.my.id/zhanotes/',
+  },
+  {
+    id: 'portfolio-zhanotes-kustom',
+    categoryId: 'portfolio',
+    quickLabel: 'Bisa ZhaNotes dengan nama/logo bisnis saya?',
+    keywords: ['zhanotes kustom', 'zhanotes custom', 'edisi kustom', 'beli putus', 'aplikasi catatan sendiri', 'white label', 'sinkron antar perangkat', 'sinkron awan', 'catatan sinkron hp laptop', 'logo sendiri'],
+    answer: 'Bisa! Ada edisi kustom ZhaNotes dengan sistem beli putus (tanpa langganan): nama, logo, dan desain disesuaikan dengan bisnis Kakak. Opsional ada sinkron awan otomatis antar perangkat yang terenkripsi, disiapkan di akun Vercel dan penyimpanan milik Kakak sendiri. Versi umumnya tetap gratis dan offline. Estimasi biaya dan detail serah terima dibahas di konsultasi gratis lewat WhatsApp ya 😊',
   },
   // ── 📞 Kontak & Konsultasi ──
   {
