@@ -853,6 +853,24 @@ body.ro .ed-tb{opacity:.4;pointer-events:none}
 <nav id="bb"><button onclick="setF('home')"><svg class=ic viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=1.7 stroke-linecap=round stroke-linejoin=round aria-hidden=true><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><small>Beranda</small></button><button onclick="setF('all')"><svg class=ic viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=1.7 stroke-linecap=round stroke-linejoin=round aria-hidden=true><rect x="3" y="4" width="18" height="5" rx="1"/><rect x="3" y="12" width="18" height="8" rx="1"/></svg><small>Catatan</small></button><button class="fab" onclick="addMenu()" aria-label="Catatan baru"><svg class=ic viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=1.7 stroke-linecap=round stroke-linejoin=round aria-hidden=true><path d="M12 5v14M5 12h14"/></svg></button><button onclick="srch()"><svg class=ic viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=1.7 stroke-linecap=round stroke-linejoin=round aria-hidden=true><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><small>Cari</small></button><button onclick="document.body.classList.toggle('sdo')"><svg class=ic viewBox="0 0 24 24" fill=none stroke=currentColor stroke-width=1.7 stroke-linecap=round stroke-linejoin=round aria-hidden=true><path d="M4 7h16M4 12h16M4 17h16"/></svg><small>Menu</small></button></nav>
 <button id="tbt" onclick="tg('ht')" title="Tampilkan bilah alat (Alt+T)">⌄ Alat</button><div id="ov"><div id="md"></div></div><div id="ts"></div><div id="ac"></div>
 <script>
+(()=>{
+  if(window.__ZHANOTES_CONSOLE_GREETED__)return;
+  window.__ZHANOTES_CONSOLE_GREETED__=true;
+  const bar='background:#0f9488;padding:5px 182px;';
+  const title='display:inline-block;background:#0f9488;color:#fff;padding:7px 26px;font:700 14px monospace;';
+  const subtitle='display:inline-block;background:#0f766e;color:#fff;padding:6px 26px;font:12px monospace;';
+  const notice='color:#c2410c;font:13px/1.7 monospace;';
+  try{
+    console.log('%c ',bar);
+    console.log('%c© ZhaNotes — arzhaning.my.id',title);
+    console.log('%cHak Cipta Dilindungi. Unauthorized Use Prohibited.',subtitle);
+    console.log('%c ',bar);
+    console.log('%c⚠ ZhaNotes adalah karya milik K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual tanpa izin tertulis.',notice);
+    console.log('%cUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.',notice);
+  }catch{}
+})();
+</script>
+<script>
 /* ===== util ===== */
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],now=()=>Date.now();
 const uid=()=>Math.random().toString(36).slice(2,8)+now().toString(36).slice(-3);
