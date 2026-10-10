@@ -39,7 +39,7 @@ function fakeFetch(url: string | URL | Request, init?: RequestInit) {
             const [cmd, ...a] = c as [string, ...string[]];
             if (cmd === 'HGETALL') {
                 const f: string[] = [];
-                for (const [k, v] of hash) f.push(k, v);
+                for (const [k, v] of hash) if (k.startsWith(`${a[0]}\u0000`)) f.push(k.slice(a[0].length + 1), v);
                 return { result: f };
             }
             if (cmd === 'GET') return { result: strs.get(a[0]) ?? null };
@@ -49,8 +49,9 @@ function fakeFetch(url: string | URL | Request, init?: RequestInit) {
                 return { result: 'OK' };
             }
             if (cmd === 'DEL') {
-                if (String(a[0]).endsWith(':docs')) hash.clear();
-                else strs.delete(a[0]);
+                if (String(a[0]).endsWith(':docs')) {
+                    for (const k of [...hash.keys()]) if (k.startsWith(`${a[0]}\u0000`)) hash.delete(k);
+                } else strs.delete(a[0]);
                 return { result: 1 };
             }
             if (cmd === 'INCR') {
@@ -59,7 +60,8 @@ function fakeFetch(url: string | URL | Request, init?: RequestInit) {
             }
             if (cmd === 'EXPIRE') return { result: 1 };
             if (cmd === 'EVAL') {
-                const [, , , field, base, json] = a;
+                const [, , docsKey, field0, base, json] = a;
+                const field = `${docsKey}\u0000${field0}`;
                 const cur = hash.get(field);
                 const rev = cur ? JSON.parse(cur).rev : 0;
                 if (rev !== Number(base)) return { result: [0, cur ?? ''] };
@@ -134,6 +136,8 @@ beforeEach(() => {
 afterEach(() => {
     vi.unstubAllGlobals();
     Object.assign(process.env, ENV);
+    delete process.env.ZHANOTES_TOKEN_2;
+    delete process.env.ZHANOTES_TOKEN_3;
 });
 
 const chunk = async (id: string, data: Buffer) =>
@@ -289,6 +293,78 @@ describe('zhanotes-cloud', () => {
             delete process.env.ZHANOTES_BLOB_HOST;
             handler = prev;
         }
+    });
+
+    describe('banyak pemilik (ZHANOTES_TOKEN_2 ..)', () => {
+        const T2 = 'rahasia-kedua';
+        const push = async (token: string, id: string, key: string, data: string) => {
+            const c = await call('chunk', { method: 'POST', token, query: { id, i: '0' }, body: Buffer.from(data) });
+            const r = await call('sync-push', { method: 'POST', token, body: { key, baseRev: 0, uid: id, chunks: [c.payload.url], size: data.length } });
+            return { url: c.payload.url as string, status: r.status };
+        };
+
+        it('token kedua diterima, token yang tidak terdaftar ditolak', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            expect((await call('sync-index', { token: T2 })).status).toBe(200);
+            expect((await call('sync-index', { token: 'bukan-token', ip: '3.3.3.3' })).status).toBe(401);
+        });
+
+        it('slot yang kosong tidak bisa dimasuki dengan token kosong', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            expect((await call('sync-index', { token: '', ip: '4.4.4.4' })).status).toBe(401);
+        });
+
+        it('konfigurasi enkripsi tiap pemilik terpisah (kata sandi boleh beda)', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            expect((await call('sync-config', { method: 'POST', body: { salt: 's1', check: 'c1' } })).status).toBe(200);
+            expect((await call('sync-config', { token: T2 })).payload.config).toBeNull();
+            expect((await call('sync-config', { method: 'POST', token: T2, body: { salt: 's2', check: 'c2' } })).status).toBe(200);
+            expect((await call('sync-config')).payload.config).toEqual({ salt: 's1', check: 'c1' });
+            expect((await call('sync-config', { token: T2 })).payload.config).toEqual({ salt: 's2', check: 'c2' });
+        });
+
+        it('indeks dan Blob terpisah: pemilik 2 tidak melihat atau menyentuh data pemilik 1', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            const p1 = await push('rahasia-pemilik', 'pemilik1aa', 'n:satu', 'data-satu');
+            expect(p1.status).toBe(200);
+            expect(Object.keys((await call('sync-index', { token: T2 })).payload.docs)).toEqual([]);
+            // tidak bisa membaca lewat proxy, dan tidak bisa memakai URL potongan pemilik 1 untuk push sendiri
+            expect((await call('sync-read', { token: T2, query: { u: p1.url } })).status).toBe(400);
+            const bad = await call('sync-push', { method: 'POST', token: T2, body: { key: 'n:curi', baseRev: 0, uid: 'pemilik1aa', chunks: [p1.url], size: 9 } });
+            expect(bad.status).toBe(400);
+            // pemilik 1 tetap bisa membaca datanya
+            expect((await call('sync-read', { query: { u: p1.url } })).status).toBe(200);
+        });
+
+        it('potongan pemilik 2 disimpan di folder terpisah, kunci Redis berawalan sendiri', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            const p2 = await push(T2, 'pemilik2bb', 'n:dua', 'data-dua');
+            expect(new URL(p2.url).pathname.startsWith('/zhanotes-2/')).toBe(true);
+            expect(Object.keys((await call('sync-index')).payload.docs)).toEqual([]);
+            expect(Object.keys((await call('sync-index', { token: T2 })).payload.docs)).toEqual(['n:dua']);
+        });
+
+        it('reset oleh satu pemilik tidak menghapus data pemilik lain', async () => {
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            const p1 = await push('rahasia-pemilik', 'pemilik1aa', 'n:satu', 'data-satu');
+            const p2 = await push(T2, 'pemilik2bb', 'n:dua', 'data-dua');
+            await call('sync-config', { method: 'POST', body: { salt: 's1', check: 'c1' } });
+            expect((await call('sync-reset', { method: 'POST', token: T2 })).status).toBe(200);
+            expect(blobStore.has(p2.url)).toBe(false);
+            expect(blobStore.has(p1.url)).toBe(true);
+            expect(Object.keys((await call('sync-index')).payload.docs)).toEqual(['n:satu']);
+            expect((await call('sync-config')).payload.config).toEqual({ salt: 's1', check: 'c1' });
+            // dan sebaliknya
+            expect((await call('sync-reset', { method: 'POST' })).status).toBe(200);
+            expect(blobStore.has(p1.url)).toBe(false);
+        });
+
+        it('hanya token 2 terisi (tanpa token 1) tetap dianggap terkonfigurasi', async () => {
+            delete process.env.ZHANOTES_TOKEN;
+            process.env.ZHANOTES_TOKEN_2 = T2;
+            expect((await call('status')).payload.configured).toBe(true);
+            expect((await call('sync-index', { token: T2 })).status).toBe(200);
+        });
     });
 
     it('aksi tidak dikenal: GET → 405, POST → 400', async () => {

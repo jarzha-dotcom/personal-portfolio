@@ -1,6 +1,6 @@
 // api/zhanotes-cloud.ts
 //
-// Sinkron otomatis ZhaNotes antar perangkat (satu pemilik per deployment).
+// Sinkron otomatis ZhaNotes antar perangkat (satu pemilik per token; sampai 5 pemilik per deployment).
 //
 // Pembagian tugas:
 //   - Vercel Blob  : isi catatan / PDF / rekaman yang SUDAH TERENKRIPSI di peramban, dipotong
@@ -12,17 +12,22 @@
 //
 // Variabel lingkungan (Vercel -> Settings -> Environment Variables):
 //   ZHANOTES_TOKEN          wajib. Rahasia pemilik; dikirim klien lewat header x-zhanotes-token.
+//   ZHANOTES_TOKEN_2 .. _5  opsional. Pemilik tambahan. Tiap token punya ruang data SENDIRI (kunci Redis, folder Blob,
+//                           kata sandi enkripsi) yang terpisah total; token 1 memakai ruang lama (tanpa migrasi).
 //   BLOB_READ_WRITE_TOKEN   wajib. Dibuat otomatis saat Vercel Blob dihubungkan ke proyek.
 //   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN   wajib (atau KV_REST_API_URL / KV_REST_API_TOKEN
 //                           kalau Redis dipasang lewat integrasi Vercel Marketplace).
 //   ZHANOTES_MAX_MB         opsional, batas ukuran satu dokumen (default 200).
 //   ZHANOTES_PREFIX         opsional, awalan kunci Redis & folder Blob (default "zhanotes").
+//   ZHANOTES_DEBUG          opsional. "1" = menyalakan tombol Log & pencatatan log sinkron di aplikasi klien (dan
+//                           status menampilkan daftar variabel yang kurang). Tanpa ini semuanya mati. Perubahan
+//                           baru berlaku setelah deploy ulang.
 //   ZHANOTES_BLOB_HOST      opsional tapi disarankan. Hostname Blob store milikmu, mis.
 //                           "abc123.public.blob.vercel-storage.com" (lihat URL salah satu blob di dashboard).
 //                           Bila diisi, proxy sync-read HANYA mau mengambil dari host itu.
 //
 // Endpoint (semua lewat /api/zhanotes-cloud?action=...):
-//   GET  status                 (tanpa token) -> { configured, maxMb }
+//   GET  status                 (tanpa token) -> { configured, maxMb, debug, missing }  (missing hanya terisi saat debug)
 //   GET  sync-config            -> { config: { salt, check } | null }
 //   POST sync-config            body { salt, check }  -> { ok }  (hanya bila belum ada; 409 bila sudah ada)
 //   GET  sync-index             -> { docs: { [kunci]: { rev, chunks[], size, deleted, updatedAt } } }
@@ -39,8 +44,30 @@ import { del, list, put } from '@vercel/blob';
 export const maxDuration = 30;
 
 const PREFIX = (process.env.ZHANOTES_PREFIX || 'zhanotes').replace(/[^a-z0-9_-]/gi, '') || 'zhanotes';
-const DOCS = `${PREFIX}:sync:docs`;
-const CFG = `${PREFIX}:sync:config`;
+const MAX_USERS = 5;
+// Ruang data per pemilik. Pemilik 1 memakai awalan lama (data yang sudah ada tetap terbaca); pemilik n>1 memakai
+// `${PREFIX}-n`. Folder Blob `zhanotes-2/` tidak berawalan `zhanotes/`, jadi pemeriksaan URL & sapu yatim tidak bocor antar pemilik.
+interface Space {
+    n: number;
+    prefix: string;
+    docs: string;
+    cfg: string;
+}
+const spaceFor = (n: number): Space => {
+    const prefix = n === 1 ? PREFIX : `${PREFIX}-${n}`;
+    return { n, prefix, docs: `${prefix}:sync:docs`, cfg: `${prefix}:sync:config` };
+};
+const tokenEnv = (n: number) => (n === 1 ? 'ZHANOTES_TOKEN' : `ZHANOTES_TOKEN_${n}`);
+// [nomor pemilik, token] untuk semua slot yang terisi.
+const tokens = (): [number, string][] => {
+    const out: [number, string][] = [];
+    for (let n = 1; n <= MAX_USERS; n++) {
+        const t = String(process.env[tokenEnv(n)] || '');
+        if (t) out.push([n, t]);
+    }
+    return out;
+};
+const DEBUG = () => process.env.ZHANOTES_DEBUG === '1';
 const MAX_MB = Math.min(1000, Math.max(5, Number(process.env.ZHANOTES_MAX_MB) || 200));
 const MAX_CHUNK_BYTES = 4 * 1024 * 1024;
 const BLOB_HOST = (process.env.ZHANOTES_BLOB_HOST || '').trim().toLowerCase();
@@ -75,16 +102,17 @@ let weakWarned = false;
 const warnWeakToken = () => {
     if (weakWarned) return;
     weakWarned = true;
-    if (String(process.env.ZHANOTES_TOKEN || '').length < 32) {
-        console.warn('[zhanotes-cloud] ZHANOTES_TOKEN kurang dari 32 karakter. Ganti dengan string acak panjang (mis. `openssl rand -base64 32`).');
+    for (const [n, t] of tokens()) {
+        if (t.length < 32) console.warn(`[zhanotes-cloud] ${tokenEnv(n)} kurang dari 32 karakter. Ganti dengan string acak panjang (mis. \`openssl rand -base64 32\`).`);
     }
+    const all = tokens().map(([, t]) => t);
+    if (new Set(all).size !== all.length) console.warn('[zhanotes-cloud] Ada token yang sama di dua slot; slot bernomor lebih kecil yang dipakai. Buat token berbeda untuk tiap pemilik.');
 };
-const isConfigured = () =>
-    Boolean(process.env.ZHANOTES_TOKEN && process.env.BLOB_READ_WRITE_TOKEN && redisUrl() && redisToken());
+const isConfigured = () => Boolean(tokens().length && process.env.BLOB_READ_WRITE_TOKEN && redisUrl() && redisToken());
 // Hanya NAMA variabel yang belum terisi (tidak pernah nilainya) — membantu diagnosis saat sinkron "belum aktif".
 const missingEnv = (): string[] => {
     const m: string[] = [];
-    if (!process.env.ZHANOTES_TOKEN) m.push('ZHANOTES_TOKEN');
+    if (!tokens().length) m.push('ZHANOTES_TOKEN');
     if (!process.env.BLOB_READ_WRITE_TOKEN) m.push('BLOB_READ_WRITE_TOKEN');
     if (!redisUrl()) m.push('UPSTASH_REDIS_REST_URL (atau KV_REST_API_URL)');
     if (!redisToken()) m.push('UPSTASH_REDIS_REST_TOKEN (atau KV_REST_API_TOKEN)');
@@ -114,8 +142,8 @@ const parseDoc = (raw: unknown): Doc | null => {
     }
 };
 
-async function readDocs(): Promise<Record<string, Doc>> {
-    const [flat] = (await redis([['HGETALL', DOCS]])) as [unknown];
+async function readDocs(sp: Space): Promise<Record<string, Doc>> {
+    const [flat] = (await redis([['HGETALL', sp.docs]])) as [unknown];
     const out: Record<string, Doc> = {};
     if (Array.isArray(flat)) {
         for (let i = 0; i + 1 < flat.length; i += 2) {
@@ -131,21 +159,21 @@ async function readDocs(): Promise<Record<string, Doc>> {
     return out;
 }
 
-const blobUrlOk = (u: unknown): u is string => {
+const blobUrlOk = (u: unknown, sp: Space): u is string => {
     if (typeof u !== 'string') return false;
     try {
         const p = new URL(u);
         if (p.protocol !== 'https:' || p.username || p.password || p.port) return false;
         const hostOk = BLOB_HOST ? p.hostname === BLOB_HOST : p.hostname.endsWith('.blob.vercel-storage.com');
-        return hostOk && p.pathname.startsWith(`/${PREFIX}/`);
+        return hostOk && p.pathname.startsWith(`/${sp.prefix}/`);
     } catch {
         return false;
     }
 };
 
 // Hanya URL Blob milik unggahan ini yang boleh disimpan/dihapus.
-const isOwnChunkUrl = (u: unknown, id: string): u is string =>
-    blobUrlOk(u) && new URL(u as string).pathname.startsWith(`/${PREFIX}/${id}/`);
+const isOwnChunkUrl = (u: unknown, id: string, sp: Space): u is string =>
+    blobUrlOk(u, sp) && new URL(u as string).pathname.startsWith(`/${sp.prefix}/${id}/`);
 
 async function readBody(req: VercelRequest): Promise<Buffer> {
     if (Buffer.isBuffer(req.body)) return req.body;
@@ -204,7 +232,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }) as typeof res.status;
 
         if (req.method === 'GET' && action === 'status') {
-            return res.status(200).json({ configured: isConfigured(), maxMb: MAX_MB, missing: isConfigured() ? [] : missingEnv() });
+            // Endpoint ini publik: daftar variabel yang kurang (nama env) hanya ditampilkan saat mode debug menyala.
+            return res.status(200).json({ configured: isConfigured(), maxMb: MAX_MB, debug: DEBUG(), missing: DEBUG() && !isConfigured() ? missingEnv() : [] });
         }
 
         warnWeakToken();
@@ -222,8 +251,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         const given = String(req.headers['x-zhanotes-token'] || '');
         const a = createHash('sha256').update(given).digest();
-        const b = createHash('sha256').update(String(process.env.ZHANOTES_TOKEN)).digest();
-        if (!given || !timingSafeEqual(a, b)) {
+        // Bandingkan ke SEMUA slot (tanpa berhenti di yang cocok) supaya waktu respons tidak membocorkan slot mana.
+        let slot = 0;
+        for (const [n, t] of tokens()) {
+            if (timingSafeEqual(a, createHash('sha256').update(t).digest()) && !slot) slot = n;
+        }
+        if (!given || !slot) {
             fails.push(now);
             failures.set(ip, fails);
             const shared = await redisFailCount(ip);
@@ -235,10 +268,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
         failures.delete(ip);
         authed = true;
+        const sp = spaceFor(slot);
 
         // ── GET sync-config ────────────────────────────────────────────────────
         if (req.method === 'GET' && action === 'sync-config') {
-            const [raw] = await redis([['GET', CFG]]);
+            const [raw] = await redis([['GET', sp.cfg]]);
             let config: unknown = null;
             try {
                 config = raw ? JSON.parse(String(raw)) : null;
@@ -250,13 +284,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // ── GET sync-index ─────────────────────────────────────────────────────
         if (req.method === 'GET' && action === 'sync-index') {
-            return res.status(200).json({ docs: await readDocs() });
+            return res.status(200).json({ docs: await readDocs(sp) });
         }
 
         // ── GET sync-read : proxy potongan (cadangan bila CORS langsung gagal) ─
         if (req.method === 'GET' && action === 'sync-read') {
             const u = String(req.query?.u || '');
-            if (!blobUrlOk(u)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            if (!blobUrlOk(u, sp)) return res.status(400).json({ error: 'BAD_REQUEST' });
             const r = await fetch(u, { redirect: 'error' });
             if (!r.ok) return res.status(404).json({ error: 'NOT_FOUND' });
             if (Number(r.headers.get('content-length') || 0) > MAX_CHUNK_BYTES) return res.status(413).json({ error: 'TOO_LARGE' });
@@ -280,7 +314,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 return res.status(413).json({ error: 'TOO_LARGE', detail: 'Potongan terlalu besar.' });
             }
             if (data.length === 0 || data.length > MAX_CHUNK_BYTES) return res.status(413).json({ error: 'TOO_LARGE', detail: 'Ukuran potongan tidak valid.' });
-            const blob = await put(`${PREFIX}/${id}/${String(i).padStart(4, '0')}.bin`, data, {
+            const blob = await put(`${sp.prefix}/${id}/${String(i).padStart(4, '0')}.bin`, data, {
                 access: 'public',
                 contentType: 'application/octet-stream',
                 addRandomSuffix: true, // URL tidak bisa ditebak; isinya pun sudah terenkripsi
@@ -295,9 +329,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const salt = String(body.salt || '');
             const check = String(body.check || '');
             if (!salt || !check || salt.length > 200 || check.length > 400) return res.status(400).json({ error: 'BAD_REQUEST' });
-            const [set] = await redis([['SET', CFG, JSON.stringify({ salt, check }), 'NX']]);
+            const [set] = await redis([['SET', sp.cfg, JSON.stringify({ salt, check }), 'NX']]);
             if (set !== 'OK') {
-                const [raw] = await redis([['GET', CFG]]);
+                const [raw] = await redis([['GET', sp.cfg]]);
                 return res.status(409).json({ error: 'CONFIG_EXISTS', config: raw ? JSON.parse(String(raw)) : null });
             }
             return res.status(200).json({ ok: true });
@@ -313,13 +347,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const size = Number(body.size) || 0;
             if (!KEY_RE.test(key) || !Number.isInteger(baseRev) || baseRev < 0) return res.status(400).json({ error: 'BAD_REQUEST' });
             if (!deleted) {
-                if (!ID_RE.test(uid) || chunks.length === 0 || chunks.length > MAX_CHUNKS || new Set(chunks).size !== chunks.length || !chunks.every((u) => isOwnChunkUrl(u, uid))) {
+                if (!ID_RE.test(uid) || chunks.length === 0 || chunks.length > MAX_CHUNKS || new Set(chunks).size !== chunks.length || !chunks.every((u) => isOwnChunkUrl(u, uid, sp))) {
                     return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Data push tidak valid.' });
                 }
                 if (size <= 0 || size > MAX_MB * 1024 * 1024) return res.status(413).json({ error: 'TOO_LARGE', detail: `Dokumen melebihi batas ${MAX_MB} MB.` });
             }
             const doc: Doc = { rev: baseRev + 1, chunks: deleted ? [] : (chunks as string[]), size: deleted ? 0 : size, deleted, updatedAt: Date.now() };
-            const [r] = (await redis([['EVAL', CAS_LUA, 1, DOCS, key, baseRev, JSON.stringify(doc)]])) as [unknown[]];
+            const [r] = (await redis([['EVAL', CAS_LUA, 1, sp.docs, key, baseRev, JSON.stringify(doc)]])) as [unknown[]];
             const ok = Number(r?.[0]) === 1;
             const prev = parseDoc(r?.[1]);
             if (!ok) {
@@ -334,14 +368,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // ── POST abort : bersihkan potongan dari unggahan yang gagal ───────────
         if (action === 'abort') {
             const id = String(body.id || '');
-            const chunks = Array.isArray(body.chunks) ? body.chunks.filter((u) => isOwnChunkUrl(u, id)) : [];
+            const chunks = Array.isArray(body.chunks) ? body.chunks.filter((u) => isOwnChunkUrl(u, id, sp)) : [];
             if (ID_RE.test(id) && chunks.length) await del(chunks as string[]).catch(() => undefined);
             return res.status(200).json({ ok: true });
         }
 
         // ── POST sync-reset : hapus semua data sinkron & konfigurasi enkripsi ──
         if (action === 'sync-reset') {
-            const docs = await readDocs();
+            const docs = await readDocs(sp);
             const urls = Object.values(docs).flatMap((d) => d.chunks);
             for (let i = 0; i < urls.length; i += 100) await del(urls.slice(i, i + 100)).catch(() => undefined);
             // Sapu juga blob yatim (unggahan yang terputus sebelum push) di folder khusus ZhaNotes.
@@ -349,7 +383,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             try {
                 let cursor: string | undefined;
                 for (let guard = 0; guard < 50; guard++) {
-                    const page = await list({ prefix: `${PREFIX}/`, cursor, limit: 500 });
+                    const page = await list({ prefix: `${sp.prefix}/`, cursor, limit: 500 });
                     const found = page.blobs.map((b) => b.url);
                     if (found.length) {
                         await del(found).catch(() => undefined);
@@ -361,7 +395,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             } catch (e) {
                 console.warn('[zhanotes-cloud] sapu blob yatim gagal');
             }
-            await redis([['DEL', DOCS], ['DEL', CFG]]);
+            await redis([['DEL', sp.docs], ['DEL', sp.cfg]]);
             return res.status(200).json({ ok: true, removed: Object.keys(docs).length, orphans });
         }
 

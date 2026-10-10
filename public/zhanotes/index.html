@@ -2,20 +2,19 @@
 <meta name="description" content="ZhaNotes: aplikasi catatan, kanvas, dan anotasi PDF yang gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Data tersimpan di perangkat Anda.">
 <meta name="theme-color" content="#faf9f7">
 <!-- PRERENDER:ZHANOTES_HEAD:START --><!-- PRERENDER:ZHANOTES_HEAD:END -->
-<link rel="icon" href="/favicon.ico">
 <link rel="manifest" href="/zhanotes/manifest.webmanifest">
-<link rel="icon" type="image/png" sizes="96x96" href="/zhanotes/icons/favicon-96x96.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/zhanotes/icons/favicon-32x32.png">
-<link rel="apple-touch-icon" href="/zhanotes/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/zhanotes/icons/favicon-96x96.png?v=2">
+<link rel="icon" type="image/png" sizes="32x32" href="/zhanotes/icons/favicon-32x32.png?v=2">
+<link rel="apple-touch-icon" href="/zhanotes/icons/apple-touch-icon.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ZhaNotes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>
-:root{--bg:#faf9f7;--pn:#fff;--tx:#1d1d1f;--mu:#8a8a90;--bd:#e8e6e1;--ac:#4f46e5;--hl:#eef0ff;box-sizing:border-box}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161618;--pn:#1e1e21;--tx:#ececee;--mu:#8b8b93;--bd:#2c2c30;--ac:#8b86ff;--hl:#26263a}}
-:root[data-theme="dark"]{--bg:#161618;--pn:#1e1e21;--tx:#ececee;--mu:#8b8b93;--bd:#2c2c30;--ac:#8b86ff;--hl:#26263a}
+:root{--bg:#faf9f7;--pn:#fff;--tx:#1d1d1f;--mu:#8a8a90;--bd:#e8e6e1;--ac:#2d4399;--hl:#e9eefb;box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161618;--pn:#1e1e21;--tx:#ececee;--mu:#8b8b93;--bd:#2c2c30;--ac:#6a85e6;--hl:#212a47}}
+:root[data-theme="dark"]{--bg:#161618;--pn:#1e1e21;--tx:#ececee;--mu:#8b8b93;--bd:#2c2c30;--ac:#6a85e6;--hl:#212a47}
 *{box-sizing:border-box}html,body{height:100%;margin:0}
 body{font:15px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--tx);display:grid;grid-template-columns:var(--c1,220px) var(--c2,290px) 1fr;transition:grid-template-columns .2s;overflow:hidden;padding-top:env(safe-area-inset-top,0px)}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -69,7 +68,7 @@ details.ft{border-top:1px solid var(--bd);flex:none}details.ft>summary{padding:6
 .sw{width:22px;height:22px;border-radius:50%;border:2px solid var(--bd);padding:0;margin:0 2px;flex:none}.sw.on{border-color:var(--tx)}
 #pv{flex:1;overflow-y:scroll;overflow-x:auto;padding:16px;background:var(--bg);position:relative}
 .pgw{position:relative;margin:0 auto 16px;background:#fff;box-shadow:0 2px 12px #0003}.pgw canvas{position:absolute;left:0;top:0;width:100%;height:100%}.pgw .ov{touch-action:none}#pv[data-t=txt] .ov{pointer-events:none}
-.tl{position:absolute;inset:0;overflow:hidden;line-height:1}.tl span{position:absolute;white-space:pre;color:transparent;cursor:text;transform-origin:0 0}.tl ::selection{background:rgba(79,70,229,.35)}
+.tl{position:absolute;inset:0;overflow:hidden;line-height:1}.tl span{position:absolute;white-space:pre;color:transparent;cursor:text;transform-origin:0 0}.tl ::selection{background:rgba(45,67,153,.35)}
 .ly{position:absolute;left:0;top:0;transform-origin:0 0}.pgw .bx{color:#111;font-size:14px;background:#fff8}
 .hm{padding:40px max(24px,calc(50% - 360px));width:100%}.hm h1{margin:0}.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:24px}
 .card{background:var(--pn);border:1px solid var(--bd);border-radius:12px;padding:14px;cursor:pointer}.card:hover{border-color:var(--ac)}.card p{margin:4px 0 0;color:var(--mu);font-size:13px;max-height:3.2em;overflow:hidden}
@@ -592,9 +591,9 @@ body.ht .zn-stk{display:none!important}
 
 
 /* ═══ Tampilan baru (tahap 1): kertas hangat, judul serif, beranda ═══ */
-:root{--bg:#f7f6f2;--pn:#fff;--sb:#f3f1ea;--tx:#25231e;--mu:#7f7c74;--bd:#e6e3da;--ac:#3b3a8f;--hl:#ecebf6;--on:#fff;--ok:#3f8f6b;--wn:#c2410c;--ser:"Iowan Old Style","Palatino Linotype",Palatino,"Noto Serif",Georgia,serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151518;--pn:#1d1d21;--sb:#19191c;--tx:#ecebe6;--mu:#8f8d86;--bd:#2c2c31;--ac:#7c79e0;--hl:#27273d}}
-:root[data-theme="dark"]{--bg:#151518;--pn:#1d1d21;--sb:#19191c;--tx:#ecebe6;--mu:#8f8d86;--bd:#2c2c31;--ac:#7c79e0;--hl:#27273d}
+:root{--bg:#f7f6f2;--pn:#fff;--sb:#f3f1ea;--tx:#25231e;--mu:#7f7c74;--bd:#e6e3da;--ac:#2d4399;--hl:#e9eefb;--on:#fff;--ok:#3f8f6b;--wn:#c2410c;--ser:"Iowan Old Style","Palatino Linotype",Palatino,"Noto Serif",Georgia,serif}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151518;--pn:#1d1d21;--sb:#19191c;--tx:#ecebe6;--mu:#8f8d86;--bd:#2c2c31;--ac:#6a85e6;--hl:#212a47}}
+:root[data-theme="dark"]{--bg:#151518;--pn:#1d1d21;--sb:#19191c;--tx:#ecebe6;--mu:#8f8d86;--bd:#2c2c31;--ac:#6a85e6;--hl:#212a47}
 body{background:var(--pn);-webkit-font-smoothing:antialiased}
 button{border-radius:10px}
 .ic{width:17px;height:17px;flex:none;vertical-align:-3px}.ic.big{width:44px;height:44px}
@@ -603,7 +602,7 @@ button{border-radius:10px}
 #sd .n .ic{color:var(--mu)}#sd .on .ic{color:var(--ac)}
 #sd kbd{margin-left:auto;float:none;color:var(--mu);font-size:11px}
 #sd h6{font-size:10.5px;letter-spacing:.12em;margin:18px 10px 4px}
-.lg{width:30px;height:30px;border-radius:9px;background:var(--ac);color:var(--on);display:grid;place-items:center;font-family:var(--ser);font-weight:700;font-size:17px}
+.lg{width:30px;height:30px;display:block;object-fit:contain;flex:none}
 .btn-p{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--ac);color:var(--on);padding:9px 16px;border-radius:11px;font-weight:600}
 .btn-p:hover{background:var(--ac);filter:brightness(1.08)}
 #sd .new{margin:2px 0 10px}#sd .new .btn-p{width:100%;flex:none}
@@ -611,7 +610,7 @@ button{border-radius:10px}
 #sd .sl[data-s="tag"]{display:flex;flex-wrap:wrap;gap:6px;padding:2px 4px}
 #sd .sl[data-s="tag"] .n{display:inline-flex;width:auto;min-height:0;padding:3px 11px;border:1px solid var(--bd);border-radius:999px;font-size:12.5px;background:var(--pn);color:var(--mu)}
 #sd .sl[data-s="tag"] .n.on{background:var(--hl);color:var(--ac);border-color:var(--ac)}
-.ws{margin-top:auto;display:flex;gap:10px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:var(--pn);cursor:pointer;flex-shrink:0}.ws:hover{border-color:var(--ac)}
+.thm{margin-top:auto}.thm+.ws{margin-top:6px}.ws{margin-top:auto;display:flex;gap:10px;align-items:center;border:1px solid var(--bd);border-radius:12px;padding:10px;background:var(--pn);cursor:pointer;flex-shrink:0}.ws:hover{border-color:var(--ac)}
 .ws .av{width:34px;height:34px;border-radius:50%;background:var(--hl);color:var(--ac);display:grid;place-items:center;font-family:var(--ser);font-weight:700;flex:none}
 .ws .wt{display:flex;flex-direction:column;gap:1px;min-width:0}.ws .wt b{font-size:13.5px}
 .svs{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:var(--mu);white-space:nowrap}
@@ -651,7 +650,7 @@ button{border-radius:10px}
 .cc{border:1px solid var(--bd);border-radius:14px;background:var(--sb);padding:18px;cursor:pointer}.cc h4{font-family:var(--ser);font-size:23px;font-weight:600;margin:8px 0;line-height:1.2}.cc p{margin:0 0 14px;font-size:13.5px}
 .kl2{display:flex;align-items:center;gap:8px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mu)}
 .kk{float:none;margin-left:6px;opacity:.8;color:inherit}
-@media(max-width:820px){.hm2{padding:18px 16px 40px}h1.ser{font-size:34px}.rg{grid-template-columns:1fr;gap:24px}.hr{width:100%;justify-content:space-between}.top #ti{font-size:22px}.pcs{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
+@media(max-width:820px){.hm2{padding:18px 16px 40px}h1.ser{font-size:34px}.rg{grid-template-columns:minmax(0,1fr);gap:24px}.rg>*{min-width:0}.hr{width:100%;justify-content:space-between}.top #ti{font-size:22px}.pcs{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}}
 
 /* perbaikan tahap 1 */
 .hh1>div:first-child{flex:1 1 340px;min-width:0}.hr{flex-wrap:nowrap}.btn-p{white-space:nowrap}
@@ -889,7 +888,7 @@ addEventListener('pagehide',()=>{clearTimeout(saveT);flush()});document.addEvent
 
 const WB_CALLOUT=(cls,ico,txt)=>'<div class="callout '+cls+'"><button type="button" class="callout-del" contenteditable="false" title="Hapus kotak">✕</button><span style="font-size:16px;margin-right:4px">'+ico+'</span> '+txt+'</div>';
 const WELCOME_BODY=[
- '<p data-wv="4"><b>ZhaNotes</b> adalah ruang catatan &amp; <i>Personal Knowledge Management (PKM)</i> yang berjalan sepenuhnya di peramban Anda: <b>gratis, tanpa iklan pihak ketiga, tanpa akun, dan bisa dipakai offline</b>. Catatan Anda tidak dikirim ke server mana pun.</p>',
+ '<p data-wv="6"><b>ZhaNotes</b> adalah ruang catatan &amp; <i>Personal Knowledge Management (PKM)</i> yang berjalan sepenuhnya di peramban Anda: <b>gratis, tanpa iklan pihak ketiga, tanpa akun, dan bisa dipakai offline</b>. Catatan Anda tidak dikirim ke server mana pun, kecuali Anda mengaktifkan sinkron awan (tersedia di edisi kustom).</p>',
  WB_CALLOUT('callout-succ','✅','<b>Janji pembuat:</b> tanpa iklan pihak ketiga, tanpa pelacak, tanpa langganan. Semua fitur di bawah ini bisa dipakai selamanya tanpa biaya.'),
  '<h3>Mulai dalam 1 menit</h3>',
  '<ul>',
@@ -920,11 +919,12 @@ const WELCOME_BODY=[
  '<a href="https://arzhaning.my.id/demos" target="_blank" rel="noopener">30 demo desain &amp; aplikasi</a>.</p>',
  '<h3>Offline &amp; keamanan data</h3>',
  WB_CALLOUT('callout-info','ℹ️','<b>Soal offline:</b> pembukaan pertama membutuhkan internet. Setelah pernah dibuka sekali, halaman tersimpan di cache peramban dan bisa dipakai tanpa internet, selama cache itu tidak dibersihkan.'),
+ WB_CALLOUT('callout-info','📲','<b>Pasang sebagai aplikasi (PWA):</b> agar ZhaNotes terbuka dari layar utama seperti aplikasi biasa dan umumnya lebih jarang kena pembersihan data situs, pilih <b>Instal aplikasi</b> di menu peramban (mis. Chrome atau Edge di komputer dan Android) atau <b>Tambahkan ke layar utama</b> di ponsel (di iPhone: tombol Bagikan → Tambahkan ke Layar Utama). Nama dan letak opsinya bergantung pada peramban dan perangkat, dan tidak semua peramban menyediakannya.'),
  WB_CALLOUT('callout-warn','⚠️','<b>Data hanya ada di peramban ini.</b> Catatan, coretan, PDF, dan rekaman tersimpan di IndexedDB perangkat ini. Data bisa hilang jika data situs dihapus atau peramban diganti, dan tidak otomatis ada di perangkat lain. Buat cadangan ZIP secara berkala lewat <b>Data → Cadangan &amp; pulihkan</b>, lalu pulihkan di perangkat mana pun.')
 ].join('');
 const RLK=(u,t,d,n)=>'<div class="lk" contenteditable="false"><a data-u="'+u+'" href="'+u+'">'+t+'</a><small>'+d+'</small><div class="lkn" contenteditable="true">'+n+'</div></div>';
 const RESEARCH_BODY=[
- '<p data-rv="3"><i>Pertanyaan riset:</i> bisakah aplikasi produktivitas lengkap (editor, whiteboard, anotasi PDF, perekam suara) berjalan tanpa server berbayar, tanpa iklan, dan tetap nyaman dipakai sehari-hari?</p>',
+ '<p data-rv="4"><i>Pertanyaan riset:</i> bisakah aplikasi produktivitas lengkap (editor, whiteboard, anotasi PDF, perekam suara) berjalan tanpa server berbayar, tanpa iklan, dan tetap nyaman dipakai sehari-hari?</p>',
  '<h3>Tautan</h3>',
  RLK('https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API','IndexedDB API - MDN Web Docs','developer.mozilla.org','Penyimpanan di sisi klien berkapasitas besar. Dipakai ZhaNotes untuk catatan, PDF, dan rekaman audio.'),
  RLK('https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API','Service Worker API - MDN Web Docs','developer.mozilla.org','Dasar kemampuan offline: aset di-cache sehingga aplikasi terbuka tanpa internet setelah kunjungan pertama.'),
@@ -940,7 +940,7 @@ const RESEARCH_BODY=[
  '<p><b>Temuan:</b></p>',
  '<ul>',
  '<li><b>Biaya:</b> tanpa backend, biaya operasional per pengguna mendekati nol, jadi aplikasi bisa gratis dan bebas iklan.</li>',
- '<li><b>Privasi:</b> data tidak pernah meninggalkan perangkat, sehingga tidak ada akun, pelacak, atau kebocoran dari server.</li>',
+ '<li><b>Privasi:</b> pada versi umum data tidak meninggalkan perangkat, sehingga tidak ada akun, pelacak, atau kebocoran dari server. Pada edisi kustom dengan sinkron awan, yang dikirim hanya salinan terenkripsi di peramban.</li>',
  '<li><b>Kecepatan:</b> baca-tulis lokal tanpa menunggu jaringan; PDF dan kanvas besar tetap lancar.</li>',
  '</ul>',
  '<p><b>Risiko dan mitigasinya:</b></p>',
@@ -955,16 +955,16 @@ const RESEARCH_BODY=[
 ].join('');
 function researchUpdate(){
   const n=S.notes.find(x=>x.t==='Riset Arsitektur Zero Server Cost');
-  if(!n||n.u!==n.c||typeof n.body!=='string'||n.body.includes('data-rv="3"'))return;
+  if(!n||n.u!==n.c||typeof n.body!=='string'||n.body.includes('data-rv="4"'))return;
   n.body=RESEARCH_BODY;if(n.tags&&!n.tags.includes('riset'))n.tags.push('riset');TXC.delete(n.id);dirty.add(n.id);save();
 }
 function welcomeUpdate(){
   const n=S.notes.find(x=>x.t==='Selamat Datang di ZhaNotes');
-  if(!n||n.u!==n.c||typeof n.body!=='string'||n.body.includes('data-wv="4"'))return;
+  if(!n||n.u!==n.c||typeof n.body!=='string'||n.body.includes('data-wv="6"'))return;
   n.body=WELCOME_BODY;TXC.delete(n.id);dirty.add(n.id);save();
 }
 const GUIDE_BODY = [
-'<p><b>ZhaNotes</b> adalah aplikasi ruang kerja pemikiran, catatan visual, dan <i>Personal Knowledge Management (PKM)</i> berkonsep <b>Local-First</b>. Semua catatan, coretan kanvas, berkas PDF, dan memo suara tersimpan aman di peramban tanpa server perantara.</p>',
+'<p><b>ZhaNotes</b> adalah aplikasi ruang kerja pemikiran, catatan visual, dan <i>Personal Knowledge Management (PKM)</i> berkonsep <b>Local-First</b>. Semua catatan, coretan kanvas, berkas PDF, dan memo suara tersimpan aman di peramban tanpa server perantara (sinkron awan bersifat opsional dan hanya ada di edisi kustom).</p>',
 WB_CALLOUT('callout-succ','✅','<b>Privasi 100% &amp; Bebas Biaya Server:</b> Data Anda tersimpan di IndexedDB perangkat ini dan tidak dikirim ke pihak ketiga. Anda memegang kendali penuh atas data Anda melalui pencadangan ZIP berkala.'),
 '<h3>1. Empat Mode Catatan Fleksibel</h3>',
 '<ul>',
@@ -1054,10 +1054,10 @@ WB_CALLOUT('callout-info','💡','<b>Tips Layar Sentuh / Tablet:</b> Secara defa
 '<h3>Sinkron Awan Otomatis (edisi khusus)</h3>',
 WB_CALLOUT('callout-info','ℹ️','<b>Catatan edisi:</b> versi umum ZhaNotes bekerja sepenuhnya offline dan lokal. Sinkron awan hanya tersedia pada edisi khusus yang disiapkan bersama penyedia aplikasi, dengan penyimpanan di akun milik pemilik edisi tersebut.'),
 '<ul>',
-'<li><b>Aktifkan:</b> <b>Data → Sinkron awan</b>, isi token akses dan kata sandi enkripsi. Setelah itu setiap perubahan terkirim sendiri ke cloud dan muncul di perangkat lain; tidak perlu cadangan manual.</li>',
+'<li><b>Aktifkan:</b> <b>kartu Ruang kerja saya</b> di kiri bawah bilah sisi, isi token akses dan kata sandi enkripsi. Setelah itu setiap perubahan terkirim sendiri ke cloud dan muncul di perangkat lain; tidak perlu cadangan manual.</li>',
 '<li><b>Terenkripsi di perangkat:</b> isi catatan, PDF, dan rekaman dienkripsi sebelum dikirim. Kata sandi enkripsi tidak disimpan di server, jadi jangan sampai lupa.</li>',
 '<li><b>Gabung otomatis:</b> bila satu catatan diubah di dua perangkat pada bagian yang berbeda (paragraf berbeda, objek dan konektor kanvas berbeda, ikon atau warna label), keduanya digabung sendiri dan versi sebelumnya masuk Riwayat. Bila bagian yang sama diubah di dua tempat, muncul layar perbandingan dengan pilihan Gabungkan, pakai versi perangkat ini, pakai versi cloud, atau simpan keduanya.</li>',
-'<li><b>Log debug:</b> di jendela Sinkron awan tekan <b>🐞 Log</b>. Error selalu tercatat; aktifkan <b>Mode debug</b> untuk detail tiap langkah. Log bisa disalin atau diunduh dan tidak berisi token, kata sandi, atau isi catatan.</li>',
+'<li><b>Log debug (pemeliharaan):</b> tombol <b>🐞 Log</b> di jendela Sinkron awan hanya muncul bila penyedia aplikasi mengaktifkannya di server. Log tidak berisi token, kata sandi, atau isi catatan.</li>',
 '</ul>',
 '<h3>9. Konektor, Tugas, Ikon &amp; Tab</h3>',
 '<ul>',
@@ -1232,12 +1232,12 @@ function side(){const tags=[...new Set(S.notes.flatMap(n=>n.tags))].sort(),b=(k,
 const th=document.documentElement.dataset.theme;
 const scr={},sdy=$('#sd').scrollTop;$$('#sd .sl').forEach(e=>scr[e.dataset.s]=e.scrollTop);
 const sec=(id,t,c,h,x)=>{const cl=SDC.includes(id),act=(id==='fol'&&flt.k==='folder')||(id==='tag'&&flt.k==='tag')||(id==='pus'&&['home','all','pin','tmp'].includes(flt.k));return `<h6 class="sh ${cl?'cl':''}" onclick="sdTog('${id}')"><span class=ch>▾</span>${t}${cl&&act?'<span class=ad>●</span>':''}${c!=null?`<span class=ct>${c}</span>`:''}</h6><div class="sb ${cl?'cl':''}"><div class=sl data-s="${id}">${h}</div>${x||''}</div>`};
-$('#sd').innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;margin-bottom:8px;border-bottom:1px solid var(--bd)"><div style="display:flex;align-items:center;gap:6px"><span class=lg>Z</span><div><strong style="font-size:15px;letter-spacing:-0.02em;display:block;line-height:1.2">ZhaNotes</strong><small style="font-size:10.5px;color:var(--mu);display:block">Local-First PKM</small></div></div><a href="/" style="font-size:11.5px;color:var(--mu);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--bd);display:inline-flex;align-items:center;gap:3px" title="Kembali ke Portofolio Arzha">← Portofolio</a></div><div class=new><button class=btn-p onclick="nmToggle(event)">${I('plus')} Catatan baru ${I('down')}</button></div>
+$('#sd').innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 4px 10px;margin-bottom:8px;border-bottom:1px solid var(--bd)"><div style="display:flex;align-items:center;gap:6px"><img class=lg src="/zhanotes/icons/icon-192.png?v=2" alt="" width="30" height="30"><div><strong style="font-size:15px;letter-spacing:-0.02em;display:block;line-height:1.2">ZhaNotes</strong><small style="font-size:10.5px;color:var(--mu);display:block">Local-First PKM</small></div></div><a href="/" onclick="return exitLink(event)" style="font-size:11.5px;color:var(--mu);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--bd);display:inline-flex;align-items:center;gap:3px" title="Kembali ke Portofolio Arzha">← Portofolio</a></div><div class=new><button class=btn-p onclick="nmToggle(event)">${I('plus')} Catatan baru ${I('down')}</button></div>
 <button class=n onclick="srch()">${I('search')} Cari <kbd>Ctrl+K</kbd></button><button class=n onclick="cap()">${I('bolt')} Tangkap cepat <kbd>Alt+J</kbd></button>
 ${sec('pus','Pustaka',null,`${b('home',null,I('home')+' Beranda')}${b('all',null,I('all')+' Semua')}${b('pin',null,I('pin')+' Disematkan')}${b('tmp',null,I('clock')+' Sementara')}`)}
 ${sec('fol','Folder',fSorted().length,fSorted().map(f=>`<div class=fr style="padding-left:${fDepth(f)*14}px">${b('folder',f,'<i class=fsw style="background:'+fcol(f)+'"></i><span class=lb2>'+esc(fName(f))+'</span><span class=c2>'+S.notes.filter(n=>n.folder===f).length+'</span>')}<button class=fm data-f="${esc(f)}" onclick="fMenu(this.dataset.f)" title="Kelola folder">⋯</button></div>`).join(''),`<button class=n onclick="addF('')">+ Folder baru</button>`)}
 ${tags.length?sec('tag','Tag',tags.length,tags.map(t=>b('tag',t,'# '+esc(t))).join('')):''}
-${sec('dat','Data',null,`<button class=n onclick="syncUI()">☁ Sinkron awan <span class=syb>${sbtxt()}</span></button><button class=n onclick="backupUI()">💾 Cadangan &amp; pulihkan</button><button class=n onclick="openGuide()">📖 Panduan &amp; Pintasan</button>${pwaBtn()}<button class=n onclick="setTheme()">🌓 Tema: ${th==='light'?'Terang':th==='dark'?'Gelap':'Otomatis'}</button>`)}<div class=ws onclick="syncUI()"><span class=av>Z</span><span class=wt><b>Ruang kerja saya</b><span class=svs data-s="${svstate()}"><i></i><span class=svt>${svtxt()}</span></span></span></div>`;
+${sec('dat','Data',null,`<button class=n onclick="backupUI()">💾 Cadangan &amp; pulihkan</button><button class=n onclick="openGuide()">📖 Panduan &amp; Pintasan</button>${pwaBtn()}`)}<button class="n thm" onclick="setTheme()">🌓 Tema: ${th==='light'?'Terang':th==='dark'?'Gelap':'Otomatis'}</button><div class=ws onclick="syncUI()" title="Sinkron awan"><span class=av>Z</span><span class=wt><b>Ruang kerja saya</b><span class=svs data-s="${svstate()}"><i></i><span class=svt>${svtxt()}</span></span></span></div>`;
 $$('#sd .sl').forEach(e=>{if(scr[e.dataset.s])e.scrollTop=scr[e.dataset.s]});$('#sd').scrollTop=sdy}
 function setTheme(){const d=document.documentElement,c=d.dataset.theme,nx=!c?'light':c==='light'?'dark':'';if(nx)d.dataset.theme=nx;else delete d.dataset.theme;try{localStorage.setItem('cv-theme',nx)}catch(e){}side();if(ED&&ED.redraw)ED.redraw()}
 let CF='all',CT=null;
@@ -2300,7 +2300,7 @@ for(const s of n.strokes){const m=mv&&sel.s.has(s),dx=m?mv.dx:0,dy=m?mv.dy:0,cl=
 if(cs&&cs.p){if(FL&&cs.shape&&CLOSEDK.has(cs.shape))fillPath(x,{p:cs.p,fill:FL},0,0);drawS(cs,0,0)}drawLinks();
 const q=selBox();if(q){x.save();x.strokeStyle=css('--ac');x.lineWidth=1.5/z;x.setLineDash([6/z,4/z]);const dx=mv?mv.dx:0,dy=mv?mv.dy:0;x.strokeRect(q[0]-4+dx,q[1]-4+dy,q[2]-q[0]+8,q[3]-q[1]+8);x.restore()}
 if(gd){x.save();x.strokeStyle='#ec4899';x.lineWidth=1/z;gd.forEach(g=>{x.beginPath();if(g.x!=null){x.moveTo(g.x,g.a);x.lineTo(g.x,g.b)}else{x.moveTo(g.a,g.y);x.lineTo(g.b,g.y)}x.stroke()});x.restore()}
-if(rect){x.save();x.fillStyle='rgba(79,70,229,.12)';x.strokeStyle=css('--ac');x.lineWidth=1/z;x.fillRect(rect.x0,rect.y0,rect.x1-rect.x0,rect.y1-rect.y0);x.strokeRect(rect.x0,rect.y0,rect.x1-rect.x0,rect.y1-rect.y0);x.restore()}
+if(rect){x.save();x.fillStyle='rgba(45,67,153,.12)';x.strokeStyle=css('--ac');x.lineWidth=1/z;x.fillRect(rect.x0,rect.y0,rect.x1-rect.x0,rect.y1-rect.y0);x.strokeRect(rect.x0,rect.y0,rect.x1-rect.x0,rect.y1-rect.y0);x.restore()}
 L.style.transform=`translate(${n.ox}px,${n.oy}px) scale(${z})`;const zl=$('#zl');if(zl)zl.textContent=Math.round(z*100)+'%'}
 function box(b){
   b.w = b.w || 200;
@@ -2908,23 +2908,26 @@ if(blob){const u=URL.createObjectURL(blob);RECURLS.push(u);au.src=u;row.querySel
 if(!n.rec.length)L.innerHTML='<p class=mu>Belum ada rekaman. Tekan Rekam, lalu pakai 📍 Penanda untuk menandai momen penting.</p>'}
 
 /* ===== cadangan ===== */
-function backupUI(){modal(`<b>💾 Cadangan &amp; pulihkan</b><p class=mu>Cadangan ZIP berisi semua catatan (termasuk tulisan tangan dan anotasi), file PDF, rekaman audio, serta salinan Markdown catatan teks.</p><button onclick="backupZip()" style="background:var(--ac);color:#fff">⬇ Unduh cadangan lengkap (ZIP)</button> <button onclick="restorePick()">⬆ Pulihkan dari cadangan…</button> <button onclick="syncUI()">☁ Sinkron awan…</button>`)}
+function backupUI(){modal(`<b>💾 Cadangan &amp; pulihkan</b><p class=mu>Cadangan ZIP berisi semua catatan (termasuk tulisan tangan dan anotasi), file PDF, rekaman audio, serta salinan Markdown catatan teks.</p><button onclick="backupZip()" style="background:var(--ac);color:#fff">⬇ Unduh cadangan lengkap (ZIP)</button> <button onclick="restorePick()">⬆ Pulihkan dari cadangan…</button>`)}
 /* ═══ Log debug sinkron ═══
    E/W (error & peringatan) SELALU dicatat; I/D (info & detail) hanya saat Mode debug aktif.
    Tidak pernah mencatat token, kata sandi, kunci, isi catatan, atau judul — hanya id, ukuran, status, dan waktu. */
-const SLG={on:false,buf:[],max:400,q:null,flt:'all'};
-try{SLG.on=localStorage.getItem('zn-sync-dbg')==='1';SLG.buf=JSON.parse(localStorage.getItem('zn-sync-log')||'[]');if(!Array.isArray(SLG.buf))SLG.buf=[]}catch(e){SLG.buf=[]}
+const SLG={on:false,live:false,buf:[],max:400,q:null,flt:'all'};
+try{SLG.live=localStorage.getItem('zn-sync-dbgsrv')==='1';SLG.on=SLG.live&&localStorage.getItem('zn-sync-dbg')==='1';SLG.buf=SLG.live?JSON.parse(localStorage.getItem('zn-sync-log')||'[]'):[];if(!Array.isArray(SLG.buf))SLG.buf=[]}catch(e){SLG.buf=[]}
 const SLX=/token|pass|sandi|key|salt|check|secret|body|^t$|^title$|^judul$/i;
 function sclean(v,d){d=d||0;if(v==null)return v;if(v instanceof Error)return{name:v.name,msg:String(v.message||'').slice(0,200),status:v.status,stack:String(v.stack||'').split('\n').slice(1,4).map(x=>x.trim().slice(0,110))};
 if(typeof v==='string')return v.length>120?v.slice(0,120)+'…('+v.length+')':v;if(typeof v!=='object')return v;if(d>3)return'[…]';
 if(Array.isArray(v))return v.length>8?[...v.slice(0,8).map(x=>sclean(x,d+1)),'+'+(v.length-8)+' lagi']:v.map(x=>sclean(x,d+1));
 const o={};for(const k of Object.keys(v).slice(0,25))o[k]=SLX.test(k)?'[disembunyikan]':sclean(v[k],d+1);return o}
 function slogSave(){clearTimeout(SLG.q);SLG.q=setTimeout(()=>{try{localStorage.setItem('zn-sync-log',JSON.stringify(SLG.buf.slice(-300)))}catch(e){try{localStorage.setItem('zn-sync-log',JSON.stringify(SLG.buf.slice(-60)))}catch(x){}}},800)}
-function slog(lv,tag,msg,data){try{if((lv==='I'||lv==='D')&&!SLG.on)return;
+function slog(lv,tag,msg,data){try{if(!SLG.live)return;if((lv==='I'||lv==='D')&&!SLG.on)return;
 const e={t:Date.now(),l:lv,g:tag,m:String(msg).slice(0,220)};if(data!==undefined)e.d=sclean(data);SLG.buf.push(e);if(SLG.buf.length>SLG.max)SLG.buf.splice(0,SLG.buf.length-SLG.max);slogSave();
 if(lv==='E'||lv==='W'){const b=document.getElementById('slb');if(b)b.textContent=slogCount()}
 if(lv==='E'||SLG.on)(lv==='E'?console.error:lv==='W'?console.warn:console.debug)('[sync:'+tag+']',msg,e.d||'')}catch(x){}}
 const slogCount=()=>SLG.buf.filter(e=>e.l==='E').length;
+/* Saklar log dari server (env ZHANOTES_DEBUG=1 -> status.debug). Mati = tanpa log di console, tanpa tombol Log, riwayat lama dihapus. */
+function slogMaster(v){v=!!v;if(v===SLG.live)return;SLG.live=v;try{localStorage.setItem('zn-sync-dbgsrv',v?'1':'0')}catch(e){}if(!v){SLG.on=false;SLG.buf=[];try{localStorage.removeItem('zn-sync-log');localStorage.removeItem('zn-sync-dbg')}catch(e){}}}
+const slogBtn=()=>SLG.live?` <button onclick="slogUI()">🐞 Log (<span id=slb>${slogCount()}</span>)</button>`:'';
 const slogFmt=e=>{const d=new Date(e.t),p=(n,l=2)=>String(n).padStart(l,'0');return p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds())+'.'+p(d.getMilliseconds(),3)+' '+e.l+' ['+e.g+'] '+e.m+(e.d!==undefined?' '+JSON.stringify(e.d):'')};
 function slogText(){const n=typeof S!=='undefined'?S.notes.length:0;
 const h=['ZhaNotes — log sinkron','dibuat: '+new Date().toISOString(),'mode debug: '+(SLG.on?'AKTIF':'mati'),'sinkron: '+(SY.on?'aktif':'mati')+' · tertunda '+(SY.pend.length+SY.del.length)+' · konflik '+SY.conf.length+' · rev '+Object.keys(SY.rev).length+' dokumen · terakhir '+(SY.last?new Date(SY.last).toISOString():'-'),
@@ -2957,7 +2960,7 @@ const SKIP=['v','o','ox','oy','z'];
 const spay=n=>{const o={};for(const k of Object.keys(n))if(!SKIP.includes(k))o[k]=n[k];return o};
 async function csig(n){if(typeof byId==='function'&&byId(n.id)===n)sprep(n);const b=await crypto.subtle.digest('SHA-1',TE.encode(stab(spay(n))));let s='';new Uint8Array(b).forEach(x=>s+=String.fromCharCode(x));return btoa(s)}
 const b64=u=>{let s='';u.forEach(x=>s+=String.fromCharCode(x));return btoa(s)},unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-const SITER=600000,sit=c=>{const n=Number(c&&c.iter);return Number.isInteger(n)&&n>=250000&&n<=2000000?n:250000}; async function skey(pw,saltB64,iter){const m=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:unb64(saltB64),iterations:iter||250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function skey(pw,saltB64){const m=await crypto.subtle.importKey('raw',TE.encode(pw),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:unb64(saltB64),iterations:250000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
 async function senc(buf,key){const iv=crypto.getRandomValues(new Uint8Array(12)),ct=new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},key||SY.key,buf)),o=new Uint8Array(15+ct.length);o.set([90,83,49]);o.set(iv,3);o.set(ct,15);return o}
 async function sdec(u,key){if(u.length<31||u[0]!==90||u[1]!==83||u[2]!==49)throw new Error('format data awan tidak dikenal');try{return await crypto.subtle.decrypt({name:'AES-GCM',iv:u.slice(3,15)},key||SY.key,u.slice(15))}catch(e){throw new Error('kata sandi enkripsi salah atau data rusak')}}
 async function sapi(action,o={}){const h={'x-zhanotes-token':o.t!==undefined?o.t:SY.t};let body;if(o.json){h['content-type']='application/json';body=JSON.stringify(o.json)}else if(o.body){h['content-type']='application/octet-stream';body=o.body}
@@ -2983,7 +2986,7 @@ try{const r=await sapi('sync-push',{method:'POST',json:{key,baseRev,uid:up.uid,c
 catch(e){if(e.status===409){slog('I','dorong','Revisi bentrok saat mengirim '+key,{baseRev,head:e.data&&e.data.head&&e.data.head.rev});return{ok:false,head:e.data&&e.data.head}}slog('E','dorong','Gagal mengirim '+key,{err:e});throw e}}
 async function stomb(key,baseRev){try{const r=await sapi('sync-push',{method:'POST',json:{key,baseRev,deleted:true}});return{ok:true,rev:r.rev}}catch(e){if(e.status===409)return{ok:false,head:e.data&&e.data.head};throw e}}
 const spersist=()=>idb('put','sync',{on:SY.on,t:SY.t,salt:SY.salt,rev:SY.rev,sig:SY.sig,pend:SY.pend,del:SY.del,delb:SY.delb,bin:SY.bin,msig:SY.msig,seeded:SY.seeded,last:SY.last}).catch(e=>slog('E','simpan','Gagal menyimpan status sinkron ke IndexedDB',{err:e}));
-async function sload(){try{const s=await idb('get','sync');if(s&&s.on){Object.assign(SY,s);SY.key=await idb('get','synckey');if(!SY.key){SY.on=false;slog('E','muat','Kunci enkripsi hilang dari IndexedDB; sinkron dinonaktifkan di perangkat ini')}else slog('I','muat','Status sinkron dimuat',{tertunda:SY.pend.length,hapus:SY.del.length,dok:Object.keys(SY.rev).length})}}catch(e){slog('E','muat','Gagal memuat status sinkron',{err:e})}}
+async function sload(){try{const s=await idb('get','sync');if(s&&s.on){Object.assign(SY,s);SY.key=await idb('get','synckey');if(!SY.key){SY.on=false;slog('E','muat','Kunci enkripsi hilang dari IndexedDB; sinkron dinonaktifkan di perangkat ini')}else slog('I','muat','Status sinkron dimuat',{tertunda:SY.pend.length,hapus:SY.del.length,dok:Object.keys(SY.rev).length})}}catch(e){slog('E','muat','Gagal memuat status sinkron',{err:e})}if(SY.on)sapi('status',{t:''}).then(r=>{if(r)slogMaster(r.debug)}).catch(()=>{})}
 function sbtxt(){return !SY.on?'':SY.busy?'⟳':SY.conf.length?'⚠ '+SY.conf.length:SY.err?'⚠':(SY.pend.length||SY.del.length)?'●':'✓'}
 function svstate(){return !SY.on?'off':SY.busy?'busy':(SY.conf.length||SY.err)?'warn':(SY.pend.length||SY.del.length)?'pend':'ok'}
 function svtxt(){return !SY.on?'Tersimpan di perangkat ini':SY.busy?'Menyinkronkan…':SY.conf.length?SY.conf.length+' konflik perlu dipilih':SY.err?(/koneksi/i.test(SY.err)?'Menunggu koneksi':'Sinkron bermasalah'):(SY.pend.length||SY.del.length)?'Menunggu dikirim ('+(SY.pend.length+SY.del.length)+')':'Semua perubahan tersimpan'}
@@ -3017,7 +3020,7 @@ async function spass(){if(!SY.on)return;if(SY.busy){SY.again=true;slog('D','puta
 try{let g=0;do{SY.again=false;await spass1()}while(SY.again&&++g<6);SY.last=now()}
 catch(e){SY.err=(e&&e.status===401)?'Token akses ditolak server':(e instanceof TypeError||(navigator.onLine===false))?'Menunggu koneksi internet':(e&&e.message)||String(e);slog(e instanceof TypeError||navigator.onLine===false?'W':'E','putaran','Putaran gagal: '+SY.err,{err:e,tertunda:SY.pend.length,saat:SY.ctx||undefined})}
 finally{SY.busy=false;await spersist();sbadge();slog('I','putaran','Selesai '+(SY.err?'dengan galat':'ok'),{ms:Math.round(performance.now()-t0),tertunda:SY.pend.length+SY.del.length,konflik:SY.conf.length})}}
-async function spass1(){const ir=await sapi('sync-index',{q:(SY.ix&&SY.sq!=null)?'&since='+SY.sq:''});let docs;if(ir.unchanged&&SY.ix)docs=SY.ix;else{docs=ir.docs;if(ir.seq!=null){SY.ix=docs;SY.sq=ir.seq}else{SY.ix=null;SY.sq=null}}const rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks',ir.unchanged?'Indeks cloud tidak berubah':'Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length,seq:ir.seq});
+async function spass1(){const {docs}=await sapi('sync-index'),rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks','Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length});
 if(!SY.seeded){if(rk.some(k=>!docs[k].deleted)){const sd=S.notes.filter(isSeed);slog('I','awal','Cloud sudah berisi catatan; membuang contoh bawaan lokal',{jumlah:sd.length});sd.forEach(sdropLocal)}SY.seeded=1}
 SY.conf=SY.conf.filter(c=>docs[c.k]&&docs[c.k].rev===c.rev);const have=new Set(SY.conf.map(c=>c.k));
 for(const k of rk){const d=docs[k],id=k.slice(2),r=SY.rev[k]||0;if(d.rev<=r||have.has(k))continue;SY.ctx={fase:'tarik',id,rev:d.rev};
@@ -3177,26 +3180,26 @@ if(ln.kind==='pdf'){const b=await idb('get',ln.id);if(b)await idb('put',cp.id,b)
 if(cp.rec)for(const r of cp.rec){const nid=uid(),b=await idb('get','rec-'+r.id);if(b)await idb('put','rec-'+nid,b);r.id=nid}
 S.notes.unshift(cp);dirty.add(cp.id);SY.ui=1}
 /* ── layar pengaturan ── */
-async function syncUI(msg){modal('<b>☁ Sinkron awan</b><p class=mu>Memeriksa server…</p>');let st=null;try{st=await sapi('status',{t:''})}catch(e){}
-if(!st){modal('<b>☁ Sinkron awan</b><p class=mu>Server sinkron tidak menjawab dengan benar (balasan bukan JSON atau tidak terjangkau). Di komputer lokal, fungsi <code>/api</code> hanya berjalan lewat <code>vercel dev</code>, bukan <code>vite</code> saja; di situs yang sudah dideploy, periksa bahwa file <code>api/zhanotes-cloud.ts</code> ikut terdeploy. Rincinya ada di Log.</p><button onclick="syncUI()">↻ Coba lagi</button> '+`<button onclick="slogUI()">🐞 Log (<span id=slb>${slogCount()}</span>)</button>`+' <button onclick="closeM()">Tutup</button>');return}
-if(st&&!st.configured)slog('W','status','Server belum dikonfigurasi',{kurang:st.missing});if(!st||!st.configured){modal('<b>☁ Sinkron awan</b><p class=mu>Fitur ini belum aktif di server ini. ZhaNotes tetap berjalan penuh secara offline; gunakan Cadangan ZIP untuk menyimpan salinan.</p>'+(st.missing&&st.missing.length?'<p class=mu>Pemilik situs: variabel yang belum terisi di Vercel: <code>'+st.missing.map(esc).join('</code>, <code>')+'</code>. Isi untuk lingkungan <b>Production</b>, lalu deploy ulang (variabel baru baru terbaca pada deployment berikutnya).</p>':'')+'<button onclick="backupUI()">💾 Cadangan ZIP</button> '+`<button onclick="slogUI()">🐞 Log (<span id=slb>${slogCount()}</span>)</button>`+' <button onclick="closeM()">Tutup</button>');return}
+async function syncUI(msg){modal('<b>☁ Sinkron awan</b><p class=mu>Memeriksa server…</p>');let st=null;try{st=await sapi('status',{t:''})}catch(e){}if(st)slogMaster(st.debug);
+if(!st){modal('<b>☁ Sinkron awan</b><p class=mu>Server sinkron tidak menjawab dengan benar (balasan bukan JSON atau tidak terjangkau). Di komputer lokal, fungsi <code>/api</code> hanya berjalan lewat <code>vercel dev</code>, bukan <code>vite</code> saja; di situs yang sudah dideploy, periksa bahwa file <code>api/zhanotes-cloud.ts</code> ikut terdeploy. Rincinya ada di Log.</p><button onclick="syncUI()">↻ Coba lagi</button> '+`${slogBtn()}`+' <button onclick="closeM()">Tutup</button>');return}
+if(st&&!st.configured)slog('W','status','Server belum dikonfigurasi',{kurang:st.missing});if(!st||!st.configured){modal('<b>☁ Sinkron awan</b><p class=mu>Fitur ini belum aktif di server ini. ZhaNotes tetap berjalan penuh secara offline; gunakan Cadangan ZIP untuk menyimpan salinan.</p>'+(st.missing&&st.missing.length?'<p class=mu>Pemilik situs: variabel yang belum terisi di Vercel: <code>'+st.missing.map(esc).join('</code>, <code>')+'</code>. Isi untuk lingkungan <b>Production</b>, lalu deploy ulang (variabel baru baru terbaca pada deployment berikutnya).</p>':'')+'<button onclick="backupUI()">💾 Cadangan ZIP</button> '+`${slogBtn()}`+' <button onclick="closeM()">Tutup</button>');return}
 if(!useIDB){modal('<b>☁ Sinkron awan</b><p class=mu>Sinkron membutuhkan IndexedDB, yang tidak tersedia di peramban ini.</p><button onclick="closeM()">Tutup</button>');return}
-if(!SY.on){modal(`<b>☁ Sinkron awan</b><p class=mu>Catatan otomatis tersimpan di cloud dan muncul di perangkat lain. Isinya <b>dienkripsi di peramban ini</b> sebelum dikirim, jadi server hanya menyimpan data acak. <b>Kata sandi enkripsi tidak disimpan di server.</b> Jika lupa, data di cloud tidak bisa dipulihkan (Anda hanya bisa menghapusnya dan mulai ulang).</p>${msg?`<p>${esc(msg)}</p>`:''}<input id=syt type=password placeholder="Token akses" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp type=password placeholder="Kata sandi enkripsi (min. 8 karakter)" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp2 type=password placeholder="Ulangi kata sandi (hanya saat pertama kali)" style="width:100%;margin:4px 0" autocomplete="off"><p class=mu>Di perangkat kerja/umum, gunakan “Keluar &amp; hapus data lokal” setelah selesai.</p><button onclick="syncEnable()" style="background:var(--ac);color:#fff">Aktifkan sinkron</button> <button onclick="slogUI()">🐞 Log (<span id=slb>${slogCount()}</span>)</button> <button onclick="closeM()">Batal</button>`);return}
-modal(`<b>☁ Sinkron awan</b><p id=syst>${sstat()}</p>${msg?`<p>${esc(msg)}</p>`:''}<p>${SY.conf.length?`<button onclick="sconfUI()" style="background:#e11d48;color:#fff">⚠ Selesaikan ${SY.conf.length} konflik</button> `:''}<button onclick="spass();setTimeout(syncUI,300)" style="background:var(--ac);color:#fff">⟳ Sinkronkan sekarang</button></p><p><button onclick="syncOff()">Matikan di perangkat ini</button> <button onclick="syncWipe()">Keluar &amp; hapus data lokal</button> <button onclick="syncReset()">Hapus semua data cloud</button> <button onclick="slogUI()">🐞 Log (<span id=slb>${slogCount()}</span>)</button></p><p class=mu>Perubahan disinkronkan otomatis beberapa detik setelah Anda berhenti mengetik, dan saat aplikasi dibuka kembali.</p>`)}
+if(!SY.on){modal(`<b>☁ Sinkron awan</b><p class=mu style="border-left:3px solid var(--ac);padding-left:10px">ℹ️ <b>Fitur edisi kustom.</b> Sinkron awan membutuhkan token akses dari penyedia aplikasi dan tidak diperlukan untuk memakai ZhaNotes: versi gratis tetap lengkap dan bekerja offline. Ingin ZhaNotes untuk bisnis Anda? <a href="https://wa.me/6282312312734" target="_blank" rel="noopener">Hubungi via WhatsApp</a>.</p><p class=mu>Catatan otomatis tersimpan di cloud dan muncul di perangkat lain. Isinya <b>dienkripsi di peramban ini</b> sebelum dikirim, jadi server hanya menyimpan data acak. <b>Kata sandi enkripsi tidak disimpan di server.</b> Jika lupa, data di cloud tidak bisa dipulihkan (Anda hanya bisa menghapusnya dan mulai ulang).</p>${msg?`<p>${esc(msg)}</p>`:''}<input id=syt type=password placeholder="Token akses" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp type=password placeholder="Kata sandi enkripsi (min. 8 karakter)" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp2 type=password placeholder="Ulangi kata sandi (hanya saat pertama kali)" style="width:100%;margin:4px 0" autocomplete="off"><p class=mu>Di perangkat kerja/umum, gunakan “Keluar &amp; hapus data lokal” setelah selesai.</p><button onclick="syncEnable()" style="background:var(--ac);color:#fff">Aktifkan sinkron</button> ${slogBtn()} <button onclick="closeM()">Batal</button>`);return}
+modal(`<b>☁ Sinkron awan</b><p id=syst>${sstat()}</p>${msg?`<p>${esc(msg)}</p>`:''}<p>${SY.conf.length?`<button onclick="sconfUI()" style="background:#e11d48;color:#fff">⚠ Selesaikan ${SY.conf.length} konflik</button> `:''}<button onclick="spass();setTimeout(syncUI,300)" style="background:var(--ac);color:#fff">⟳ Sinkronkan sekarang</button></p><p><button onclick="syncOff()">Matikan di perangkat ini</button> <button onclick="syncWipe()">Keluar &amp; hapus data lokal</button> <button onclick="syncReset()">Hapus semua data cloud</button> ${slogBtn()}</p><p class=mu>Perubahan disinkronkan otomatis beberapa detik setelah Anda berhenti mengetik, dan saat aplikasi dibuka kembali.</p>`)}
 async function syncEnable(){const t=(($('#syt')||{}).value||'').trim(),p=($('#syp')||{}).value||'',p2=($('#syp2')||{}).value||'';
 if(!t)return toast('Isi token akses dulu');if(p.length<8)return toast('Kata sandi enkripsi minimal 8 karakter');
 try{toast('Memeriksa…');let cfg=(await sapi('sync-config',{t})).config,key;
-if(cfg){key=await skey(p,cfg.salt,sit(cfg));try{const ok=TD.decode(await sdec(unb64(cfg.check),key));if(ok!=='zhanotes-ok')throw 0}catch(e){slog('W','aktivasi','Kata sandi enkripsi salah');return toast('Kata sandi enkripsi salah')}}
-else{if(p!==p2)return toast('Kata sandi tidak sama dengan ulangannya');const salt=b64(crypto.getRandomValues(new Uint8Array(16)));key=await skey(p,salt,SITER);const check=b64(await senc(TE.encode('zhanotes-ok'),key));
-try{await sapi('sync-config',{t,method:'POST',json:{salt,check,iter:SITER}});cfg={salt,check,iter:SITER}}catch(e){if(e.status===409&&e.data&&e.data.config){cfg=e.data.config;key=await skey(p,cfg.salt,sit(cfg));try{await sdec(unb64(cfg.check),key)}catch(x){return toast('Kata sandi enkripsi salah')}}else throw e}}
-SY.t=t;SY.key=key;SY.salt=cfg.salt;SY.on=true;SY.ix=null;SY.sq=null;SY.rev={};SY.sig={};SY.del=[];SY.delb=[];SY.bin={};SY.msig='';SY.seeded=0;SY.conf=[];SY.err='';SY.last=0;
+if(cfg){key=await skey(p,cfg.salt);try{const ok=TD.decode(await sdec(unb64(cfg.check),key));if(ok!=='zhanotes-ok')throw 0}catch(e){slog('W','aktivasi','Kata sandi enkripsi salah');return toast('Kata sandi enkripsi salah')}}
+else{if(p!==p2)return toast('Kata sandi tidak sama dengan ulangannya');const salt=b64(crypto.getRandomValues(new Uint8Array(16)));key=await skey(p,salt);const check=b64(await senc(TE.encode('zhanotes-ok'),key));
+try{await sapi('sync-config',{t,method:'POST',json:{salt,check}});cfg={salt,check}}catch(e){if(e.status===409&&e.data&&e.data.config){cfg=e.data.config;key=await skey(p,cfg.salt);try{await sdec(unb64(cfg.check),key)}catch(x){return toast('Kata sandi enkripsi salah')}}else throw e}}
+SY.t=t;SY.key=key;SY.salt=cfg.salt;SY.on=true;SY.rev={};SY.sig={};SY.del=[];SY.delb=[];SY.bin={};SY.msig='';SY.seeded=0;SY.conf=[];SY.err='';SY.last=0;
 SY.pend=S.notes.filter(n=>!isSeed(n)).map(n=>n.id);
 await idb('put','synckey',key);await spersist();slog('I','aktivasi','Sinkron diaktifkan',{pending:SY.pend.length});sbadge();spass();syncUI('✅ Sinkron diaktifkan. Catatan di perangkat ini mulai diunggah.')}
 catch(e){slog('E','aktivasi','Gagal mengaktifkan sinkron',{err:e});toast('Gagal: '+(e&&e.message||''))}}
 async function syncStop(){SY.on=false;SY.key=null;clearTimeout(_sT);try{await idb('del','sync');await idb('del','synckey');for(const k of await idb('keys','sbase-'))await idb('del',k)}catch(e){}sbadge()}
 function syncOff(){ask('Matikan sinkron di perangkat ini? Catatan di perangkat ini tetap ada, tetapi tidak lagi dikirim ke atau diterima dari cloud.','Matikan',async()=>{await syncStop();syncUI('Sinkron dimatikan di perangkat ini.')})}
 function syncWipe(){ask('Hapus SEMUA catatan di perangkat ini dan keluar dari sinkron? Catatan di cloud tidak dihapus. Perubahan yang belum terkirim akan hilang.','Keluar & hapus',async()=>{try{toast('Mengirim perubahan terakhir…');await spass();if(SY.pend.length||SY.del.length||SY.conf.length){return ask('Masih ada '+(SY.pend.length+SY.del.length)+' perubahan belum terkirim dan '+SY.conf.length+' konflik. Tetap hapus data lokal?','Tetap hapus',syncWipeNow)}await syncWipeNow()}catch(e){slog('E','keluar','Gagal keluar & hapus data lokal',{err:e});toast('Gagal: '+(e&&e.message||''))}})}
-async function syncWipeNow(){await syncStop();try{const db=await odb();db.close()}catch(e){}_db=null;await new Promise(r=>{const q=indexedDB.deleteDatabase('cv-pdf');q.onsuccess=q.onerror=q.onblocked=()=>r()});try{localStorage.removeItem('cv1');localStorage.removeItem('cv-ui')}catch(e){}location.reload()}
+async function syncWipeNow(){await syncStop();try{const db=await odb();db.close()}catch(e){}_db=null;await new Promise(r=>{const q=indexedDB.deleteDatabase('cv-pdf');q.onsuccess=q.onerror=q.onblocked=()=>r()});try{localStorage.removeItem('cv1');localStorage.removeItem('cv-ui')}catch(e){}(window.znLeave=1,location.reload())}
 function syncReset(){ask('Hapus SEMUA data ZhaNotes di cloud (catatan, lampiran, dan pengaturan enkripsi)? Catatan di perangkat ini tidak terhapus. Ini tidak bisa dibatalkan.','Hapus data cloud',async()=>{try{await sapi('sync-reset',{method:'POST'});slog('W','reset','Data cloud dihapus oleh pengguna');await syncStop();syncUI('Data cloud dihapus. Aktifkan lagi untuk memulai ulang dengan kata sandi baru.')}catch(e){slog('E','reset','Gagal menghapus data cloud',{err:e});toast('Gagal: '+(e&&e.message||''))}})}
 const safe=s=>String(s||'tanpa-judul').replace(/[\\/:*?"<>|]/g,'_').slice(0,60);
 async function makeBackup(){await ldE('emb-jszip','JSZip',JSZIP);const z=new JSZip();z.file('catatan.json',JSON.stringify({v:2,folders:S.folders,notes:S.notes.map(n=>({...n,v:[]}))}));
@@ -3395,7 +3398,7 @@ function dailyNote(){const t='Harian '+isoD();const n=S.notes.find(x=>x.t===t&&x
 function gvClose(){const g=document.getElementById('gv');if(g){g._stop&&g._stop();g.remove()}const t=$('#gv-tip');t&&(t.style.display='none')}
 function graph(){gvClose();const el=document.createElement('div');el.id='gv';
 el.innerHTML=`<div class="gv-h"><b>🕸 Graph Backlinks</b><label><input type="checkbox" id="gv-all"> Semua catatan</label>${cur?'<label><input type="checkbox" id="gv-loc"> Sekitar catatan ini</label>':''}<span class="mu" id="gv-info"></span><span style="flex:1"></span><button id="gv-p" title="Perbesar">＋</button><button id="gv-m" title="Perkecil">−</button><button id="gv-f">Pas</button><button id="gv-x">✕ Tutup</button></div><canvas id="gv-c"></canvas><div id="gv-tip"></div>`;document.body.appendChild(el);
-const cv=el.querySelector('#gv-c'),cx=cv.getContext('2d'),tip=el.querySelector('#gv-tip'),info=el.querySelector('#gv-info'),rs=getComputedStyle(document.documentElement),C={tx:rs.getPropertyValue('--tx').trim()||'#222',mu:rs.getPropertyValue('--mu').trim()||'#888',bd:rs.getPropertyValue('--bd').trim()||'#ddd',ac:rs.getPropertyValue('--ac').trim()||'#4f46e5',bg:rs.getPropertyValue('--bg').trim()||'#fff'},KC={page:C.ac,canvas:'#059669',riset:'#d97706',pdf:'#e11d48',ghost:C.mu};
+const cv=el.querySelector('#gv-c'),cx=cv.getContext('2d'),tip=el.querySelector('#gv-tip'),info=el.querySelector('#gv-info'),rs=getComputedStyle(document.documentElement),C={tx:rs.getPropertyValue('--tx').trim()||'#222',mu:rs.getPropertyValue('--mu').trim()||'#888',bd:rs.getPropertyValue('--bd').trim()||'#ddd',ac:rs.getPropertyValue('--ac').trim()||'#2d4399',bg:rs.getPropertyValue('--bg').trim()||'#fff'},KC={page:C.ac,canvas:'#059669',riset:'#d97706',pdf:'#e11d48',ghost:C.mu};
 let W=0,H=0,DPR=window.devicePixelRatio||1,V={k:1,x:0,y:0},nodes=[],edges=[],alpha=1,raf=0,hover=null,drag=null,nb=new Set();const pos=new Map();
 const rad=n=>4+Math.sqrt(n.deg)*2.6;
 function build(){const all=el.querySelector('#gv-all').checked,locE=el.querySelector('#gv-loc'),loc=locE&&locE.checked;
@@ -3480,10 +3483,10 @@ window.addEventListener('appinstalled',()=>{PWA.installed=true;PWA.dp=null;pwaHi
 
 /* --- toast pembaruan --- */
 function pwaShowUpdate(reg){const el=document.getElementById('pwa-u');if(!el)return;el.hidden=false;document.getElementById('pwa-u-go').onclick=async()=>{const b=document.getElementById('pwa-u-go');b.disabled=true;b.textContent='Memuat…';try{if(typeof flush==='function')await flush()}catch(e){}
-PWA.reloading=true;if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});else location.reload();setTimeout(()=>{if(PWA.reloading)location.reload()},3000)}}
+PWA.reloading=true;if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});else (window.znLeave=1,location.reload());setTimeout(()=>{if(PWA.reloading)(window.znLeave=1,location.reload())},3000)}}
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   if(location.pathname==='/zhanotes')try{history.replaceState(null,'','/zhanotes/'+location.search+location.hash)}catch(e){}
-  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(PWA.reloading)location.reload()});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(PWA.reloading)(window.znLeave=1,location.reload())});
   const reg_=()=>navigator.serviceWorker.register('/sw.js').then(reg=>{
     const ping=()=>{if(reg.waiting&&navigator.serviceWorker.controller)pwaShowUpdate(reg)};ping();
     reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw&&nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller)pwaShowUpdate(reg)})});
@@ -3491,7 +3494,7 @@ if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
   }).catch(()=>{});
   if(document.readyState==='complete')reg_();else window.addEventListener('load',reg_);
 }
-document.body.insertAdjacentHTML('beforeend',`<div id="pwa-i" class="zn-pwa" role="dialog" aria-label="Pasang aplikasi" hidden><img src="/zhanotes/icons/icon-192.png" alt="" width="44" height="44"><div class="zn-pwa-t"><b>Pasang ZhaNotes</b><small id="pwa-i-msg">Akses cepat dari layar utama, terbuka tanpa browser, dan tetap bisa dipakai offline.</small><ol id="pwa-i-ios" hidden><li>Ketuk ikon <b>Bagikan</b> (⬆︎) di Safari.</li><li>Pilih <b>Tambah ke Layar Utama</b> (<i>Add to Home Screen</i>).</li><li>Ketuk <b>Tambah</b> di pojok kanan atas.</li></ol><div class="zn-pwa-a"><button id="pwa-i-ok" onclick="pwaOk()">⬇ Pasang</button><button onclick="pwaHideInstall(true)">Nanti saja</button></div></div><button class="zn-pwa-x" aria-label="Tutup" onclick="pwaHideInstall(true)">✕</button></div><div id="pwa-u" class="zn-pwa-u" role="status" hidden><span>✨ Versi baru tersedia</span><button id="pwa-u-go">⟳ Muat ulang</button><button class="zn-pwa-x" aria-label="Nanti" onclick="this.parentNode.hidden=true">✕</button></div>`);
+document.body.insertAdjacentHTML('beforeend',`<div id="pwa-i" class="zn-pwa" role="dialog" aria-label="Pasang aplikasi" hidden><img src="/zhanotes/icons/icon-192.png?v=2" alt="" width="44" height="44"><div class="zn-pwa-t"><b>Pasang ZhaNotes</b><small id="pwa-i-msg">Akses cepat dari layar utama, terbuka tanpa browser, dan tetap bisa dipakai offline.</small><ol id="pwa-i-ios" hidden><li>Ketuk ikon <b>Bagikan</b> (⬆︎) di Safari.</li><li>Pilih <b>Tambah ke Layar Utama</b> (<i>Add to Home Screen</i>).</li><li>Ketuk <b>Tambah</b> di pojok kanan atas.</li></ol><div class="zn-pwa-a"><button id="pwa-i-ok" onclick="pwaOk()">⬇ Pasang</button><button onclick="pwaHideInstall(true)">Nanti saja</button></div></div><button class="zn-pwa-x" aria-label="Tutup" onclick="pwaHideInstall(true)">✕</button></div><div id="pwa-u" class="zn-pwa-u" role="status" hidden><span>✨ Versi baru tersedia</span><button id="pwa-u-go">⟳ Muat ulang</button><button class="zn-pwa-x" aria-label="Nanti" onclick="this.parentNode.hidden=true">✕</button></div>`);
 
 /* ===== pintasan ===== */
 document.addEventListener('keydown',e=>{const k=e.key.toLowerCase(),ed=e.target.isContentEditable||/^(input|textarea|select)$/i.test(e.target.tagName),mod=e.ctrlKey||e.metaKey;
@@ -3869,6 +3872,48 @@ document.addEventListener('keydown',e=>{if(e.altKey&&e.shiftKey&&!e.ctrlKey&&!e.
 const t=e.target,tb=t&&t.closest&&t.closest('#tabs .tab');if(!tb||!e.altKey||!e.shiftKey||(e.key!=='ArrowLeft'&&e.key!=='ArrowRight'))return;e.preventDefault();const id=tb.dataset.id,i=TABS.indexOf(id),j=i+(e.key==='ArrowLeft'?-1:1);if(i<0||j<0||j>=TABS.length)return;TABS.splice(i,1);TABS.splice(j,0,id);tabsSave();tabsUpd();const f=document.querySelector('#tabs .tab[data-id="'+id+'"]');f&&f.focus()},true)})();
 /* lencana tenggat/ulang di editor */
 {const st=document.createElement('style'),R={d:'harian',wd:'hari kerja',w:'mingguan',w2:'2 mingguan',m:'bulanan',y:'tahunan'};let c='';for(const[k,v]of Object.entries(R)){c+=`.task-item[data-rep="${k}"]::after{content:"↻ ${v}"}.task-item[data-rep="${k}"][data-due]::after{content:"↻ ${v} · " attr(data-due)}`}st.textContent='.task-item[data-due]::after,.task-item[data-rep]::after{font-size:11.5px;color:var(--mu);background:var(--hl);border-radius:10px;padding:1px 8px;white-space:nowrap;flex:none;user-select:none}.task-item[data-due]::after{content:"📅 " attr(data-due)}'+c;document.head.appendChild(st)}
+
+/* ---- Peringatan sebelum keluar (tombol Kembali / tutup tab / ← Portofolio) ---- */
+(()=>{
+const KEY='zn-exitwarn';
+const on=()=>{try{return localStorage.getItem(KEY)!=='0'}catch(e){return true}};
+const setOn=v=>{try{localStorage.setItem(KEY,v?'1':'0')}catch(e){}};
+let armed=false;
+const pend=()=>{try{return SY&&SY.on&&SY.pend?SY.pend.length:0}catch(e){return 0}};
+const push=()=>{try{history.pushState({zn:1},'',location.href)}catch(e){}};
+/* Entri penjaga baru didorong setelah interaksi pertama: Chrome melewati entri riwayat yang dibuat tanpa interaksi. */
+const arm=()=>{if(armed||!on())return;armed=true;push()};
+['pointerdown','keydown','touchstart'].forEach(ev=>addEventListener(ev,arm,{capture:true,passive:true}));
+/* Tutup tab, muat ulang, ketik alamat lain: dialog bawaan peramban (teksnya tidak bisa diubah). */
+addEventListener('beforeunload',e=>{if(window.znLeave||!on())return;e.preventDefault();e.returnValue=''});
+function exitAsk(dest){
+  const n=pend();
+  window.znExitDest=dest||'';
+  modal(`<b>Keluar dari ZhaNotes?</b><p class=mu style="margin:8px 0 14px">Catatan Anda tersimpan otomatis di perangkat ini.${n?` Ada ${n} perubahan yang belum terkirim ke cloud; tetap aman di sini dan terkirim saat Anda kembali.`:''}</p><div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap"><button onclick="exitGo()">Keluar</button><button id=exk class=btn-p onclick="closeM()">Tetap di sini</button></div>`);
+  const b=document.getElementById('exk');b&&b.focus();
+}
+window.exitGo=()=>{
+  window.znLeave=1;try{flush()}catch(e){}closeM();
+  const d=window.znExitDest;
+  if(d){location.href=d;return}
+  history.go(armed?-2:-1);                       /* lewati entri penjaga lalu keluar dari halaman ini */
+  setTimeout(()=>{location.href='/'},600);       /* tidak ada halaman sebelumnya (tab baru / PWA): ke portofolio */
+};
+window.exitLink=e=>{
+  if(!on()||(e&&(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||e.button)))return true;
+  if(e)e.preventDefault();exitAsk('/');return false;
+};
+addEventListener('popstate',()=>{
+  if(window.znLeave||!armed)return;
+  if(!on()){history.back();return}                 /* peringatan dimatikan setelah penjaga terpasang: biarkan Kembali bekerja */
+  push();                                          /* pasang penjaga lagi supaya Kembali berikutnya juga tertahan */
+  const mo=$('#ov').classList.contains('on'),dr=document.body.classList.contains('sdo');
+  if(mo||dr){closeM();document.body.classList.remove('sdo');return}   /* Kembali menutup panel yang terbuka dulu */
+  exitAsk('');
+});
+const C0=CMDS;
+CMDS=function(){const C=C0();C.push({l:on()?'Matikan peringatan sebelum keluar':'Nyalakan peringatan sebelum keluar',kw:'peringatan konfirmasi keluar tutup kembali tab',sc:'',f:()=>{const v=!on();setOn(v);if(v)arm();toast(v?'Peringatan sebelum keluar: nyala':'Peringatan sebelum keluar: mati')}});return C};
+})();
 </script>
 <script id="zn-rz">
 (()=>{const R=document.documentElement,LIM={c1:[160,420,220],c2:[220,640,290]};let V={};try{V=JSON.parse(localStorage.getItem('zn-cols')||'{}')}catch(e){}
