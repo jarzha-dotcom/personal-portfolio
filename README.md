@@ -120,6 +120,16 @@ Saya lebih percaya pada bukti nyata daripada sekadar janji. Berikut adalah beber
     *   **Mode Antrean Offline Gudang**: Staf tetap dapat menginput data di area ruang bawah tanah atau area minim sinyal; data otomatis tersinkronisasi saat kembali online.
     *   **Ekspor Laporan Otomatis**: Laporan resmi berformat PDF dan Excel terkirim langsung ke email manajemen.
 
+4.  **📝 ZhaNotes — Catatan, Kanvas & Anotasi PDF: Gratis, Offline, Tanpa Iklan Pihak Ketiga**  
+    *Kunjungi & Coba: [arzhaning.my.id/zhanotes](https://arzhaning.my.id/zhanotes/)*  
+    *   **4 Mode Kerja dalam Satu Aplikasi**: Halaman rich-text (checklist, tabel, kotak callout, perintah cepat `/`), Kanvas bebas (pena peka tekanan, bentuk, kartu teks, konektor), Riset & Kliping (tautan, kutipan, tangkapan layar, catatan pribadi), dan PDF Reader & Annotator (stabilo teks, coretan, kartu catatan, ekspor PDF beranotasi).
+    *   **Local-First & Zero Server Cost**: Berjalan 100% di browser (IndexedDB) tanpa akun. Catatan, PDF, dan rekaman suara tersimpan di perangkat Anda, dengan cadangan ZIP kapan saja dan bisa dipakai offline.
+    *   **Wiki Backlinks & Peta Grafis**: Hubungkan catatan dengan sintaks `[[ ]]`, lihat tautan masuk/keluar, dan jelajahi peta keterkaitan antar catatan.
+    *   **Perekam Suara Berpenanda Waktu**: Rekam rapat atau kuliah, lalu tandai momen penting untuk dilompati nanti.
+    *   **Ekspor Tanpa Backend**: Word (.docx), PDF, Markdown, HTML, JSON, PNG, dan SVG dihasilkan langsung di browser.
+    *   **Contoh Bawaan**: Laporan audit PDF beranotasi dan diagram kanvas alur rekonsiliasi bank, siap dicoba begitu aplikasi dibuka.
+    *   **Edisi Kustom (Beli Putus)**: Tersedia untuk bisnis dengan nama, logo, dan desain sesuai permintaan, tanpa biaya langganan. Opsional sinkron awan antar perangkat yang dienkripsi AES-GCM di peramban, disiapkan di akun Vercel dan penyimpanan milik pelanggan sendiri. Versi umum tidak memiliki sinkron awan.
+
 ---
 
 ### 7. 📚 Pusat Edukasi & Artikel Wawasan Bisnis/Teknologi (Audio-Enabled)
@@ -174,6 +184,13 @@ Sebanyak 30 file desain landing page dan aplikasi web mandiri di folder ini adal
 
 Pelanggaran akan ditindaklanjuti melalui **DMCA takedown** dan jalur hukum yang berlaku.
 
+### Aplikasi ZhaNotes (`public/zhanotes/`)
+ZhaNotes **gratis dipakai** lewat website, tetapi kode sumbernya tetap karya eksklusif K. Arzhaning Jagad dan **bukan open source**:
+- ✅ **Diizinkan** menggunakan aplikasi untuk keperluan pribadi dan melihatnya sebagai referensi kualitas
+- ❌ **Dilarang** menyalin, mendistribusikan ulang, menjual, atau menjadikannya dasar produk lain
+- ❌ **Dilarang** menghapus atau mengganti identitas pembuat tanpa izin tertulis
+- 💼 Penggunaan komersial dengan nama dan branding sendiri tersedia lewat **Edisi Kustom** berlisensi pakai (hubungi saya untuk detail)
+
 ---
 
 ## 💼 Layanan Jasa yang Saya Tawarkan
@@ -188,6 +205,8 @@ Saya siap membantu mewujudkan kebutuhan digital bisnis Anda, mulai dari tahap ko
     Pembuatan sistem pencatatan stok, aset, pelacakan barcode/QR, dan rekonsiliasi data berbasis cloud hemat biaya yang dirancang siap pakai dan rapi diaudit.
 4.  **Platform Game Realtime & Gamifikasi Interaktif**  
     Pembangunan game edukasi interaktif maupun platform permainan papan multiplayer online untuk kebutuhan promosi brand, komunitas, atau media edukasi keluarga.
+5.  **Edisi Kustom Aplikasi Siap Pakai (ZhaNotes)**  
+    Aplikasi catatan, kanvas, dan anotasi PDF dengan nama, logo, dan desain bisnis Anda. Sistem beli putus tanpa langganan, opsional dengan sinkron awan terenkripsi di akun milik Anda sendiri.
 
 ---
 
@@ -203,4 +222,4 @@ Punya ide aplikasi, ingin mengotomatiskan alur kerja bisnis, atau ingin memasang
 ---
 
 *Hak Cipta © 2026 K. Arzhaning Jagad (Arzha). Seluruh hak cipta dilindungi undang-undang.*  
-*File desain di `public/demos/` dilindungi tambahan — lihat [LICENSE](./LICENSE) untuk detail lengkap.*
+*File desain di `public/demos/` dan aplikasi di `public/zhanotes/` dilindungi tambahan — lihat [LICENSE](./LICENSE) untuk detail lengkap.*

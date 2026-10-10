@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v8';
+const CACHE_VERSION = 'v9';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';

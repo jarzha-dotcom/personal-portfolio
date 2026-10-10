@@ -110,7 +110,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'proses',
     quickLabel: 'Source code dikasih ke klien?',
     keywords: ['source code', 'kodingan', 'repo', 'github', 'hak milik', 'milik siapa', 'dapet kodingan'],
-    answer: '100% dikasih! Seluruh source code, repositori GitHub, dan aset project diserahkan penuh jadi hak milik Kakak tanpa biaya lisensi tersembunyi.',
+    answer: 'Untuk proyek custom, hasil kerja yang dibuat khusus untuk Kakak (source code, repositori GitHub, dan aset project) diserahkan lengkap tanpa biaya lisensi tersembunyi. Pustaka open-source pihak ketiga tetap mengikuti lisensinya masing-masing, dan produk milik Arzha seperti ZhaNotes edisi kustom diberikan dalam bentuk lisensi pakai. Rincian serah terimanya kita tuangkan tertulis di awal kesepakatan ya 😊',
   },
   {
     id: 'proses-hosting',
@@ -124,7 +124,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'proses',
     quickLabel: 'Kenapa bisa percaya sama Arzha?',
     keywords: ['ga percaya', 'tidak percaya', 'ragu', 'takut ditipu', 'penipuan', 'aman ga', 'terpercaya', 'bukti kerja', 'ga mau', 'kabur'],
-    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 3 proyek live nyata yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
+    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 4 aplikasi live nyata (ditambah chatbot AI dan galeri 30 demo) yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
   },
   // ── 🛠️ Skill & Teknis ──
   {
@@ -161,7 +161,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
     keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 5 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server), 5) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
+    answer: 'Ada 4 aplikasi live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server). Selain itu ada AI Chatbot Showcase (multi-agent Gemini & Antigravity) dan galeri 30 demo desain & aplikasi di arzhaning.my.id/demos. Cek demonya di bagian Proyek ya!',
   },
   {
     id: 'portfolio-bgames',

@@ -182,7 +182,7 @@ Setiap catatan halaman dan riset dilengkapi perekam suara bawaan:
 
 - Buka **Data → Sinkron awan**, isi token akses dan kata sandi enkripsi. Setelah aktif, setiap perubahan dikirim otomatis (jeda ±2,5 detik) dan diperiksa ulang tiap 90 detik saat aplikasi terbuka, jadi catatan dari laptop sudah ada di HP tanpa cadangan manual.
 - Catatan, PDF, dan rekaman **dienkripsi di peramban** (AES-GCM) sebelum diunggah. Kata sandi enkripsi tidak pernah dikirim atau disimpan di server.
-- **Gabung otomatis:** jika satu catatan diubah di dua perangkat pada bagian yang berbeda (paragraf berbeda, kotak atau coretan kanvas berbeda, anotasi PDF berbeda, tag dan judul berbeda), hasilnya digabung sendiri dan versi sebelum gabung masuk Riwayat.
+- **Gabung otomatis:** jika satu catatan diubah di dua perangkat pada bagian yang berbeda (paragraf berbeda, kotak, coretan, atau konektor kanvas berbeda, ikon dan warna label, anotasi PDF berbeda, tag dan judul berbeda), hasilnya digabung sendiri dan versi sebelum gabung masuk Riwayat.
 - **Bentrok:** jika bagian yang sama diubah di dua tempat (atau catatan dihapus di satu dan diedit di lain), muncul layar perbandingan dengan pilihan **Gabungkan** (kedua versi bagian yang bentrok ditaruh berdampingan dan ditandai ⚠), pakai versi perangkat ini, pakai versi cloud, atau simpan keduanya.
 - **Log debug:** di jendela Sinkron awan tekan **🐞 Log**. Error dan peringatan selalu tercatat; aktifkan **Mode debug** untuk melihat tiap langkah (panggilan server, putaran sinkron, konflik). Log bisa disalin atau diunduh `.txt` dan tidak memuat token, kata sandi, judul, maupun isi catatan.
 - Cadangan ZIP lokal tetap tersedia kapan saja.

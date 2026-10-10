@@ -4,7 +4,9 @@
 <!-- PRERENDER:ZHANOTES_HEAD:START --><!-- PRERENDER:ZHANOTES_HEAD:END -->
 <link rel="icon" href="/favicon.ico">
 <link rel="manifest" href="/zhanotes/manifest.webmanifest">
-<link rel="apple-touch-icon" href="/zhanotes/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/zhanotes/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/zhanotes/icons/favicon-32x32.png">
+<link rel="apple-touch-icon" href="/zhanotes/icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ZhaNotes">
@@ -918,7 +920,6 @@ const WELCOME_BODY=[
  '<a href="https://arzhaning.my.id/demos" target="_blank" rel="noopener">30 demo desain &amp; aplikasi</a>.</p>',
  '<h3>Offline &amp; keamanan data</h3>',
  WB_CALLOUT('callout-info','ℹ️','<b>Soal offline:</b> pembukaan pertama membutuhkan internet. Setelah pernah dibuka sekali, halaman tersimpan di cache peramban dan bisa dipakai tanpa internet, selama cache itu tidak dibersihkan.'),
- WB_CALLOUT('callout-info','📲','<b>Bisa dipasang sebagai aplikasi (PWA).</b> Pilih <b>Instal aplikasi</b> di menu peramban, atau <b>Tambahkan ke layar utama</b> di ponsel, agar ZhaNotes mudah dibuka seperti aplikasi. Ketersediaan opsi bergantung pada peramban dan perangkat.'),
  WB_CALLOUT('callout-warn','⚠️','<b>Data hanya ada di peramban ini.</b> Catatan, coretan, PDF, dan rekaman tersimpan di IndexedDB perangkat ini. Data bisa hilang jika data situs dihapus atau peramban diganti, dan tidak otomatis ada di perangkat lain. Buat cadangan ZIP secara berkala lewat <b>Data → Cadangan &amp; pulihkan</b>, lalu pulihkan di perangkat mana pun.')
 ].join('');
 const RLK=(u,t,d,n)=>'<div class="lk" contenteditable="false"><a data-u="'+u+'" href="'+u+'">'+t+'</a><small>'+d+'</small><div class="lkn" contenteditable="true">'+n+'</div></div>';
@@ -1055,7 +1056,7 @@ WB_CALLOUT('callout-info','ℹ️','<b>Catatan edisi:</b> versi umum ZhaNotes be
 '<ul>',
 '<li><b>Aktifkan:</b> <b>Data → Sinkron awan</b>, isi token akses dan kata sandi enkripsi. Setelah itu setiap perubahan terkirim sendiri ke cloud dan muncul di perangkat lain; tidak perlu cadangan manual.</li>',
 '<li><b>Terenkripsi di perangkat:</b> isi catatan, PDF, dan rekaman dienkripsi sebelum dikirim. Kata sandi enkripsi tidak disimpan di server, jadi jangan sampai lupa.</li>',
-'<li><b>Gabung otomatis:</b> bila satu catatan diubah di dua perangkat pada bagian yang berbeda (paragraf berbeda, objek kanvas berbeda), keduanya digabung sendiri dan versi sebelumnya masuk Riwayat. Bila bagian yang sama diubah di dua tempat, muncul layar perbandingan dengan pilihan Gabungkan, pakai versi perangkat ini, pakai versi cloud, atau simpan keduanya.</li>',
+'<li><b>Gabung otomatis:</b> bila satu catatan diubah di dua perangkat pada bagian yang berbeda (paragraf berbeda, objek dan konektor kanvas berbeda, ikon atau warna label), keduanya digabung sendiri dan versi sebelumnya masuk Riwayat. Bila bagian yang sama diubah di dua tempat, muncul layar perbandingan dengan pilihan Gabungkan, pakai versi perangkat ini, pakai versi cloud, atau simpan keduanya.</li>',
 '<li><b>Log debug:</b> di jendela Sinkron awan tekan <b>🐞 Log</b>. Error selalu tercatat; aktifkan <b>Mode debug</b> untuk detail tiap langkah. Log bisa disalin atau diunduh dan tidak berisi token, kata sandi, atau isi catatan.</li>',
 '</ul>',
 '<h3>9. Konektor, Tugas, Ikon &amp; Tab</h3>',
@@ -1274,11 +1275,11 @@ cnt=x=>S.notes.filter(n=>inF(n,x)).length,
 row=n=>`<div class=rr style="${lcs(n)}" onclick="go('${n.id}')"><div class=ri>${nic(n)}</div><div class=rt><b>${esc(n.t||'Tanpa judul')}${n.pin?' '+I('pin'):''}</b><small>${n.folder?esc(fName(n.folder))+' · ':''}${n.exp?'Sementara':(KL[n.kind]||'')}${n.tags.length?' · '+n.tags.slice(0,3).map(t=>'#'+esc(t)).join(' '):''}</small></div><span class=tm>${rel(n.u)}</span></div>`,
 card=n=>`<div class=pcard style="${lcs(n)}" onclick="go('${n.id}')">${pvHTML(n)}<div class=pf>${nic(n)}<div style="min-width:0"><b>${esc(n.t||'Tanpa judul')}</b><small>${n.folder?esc(fName(n.folder))+' · ':''}${rel(n.u)}</small></div></div></div>`,
 up=f.k==='folder'&&f.v.indexOf('/')>=0?f.v.slice(0,f.v.lastIndexOf('/')):null;
-m.innerHTML=`<div class=hm2><div class=uib>${uiB()}</div><div class=hh1><div><div class=dt>${up!==null||f.k==='folder'?`<a class=crumb onclick="${up?`setF('folder','${esc(up).replace(/'/g,"\\'")}')`:"setF('all')"}">‹ ${up?esc(fName(up)):'Semua catatan'}</a>`:kic}</div><h1 class=ser>${f.k==='folder'?`<i class=fsw2 style="background:${fcol(f.v)}"></i>`:''}${esc(title)}</h1><p class=mu>${base.length} catatan${subs.length?' · '+subs.length+' notebook':''}${a.length!==base.length?' · menampilkan '+a.length:''}</p></div><div class=hr><span class=svs data-s="${svstate()}"><i></i><span class=svt>${svtxt()}</span></span><button class=btn-p onclick="nmToggle(event)">${I('plus')} Catatan baru ${I('down')}</button></div></div>
-${subs.length?`<div class=sh2>${I('folder')}<b>Notebook</b></div><div class=nbs>${subs.map(x=>`<div class=nb onclick="setF('folder','${esc(x).replace(/'/g,"\\'")}')" style="--nc:${fcol(x)}"><span class=nbc></span><div><b>${esc(fName(x))}</b><small>${cnt(x)} catatan</small></div></div>`).join('')}</div>`:''}
+m.innerHTML=`<div class=hm2><div class=uib>${uiB()}</div><div class=hh1><div><div class=dt>${up!==null||f.k==='folder'?`<a class=crumb onclick="${up?`setF('folder','${esc(String(up).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}')`:"setF('all')"}">‹ ${up?esc(fName(up)):'Semua catatan'}</a>`:kic}</div><h1 class=ser>${f.k==='folder'?`<i class=fsw2 style="background:${fcol(f.v)}"></i>`:''}${esc(title)}</h1><p class=mu>${base.length} catatan${subs.length?' · '+subs.length+' notebook':''}${a.length!==base.length?' · menampilkan '+a.length:''}</p></div><div class=hr><span class=svs data-s="${svstate()}"><i></i><span class=svt>${svtxt()}</span></span><button class=btn-p onclick="nmToggle(event)">${I('plus')} Catatan baru ${I('down')}</button></div></div>
+${subs.length?`<div class=sh2>${I('folder')}<b>Notebook</b></div><div class=nbs>${subs.map(x=>`<div class=nb onclick="setF('folder','${esc(String(x).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}')" style="--nc:${fcol(x)}"><span class=nbc></span><div><b>${esc(fName(x))}</b><small>${cnt(x)} catatan</small></div></div>`).join('')}</div>`:''}
 <div class=rh><div class=sh2 style="margin:0">${I('list')}<b>Catatan</b></div><span class=vt><button class="${HV.v==='list'?'on':''}" onclick="hvSet('v','list');coll($('#mn'))" title="Daftar">${I('list')}</button><button class="${HV.v==='grid'?'on':''}" onclick="hvSet('v','grid');coll($('#mn'))" title="Kisi">${I('grid')}</button></span></div>
 <div class=ft2>${[['all','Semua'],['page','Halaman'],['canvas','Kanvas'],['riset','Riset'],['pdf','PDF']].map(([k,l])=>`<button class="${CF===k?'on':''}" onclick="cfSet('f','${k}')">${l}${k!=='all'?' <i>'+base.filter(n=>n.kind===k).length+'</i>':''}</button>`).join('')}</div>
-${tg2.length?`<div class=tgc>${tg2.map(t=>`<button class="${CT===t?'on':''}" onclick="cfSet('t','${esc(t).replace(/'/g,"\\'")}')">#${esc(t)}</button>`).join('')}</div>`:''}
+${tg2.length?`<div class=tgc>${tg2.map(t=>`<button class="${CT===t?'on':''}" onclick="cfSet('t','${esc(String(t).replace(/\\/g,"\\\\").replace(/'/g,"\\'"))}')">#${esc(t)}</button>`).join('')}</div>`:''}
 <div style="margin-top:10px">${a.length?(HV.v==='grid'?`<div class=pcs>${a.slice(0,LISTN).map(card).join('')}</div>`:a.slice(0,LISTN).map(row).join('')):'<p class=mu style="padding:18px 0">Belum ada catatan di sini.</p>'}${a.length>LISTN?`<button class=more onclick="LISTN+=150;coll($('#mn'))">Tampilkan lebih banyak (${a.length-LISTN})</button>`:''}</div></div>`}
 
 /* ===== tampilan catatan ===== */
@@ -1811,11 +1812,12 @@ function setEditorWidth(val) {
 function migrateNoteDOM(html) {
   if (!html) return '';
   const div = new DOMParser().parseFromString('<body>' + html, 'text/html').body;
-  div.querySelectorAll('script,iframe,object,embed,link,meta,style,base').forEach(el => el.remove());
+  div.querySelectorAll('script,iframe,frame,frameset,object,embed,applet,link,meta,style,base,noscript,template,animate,set,animateMotion,animateTransform,foreignObject').forEach(el => el.remove());
   div.querySelectorAll('*').forEach(el => {
     [...el.attributes].forEach(at => {
       const nm = at.name.toLowerCase(), v = at.value.replace(/[\s\u0000-\u001f]/g, '').toLowerCase();
-      if (nm.startsWith('on') || ((nm === 'href' || nm === 'src' || nm === 'xlink:href') && /^(javascript|vbscript):/.test(v))) el.removeAttribute(at.name);
+      if (nm.startsWith('on') || nm === 'srcdoc' || nm === 'formaction' || /^(javascript|vbscript):/.test(v) ||
+          (/^(href|src|xlink:href|action|data)$/.test(nm) && /^data:(text\/html|application\/xhtml|image\/svg)/.test(v) && !(nm === 'src' && el.tagName === 'IMG'))) el.removeAttribute(at.name);
     });
   });
 
@@ -3057,14 +3059,14 @@ setInterval(()=>{if(SY.on&&!document.hidden&&navigator.onLine!==false){slog('D',
 const h53=s=>{let a=0xdeadbeef,b=0x41c6ce57;for(let i=0,c;i<s.length;i++){c=s.charCodeAt(i);a=Math.imul(a^c,2654435761);b=Math.imul(b^c,1597334677)}a=Math.imul(a^(a>>>16),2246822507)^Math.imul(b^(b>>>13),3266489909);b=Math.imul(b^(b>>>16),2246822507)^Math.imul(a^(a>>>13),3266489909);return(4294967296*(2097151&b)+(a>>>0)).toString(36)};
 const oh=o=>h53(stab(o));
 function sprep(n){let ch=0;const seen=new Set(),fix=a=>{if(!Array.isArray(a))return;for(const o of a){if(!o||typeof o!=='object'||Array.isArray(o))continue;if(!o.id||seen.has(o.id)){o.id=uid()+uid();ch=1}seen.add(o.id)}};
-if(n.kind==='canvas'){fix(n.boxes);fix(n.strokes)}
+if(n.kind==='canvas'){fix(n.boxes);fix(n.strokes);fix(n.links)}
 if(n.kind==='pdf'&&n.ann)for(const p of Object.keys(n.ann)){const a=n.ann[p];if(a&&typeof a==='object'){fix(a.s);fix(a.b);fix(a.h)}}
 if(ch){dirty.add(n.id);try{if(typeof save==='function')save()}catch(e){}slog('D','gabung','Id objek ditambahkan',{id:n.id,jenis:n.kind})}return ch}
 function sblocks(html){const d=new DOMParser().parseFromString('<body>'+(html||''),'text/html'),o=[];d.body.childNodes.forEach(x=>{if(x.nodeType===1)o.push(x.outerHTML);else if(x.nodeType===3&&x.textContent.trim())o.push(x.textContent.trim())});return o}
 function sbdesc(n){const m=a=>{const o={};(a||[]).forEach(x=>{if(x&&x.id)o[x.id]=oh(x)});return o};
-const d={k:n.kind,t:n.t||'',folder:n.folder||'',tags:(n.tags||[]).slice(),pin:n.pin?1:0,exp:n.exp||0,rec:m(n.rec)};
+const d={k:n.kind,t:n.t||'',folder:n.folder||'',tags:(n.tags||[]).slice(),pin:n.pin?1:0,exp:n.exp||0,ic:n.ic||'',lc:n.lc||'',rec:m(n.rec)};
 if(n.kind==='page'||n.kind==='riset')d.blocks=sblocks(n.body).map(h53);
-else if(n.kind==='canvas'){d.boxes=m(n.boxes);d.strokes=m(n.strokes)}
+else if(n.kind==='canvas'){d.boxes=m(n.boxes);d.strokes=m(n.strokes);d.links=m(n.links)}
 else if(n.kind==='pdf'){d.ann={};for(const p of Object.keys(n.ann||{})){const a=n.ann[p]||{};d.ann[p]={s:m(a.s),b:m(a.b),h:m(a.h)}}}
 return d}
 const sbaseGet=id=>idb('get','sbase-'+id).catch(()=>null);
@@ -3093,15 +3095,18 @@ async function smergeTry(ln,rn){const bd=await sbaseGet(ln.id);if(!bd||bd.k!==ln
 sprep(ln);const out=JSON.parse(JSON.stringify(spay(ln)));let conf=0;
 for(const f of ['t','folder']){const r=m3(bd[f]||'',ln[f]||'',rn[f]||'');out[f]=r[0];conf+=r[1]}
 for(const f of ['pin','exp']){const r=m3(bd[f]||0,ln[f]||0,rn[f]||0);out[f]=r[0];conf+=r[1]}
+for(const f of ['ic','lc']){const r=m3(bd[f]||'',ln[f]||'',rn[f]||'');if(r[0])out[f]=r[0];else delete out[f];conf+=r[1]}
 const tl=ln.tags||[],tr=rn.tags||[],tb=bd.tags||[];out.tags=[...new Set([...tl,...tr])].filter(x=>{const a=tl.includes(x),b=tr.includes(x),c=tb.includes(x);return(a&&b)||(!c&&(a||b))});
 const rc=omerge(bd.rec,ln.rec,rn.rec);if(!rc)return null;if(rc.list.length||ln.rec||rn.rec)out.rec=rc.list;conf+=rc.conf;
 if(ln.kind==='page'||ln.kind==='riset'){const Lb=sblocks(ln.body),Rb=sblocks(rn.body),r=dmerge(bd.blocks||[],Lb.map(h53),Lb,Rb.map(h53),Rb);if(!r)return null;out.body=r.html;conf+=r.conf}
-else if(ln.kind==='canvas'){const a=omerge(bd.boxes,ln.boxes,rn.boxes),b=omerge(bd.strokes,ln.strokes,rn.strokes);if(!a||!b)return null;out.boxes=a.list;out.strokes=b.list;conf+=a.conf+b.conf}
+else if(ln.kind==='canvas'){if(bd.links===undefined&&JSON.stringify(ln.links||[])!==JSON.stringify(rn.links||[]))return null;
+const a=omerge(bd.boxes,ln.boxes,rn.boxes),b=omerge(bd.strokes,ln.strokes,rn.strokes),c=omerge(bd.links,ln.links,rn.links);if(!a||!b||!c)return null;out.boxes=a.list;out.strokes=b.list;
+const ids=new Set([...a.list,...b.list].map(x=>x.id));const lk=c.list.filter(l=>[l.f,l.t].every(e=>{const id=e&&(e.b||e.s);return !id||ids.has(id)}));if(lk.length||ln.links||rn.links)out.links=lk;conf+=a.conf+b.conf+c.conf}
 else if(ln.kind==='pdf'){out.ann={};for(const p of new Set([...Object.keys(ln.ann||{}),...Object.keys(rn.ann||{})])){const A=(ln.ann||{})[p]||{},B=(rn.ann||{})[p]||{},bb=(bd.ann||{})[p]||{},s=omerge(bb.s,A.s,B.s),b=omerge(bb.b,A.b,B.b),h=omerge(bb.h,A.h,B.h);if(!s||!b||!h)return null;out.ann[p]={...A,s:s.list,b:b.list,h:h.list};conf+=s.conf+b.conf+h.conf}}
 else return null;
 return{note:out,conf,clean:conf===0}}
 async function sapplyMerge(ln,rn,m,k,rev,docs){snap(ln);
-const h={ts:now(),sg:sig(rn),t:rn.t,body:rn.body,strokes:(rn.strokes||[]).slice(),boxes:JSON.parse(JSON.stringify(rn.boxes||[])),ann:rn.ann?JSON.parse(JSON.stringify(rn.ann)):undefined};ln.v.unshift(h);ln.v.length=Math.min(ln.v.length,30);
+const h={ts:now(),sg:sig(rn),t:rn.t,body:rn.body,strokes:(rn.strokes||[]).slice(),boxes:JSON.parse(JSON.stringify(rn.boxes||[])),links:JSON.parse(JSON.stringify(rn.links||[])),ann:rn.ann?JSON.parse(JSON.stringify(rn.ann)):undefined};ln.v.unshift(h);ln.v.length=Math.min(ln.v.length,30);
 const keep={v:ln.v,o:ln.o,ox:ln.ox,oy:ln.oy,z:ln.z};await spullBins(m,docs);Object.assign(ln,m,keep,{u:now()});
 TXC.delete(ln.id);SY.rev[k]=rev;padd(SY.pend,ln.id);dirty.add(ln.id);SY.ui=1;if(cur===ln.id)SY.cur=1;await flush()}
 async function sbaseFill(){if(SY.bfilled)return;SY.bfilled=1;const have=new Set((await idb('keys','sbase-')).map(k=>k.slice(6)));let n0=0;
@@ -3127,6 +3132,7 @@ const tl=l.tags||[],tr=r.tags||[],ta=tl.filter(x=>!tr.includes(x)),tb=tr.filter(
 if(ta.length||tb.length)rows.push('Tag: '+(ta.length?`<ins class=wi>+ ${ta.map(esc).join(', ')}</ins> hanya di perangkat ini `:'')+(tb.length?`<del class=wd>− ${tb.map(esc).join(', ')}</del> hanya di cloud`:''));
 if(!!l.pin!==!!r.pin)rows.push('Sematan: '+(l.pin?'disematkan di perangkat ini, tidak di cloud':'disematkan di cloud, tidak di perangkat ini'));
 if(!!l.exp!==!!r.exp)rows.push('Kedaluwarsa: '+(l.exp?'hanya di perangkat ini':'hanya di cloud'));
+if((l.ic||'')!==(r.ic||'')||(l.lc||'')!==(r.lc||''))rows.push(`Ikon / warna label: <del class=wd>${esc(r.ic||'—')} ${esc(r.lc||'')}</del> (cloud) → <ins class=wi>${esc(l.ic||'—')} ${esc(l.lc||'')}</ins> (perangkat ini)`);
 if(rows.length)h+=`<div class=df style="margin-bottom:8px">${rows.map(x=>`<div class=s>${x}</div>`).join('')}</div>`;
 if(l.kind==='page'||l.kind==='riset'){const d=lineDiff(md(r.body||''),md(l.body||''));let o='',run=0,add=0,del=0;
 for(let k=0;k<d.length;k++){const x=d[k];
@@ -3137,8 +3143,8 @@ if(x[0]==='-'){let e=k;while(e<d.length&&d[e][0]==='-')e++;let f=e;while(f<d.len
 if(x[0]==='+')add++;else del++;
 o+=`<div class="${x[0]==='+'?'a':'d'}">${x[0]} ${esc(x[1])}</div>`}
 h+=`<p class=mu>${add||del?`<b>+${add}</b> baris baru di perangkat ini · <b>−${del}</b> baris hanya di cloud. `:''}Hijau = hanya ada di perangkat ini, merah = hanya ada di cloud; baris yang diedit di kedua sisi ditandai ~ dengan kata yang berbeda.</p><div class=df>${(add||del)?o:'<div class=s>Tidak ada perbedaan teks (bedanya ada di format atau lampiran).</div>'}</div>`}
-else if(l.kind==='canvas'){const o=sobj('kotak teks',l.boxes||[],r.boxes||[],b=>strip(b.t||b.html||b.text||'(kosong)'))+sobj('coretan',l.strokes||[],r.strokes||[]);
-h+=`<p class=mu>Perangkat ini: ${l.strokes.length} coretan, ${l.boxes.length} kotak teks · Cloud: ${r.strokes.length} coretan, ${r.boxes.length} kotak teks. Kotak yang diedit atau digeser dihitung sebagai berbeda di kedua sisi.</p><div class=df>${o||'<div class=s>Objek kanvas sama persis (bedanya hanya pada pengaturan lain).</div>'}</div>`}
+else if(l.kind==='canvas'){const o=sobj('kotak teks',l.boxes||[],r.boxes||[],b=>strip(b.t||b.html||b.text||'(kosong)'))+sobj('coretan',l.strokes||[],r.strokes||[])+sobj('konektor',l.links||[],r.links||[],k=>k.lb||'');
+h+=`<p class=mu>Perangkat ini: ${l.strokes.length} coretan, ${l.boxes.length} kotak teks, ${(l.links||[]).length} konektor · Cloud: ${r.strokes.length} coretan, ${r.boxes.length} kotak teks, ${(r.links||[]).length} konektor. Kotak yang diedit atau digeser dihitung sebagai berbeda di kedua sisi.</p><div class=df>${o||'<div class=s>Objek kanvas sama persis (bedanya hanya pada pengaturan lain).</div>'}</div>`}
 else{const pg=Object.keys({...(l.ann||{}),...(r.ann||{})}).sort((a,b)=>a-b);let o='';
 for(const p of pg){const A=(l.ann||{})[p]||{},B=(r.ann||{})[p]||{};const x=sobj('coretan',A.s||[],B.s||[])+sobj('teks',A.b||[],B.b||[],b=>strip(b.t||b.text||''))+sobj('sorotan',A.h||[],B.h||[]);if(x)o+=`<div class=s><b>Halaman ${esc(p)}</b></div>${x}`}
 h+=`<p class=mu>Anotasi PDF dibandingkan per halaman.</p><div class=df>${o||'<div class=s>Anotasi sama persis.</div>'}</div>`}
@@ -3200,6 +3206,9 @@ async function backupZip(){try{toast('Menyiapkan cadangan…');await dl('cadanga
 function restorePick(){const i=document.createElement('input');i.type='file';i.accept='.zip,.json';i.onchange=()=>{const f=i.files[0];if(f)ask(`Pulihkan dari “${esc(f.name)}”? Catatan dengan ID sama akan ditimpa; catatan lain tetap ada.`,'Pulihkan',()=>restoreDo(f))};i.click()}
 async function restoreDo(f){try{toast('Memulihkan…');let data,z=null;if(/\.json$/i.test(f.name))data=JSON.parse(await f.text());else{await ldE('emb-jszip','JSZip',JSZIP);z=await JSZip.loadAsync(f);data=JSON.parse(await z.file('catatan.json').async('string'))}
 if(!data||!Array.isArray(data.notes))throw new Error('format tidak dikenal');
+data.notes=data.notes.filter(n=>n&&typeof n==='object'&&typeof n.id==='string'&&/^[A-Za-z0-9_-]{1,64}$/.test(n.id)&&(n.folder==null||typeof n.folder==='string'));
+if(!data.notes.length)throw new Error('tidak ada catatan yang valid');
+data.folders=(Array.isArray(data.folders)?data.folders:[]).filter(p=>typeof p==='string');
 for(const n of data.notes){const old=byId(n.id);if(typeof sbaseDrop==='function')sbaseDrop(n.id);n.v=old?old.v:[];n.tags=n.tags||[];n.folder=n.folder||'';n.strokes=n.strokes||[];n.boxes=n.boxes||[];if(old)S.notes[S.notes.indexOf(old)]=n;else S.notes.push(n);dirty.add(n.id);TXC.delete(n.id)}
 (data.folders||[]).forEach(p=>{if(!S.folders.includes(p))S.folders.push(p)});
 if(z){for(const n of data.notes){if(n.kind==='pdf'){const e=z.file('pdf/'+n.id+'.pdf');if(e)await idb('put',n.id,await e.async('arraybuffer'))}for(const r of n.rec||[]){const e=z.file('audio/'+r.id+'.'+(String(r.mime).includes('mp4')?'mp4':'webm'));if(e)await idb('put','rec-'+r.id,new Blob([await e.async('arraybuffer')],{type:r.mime||'audio/webm'}))}}}

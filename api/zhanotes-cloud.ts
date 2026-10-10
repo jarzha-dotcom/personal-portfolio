@@ -17,6 +17,9 @@
 //                           kalau Redis dipasang lewat integrasi Vercel Marketplace).
 //   ZHANOTES_MAX_MB         opsional, batas ukuran satu dokumen (default 200).
 //   ZHANOTES_PREFIX         opsional, awalan kunci Redis & folder Blob (default "zhanotes").
+//   ZHANOTES_BLOB_HOST      opsional tapi disarankan. Hostname Blob store milikmu, mis.
+//                           "abc123.public.blob.vercel-storage.com" (lihat URL salah satu blob di dashboard).
+//                           Bila diisi, proxy sync-read HANYA mau mengambil dari host itu.
 //
 // Endpoint (semua lewat /api/zhanotes-cloud?action=...):
 //   GET  status                 (tanpa token) -> { configured, maxMb }
@@ -31,7 +34,7 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHash, timingSafeEqual } from 'node:crypto';
-import { del, put } from '@vercel/blob';
+import { del, list, put } from '@vercel/blob';
 
 export const maxDuration = 30;
 
@@ -40,6 +43,9 @@ const DOCS = `${PREFIX}:sync:docs`;
 const CFG = `${PREFIX}:sync:config`;
 const MAX_MB = Math.min(1000, Math.max(5, Number(process.env.ZHANOTES_MAX_MB) || 200));
 const MAX_CHUNK_BYTES = 4 * 1024 * 1024;
+const BLOB_HOST = (process.env.ZHANOTES_BLOB_HOST || '').trim().toLowerCase();
+const FAIL_LIMIT = 5;
+const FAIL_WINDOW_S = 10 * 60;
 const MAX_CHUNKS = Math.ceil((MAX_MB * 1024 * 1024) / (3 * 1024 * 1024)) + 2;
 const ID_RE = /^[a-z0-9-]{8,64}$/;
 const KEY_RE = /^(meta|(n|pdf|rec):[A-Za-z0-9_-]{1,40})$/;
@@ -64,6 +70,15 @@ return {1, cur or ''}
 
 const redisUrl = () => process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL || '';
 const redisToken = () => process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN || '';
+// Token pendek = mudah ditebak; batas percobaan hanya memperlambat, kekuatan token yang melindungi.
+let weakWarned = false;
+const warnWeakToken = () => {
+    if (weakWarned) return;
+    weakWarned = true;
+    if (String(process.env.ZHANOTES_TOKEN || '').length < 32) {
+        console.warn('[zhanotes-cloud] ZHANOTES_TOKEN kurang dari 32 karakter. Ganti dengan string acak panjang (mis. `openssl rand -base64 32`).');
+    }
+};
 const isConfigured = () =>
     Boolean(process.env.ZHANOTES_TOKEN && process.env.BLOB_READ_WRITE_TOKEN && redisUrl() && redisToken());
 // Hanya NAMA variabel yang belum terisi (tidak pernah nilainya) — membantu diagnosis saat sinkron "belum aktif".
@@ -120,7 +135,9 @@ const blobUrlOk = (u: unknown): u is string => {
     if (typeof u !== 'string') return false;
     try {
         const p = new URL(u);
-        return p.protocol === 'https:' && p.hostname.endsWith('.blob.vercel-storage.com') && p.pathname.startsWith(`/${PREFIX}/`);
+        if (p.protocol !== 'https:' || p.username || p.password || p.port) return false;
+        const hostOk = BLOB_HOST ? p.hostname === BLOB_HOST : p.hostname.endsWith('.blob.vercel-storage.com');
+        return hostOk && p.pathname.startsWith(`/${PREFIX}/`);
     } catch {
         return false;
     }
@@ -155,12 +172,28 @@ const jsonBody = (req: VercelRequest): Record<string, unknown> => {
     return b && typeof b === 'object' ? (b as Record<string, unknown>) : {};
 };
 
-// Percobaan token salah per IP (in-memory, pengaman kasar -- sama seperti PIN di chat.ts).
+// Percobaan token salah per IP. Lapisan 1: in-memory (cepat, per instance). Lapisan 2: Redis (dibagi antar
+// instance serverless, jadi penyerang tidak bisa menghindar dengan memicu instance baru).
 const failures = new Map<string, number[]>();
+const pruneFailures = (now: number) => {
+    if (failures.size < 500) return;
+    for (const [k, v] of failures) if (!v.some((t) => now - t < FAIL_WINDOW_S * 1000)) failures.delete(k);
+};
+async function redisFailCount(ip: string): Promise<number> {
+    try {
+        const k = `${PREFIX}:auth:fail:${createHash('sha256').update(ip).digest('hex').slice(0, 16)}`;
+        const [n] = await redis([['INCR', k], ['EXPIRE', k, FAIL_WINDOW_S]]);
+        return Number(n) || 0;
+    } catch {
+        return 0; // Redis gangguan: andalkan lapisan in-memory
+    }
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    let authed = false;
     try {
         res.setHeader('Cache-Control', 'no-store');
+        res.setHeader('X-Content-Type-Options', 'nosniff');
         const action = String(req.query?.action || '');
         // Log server: setiap respons gagal (kecuali 409 bentrok revisi, yang normal) tercatat di log Vercel.
         // Hanya aksi, status, dan metode; tidak pernah token, isi, atau kunci.
@@ -174,13 +207,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).json({ configured: isConfigured(), maxMb: MAX_MB, missing: isConfigured() ? [] : missingEnv() });
         }
 
+        warnWeakToken();
         if (!isConfigured()) return res.status(503).json({ error: 'NOT_CONFIGURED', detail: 'Sinkron awan belum dikonfigurasi di server ini.' });
 
         // ── Autentikasi ────────────────────────────────────────────────────────
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
         const now = Date.now();
-        const fails = (failures.get(ip) || []).filter((t) => now - t < 10 * 60 * 1000);
-        if (fails.length >= 5) return res.status(429).json({ error: 'TOO_MANY_ATTEMPTS', detail: 'Terlalu banyak percobaan token. Coba lagi beberapa menit lagi.' });
+        pruneFailures(now);
+        const fails = (failures.get(ip) || []).filter((t) => now - t < FAIL_WINDOW_S * 1000);
+        if (fails.length >= FAIL_LIMIT) {
+            res.setHeader('Retry-After', String(FAIL_WINDOW_S));
+            return res.status(429).json({ error: 'TOO_MANY_ATTEMPTS', detail: 'Terlalu banyak percobaan token. Coba lagi beberapa menit lagi.' });
+        }
 
         const given = String(req.headers['x-zhanotes-token'] || '');
         const a = createHash('sha256').update(given).digest();
@@ -188,9 +226,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (!given || !timingSafeEqual(a, b)) {
             fails.push(now);
             failures.set(ip, fails);
+            const shared = await redisFailCount(ip);
+            if (shared > FAIL_LIMIT) {
+                res.setHeader('Retry-After', String(FAIL_WINDOW_S));
+                return res.status(429).json({ error: 'TOO_MANY_ATTEMPTS', detail: 'Terlalu banyak percobaan token. Coba lagi beberapa menit lagi.' });
+            }
             return res.status(401).json({ error: 'INVALID_TOKEN', detail: 'Token akses salah.' });
         }
         failures.delete(ip);
+        authed = true;
 
         // ── GET sync-config ────────────────────────────────────────────────────
         if (req.method === 'GET' && action === 'sync-config') {
@@ -213,8 +257,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (req.method === 'GET' && action === 'sync-read') {
             const u = String(req.query?.u || '');
             if (!blobUrlOk(u)) return res.status(400).json({ error: 'BAD_REQUEST' });
-            const r = await fetch(u);
+            const r = await fetch(u, { redirect: 'error' });
             if (!r.ok) return res.status(404).json({ error: 'NOT_FOUND' });
+            if (Number(r.headers.get('content-length') || 0) > MAX_CHUNK_BYTES) return res.status(413).json({ error: 'TOO_LARGE' });
             const buf = Buffer.from(await r.arrayBuffer());
             if (buf.length > MAX_CHUNK_BYTES) return res.status(413).json({ error: 'TOO_LARGE' });
             res.setHeader('Content-Type', 'application/octet-stream');
@@ -268,7 +313,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const size = Number(body.size) || 0;
             if (!KEY_RE.test(key) || !Number.isInteger(baseRev) || baseRev < 0) return res.status(400).json({ error: 'BAD_REQUEST' });
             if (!deleted) {
-                if (!ID_RE.test(uid) || chunks.length === 0 || chunks.length > MAX_CHUNKS || !chunks.every((u) => isOwnChunkUrl(u, uid))) {
+                if (!ID_RE.test(uid) || chunks.length === 0 || chunks.length > MAX_CHUNKS || new Set(chunks).size !== chunks.length || !chunks.every((u) => isOwnChunkUrl(u, uid))) {
                     return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Data push tidak valid.' });
                 }
                 if (size <= 0 || size > MAX_MB * 1024 * 1024) return res.status(413).json({ error: 'TOO_LARGE', detail: `Dokumen melebihi batas ${MAX_MB} MB.` });
@@ -299,13 +344,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const docs = await readDocs();
             const urls = Object.values(docs).flatMap((d) => d.chunks);
             for (let i = 0; i < urls.length; i += 100) await del(urls.slice(i, i + 100)).catch(() => undefined);
+            // Sapu juga blob yatim (unggahan yang terputus sebelum push) di folder khusus ZhaNotes.
+            let orphans = 0;
+            try {
+                let cursor: string | undefined;
+                for (let guard = 0; guard < 50; guard++) {
+                    const page = await list({ prefix: `${PREFIX}/`, cursor, limit: 500 });
+                    const found = page.blobs.map((b) => b.url);
+                    if (found.length) {
+                        await del(found).catch(() => undefined);
+                        orphans += found.length;
+                    }
+                    if (!page.hasMore) break;
+                    cursor = page.cursor;
+                }
+            } catch (e) {
+                console.warn('[zhanotes-cloud] sapu blob yatim gagal');
+            }
             await redis([['DEL', DOCS], ['DEL', CFG]]);
-            return res.status(200).json({ ok: true, removed: Object.keys(docs).length });
+            return res.status(200).json({ ok: true, removed: Object.keys(docs).length, orphans });
         }
 
         return res.status(400).json({ error: 'UNKNOWN_ACTION' });
     } catch (err: any) {
         console.error('[zhanotes-cloud] error:', err);
-        return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', detail: err?.message || String(err) });
+        const detail = authed ? String(err?.message || err).slice(0, 300) : 'Kesalahan server.';
+        return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', detail });
     }
 }
