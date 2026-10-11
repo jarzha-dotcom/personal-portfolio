@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1.0.1';
+const CACHE_VERSION = 'v1.0.4';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -102,7 +102,10 @@ self.addEventListener('fetch', (event) => {
                         const clone = response.clone();
                         const zhaClone = response.ok && isZhaNotesPage(url.pathname) ? response.clone() : null;
                         caches.open(RUNTIME_CACHE).then((cache) => {
-                            cache.put(request, clone);
+                            // Alamat ZhaNotes ber-?aksi= atau ?judul/teks/url= (shortcut / share_target) tidak disimpan
+                            // dengan query-nya: teks yang dibagikan ikut ada di URL. Halaman
+                            // tetap tersedia offline lewat kunci kanonik di bawah.
+                            if (!['aksi', 'judul', 'teks', 'url'].some((k) => url.searchParams.has(k))) cache.put(request, clone);
                             if (zhaClone) cache.put(ZHANOTES_CANONICAL, zhaClone);
                         });
                     }

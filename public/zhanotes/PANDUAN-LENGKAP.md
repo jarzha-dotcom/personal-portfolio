@@ -25,6 +25,40 @@ Akibatnya, elemen kanvas ikut terkena `display: none`, sehingga tidak tampil dan
 
 ---
 
+## 🆕 Pembaruan Terbaru
+
+### 📱 HP & PWA
+- **Bottom sheet**: jendela (Cari, Tangkap cepat, Tambah, dll.) muncul dari bawah di HP. Tarik gagangnya ke bawah untuk menutup; tingginya mengikuti keyboard virtual.
+- **Geser dari tepi kiri** membuka sidebar, geser ke kiri menutupnya (tidak aktif di area Kanvas dan PDF).
+- **Filter dilipat**: di HP, filter Beranda dan daftar Catatan menjadi satu tombol `Filter: Semua ▾`.
+- **Target sentuh 44px** untuk menu bawah, toolbar editor, dan bilah atas; tarik-untuk-muat-ulang dimatikan.
+- **Properti catatan (⚙)** di bilah atas catatan: ubah folder, tag, dan jadwal hapus.
+- **Pintasan ikon app** (tekan lama ikon): *Catatan baru*, *Tangkap cepat*, *Cari*. Di Android, menu **Bagikan** ke ZhaNotes membuka Tangkap cepat berisi teks yang dibagikan. Setelah pembaruan, pasang ulang PWA bila pintasan belum muncul.
+
+### 🗂️ Daftar Catatan & Tag
+- **Halaman bernomor** (‹ 1 … 4 5 6 … 12 ›) dengan keterangan "51–100 dari 137"; ukuran halaman 25 / 50 / 100 (disimpan di perangkat).
+- **Tag di daftar**: 12 tag teratas (paling sering dipakai) dan tombol `+N lagi ▾`; tombol `▾ Tag` menyembunyikan seluruh deretan. Tag aktif selalu terlihat.
+- **🔍 Cari tag**: dari daftar catatan atau palet `Ctrl+K` → *Cari tag…*; menampilkan jumlah catatan per tag.
+- **Kelola tag** (menu Data di sidebar): ganti nama, gabungkan (nama yang sama), atau hapus (kosongkan nama).
+- Tag tidak lagi ditampilkan di sidebar; semua urusan tag ada di daftar catatan.
+
+### 🔎 Pencarian Global (`Alt`/`Ctrl+K` atau tombol Cari)
+Selain kata kunci dan `#tag`, kini ada filter yang bisa digabung:
+
+| Filter | Contoh | Arti |
+| :--- | :--- | :--- |
+| `#tag` | `#kerja` | Hanya catatan bertag tersebut |
+| `tipe:` | `tipe:kanvas` | `halaman`, `kanvas`, `riset`, `pdf` |
+| `folder:` | `folder:audit` | Folder yang namanya mengandung kata itu |
+| `dalam:` | `dalam:7` | Diubah dalam N hari terakhir |
+
+Contoh: `tipe:pdf dalam:30 #laporan stok`. Filter tanpa kata kunci menampilkan hingga 40 catatan. Tombol **★ Simpan** menyimpan pencarian saat ini sebagai tombol cepat (maks. 8, tersimpan di perangkat); klik kanan atau tekan lama untuk menghapusnya.
+
+### 🖨️ Cetak
+`Ctrl+P` mencetak isi catatan saja: sidebar, daftar, toolbar, dan menu bawah disembunyikan; margin 16 mm; tabel, blok kode, dan gambar tidak terpotong di tengah halaman.
+
+---
+
 ## 🧪 Catatan Contoh Bawaan
 Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit Stock Opname** (PDF 3 halaman dengan stabilo, coretan, lingkaran, panah, centang/silang, tanda tangan, dan kartu catatan), **Contoh: Diagram Alur Rekonsiliasi Bank** (kanvas), serta catatan Riset. Contoh PDF bisa dibuat ulang lewat `Ctrl+K` → *Buat contoh PDF beranotasi*.
 
@@ -34,8 +68,15 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 
 ### 1. 📄 Halaman (Dokumen Teks Kaya / WYSIWYG)
 - Editor dokumen bebas gangguan dengan dukungan penulisan heading (H1, H2, H3), teks tebal, miring, coret, stabilo kuning, dan monospace.
+- **Warna kustom**: di menu **A ▾** (warna teks) dan **🖍 ▾** (stabilo) ada kotak pemilih warna bebas di ujung deretan warna. Tombol **✕ Bersihkan** di tab Teks menghapus format.
+- **Toolbar 4 tab** (Teks, Paragraf, Lanjutan, Sisipkan), tiap tab satu baris.
+- **Tab Paragraf**: rata teks, daftar, indentasi. **Tab Lanjutan**: **Jarak baris** (1.2–2.2 per paragraf), **Aa Huruf** (HURUF BESAR, huruf kecil, Kapital Tiap Kata, kapital awal kalimat) pada teks terpilih, dan **⌫ Hapus format**.
 - **Checklist Tugas**: Kotak centang interaktif yang dapat dicentang langsung atau dihapus.
-- **Tabel Terintegrasi**: Tambah baris, kolom, atau hapus tabel dengan mudah.
+- **Tabel Terintegrasi**: menu **Tabel ▾** di tab Sisipkan: tabel baru, tambah/hapus baris dan kolom, **urutkan kolom A→Z / Z→A**, **header menempel**, salin sebagai CSV, hapus tabel. **Impor CSV / Excel** (tempel atau pilih berkas `.csv/.tsv/.txt`, maks. 500 baris × 30 kolom); menempel dari Excel/Sheets langsung jadi tabel.
+- **Blok Kode**: kotak monospace dengan tombol **⧉ Salin**.
+- **Daftar Isi otomatis** (satu per catatan, ikut berubah saat judul H1–H3 berubah; klik untuk lompat) dan **Catatan Kaki** bernomor otomatis (klik nomor untuk ubah/hapus, ↩ untuk kembali ke teks).
+- **Simbol ▾**: simbol matematika, panah, dan emoji. **Kotak ▾**: menu callout berlabel.
+- Berlaku juga untuk catatan **Riset**. Perintah `Ctrl+K` ditambah *Sisipkan: …*, *Tabel: …*, dan *Format: …*.
 - **Kotak Catatan (Callout)**: Kotak warna-warni untuk Informasi (Biru), Peringatan (Kuning), Sukses (Hijau), Catatan (Ungu), dan Bahaya (Merah).
 - **Gambar & Sketsa**: Unggah gambar langsung dari komputer/ponsel, ubah ukuran (resize), potong (crop), putar (rotate), atau atur perataan (kiri, tengah, kanan, melayang).
 - **Perintah Cepat Garis Miring (`/`)**: Ketik `/` di awal baris untuk memunculkan menu sisip cepat.
@@ -48,6 +89,13 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 - **Kartu Teks Bebas (T)**: Klik di mana saja pada kanvas untuk membuat kartu teks yang bisa diketik, digeser (*drag*), dan diubah ukurannya (*resize*).
 - **Alat Geser (✋)**: Geser kanvas (*pan*) untuk menjelajahi area gambar tanpa mencoret.
 - **Zoom & Navigasi**: *Pinch-to-zoom* dua jari, *scroll wheel* mouse, tombol perbesar/perkecil, serta tombol *Fit to Screen* (⤢) untuk melihat seluruh isi gambar sekaligus.
+- **Jenis pena**: Pena, Pensil, Spidol, Stabilo; 17 warna plus pemilih warna bebas. Ketuk ikon alat untuk membuka panel opsinya (ketuk lagi atau di luar untuk menutup). Warna garis dan warna isi terpisah.
+- **Penghapus**: mode *Goresan* (hapus utuh) dan *Bagian* (memotong goresan), tiga ukuran. Tersedia juga di PDF.
+- **Seleksi**: mode *Kotak* dan *Bebas (lasso)*.
+- **Preset pena (4 slot)**: simpan jenis, warna, dan tebal; panggil dengan tombol `1`–`4` atau bulatan di toolbar (di HP muncul saat Pena aktif). Simpan lewat `Shift`+klik, klik kanan, atau panel Pena.
+- **Latar**: Titik, Kisi, Garis, Polos (per catatan) dan **snap ke kisi** untuk bentuk dan kartu teks baru (tahan `Alt` untuk melewati).
+- **Bentuk**: 12 bentuk; **konektor** dengan beberapa jenis.
+- **Grup**: `Ctrl+G` mengelompokkan, `Ctrl+Shift+G` melepas. **Kunci**: menu klik kanan → *Kunci* / *Buka kunci* (ditandai 🔒). **Sebar rata** horizontal/vertikal (minimal 3 objek) lewat klik kanan (tekan lama di HP).
 - **Ekspor Gambar**: Unduh kanvas ke dalam format PNG berkualitas tinggi, SVG vektor, atau PDF dokumen.
 
 ### 3. 🔬 Riset & Kliping
@@ -62,6 +110,10 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 - Coret bebas di atas lembar PDF dengan pena berwarna dan stabilo bebas.
 - **Stabilo Teks Seleksi (🔤)**: Blok teks pada dokumen PDF untuk memberi efek sorotan stabilo rapi.
 - Tempel kartu catatan teks di atas halaman PDF.
+- **🔎 Cari di PDF & Daftar Anotasi**: tombol `🔎 Cari` di toolbar PDF atau `Ctrl+F` saat PDF terbuka. Ketik kata untuk mencari teks di semua halaman (hasil per halaman dengan kutipan; klik untuk lompat, `Enter` membuka hasil pertama). Kosongkan kolom untuk melihat **daftar anotasi** per halaman (jumlah sorotan, coretan, dan catatan teks). Pencarian hanya bekerja pada PDF yang punya lapisan teks (bukan hasil pindai).
+- **Garis bawah & coret teks**: tombol `U Garis bawah` dan `S Coret` di toolbar PDF. Pilih teks di halaman lalu lepas; garis merah mengikuti tiap baris yang dipilih (warna mengikuti warna garis bila dipilih manual). Ikut tersimpan dan masuk ke **Ekspor PDF Beranotasi**. Hapus dengan penghapus seperti sorotan.
+- **📝 Ke catatan**: tombol di toolbar PDF yang membuat catatan Halaman baru berisi anotasi per halaman: kutipan teks dari sorotan/garis bawah/coret, isi kartu catatan, dan jumlah coretan tangan, dengan tautan balik `[[judul PDF]]`. Tag dan folder PDF ikut disalin. Kutipan diambil dari lapisan teks PDF (PDF hasil pindai tidak menghasilkan kutipan).
+- **▦ Halaman**: tombol di toolbar PDF membuka **thumbnail semua halaman** (halaman beranotasi diberi tanda ✎ dan jumlahnya) dan **daftar isi PDF** (bila PDF punya bookmark). Klik untuk lompat ke halaman.
 - **Ekspor PDF Beranotasi**: Unduh dokumen PDF baru lengkap dengan seluruh goresan dan catatan yang Anda tambahkan.
 
 ---
@@ -87,7 +139,9 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 | `Alt + ]` | **Tab Berikutnya** | Pindah ke tab catatan berikutnya |
 | `Alt + W` | **Tutup Tab** | Menutup tab catatan yang sedang aktif |
 | `Ctrl + F` / `Ctrl + H` | **Cari & Ganti** | Mencari dan mengganti kata di dalam catatan |
+| `Ctrl + F` (di PDF) | **Cari di PDF** | Cari teks di semua halaman PDF dan lihat daftar anotasi |
 | `Esc` | **Batal / Tutup** | Menutup modal, menu dropdown, atau keluar mode fokus |
+| `Ctrl + P` | **Cetak** | Cetak isi catatan aktif (tanpa sidebar dan toolbar) |
 | `?` atau `F1` | **Panduan & Pintasan** | Membuka jendela panduan dan daftar pintasan ini |
 
 > **Peringatan sebelum keluar:** menekan tombol Kembali peramban/HP atau tautan **← Portofolio** memunculkan konfirmasi *Keluar dari ZhaNotes?* (pilih **Tetap di sini** bila salah klik). Menutup tab atau memuat ulang memunculkan dialog bawaan peramban. Saat ada panel terbuka, Kembali menutup panelnya lebih dulu. Matikan atau nyalakan lewat `Ctrl + K` → *peringatan sebelum keluar*; catatan tetap tersimpan otomatis di perangkat.
@@ -106,6 +160,11 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 | `+` atau `=` | **Perbesar (Zoom In)** | Memperbesar sudut pandang kanvas |
 | `-` atau `_` | **Perkecil (Zoom Out)** | Memperkecil sudut pandang kanvas |
 | `0` | **⤢ Pas ke Layar (Fit)** | Menyesuaikan tampilan agar seluruh gambar muat di layar |
+| `L` | **Seleksi Kotak ⇄ Bebas** | Beralih antara seleksi kotak dan lasso |
+| `G` | **Ganti Latar** | Titik → Kisi → Garis → Polos |
+| `Shift + G` | **Snap ke Kisi** | Nyalakan/matikan snap |
+| `1` – `4` | **Preset Pena** | Panggil preset pena tersimpan |
+| `Ctrl + G` / `Ctrl + Shift + G` | **Grup / Lepas Grup** | Kelompokkan atau pisahkan objek terpilih |
 | `Del` / `Backspace` | **Hapus Objek Terpilih** | Menghapus kartu teks atau goresan yang sedang dipilih |
 | `Ctrl + Z` | **Undo** | Membatalkan goresan atau aksi terakhir |
 | `Ctrl + Y` / `Ctrl + Shift + Z` | **Redo** | Mengulangi goresan atau aksi yang dibatalkan |
@@ -126,8 +185,12 @@ Ketik tanda `/` pada baris baru di editor halaman untuk memunculkan menu perinta
 | `/poin` atau `/bullet` | **Daftar Poin** | Daftar bulatan tidak berurut (•) |
 | `/nomor` | **Daftar Nomor** | Daftar penomoran angka otomatis (1, 2, 3) |
 | `/kutipan` atau `/quote` | **Kutipan** | Kotak kutipan penting (*blockquote*) |
-| `/kode` atau `/code` | **Blok Kode** | Kotak kode program berlatar *monospace* |
+| `/kode` atau `/code` | **Blok Kode** | Kotak kode *monospace* dengan tombol ⧉ Salin |
 | `/tabel` | **Tabel** | Sisipkan tabel dengan baris dan kolom |
+| `/isi` atau `/toc` | **Daftar Isi** | Daftar isi otomatis dari judul H1–H3 (satu per catatan) |
+| `/kaki` atau `/footnote` | **Catatan Kaki** | Rujukan bernomor otomatis di akhir halaman |
+| `/csv` atau `/excel` | **Impor CSV / Excel** | Ubah data tempelan atau berkas CSV jadi tabel |
+| `/simbol` atau `/sigma` | **Simbol** | Rumus, panah, dan emoji |
 | `/garis` | **Garis Pemisah** | Garis horizontal pembatas (*divider*) |
 | `/info` | **Callout Info** | Kotak informasi berlatar biru |
 | `/peringatan` | **Callout Peringatan** | Kotak peringatan berlatar kuning |
