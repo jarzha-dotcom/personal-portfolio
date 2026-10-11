@@ -93,9 +93,10 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 - **Penghapus**: mode *Goresan* (hapus utuh) dan *Bagian* (memotong goresan), tiga ukuran. Tersedia juga di PDF.
 - **Seleksi**: mode *Kotak* dan *Bebas (lasso)*.
 - **Preset pena (4 slot)**: simpan jenis, warna, dan tebal; panggil dengan tombol `1`–`4` atau bulatan di toolbar (di HP muncul saat Pena aktif). Simpan lewat `Shift`+klik, klik kanan, atau panel Pena.
-- **Latar**: Titik, Kisi, Garis, Polos (per catatan) dan **snap ke kisi** untuk bentuk dan kartu teks baru (tahan `Alt` untuk melewati).
+- **Latar**: Titik, Kisi, Garis, Polos (per catatan) dan **snap ke kisi** untuk bentuk dan kartu teks baru serta saat memindahkan objek (tahan `Alt` untuk melewati; garis panduan sejajar antar-objek didahulukan).
 - **Bentuk**: 12 bentuk; **konektor** dengan beberapa jenis.
 - **Grup**: `Ctrl+G` mengelompokkan, `Ctrl+Shift+G` melepas. **Kunci**: menu klik kanan → *Kunci* / *Buka kunci* (ditandai 🔒). **Sebar rata** horizontal/vertikal (minimal 3 objek) lewat klik kanan (tekan lama di HP).
+- **Pengenal bentuk**: saat menggambar dengan Pena, tahan sejenak (sekitar setengah detik) di akhir coretan; garis lurus, kotak, atau lingkaran/elips buatan tanganmu dirapikan otomatis (garis hampir lurus dikunci horizontal/vertikal). Coretan bebas biasa tidak berubah. Nyalakan/matikan di panel Pena atau lewat `Ctrl+K` → *Kanvas: pengenal bentuk*.
 - **Ekspor Gambar**: Unduh kanvas ke dalam format PNG berkualitas tinggi, SVG vektor, atau PDF dokumen.
 
 ### 3. 🔬 Riset & Kliping
