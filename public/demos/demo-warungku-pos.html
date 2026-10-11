@@ -48,7 +48,6 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   
-  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-warungku-pos.css">
   <!-- FontAwesome 6 Icons CDN -->
@@ -179,32 +178,63 @@
     .wk-toast.error { background: #9f1239; } .wk-toast.error i { color: #fda4af; }
     @keyframes wkin { from { opacity: 0; transform: translateX(24px); } to { opacity: 1; transform: none; } }
 
+    /* ===== Fallback utilitas Tailwind berangka desimal (tidak ikut ter-build pada css lama) ===== */
+    .gap-0\.5{gap:calc(var(--spacing,.25rem)*.5)} .gap-1\.5{gap:calc(var(--spacing,.25rem)*1.5)} .gap-2\.5{gap:calc(var(--spacing,.25rem)*2.5)} .gap-3\.5{gap:calc(var(--spacing,.25rem)*3.5)}
+    .left-3\.5{left:calc(var(--spacing,.25rem)*3.5)} .mb-0\.5{margin-bottom:calc(var(--spacing,.25rem)*.5)} .ml-0\.5{margin-left:calc(var(--spacing,.25rem)*.5)} .mt-0\.5{margin-top:calc(var(--spacing,.25rem)*.5)} .my-2\.5{margin-block:calc(var(--spacing,.25rem)*2.5)}
+    .p-0\.5{padding:calc(var(--spacing,.25rem)*.5)} .p-2\.5{padding:calc(var(--spacing,.25rem)*2.5)} .p-3\.5{padding:calc(var(--spacing,.25rem)*3.5)}
+    .pb-0\.5{padding-bottom:calc(var(--spacing,.25rem)*.5)} .pt-2\.5{padding-top:calc(var(--spacing,.25rem)*2.5)}
+    .px-1\.5{padding-inline:calc(var(--spacing,.25rem)*1.5)} .px-2\.5{padding-inline:calc(var(--spacing,.25rem)*2.5)} .px-3\.5{padding-inline:calc(var(--spacing,.25rem)*3.5)}
+    .py-0\.5{padding-block:calc(var(--spacing,.25rem)*.5)} .py-1\.5{padding-block:calc(var(--spacing,.25rem)*1.5)} .py-2\.5{padding-block:calc(var(--spacing,.25rem)*2.5)} .py-3\.5{padding-block:calc(var(--spacing,.25rem)*3.5)}
+    .active\:scale-\[0\.985\]:active{scale:.985} .active\:scale-\[0\.99\]:active{scale:.99}
 
     /* ===== MOBILE / TABLET (<1024px): satu kolom + tab bawah Menu | Pesanan ===== */
     #wk-mobtab { display: none; }
     @media (max-width: 1023px) {
-      html body { padding-bottom: 102px !important; }
+      /* kunci lebar halaman: tanpa ini Chrome Android memperkecil (zoom-out) tampilan bila ada elemen yang melebihi layar */
+      html, body { max-width: 100vw; overflow-x: hidden; }
+      /* html body = spesifisitas lebih tinggi daripada `body{padding-bottom:46px!important}` milik bar demo; dvh = tinggi layar yang benar-benar terlihat */
+      html body { padding-bottom: 102px !important; height: 100dvh !important; width: 100% !important; }
       [id$="-modal"] { padding-bottom: 118px !important; }
-      .wk-toastbox { top: 70px !important; left: 10px; right: 10px !important; max-width: none !important; align-items: flex-end; }
-      header { padding-left: 10px !important; padding-right: 10px !important; }
-      header > div:last-child { gap: 4px !important; }
-      header button { padding: 8px 10px !important; min-height: 38px; }
-      header button span:not(.wk-hbadge):not(#history-badge), header h1 + span { display: none !important; }
-      header > div:first-child p { display: none !important; }
-      main > section, main > aside { width: 100% !important; flex: 1 1 auto; min-height: 0; border: 0 !important; display: none !important; }
-      body[data-tab="produk"] #wk-sec-produk,
-      body[data-tab="cart"] #wk-sec-cart { display: flex !important; }
-      #wk-sec-cart { overflow-y: auto !important; }
-      #wk-sec-cart #cart-list { flex: none !important; min-height: 150px; max-height: 38vh; }
-      #search-input, #customer-name, #custom-cash-input, #table-number { font-size: 16px; }
-      #wk-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #171717; border-top: 1px solid #262626; padding: 6px 8px; gap: 8px; }
-      #wk-mobtab button { flex: 1; border: 0; border-radius: 12px; background: transparent; color: #a3a3a3; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+      [id$="-modal"] > div { max-height: calc(100dvh - 150px) !important; }
+      .wk-toastbox { top: 112px; right: 10px; left: 10px; align-items: flex-end; max-width: none; }
+      /* header 2 baris: baris 1 = brand, baris 2 = tombol ikon berbagi lebar penuh */
+      header { height: auto !important; flex-wrap: wrap !important; padding: 8px 10px !important; gap: 8px 6px; }
+      header > div:first-child { flex: 1 1 auto; min-width: 0; }
+      header > div:first-child h1 { font-size: 15px; white-space: nowrap; }
+      header > div:first-child .flex.items-center.gap-2 > span, header > div:first-child p { display: none !important; }
+      header > div:last-child { order: 3; flex: 1 1 100%; width: 100%; gap: 6px; }
+      header > div:last-child > button { flex: 1 1 0; min-width: 0; justify-content: center; padding: 0 !important; min-height: 40px; position: relative; }
+      header > div:last-child > button span:not(.wk-hbadge):not(#history-badge) { display: none !important; }
+      header > div:last-child > button:last-child { background: #f5f5f5; border: 1px solid #e5e5e5; border-radius: 8px; }
+      header .wk-hbadge, header #history-badge { position: absolute; top: -5px; right: -3px; min-width: 16px; height: 16px; font-size: 9px; padding: 0 4px; margin: 0; display: inline-flex; align-items: center; justify-content: center; }
+      /* satu kolom, ganti lewat tab */
+      main { min-height: 0; }
+      main > section { width: 100% !important; flex: 1 1 auto; min-height: 0; display: none !important; padding: 10px !important; gap: 10px !important; }
+      main > aside { width: 100% !important; flex: 1 1 auto; min-height: 0; display: none !important; border-left: 0 !important; overflow-y: auto !important; box-shadow: none; }
+      body[data-tab="menu"] main > section { display: flex !important; }
+      body[data-tab="cart"] main > aside { display: flex !important; }
+      main > aside #cart-list { flex: none !important; min-height: 120px; max-height: 34vh; }
+      #search-input, #custom-cash-input, #customer-name, #table-number { font-size: 16px !important; }
+      /* tombol Simpan + Bayar menempel di bawah panel pesanan (selalu terlihat di atas tab bar) */
+      /* blok tagihan 'dilebur' ke panel pesanan agar baris Simpan + Bayar bisa menempel di bawah apa pun posisi scroll-nya */
+      main > aside > div:last-child { display: contents; }
+      main > aside > div:last-child > * { margin-left: 14px; margin-right: 14px; margin-top: 12px; flex-shrink: 0; }
+      main > aside > div:last-child > :first-child { border-top: 1px solid #e5e5e5; padding-top: 12px; margin-left: 0; margin-right: 0; padding-left: 14px; padding-right: 14px; margin-top: 0; }
+      main > aside > div:last-child > .wk-payrow { position: sticky; bottom: 0; z-index: 5; background: #fff; margin: 12px 0 0; padding: 8px 14px 12px; border-top: 1px solid #e5e5e5; box-shadow: 0 -8px 16px rgba(0,0,0,.06); }
+      /* tab bar bawah (di atas bar demo 46px) */
+      #wk-mobtab { display: flex; position: fixed; left: 0; right: 0; bottom: 46px; height: 56px; z-index: 40; background: #fff; border-top: 1px solid #e5e5e5; padding: 6px 8px; gap: 8px; }
+      #wk-mobtab button { flex: 1; min-width: 0; border: 0; border-radius: 12px; background: transparent; color: #737373; font: 700 12px 'Plus Jakarta Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer; white-space: nowrap; padding: 0 4px; }
       #wk-mobtab button.on { background: #f59e0b; color: #fff; }
-      #wk-mobtab .wk-tb-n { background: #f59e0b; color: #fff; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
+      #wk-mobtab .wk-tb-n { background: #e5e5e5; color: #404040; border-radius: 99px; padding: 1px 7px; font-size: 11px; }
       #wk-mobtab button.on .wk-tb-n { background: #fff; color: #b45309; }
-      #wk-mobtab .wk-tb-t { font-family: 'JetBrains Mono', monospace; font-size: 11px; opacity: .9; }
+      #wk-mobtab .wk-tb-t { font: 700 11px 'JetBrains Mono', monospace; white-space: nowrap; }
     }
-    @media (max-width: 520px) { header > div:first-child > div:last-child { display: none !important; } }
+    @media (max-width: 380px) { #wk-mobtab .wk-tb-t { font-size: 10px; } }
+    /* header desktop: jangan melebihi lebar layar (laptop kecil / tablet landscape) */
+    @media (min-width: 1024px) and (max-width: 1279px) {
+      header > div:last-child > button span:not(.wk-hbadge):not(#history-badge) { display: none !important; }
+      header { padding-left: 12px !important; padding-right: 12px !important; }
+    }
 
     @media print {
       body * {
@@ -233,7 +263,7 @@
     }
   </style>
 </head>
-<body data-tab="produk" class="bg-neutral-100 text-neutral-900 h-screen w-screen flex flex-col overflow-hidden select-none">
+<body data-tab="menu" class="bg-neutral-100 text-neutral-900 h-screen w-screen flex flex-col overflow-hidden select-none">
 <!-- @jz-bar-start -->
 <style>
 /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -346,7 +376,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
   <main class="flex-1 flex overflow-hidden">
 
     <!-- ========== KOLOM KIRI (KATALOG MENU & KATEGORI) ========== -->
-    <section id="wk-sec-produk" class="flex-1 flex flex-col h-full overflow-hidden bg-neutral-100/60 p-4 gap-4">
+    <section class="flex-1 flex flex-col h-full overflow-hidden bg-neutral-100/60 p-4 gap-4">
       <!-- Search & Category Filters -->
       <div class="flex flex-col gap-3 shrink-0">
         <div class="relative">
@@ -378,7 +408,7 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
     </section>
 
     <!-- ========== KOLOM KANAN (KERANJANG / ORDER SUMMARY) ========== -->
-    <aside id="wk-sec-cart" class="w-96 lg:w-[420px] bg-white border-l border-neutral-200 flex flex-col h-full overflow-hidden select-none shrink-0 shadow-sm">
+    <aside class="w-96 lg:w-[420px] bg-white border-l border-neutral-200 flex flex-col h-full overflow-hidden select-none shrink-0 shadow-sm">
       <!-- Top Order Header -->
       <div class="p-3.5 border-b border-neutral-200 flex flex-col gap-2.5 bg-neutral-50/50">
         <div class="flex items-center justify-between">
@@ -957,6 +987,12 @@ body{padding-bottom:46px!important;box-sizing:border-box!important}
       </div>
     </div>
   </div>
+
+  <!-- TAB BAWAH MOBILE -->
+  <nav id="wk-mobtab" aria-label="Navigasi mobile">
+    <button type="button" id="wk-tab-menu" class="on" onclick="wkTab('menu')"><i class="fa-solid fa-utensils"></i><span>Menu</span></button>
+    <button type="button" id="wk-tab-cart" onclick="wkTab('cart')"><i class="fa-solid fa-bag-shopping"></i><span>Pesanan</span><b class="wk-tb-n" id="wk-tb-n">0</b><span class="wk-tb-t" id="wk-tb-t">Rp 0</span></button>
+  </nav>
 
   <div id="wk-toast" class="wk-toastbox" aria-live="polite"></div>
 
@@ -2115,6 +2151,7 @@ function calculateTotals() {
 
   const btn = wk$('btn-process-checkout');
   const ok = cart.length > 0 && wkShift.open && (paymentMethod !== 'cash' || cashTendered >= t.total);
+  wkUpdateTab(t);
   btn.disabled = !ok;
   btn.className = ok
     ? 'w-full py-3.5 px-4 rounded-xl font-bold text-sm bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white flex items-center justify-center gap-2 shadow-md shadow-emerald-600/25 transition-all cursor-pointer active:scale-[0.99]'
@@ -2251,6 +2288,7 @@ function wkFirstFreeTable() {
   return wkTables.find(t => !wkHeld.some(h => h.orderType === 'dine_in' && h.table === t)) || wkTables[0];
 }
 function wkResetOrder() {
+  wkTab('menu');
   cart = [];
   cashTendered = 0;
   wkDiscount = { type: 'pct', value: 0 };
@@ -2370,7 +2408,7 @@ function wkRecall(id) {
     if (h.orderType === 'dine_in') wk$('table-number').value = h.table;
     wk$('customer-name').value = h.customer || '';
     setPaymentMethod('cash');
-    renderCart(); renderProducts(); wkUpdateBadges(); wkCloseHeld();
+    renderCart(); renderProducts(); wkUpdateBadges(); wkCloseHeld(); wkTab('cart');
     wkToast(id + ' dipanggil ke kasir.', 'success');
   };
   if (cart.length > 0) {
@@ -2860,6 +2898,22 @@ wk$('search-input').addEventListener('keydown', e => {
 });
 wk$('settings-modal').querySelector('form').addEventListener('submit', () => setTimeout(() => wkToast('Pengaturan disimpan.', 'success'), 0));
 
+
+/* ---------- Tab mobile Menu | Pesanan ---------- */
+function wkTab(t) {
+  document.body.setAttribute('data-tab', t);
+  const m = wk$('wk-tab-menu'), c = wk$('wk-tab-cart');
+  if (m) m.classList.toggle('on', t === 'menu');
+  if (c) c.classList.toggle('on', t === 'cart');
+  const aside = document.querySelector('main > aside');
+  if (aside) aside.scrollTop = 0;
+}
+function wkUpdateTab(t) {
+  const n = cart.reduce((a, it) => a + it.quantity, 0);
+  const el = wk$('wk-tb-n'); if (el) el.textContent = n;
+  const tt = wk$('wk-tb-t'); if (tt) tt.textContent = formatRupiah(t.total);
+}
+
 /* ---------- Inisialisasi ulang ---------- */
 wkTables = [...document.querySelectorAll('#table-number option')].map(o => o.value);
 wkSeed();
@@ -2873,48 +2927,6 @@ wkUpdateBadges();
 updateDrawerStats();
 wkUpdateShiftUI();
 
-</script>
-<nav id="wk-mobtab" aria-label="Navigasi kasir">
-  <button type="button" id="wk-tab-produk" class="on" onclick="wkTab('produk')"><i class="fa-solid fa-utensils"></i><span>Menu</span></button>
-  <button type="button" id="wk-tab-cart" onclick="wkTab('cart')"><i class="fa-solid fa-bag-shopping"></i><span>Pesanan</span><span class="wk-tb-n" id="wk-tb-n">0</span><span class="wk-tb-t" id="wk-tb-t">Rp 0</span></button>
-</nav>
-<script>
-function wkTab(t){
-  document.body.setAttribute('data-tab', t);
-  document.getElementById('wk-tab-produk').classList.toggle('on', t==='produk');
-  document.getElementById('wk-tab-cart').classList.toggle('on', t==='cart');
-}
-(function(){
-  var nEl=document.getElementById('wk-tb-n'), tEl=document.getElementById('wk-tb-t'), last=0;
-  function sync(){
-    var b=document.getElementById('cart-count-badge'), g=document.getElementById('bill-total');
-    if(b) nEl.textContent=(b.textContent.match(/\d+/)||['0'])[0];
-    if(g) tEl.textContent=g.textContent;
-  }
-  ['cart-count-badge','bill-total'].forEach(function(id){
-    var el=document.getElementById(id);
-    if(el) new MutationObserver(sync).observe(el,{childList:true,characterData:true,subtree:true});
-  });
-  sync();
-  // animasi singkat tab Pesanan saat item bertambah
-  var tb=document.getElementById('wk-tab-cart');
-  new MutationObserver(function(){
-    var n=parseInt(nEl.textContent,10)||0;
-    if(n>last && document.body.getAttribute('data-tab')==='produk'){ tb.animate([{transform:'scale(1)'},{transform:'scale(1.08)'},{transform:'scale(1)'}],{duration:350}); }
-    last=n;
-  }).observe(nEl,{childList:true,characterData:true,subtree:true});
-  // setelah struk transaksi baru ditutup, kembali ke Menu
-  var f=window.closeReceiptModal;
-  if(typeof f==='function'){
-    window.closeReceiptModal=function(){
-      var fin=(typeof wkPendingFinish!=='undefined')&&wkPendingFinish;
-      var r=f.apply(this,arguments);
-      if(fin && window.innerWidth<1024) wkTab('produk');
-      return r;
-    };
-  }
-  window.addEventListener('resize',function(){ if(window.innerWidth>=1024) document.body.setAttribute('data-tab','produk'); });
-})();
 </script>
 </body>
 </html>

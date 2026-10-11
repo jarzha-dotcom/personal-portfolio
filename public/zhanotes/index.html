@@ -84,7 +84,7 @@ details.ft{border-top:1px solid var(--bd);flex:none}details.ft>summary{padding:6
 .tgm,#bb,#scrim,#tbt{display:none}body.ht .top,body.ht .meta,body.ht .tb{display:none!important}body.ht.hc #tbt{display:block;position:fixed;top:8px;right:14px;z-index:15;background:var(--pn);border:1px solid var(--bd);box-shadow:0 2px 10px #0003;opacity:.75;padding:4px 12px;border-radius:20px;font-size:13px}body.ht.hc #tbt:hover{opacity:1}
 @media(min-width:821px){body.hs{--c1:0px}body.hl{--c2:0px}body.hs #sd,body.hl #ls{padding:0;border:0;visibility:hidden;overflow:hidden}#sd,#ls{min-width:0}}
 @media(max-width:820px){
-body{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto;height:100dvh}
+body{position:fixed;inset:0;height:auto;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr) auto}
 #sd{position:fixed;left:0;top:0;bottom:0;width:272px;z-index:20;background:var(--pn);transform:translateX(-100%);transition:transform .2s;padding-top:max(16px,env(safe-area-inset-top,0px))}
 body.sdo #sd{transform:none;box-shadow:0 0 40px #0006}body.sdo #scrim{display:block;position:fixed;inset:0;background:#0005;z-index:19}
 #ls,#mn{grid-column:1;grid-row:1;display:none;min-width:0}body:not(.hc):not(.hh) #ls{display:block}body.hc #mn,body.hh #mn{display:flex}
@@ -846,6 +846,13 @@ body.ro .ed-tb{opacity:.4;pointer-events:none}
 .cvm .sw2{width:20px;height:20px;border-radius:50%;border:1px solid var(--bd);padding:0;cursor:pointer;color:var(--tx);font-size:11px;line-height:1}
 .cvm .mb{min-width:30px;height:28px;padding:0 6px;border:1px solid var(--bd);border-radius:6px;background:none;color:inherit;cursor:pointer;font:inherit}
 .cvm .sw2:hover,.cvm .sw2:focus-visible,.cvm .mb:hover,.cvm .mb:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+/* ZN-FIX: scroll sidebar & tinggi layout mobile */
+#sd{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}
+#sd .sl{overscroll-behavior:auto}
+@media(max-width:820px){
+#sd{padding-bottom:max(24px,calc(env(safe-area-inset-bottom,0px) + 16px));touch-action:pan-y}
+#sd .sl{max-height:none;overflow:visible}
+}
 </style>
 </head><body>
 <!-- PRERENDER:ZHANOTES_NOSCRIPT:START --><!-- PRERENDER:ZHANOTES_NOSCRIPT:END -->
@@ -3018,7 +3025,13 @@ if(JSON.stringify(S.folders.slice().sort())!==SY.msig)ch=true;
 if(ch){spersist();sbadge();ssoon()}}
 function syncDrop(n){if(!SY.on||SY.quiet||isSeed(n))return;sbaseDrop(n.id);padd(SY.del,n.id);SY.pend=SY.pend.filter(x=>x!==n.id);
 if(n.kind==='pdf')padd(SY.delb,'pdf:'+n.id);(n.rec||[]).forEach(r=>padd(SY.delb,'rec:'+r.id));spersist();sbadge();ssoon()}
-let _sT=null;const ssoon=()=>{clearTimeout(_sT);_sT=setTimeout(()=>{slog('D','pemicu','jeda ketik 2,5 dtk');spass()},2500)};
+/* Jadwal kirim: tunggu SYNC_IDLE tanpa perubahan baru (debounce), tapi paling lama SYNC_MAX sejak perubahan pertama (max-wait).
+   Saat tab disembunyikan/ditutup langsung kirim, karena itu momen orang berpindah perangkat.
+   Pemicu karena edit memakai putaran "cepat" (spass(true)): hanya mendorong catatan yang berubah, tanpa mengunduh indeks cloud. */
+const SYNC_IDLE=8000,SYNC_MAX=45000;let _sT=null,_sFirst=0;
+const ssoon=()=>{const t=Date.now();if(!_sFirst)_sFirst=t;clearTimeout(_sT);
+const wait=document.hidden?0:Math.max(0,Math.min(SYNC_IDLE,_sFirst+SYNC_MAX-t));
+_sT=setTimeout(()=>{_sFirst=0;slog('D','pemicu',document.hidden?'tab disembunyikan':'jeda ketik '+(SYNC_IDLE/1000)+' dtk / batas '+(SYNC_MAX/1000)+' dtk');spass(true)},wait)};
 /* ── lampiran biner (PDF, rekaman) ── */
 async function spushBins(n,docs){const ks=[];if(n.kind==='pdf')ks.push(['pdf:'+n.id,n.id]);(n.rec||[]).forEach(r=>ks.push(['rec:'+r.id,'rec-'+r.id]));
 for(const [bk,ik] of ks){const d=docs&&docs[bk];if(d&&!d.deleted){SY.bin[bk]=d.rev;continue}if(!d&&SY.bin[bk]!=null&&!docs)continue;
@@ -3034,11 +3047,17 @@ if(old)S.notes[S.notes.indexOf(old)]=n;else S.notes.unshift(n);
 TXC.delete(id);SY.rev[k]=rev;SY.sig[id]=await csig(n);SY.pend=SY.pend.filter(x=>x!==id);dirty.delete(id);SY.ui=1;if(cur===id)SY.cur=1;await sbaseSave(id,sbdesc(n))}
 function sdropLocal(n){sbaseDrop(n.id);SY.quiet=1;try{dropN(n);S.notes=S.notes.filter(x=>x!==n)}finally{SY.quiet=0}if(cur===n.id){cur=null;SY.cur=1}SY.ui=1}
 /* ── satu putaran sinkron ── */
-async function spass(){if(!SY.on)return;if(SY.busy){SY.again=true;slog('D','putaran','Putaran sedang berjalan, dijadwalkan ulang');return}SY.busy=true;SY.err='';SY.msg='';SY.ctx=null;sbadge();const t0=performance.now();slog('I','putaran','Mulai',{tertunda:SY.pend.length,hapus:SY.del.length,konflik:SY.conf.length,online:navigator.onLine});
-try{let g=0;do{SY.again=false;await spass1()}while(SY.again&&++g<6);SY.last=now()}
+async function spass(fast){if(!SY.on)return;if(SY.busy){SY.again=true;slog('D','putaran','Putaran sedang berjalan, dijadwalkan ulang');return}SY.busy=true;SY.err='';SY.msg='';SY.ctx=null;sbadge();const t0=performance.now();slog('I','putaran','Mulai',{tertunda:SY.pend.length,hapus:SY.del.length,konflik:SY.conf.length,online:navigator.onLine});
+try{let g=0;do{SY.again=false;await spass1(!!fast&&g===0)}while(SY.again&&++g<6);SY.last=now()}
 catch(e){SY.err=(e&&e.status===401)?'Token akses ditolak server':(e instanceof TypeError||(navigator.onLine===false))?'Menunggu koneksi internet':(e&&e.message)||String(e);slog(e instanceof TypeError||navigator.onLine===false?'W':'E','putaran','Putaran gagal: '+SY.err,{err:e,tertunda:SY.pend.length,saat:SY.ctx||undefined})}
 finally{SY.busy=false;await spersist();sbadge();slog('I','putaran','Selesai '+(SY.err?'dengan galat':'ok'),{ms:Math.round(performance.now()-t0),tertunda:SY.pend.length+SY.del.length,konflik:SY.conf.length})}}
-async function spass1(){const {docs}=await sapi('sync-index'),rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks','Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length});
+async function spass1(fast){
+/* Putaran cepat hanya aman bila: sudah pernah sinkron penuh, tidak ada hapus/konflik tertunda, dan daftar folder tidak berubah.
+   Bentrok revisi tetap terdeteksi lewat spush (409 -> SY.again), lalu putaran berikutnya otomatis penuh. */
+fast=!!fast&&!!SY.seeded&&!SY.del.length&&!SY.delb.length&&!SY.conf.length&&JSON.stringify(S.folders.slice().sort())===SY.msig;
+let docs,rk=[];
+if(!fast){const ix=await sapi('sync-index');docs=ix.docs;rk=Object.keys(docs).filter(k=>k.startsWith('n:'));slog('D','indeks','Indeks cloud',{dokumen:Object.keys(docs).length,catatan:rk.length})}
+else slog('D','indeks','Putaran cepat: indeks cloud dilewati',{tertunda:SY.pend.length});
 if(!SY.seeded){if(rk.some(k=>!docs[k].deleted)){const sd=S.notes.filter(isSeed);slog('I','awal','Cloud sudah berisi catatan; membuang contoh bawaan lokal',{jumlah:sd.length});sd.forEach(sdropLocal)}SY.seeded=1}
 SY.conf=SY.conf.filter(c=>docs[c.k]&&docs[c.k].rev===c.rev);const have=new Set(SY.conf.map(c=>c.k));
 for(const k of rk){const d=docs[k],id=k.slice(2),r=SY.rev[k]||0;if(d.rev<=r||have.has(k))continue;SY.ctx={fase:'tarik',id,rev:d.rev};
@@ -3061,7 +3080,7 @@ for(const id of [...SY.del]){const k='n:'+id;if(blocked.has(k))continue;SY.ctx={
 if(!r0&&!docs[k]){SY.del=SY.del.filter(x=>x!==id);continue}
 const r=await stomb(k,r0);if(r.ok){slog('D','hapus','Penghapusan terkirim',{id,rev:r.rev});SY.rev[k]=r.rev;SY.del=SY.del.filter(x=>x!==id);delete SY.sig[id]}else{slog('I','hapus','Penghapusan ditolak (revisi berubah), ulangi',{id});SY.again=true}}
 for(const bk of [...SY.delb]){const r0=SY.bin[bk];if(r0==null){SY.delb=SY.delb.filter(x=>x!==bk);continue}const r=await stomb(bk,r0);if(r.ok||r.head){SY.delb=SY.delb.filter(x=>x!==bk);delete SY.bin[bk]}}
-SY.ctx={fase:'folder'};await smeta(docs);SY.ctx=null;try{await sbaseFill()}catch(e){slog('W','gabung','Gagal mengisi basis gabungan',{err:e})}}
+if(!fast){SY.ctx={fase:'folder'};await smeta(docs);SY.ctx=null;try{await sbaseFill()}catch(e){slog('W','gabung','Gagal mengisi basis gabungan',{err:e})}}}
 async function smeta(docs){const d=docs.meta,rv=SY.rev.meta||0,ms0=JSON.stringify(S.folders.slice().sort());
 if((!d||d.rev===rv)&&ms0===SY.msig)return;
 let rf=null;if(d&&!d.deleted&&d.rev>rv)rf=JSON.parse(TD.decode(await sdown(d))).folders||[];
@@ -3203,7 +3222,7 @@ if(!st){modal('<b>☁ Sinkron awan</b><p class=mu>Server sinkron tidak menjawab 
 if(st&&!st.configured)slog('W','status','Server belum dikonfigurasi',{kurang:st.missing});if(!st||!st.configured){modal('<b>☁ Sinkron awan</b><p class=mu>Fitur ini belum aktif di server ini. ZhaNotes tetap berjalan penuh secara offline; gunakan Cadangan ZIP untuk menyimpan salinan.</p>'+(st.missing&&st.missing.length?'<p class=mu>Pemilik situs: variabel yang belum terisi di Vercel: <code>'+st.missing.map(esc).join('</code>, <code>')+'</code>. Isi untuk lingkungan <b>Production</b>, lalu deploy ulang (variabel baru baru terbaca pada deployment berikutnya).</p>':'')+'<button onclick="backupUI()">💾 Cadangan ZIP</button> '+`${slogBtn()}`+' <button onclick="closeM()">Tutup</button>');return}
 if(!useIDB){modal('<b>☁ Sinkron awan</b><p class=mu>Sinkron membutuhkan IndexedDB, yang tidak tersedia di peramban ini.</p><button onclick="closeM()">Tutup</button>');return}
 if(!SY.on){modal(`<b>☁ Sinkron awan</b><p class=mu style="border-left:3px solid var(--ac);padding-left:10px">ℹ️ <b>Fitur edisi kustom.</b> Sinkron awan membutuhkan token akses dari penyedia aplikasi dan tidak diperlukan untuk memakai ZhaNotes: versi gratis tetap lengkap dan bekerja offline. Ingin ZhaNotes untuk bisnis Anda? <a href="https://wa.me/6282312312734" target="_blank" rel="noopener">Hubungi via WhatsApp</a>.</p><p class=mu>Catatan otomatis tersimpan di cloud dan muncul di perangkat lain. Isinya <b>dienkripsi di peramban ini</b> sebelum dikirim, jadi server hanya menyimpan data acak. <b>Kata sandi enkripsi tidak disimpan di server.</b> Jika lupa, data di cloud tidak bisa dipulihkan (Anda hanya bisa menghapusnya dan mulai ulang).</p>${msg?`<p>${esc(msg)}</p>`:''}<input id=syt type=password placeholder="Token akses" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp type=password placeholder="Kata sandi enkripsi (min. 8 karakter)" style="width:100%;margin:4px 0" autocomplete="off"><input id=syp2 type=password placeholder="Ulangi kata sandi (hanya saat pertama kali)" style="width:100%;margin:4px 0" autocomplete="off"><p class=mu>Di perangkat kerja/umum, gunakan “Keluar &amp; hapus data lokal” setelah selesai.</p><button onclick="syncEnable()" style="background:var(--ac);color:#fff">Aktifkan sinkron</button> ${slogBtn()} <button onclick="closeM()">Batal</button>`);return}
-modal(`<b>☁ Sinkron awan</b><p id=syst>${sstat()}</p>${msg?`<p>${esc(msg)}</p>`:''}<p>${SY.conf.length?`<button onclick="sconfUI()" style="background:#e11d48;color:#fff">⚠ Selesaikan ${SY.conf.length} konflik</button> `:''}<button onclick="spass();setTimeout(syncUI,300)" style="background:var(--ac);color:#fff">⟳ Sinkronkan sekarang</button></p><p><button onclick="syncOff()">Matikan di perangkat ini</button> <button onclick="syncWipe()">Keluar &amp; hapus data lokal</button> <button onclick="syncReset()">Hapus semua data cloud</button> ${slogBtn()}</p><p class=mu>Perubahan disinkronkan otomatis beberapa detik setelah Anda berhenti mengetik, dan saat aplikasi dibuka kembali.</p>`)}
+modal(`<b>☁ Sinkron awan</b><p id=syst>${sstat()}</p>${msg?`<p>${esc(msg)}</p>`:''}<p>${SY.conf.length?`<button onclick="sconfUI()" style="background:#e11d48;color:#fff">⚠ Selesaikan ${SY.conf.length} konflik</button> `:''}<button onclick="spass();setTimeout(syncUI,300)" style="background:var(--ac);color:#fff">⟳ Sinkronkan sekarang</button></p><p><button onclick="syncOff()">Matikan di perangkat ini</button> <button onclick="syncWipe()">Keluar &amp; hapus data lokal</button> <button onclick="syncReset()">Hapus semua data cloud</button> ${slogBtn()}</p><p class=mu>Perubahan disimpan di perangkat ini lebih dulu, lalu dikirim ke cloud sekitar 8 detik setelah Anda berhenti mengetik (paling lama 45 detik saat menulis terus), dan langsung saat tab ditinggalkan.</p>`)}
 async function syncEnable(){const t=(($('#syt')||{}).value||'').trim(),p=($('#syp')||{}).value||'',p2=($('#syp2')||{}).value||'';
 if(!t)return toast('Isi token akses dulu');if(p.length<8)return toast('Kata sandi enkripsi minimal 8 karakter');
 try{toast('Memeriksa…');let cfg=(await sapi('sync-config',{t})).config,key;
