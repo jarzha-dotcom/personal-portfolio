@@ -37,6 +37,7 @@ Akibatnya, elemen kanvas ikut terkena `display: none`, sehingga tidak tampil dan
 
 ### 🗂️ Daftar Catatan & Tag
 - **Halaman bernomor** (‹ 1 … 4 5 6 … 12 ›) dengan keterangan "51–100 dari 137"; ukuran halaman 25 / 50 / 100 (disimpan di perangkat).
+- **Beranda ("Baru dibuka") juga berhalaman**: 12 catatan per halaman dengan penomoran yang sama (‹ 1 2 3 ›); kembali ke halaman 1 saat filter jenis diganti.
 - **Tag di daftar**: 12 tag teratas (paling sering dipakai) dan tombol `+N lagi ▾`; tombol `▾ Tag` menyembunyikan seluruh deretan. Tag aktif selalu terlihat.
 - **🔍 Cari tag**: dari daftar catatan atau palet `Ctrl+K` → *Cari tag…*; menampilkan jumlah catatan per tag.
 - **Kelola tag** (menu Data di sidebar): ganti nama, gabungkan (nama yang sama), atau hapus (kosongkan nama).
@@ -89,14 +90,18 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 - **Kartu Teks Bebas (T)**: Klik di mana saja pada kanvas untuk membuat kartu teks yang bisa diketik, digeser (*drag*), dan diubah ukurannya (*resize*).
 - **Alat Geser (✋)**: Geser kanvas (*pan*) untuk menjelajahi area gambar tanpa mencoret.
 - **Zoom & Navigasi**: *Pinch-to-zoom* dua jari, *scroll wheel* mouse, tombol perbesar/perkecil, serta tombol *Fit to Screen* (⤢) untuk melihat seluruh isi gambar sekaligus.
+- **Label toolbar**: `Ctrl+K` → *Toolbar: ikon saja / ikon + label / otomatis* berganti antara label menyesuaikan lebar layar (bawaan), ikon saja, dan ikon + label di toolbar Kanvas dan PDF pada layar lebar. Pilihan tersimpan di perangkat.
+- **Cari di kanvas**: `Ctrl+F` saat kanvas aktif (atau `Ctrl+K` → *Kanvas: cari objek*) mencari teks kartu, label bentuk, dan label konektor. Klik hasil (atau `Enter` untuk hasil pertama) untuk memilih objeknya dan memusatkan tampilan ke sana.
+- **Minimap**: peta mini di pojok kanan bawah menampilkan seluruh isi kanvas dan kotak biru area yang sedang terlihat. Klik atau seret di peta untuk pindah. Nyalakan/matikan dengan `M` atau `Ctrl+K` → *Kanvas: minimap* (pilihan tersimpan di perangkat).
 - **Jenis pena**: Pena, Pensil, Spidol, Stabilo; 17 warna plus pemilih warna bebas. Ketuk ikon alat untuk membuka panel opsinya (ketuk lagi atau di luar untuk menutup). Warna garis dan warna isi terpisah.
-- **Penghapus**: mode *Goresan* (hapus utuh) dan *Bagian* (memotong goresan), tiga ukuran. Tersedia juga di PDF.
+- **Penghapus**: mode *Goresan* (hapus utuh) dan *Bagian* (menghapus hanya bagian yang disentuh). Pilihan ukuran (tiga ukuran) hanya muncul di mode *Bagian*. Tersedia juga di PDF.
 - **Seleksi**: mode *Kotak* dan *Bebas (lasso)*.
 - **Preset pena (4 slot)**: simpan jenis, warna, dan tebal; panggil dengan tombol `1`–`4` atau bulatan di toolbar (di HP muncul saat Pena aktif). Simpan lewat `Shift`+klik, klik kanan, atau panel Pena.
 - **Latar**: Titik, Kisi, Garis, Polos (per catatan) dan **snap ke kisi** untuk bentuk dan kartu teks baru serta saat memindahkan objek (tahan `Alt` untuk melewati; garis panduan sejajar antar-objek didahulukan).
 - **Bentuk**: 12 bentuk; **konektor** dengan beberapa jenis.
 - **Grup**: `Ctrl+G` mengelompokkan, `Ctrl+Shift+G` melepas. **Kunci**: menu klik kanan → *Kunci* / *Buka kunci* (ditandai 🔒). **Sebar rata** horizontal/vertikal (minimal 3 objek) lewat klik kanan (tekan lama di HP).
 - **Pengenal bentuk**: saat menggambar dengan Pena, tahan sejenak (sekitar setengah detik) di akhir coretan; garis lurus, kotak, atau lingkaran/elips buatan tanganmu dirapikan otomatis (garis hampir lurus dikunci horizontal/vertikal). Coretan bebas biasa tidak berubah. Nyalakan/matikan di panel Pena atau lewat `Ctrl+K` → *Kanvas: pengenal bentuk*.
+- **Ekspor atau salin objek terpilih**: pilih objek, lalu `Ctrl+K` → *Kanvas: ekspor objek terpilih sebagai PNG* (unduh) atau *Kanvas: salin objek terpilih sebagai gambar* (ke clipboard, siap ditempel ke dokumen atau chat). Hanya objek terpilih yang disertakan.
 - **Ekspor Gambar**: Unduh kanvas ke dalam format PNG berkualitas tinggi, SVG vektor, atau PDF dokumen.
 
 ### 3. 🔬 Riset & Kliping
@@ -160,7 +165,10 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 | `R` | **◻ Bentuk (Shape)** | Menggambar garis, kotak, atau elips |
 | `+` atau `=` | **Perbesar (Zoom In)** | Memperbesar sudut pandang kanvas |
 | `-` atau `_` | **Perkecil (Zoom Out)** | Memperkecil sudut pandang kanvas |
+| `I` | **Pipet warna** | Lalu klik goresan atau bentuk untuk mengambil warna garisnya (Esc batal) |
+| `Z` | **Perbesar ke objek terpilih** | Zoom dan pusatkan tampilan ke objek yang sedang dipilih |
 | `0` | **⤢ Pas ke Layar (Fit)** | Menyesuaikan tampilan agar seluruh gambar muat di layar |
+| `M` | **Minimap** | Tampilkan/sembunyikan peta mini kanvas |
 | `L` | **Seleksi Kotak ⇄ Bebas** | Beralih antara seleksi kotak dan lasso |
 | `G` | **Ganti Latar** | Titik → Kisi → Garis → Polos |
 | `Shift + G` | **Snap ke Kisi** | Nyalakan/matikan snap |
