@@ -12,3 +12,4 @@ coverage/
 .audio-cache/
 public/audio/
 src/assets/images/*.jpeg
+zhanotes-src/

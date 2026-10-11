@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1.0.4';
+const CACHE_VERSION = 'v1.0.5';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -141,6 +141,26 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 })
                 .catch(() => caches.match(request).then((cached) => cached || Response.error()))
+        );
+        return;
+    }
+
+    // Pustaka ZhaNotes (pdf.js, pdf-lib, JSZip) di /zhanotes/lib/: nama file memuat hash
+    // isinya, jadi tidak pernah berubah → cache-first (tanpa revalidate tiap pemakaian).
+    if (url.pathname.startsWith('/zhanotes/lib/')) {
+        event.respondWith(
+            caches.match(request).then(
+                (cached) =>
+                    cached ||
+                    fetch(request).then((response) => {
+                        const ct = response.headers.get('content-type') || '';
+                        if (response.ok && ct.includes('javascript')) {
+                            const clone = response.clone();
+                            caches.open(RUNTIME_CACHE).then((cache) => cache.put(request, clone));
+                        }
+                        return response;
+                    })
+            )
         );
         return;
     }
