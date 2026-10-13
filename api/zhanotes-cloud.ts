@@ -35,10 +35,21 @@
 //   POST sync-push              body { key, baseRev, uid, chunks[], size, deleted? } -> { ok, rev } | 409 { head }
 //   POST abort                  body { id, chunks[] }  -> { ok }   (bersihkan unggahan yang gagal)
 //   GET  sync-read&u=<url>      -> byte mentah potongan (cadangan bila unduhan langsung diblokir CORS)
-//   POST sync-reset             -> { ok }  (hapus SEMUA data sinkron + konfigurasi enkripsi)
+//   POST sync-reset             -> { ok }  (hapus SEMUA data sinkron + konfigurasi enkripsi, termasuk tautan bagi)
+//
+// Berbagi tautan baca-saja (edisi kustom). Isi catatan dienkripsi AES-GCM di peramban pemilik; kuncinya hanya ada di
+// bagian # tautan (tidak pernah sampai ke server). Server hanya menyimpan byte terenkripsi + masa berlaku.
+//   POST share-put&days=0|1|7|30  body byte terenkripsi (<= 3,5 MB, berawalan "ZS1") -> { id, at, exp }
+//   GET  share-list               -> { shares: [{ id, at, exp, size }], max }        (kedaluwarsa dibersihkan)
+//   POST share-revoke             body { id } -> { ok }
+//   GET  share-get&id=            (TANPA token; dibatasi 60 baca/menit/IP) -> byte terenkripsi, atau 404
+// Pratinjau tautan (edisi kustom, perlu token):
+//   GET  link-preview&u=<url>     -> { url, title, desc, site }  (hanya situs publik http/https; IP privat ditolak)
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
+import { lookup } from 'node:dns/promises';
+import { isIP } from 'node:net';
 import { del, list, put } from '@vercel/blob';
 
 export const maxDuration = 30;
@@ -76,6 +87,13 @@ const FAIL_WINDOW_S = 10 * 60;
 const MAX_CHUNKS = Math.ceil((MAX_MB * 1024 * 1024) / (3 * 1024 * 1024)) + 2;
 const ID_RE = /^[a-z0-9-]{8,64}$/;
 const KEY_RE = /^(meta|(n|pdf|rec):[A-Za-z0-9_-]{1,40})$/;
+const SHARE_RE = /^[A-Za-z0-9_-]{16,32}$/;
+const MAX_SHARE_BYTES = Math.floor(3.5 * 1024 * 1024);
+const MAX_SHARES = 50;
+const SHARE_DAYS = [0, 1, 7, 30]; // 0 = tanpa batas
+const SHARE_READ_LIMIT = 60; // pembacaan per IP per menit
+const SHARE_PATH_RE = new RegExp(`^/${PREFIX}(-[2-5])?/shares/`);
+const MAX_PAGE_BYTES = 512 * 1024;
 
 interface Doc {
     rev: number;
@@ -200,6 +218,170 @@ const jsonBody = (req: VercelRequest): Record<string, unknown> => {
     return b && typeof b === 'object' ? (b as Record<string, unknown>) : {};
 };
 
+// ── Berbagi tautan ────────────────────────────────────────────────────────
+interface Share {
+    url: string;
+    at: number;
+    exp: number; // ms epoch; 0 = tanpa batas
+    size: number;
+}
+const shareKey = (id: string) => `${PREFIX}:share:${id}`;
+const shareUrlOk = (u: unknown): u is string => {
+    if (typeof u !== 'string') return false;
+    try {
+        const p = new URL(u);
+        if (p.protocol !== 'https:' || p.username || p.password || p.port) return false;
+        const hostOk = BLOB_HOST ? p.hostname === BLOB_HOST : p.hostname.endsWith('.blob.vercel-storage.com');
+        return hostOk && SHARE_PATH_RE.test(p.pathname);
+    } catch {
+        return false;
+    }
+};
+const parseShare = (raw: unknown): Share | null => {
+    try {
+        const s = JSON.parse(String(raw)) as Share;
+        return s && typeof s.url === 'string' && Number.isFinite(s.at) && Number.isFinite(s.exp) ? s : null;
+    } catch {
+        return null;
+    }
+};
+async function hgetall(key: string): Promise<Record<string, string>> {
+    const [flat] = (await redis([['HGETALL', key]])) as [unknown];
+    const out: Record<string, string> = {};
+    if (Array.isArray(flat)) {
+        for (let i = 0; i + 1 < flat.length; i += 2) out[String(flat[i])] = String(flat[i + 1]);
+    } else if (flat && typeof flat === 'object') {
+        for (const [k, v] of Object.entries(flat as Record<string, unknown>)) out[k] = String(v);
+    }
+    return out;
+}
+// Hapus tautan kedaluwarsa milik satu pemilik (blob + indeks), kembalikan yang masih aktif.
+async function activeShares(sp: Space): Promise<Record<string, Share>> {
+    const raw = await hgetall(`${sp.prefix}:shares`);
+    const now = Date.now();
+    const live: Record<string, Share> = {};
+    const dead: string[] = [];
+    for (const [id, v] of Object.entries(raw)) {
+        const s = parseShare(v);
+        if (s && (!s.exp || s.exp > now)) live[id] = s;
+        else dead.push(id);
+    }
+    if (dead.length) {
+        const urls = dead.map((id) => parseShare(raw[id])?.url).filter((u): u is string => !!u && shareUrlOk(u));
+        if (urls.length) await del(urls).catch(() => undefined);
+        await redis([['HDEL', `${sp.prefix}:shares`, ...dead], ...dead.map((id) => ['DEL', shareKey(id)])]);
+    }
+    return live;
+}
+
+// ── Pratinjau tautan ──────────────────────────────────────────────────────
+const privV4 = (a: number[]) =>
+    a.length !== 4 || a.some((x) => !(x >= 0 && x <= 255)) || a[0] === 0 || a[0] === 10 || a[0] === 127 ||
+    (a[0] === 100 && a[1] >= 64 && a[1] <= 127) || (a[0] === 169 && a[1] === 254) || (a[0] === 172 && a[1] >= 16 && a[1] <= 31) ||
+    (a[0] === 192 && a[1] === 168) || (a[0] === 192 && a[1] === 0 && a[2] === 0) || (a[0] === 198 && (a[1] === 18 || a[1] === 19)) || a[0] >= 224;
+const isPrivateIp = (ip: string): boolean => {
+    const v = isIP(ip);
+    if (v === 4) return privV4(ip.split('.').map(Number));
+    if (v === 6) {
+        const s = ip.toLowerCase();
+        return s === '::' || s === '::1' || /^fe[89ab]/.test(s) || /^f[cd]/.test(s) || s.startsWith('ff') || s.startsWith('::ffff:') || s.startsWith('64:ff9b:') || s.startsWith('2001:db8');
+    }
+    return true;
+};
+const badHost = (h: string) => h === 'localhost' || h.endsWith('.localhost') || h.endsWith('.local') || h.endsWith('.internal') || h.endsWith('.lan') || (!h.includes('.') && !isIP(h));
+// Ambil halaman HTML publik: hanya http/https port 80/443, tolak IP privat (termasuk hasil DNS dan tiap lompatan redirect).
+// Catatan: DNS di-resolve sekali untuk pemeriksaan lalu fetch me-resolve lagi (celah DNS-rebinding kecil); endpoint ini
+// hanya untuk pemilik bertoken dan hanya mengembalikan judul/deskripsi teks.
+async function fetchPage(u: string): Promise<{ html: string; url: string }> {
+    let cur = u;
+    for (let hop = 0; hop < 4; hop++) {
+        let p: URL;
+        try {
+            p = new URL(cur);
+        } catch {
+            throw new Error('URL_NOT_ALLOWED');
+        }
+        const host = p.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+        if (!/^https?:$/.test(p.protocol) || p.username || p.password || (p.port && p.port !== '80' && p.port !== '443') || !host || badHost(host)) throw new Error('URL_NOT_ALLOWED');
+        if (isIP(host)) {
+            if (isPrivateIp(host)) throw new Error('URL_NOT_ALLOWED');
+        } else {
+            const addrs = await lookup(host, { all: true });
+            if (!addrs.length || addrs.some((a) => isPrivateIp(a.address))) throw new Error('URL_NOT_ALLOWED');
+        }
+        const ctl = new AbortController();
+        const timer = setTimeout(() => ctl.abort(), 6000);
+        let r: any;
+        try {
+            r = await fetch(cur, { redirect: 'manual', signal: ctl.signal, headers: { 'user-agent': 'Mozilla/5.0 (compatible; ZhaNotesPreview/1.0)', accept: 'text/html,application/xhtml+xml' } });
+        } finally {
+            clearTimeout(timer);
+        }
+        if (r.status >= 300 && r.status < 400) {
+            const loc = r.headers.get('location');
+            if (!loc) throw new Error('HTTP_' + r.status);
+            cur = new URL(loc, cur).toString();
+            continue;
+        }
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        if (!/text\/html|application\/xhtml/i.test(String(r.headers.get('content-type') || ''))) throw new Error('NOT_HTML');
+        const reader = r.body?.getReader?.();
+        if (!reader) throw new Error('FETCH_FAILED');
+        const parts: Uint8Array[] = [];
+        let got = 0;
+        while (got < MAX_PAGE_BYTES) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            parts.push(value);
+            got += value.length;
+        }
+        try {
+            await reader.cancel();
+        } catch {
+            /* abaikan */
+        }
+        return { html: new TextDecoder('utf-8').decode(Buffer.concat(parts)).slice(0, MAX_PAGE_BYTES), url: cur };
+    }
+    throw new Error('TOO_MANY_REDIRECTS');
+}
+const entDecode = (s: string) =>
+    s.replace(/&(#x?[0-9a-f]+|amp|lt|gt|quot|apos|nbsp);/gi, (_m, g: string) => {
+        const l = g.toLowerCase();
+        if (l === 'amp') return '&';
+        if (l === 'lt') return '<';
+        if (l === 'gt') return '>';
+        if (l === 'quot') return '"';
+        if (l === 'apos') return "'";
+        if (l === 'nbsp') return ' ';
+        const n = l[1] === 'x' ? parseInt(l.slice(2), 16) : parseInt(l.slice(1), 10);
+        return Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : '';
+    });
+const cleanTxt = (s: string, max: number) => entDecode(s).replace(/\s+/g, ' ').trim().slice(0, max);
+const metaOf = (h: string, keys: string[]): string => {
+    const tags = h.match(/<meta\b[^>]*>/gi) || [];
+    for (const k of keys) {
+        for (const t of tags) {
+            const nm = /(?:property|name)\s*=\s*["']([^"']+)["']/i.exec(t);
+            if (!nm || nm[1].toLowerCase() !== k) continue;
+            const c = /content\s*=\s*(?:"([^"]*)"|'([^']*)')/i.exec(t);
+            const v = c ? c[1] || c[2] || '' : '';
+            if (v.trim()) return v;
+        }
+    }
+    return '';
+};
+const parseMeta = (html: string) => {
+    const head = html.slice(0, 300000);
+    const tm = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(head);
+    return {
+        title: cleanTxt(metaOf(head, ['og:title', 'twitter:title']) || (tm ? tm[1] : ''), 200),
+        desc: cleanTxt(metaOf(head, ['og:description', 'description', 'twitter:description']), 400),
+        site: cleanTxt(metaOf(head, ['og:site_name']), 80),
+    };
+};
+// Hanya untuk uji (uji/uji-server.mjs).
+export const __test = { isPrivateIp, parseMeta, fetchPage };
+
 // Percobaan token salah per IP. Lapisan 1: in-memory (cepat, per instance). Lapisan 2: Redis (dibagi antar
 // instance serverless, jadi penyerang tidak bisa menghindar dengan memicu instance baru).
 const failures = new Map<string, number[]>();
@@ -238,6 +420,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         warnWeakToken();
         if (!isConfigured()) return res.status(503).json({ error: 'NOT_CONFIGURED', detail: 'Sinkron awan belum dikonfigurasi di server ini.' });
+
+        // ── GET share-get : publik (tanpa token); isinya terenkripsi, kuncinya hanya ada di tautan ──────
+        if (req.method === 'GET' && action === 'share-get') {
+            const id = String(req.query?.id || '');
+            if (!SHARE_RE.test(id)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const ipH = createHash('sha256').update(String(req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim()).digest('hex').slice(0, 16);
+            const rl = `${PREFIX}:share:rl:${ipH}`;
+            const [cnt, , raw] = await redis([['INCR', rl], ['EXPIRE', rl, 60], ['GET', shareKey(id)]]);
+            if (Number(cnt) > SHARE_READ_LIMIT) {
+                res.setHeader('Retry-After', '60');
+                return res.status(429).json({ error: 'TOO_MANY_REQUESTS', detail: 'Terlalu sering membuka tautan. Coba lagi sebentar.' });
+            }
+            const rec = parseShare(raw);
+            if (!rec || (rec.exp && rec.exp < Date.now()) || !shareUrlOk(rec.url)) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan, sudah dicabut, atau sudah kedaluwarsa.' });
+            const r = await fetch(rec.url, { redirect: 'error' });
+            if (!r.ok) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan, sudah dicabut, atau sudah kedaluwarsa.' });
+            const buf = Buffer.from(await r.arrayBuffer());
+            if (buf.length > MAX_SHARE_BYTES + 1024) return res.status(413).json({ error: 'TOO_LARGE' });
+            res.setHeader('Content-Type', 'application/octet-stream');
+            return res.status(200).send(buf);
+        }
 
         // ── Autentikasi ────────────────────────────────────────────────────────
         const ip = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || 'unknown';
@@ -300,6 +503,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).send(buf);
         }
 
+        // ── GET share-list ─────────────────────────────────────────────────────
+        if (req.method === 'GET' && action === 'share-list') {
+            const live = await activeShares(sp);
+            const shares = Object.entries(live)
+                .map(([id, s]) => ({ id, at: s.at, exp: s.exp, size: s.size }))
+                .sort((a, b) => b.at - a.at);
+            return res.status(200).json({ shares, max: MAX_SHARES });
+        }
+
+        // ── GET link-preview ───────────────────────────────────────────────────
+        if (req.method === 'GET' && action === 'link-preview') {
+            const u = String(req.query?.u || '').trim();
+            if (!u || u.length > 2000) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Alamat tidak valid.' });
+            try {
+                const { html, url } = await fetchPage(u);
+                return res.status(200).json({ url, ...parseMeta(html) });
+            } catch (e: any) {
+                const code = String(e?.message || '');
+                if (code === 'URL_NOT_ALLOWED') return res.status(422).json({ error: code, detail: 'Alamat ini tidak diizinkan (hanya situs web publik).' });
+                if (code === 'NOT_HTML') return res.status(422).json({ error: code, detail: 'Alamat itu bukan halaman web.' });
+                if (code === 'TOO_MANY_REDIRECTS') return res.status(422).json({ error: code, detail: 'Terlalu banyak pengalihan alamat.' });
+                if (/^HTTP_\d+$/.test(code)) return res.status(422).json({ error: code, detail: `Situs membalas dengan kesalahan (${code.replace('_', ' ')}).` });
+                return res.status(502).json({ error: 'FETCH_FAILED', detail: 'Gagal mengambil halaman (situs tidak merespons).' });
+            }
+        }
+
         if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
         // ── POST chunk ─────────────────────────────────────────────────────────
@@ -322,7 +551,47 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).json({ url: blob.url });
         }
 
+        // ── POST share-put : simpan catatan terenkripsi untuk dibagikan ─────────
+        if (action === 'share-put') {
+            const days = Number(req.query?.days);
+            if (!SHARE_DAYS.includes(days)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Masa berlaku tidak valid.' });
+            let data: Buffer;
+            try {
+                data = await readBody(req);
+            } catch {
+                return res.status(413).json({ error: 'TOO_LARGE', detail: 'Catatan terlalu besar untuk dibagikan.' });
+            }
+            if (data.length < 40 || data.length > MAX_SHARE_BYTES) return res.status(413).json({ error: 'TOO_LARGE', detail: `Catatan terlalu besar untuk dibagikan (maksimal ${(MAX_SHARE_BYTES / 1048576).toFixed(1)} MB termasuk gambar).` });
+            // Pastikan berformat data terenkripsi klien ("ZS1"): server tidak menyimpan teks polos.
+            if (data[0] !== 90 || data[1] !== 83 || data[2] !== 49) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Format data tidak dikenal.' });
+            const live = await activeShares(sp);
+            if (Object.keys(live).length >= MAX_SHARES) return res.status(409).json({ error: 'SHARE_LIMIT', detail: `Batas ${MAX_SHARES} tautan aktif tercapai. Cabut sebagian dulu.` });
+            const id = randomBytes(16).toString('base64url');
+            const blob = await put(`${sp.prefix}/shares/${id}.bin`, data, { access: 'public', contentType: 'application/octet-stream', addRandomSuffix: true });
+            const at = Date.now();
+            const exp = days ? at + days * 86400000 : 0;
+            const rec: Share = { url: blob.url, at, exp, size: data.length };
+            await redis([
+                ['SET', shareKey(id), JSON.stringify(rec), ...(days ? ['EX', days * 86400 + 3600] : [])],
+                ['HSET', `${sp.prefix}:shares`, id, JSON.stringify(rec)],
+            ]);
+            return res.status(200).json({ id, at, exp });
+        }
+
         const body = jsonBody(req);
+
+        // ── POST share-revoke ──────────────────────────────────────────────────
+        if (action === 'share-revoke') {
+            const id = String(body.id || '');
+            if (!SHARE_RE.test(id)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const raw = (await hgetall(`${sp.prefix}:shares`))[id];
+            if (raw) {
+                const s = parseShare(raw);
+                if (s && shareUrlOk(s.url)) await del(s.url).catch(() => undefined);
+                await redis([['HDEL', `${sp.prefix}:shares`, id], ['DEL', shareKey(id)]]);
+            }
+            return res.status(200).json({ ok: true });
+        }
 
         // ── POST sync-config : simpan salt + verifikator kata sandi (sekali saja) ─
         if (action === 'sync-config') {
@@ -395,7 +664,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             } catch (e) {
                 console.warn('[zhanotes-cloud] sapu blob yatim gagal');
             }
-            await redis([['DEL', sp.docs], ['DEL', sp.cfg]]);
+            const shareIds = Object.keys(await hgetall(`${sp.prefix}:shares`));
+            await redis([['DEL', sp.docs], ['DEL', sp.cfg], ['DEL', `${sp.prefix}:shares`], ...shareIds.map((sid) => ['DEL', shareKey(sid)])]);
             return res.status(200).json({ ok: true, removed: Object.keys(docs).length, orphans });
         }
 

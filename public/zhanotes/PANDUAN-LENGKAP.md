@@ -132,6 +132,18 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 
 ---
 
+## 🛠 Toolbar Melayang (semua jenis catatan)
+
+Alternatif toolbar di atas layar, berguna di HP, layar kecil, dan mode fokus.
+
+- **Cara kerja:** toolbar diubah jadi **satu tombol bulat** yang bisa dipindah. Klik tombolnya, muncul **kartu alat** berisi toolbar lengkap catatan yang sedang dibuka (Halaman/Riset: tab Teks, Paragraf, Lanjutan, Sisipkan, dan Kustom bila ada; Kanvas dan PDF: semua alat). Pilih satu alat, kartu **menutup sendiri** dan kembali jadi tombol.
+- **Alat yang membuka panel atau menu** (Tabel, Kotak, Simbol, warna, Pena, Bentuk, Konektor, dll.) membuat kartu tetap terbuka sampai pilihan dibuat atau tombol **✓ OK** ditekan, lalu kartu menutup. Pindah tab di dalam kartu tidak menutupnya. Dialog (mis. Rumus, Sitasi) menutup kartu begitu terbuka.
+- **Menyalakan:** tombol **⇲ Melayang** di atas toolbar, atau `Ctrl+K` → *Toolbar: tombol alat melayang*. Kembali ke toolbar biasa lewat **⇱ Toolbar biasa** di dalam kartu. Pilihan tersimpan di perangkat. Di **mode fokus** (`Alt+Z`) tombol ini selalu muncul walau pilihannya mati (tombol *🎨 Alat* di pil mode fokus membuka kartunya).
+- **Memindah:** seret tombolnya ke mana saja; saat dilepas ia menempel ke tepi kiri atau kanan, posisinya diingat. Kartu muncul di bawah atau di atas tombol, mana yang muat, dan selalu masuk layar.
+- **Menutup:** `Esc`, ketuk di luar kartu, atau tombol ✕ Tutup. Di Kanvas dan PDF ikon tombol mengikuti alat aktif (✏️, 🧽, ⬚, ◻, dll.).
+
+---
+
 ## ⌨️ Tabel Lengkap Pintasan Keyboard (Shortcut Cheat Sheet)
 
 ### 🌐 Navigasi & Jendela Utama
@@ -272,16 +284,32 @@ Setiap catatan halaman dan riset dilengkapi perekam suara bawaan:
 
 ---
 
+## 📚 Status baca per sumber (Halaman dan Riset)
+
+Untuk melacak bacaan: `Ctrl+K` → *Tambah sumber dengan status baca* (atau tombol **📚 Sumber** di tab Sisipkan). Isi judul, tautan atau DOI (opsional), dan catatan singkat; satu baris sumber masuk ke catatan lengkap dengan lencana status. **Klik lencana** untuk mengganti: ○ Belum dibaca → ◐ Sedang dibaca → ✓ Selesai dibaca. **📊 Progres** (atau *Ringkasan status baca*) menampilkan persentase yang sudah selesai, bilah progres, dan daftar sumber; klik satu untuk melompat ke barisnya. Catatan yang punya lencana juga menampilkan progresnya (mis. `📚 2/5`) di daftar catatan. Semua ini bekerja offline di semua edisi. Di edisi kustom, tombol *Isi judul dari tautan* mengambil judul situs otomatis.
+
+---
+
+## 📥 Membuka tautan yang dibagikan orang lain
+
+Buka tautannya (bentuknya `…/zhanotes/#bagi=…`). Catatan tampil **hanya baca** di layar penuh, tanpa mengubah catatanmu. Tombol *Salin ke catatan saya* membuat salinan yang bisa kamu edit; *Tutup* menghapus kunci dari alamat. Gambar dari situs luar, formulir, dan skrip tidak ditampilkan. Untuk Kanvas yang dibagikan, kamu melihat gambarnya (bisa diunduh atau disimpan sebagai catatan). Tautan yang sudah dicabut atau kedaluwarsa menampilkan pesan, dan kunci yang salah tidak bisa membuka isinya. Membukanya butuh internet.
+
+---
+
 ## 🧩 Fitur Khusus Edisi Kustom
 
-Versi umum ZhaNotes 100% offline. Fitur yang butuh internet **hanya muncul di edisi kustom** (muncul otomatis bila Sinkron awan sudah aktif; tanpa itu fiturnya tersembunyi), dan tidak mengganggu pemakaian offline. Cara memakainya: di catatan Halaman/Riset buka tab **✨ Kustom** di toolbar dan klik **∑ Rumus**, **◇ Diagram**, **🌐 Wikipedia**, **🔤 OCR**, atau **🎤 Dikte**. Di **Kanvas** dan **PDF** ada tombol **✨ Kustom** yang membuka menu (Dikte, Wikipedia, OCR, Rumus; Diagram hanya di Kanvas); hasilnya masuk sebagai kartu. Semuanya juga ada di `Ctrl+K` dengan awalan *Kustom:*. Tab dan tombol Kustom hilang sendiri bila Sinkron awan dimatikan.
+Versi umum ZhaNotes 100% offline. Fitur yang butuh internet **hanya muncul di edisi kustom** (muncul otomatis bila Sinkron awan sudah aktif; tanpa itu fiturnya tersembunyi), dan tidak mengganggu pemakaian offline. Cara memakainya: di catatan Halaman/Riset buka tab **✨ Kustom** di toolbar dan klik **∑ Rumus**, **◇ Diagram**, **🌐 Wikipedia**, **🔤 OCR**, **🎤 Dikte**, **🔗 Tautan** (pratinjau tautan), atau **📤 Bagikan** (tautan baca-saja). Di **Kanvas** dan **PDF** ada tombol **✨ Kustom** yang membuka menu (Dikte, Wikipedia, OCR, Rumus; Diagram hanya di Kanvas); hasilnya masuk sebagai kartu. Semuanya juga ada di `Ctrl+K` dengan awalan *Kustom:*. Tab dan tombol Kustom hilang sendiri bila Sinkron awan dimatikan.
 
 - **Sinkron awan terenkripsi** antar perangkat (lihat bagian sinkronisasi).
 - **🌐 Isi sitasi dari DOI**: di dialog Sitasi, tempel DOI lalu klik *Isi dari DOI*; penulis, tahun, judul, jurnal, volume, dan halaman terisi dari Crossref (periksa lagi hasilnya).
 - **🌐 Kutip Wikipedia** (`Ctrl+K` → *Kustom: kutip Wikipedia*): ringkasan pembuka artikel (Indonesia atau Inggris) disisipkan sebagai kutipan beserta tautan sumber dan keterangan lisensi CC BY-SA. Ada tombol judul contoh untuk dicoba. Di Kanvas dan PDF hasilnya menjadi kartu teks.
-- **∑ Rumus matematika (KaTeX)** (`Ctrl+K` → *Kustom: rumus matematika*): tulis LaTeX (mis. `\frac{a}{b}`), lihat pratinjau langsung, lalu sisipkan. Ada pilihan **Contoh rumus ▾** (20 contoh: pecahan, rumus abc, sigma, integral, limit, matriks, determinan, kombinasi, simpangan baku, bunga majemuk, NPV, persentase selisih stok, dan lainnya). Pustaka dimuat dari internet hanya saat dipakai; hasilnya disimpan sebagai MathML sehingga **rumus tetap tampil offline**. Klik rumus untuk mengubahnya (butuh internet). Di Kanvas dan PDF rumus disisipkan sebagai kartu teks `$…$` (bukan gambar). Di ekspor (Markdown, teks, Word, PDF) dan pencarian, rumus ditulis sebagai `$…$` (atau `$$…$$` bila tampil sendiri).
+- **∑ Rumus matematika (KaTeX)** (`Ctrl+K` → *Kustom: rumus matematika*): tulis LaTeX (mis. `\frac{a}{b}`), lihat pratinjau langsung, lalu sisipkan. Ada pilihan **Contoh rumus ▾** (20 contoh: pecahan, rumus abc, sigma, integral, limit, matriks, determinan, kombinasi, simpangan baku, bunga majemuk, NPV, persentase selisih stok, dan lainnya). Pustaka dimuat dari internet hanya saat dipakai; hasilnya disimpan sebagai MathML sehingga **rumus tetap tampil offline**. Klik rumus untuk mengubahnya (butuh internet). Rumus yang disisipkan di tengah kalimat tetap sebaris, tidak memecah paragraf (catatan: penyisipan ini tidak bisa dibatalkan dengan `Ctrl+Z`; hapus dengan menekan `Backspace`). Di **Kanvas** rumus menjadi **kartu gambar** (dirender di perangkat, tetap tampil offline) yang menyimpan kode TeX-nya; klik dua kali kartunya untuk mengedit. Di PDF rumus masih disisipkan sebagai kartu teks `$…$`. Di ekspor (Markdown, teks, Word, PDF) dan pencarian, rumus ditulis sebagai `$…$` (atau `$$…$$` bila tampil sendiri).
 - **◇ Diagram Mermaid** (`Ctrl+K` → *Kustom: diagram Mermaid*): tulis kode atau pilih **Contoh diagram ▾** (13 contoh: alur proses, alur dengan kelompok, rekonsiliasi bank, struktur organisasi, sequence, state, class, ER, gantt, pie, mindmap, timeline, journey), pratinjau, lalu sisipkan. Disimpan sebagai gambar SVG sehingga **tetap tampil offline**; klik dua kali diagramnya untuk mengubah kodenya (butuh internet). Di ekspor Word dan PDF diagram disematkan sebagai gambar PNG; di ekspor Markdown tampil sebagai `[gambar]`. Di **Kanvas** diagram menjadi kartu gambar yang menyimpan kodenya; klik dua kali kartunya untuk mengubah (butuh internet).
 - **🔤 OCR** (`Ctrl+K` → *Kustom: OCR teks*): baca teks dari foto/gambar, atau dari halaman PDF yang sedang dibuka (PDF hasil pindai). Bahasa Indonesia + Inggris. Mesin dan data bahasa (beberapa MB) diunduh saat pertama dipakai. Hasil bisa disalin, disisipkan ke catatan (di Kanvas dan PDF: **Sisipkan sebagai kartu**), atau dijadikan catatan baru; selalu periksa kembali hasilnya.
+- **📤 Bagikan halaman PDF** (buka PDF → ✨ Kustom → *Bagikan*, atau `Ctrl+K`): isi kolom *Halaman* (mis. `1-3,5`, maksimal 12 halaman; bawaannya halaman yang sedang dibuka). Halaman dikirim sebagai **gambar** (dienkripsi seperti catatan lain), tanpa anotasi dan tanpa teks yang bisa disalin. Penerima membaca halaman bertumpuk dan bisa menyimpannya sebagai catatan Halaman. Kalau terlalu besar, pilih lebih sedikit halaman.
+- **📤 Bagikan Kanvas**: buka Kanvas, lalu ✨ Kustom → *Bagikan* (atau `Ctrl+K`). Kanvas dikirim sebagai **gambar PNG** tampilan lengkapnya (dienkripsi sama seperti catatan Halaman). Penerima bisa memperbesar, mengunduh PNG, atau menyimpannya sebagai catatan Halaman; mereka tidak bisa mengedit Kanvas aslinya.
+- **📤 Bagikan lewat tautan baca-saja** (tombol *Bagikan* di tab ✨ Kustom, atau `Ctrl+K` → *Kustom: bagikan catatan lewat tautan*; untuk catatan Halaman/Riset): pilih masa berlaku (1, 7, 30 hari, atau tanpa batas) lalu *Buat tautan*. Isi catatan dienkripsi di perangkatmu; kuncinya hanya ada di tautan (setelah tanda `#`) dan tidak pernah dikirim ke server, jadi server hanya menyimpan data terenkripsi. Siapa pun yang memegang tautan bisa membacanya, jadi kirim lewat jalur yang kamu percaya. Daftar *Tautan aktif* di dialog yang sama punya tombol **Salin** dan **Cabut** (tautan yang dicabut langsung tidak bisa dibuka). Maksimal 50 tautan aktif dan ukuran sekitar 3,5 MB termasuk gambar. Teks, gambar, rumus, dan diagram ikut; lampiran dan Kanvas/PDF tidak.
+- **🔗 Pratinjau tautan** (tombol *Tautan*, atau `Ctrl+K` → *Kustom: pratinjau tautan*): tempel alamat situs, lalu judul, nama situs, dan deskripsinya masuk sebagai kartu bertautan (tanpa gambar, jadi tetap ringan dan tampil offline). Hanya situs web publik; alamat jaringan lokal ditolak.
 - **🎤 Dikte suara** (`Ctrl+K` → *Kustom: dikte suara*): bicara, teks masuk di posisi kursor (bahasa Indonesia). Di Kanvas dan PDF teks masuk ke kartu yang terakhir dipilih (ditambahkan di akhir), atau dibuatkan kartu baru bila belum ada. Jalankan perintah yang sama untuk berhenti. Memerlukan izin mikrofon dan, di sebagian peramban, internet.
 
 Saat offline, fitur kustom menampilkan pesan gagal tanpa merusak catatan. Bila pustaka gagal diverifikasi (hash integritas tidak cocok) pesannya berbeda dari pesan "butuh internet".
