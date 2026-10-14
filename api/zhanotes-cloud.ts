@@ -43,6 +43,17 @@
 //   GET  share-list               -> { shares: [{ id, at, exp, size }], max }        (kedaluwarsa dibersihkan)
 //   POST share-revoke             body { id } -> { ok }
 //   GET  share-get&id=            (TANPA token; dibatasi 60 baca/menit/IP) -> byte terenkripsi, atau 404
+//                                 Header balasan: x-share-rev (nomor versi), x-share-edit ("1" bila tautan punya kunci tulis aktif)
+// Tautan hidup & tautan edit bersama (edisi kustom):
+//   POST share-put&id=<id>&baseRev=<n>[&force=1][&days=][&wh=<hex>|none]   (pemilik; body byte terenkripsi)
+//        -> { id, rev, at, exp } | 409 { error: CONFLICT, rev } bila versi di server sudah berubah (mis. diedit penerima).
+//        Tautan yang sama langsung menampilkan versi baru. Versi sebelumnya disimpan satu tingkat.
+//        &wh=<sha256 hex dari kunci tulis> mengaktifkan hak edit untuk pemegang kunci tulis (hanya saat membuat/memperbarui).
+//   POST share-edit&id=<id>&baseRev=<n>   (TANPA token pemilik; header x-zhanotes-write: kunci tulis; body byte terenkripsi)
+//        -> { ok, rev } | 409 { error: CONFLICT, rev } | 403 { error: BAD_WRITE_KEY | EDIT_DISABLED }
+//        Penerima tidak bisa menghapus, mencabut, atau memperpanjang tautan; hanya menulis versi baru.
+//   POST share-opts               body { id, days?, edit?: false } -> { ok, rev, exp, edit }  (pemilik: ubah masa berlaku / matikan edit)
+//   GET  share-prev&id=           (pemilik) -> byte terenkripsi versi sebelumnya; header x-share-rev = versi saat ini
 // Pratinjau tautan (edisi kustom, perlu token):
 //   GET  link-preview&u=<url>     -> { url, title, desc, site }  (hanya situs publik http/https; IP privat ditolak)
 
@@ -224,7 +235,43 @@ interface Share {
     at: number;
     exp: number; // ms epoch; 0 = tanpa batas
     size: number;
+    rev?: number; // nomor versi; tautan lama tanpa rev dianggap 1
+    up?: number; // waktu pembaruan terakhir (ms epoch)
+    pu?: string; // URL blob versi sebelumnya (satu tingkat)
+    wh?: string; // sha256 (hex) kunci tulis; ada = tautan edit bersama aktif. Kuncinya sendiri tidak pernah disimpan.
+    sp?: string; // awalan ruang pemilik (agar penulis berbekal kunci tulis bisa menemukan indeks pemilik)
 }
+const HEX64 = /^[a-f0-9]{64}$/;
+const WKEY_RE = /^[A-Za-z0-9_-]{43}$/;
+const spaceOk = (sp: unknown): sp is string => typeof sp === 'string' && (sp === PREFIX || new RegExp(`^${PREFIX}-[2-5]$`).test(sp));
+const sha256 = (s: string) => createHash('sha256').update(s).digest();
+const sha256hex = (s: string) => sha256(s).toString('hex');
+const SHARE_WRITE_LIMIT = 30; // penulisan per IP per menit
+const SHARE_WRITE_FAIL_LIMIT = 10; // kunci tulis salah per IP per 10 menit
+
+// Compare-and-set atomik untuk catatan bagi. ARGV: 1 id, 2 rev yang diharapkan (-1 = abaikan), 3 wh yang diharapkan ('' = abaikan),
+// 4 patch JSON, 5 naikkan rev ('1'/'0'), 6 geser versi sekarang jadi "sebelumnya" ('1'/'0'), 7 waktu sekarang (ms).
+// Kembali {kode, isi lama, isi baru}: 1 = berhasil, 0 = rev bentrok, 2 = catatan tidak ada, 3 = kunci tulis berubah.
+const SHARE_LUA = `
+local cur = redis.call('HGET', KEYS[1], ARGV[1])
+if not cur then return {2, ''} end
+local d = cjson.decode(cur)
+local rev = d.rev or 1
+if ARGV[2] ~= '-1' and rev ~= tonumber(ARGV[2]) then return {0, cur} end
+if ARGV[3] ~= '' and d.wh ~= ARGV[3] then return {3, cur} end
+local p = cjson.decode(ARGV[4])
+if ARGV[6] == '1' then d.pu = d.url end
+for k, v in pairs(p) do d[k] = v end
+if p.nowh then d.wh = nil end
+d.nowh = nil
+if ARGV[5] == '1' then d.rev = rev + 1 else d.rev = rev end
+local enc = cjson.encode(d)
+redis.call('HSET', KEYS[1], ARGV[1], enc)
+local ttl = 0
+if d.exp and d.exp > 0 then ttl = math.max(60, math.ceil((d.exp - tonumber(ARGV[7])) / 1000) + 3600) end
+if ttl > 0 then redis.call('SET', KEYS[2], enc, 'EX', ttl) else redis.call('SET', KEYS[2], enc) end
+return {1, cur, enc}
+`;
 const shareKey = (id: string) => `${PREFIX}:share:${id}`;
 const shareUrlOk = (u: unknown): u is string => {
     if (typeof u !== 'string') return false;
@@ -255,6 +302,17 @@ async function hgetall(key: string): Promise<Record<string, string>> {
     }
     return out;
 }
+async function shareCas(hashKey: string, id: string, expRev: number, expWh: string, patch: Record<string, unknown>, bump: boolean, shift: boolean) {
+    const [r] = (await redis([['EVAL', SHARE_LUA, 2, hashKey, shareKey(id), id, expRev, expWh, JSON.stringify(patch), bump ? '1' : '0', shift ? '1' : '0', Date.now()]])) as [unknown[]];
+    let next: Share | null = null;
+    try {
+        next = r?.[2] ? (JSON.parse(String(r[2])) as Share) : null;
+    } catch {
+        next = null;
+    }
+    return { code: Number(r?.[0]), prev: parseShare(r?.[1]), next };
+}
+const shareBlobs = (s: Share | null | undefined): string[] => [s?.url, s?.pu].filter((u): u is string => !!u && shareUrlOk(u));
 // Hapus tautan kedaluwarsa milik satu pemilik (blob + indeks), kembalikan yang masih aktif.
 async function activeShares(sp: Space): Promise<Record<string, Share>> {
     const raw = await hgetall(`${sp.prefix}:shares`);
@@ -267,7 +325,7 @@ async function activeShares(sp: Space): Promise<Record<string, Share>> {
         else dead.push(id);
     }
     if (dead.length) {
-        const urls = dead.map((id) => parseShare(raw[id])?.url).filter((u): u is string => !!u && shareUrlOk(u));
+        const urls = dead.flatMap((id) => shareBlobs(parseShare(raw[id])));
         if (urls.length) await del(urls).catch(() => undefined);
         await redis([['HDEL', `${sp.prefix}:shares`, ...dead], ...dead.map((id) => ['DEL', shareKey(id)])]);
     }
@@ -439,7 +497,50 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const buf = Buffer.from(await r.arrayBuffer());
             if (buf.length > MAX_SHARE_BYTES + 1024) return res.status(413).json({ error: 'TOO_LARGE' });
             res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('x-share-rev', String(rec.rev || 1));
+            res.setHeader('x-share-edit', rec.wh && spaceOk(rec.sp) ? '1' : '0');
             return res.status(200).send(buf);
+        }
+
+        // ── POST share-edit : penulisan oleh pemegang kunci tulis (TANPA token pemilik) ─────────────
+        if (req.method === 'POST' && action === 'share-edit') {
+            const id = String(req.query?.id || '');
+            const baseRev = Number(req.query?.baseRev);
+            const wkey = String(req.headers['x-zhanotes-write'] || '');
+            if (!SHARE_RE.test(id) || !Number.isInteger(baseRev) || baseRev < 1) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const ipH = createHash('sha256').update(String(req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim()).digest('hex').slice(0, 16);
+            const wr = `${PREFIX}:share:wr:${ipH}`;
+            const wf = `${PREFIX}:share:wf:${ipH}`;
+            const [cnt, , failed, raw] = await redis([['INCR', wr], ['EXPIRE', wr, 60], ['GET', wf], ['GET', shareKey(id)]]);
+            if (Number(cnt) > SHARE_WRITE_LIMIT || Number(failed) >= SHARE_WRITE_FAIL_LIMIT) {
+                res.setHeader('Retry-After', '60');
+                return res.status(429).json({ error: 'TOO_MANY_REQUESTS', detail: 'Terlalu sering menyimpan. Coba lagi sebentar.' });
+            }
+            const rec = parseShare(raw);
+            if (!rec || (rec.exp && rec.exp < Date.now()) || !shareUrlOk(rec.url)) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan, sudah dicabut, atau sudah kedaluwarsa.' });
+            if (!rec.wh || !HEX64.test(rec.wh) || !spaceOk(rec.sp)) return res.status(403).json({ error: 'EDIT_DISABLED', detail: 'Hak edit pada tautan ini tidak aktif.' });
+            if (!WKEY_RE.test(wkey) || !timingSafeEqual(sha256(wkey), Buffer.from(rec.wh, 'hex'))) {
+                await redis([['INCR', wf], ['EXPIRE', wf, 600]]);
+                return res.status(403).json({ error: 'BAD_WRITE_KEY', detail: 'Kunci edit tidak cocok.' });
+            }
+            let data: Buffer;
+            try {
+                data = await readBody(req);
+            } catch {
+                return res.status(413).json({ error: 'TOO_LARGE', detail: 'Catatan terlalu besar.' });
+            }
+            if (data.length < 40 || data.length > MAX_SHARE_BYTES) return res.status(413).json({ error: 'TOO_LARGE', detail: `Catatan terlalu besar (maksimal ${(MAX_SHARE_BYTES / 1048576).toFixed(1)} MB).` });
+            if (data[0] !== 90 || data[1] !== 83 || data[2] !== 49) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Format data tidak dikenal.' });
+            const blob = await put(`${rec.sp}/shares/${id}.bin`, data, { access: 'public', contentType: 'application/octet-stream', addRandomSuffix: true });
+            const c = await shareCas(`${rec.sp}:shares`, id, baseRev, rec.wh, { url: blob.url, size: data.length, up: Date.now() }, true, true);
+            if (c.code !== 1) {
+                await del(blob.url).catch(() => undefined);
+                if (c.code === 0) return res.status(409).json({ error: 'CONFLICT', rev: c.prev?.rev || 1, detail: 'Catatan sudah diubah orang lain.' });
+                if (c.code === 3) return res.status(403).json({ error: 'EDIT_DISABLED', detail: 'Hak edit pada tautan ini baru saja dimatikan.' });
+                return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan, sudah dicabut, atau sudah kedaluwarsa.' });
+            }
+            if (c.prev?.pu && shareUrlOk(c.prev.pu)) await del(c.prev.pu).catch(() => undefined);
+            return res.status(200).json({ ok: true, rev: c.next?.rev || baseRev + 1 });
         }
 
         // ── Autentikasi ────────────────────────────────────────────────────────
@@ -507,9 +608,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (req.method === 'GET' && action === 'share-list') {
             const live = await activeShares(sp);
             const shares = Object.entries(live)
-                .map(([id, s]) => ({ id, at: s.at, exp: s.exp, size: s.size }))
+                .map(([id, s]) => ({ id, at: s.at, exp: s.exp, size: s.size, rev: s.rev || 1, up: s.up || s.at, edit: !!(s.wh && spaceOk(s.sp)), prev: !!(s.pu && shareUrlOk(s.pu)) }))
                 .sort((a, b) => b.at - a.at);
             return res.status(200).json({ shares, max: MAX_SHARES });
+        }
+
+        // ── GET share-prev : versi sebelumnya (hanya pemilik) ──────────────────
+        if (req.method === 'GET' && action === 'share-prev') {
+            const id = String(req.query?.id || '');
+            if (!SHARE_RE.test(id)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const rec = parseShare((await hgetall(`${sp.prefix}:shares`))[id]);
+            if (!rec || (rec.exp && rec.exp < Date.now())) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan.' });
+            if (!rec.pu || !shareUrlOk(rec.pu)) return res.status(404).json({ error: 'NO_PREVIOUS', detail: 'Belum ada versi sebelumnya.' });
+            const r = await fetch(rec.pu, { redirect: 'error' });
+            if (!r.ok) return res.status(404).json({ error: 'NO_PREVIOUS', detail: 'Versi sebelumnya sudah tidak tersedia.' });
+            const buf = Buffer.from(await r.arrayBuffer());
+            if (buf.length > MAX_SHARE_BYTES + 1024) return res.status(413).json({ error: 'TOO_LARGE' });
+            res.setHeader('Content-Type', 'application/octet-stream');
+            res.setHeader('x-share-rev', String(rec.rev || 1));
+            return res.status(200).send(buf);
         }
 
         // ── GET link-preview ───────────────────────────────────────────────────
@@ -551,10 +668,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(200).json({ url: blob.url });
         }
 
-        // ── POST share-put : simpan catatan terenkripsi untuk dibagikan ─────────
+        // ── POST share-put : simpan catatan terenkripsi untuk dibagikan (baru), atau perbarui tautan yang sudah ada ─────────
         if (action === 'share-put') {
-            const days = Number(req.query?.days);
-            if (!SHARE_DAYS.includes(days)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Masa berlaku tidak valid.' });
+            const qid = String(req.query?.id || '');
+            const upd = qid !== '';
+            if (upd && !SHARE_RE.test(qid)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const daysQ = req.query?.days;
+            const days = Number(daysQ);
+            if ((!upd || daysQ !== undefined) && !SHARE_DAYS.includes(days)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Masa berlaku tidak valid.' });
+            const whq = String(req.query?.wh || '');
+            if (whq && whq !== 'none' && !HEX64.test(whq)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Kunci tulis tidak valid.' });
             let data: Buffer;
             try {
                 data = await readBody(req);
@@ -564,18 +687,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             if (data.length < 40 || data.length > MAX_SHARE_BYTES) return res.status(413).json({ error: 'TOO_LARGE', detail: `Catatan terlalu besar untuk dibagikan (maksimal ${(MAX_SHARE_BYTES / 1048576).toFixed(1)} MB termasuk gambar).` });
             // Pastikan berformat data terenkripsi klien ("ZS1"): server tidak menyimpan teks polos.
             if (data[0] !== 90 || data[1] !== 83 || data[2] !== 49) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Format data tidak dikenal.' });
+
+            if (upd) {
+                // Perbarui tautan yang sama. Hanya pemilik (token ruangnya) yang bisa: id harus ada di indeks ruang ini.
+                const old = parseShare((await hgetall(`${sp.prefix}:shares`))[qid]);
+                if (!old || !shareUrlOk(old.url) || (old.exp && old.exp <= Date.now())) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan sudah dicabut atau kedaluwarsa.' });
+                const force = req.query?.force === '1';
+                const baseRev = Number(req.query?.baseRev);
+                if (!force && !(Number.isInteger(baseRev) && baseRev >= 1)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Nomor versi (baseRev) wajib.' });
+                const blob = await put(`${sp.prefix}/shares/${qid}.bin`, data, { access: 'public', contentType: 'application/octet-stream', addRandomSuffix: true });
+                const patch: Record<string, unknown> = { url: blob.url, size: data.length, up: Date.now(), sp: sp.prefix };
+                if (daysQ !== undefined) patch.exp = days ? Date.now() + days * 86400000 : 0;
+                if (whq === 'none') patch.nowh = true;
+                else if (whq) patch.wh = whq;
+                const c = await shareCas(`${sp.prefix}:shares`, qid, force ? -1 : baseRev, '', patch, true, true);
+                if (c.code !== 1) {
+                    await del(blob.url).catch(() => undefined);
+                    if (c.code === 0) return res.status(409).json({ error: 'CONFLICT', rev: c.prev?.rev || 1, detail: 'Tautan ini sudah diubah (mis. oleh penerima).' });
+                    return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan sudah dicabut atau kedaluwarsa.' });
+                }
+                if (c.prev?.pu && shareUrlOk(c.prev.pu)) await del(c.prev.pu).catch(() => undefined);
+                return res.status(200).json({ id: qid, rev: c.next?.rev || 1, at: c.next?.at, exp: c.next?.exp ?? 0 });
+            }
+
             const live = await activeShares(sp);
             if (Object.keys(live).length >= MAX_SHARES) return res.status(409).json({ error: 'SHARE_LIMIT', detail: `Batas ${MAX_SHARES} tautan aktif tercapai. Cabut sebagian dulu.` });
             const id = randomBytes(16).toString('base64url');
             const blob = await put(`${sp.prefix}/shares/${id}.bin`, data, { access: 'public', contentType: 'application/octet-stream', addRandomSuffix: true });
             const at = Date.now();
             const exp = days ? at + days * 86400000 : 0;
-            const rec: Share = { url: blob.url, at, exp, size: data.length };
+            const rec: Share = { url: blob.url, at, exp, size: data.length, rev: 1, up: at, sp: sp.prefix, ...(whq && whq !== 'none' ? { wh: whq } : {}) };
             await redis([
                 ['SET', shareKey(id), JSON.stringify(rec), ...(days ? ['EX', days * 86400 + 3600] : [])],
                 ['HSET', `${sp.prefix}:shares`, id, JSON.stringify(rec)],
             ]);
-            return res.status(200).json({ id, at, exp });
+            return res.status(200).json({ id, at, exp, rev: 1 });
         }
 
         const body = jsonBody(req);
@@ -586,11 +732,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             if (!SHARE_RE.test(id)) return res.status(400).json({ error: 'BAD_REQUEST' });
             const raw = (await hgetall(`${sp.prefix}:shares`))[id];
             if (raw) {
-                const s = parseShare(raw);
-                if (s && shareUrlOk(s.url)) await del(s.url).catch(() => undefined);
+                const urls = shareBlobs(parseShare(raw));
+                if (urls.length) await del(urls).catch(() => undefined);
                 await redis([['HDEL', `${sp.prefix}:shares`, id], ['DEL', shareKey(id)]]);
             }
             return res.status(200).json({ ok: true });
+        }
+
+        // ── POST share-opts : ubah masa berlaku / matikan hak edit (pemilik) ──────
+        if (action === 'share-opts') {
+            const id = String(body.id || '');
+            if (!SHARE_RE.test(id)) return res.status(400).json({ error: 'BAD_REQUEST' });
+            const old = parseShare((await hgetall(`${sp.prefix}:shares`))[id]);
+            if (!old || (old.exp && old.exp <= Date.now())) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan.' });
+            const patch: Record<string, unknown> = { sp: sp.prefix };
+            if (body.days !== undefined) {
+                const days = Number(body.days);
+                if (!SHARE_DAYS.includes(days)) return res.status(400).json({ error: 'BAD_REQUEST', detail: 'Masa berlaku tidak valid.' });
+                patch.exp = days ? Date.now() + days * 86400000 : 0;
+            }
+            const offEdit = body.edit === false;
+            if (offEdit) patch.nowh = true;
+            // Mematikan edit menaikkan nomor versi supaya penulis yang sedang membuka versi lama ditolak.
+            const c = await shareCas(`${sp.prefix}:shares`, id, Number(old.rev || 1), '', patch, offEdit, false);
+            if (c.code === 0) return res.status(409).json({ error: 'CONFLICT', rev: c.prev?.rev || 1, detail: 'Tautan baru saja berubah. Coba lagi.' });
+            if (c.code !== 1) return res.status(404).json({ error: 'NOT_FOUND', detail: 'Tautan tidak ditemukan.' });
+            return res.status(200).json({ ok: true, rev: c.next?.rev || 1, exp: c.next?.exp ?? 0, edit: !!c.next?.wh });
         }
 
         // ── POST sync-config : simpan salt + verifikator kata sandi (sekali saja) ─
