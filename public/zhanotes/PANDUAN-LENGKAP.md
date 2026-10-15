@@ -4,24 +4,13 @@
 
 ---
 
-## 🎯 Ringkasan Pembaruan & Perbaikan Mode Kanvas
+## 🎯 Kanvas Saat Toolbar Disembunyikan & Mode Fokus
 
-### ❓ Masalah Sebelumnya
-Saat berada di mode kanvas, ketika pengguna mengaktifkan **Sembunyikan Toolbar** (`Alt+M`), **Sembunyikan Semua Alat** (`Alt+T`), atau masuk ke **Mode Fokus / Zen** (`Alt+Z`), kanvas gambar tidak dapat dicoret sama sekali atau bahkan hilang dari layar.
+Kanvas dan penampil PDF selalu tetap tampil dan bisa dicoret saat **Sembunyikan Toolbar** (`Alt+M`), **Sembunyikan Semua Alat** (`Alt+T`), atau **Mode Fokus / Zen** (`Alt+Z`). (Dulu kanvas ikut hilang karena berada di dalam bilah alat; kini keduanya terpisah.)
 
-### 🔍 Penyebab Masalah
-Elemen kontainer kanvas (`#cw` dan `<canvas id="cv">`) sebelumnya dirender di dalam kontainer bilah alat lengket (`.zn-stk-body` di dalam `.zn-stk`). Ketika bilah alat disembunyikan atau mode fokus diaktifkan:
-- `body.hb .zn-stk-body { display: none }`
-- `body.ht .zn-stk { display: none!important }`
-- `body.zen .zn-stk { display: none!important }`
-
-Akibatnya, elemen kanvas ikut terkena `display: none`, sehingga tidak tampil dan tidak dapat menangkap input mouse, stylus, maupun sentuhan jari.
-
-### 🛠 Solusi & Perbaikan yang Diterapkan
-1. **Pemisahan Elemen Kanvas dari Toolbar**: Kontainer kanvas (`#cw`) dan penampil PDF (`#pv`) dipindahkan keluar dari `.zn-stk` menjadi anak langsung dari `#mn`, sejajar dengan wadah dokumen (`#bd`).
-2. **Kanvas Tetap Aktif di Seluruh Mode**: Saat toolbar disembunyikan (`Alt+M`), alat disembunyikan (`Alt+T`), atau dalam mode fokus layar penuh (`Alt+Z`), kanvas tetap 100% terlihat, meluas mengisi seluruh ruang layar, dan langsung bisa dicorat-coret.
-3. **Pintasan Keyboard Khusus Kanvas**: Anda dapat beralih alat corat-coret secara instan tanpa perlu membuka toolbar (`P` untuk Pena, `E` untuk Penghapus, `S`/`V` untuk Seleksi, `H` untuk Geser, `T` untuk Teks, `R` untuk Bentuk, `+`/`-` untuk Zoom, `0` untuk Fit).
-4. **Panggil Toolbar di Mode Zen**: Tekan `Alt+T` atau klik tombol `🎨 Alat` di sudut kanan atas untuk menampilkan toolbar mengambang sementara di atas kanvas.
+1. **Kanvas Tetap Aktif di Seluruh Mode**: Saat toolbar disembunyikan (`Alt+M`), alat disembunyikan (`Alt+T`), atau dalam mode fokus layar penuh (`Alt+Z`), kanvas tetap 100% terlihat, meluas mengisi seluruh ruang layar, dan langsung bisa dicorat-coret.
+2. **Pintasan Keyboard Khusus Kanvas**: Anda dapat beralih alat corat-coret secara instan tanpa perlu membuka toolbar (`P` untuk Pena, `E` untuk Penghapus, `S`/`V` untuk Seleksi, `H` untuk Geser, `T` untuk Teks, `R` untuk Bentuk, `+`/`-` untuk Zoom, `0` untuk Fit).
+3. **Panggil Toolbar di Mode Zen**: Tekan `Alt+T` atau klik tombol `🎨 Alat` di sudut kanan atas untuk menampilkan toolbar mengambang sementara di atas kanvas.
 
 ---
 
@@ -63,6 +52,66 @@ Contoh: `tipe:pdf dalam:30 #laporan stok` atau `sejak:2026-10-01 sebelum:2026-10
 
 ---
 
+## 🆕 Pembaruan Tahap 28–63 (Oktober 2026)
+
+### 🧰 Toolbar & Tampilan
+- **Toolbar melayang** (tombol **⇲ Melayang**): lihat bagian *Toolbar Melayang* di bawah. Di tahap 46 baris tab toolbar di HP dirapikan agar tidak tertimpa tombol Melayang/Sembunyikan.
+- **Label toolbar**: `Ctrl+K` → *Toolbar: ikon saja / ikon + label / otomatis* (Kanvas dan PDF, layar lebar).
+- **Tab bisa diurutkan**: seret tab untuk memindah (tahan lama di layar sentuh); `Alt+Shift+Panah` menggeser tab terfokus. **Buka kembali tab yang ditutup**: `Alt+Shift+T` atau tombol ↺ di bilah tab.
+- **Mode baca** (`Alt+R`, tombol 🔒/🔓 di bilah atas): mengunci edit pada catatan Halaman/Riset.
+- **Ikon & warna label catatan**: menu ⋯ → *Ikon & warna label* (atau klik ikon di samping judul). 11 kategori berisi 431 ikon (dropdown + halaman ‹ ›), plus kolom emoji bebas dan 9 warna label yang tampil di daftar, tab, dan Beranda.
+- **Pratinjau `[[tautan]]`**: arahkan kursor ke tautan wiki untuk melihat cuplikan isinya.
+- **Template di tombol "+" dan Beranda**: menu *Catatan baru* punya **📋 Dari template** dan **📅 Catatan harian**; Beranda punya kartu *Pakai template*.
+
+### ✍️ Halaman & Riset
+- **Kotak callout 11 jenis**: info, peringatan, sukses, catatan, bahaya, **tips, contoh, definisi, pertanyaan, kutipan, tugas**. Menu **Kotak ▾**, perintah `/`, dan `Ctrl+K` memakai daftar yang sama. **Ganti jenis setelah dibuat**: klik ikon di kotak callout, lalu pilih jenis lain (isi dan judul buatan sendiri dipertahankan).
+- **Simbol ▾**: 24 kategori berisi 1.795 simbol (operator, himpunan, huruf Yunani, satuan, kimia/fisika, pangkat, pecahan, angka berlingkar, tanda baca, mata uang, huruf beraksen, panah, bentuk, garis/kotak, centang/bintang, musik/kartu, cuaca, 7 kategori emoji). Pilih kategori lewat dropdown, pindah halaman dengan ‹ ›; kategori **Terakhir dipakai** menyimpan 24 simbol terakhir.
+- **Sitasi** (tombol **❝ Sitasi** di tab Sisipkan, `/sitasi`, atau `Ctrl+K`): 8 format, yaitu **APA 7, Harvard, IEEE, Chicago, MLA 9, Vancouver, BibTeX, RIS** (Zotero/Mendeley), untuk artikel jurnal, buku, halaman web, skripsi/tesis, dan laporan. Di edisi kustom ada tombol *Isi dari DOI*.
+  - **Daftar pustaka**: tekan **＋ Simpan ke daftar** untuk menampung banyak sumber di satu catatan (maks. 200), lalu **📚 Daftar pustaka** (atau `Ctrl+K` → *Daftar pustaka catatan ini*) untuk menyisipkan atau menyalin semuanya. APA, Harvard, Chicago, MLA diurutkan abjad penulis; IEEE dan Vancouver mengikuti urutan dimasukkan (daftar bernomor); BibTeX/RIS digabung dalam satu blok kode. Hapus entri dengan ✕.
+- **Status baca per sumber** (tab Sisipkan → **📚 Sumber**, **📊 Progres**): lihat bagian *Status baca* di bawah.
+- **Tugas**: tampilan **Tugas** di sidebar (atau `Ctrl+K`) mengumpulkan semua centang dari semua catatan: filter per catatan/tag, cari, edit teks langsung, hapus (bisa diurungkan), tenggat (`@2026-12-31`), dan **pengulangan** (`~harian`, `~harikerja`, `~mingguan`, `~2mingguan`, `~bulanan`, `~tahunan`, atau menu ↻): saat dicentang, tenggat maju otomatis. 🔔 *Pengingat* memberi tahu tugas jatuh tempo selama aplikasi terbuka.
+- **Impor .md / ZIP** (menu Data): impor Markdown, termasuk ekspor Obsidian dan Notion.
+- **Rumus sebaris** tidak lagi memecah paragraf (catatan: penyisipan ini tidak bisa dibatalkan dengan `Ctrl+Z`; hapus dengan `Backspace`).
+
+### 📋 Template (67 template, 9 kategori)
+Buka lewat tombol "+" → **Dari template**, kartu Beranda, atau `Ctrl+K`. Ada kolom cari, **dropdown kategori** (menampilkan jumlah per kategori), dan halaman ‹ ›. Kategori: Harian & Perencanaan, Kerja & Proyek, Belajar & Riset, Pribadi & Refleksi, Keuangan, Kesehatan & Gaya Hidup, Acara & Perjalanan, **Anak & Latihan**, Panduan. *Catatan harian* kini benar-benar memakai template harian.
+
+**Tabel berhitung** (semua edisi, offline): tabel yang menghitung sendiri. Isi **Jml** dan **Harga/satuan**; **Subtotal**, **Total**, dan **Sisa anggaran** terisi otomatis. Angka boleh ditulis `15000`, `15.000`, `Rp15.000`, `15rb`, `1,5jt`, `0,5`, atau `1/2` (koma = desimal). Sel hasil tidak bisa diedit; baris contoh (dan harganya) hanya contoh, ganti atau hapus. Tambah baris lewat menu **Tabel ▾**. Template yang memakainya:
+- **Belanja + estimasi harga** dan **Belanja bulanan + anggaran** (empat kategori + ringkasan total semua dan sisa anggaran).
+- **Inventaris dapur & stok**: Stok vs Minimal; kolom Status menampilkan **⚠ Beli** / **✓ Cukup** otomatis, dan centang **Dibeli** mengubahnya jadi *Sudah dibeli*.
+- **Patungan / bagi tagihan**: tulis nama di tiap pesanan; pajak/servis/ongkir dibagi sebanding; tabel bagian tiap orang dan selisih (harus Rp0) terisi otomatis (ketik nama yang sama persis).
+- **Kuitansi / penawaran sederhana** (dibayar dan kembalian/kurang) dan **Anggaran perjalanan** (total, per orang, sisa anggaran).
+
+**Latihan anak (Anak & Latihan)**: soal **diacak** setiap template dipakai, lengkap dengan kunci jawaban.
+- *Latihan berhitung 5–6 th* dan *7–8 th*, *Latihan membaca jam*, *Latihan mengenal uang (Rp)*, *Latihan huruf dan suku kata*, *Latihan mengenal bentuk*, dan *Tabel perkalian 1–10*.
+- **🎲 Acak ulang soal** (menu ⋯, palet `Ctrl+K`, dan tombol di bilah atas pada layar lebar): mengganti isi dengan soal baru (jawaban yang sudah ditulis hilang). Latihan berhitung punya pilihan **Tingkat** (5–6 th: sampai 10 atau 20; 7–8 th: sampai 100 atau 20).
+- **Cara menjawab** (latihan berhitung): *Biasa* (garis kosong, cocok dicetak), *Ketik angka* (kolom jawaban memunculkan papan angka; tombol **✔ Periksa jawaban** menandai hijau/merah dan menampilkan skor; soal non-angka tetap garis kosong), atau *Stylus* (ketuk kotak, tulis jawaban dengan pena atau jari di pad kecil; telapak tangan diabaikan setelah pena terdeteksi; tidak diperiksa otomatis). Bisa diganti lewat 🎲.
+- **Kunci jawaban terlipat** di bawah judul 🔑 dan **tidak ikut tercetak** selama terlipat. Untuk menguncinya, buat **PIN orang tua** 4–6 angka (dialog muncul setelah membuat template, atau menu ⋯ → *PIN kunci jawaban*). Membuka kunci meminta PIN, terkunci lagi otomatis dalam 2 menit, dan salah 5 kali memblokir 30 detik. *Penting:* ini penghalang tampilan, bukan enkripsi; teks kunci tetap ada di isi catatan (terlihat lewat ekspor atau alat pengembang). PIN hanya di perangkat itu dan tidak ikut sinkron.
+
+### 📤 Tautan Hidup, Edit Bersama, & Cadangan Kunci (edisi kustom)
+Tombol **📤 Bagikan** ada di header catatan. Isi dienkripsi di perangkat Anda; kunci baca hanya ada di tautan (setelah `#`), jadi server hanya menyimpan data terenkripsi. Tiga jenis:
+- **Salinan**: snapshot tetap, baca-saja (bawaan 7 hari).
+- **Tautan hidup**: baca-saja; setelah mengedit, buka dialog dan tekan **Perbarui** agar tautan yang sama menampilkan versi terbaru (bawaan 30 hari).
+- **Edit bersama** (khusus Halaman/Riset): penerima bisa mengedit teks dan menyimpan ke tautan yang sama, tetapi tidak bisa menghapus, mencabut, atau memperpanjang. Edit yang bentrok ditolak (penerima bisa memuat ulang atau menyimpan pekerjaannya sebagai catatannya sendiri). Satu versi sebelumnya selalu disimpan (**Versi sebelumnya**). Siapa pun yang memegang tautan edit bisa mengubah isinya; kirim hanya ke orang yang dipercaya. Penerima bisa mencentang tugas.
+
+Fitur pendukung:
+- **Penanda "⬇ Diubah penerima" / "Tautan berubah"** di header catatan bila versi di tautan lebih baru daripada versi lokal. **⬇ Tarik perubahan** mengganti isi catatan dengan versi di tautan (versi lama tersimpan di Riwayat; unsur seperti SVG sebaris atau lampiran bisa hilang). Kunci jawaban lokal dipertahankan bila tautan tidak memuatnya.
+- **Simpan otomatis sebelum kedaluwarsa**: bila tautan punya perubahan yang belum ditarik dan sisa masa berlakunya ≤ 3 hari, versi dari penerima disimpan ke **Riwayat** catatan (isi catatan tidak berubah). Hanya berjalan bila aplikasi dibuka dalam 3 hari terakhir itu.
+- **Kunci jawaban tidak ikut dibagikan** secara bawaan; centang **Sertakan kunci jawaban** bila ingin ikut (di tautan, lipatan dan PIN tidak berlaku).
+- **Keamanan isi masuk**: gaya sebaris dari tautan disaring dengan daftar putih (posisi, `z-index`, `opacity`, dan sejenisnya dibuang) dan hanya kotak centang tugas yang boleh aktif.
+- **Cabut** dan **Perpanjang** meminta konfirmasi. Maksimal 50 tautan aktif.
+- **🔑 Cadangkan / pulihkan kunci**: kunci tautan hanya tersimpan di peramban, jadi simpan cadangannya sebagai berkas terenkripsi (kata sandi min. 8 karakter), lalu pulihkan di perangkat lain. Catatan asal juga harus ada di perangkat baru agar **Perbarui** dan **Tarik** aktif; tautan yang sudah dicabut atau kedaluwarsa tetap ditolak server.
+
+### 📕 PDF
+- Ekspor PDF beranotasi kini benar pada halaman yang punya rotasi bawaan (90/180/270) maupun kotak potong khusus; sebelumnya sorotan, coretan, dan catatan bisa meleset.
+- Kartu catatan dan penyebutan fitur *Cari*, *Halaman*, *Ke catatan*, serta garis bawah/coret teks sudah dijelaskan di bagian PDF.
+
+### 🔧 Perlu Diketahui
+- Fitur yang belum diuji di perangkat sungguhan (iOS Safari, Android Chrome, stylus): papan angka, kotak jawaban stylus, toolbar melayang, tabel berhitung di layar sempit.
+- Mengisi tabel berhitung lewat tempel/dikte dan riwayat undo (`Ctrl+Z`) pada tabel berhitung belum diuji menyeluruh.
+
+---
+
 ## 🧪 Catatan Contoh Bawaan
 Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit Stock Opname** (PDF 3 halaman dengan stabilo, coretan, lingkaran, panah, centang/silang, tanda tangan, dan kartu catatan), **Contoh: Diagram Alur Rekonsiliasi Bank** (kanvas), serta catatan Riset. Contoh PDF bisa dibuat ulang lewat `Ctrl+K` → *Buat contoh PDF beranotasi*.
 
@@ -79,10 +128,10 @@ Saat pertama dibuka, ZhaNotes membuat contoh siap pakai: **Contoh: Laporan Audit
 - **Tabel Terintegrasi**: menu **Tabel ▾** di tab Sisipkan: tabel baru, tambah/hapus baris dan kolom, **urutkan kolom A→Z / Z→A**, **header menempel**, salin sebagai CSV, hapus tabel. **Impor CSV / Excel** (tempel atau pilih berkas `.csv/.tsv/.txt`, maks. 500 baris × 30 kolom); menempel dari Excel/Sheets langsung jadi tabel.
 - **Blok Kode**: kotak monospace dengan tombol **⧉ Salin**.
 - **Daftar Isi otomatis** (satu per catatan, ikut berubah saat judul H1–H3 berubah; klik untuk lompat) dan **Catatan Kaki** bernomor otomatis (klik nomor untuk ubah/hapus, ↩ untuk kembali ke teks).
-- **Sitasi / referensi** (`Ctrl+K` → *Sisipkan: Sitasi*): isi penulis, tahun, judul, sumber, volume(isu), halaman, dan URL/DOI untuk artikel jurnal, buku, atau halaman web, lalu pilih **APA 7** atau **BibTeX**. Bisa disisipkan ke catatan atau disalin. Diproses di perangkat (offline).
-- **Simbol ▾**: simbol matematika, panah, dan emoji. **Kotak ▾**: menu callout berlabel.
+- **Sitasi / referensi** (`Ctrl+K` → *Sisipkan: Sitasi*): isi penulis, tahun, judul, sumber, volume(isu), halaman, dan URL/DOI untuk artikel jurnal, buku, atau halaman web, lalu pilih satu dari 8 format (**APA 7, Harvard, IEEE, Chicago, MLA 9, Vancouver, BibTeX, RIS**). Bisa disisipkan ke catatan atau disalin, atau dikumpulkan jadi daftar pustaka (lihat *Pembaruan Tahap 28–63*). Diproses di perangkat (offline).
+- **Simbol ▾**: 24 kategori (1.795 simbol dan emoji) dengan paginasi dan kategori *Terakhir dipakai*. **Kotak ▾**: menu 11 jenis callout berlabel.
 - Berlaku juga untuk catatan **Riset**. Perintah `Ctrl+K` ditambah *Sisipkan: …*, *Tabel: …*, dan *Format: …*.
-- **Kotak Catatan (Callout)**: Kotak warna-warni untuk Informasi (Biru), Peringatan (Kuning), Sukses (Hijau), Catatan (Ungu), dan Bahaya (Merah).
+- **Kotak Catatan (Callout)**: 11 jenis kotak berwarna: Informasi (biru), Peringatan (kuning), Sukses (hijau), Catatan (ungu), Bahaya (merah), Tips (teal), Contoh (indigo), Definisi (abu-abu), Pertanyaan (oranye), Kutipan (merah muda), dan Tugas (hijau limau). Klik ikonnya untuk mengganti jenis.
 - **Gambar & Sketsa**: Unggah gambar langsung dari komputer/ponsel, ubah ukuran (resize), potong (crop), putar (rotate), atau atur perataan (kiri, tengah, kanan, melayang).
 - **Perintah Cepat Garis Miring (`/`)**: Ketik `/` di awal baris untuk memunculkan menu sisip cepat.
 
@@ -164,6 +213,9 @@ Alternatif toolbar di atas layar, berguna di HP, layar kecil, dan mode fokus.
 | `Alt + [` | **Tab Sebelumnya** | Pindah ke tab catatan sebelumnya |
 | `Alt + ]` | **Tab Berikutnya** | Pindah ke tab catatan berikutnya |
 | `Alt + W` | **Tutup Tab** | Menutup tab catatan yang sedang aktif |
+| `Alt + Shift + T` | **Buka Kembali Tab** | Membuka kembali tab yang baru ditutup |
+| `Alt + Shift + ←/→` | **Geser Tab** | Memindah tab terfokus ke kiri/kanan |
+| `Alt + R` | **Mode Baca** | Kunci/buka kunci edit pada catatan Halaman/Riset |
 | `Ctrl + F` / `Ctrl + H` | **Cari & Ganti** | Mencari dan mengganti kata di dalam catatan. Tombol `Aa` = peka huruf besar/kecil; tombol `.*` = ekspresi reguler (regex), dan kolom ganti mendukung `$1`, `$2` untuk grup. Pola regex yang salah menampilkan `regex ✗` |
 | `Ctrl + F` (di PDF) | **Cari di PDF** | Cari teks di semua halaman PDF dan lihat daftar anotasi |
 | `Esc` | **Batal / Tutup** | Menutup modal, menu dropdown, atau keluar mode fokus |
@@ -226,6 +278,13 @@ Ketik tanda `/` pada baris baru di editor halaman untuk memunculkan menu perinta
 | `/sukses` | **Callout Sukses** | Kotak pesan sukses berlatar hijau |
 | `/catatan` | **Callout Catatan** | Kotak catatan ide berlatar ungu |
 | `/bahaya` | **Callout Bahaya** | Kotak perhatian penting berlatar merah |
+| `/tips` | **Callout Tips** | Kotak saran berlatar teal |
+| `/contoh` | **Callout Contoh** | Kotak contoh berlatar indigo |
+| `/definisi` | **Callout Definisi** | Kotak istilah berlatar abu-abu |
+| `/pertanyaan` | **Callout Pertanyaan** | Kotak pertanyaan berlatar oranye |
+| `/kutipan` | **Callout Kutipan** | Kotak kutipan berlatar merah muda |
+| `/tugas` | **Callout Tugas** | Kotak tugas berlatar hijau limau |
+| `/sitasi` | **Sitasi** | Dialog sitasi/referensi (8 format) |
 | `/gambar` | **Gambar** | Unggah gambar dari penyimpanan perangkat |
 | `/sketsa` | **Sketsa Tangan** | Kotak gambar mini tulisan tangan langsung di dokumen |
 | `/tautan` | **Tautan Web** | Sisipkan link URL ke situs eksternal |
@@ -298,17 +357,17 @@ Buka tautannya (bentuknya `…/zhanotes/#bagi=…`). Catatan tampil **hanya baca
 
 ## 🧩 Fitur Khusus Edisi Kustom
 
-Versi umum ZhaNotes 100% offline. Fitur yang butuh internet **hanya muncul di edisi kustom** (muncul otomatis bila Sinkron awan sudah aktif; tanpa itu fiturnya tersembunyi), dan tidak mengganggu pemakaian offline. Cara memakainya: di catatan Halaman/Riset buka tab **✨ Kustom** di toolbar dan klik **∑ Rumus**, **◇ Diagram**, **🌐 Wikipedia**, **🔤 OCR**, **🎤 Dikte**, **🔗 Tautan** (pratinjau tautan), atau **📤 Bagikan** (tautan baca-saja). Di **Kanvas** dan **PDF** ada tombol **✨ Kustom** yang membuka menu (Dikte, Wikipedia, OCR, Rumus; Diagram hanya di Kanvas); hasilnya masuk sebagai kartu. Semuanya juga ada di `Ctrl+K` dengan awalan *Kustom:*. Tab dan tombol Kustom hilang sendiri bila Sinkron awan dimatikan.
+Versi umum ZhaNotes 100% offline. Fitur yang butuh internet **hanya muncul di edisi kustom** (muncul otomatis bila Sinkron awan sudah aktif; tanpa itu fiturnya tersembunyi), dan tidak mengganggu pemakaian offline. Cara memakainya: di catatan Halaman/Riset buka tab **✨ Kustom** di toolbar dan klik **∑ Rumus**, **◇ Diagram**, **🌐 Wikipedia**, **🔤 OCR**, **🎤 Dikte**, atau **🔗 Tautan** (pratinjau tautan). Tombol **📤 Bagikan** kini ada di header catatan. Di **Kanvas** dan **PDF** ada tombol **✨ Kustom** yang membuka menu (Dikte, Wikipedia, OCR, Rumus; Diagram hanya di Kanvas); hasilnya masuk sebagai kartu. Semuanya juga ada di `Ctrl+K` dengan awalan *Kustom:*. Tab dan tombol Kustom hilang sendiri bila Sinkron awan dimatikan.
 
 - **Sinkron awan terenkripsi** antar perangkat (lihat bagian sinkronisasi).
 - **🌐 Isi sitasi dari DOI**: di dialog Sitasi, tempel DOI lalu klik *Isi dari DOI*; penulis, tahun, judul, jurnal, volume, dan halaman terisi dari Crossref (periksa lagi hasilnya).
-- **🌐 Kutip Wikipedia** (`Ctrl+K` → *Kustom: kutip Wikipedia*): ringkasan pembuka artikel (Indonesia atau Inggris) disisipkan sebagai kutipan beserta tautan sumber dan keterangan lisensi CC BY-SA. Ada tombol judul contoh untuk dicoba. Di Kanvas dan PDF hasilnya menjadi kartu teks.
-- **∑ Rumus matematika (KaTeX)** (`Ctrl+K` → *Kustom: rumus matematika*): tulis LaTeX (mis. `\frac{a}{b}`), lihat pratinjau langsung, lalu sisipkan. Ada pilihan **Contoh rumus ▾** (20 contoh: pecahan, rumus abc, sigma, integral, limit, matriks, determinan, kombinasi, simpangan baku, bunga majemuk, NPV, persentase selisih stok, dan lainnya). Pustaka dimuat dari internet hanya saat dipakai; hasilnya disimpan sebagai MathML sehingga **rumus tetap tampil offline**. Klik rumus untuk mengubahnya (butuh internet). Rumus yang disisipkan di tengah kalimat tetap sebaris, tidak memecah paragraf (catatan: penyisipan ini tidak bisa dibatalkan dengan `Ctrl+Z`; hapus dengan menekan `Backspace`). Di **Kanvas** rumus menjadi **kartu gambar** (dirender di perangkat, tetap tampil offline) yang menyimpan kode TeX-nya; klik dua kali kartunya untuk mengedit. Di PDF rumus masih disisipkan sebagai kartu teks `$…$`. Di ekspor (Markdown, teks, Word, PDF) dan pencarian, rumus ditulis sebagai `$…$` (atau `$$…$$` bila tampil sendiri).
-- **◇ Diagram Mermaid** (`Ctrl+K` → *Kustom: diagram Mermaid*): tulis kode atau pilih **Contoh diagram ▾** (13 contoh: alur proses, alur dengan kelompok, rekonsiliasi bank, struktur organisasi, sequence, state, class, ER, gantt, pie, mindmap, timeline, journey), pratinjau, lalu sisipkan. Disimpan sebagai gambar SVG sehingga **tetap tampil offline**; klik dua kali diagramnya untuk mengubah kodenya (butuh internet). Di ekspor Word dan PDF diagram disematkan sebagai gambar PNG; di ekspor Markdown tampil sebagai `[gambar]`. Di **Kanvas** diagram menjadi kartu gambar yang menyimpan kodenya; klik dua kali kartunya untuk mengubah (butuh internet).
+- **🌐 Kutip Wikipedia** (`Ctrl+K` → *Kustom: kutip Wikipedia*): ringkasan pembuka artikel (Indonesia atau Inggris) disisipkan sebagai kutipan beserta tautan sumber dan keterangan lisensi CC BY-SA. Ada dropdown **Contoh topik** (50 topik dalam 7 bidang) untuk dicoba. Di Kanvas dan PDF hasilnya menjadi kartu teks.
+- **∑ Rumus matematika (KaTeX)** (`Ctrl+K` → *Kustom: rumus matematika*): tulis LaTeX (mis. `\frac{a}{b}`), lihat pratinjau langsung, lalu sisipkan. Ada pilihan **Contoh rumus ▾** (147 contoh dalam 10 kelompok: matematika dasar, bangun datar, bangun ruang, aljabar dan kalkulus, trigonometri dan geometri analitik, kalkulus lanjut dan vektor, fisika, kimia, statistik dan peluang, akuntansi dan keuangan). Pustaka dimuat dari internet hanya saat dipakai; hasilnya disimpan sebagai MathML sehingga **rumus tetap tampil offline**. Klik rumus untuk mengubahnya (butuh internet). Rumus yang disisipkan di tengah kalimat tetap sebaris, tidak memecah paragraf (catatan: penyisipan ini tidak bisa dibatalkan dengan `Ctrl+Z`; hapus dengan menekan `Backspace`). Di **Kanvas** rumus menjadi **kartu gambar** (dirender di perangkat, tetap tampil offline) yang menyimpan kode TeX-nya; klik dua kali kartunya untuk mengedit. Di PDF rumus masih disisipkan sebagai kartu teks `$…$`. Di ekspor (Markdown, teks, Word, PDF) dan pencarian, rumus ditulis sebagai `$…$` (atau `$$…$$` bila tampil sendiri).
+- **◇ Diagram Mermaid** (`Ctrl+K` → *Kustom: diagram Mermaid*): tulis kode atau pilih **Contoh diagram ▾** (40 contoh dalam 5 kelompok: alur dan keputusan, akuntansi dan bisnis, organisasi dan sistem, jadwal dan waktu, ide/analisis/pengguna; mencakup flowchart, sequence, state, class, ER, gantt, pie, mindmap, timeline, journey, quadrant, dan Git), pratinjau, lalu sisipkan. Disimpan sebagai gambar SVG sehingga **tetap tampil offline**; klik dua kali diagramnya untuk mengubah kodenya (butuh internet). Di ekspor Word dan PDF diagram disematkan sebagai gambar PNG; di ekspor Markdown tampil sebagai `[gambar]`. Di **Kanvas** diagram menjadi kartu gambar yang menyimpan kodenya; klik dua kali kartunya untuk mengubah (butuh internet).
 - **🔤 OCR** (`Ctrl+K` → *Kustom: OCR teks*): baca teks dari foto/gambar, atau dari halaman PDF yang sedang dibuka (PDF hasil pindai). Bahasa Indonesia + Inggris. Mesin dan data bahasa (beberapa MB) diunduh saat pertama dipakai. Hasil bisa disalin, disisipkan ke catatan (di Kanvas dan PDF: **Sisipkan sebagai kartu**), atau dijadikan catatan baru; selalu periksa kembali hasilnya.
 - **📤 Bagikan halaman PDF** (buka PDF → ✨ Kustom → *Bagikan*, atau `Ctrl+K`): isi kolom *Halaman* (mis. `1-3,5`, maksimal 12 halaman; bawaannya halaman yang sedang dibuka). Halaman dikirim sebagai **gambar** (dienkripsi seperti catatan lain), tanpa anotasi dan tanpa teks yang bisa disalin. Penerima membaca halaman bertumpuk dan bisa menyimpannya sebagai catatan Halaman. Kalau terlalu besar, pilih lebih sedikit halaman.
 - **📤 Bagikan Kanvas**: buka Kanvas, lalu ✨ Kustom → *Bagikan* (atau `Ctrl+K`). Kanvas dikirim sebagai **gambar PNG** tampilan lengkapnya (dienkripsi sama seperti catatan Halaman). Penerima bisa memperbesar, mengunduh PNG, atau menyimpannya sebagai catatan Halaman; mereka tidak bisa mengedit Kanvas aslinya.
-- **📤 Bagikan lewat tautan baca-saja** (tombol *Bagikan* di tab ✨ Kustom, atau `Ctrl+K` → *Kustom: bagikan catatan lewat tautan*; untuk catatan Halaman/Riset): pilih masa berlaku (1, 7, 30 hari, atau tanpa batas) lalu *Buat tautan*. Isi catatan dienkripsi di perangkatmu; kuncinya hanya ada di tautan (setelah tanda `#`) dan tidak pernah dikirim ke server, jadi server hanya menyimpan data terenkripsi. Siapa pun yang memegang tautan bisa membacanya, jadi kirim lewat jalur yang kamu percaya. Daftar *Tautan aktif* di dialog yang sama punya tombol **Salin** dan **Cabut** (tautan yang dicabut langsung tidak bisa dibuka). Maksimal 50 tautan aktif dan ukuran sekitar 3,5 MB termasuk gambar. Teks, gambar, rumus, dan diagram ikut; lampiran dan Kanvas/PDF tidak.
+- **📤 Bagikan lewat tautan** (tombol 📤 di header catatan, atau `Ctrl+K` → *Kustom: bagikan lewat tautan*). Jenis *Tautan hidup* dan *Edit bersama* dijelaskan di bagian *Pembaruan Tahap 28–63*; berikut jenis dasar *Salinan* baca-saja: pilih masa berlaku (1, 7, 30 hari, atau tanpa batas) lalu *Buat tautan*. Isi catatan dienkripsi di perangkatmu; kuncinya hanya ada di tautan (setelah tanda `#`) dan tidak pernah dikirim ke server, jadi server hanya menyimpan data terenkripsi. Siapa pun yang memegang tautan bisa membacanya, jadi kirim lewat jalur yang kamu percaya. Daftar *Tautan aktif* di dialog yang sama punya tombol **Salin** dan **Cabut** (tautan yang dicabut langsung tidak bisa dibuka). Maksimal 50 tautan aktif dan ukuran sekitar 3,5 MB termasuk gambar. Teks, gambar, rumus, dan diagram ikut; lampiran tidak ikut. Kanvas dan PDF dibagikan sebagai gambar (lihat butir *Bagikan Kanvas* dan *Bagikan halaman PDF* di bawah).
 - **🔗 Pratinjau tautan** (tombol *Tautan*, atau `Ctrl+K` → *Kustom: pratinjau tautan*): tempel alamat situs, lalu judul, nama situs, dan deskripsinya masuk sebagai kartu bertautan (tanpa gambar, jadi tetap ringan dan tampil offline). Hanya situs web publik; alamat jaringan lokal ditolak.
 - **🎤 Dikte suara** (`Ctrl+K` → *Kustom: dikte suara*): bicara, teks masuk di posisi kursor (bahasa Indonesia). Di Kanvas dan PDF teks masuk ke kartu yang terakhir dipilih (ditambahkan di akhir), atau dibuatkan kartu baru bila belum ada. Jalankan perintah yang sama untuk berhenti. Memerlukan izin mikrofon dan, di sebagian peramban, internet.
 
