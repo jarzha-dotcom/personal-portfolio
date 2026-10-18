@@ -976,7 +976,18 @@
     .tur-block {
       position: fixed;
       inset: 0;
-      z-index: 60
+      z-index: 60;
+      touch-action: none
+    }
+
+    html.tur-lock,
+    html.tur-lock body {
+      overflow: hidden !important;
+      overscroll-behavior: none
+    }
+
+    html.tur-lock {
+      scrollbar-gutter: stable
     }
 
     .tur-spot {
@@ -985,8 +996,7 @@
       border-radius: 14px;
       box-shadow: 0 0 0 9999px rgba(0, 0, 0, .6);
       outline: 3px solid #FCD34D;
-      pointer-events: none;
-      transition: all .25s
+      pointer-events: none
     }
 
     .tur-card {
@@ -1038,12 +1048,32 @@
     }
 
     @media(max-width:959px) {
-      .tur-card:not(.tur-mid) {
-        left: 12px;
-        right: 12px;
-        bottom: 12px;
-        width: auto
+      .tur-card {
+        max-height: 40vh;
+        padding: 14px;
+        gap: 8px
       }
+
+      .tur-card p {
+        font-size: 16px;
+        margin: 0
+      }
+
+      .tur-card .title {
+        font-size: 19px
+      }
+
+      .tur-hint {
+        display: none
+      }
+
+      .tur-card.tur-mid {
+        max-height: 80vh
+      }
+    }
+
+    .tur-hint {
+      margin: 0
     }
 
     .phead {
@@ -1775,7 +1805,7 @@
     function applyTema() { var d = TEMA === 'gelap' || (TEMA === 'auto' && mq && mq.matches); document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light'); document.documentElement.lang = LANG }
     var EN_SORT;
     var EX = { 'Selesai': 'Finish', 'Beranda': 'Home', 'Uang': 'Money', 'Kamar': 'Rooms', 'Penghuni': 'Tenants', 'Lainnya': 'More', 'Profil': 'Profile', 'Lapor': 'Report', 'Riwayat': 'History', 'Masuk': 'Log in', 'Keluar': 'Log out', 'Tutup': 'Close', 'Simpan': 'Save', 'Batal': 'Cancel', 'Semua': 'All', 'Hapus': 'Delete', 'Kembali': 'Back', 'Telepon': 'Call', 'Tanggal': 'Date', 'Untuk': 'For', 'Pemilik': 'Owner', 'Keduanya': 'Both', 'Berakhir': 'Ends', 'Air': 'Water', 'Listrik': 'Electricity', 'Kebersihan': 'Cleaning', 'Perbaikan': 'Repairs', 'Galeri': 'Gallery', 'Kosong': 'Vacant', 'Terang': 'Light', 'Gelap': 'Dark', 'Biasa': 'Normal', 'Besar': 'Large', 'Akun': 'Account', 'Tema': 'Theme', 'Bahasa': 'Language', 'Tampilan': 'Appearance', 'Pengaturan': 'Settings', 'Pengumuman': 'Announcements', 'Pembayaran': 'Payments', 'Otomatisasi': 'Automation', 'Perpanjang': 'Extend', 'Tolak': 'Reject', 'Nonaktifkan': 'Deactivate', 'Kwitansi': 'Receipt', 'Tunai': 'Cash', 'Menu utama': 'Main menu', 'Sudah bayar': 'Paid', 'Belum bayar': 'Unpaid', 'Menunggak': 'Overdue', 'Sewa kos': 'Boarding house rent', 'Ya, hapus': 'Yes, delete', 'Tidak jadi': 'Never mind', 'Lihat detail': 'View details', 'Pilih bulan': 'Choose month', 'Perbaikan selesai': 'Repair done', 'Aplikasi Kelola Kos Sederhana': 'Simple boarding house management app' };
-    var PH = [['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
+    var PH = [['Tekan Selesai untuk kembali ke tempat Anda memulai tur.', 'Press Finish to return to where you started the tour.'], ['Coba sendiri di aplikasi', 'Try it yourself in the app'], ['Tur ditutup. Kembali ke halaman awal.', 'Tour closed. Back to the start page.'], ['Tur ditutup.', 'Tour closed.'], ['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
     ['Buka Lainnya, lalu Laporan keuangan. Ketuk "Catat uang keluar", pilih untuk apa (listrik, perbaikan, dan lainnya), isi jumlahnya, lalu Simpan.', 'Open More, then Financial report. Tap "Record expense", choose what it is for (electricity, repairs, and so on), enter the amount, then Save.'],
     ['Buka Lainnya, lalu Pengaturan. Isi nama bank, nomor rekening, dan gambar QRIS agar tampil di "Cara membayar" milik penghuni. Tulis peraturan kos satu per baris, penghuni akan diberi tahu.', 'Open More, then Settings. Enter the bank name, account number, and QRIS image so they show in the tenant "How to pay". Write the house rules one per line and tenants will be notified.'],
     ['Buka menu Penghuni, ketuk "Kirim pengumuman ke semua penghuni". Tulis pesan lalu ketuk "Tampilkan di portal penghuni". Untuk WhatsApp, ketuk nama penghuni satu per satu.', 'Open Tenants and tap "Send announcement to all tenants". Write the message, then tap "Show in tenant portal". For WhatsApp, tap each tenant name.'],
@@ -2210,13 +2240,16 @@
     function simpanFoto() { pilihFoto('fp', function (img) { if (!img) return; sess.foto = img; save(); toast('Foto profil diperbarui.'); draw() }, 200, 0.8) }
     function hapusFoto() { delete sess.foto; save(); toast('Foto profil dihapus.'); draw() }
     var TUR = null;
-    function turRoot() { var r = document.getElementById('tur'); if (!r) { r = document.createElement('div'); r.id = 'tur'; document.body.appendChild(r) } return r }
-    function turTutup() { var r = document.getElementById('tur'); if (r) r.remove(); TUR = null }
+    function turRoot() { var r = document.getElementById('tur'); if (!r) { r = document.createElement('div'); r.id = 'tur'; document.body.appendChild(r); document.documentElement.classList.add('tur-lock') } return r }
+    function turTutup() { var r = document.getElementById('tur'); if (r) r.remove(); document.documentElement.classList.remove('tur-lock'); TUR = null }
+    function turSnap() { return { u: sess ? sess.user : null, tab: tab } }
+    function turKeluar(stay) { var pv = TUR && TUR.prev; turTutup(); if (stay || !pv) { toast('Tur ditutup.'); return } if (!pv.u) { logout(); toast('Tur ditutup. Kembali ke halaman awal.') } else { var a = findAcc(pv.u); if (a) { setSess(a); go(pv.tab) } toast('Tur ditutup.') } }
     function turNanti() { try { sessionStorage.setItem('kospro_tur_nanti', '1') } catch (e) { } turTutup(); toast('Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.') }
     function turLewati() { try { localStorage.setItem('kospro_tur', 'lewati') } catch (e) { } turTutup(); toast('Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.') }
     function turTawar() { var lw = '', nd = ''; try { lw = localStorage.getItem('kospro_tur'); nd = sessionStorage.getItem('kospro_tur_nanti') } catch (e) { } if (lw === 'lewati' || nd || TUR || document.getElementById('tur')) return; var r = turRoot(); r.innerHTML = '<div class="tur-block" style="background:rgba(0,0,0,.55)"></div><div class="tur-card tur-mid" role="dialog" aria-modal="true" aria-labelledby="turh"><p class="title" id="turh">Selamat datang di demo KosPro Mudah</p><p>Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.</p><button class="btn" onclick="turMulai(\'singkat\')">Mulai tur</button><button class="btn alt" onclick="turNanti()">Nanti saja</button><button class="btn alt" onclick="turLewati()">Lewati</button></div>'; trAll(r); var b = r.querySelector('.btn'); if (b) b.focus() }
     function asOwner() { var o = ownerAcc(); if (sess !== o) setSess(o) }
     function asTenant() { var a = accByNo('103') || accounts.filter(function (x) { return x.role === 'penghuni' })[0]; if (a && sess !== a) setSess(a) }
+    function turKamar() { var k = [].slice.call(document.querySelectorAll('#app .rgrid > *')); return window.innerWidth < 960 ? k.slice(0, 3) : document.querySelector('#app .rgrid') }
     function cariKartu(re) { return function () { return [].slice.call(document.querySelectorAll('#app .card')).filter(function (c) { return re.test(c.textContent) })[0] } }
     function turSteps(m) {
       var S = [], o = function (tab) { return function () { asOwner(); go(tab) } }, t = function (tab) { return function () { asTenant(); go(tab) } };
@@ -2225,7 +2258,7 @@
           { p: o('beranda'), t: 'Mulai dari sisi pemilik', x: 'Anda sekarang masuk sebagai pemilik kos. Tur ini menunjukkan satu alur lengkap: penghuni melapor, pemilik menanggapi, lalu status kembali ke penghuni.' },
           { p: o('uang'), tg: '.uhero', t: 'Uang sewa dalam satu pandangan', x: 'Sisa tagihan bulan ini, uang yang sudah masuk, dan bar yang menunjukkan siapa sudah bayar, jatuh tempo, atau terlambat.' },
           { tg: '.ucard', t: 'Tagih dengan satu ketukan', x: 'Setiap penghuni yang belum bayar punya tombol WhatsApp berisi pesan siap kirim, dan tombol untuk mencatat pembayaran (boleh dicicil).' },
-          { p: o('kamar'), tg: '.rgrid', t: 'Semua kamar di satu tempat', x: 'Ketuk kamar untuk melihat detail, mengubah data, memperpanjang sewa, atau mengosongkan kamar.' },
+          { p: o('kamar'), tg: turKamar, t: 'Semua kamar di satu tempat', x: 'Ketuk kamar untuk melihat detail, mengubah data, memperpanjang sewa, atau mengosongkan kamar.' },
           { p: t('p_lapor'), tg: '#lt', t: 'Sekarang sisi penghuni', x: 'Penghuni kamar 103 melapor kalau ada yang rusak, lengkap dengan foto kalau perlu. Kami kirimkan satu laporan contoh.', a: ['Kirim contoh laporan', function () { var e = document.getElementById('lt'); if (e) { e.value = 'Kran air di kamar mandi bocor'; kirimLapor() } }] },
           { p: o('beranda'), tg: cariKartu(/Kabar dari penghuni|News from tenants/), t: 'Laporan langsung sampai ke pemilik', x: 'Laporan tadi muncul di Beranda pemilik. Pemilik bisa menelepon tukang lalu menandai statusnya.', a: ['Tandai sedang ditangani', function () { var k = tickets[0]; if (k && k.st === 'baru') tangani(k.id) }] },
           { p: t('p_beranda'), tg: cariKartu(/Laporan kerusakan Anda|Your damage report/), t: 'Status ikut berubah di penghuni', x: 'Penghuni langsung melihat laporannya sedang ditangani, tanpa perlu bertanya lewat chat.' },
@@ -2237,7 +2270,7 @@
           { p: o('beranda'), t: 'Tur lengkap', x: 'Kita lihat semua yang sudah aktif, lalu rencana fitur yang bisa ditambahkan kalau Anda berminat. Anda bisa keluar kapan saja.' },
           { p: o('uang'), tg: '.uhero', t: 'Uang sewa dan cicilan', x: 'Penghuni boleh membayar sebagian. Sisa tagihan terhitung otomatis, dan setiap pembayaran mendapat kwitansi sendiri yang bisa dikirim lewat WhatsApp.' },
           { p: t('p_beranda'), tg: '#app .card.warn', t: 'Bukti transfer dari penghuni', x: 'Penghuni mengunggah foto bukti dari tombol "Bayar dan kirim bukti". Pemilik menyetujui di menu Uang, dan status sewa berubah lunas di kedua sisi.' },
-          { p: o('kamar'), tg: '.rgrid', t: 'Kamar dan penghuni', x: 'Tambah atau hapus kamar, ubah harga dan data penghuni, perpanjang sewa, dan lihat sewa yang segera berakhir. Akun penghuni dibuat otomatis.' },
+          { p: o('kamar'), tg: turKamar, t: 'Kamar dan penghuni', x: 'Tambah atau hapus kamar, ubah harga dan data penghuni, perpanjang sewa, dan lihat sewa yang segera berakhir. Akun penghuni dibuat otomatis.' },
           { p: o('penghuni'), t: 'Pengumuman dan kabar penghuni', x: 'Tulis pengumuman sekali, penghuni langsung membacanya di portal mereka. Bisa juga dikirim lewat WhatsApp satu per satu.' },
           { p: o('laporan'), t: 'Laporan keuangan', x: 'Uang masuk dan keluar enam bulan terakhir, grafik, catatan pengeluaran, cetak PDF, dan unduh CSV untuk Excel.' },
           { p: o('pengaturan'), t: 'Pengaturan', x: 'Isi alamat, rekening bank, dan gambar QRIS yang tampil di "Cara membayar" milik penghuni. Tulis peraturan kos dan penghuni diberi tahu saat berubah. Ada juga cadangan data.' },
@@ -2248,21 +2281,38 @@
       }
       return S
     }
-    function turMulai(m) { turTutup(); TUR = { m: m, i: -1, s: turSteps(m) }; turGo(1) }
-    function turGo(d) { var i = TUR.i + d; if (i >= TUR.s.length) { var o = ownerAcc(); turTutup(); return } if (i < 0) return; TUR.i = i; var st = TUR.s[i]; if (st.p) st.p(); setTimeout(turRender, 140) }
+    function turMulai(m) { var pv = TUR ? TUR.prev : turSnap(); turTutup(); TUR = { m: m, i: -1, s: turSteps(m), prev: pv }; turGo(1) }
+    function turGo(d) { var i = TUR.i + d; if (i >= TUR.s.length) { turKeluar(); return } if (i < 0) return; TUR.i = i; var st = TUR.s[i]; if (st.p) st.p(); setTimeout(turRender, 140) }
+    var turRaf = 0;
+    function turEl() { var st = TUR && TUR.s[TUR.i]; if (!st || !st.tg) return null; var el = null; try { el = typeof st.tg === 'function' ? st.tg() : document.querySelector(st.tg) } catch (e) { } if (Array.isArray(el)) { el = el.filter(turVis); return el.length ? el : null } return turVis(el) ? el : null }
+    function turVis(e) { if (!e) return false; var c = getComputedStyle(e); return !!e.offsetParent || c.position === 'fixed' || c.display === 'contents' }
+    function turRect(el) { var L = Array.isArray(el) ? el : (getComputedStyle(el).display === 'contents' && el.children.length ? [].slice.call(el.children) : null); if (L) { var l = 1e9, t = 1e9, r = -1e9, b = -1e9; L.forEach(function (c) { var q = c.getBoundingClientRect(); l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom) }); return { left: l, top: t, right: r, bottom: b } } return el.getBoundingClientRect() }
+    function turFokus() { var el = turEl(); if (!el) return; if (Array.isArray(el)) el = el[0]; if (getComputedStyle(el).display === 'contents' && el.children[0]) el = el.children[0]; var mob = window.innerWidth < 960; el.style.scrollMarginTop = (mob ? 76 : 90) + 'px'; el.scrollIntoView({ block: mob ? 'start' : 'center' }) }
+    function turTick() { if (turRaf) return; turRaf = requestAnimationFrame(function () { turRaf = 0; turLayout() }) }
     function turRender() {
-      if (!TUR) return; var st = TUR.s[TUR.i], r = turRoot(), n = TUR.s.length, el = null, last = TUR.i === n - 1; try { el = typeof st.tg === 'function' ? st.tg() : (st.tg ? document.querySelector(st.tg) : null) } catch (e) { }
-      if (el && !el.offsetParent && getComputedStyle(el).position !== 'fixed') el = null;
-      if (el) { el.style.scrollMarginTop = '90px'; el.scrollIntoView({ block: window.innerWidth < 960 ? 'start' : 'center' }) }
-      var x = typeof st.x === 'function' ? st.x() : st.x;
-      r.innerHTML = '<div class="tur-block"' + (el ? '' : ' style="background:rgba(0,0,0,.55)"') + '></div>' + (el ? '<div class="tur-spot"></div>' : '') + '<div class="tur-card' + (el ? '' : ' tur-mid') + '" role="dialog" aria-modal="true" aria-labelledby="turh"><small class="muted">Langkah ' + (TUR.i + 1) + ' dari ' + n + '</small><p class="title" id="turh">' + st.t + '</p><p>' + x + '</p>' + (st.a ? '<button class="btn" id="tura">' + st.a[0] + '</button>' : '') + '<div class="tur-row">' + (TUR.i > 0 ? '<button class="btn alt" onclick="turGo(-1)">Kembali</button>' : '') + '<button class="btn' + (st.a ? ' alt' : '') + '" onclick="turGo(1)">' + (last ? 'Selesai' : 'Berikutnya') + '</button></div>' + (last ? '' : '<button class="tur-x" onclick="turTutup()">Keluar tur</button>') + '</div>';
-      trAll(r); var card = r.querySelector('.tur-card'), sp = r.querySelector('.tur-spot');
-      if (el && sp) setTimeout(function () { var b = el.getBoundingClientRect(); sp.style.cssText = 'left:' + (b.left - 6) + 'px;top:' + (b.top - 6) + 'px;width:' + (b.width + 12) + 'px;height:' + (b.height + 12) + 'px'; if (window.innerWidth >= 960) { var ch = card.offsetHeight, cw = card.offsetWidth, cx = Math.min(Math.max(12, b.left), window.innerWidth - cw - 12), cy = b.bottom + 16 + ch < window.innerHeight ? b.bottom + 16 : Math.max(12, b.top - 16 - ch); card.style.left = cx + 'px'; card.style.top = cy + 'px' } }, 90);
-      var a = document.getElementById('tura'); if (a) a.onclick = function () { st.a[1](); if (!st.na) setTimeout(function () { turGo(1) }, 500) };
-      var f = r.querySelector('.tur-row .btn:last-child'); if (f) f.focus()
+      if (!TUR) return; var st = TUR.s[TUR.i], r = turRoot(), n = TUR.s.length, el = turEl(), last = TUR.i === n - 1, x = typeof st.x === 'function' ? st.x() : st.x;
+      r.innerHTML = '<div class="tur-block"' + (el ? '' : ' style="background:rgba(0,0,0,.55)"') + '></div>' + (el ? '<div class="tur-spot"></div>' : '') + '<div class="tur-card' + (el ? '' : ' tur-mid') + '" role="dialog" aria-modal="true" aria-labelledby="turh"><small class="muted">Langkah ' + (TUR.i + 1) + ' dari ' + n + '</small><p class="title" id="turh">' + st.t + '</p><p>' + x + '</p>' + (st.a ? '<button class="btn" id="tura">' + st.a[0] + '</button>' : '') + '<div class="tur-row">' + (TUR.i > 0 ? '<button class="btn alt" onclick="turGo(-1)">Kembali</button>' : '') + '<button class="btn' + (st.a ? ' alt' : '') + '" onclick="turGo(1)">' + (last ? 'Selesai' : 'Berikutnya') + '</button></div>' + (last ? '<p class="muted"><small>Tekan Selesai untuk kembali ke tempat Anda memulai tur.</small></p><button class="btn alt" onclick="turKeluar(true)">Coba sendiri di aplikasi</button>' : '<button class="tur-x" onclick="turKeluar()">Keluar tur</button>') + '</div>';
+      trAll(r); turFokus(); turLayout(); var a = document.getElementById('tura'); if (a) a.onclick = function () { st.a[1](); if (!st.na) setTimeout(function () { turGo(1) }, 500) };
+      var f = r.querySelector('.tur-row .btn:last-child'); if (f) f.focus({ preventScroll: true })
     }
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.getElementById('tur')) { if (TUR) turTutup(); else turNanti() } });
-    window.addEventListener('resize', function () { if (TUR && TUR.i >= 0) turRender() });
+    function turLayout() {
+      if (!TUR) return; var r = document.getElementById('tur'); if (!r) return; var card = r.querySelector('.tur-card'), sp = r.querySelector('.tur-spot'), el = turEl(); if (!card || !sp) return; if (!el) { sp.style.display = 'none'; return }
+      var jb = document.getElementById('__jz-bar'), bh = jb ? jb.offsetHeight : 0, vw = window.innerWidth, vh = window.innerHeight - bh, P = 12, G = 14, b = turRect(el), on = b.bottom > 0 && b.top < vh && b.right > 0 && b.left < vw, S = { l: b.left - 6, t: b.top - 6, r: b.right + 6, b: b.bottom + 6 }, cl = function (v, a, z) { return Math.max(a, Math.min(v, z)) };
+      card.classList.remove('tur-mid'); card.style.transform = 'none'; if (vw < 960) { card.style.left = P + 'px'; card.style.right = P + 'px'; card.style.width = 'auto' } var cw = card.offsetWidth, ch = card.offsetHeight;
+      if (vw < 960) { var bot = (b.top + b.bottom) / 2 < vh * 0.55; card.style.left = P + 'px'; card.style.right = P + 'px'; card.style.width = 'auto'; if (bot) { card.style.top = 'auto'; card.style.bottom = (P + bh) + 'px'; S.b = Math.min(S.b, vh - ch - P - G) } else { card.style.bottom = 'auto'; card.style.top = (P + 60) + 'px'; S.t = Math.max(S.t, P + 60 + ch + G) } }
+      else {
+        var C = [function () { return [cl(S.l, P, vw - cw - P), S.b + G] }, function () { return [cl(S.l, P, vw - cw - P), S.t - G - ch] }, function () { return [S.r + G, cl(S.t, P, vh - ch - P)] }, function () { return [S.l - G - cw, cl(S.t, P, vh - ch - P)] }], F = [function (p) { return p[1] + ch <= vh - P }, function (p) { return p[1] >= P }, function (p) { return p[0] + cw <= vw - P }, function (p) { return p[0] >= P }], pos = null, i, p;
+        for (i = 0; i < 4 && !pos; i++) { p = C[i](); if (F[i](p)) pos = p }
+        if (!pos) { pos = [vw - cw - P, vh - ch - P]; if (S.r > pos[0] - G && S.b > pos[1] - G) { if (S.t < pos[1] - G) S.b = pos[1] - G; else S.r = pos[0] - G } }
+        card.style.left = pos[0] + 'px'; card.style.top = pos[1] + 'px'; card.style.right = 'auto'; card.style.bottom = 'auto'
+      }
+      S.l = Math.max(S.l, 0); S.t = Math.max(S.t, 0); S.r = Math.min(S.r, vw); S.b = Math.min(S.b, vh);
+      if (on && S.r > S.l && S.b > S.t) { sp.style.display = 'block'; sp.style.left = S.l + 'px'; sp.style.top = S.t + 'px'; sp.style.width = (S.r - S.l) + 'px'; sp.style.height = (S.b - S.t) + 'px' } else sp.style.display = 'none';
+      var off = card.querySelector('.tur-off'); if (off) off.style.display = on ? 'none' : 'block'
+    }
+    window.addEventListener('scroll', function () { if (TUR) turTick() }, true);
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.getElementById('tur')) { if (TUR) turKeluar(); else turNanti() } });
+    window.addEventListener('resize', function () { if (TUR && TUR.i >= 0) turLayout() });
     function stTxt(s) { return s === 'selesai' ? 'Selesai diperbaiki' : s === 'proses' ? 'Sedang ditangani' : 'Terkirim, menunggu pemilik' }
     function pLapor() {
       var mine = tickets.filter(function (t) { return t.no === me });
