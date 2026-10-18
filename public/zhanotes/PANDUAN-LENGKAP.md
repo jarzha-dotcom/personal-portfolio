@@ -52,7 +52,7 @@ Contoh: `tipe:pdf dalam:30 #laporan stok` atau `sejak:2026-10-01 sebelum:2026-10
 
 ---
 
-## 🆕 Pembaruan Tahap 28–63 (Oktober 2026)
+## 🆕 Pembaruan Tahap 28–69 (Oktober 2026)
 
 ### 🧰 Toolbar & Tampilan
 - **Toolbar melayang** (tombol **⇲ Melayang**): lihat bagian *Toolbar Melayang* di bawah. Di tahap 46 baris tab toolbar di HP dirapikan agar tidak tertimpa tombol Melayang/Sembunyikan.
@@ -61,6 +61,7 @@ Contoh: `tipe:pdf dalam:30 #laporan stok` atau `sejak:2026-10-01 sebelum:2026-10
 - **Mode baca** (`Alt+R`, tombol 🔒/🔓 di bilah atas): mengunci edit pada catatan Halaman/Riset.
 - **Ikon & warna label catatan**: menu ⋯ → *Ikon & warna label* (atau klik ikon di samping judul). 11 kategori berisi 431 ikon (dropdown + halaman ‹ ›), plus kolom emoji bebas dan 9 warna label yang tampil di daftar, tab, dan Beranda.
 - **Pratinjau `[[tautan]]`**: arahkan kursor ke tautan wiki untuk melihat cuplikan isinya.
+- **🎓 Tutorial pembuka**: saat pertama kali membuka ZhaNotes muncul dialog dengan tiga pilihan: **Mulai tutorial** (tur sekitar 2 menit yang menyorot tombol-tombol utama), **Nanti saja** (ditutup tanpa disimpan, jadi muncul lagi saat halaman dimuat ulang), dan **Lewati** (tidak muncul lagi di perangkat itu). Pengguna lama hanya mendapat kartu kecil di pojok. Bagi yang menyelesaikan tur, **tips per fitur** (Kanvas, PDF, Riset, latihan anak, tabel berhitung, dan Bagikan di edisi kustom) ditawarkan sekali saat pertama kali dipakai, dengan pilihan *Lihat tips*, *Nanti saja*, dan *Tidak perlu*. Semuanya bisa diulang kapan saja lewat `Ctrl+K` → **Pusat belajar** atau kartu **Tutorial** di Beranda; `Ctrl+K` → *Mulai tutorial* menjalankan tur pengenalan. Tidak tampil di penampil tautan bagi.
 - **Template di tombol "+" dan Beranda**: menu *Catatan baru* punya **📋 Dari template** dan **📅 Catatan harian**; Beranda punya kartu *Pakai template*.
 
 ### ✍️ Halaman & Riset
@@ -73,7 +74,7 @@ Contoh: `tipe:pdf dalam:30 #laporan stok` atau `sejak:2026-10-01 sebelum:2026-10
 - **Impor .md / ZIP** (menu Data): impor Markdown, termasuk ekspor Obsidian dan Notion.
 - **Rumus sebaris** tidak lagi memecah paragraf (catatan: penyisipan ini tidak bisa dibatalkan dengan `Ctrl+Z`; hapus dengan `Backspace`).
 
-### 📋 Template (67 template, 9 kategori)
+### 📋 Template (72 template, 9 kategori)
 Buka lewat tombol "+" → **Dari template**, kartu Beranda, atau `Ctrl+K`. Ada kolom cari, **dropdown kategori** (menampilkan jumlah per kategori), dan halaman ‹ ›. Kategori: Harian & Perencanaan, Kerja & Proyek, Belajar & Riset, Pribadi & Refleksi, Keuangan, Kesehatan & Gaya Hidup, Acara & Perjalanan, **Anak & Latihan**, Panduan. *Catatan harian* kini benar-benar memakai template harian.
 
 **Tabel berhitung** (semua edisi, offline): tabel yang menghitung sendiri. Isi **Jml** dan **Harga/satuan**; **Subtotal**, **Total**, dan **Sisa anggaran** terisi otomatis. Angka boleh ditulis `15000`, `15.000`, `Rp15.000`, `15rb`, `1,5jt`, `0,5`, atau `1/2` (koma = desimal). Sel hasil tidak bisa diedit; baris contoh (dan harganya) hanya contoh, ganti atau hapus. Tambah baris lewat menu **Tabel ▾**. Template yang memakainya:
@@ -81,11 +82,16 @@ Buka lewat tombol "+" → **Dari template**, kartu Beranda, atau `Ctrl+K`. Ada k
 - **Inventaris dapur & stok**: Stok vs Minimal; kolom Status menampilkan **⚠ Beli** / **✓ Cukup** otomatis, dan centang **Dibeli** mengubahnya jadi *Sudah dibeli*.
 - **Patungan / bagi tagihan**: tulis nama di tiap pesanan; pajak/servis/ongkir dibagi sebanding; tabel bagian tiap orang dan selisih (harus Rp0) terisi otomatis (ketik nama yang sama persis).
 - **Kuitansi / penawaran sederhana** (dibayar dan kembalian/kurang) dan **Anggaran perjalanan** (total, per orang, sisa anggaran).
+- **Tagihan bulanan**: jatuh tempo dan jumlah per tagihan, kolom centang **Dibayar**; baris *Sudah dibayar* dan *Belum dibayar* ikut berubah saat dicentang, ditambah *Dana yang disiapkan* dan *Sisa setelah semua lunas*.
+- **Pengeluaran bulanan per kategori**: lima tabel kategori (tanggal, keterangan, jumlah) dengan total tiap kategori, lalu ringkasan total semua, pemasukan/anggaran, dan sisa (merah bila melebihi).
+- **Anggaran acara per orang**: konsumsi, tempat, dekorasi, souvenir; ketik *Jumlah tamu* untuk melihat **biaya per tamu** dan sisa dana. Dilengkapi tabel Panitia & tugas.
+- **RAB renovasi / proyek per tahap**: Volume × Harga satuan = Subtotal di lima tahap ditambah upah dan dana tak terduga; total tiap tahap, **total semua tahap**, anggaran tersedia, dan sisa anggaran terhitung otomatis. Untuk menambah tahap, salin sebuah tabel tahap.
+- **Jadwal piket anak** (kategori Anak & Latihan): tugas × 7 hari dengan kotak centang; kolom **Bintang** (⭐ per centang) dan *Total bintang minggu ini* terhitung otomatis.
 
 **Latihan anak (Anak & Latihan)**: soal **diacak** setiap template dipakai, lengkap dengan kunci jawaban.
 - *Latihan berhitung 5–6 th* dan *7–8 th*, *Latihan membaca jam*, *Latihan mengenal uang (Rp)*, *Latihan huruf dan suku kata*, *Latihan mengenal bentuk*, dan *Tabel perkalian 1–10*.
 - **🎲 Acak ulang soal** (menu ⋯, palet `Ctrl+K`, dan tombol di bilah atas pada layar lebar): mengganti isi dengan soal baru (jawaban yang sudah ditulis hilang). Latihan berhitung punya pilihan **Tingkat** (5–6 th: sampai 10 atau 20; 7–8 th: sampai 100 atau 20).
-- **Cara menjawab** (latihan berhitung): *Biasa* (garis kosong, cocok dicetak), *Ketik angka* (kolom jawaban memunculkan papan angka; tombol **✔ Periksa jawaban** menandai hijau/merah dan menampilkan skor; soal non-angka tetap garis kosong), atau *Stylus* (ketuk kotak, tulis jawaban dengan pena atau jari di pad kecil; telapak tangan diabaikan setelah pena terdeteksi; tidak diperiksa otomatis). Bisa diganti lewat 🎲.
+- **Cara menjawab** (latihan berhitung): *Biasa* (garis kosong, cocok dicetak), *Ketik angka* (kolom jawaban memunculkan papan angka; tombol **✔ Periksa jawaban** menandai hijau/merah dan menampilkan skor; soal non-angka tetap garis kosong), atau *Stylus* (ketuk kotak, tulis jawaban dengan pena atau jari di pad kecil; telapak tangan diabaikan setelah pena terdeteksi). Tulisan tangan tidak diperiksa otomatis, jadi **orang tua menilai**: ketuk penanda ○ di ujung tiap soal menjadi ✓ (benar), ✗ (salah), lalu kembali ke ○; skor (*Nilai: benar N dari M soal*) terhitung otomatis di bawah soal tanpa membuka kunci jawaban. Bila PIN orang tua sudah dibuat, menilai meminta PIN, dan PIN yang benar sekaligus membuka kunci jawaban selama 2 menit. Penanda dan skor tidak ikut tercetak. Cara menjawab bisa diganti lewat 🎲.
 - **Kunci jawaban terlipat** di bawah judul 🔑 dan **tidak ikut tercetak** selama terlipat. Untuk menguncinya, buat **PIN orang tua** 4–6 angka (dialog muncul setelah membuat template, atau menu ⋯ → *PIN kunci jawaban*). Membuka kunci meminta PIN, terkunci lagi otomatis dalam 2 menit, dan salah 5 kali memblokir 30 detik. *Penting:* ini penghalang tampilan, bukan enkripsi; teks kunci tetap ada di isi catatan (terlihat lewat ekspor atau alat pengembang). PIN hanya di perangkat itu dan tidak ikut sinkron.
 
 ### 📤 Tautan Hidup, Edit Bersama, & Cadangan Kunci (edisi kustom)
@@ -107,7 +113,9 @@ Fitur pendukung:
 - Kartu catatan dan penyebutan fitur *Cari*, *Halaman*, *Ke catatan*, serta garis bawah/coret teks sudah dijelaskan di bagian PDF.
 
 ### 🔧 Perlu Diketahui
-- Fitur yang belum diuji di perangkat sungguhan (iOS Safari, Android Chrome, stylus): papan angka, kotak jawaban stylus, toolbar melayang, tabel berhitung di layar sempit.
+- Fitur yang belum diuji di perangkat sungguhan (iOS Safari, Android Chrome, stylus): papan angka (termasuk menghapus jawaban), kotak jawaban stylus, ketuk penanda ○ di layar sentuh, toolbar melayang, tabel berhitung di layar sempit.
+- **Perbaikan tahap 66:** menghapus jawaban di kolom *Ketik angka* kini hanya mengosongkan kolom (sebelumnya kolom ikut terhapus dan garis jawaban hilang); filter angka (maks. 4 digit) dan Enter untuk menutup papan angka kini bekerja. Soal *"lingkari"* dihapus dari template catatan Halaman (5–6 th dan uang); latihan jenis itu akan dibuat khusus untuk Kanvas. Catatan latihan yang dibuat **sebelum** tahap 66 tidak punya penanda ○; pakai 🎲 Acak ulang soal untuk memakainya.
+- Salinan lewat tautan bagi mungkin belum membawa penanda ✓/✗ orang tua; tombol ○ juga belum aktif di penampil penerima.
 - Mengisi tabel berhitung lewat tempel/dikte dan riwayat undo (`Ctrl+Z`) pada tabel berhitung belum diuji menyeluruh.
 
 ---

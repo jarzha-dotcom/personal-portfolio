@@ -302,5 +302,15 @@
       "Aplikasi Web",
       "Properti"
     ]
+  },
+  {
+    "file": "demo-kospro-mudah.html",
+    "thumb": "thumbs/demo-kospro-mudah.webp",
+    "title": "Aplikasi Kelola Kos Sederhana",
+    "desc": "Aplikasi kelola kos dengan huruf besar dan tombol jelas, ringkasan uang masuk dan keluar, penagihan lewat WhatsApp, kwitansi, pengumuman, uang jaminan, laporan keuangan 6 bulan, portal penghuni, dan tampilan desktop.",
+    "tags": [
+      "Aplikasi Web",
+      "Properti"
+    ]
   }
 ]
