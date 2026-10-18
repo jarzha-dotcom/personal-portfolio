@@ -312,5 +312,15 @@
       "Aplikasi Web",
       "Properti"
     ]
+  },
+  {
+    "file": "demo-landing-kos-griya-asri.html",
+    "thumb": "thumbs/demo-landing-kos-griya-asri.webp",
+    "title": "Landing Page Kos-Kosan & Hunian",
+    "desc": "Landing page kos dengan foto kamar asli, filter tipe kamar, kalkulator simulasi sewa dan diskon durasi, waktu tempuh ke titik penting, tata tertib, jadwal survei ke WhatsApp, serta tautan ke aplikasi penghuni KosPro.",
+    "tags": [
+      "Landing Page",
+      "Properti"
+    ]
   }
 ]
