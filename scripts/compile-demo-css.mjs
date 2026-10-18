@@ -38,6 +38,14 @@ async function compileDemo(demoFile) {
   const filePath = join(DEMOS_DIR, demoFile);
   let html = readFileSync(filePath, 'utf-8');
 
+  // Opt-out: demo yang tidak memakai Tailwind cukup diberi komentar <!-- @jz-no-tw --> di HTML.
+  // Link CSS lama dilepas, dan tidak ada file CSS baru yang dibuat.
+  if (html.includes('<!-- @jz-no-tw -->')) {
+    const cleaned = html.replace(/\s*<!-- @jz-tw-css -->\s*<link\s+rel=["']stylesheet["']\s+href=["']\.\/css\/[^"']+["']>/gi, '');
+    if (!DRY_RUN && cleaned !== html) writeFileSync(filePath, cleaned, 'utf-8');
+    return { cssSize: 0, hasConfig: false, skipped: true };
+  }
+
   // Ekstrak tailwind.config jika ada
   const configMatch = html.match(/<script[^>]*>\s*tailwind\.config\s*=\s*([\s\S]*?)\s*<\/script>/i);
   let hasCustomConfig = false;
@@ -134,7 +142,8 @@ async function main() {
       const res = await compileDemo(entry.file);
       const elapsed = Date.now() - start;
       const sizeKb = (res.cssSize / 1024).toFixed(1);
-      console.log(`  ✓ ${entry.file} -> css/${entry.file.replace('.html', '.css')} (${sizeKb} KB, ${elapsed}ms)`);
+      if (res.skipped) console.log(`  - ${entry.file} dilewati (@jz-no-tw)`);
+      else console.log(`  ✓ ${entry.file} -> css/${entry.file.replace('.html', '.css')} (${sizeKb} KB, ${elapsed}ms)`);
       success++;
     } catch (err) {
       console.error(`  ✗ ${entry.file}: ${err.message}`);
