@@ -1763,6 +1763,44 @@
       text-decoration: underline;
       text-underline-offset: 3px
     }
+
+    /* ===== v3.4: padding samping section "sec wrap" ===== 
+       .sec (padding:72px 0) menimpa .wrap sehingga isi menempel ke tepi layar dan halaman melebar 16px di HP */
+    .sec.wrap {
+      padding-left: 20px;
+      padding-right: 20px
+    }
+
+    @media (max-width:860px) {
+      .sec.wrap {
+        padding-left: 16px;
+        padding-right: 16px
+      }
+    }
+
+    /* ===== v3.3: teks tak terbaca di mode gelap (diaudit dengan render nyata) ===== */
+    [data-theme=dark] .hero-ticks,
+    [data-theme=dark] .fac-card h4,
+    [data-theme=dark] .form-group label {
+      color: var(--text)
+    }
+
+    [data-theme=dark] .modal-close {
+      color: var(--text-muted)
+    }
+
+    [data-theme=dark] .sec-eyebrow,
+    [data-theme=dark] [style*="color:var(--primary)"] {
+      color: #45B386 !important
+    }
+
+    [data-theme=dark] [style*="color:#047857"] {
+      color: #34D399 !important
+    }
+
+    [data-theme=dark] header [style*="background:var(--primary)"] {
+      background: #1F7A55 !important
+    }
   </style>
   <!-- @jz-no-tw -->
   <!-- @jz-tw-css -->
@@ -2578,7 +2616,7 @@
             <span>Sewa Pokok:</span>
             <strong id="resGross">Rp2.200.000</strong>
           </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:6px; color:#059669;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px; color:#047857;">
             <span>Potongan Diskon:</span>
             <strong id="resDiscount">Rp0</strong>
           </div>
