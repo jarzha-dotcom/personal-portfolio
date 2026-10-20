@@ -53,6 +53,9 @@
     href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
   <style>
     :root {
+      --accent-ink: #14573B;
+      --neutral-bg: #F3F4F6;
+      --neutral-ink: #374151;
       --surface: #FFF;
       --ground: #F6F5F0;
       --ink: #1F2937;
@@ -216,7 +219,7 @@
       height: 56px;
       border-radius: 14px;
       background: var(--accent-soft);
-      color: #14573B;
+      color: var(--accent-ink);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -236,8 +239,8 @@
     }
 
     .kosong .badge {
-      background: #F3F4F6;
-      color: #374151
+      background: var(--neutral-bg);
+      color: var(--neutral-ink)
     }
 
     .room .who {
@@ -247,7 +250,7 @@
     .state {
       font-size: 16px;
       font-weight: 700;
-      color: #14573B;
+      color: var(--accent-ink);
       text-align: right
     }
 
@@ -260,7 +263,7 @@
     }
 
     .kosong .state {
-      color: #374151
+      color: var(--neutral-ink)
     }
 
     .pay {
@@ -973,6 +976,12 @@
 
   <style>
     /* Halaman Uang: tampilan baru */
+    .credit a {
+      display: inline-block;
+      padding: 14px 6px;
+      margin: -14px -6px
+    }
+
     .tur-block {
       position: fixed;
       inset: 0;
@@ -1195,6 +1204,9 @@
 
     html[data-theme=dark] {
       color-scheme: dark;
+      --accent-ink: #7BDDB0;
+      --neutral-bg: #26312E;
+      --neutral-ink: #C5CFCB;
       --surface: #18211F;
       --ground: #0F1514;
       --ink: #E8EEEB;
@@ -1787,7 +1799,7 @@
     function loadState() { try { var sv = JSON.parse(localStorage.getItem(KEY)); if (sv && sv.rooms) { rooms = sv.rooms; hist = sv.hist; tickets = sv.tickets; income = sv.income; big = sv.big; cfg = Object.assign({}, CFG0, sv.cfg); accounts = sv.accounts || accounts; expenses = sv.expenses || expenses; ann = sv.ann || ann; proofs = sv.proofs || proofs } } catch (e) { } }
     loadState();
     function findAcc(u) { return accounts.filter(function (a) { return a.user === u })[0] }
-    try { var nt = performance.getEntriesByType('navigation')[0]; if (!/sebagai=/.test(location.hash) && !(nt && nt.type === 'reload')) sessionStorage.removeItem(SESI) } catch (e) { }
+    try { var nt = performance.getEntriesByType('navigation')[0], rl = nt && nt.type === 'reload'; if (!rl) sessionStorage.removeItem('kospro_tur_nanti'); if (!/sebagai=/.test(location.hash) && !rl) sessionStorage.removeItem(SESI) } catch (e) { }
     try { var su = sessionStorage.getItem(SESI); var sa = su && findAcc(su); if (sa && (sa.role === 'pemilik' || R0(sa.no))) { sess = sa; me = sa.no || null } } catch (e) { }
     var TUR_AUTO, turAwal; (function () { var m = /sebagai=(pemilik|penghuni):?(\w*)/.exec(location.hash); if (!m) return; var tm = /tur=(singkat|lengkap)/.exec(location.hash); if (tm) { TUR_AUTO = tm[1]; turAwal = { u: null, tab: 'beranda' } } var ad = m[1] === 'pemilik' ? ownerAcc() : accounts.filter(function (a) { return a.role === 'penghuni' && a.no === m[2] })[0]; if (ad) { sess = ad; me = ad.no || null; tab = m[1] === 'pemilik' ? (m[2] || 'beranda') : 'p_beranda'; try { sessionStorage.setItem(SESI, ad.user) } catch (e) { } } try { history.replaceState(null, '', location.href.split('#')[0]) } catch (e) { } })();
     window.addEventListener('storage', function (e) { if (e.key !== KEY || !sess) return; var t = document.activeElement && document.activeElement.tagName; if (/INPUT|TEXTAREA|SELECT/.test(t) || document.querySelector('.ov')) return; var sn = snap(); loadState(); sess = findAcc(sess.user) || sess; draw(); var nm = notif(sn); if (nm) toast(nm) });
@@ -1810,7 +1822,7 @@
     function applyTema() { var d = TEMA === 'gelap' || (TEMA === 'auto' && mq && mq.matches); document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light'); document.documentElement.lang = LANG }
     var EN_SORT;
     var EX = { 'Selesai': 'Finish', 'Beranda': 'Home', 'Uang': 'Money', 'Kamar': 'Rooms', 'Penghuni': 'Tenants', 'Lainnya': 'More', 'Profil': 'Profile', 'Lapor': 'Report', 'Riwayat': 'History', 'Masuk': 'Log in', 'Keluar': 'Log out', 'Tutup': 'Close', 'Simpan': 'Save', 'Batal': 'Cancel', 'Semua': 'All', 'Hapus': 'Delete', 'Kembali': 'Back', 'Telepon': 'Call', 'Tanggal': 'Date', 'Untuk': 'For', 'Pemilik': 'Owner', 'Keduanya': 'Both', 'Berakhir': 'Ends', 'Air': 'Water', 'Listrik': 'Electricity', 'Kebersihan': 'Cleaning', 'Perbaikan': 'Repairs', 'Galeri': 'Gallery', 'Kosong': 'Vacant', 'Terang': 'Light', 'Gelap': 'Dark', 'Biasa': 'Normal', 'Besar': 'Large', 'Akun': 'Account', 'Tema': 'Theme', 'Bahasa': 'Language', 'Tampilan': 'Appearance', 'Pengaturan': 'Settings', 'Pengumuman': 'Announcements', 'Pembayaran': 'Payments', 'Otomatisasi': 'Automation', 'Perpanjang': 'Extend', 'Tolak': 'Reject', 'Nonaktifkan': 'Deactivate', 'Kwitansi': 'Receipt', 'Tunai': 'Cash', 'Menu utama': 'Main menu', 'Sudah bayar': 'Paid', 'Belum bayar': 'Unpaid', 'Menunggak': 'Overdue', 'Sewa kos': 'Boarding house rent', 'Ya, hapus': 'Yes, delete', 'Tidak jadi': 'Never mind', 'Lihat detail': 'View details', 'Pilih bulan': 'Choose month', 'Perbaikan selesai': 'Repair done', 'Aplikasi Kelola Kos Sederhana': 'Simple boarding house management app' };
-    var PH = [['Kembali ke halaman utama', 'Back to main page'], ['Tekan Selesai untuk kembali ke tempat Anda memulai tur.', 'Press Finish to return to where you started the tour.'], ['Coba sendiri di aplikasi', 'Try it yourself in the app'], ['Tur ditutup. Kembali ke halaman awal.', 'Tour closed. Back to the start page.'], ['Tur ditutup.', 'Tour closed.'], ['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
+    var PH = [['Baru pertama kali di sini?', 'First time here?'], ['Ikut tur 2 menit supaya langsung paham alurnya dari penghuni sampai pemilik.', 'Take the 2-minute tour to understand the flow from tenant to owner right away.'], ['Mulai tur demo', 'Start demo tour'], ['Kembali ke halaman utama', 'Back to main page'], ['Tekan Selesai untuk kembali ke tempat Anda memulai tur.', 'Press Finish to return to where you started the tour.'], ['Coba sendiri di aplikasi', 'Try it yourself in the app'], ['Tur ditutup. Kembali ke halaman awal.', 'Tour closed. Back to the start page.'], ['Tur ditutup.', 'Tour closed.'], ['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
     ['Buka Lainnya, lalu Laporan keuangan. Ketuk "Catat uang keluar", pilih untuk apa (listrik, perbaikan, dan lainnya), isi jumlahnya, lalu Simpan.', 'Open More, then Financial report. Tap "Record expense", choose what it is for (electricity, repairs, and so on), enter the amount, then Save.'],
     ['Buka Lainnya, lalu Pengaturan. Isi nama bank, nomor rekening, dan gambar QRIS agar tampil di "Cara membayar" milik penghuni. Tulis peraturan kos satu per baris, penghuni akan diberi tahu.', 'Open More, then Settings. Enter the bank name, account number, and QRIS image so they show in the tenant "How to pay". Write the house rules one per line and tenants will be notified.'],
     ['Buka menu Penghuni, ketuk "Kirim pengumuman ke semua penghuni". Tulis pesan lalu ketuk "Tampilkan di portal penghuni". Untuk WhatsApp, ketuk nama penghuni satu per satu.', 'Open Tenants and tap "Send announcement to all tenants". Write the message, then tap "Show in tenant portal". For WhatsApp, tap each tenant name.'],
@@ -1996,7 +2008,7 @@
       return h + '<button class="btn alt mobonly" onclick="logout()">Keluar dari akun</button><button class="btn alt dangerbtn" onclick="resetAsk()">Kembalikan demo seperti awal</button>'
     }
     function resetAsk() { openM('<p class="title">Kembalikan demo seperti awal?</p><p>Semua pembayaran, penghuni baru, laporan, dan pengaturan yang tadi dicatat akan dihapus.</p><button class="btn" style="background:var(--bad);border-color:var(--bad)" onclick="resetDemo()">Ya, kembalikan</button><button class="btn alt" onclick="closeM()">Tidak jadi</button>') }
-    function resetDemo() { try { localStorage.removeItem(KEY); sessionStorage.removeItem(SESI) } catch (e) { } location.reload() }
+    function resetDemo() { try { localStorage.removeItem(KEY); localStorage.removeItem('kospro_tur'); sessionStorage.removeItem(SESI); sessionStorage.removeItem('kospro_tur_nanti') } catch (e) { } location.reload() }
     function keluarForm(k, c) { closeM(); openM('<p class="title">Catat uang keluar</p><div><label for="ek">Untuk apa?</label><select id="ek">' + KAT.map(function (x) { return '<option' + (x === k ? ' selected' : '') + '>' + x + '</option>' }).join('') + '</select></div><div><label for="ej">Jumlah (Rp)</label><input id="ej" type="number" inputmode="numeric" placeholder="Contoh: 350000"></div><div><label for="ec">Catatan (boleh dikosongkan)</label><input id="ec" autocomplete="off" placeholder="Contoh: servis AC kamar 105" value="' + esc(c || '') + '"></div><div><label for="et">Tanggal</label><input id="et" type="date" value="' + ymd(TODAY) + '"></div><button class="btn" onclick="simpanKeluar()">Simpan</button><button class="btn alt" onclick="closeM()">Batal</button>') }
     function simpanKeluar() {
       var k = document.getElementById('ek').value, j = parseInt(document.getElementById('ej').value, 10), c = document.getElementById('ec').value.trim(), t = document.getElementById('et').value || ymd(TODAY);
@@ -2087,7 +2099,7 @@
     function bacaAturan() { R(me).aturanSeen = cfg.aturanV; save(); toast('Terima kasih sudah membaca.'); draw() }
     function pengaturan() {
       var nP = rooms.filter(function (r) { return r.name }), bc = nP.filter(function (r) { return (r.aturanSeen == null ? 1 : r.aturanSeen) === cfg.aturanV }).length, F = function (i, t, v, x) { return '<div><label for="' + i + '">' + t + '</label><input id="' + i + '" value="' + esc(v) + '" ' + (x || '') + '></div>' };
-      return '<div><h1>Pengaturan</h1><p class="muted">Ubah lalu tekan Simpan</p></div><div class="cols"><div class="colL"><div class="card"><p class="title">Data kos</p>' + F('cn', 'Nama kos', cfg.nama) + F('ca', 'Alamat kos', cfg.alamat) + F('ct', 'Nomor telepon tukang', cfg.tukang, 'type="tel" inputmode="tel"') + F('cg', 'Target uang masuk per bulan (Rp)', cfg.target, 'type="number" inputmode="numeric"') + '</div><div class="card"><p class="title">Pemilik</p>' + F('co', 'Nama pemilik', pemNama()) + F('cw', 'Nomor WhatsApp pemilik', '0' + cfg.wa.replace(/^62/, ''), 'type="tel" inputmode="tel"') + '</div><div class="card"><p class="title">Cadangan data</p><p class="muted">Simpan semua data ke file, atau pulihkan dari file cadangan.</p><button class="btn alt" onclick="unduhCadangan()">Simpan cadangan data</button><div><label for="cf">Pulihkan dari file cadangan</label><input id="cf" type="file" accept=".json,application/json"></div><button class="btn alt" onclick="pulihCadangan()">Pulihkan sekarang</button></div></div><div class="colR"><div class="card"><p class="title">Cara pembayaran</p><p class="muted">Tampil di portal penghuni pada "Cara membayar"</p>' + F('cb', 'Nama bank', cfg.bank) + F('cr2', 'Nomor rekening', cfg.rek, 'inputmode="numeric"') + F('cat', 'Atas nama', cfg.atasNama) + '<div><label for="cq">Gambar QRIS (boleh dikosongkan)</label><input id="cq" type="file" accept="image/*"></div>' + (cfg.qris ? '<img class="proof" src="' + cfg.qris + '" alt="QRIS saat ini" style="max-height:200px"><label style="display:flex;gap:10px;align-items:center"><input id="cqh" type="checkbox" style="width:24px;height:24px"> Hapus gambar QRIS</label>' : '') + '</div><div class="card"><p class="title">Peraturan kos</p><p class="muted">Satu aturan per baris. Penghuni melihatnya di Beranda.</p><textarea id="cr" rows="7">' + esc(cfg.aturan) + '</textarea><p class="muted">' + bc + ' dari ' + nP.length + ' penghuni sudah membaca versi terbaru.</p></div></div></div><button class="btn" onclick="simpanCfg()">Simpan</button>'
+      return '<div><h1>Pengaturan</h1><p class="muted">Ubah lalu tekan Simpan</p></div><div class="cols"><div class="colL"><div class="card"><p class="title">Data kos</p>' + F('cn', 'Nama kos', cfg.nama) + F('ca', 'Alamat kos', cfg.alamat) + F('ct', 'Nomor telepon tukang', cfg.tukang, 'type="tel" inputmode="tel"') + F('cg', 'Target uang masuk per bulan (Rp)', cfg.target, 'type="number" inputmode="numeric"') + '</div><div class="card"><p class="title">Pemilik</p>' + F('co', 'Nama pemilik', pemNama()) + F('cw', 'Nomor WhatsApp pemilik', '0' + cfg.wa.replace(/^62/, ''), 'type="tel" inputmode="tel"') + '</div><div class="card"><p class="title">Cadangan data</p><p class="muted">Simpan semua data ke file, atau pulihkan dari file cadangan.</p><button class="btn alt" onclick="unduhCadangan()">Simpan cadangan data</button><div><label for="cf">Pulihkan dari file cadangan</label><input id="cf" type="file" accept=".json,application/json"></div><button class="btn alt" onclick="pulihCadangan()">Pulihkan sekarang</button></div></div><div class="colR"><div class="card"><p class="title">Cara pembayaran</p><p class="muted">Tampil di portal penghuni pada "Cara membayar"</p>' + F('cb', 'Nama bank', cfg.bank) + F('cr2', 'Nomor rekening', cfg.rek, 'inputmode="numeric"') + F('cat', 'Atas nama', cfg.atasNama) + '<div><label for="cq">Gambar QRIS (boleh dikosongkan)</label><input id="cq" type="file" accept="image/*"></div>' + (cfg.qris ? '<img class="proof" src="' + cfg.qris + '" alt="QRIS saat ini" style="max-height:200px"><label style="display:flex;gap:10px;align-items:center"><input id="cqh" type="checkbox" style="width:24px;height:24px"> Hapus gambar QRIS</label>' : '') + '</div><div class="card"><p class="title">Peraturan kos</p><p class="muted">Satu aturan per baris. Penghuni melihatnya di Beranda.</p><textarea id="cr" rows="7" aria-label="Peraturan kos">' + esc(cfg.aturan) + '</textarea><p class="muted">' + bc + ' dari ' + nP.length + ' penghuni sudah membaca versi terbaru.</p></div></div></div><button class="btn" onclick="simpanCfg()">Simpan</button>'
     }
     function simpanCfg() {
       var g = function (i) { return document.getElementById(i).value.trim() }, n = g('cn'), t = g('ct'), tg = parseInt(g('cg'), 10), w = g('cw').replace(/\D/g, '');
@@ -2114,9 +2126,10 @@
     function isiAkun(u) { var a = findAcc(u); document.getElementById('lu').value = a.user; document.getElementById('lp').value = a.pass }
     function loginPage() {
       var h = '<div style="text-align:center"><h1 style="color:var(--accent)">KosPro Mudah</h1><p class="muted">' + cfg.nama + '</p></div>';
+      h += '<div class="card hero"><p class="title">Baru pertama kali di sini?</p><p>Ikut tur 2 menit supaya langsung paham alurnya dari penghuni sampai pemilik.</p><button type="button" class="btn alt" onclick="turMulai(\'singkat\')">Mulai tur demo</button></div>';
       h += '<form class="card" onsubmit="return doLogin()"><div><label for="lu">Nama pengguna</label><input id="lu" autocomplete="username" autocapitalize="none" spellcheck="false"></div><div><label for="lp">Kata sandi</label><input id="lp" type="password" autocomplete="current-password"></div><button class="btn" type="submit">Masuk</button><button type="button" class="btn alt" onclick="lupaSandi()">Lupa kata sandi?</button></form>';
       var d = [[ownerAcc(), 'Pemilik kos'], [accByNo('103'), 'Penghuni kamar 103 (belum bayar)'], [accByNo('102'), 'Penghuni kamar 102 (sudah lunas)']].filter(function (x) { return x[0] });
-      h += '<div class="card"><p><b>Akun untuk mencoba demo</b></p>' + d.map(function (x) { var a = x[0]; return '<div class="pay" style="flex-direction:column;gap:6px"><span>' + x[1] + '<br><small>Nama pengguna: ' + a.user + ' · Kata sandi: ' + a.pass + '</small></span><button type="button" class="btn alt" onclick="isiAkun(\'' + a.user + '\')">Pakai akun ini</button></div>' }).join('') + '</div>'; h += '<button type="button" class="btn alt" onclick="turMulai(\'singkat\')">Tur demo singkat</button><a class="btn alt" href="landing-kospro-mudah.html">Kembali ke halaman utama</a>';
+      h += '<div class="card"><p><b>Akun untuk mencoba demo</b></p>' + d.map(function (x) { var a = x[0]; return '<div class="pay" style="flex-direction:column;gap:6px"><span>' + x[1] + '<br><small>Nama pengguna: ' + a.user + ' · Kata sandi: ' + a.pass + '</small></span><button type="button" class="btn alt" onclick="isiAkun(\'' + a.user + '\')">Pakai akun ini</button></div>' }).join('') + '</div>'; h += '<a class="btn alt" href="landing-kospro-mudah.html">Kembali ke halaman utama</a>';
       return h + '<p class="credit">Demo: data tersimpan di browser ini saja.</p><button class="btn alt dangerbtn" onclick="resetAsk()">Kembalikan demo seperti awal</button>'
     }
     function dispNama(a) { var r = a.no && R(a.no); return r && r.name || a.nama }
@@ -2193,7 +2206,7 @@
     function lupaSandi() { openM('<p class="title">Lupa kata sandi?</p><p>Minta pemilik kos mengembalikan sandi Anda ke sandi awal. Setelah masuk, Anda bisa menggantinya sendiri.</p><a class="btn" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.wa || WA_PEMILIK) + '?text=' + encodeURIComponent('Halo, saya lupa kata sandi aplikasi KosPro. Mohon bantu reset ke sandi awal.') + '">Hubungi pemilik lewat WhatsApp</a><button class="btn alt" onclick="closeM()">Tutup</button>') }
     function unduhCadangan() { save(); var t = localStorage.getItem(KEY) || '{}', a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([t], { type: 'application/json' })); a.download = 'cadangan-kospro-' + ymd(TODAY) + '.json'; document.body.appendChild(a); a.click(); a.remove(); toast('Cadangan data disimpan.') }
     function pulihCadangan() { var f = document.getElementById('cf'); f = f && f.files && f.files[0]; if (!f) { toast('Pilih file cadangan dulu.'); return } var fr = new FileReader(); fr.onload = function () { try { var o = JSON.parse(fr.result); if (!o || !o.rooms || !o.accounts) throw 0; localStorage.setItem(KEY, fr.result); loadState(); sess = findAcc(sess.user) || sess; toast('Data berhasil dipulihkan.'); draw() } catch (e) { toast('File cadangan tidak valid.') } }; fr.readAsText(f) }
-    function buktiRiwayat() { var m = proofs.filter(function (p) { return p.no === me }); if (!m.length) return ''; var T2 = { menunggu: 'Menunggu dicek', disetujui: 'Disetujui', ditolak: 'Ditolak' }; return '<p class="title" style="margin:6px 0 0">Bukti transfer saya</p><div class="card" style="padding:4px 16px">' + m.map(function (p) { var c = p.st === 'disetujui' ? '#14573B' : p.st === 'ditolak' ? 'var(--bad)' : '#78350F'; return '<div class="pay"><img src="' + p.img + '" alt="Bukti transfer" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex:none"><span style="flex:1">' + rp(p.amt) + '<br><small>' + whenTxt(p) + '</small></span><span style="text-align:right"><b style="color:' + c + '">' + T2[p.st] + '</b>' + (p.st === 'ditolak' ? '<br><button class="btn alt mini" onclick="bayarCara()">Kirim ulang</button>' : '') + '</span></div>' }).join('') + '</div>' }
+    function buktiRiwayat() { var m = proofs.filter(function (p) { return p.no === me }); if (!m.length) return ''; var T2 = { menunggu: 'Menunggu dicek', disetujui: 'Disetujui', ditolak: 'Ditolak' }; return '<p class="title" style="margin:6px 0 0">Bukti transfer saya</p><div class="card" style="padding:4px 16px">' + m.map(function (p) { var c = p.st === 'disetujui' ? 'var(--accent-ink)' : p.st === 'ditolak' ? 'var(--bad)' : 'var(--warn)'; return '<div class="pay"><img src="' + p.img + '" alt="Bukti transfer" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex:none"><span style="flex:1">' + rp(p.amt) + '<br><small>' + whenTxt(p) + '</small></span><span style="text-align:right"><b style="color:' + c + '">' + T2[p.st] + '</b>' + (p.st === 'ditolak' ? '<br><button class="btn alt mini" onclick="bayarCara()">Kirim ulang</button>' : '') + '</span></div>' }).join('') + '</div>' }
     function pRiwayat() { return pRiwayat0() + buktiRiwayat() }
     var FG = [['Pembayaran', 'Uang masuk lebih cepat dan lebih rapi'], ['Otomatisasi', 'Pekerjaan berulang dikerjakan sistem'], ['Operasional harian', 'Urusan kamar dan penghuni sehari-hari'], ['Laporan dan pertumbuhan', 'Melihat gambaran usaha dan menambah properti'], ['Akses dan keamanan', 'Siapa boleh melihat apa, dan data tetap aman']];
     var FITUR = [
@@ -2323,7 +2336,7 @@
       var mine = tickets.filter(function (t) { return t.no === me });
       var h = '<div><h1>Lapor kerusakan</h1><p class="muted">Pemilik kos akan langsung menerima laporan ini</p></div><div class="cols"><div class="colL"><div class="card"><div><label for="lt">Apa yang rusak atau perlu diperbaiki?</label><input id="lt" autocomplete="off" placeholder="Contoh: kran air bocor"></div><div><label for="lf">Foto kerusakan (boleh dikosongkan)</label><input id="lf" type="file" accept="image/*"></div><button class="btn" onclick="kirimLapor()">Kirim laporan</button></div></div><div class="colR">' + demoCard() + '<p class="title">Laporan saya</p>';
       if (!mine.length) h += '<div class="card"><p class="muted">Belum ada laporan.</p></div>';
-      mine.forEach(function (t) { h += '<div class="card"><p>“' + t.txt + '”</p>' + imgT(t) + '<p><small>' + whenTxt(t) + '</small></p><p><b' + (t.st === 'selesai' ? ' style="color:#14573B"' : '') + '>' + stTxt(t.st) + '</b></p></div>' }); return h + '</div></div>'
+      mine.forEach(function (t) { h += '<div class="card"><p>“' + t.txt + '”</p>' + imgT(t) + '<p><small>' + whenTxt(t) + '</small></p><p><b' + (t.st === 'selesai' ? ' style="color:var(--accent-ink)"' : '') + '>' + stTxt(t.st) + '</b></p></div>' }); return h + '</div></div>'
     }
     var pnames = { p_beranda: 'Beranda', p_lapor: 'Lapor', p_riwayat: 'Riwayat' };
     var pico = { p_beranda: ico.beranda, p_lapor: '<path d="M14.7 6.3a4 4 0 0 0-5 5L3 18l3 3 6.7-6.7a4 4 0 0 0 5-5l-2.5 2.5-2.2-.5-.5-2.2z"/>', p_riwayat: ico.uang };
