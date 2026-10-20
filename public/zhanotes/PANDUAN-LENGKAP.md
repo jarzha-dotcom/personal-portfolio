@@ -52,7 +52,7 @@ Contoh: `tipe:pdf dalam:30 #laporan stok` atau `sejak:2026-10-01 sebelum:2026-10
 
 ---
 
-## 🆕 Pembaruan Tahap 28–73 (Oktober 2026)
+## 🆕 Pembaruan Tahap 28–74 (Oktober 2026)
 
 ### 🧰 Toolbar & Tampilan
 - **Toolbar melayang** (tombol **⇲ Melayang**): lihat bagian *Toolbar Melayang* di bawah. Di tahap 46 baris tab toolbar di HP dirapikan agar tidak tertimpa tombol Melayang/Sembunyikan.
@@ -79,6 +79,7 @@ Buka lewat tombol "+" → **Dari template**, kartu Beranda, atau `Ctrl+K`. Ada k
 
 **Tabel berhitung** (semua edisi, offline): tabel yang menghitung sendiri. Isi **Jml** dan **Harga/satuan**; **Subtotal**, **Total**, dan **Sisa anggaran** terisi otomatis. Angka boleh ditulis `15000`, `15.000`, `Rp15.000`, `15rb`, `1,5jt`, `0,5`, atau `1/2` (koma = desimal). Sel hasil tidak bisa diedit; baris contoh (dan harganya) hanya contoh, ganti atau hapus. Tambah baris lewat menu **Tabel ▾**. Template yang memakainya:
 - **Belanja + estimasi harga** dan **Belanja bulanan + anggaran** (empat kategori + ringkasan total semua dan sisa anggaran). Keduanya punya kolom centang **✓**: centang barang yang sudah dibeli, barangnya dicoret dan ringkasan **Sudah dibeli** / **Belum dibeli** ikut berubah.
+- **Template yang ikut menghitung (tahap 74):** *Anggaran bulanan* (Rencana, Realisasi, Selisih; total pemasukan dan pengeluaran; **Sisa dana**), *Catatan pengeluaran* (total, rata-rata), *Utang & cicilan* (total tiap kolom), *Target tabungan* (setoran, total berjalan, rata-rata, **Kurang**, bar **Progres** terhadap target yang Anda ketik), *Rencana acara* dan *Persiapan pernikahan* (centang tugas atau vendor; progres dan total DP/pelunasan otomatis), *Pelacak kebiasaan* (⭐ per kebiasaan dan **Ketuntasan**), *Log olahraga* (total menit), *Jurnal tidur* (tulis jam `22:30` atau `22.30`; **Durasi** otomatis, termasuk melewati tengah malam) dan *Pelacak mood* (rata-rata). Jumlah template tetap 72.
 - **Tombol baris cepat** (semua tabel berhitung, juga catatan lama): klik sebuah sel, lalu bilah kecil muncul di atas baris itu. **＋ Baris** menambah baris kosong tepat di bawahnya (kursor langsung di kolom pertama), **🗑 Hapus** menghapus baris data (baris total dan anggaran tidak bisa dihapus), **↶ Urungkan** mengembalikan baris yang baru dihapus. Total dan sisa dihitung ulang otomatis; bilah tidak tersimpan di catatan.
 - **Inventaris dapur & stok**: Stok vs Minimal; kolom Status menampilkan **⚠ Beli** / **✓ Cukup** otomatis, dan centang **Dibeli** mengubahnya jadi *Sudah dibeli*.
 - **Patungan / bagi tagihan**: tulis nama di tiap pesanan; pajak/servis/ongkir dibagi sebanding; tabel bagian tiap orang dan selisih (harus Rp0) terisi otomatis (ketik nama yang sama persis).
