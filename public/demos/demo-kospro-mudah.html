@@ -1545,9 +1545,588 @@
   </style>
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-kospro-mudah.css">
+  <style id="motion-css">
+    :root {
+      --e: cubic-bezier(.2, 0, 0, 1);
+      --eo: cubic-bezier(.05, .7, .1, 1);
+      --ei: cubic-bezier(.3, 0, 1, 1);
+      --eb: cubic-bezier(.175, .885, .32, 1.275)
+    }
+
+    /* Splash */
+    #splash {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 24px;
+      text-align: center;
+      color: #fff;
+      cursor: pointer;
+      overflow: hidden;
+      background: radial-gradient(120% 90% at 50% 38%, #1f7a54 0%, #14573B 55%, #0d3d29 100%)
+    }
+
+    #splash.out {
+      animation: spOut .7s cubic-bezier(.65, 0, .35, 1) forwards;
+      pointer-events: none
+    }
+
+    @keyframes spOut {
+      to {
+        translate: 0 -104%;
+        border-radius: 0 0 50% 50%/0 0 90px 90px
+      }
+    }
+
+    #splash .glow {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 360px;
+      height: 360px;
+      margin: -237px 0 0 -180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(252, 211, 77, .3), transparent 65%);
+      animation: glow 3s ease-in-out infinite
+    }
+
+    @keyframes glow {
+      50% {
+        scale: 1.15;
+        opacity: .7
+      }
+    }
+
+    #splash .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(46px);
+      opacity: .3;
+      animation: drift 9s ease-in-out infinite alternate
+    }
+
+    #splash .o1 {
+      width: 220px;
+      height: 220px;
+      background: #34d399;
+      left: -60px;
+      top: 12%
+    }
+
+    #splash .o2 {
+      width: 260px;
+      height: 260px;
+      background: #FCD34D;
+      right: -90px;
+      bottom: 8%;
+      opacity: .16;
+      animation-delay: -4s
+    }
+
+    @keyframes drift {
+      to {
+        translate: 40px -30px
+      }
+    }
+
+    #splash svg {
+      position: relative;
+      overflow: visible
+    }
+
+    #splash .h {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw .95s var(--e) .15s forwards
+    }
+
+    @keyframes draw {
+      to {
+        stroke-dashoffset: 0
+      }
+    }
+
+    #splash .w {
+      fill: #FCD34D;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: win .45s var(--eb) calc(.85s + var(--k) * 70ms) forwards
+    }
+
+    #splash .w.d {
+      fill: #fff;
+      --o: .35
+    }
+
+    @keyframes win {
+      from {
+        opacity: 0;
+        transform: scale(.3)
+      }
+
+      to {
+        opacity: var(--o, 1);
+        transform: scale(1)
+      }
+    }
+
+    #splash .t {
+      display: flex;
+      gap: .28em;
+      margin-top: 10px;
+      font-size: 44px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -.5px
+    }
+
+    #splash .t span,
+    #splash .n,
+    #splash .s,
+    #splash .sk {
+      opacity: 0;
+      translate: 0 16px;
+      animation: up .6s var(--eo) forwards
+    }
+
+    #splash .t span:nth-child(1) {
+      animation-delay: .95s
+    }
+
+    #splash .t span:nth-child(2) {
+      animation-delay: 1.07s;
+      color: #FCD34D
+    }
+
+    #splash .n {
+      font-size: 20px;
+      font-weight: 700;
+      --to: .92;
+      animation-delay: 1.25s
+    }
+
+    #splash .s {
+      font-size: 17px;
+      --to: .72;
+      animation-delay: 1.4s
+    }
+
+    @keyframes up {
+      to {
+        opacity: var(--to, 1);
+        translate: 0 0
+      }
+    }
+
+    #splash .pb {
+      position: absolute;
+      left: 50%;
+      bottom: calc(66px + env(safe-area-inset-bottom));
+      width: 120px;
+      height: 4px;
+      margin-left: -60px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, .2);
+      overflow: hidden
+    }
+
+    #splash .pb i {
+      display: block;
+      height: 100%;
+      background: #FCD34D;
+      transform: scaleX(0);
+      transform-origin: left;
+      animation: pb 2.4s linear forwards
+    }
+
+    @keyframes pb {
+      to {
+        transform: scaleX(1)
+      }
+    }
+
+    #splash .sk {
+      position: absolute;
+      bottom: calc(28px + env(safe-area-inset-bottom));
+      font-size: 14px;
+      --to: .6;
+      animation-delay: 1.2s
+    }
+
+    /* Transisi halaman */
+    #app.enter .mfx {
+      animation: rise .38s var(--eo) var(--d, 0ms) both
+    }
+
+    @keyframes rise {
+      from {
+        opacity: 0;
+        translate: 0 12px
+      }
+    }
+
+    #app.enter .mcol .b {
+      transform-origin: bottom;
+      animation: grow .65s var(--eo) calc(var(--d, 0ms) + .2s) both
+    }
+
+    @keyframes grow {
+      from {
+        scale: 1 0
+      }
+    }
+
+    /* Navigasi */
+    nav button {
+      position: relative;
+      z-index: 1
+    }
+
+    #navind {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 0;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      pointer-events: none;
+      transition: transform .42s var(--e), width .42s var(--e), height .42s var(--e), opacity .2s
+    }
+
+    nav.mi button[aria-current=page] {
+      background: transparent
+    }
+
+    /* Tombol dan kartu */
+    .btn,
+    nav button,
+    .room,
+    .mcol {
+      transition: transform .14s var(--e), box-shadow .2s var(--e), background-color .2s var(--e), color .2s, border-color .2s
+    }
+
+    @media(hover:hover) {
+      .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(20, 87, 59, .18)
+      }
+
+      button.room:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, .08)
+      }
+    }
+
+    .btn:active,
+    nav button:active,
+    button.room:active,
+    .mcol:active {
+      transform: scale(.97)
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, .14) 50%, transparent 60%);
+      translate: -120% 0;
+      animation: shim 7s ease-in-out 3s infinite
+    }
+
+    @keyframes shim {
+      0% {
+        translate: -120% 0
+      }
+
+      18%,
+      100% {
+        translate: 120% 0
+      }
+    }
+
+    .room.late .badge {
+      animation: late 2.6s ease-in-out infinite
+    }
+
+    @keyframes late {
+      50% {
+        box-shadow: 0 0 0 6px rgba(185, 28, 28, .2)
+      }
+    }
+
+    /* Modal dan toast */
+    .ov {
+      animation: ovIn .22s ease both
+    }
+
+    .sheet {
+      animation: shIn .36s var(--eo) both
+    }
+
+    .ov.cl {
+      animation: ovOut .2s ease forwards;
+      pointer-events: none
+    }
+
+    .ov.cl .sheet {
+      animation: shOut .2s var(--ei) forwards
+    }
+
+    @keyframes ovIn {
+      from {
+        opacity: 0
+      }
+    }
+
+    @keyframes ovOut {
+      to {
+        opacity: 0
+      }
+    }
+
+    @keyframes shIn {
+      from {
+        translate: 0 40px;
+        opacity: 0
+      }
+    }
+
+    @keyframes shOut {
+      to {
+        translate: 0 30px;
+        opacity: 0
+      }
+    }
+
+    #toast.show {
+      animation: tIn .38s var(--eb) both
+    }
+
+    #toast.hide {
+      animation: tOut .25s var(--ei) forwards
+    }
+
+    @keyframes tIn {
+      from {
+        opacity: 0;
+        translate: 0 24px;
+        scale: .92
+      }
+    }
+
+    @keyframes tOut {
+      to {
+        opacity: 0;
+        translate: 0 16px
+      }
+    }
+
+    /* Tur */
+    .tur-card {
+      animation: turIn .34s var(--eo) both
+    }
+
+    @keyframes turIn {
+      from {
+        opacity: 0;
+        translate: 0 10px;
+        scale: .97
+      }
+    }
+
+    .tur-spot {
+      animation: spot 1.8s ease-in-out infinite
+    }
+
+    @keyframes spot {
+      50% {
+        outline-offset: 5px
+      }
+    }
+
+    /* Sukses bayar */
+    #okfx {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      pointer-events: none;
+      animation: okOut .35s ease 1.15s forwards
+    }
+
+    @keyframes okOut {
+      to {
+        opacity: 0
+      }
+    }
+
+    #okfx .w0 {
+      position: relative;
+      width: 104px;
+      height: 104px
+    }
+
+    #okfx .c {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background: #1B6B4A;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 10px 36px rgba(20, 87, 59, .45);
+      animation: pop .5s var(--eb) both
+    }
+
+    @keyframes pop {
+      from {
+        scale: .2;
+        opacity: 0
+      }
+    }
+
+    #okfx svg {
+      width: 58px;
+      height: 58px
+    }
+
+    #okfx path {
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw .45s var(--e) .25s forwards
+    }
+
+    #okfx .r {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid #1B6B4A;
+      animation: ring .9s var(--eo) .1s both
+    }
+
+    @keyframes ring {
+      from {
+        scale: 1;
+        opacity: .7
+      }
+
+      to {
+        scale: 2.1;
+        opacity: 0
+      }
+    }
+
+    #okfx .p {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 10px;
+      height: 10px;
+      margin: -5px;
+      border-radius: 50%;
+      background: var(--pc);
+      animation: burst .85s var(--eo) .2s both
+    }
+
+    @keyframes burst {
+      from {
+        opacity: 1;
+        transform: rotate(var(--a)) translateY(-48px) scale(.7)
+      }
+
+      to {
+        opacity: 0;
+        transform: rotate(var(--a)) translateY(-112px) scale(0)
+      }
+    }
+
+    #okfx .m {
+      background: #111827;
+      color: #fff;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      animation: up2 .4s var(--eo) .45s both
+    }
+
+    @keyframes up2 {
+      from {
+        opacity: 0;
+        translate: 0 12px
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+      }
+    }
+
+    @media print {
+
+      #splash,
+      #okfx,
+      #navind {
+        display: none !important
+      }
+    }
+  </style>
 </head>
 
 <body>
+  <div id="splash" aria-hidden="true">
+    <div class="glow"></div><i class="orb o1"></i><i class="orb o2"></i>
+    <svg width="176" height="176" viewBox="0 0 200 200">
+      <path class="h" pathLength="1" d="M28 98 L100 36 L172 98 M44 86 V164 a9 9 0 0 0 9 9 H147 a9 9 0 0 0 9 -9 V86" />
+      <g id="spw"></g>
+    </svg>
+    <div class="t"><span>KosPro</span><span>Mudah</span></div>
+    <div class="n"></div>
+    <div class="s">Kelola kos jadi mudah</div>
+    <div class="pb"><i></i></div>
+    <div class="sk">Ketuk untuk lewati</div>
+  </div>
+  <script>
+      (function () {
+        var s = document.getElementById('splash'), skip = false, g = '';
+        try { var nt = performance.getEntriesByType('navigation')[0]; skip = matchMedia('(prefers-reduced-motion: reduce)').matches || (nt && nt.type === 'reload') || /sebagai=|tur=/.test(location.hash) } catch (e) { }
+        if (skip) { s.remove(); window.__spOn = false; return }
+        for (var i = 0; i < 12; i++) { var c = i % 4, r = (i / 4) | 0; g += '<rect class="w' + (i === 3 || i === 11 ? ' d' : '') + '" x="' + (51 + c * 26) + '" y="' + (106 + r * 20) + '" width="20" height="14" rx="3" style="--k:' + (c + r) + '"/>' }
+        document.getElementById('spw').innerHTML = g; window.__spOn = true
+      })()
+  </script>
+
   <!-- @jz-bar-start -->
   <style>
     /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -2358,6 +2937,123 @@
       loadState(); if (sess) { sess = findAcc(sess.user) || null; if (sess && sess.no && !R(sess.no)) sess = null } draw()
     });
     draw(); setTimeout(function () { if (TUR_AUTO) turMulai(TUR_AUTO); else turTawar() }, 700);
+  </script>
+  <script>
+    /* Lapisan motion KosPro Mudah. Membungkus fungsi yang ada tanpa mengubah logikanya. */
+    (function () {
+      var RM = matchMedia('(prefers-reduced-motion: reduce)'), EO = 'cubic-bezier(.05,.7,.1,1)', E = 'cubic-bezier(.2,0,0,1)', EB = 'cubic-bezier(.175,.885,.32,1.275)';
+      var $ = function (s, r) { return (r || document).querySelector(s) }, $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)) };
+      var app = $('#app'), nv = $('nav'), ind = null, prevKey = (sess ? sess.user : '-') + '|' + tab, prevBadge = '', spActive = !!window.__spOn, after = null;
+      function anim(el, kf, o) { if (RM.matches || !el || !el.animate) return; return el.animate(kf, o) }
+
+      /* Angka menghitung naik */
+      function countUp(e, delay) {
+        var t = e.textContent, m = /^Rp\s([\d.]+)$/.exec(t.trim()); if (!m || RM.matches) return;
+        var to = parseInt(m[1].replace(/\./g, ''), 10); if (!to) return; e.textContent = 'Rp 0';
+        setTimeout(function () {
+          var t0 = performance.now(), D = 1100;
+          (function f(n) { if (!e.isConnected) return; var p = Math.min((n - t0) / D, 1); e.textContent = p < 1 ? rp(Math.round(to * (1 - Math.pow(1 - p, 3)))) : t; if (p < 1) requestAnimationFrame(f) })(t0)
+        }, delay)
+      }
+
+      /* Masuk halaman: kartu berurutan, bar terisi, angka naik */
+      function enterFx(base) {
+        if (RM.matches || !app) return; base = base || 0;
+        $$('#app > *:not(.kpi):not(.cols):not(.fgrid):not(.credit), .kpi > .card, .colL > .card, .colR > .card, .fgrid > .card').forEach(function (e, i) { e.classList.add('mfx'); e.style.setProperty('--d', (base + Math.min(i, 8) * 45) + 'ms') });
+        $$('.rg > .room').forEach(function (e, i) { e.classList.add('mfx'); e.style.setProperty('--d', (base + 220 + ((i % 4) + ((i / 4) | 0)) * 40) + 'ms') });
+        $$('.mcol').forEach(function (e, i) { e.style.setProperty('--d', (base + i * 60) + 'ms') });
+        app.classList.add('enter'); clearTimeout(app._t);
+        app._t = setTimeout(function () { app.classList.remove('enter'); $$('.mfx', app).forEach(function (e) { e.classList.remove('mfx') }) }, 1500 + base);
+        var d = base + 250;
+        $$('.hero .big, .warn .big2', app).forEach(function (e, i) { countUp(e, d + i * 120) });
+        $$('.hero .bar > i', app).forEach(function (e) { var w = e.style.width || '100%'; anim(e, [{ width: '0%' }, { width: w }], { duration: 1000, delay: d, easing: EO, fill: 'backwards' }) });
+        $$('.seg i', app).forEach(function (e, i) { anim(e, [{ opacity: 0, scale: '.3' }, { opacity: 1, scale: '1' }], { duration: 380, delay: d + i * 55, easing: EB, fill: 'backwards' }) });
+        anim($('.card.warn', app), [{ boxShadow: '0 0 0 0 rgba(180,83,9,.55)' }, { boxShadow: '0 0 0 14px rgba(180,83,9,0)' }], { duration: 900, delay: d + 900, iterations: 2, easing: 'ease-out' })
+      }
+
+      /* Indikator navigasi yang meluncur */
+      function pill(ch) {
+        if (!nv || nv.style.display === 'none') { if (ind) { ind.style.opacity = 0; ind._h = 1 } return }
+        if (!ind) { ind = document.createElement('i'); ind.id = 'navind'; nv.insertBefore(ind, nv.firstChild); nv.classList.add('mi'); ind._h = 1 }
+        var b = $('#nav [aria-current=page]'); if (!b) { ind.style.opacity = 0; ind._h = 1; return }
+        var nr = nv.getBoundingClientRect(), br = b.getBoundingClientRect(), snap = ind._h || RM.matches;
+        if (snap) ind.style.transition = 'none';
+        ind.style.width = br.width + 'px'; ind.style.height = br.height + 'px';
+        ind.style.transform = 'translate(' + (br.left - nr.left - nv.clientLeft) + 'px,' + (br.top - nr.top - nv.clientTop + nv.scrollTop) + 'px)'; ind.style.opacity = 1;
+        if (snap) { void ind.offsetWidth; ind.style.transition = '' } ind._h = 0;
+        if (ch) anim($('svg', b), [{ scale: 1 }, { scale: 1.3 }, { scale: 1 }], { duration: 420, easing: EB })
+      }
+      function badge() { var n = $('#nav .n'), t = n ? n.textContent : ''; if (n && prevBadge !== '' && t !== prevBadge) anim(n, [{ scale: 1 }, { scale: 1.5 }, { scale: 1 }], { duration: 480, easing: EB }); prevBadge = t }
+
+      var _draw = draw;
+      draw = function () {
+        _draw.apply(this, arguments);
+        var key = (sess ? sess.user : '-') + '|' + tab, ch = key !== prevKey; prevKey = key;
+        pill(ch); badge(); if (ch && !spActive) enterFx(0)
+      };
+      window.addEventListener('resize', function () { pill(false) });
+
+      /* Modal: animasi keluar */
+      var _closeM = closeM;
+      closeM = function () {
+        var m = $('#modal'), ov = m && m.firstElementChild;
+        if (!ov || RM.matches || ov.classList.contains('cl')) { _closeM(); return }
+        ov.classList.add('cl'); setTimeout(function () { if (m.firstElementChild === ov) _closeM() }, 210)
+      };
+
+      /* Toast: masuk dan keluar */
+      var _toast = toast;
+      toast = function (t) {
+        _toast(t); if (RM.matches) return; var e = $('#toast'); clearTimeout(window._t);
+        e.classList.remove('hide', 'show'); void e.offsetWidth; e.classList.add('show');
+        clearTimeout(e._h); e._h = setTimeout(function () { e.classList.add('hide') }, 4200);
+        window._t = setTimeout(function () { e.style.display = 'none'; e.classList.remove('show', 'hide') }, 4480)
+      };
+
+      /* Login: goyang saat salah, kilat saat akun demo diisi */
+      var _dl = doLogin;
+      doLogin = function () {
+        var r = _dl.apply(this, arguments);
+        if (!sess) anim($('form.card'), [{ translate: '0' }, { translate: '-12px' }, { translate: '10px' }, { translate: '-8px' }, { translate: '5px' }, { translate: '0' }], { duration: 380, easing: 'ease-in-out' });
+        return r
+      };
+      var _ia = isiAkun;
+      isiAkun = function () { _ia.apply(this, arguments);['lu', 'lp'].forEach(function (i) { anim(document.getElementById(i), [{ boxShadow: '0 0 0 5px rgba(252,211,77,.95)' }, { boxShadow: '0 0 0 0 rgba(252,211,77,0)' }], { duration: 700, easing: 'ease-out' }) }) };
+
+      /* Sukses catat pembayaran */
+      function burst(lunas) {
+        if (RM.matches) return; var o = $('#okfx'); if (o) o.remove();
+        var cols = ['#FCD34D', '#1B6B4A', '#86EFAC', '#FCD34D', '#14573B'], p = '', en = typeof LANG !== 'undefined' && LANG === 'en';
+        for (var i = 0; i < 12; i++) p += '<i class="p" style="--a:' + i * 30 + 'deg;--pc:' + cols[i % 5] + '"></i>';
+        o = document.createElement('div'); o.id = 'okfx'; o.setAttribute('aria-hidden', 'true');
+        o.innerHTML = '<div class="w0"><div class="c"><svg viewBox="0 0 24 24"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg></div><i class="r"></i>' + p + '</div><div class="m">' + (lunas ? (en ? 'Paid in full!' : 'Lunas!') : (en ? 'Installment recorded' : 'Cicilan tercatat')) + '</div>';
+        document.body.appendChild(o); setTimeout(function () { o.remove() }, 1600)
+      }
+      var _catat = catat;
+      catat = function (no) { var n = hist.length; _catat.apply(this, arguments); if (hist.length > n) burst((R(no) || {}).st === 'lunas') };
+
+      /* Tur: sorotan berpindah mulus */
+      var _tr = turRender;
+      turRender = function () {
+        var o = $('.tur-spot'), or = o && o.getBoundingClientRect(); _tr.apply(this, arguments);
+        var n = $('.tur-spot'); if (or && n) { var r = n.getBoundingClientRect(); anim(n, [{ left: or.left + 'px', top: or.top + 'px', width: or.width + 'px', height: or.height + 'px' }, { left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px' }], { duration: 480, easing: E }) }
+      };
+      var _tt = turTawar;
+      turTawar = function () { if (spActive) { after = _tt; return } _tt.apply(this, arguments) };
+
+      /* Splash */
+      var sp = $('#splash');
+      function exit() {
+        if (!spActive || !sp) return; spActive = false; sp.classList.add('out');
+        document.documentElement.style.overflow = ''; enterFx(180);
+        setTimeout(function () { sp.remove(); if (after) setTimeout(after, 250) }, 760)
+      }
+      pill(false);
+      if (spActive && sp) {
+        $('.n', sp).textContent = cfg.nama; document.documentElement.style.overflow = 'hidden';
+        sp.addEventListener('click', exit); document.addEventListener('keydown', exit, { once: true }); setTimeout(exit, 2500)
+      } else enterFx(0)
+    })()
   </script>
 </body>
 

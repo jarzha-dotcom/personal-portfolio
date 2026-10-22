@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1.0.9';
+const CACHE_VERSION = 'v1.1.0';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -50,7 +50,7 @@ self.addEventListener('install', (event) => {
             // kunjungan pertama (navigasi pertama terjadi sebelum SW aktif,
             // jadi tidak pernah masuk runtime cache). Best-effort: kalau gagal
             // (mis. offline/404) instalasi SW tidak ikut batal.
-            await cache.add(ZHANOTES_CANONICAL).catch(() => {});
+            await cache.add(ZHANOTES_CANONICAL).catch(() => { });
         })
     );
     // Sengaja TIDAK skipWaiting() otomatis di sini — biar tab yang lagi aktif
