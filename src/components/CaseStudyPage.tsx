@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useInView } from '../hooks/useInView';
 import {
   ArrowLeft,
   ArrowRight,
@@ -133,17 +134,19 @@ const ArchitectureFlow: React.FC<{
   steps: string[];
   darkMode: boolean;
   c: Tokens;
-}> = ({ steps, darkMode, c }) => (
+}> = ({ steps, darkMode, c }) => {
+  const { ref, isInView } = useInView<HTMLOListElement>();
+  return (
   <div className="mt-8">
     <h3 className={`text-base font-bold mb-4 flex items-center gap-2 ${c.heading}`}>
       <Workflow className="w-4 h-4 text-teal-500" aria-hidden="true" />
       Alur Sistem
     </h3>
     <div className={`rounded-2xl border p-5 overflow-x-auto ${c.inner}`}>
-      <ol className="flex items-center gap-0 min-w-max">
+      <ol ref={ref} data-inview={isInView} style={{ '--mo-step': '45ms' } as React.CSSProperties} className="mo-scope flex items-center gap-0 min-w-max">
         {steps.map((step, idx) => (
           <React.Fragment key={step}>
-            <li className="flex flex-col items-center gap-2 group">
+            <li style={{ '--i': idx * 2 } as React.CSSProperties} className="mo-item flex flex-col items-center gap-2 group">
               <span
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-transform group-hover:scale-110 ${c.flowBadge}`}
               >
@@ -158,7 +161,7 @@ const ArchitectureFlow: React.FC<{
               </span>
             </li>
             {idx < steps.length - 1 && (
-              <li className="flex items-center px-1 pb-8" aria-hidden="true">
+              <li style={{ '--i': idx * 2 + 1 } as React.CSSProperties} className="mo-item flex items-center px-1 pb-8" aria-hidden="true">
                 <div className={`w-8 h-px ${darkMode ? 'bg-slate-700' : 'bg-slate-300'}`} />
                 <ArrowRight className={`w-4 h-4 -ml-1 ${c.muted}`} />
               </li>
@@ -168,7 +171,8 @@ const ArchitectureFlow: React.FC<{
       </ol>
     </div>
   </div>
-);
+  );
+};
 
 /* ===== Client Case Card utama ===== */
 const ClientCase: React.FC<{

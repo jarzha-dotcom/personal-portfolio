@@ -18,6 +18,7 @@ import {
     Bot,
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
+import { InView } from './InView';
 import { injectJsonLd, removeJsonLd, buildServicesJsonLd } from '../utils/seoHelpers';
 
 interface ServicesProps {
@@ -202,13 +203,14 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                 </div>
 
                 {/* Services Grid — 4 kolom di desktop */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                <InView className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
                     {services.map((service, idx) => {
                         const colors = getColorClasses(service.color);
                         return (
                             <div
                                 key={idx}
-                                className={`p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 ${darkMode
+                                style={{ '--i': idx } as React.CSSProperties}
+                                className={`mo-item p-5 sm:p-6 rounded-2xl border transition-all duration-200 hover:-translate-y-1 ${darkMode
                                         ? 'bg-slate-900 border-slate-700 hover:border-slate-600'
                                         : 'bg-slate-50 border-slate-200 hover:border-slate-300 hover:shadow-md'
                                     }`}
@@ -237,7 +239,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             </div>
                         );
                     })}
-                </div>
+                </InView>
 
                 {/* Promo Peluncuran Banner */}
                 <div
@@ -280,7 +282,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                 </li>
                             </ul>
                             {/* Progress kuota — angkanya di-update manual di const di atas */}
-                            <div className="mt-3 pt-3 border-t border-amber-500/20">
+                            <InView className="mt-3 pt-3 border-t border-amber-500/20">
                                 <div className="flex items-center justify-between text-[11px] mb-1.5">
                                     <span className={darkMode ? 'text-slate-300' : 'text-slate-600'}>Slot promo terisi</span>
                                     <span className={`font-bold ${darkMode ? 'text-amber-400' : 'text-amber-600'}`}>
@@ -292,7 +294,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                         }`}
                                 >
                                     <div
-                                        className="bg-amber-500 h-full rounded-full transition-all duration-700"
+                                        className="mo-fill bg-amber-500 h-full rounded-full transition-all duration-700"
                                         style={{ width: `${Math.min((PROMO_SLOTS_TAKEN / PROMO_SLOTS_TOTAL) * 100, 100)}%` }}
                                         role="progressbar"
                                         aria-valuenow={PROMO_SLOTS_TAKEN}
@@ -300,7 +302,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                         aria-valuemax={PROMO_SLOTS_TOTAL}
                                     />
                                 </div>
-                            </div>
+                            </InView>
                         </div>
                     </div>
                 </div>
@@ -316,11 +318,12 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             Paket & Estimasi Harga
                         </h3>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <InView className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                         {pricingTiers.map((tier, i) => (
                             <div
                                 key={i}
-                                className={`p-4 rounded-xl border flex flex-col ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
+                                style={{ '--i': i } as React.CSSProperties}
+                                className={`mo-item p-4 rounded-xl border flex flex-col ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'
                                     }`}
                             >
                                 <div
@@ -340,7 +343,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                 </p>
                             </div>
                         ))}
-                    </div>
+                    </InView>
                     <p className={`text-[11px] mt-4 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                         Harga di atas adalah estimasi awal — harga final ditentukan setelah diskusi kebutuhan detail (fitur, kompleksitas, timeline). Konsultasi awal selalu gratis.
                     </p>
@@ -358,7 +361,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                         <Sparkles className={`w-4 h-4 ${darkMode ? 'text-teal-400' : 'text-teal-600'}`} />
                         Kenapa Bekerja Sama dengan Saya?
                     </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <InView className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         {[
                             {
                                 icon: <Zap className="w-4 h-4" />,
@@ -376,7 +379,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                 desc: 'Update progres berkala via WhatsApp, transparan, dan terbuka untuk revisi selama pengembangan.',
                             },
                         ].map((item, i) => (
-                            <div key={i} className="flex items-start gap-3">
+                            <div key={i} style={{ '--i': i } as React.CSSProperties} className="mo-item flex items-start gap-3">
                                 <div
                                     className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-500/10 text-teal-600'
                                         }`}
@@ -393,7 +396,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </InView>
                 </div>
 
                 {/* Workflow / Process */}
@@ -407,11 +410,11 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                     >
                         Alur Kerja Sederhana & Transparan
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <InView className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                         {workflow.map((step, i) => (
-                            <div key={i} className="flex items-start gap-2.5">
+                            <div key={i} style={{ '--i': i } as React.CSSProperties} className="mo-item flex items-start gap-2.5">
                                 <div
-                                    className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-600 text-white'
+                                    className={`mo-dot w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${darkMode ? 'bg-teal-500/20 text-teal-400' : 'bg-teal-600 text-white'
                                         }`}
                                 >
                                     {step.step}
@@ -426,7 +429,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                                 </div>
                             </div>
                         ))}
-                    </div>
+                    </InView>
                     <div className="text-center">
                         <a
                             href={`https://wa.me/${cleanPhone}?text=${encodeURIComponent(
@@ -434,7 +437,7 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             )}`}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-lg shadow-teal-600/20 transition-all hover:scale-105 active:scale-95"
+                            className="w-full sm:w-auto justify-center inline-flex items-center gap-2 px-6 py-3.5 sm:py-3 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-sm font-bold shadow-lg shadow-teal-600/20 transition-all hover:scale-105 active:scale-95"
                         >
                             <MessageCircle className="w-4 h-4" />
                             <span>Diskusikan Proyek Anda via WhatsApp</span>

@@ -330,7 +330,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                       aria-expanded={karyaOpen}
                       aria-controls="nav-karya-menu"
                       onClick={() => setKaryaOpen((o) => !o)}
-                      className={`inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(groupActive || karyaOpen)}`}
+                      data-active={groupActive || karyaOpen ? 'true' : undefined}
+                      className={`mo-underline inline-flex items-center gap-1 text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(groupActive || karyaOpen)}`}
                     >
                       {entry.name}
                       <ChevronDown
@@ -340,7 +341,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                     {karyaOpen && (
                       <div
                         id="nav-karya-menu"
-                        className={`absolute left-0 top-full mt-3 w-56 rounded-xl border p-1.5 shadow-xl ${darkMode
+                        className={`mo-menu absolute left-0 top-full mt-3 w-56 rounded-xl border p-1.5 shadow-xl ${darkMode
                             ? 'bg-slate-900 border-slate-800 shadow-black/40'
                             : 'bg-white border-slate-200 shadow-slate-200/80'
                           }`}
@@ -380,7 +381,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                   href={itemHref(entry)}
                   aria-current={isActive ? 'page' : undefined}
                   onClick={(e) => handleItemClick(e, entry)}
-                  className={`text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(isActive)}`}
+                  data-active={isActive ? 'true' : undefined}
+                  className={`mo-underline text-xs uppercase tracking-wider font-semibold transition-colors rounded-md px-0.5 ${FOCUS_RING} ${linkTone(isActive)}`}
                 >
                   {entry.name}
                 </a>
@@ -400,7 +402,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
                 }`}
             >
-              {darkMode ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+              {darkMode ? <Sun key="sun" className="mo-icon-swap w-3.5 h-3.5" /> : <Moon key="moon" className="mo-icon-swap w-3.5 h-3.5" />}
             </button>
           </div>
 
@@ -410,10 +412,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
               id="theme-toggle-mobile"
               onClick={() => setDarkMode(!darkMode)}
               aria-label="Ganti mode gelap/terang"
-              className={`p-2 rounded-lg ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-amber-300 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
+              className={`p-2.5 rounded-lg active:scale-95 transition-transform ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-amber-300 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
             >
-              {darkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              {darkMode ? <Sun key="sun" className="mo-icon-swap w-4 h-4" /> : <Moon key="moon" className="mo-icon-swap w-4 h-4" />}
             </button>
 
             <button
@@ -423,10 +425,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
               aria-label="Toggle menu navigasi"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-nav-drawer"
-              className={`p-2 rounded-lg ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-slate-200 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
+              className={`p-2.5 rounded-lg active:scale-95 transition-transform ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-slate-200 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
                 }`}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X key="x" className="mo-icon-swap w-5 h-5" /> : <Menu key="menu" className="mo-icon-swap w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -440,15 +442,15 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
           role="dialog"
           aria-modal="true"
           aria-label="Menu navigasi"
-          className={`md:hidden px-4 pt-2 pb-6 border-b transition-all outline-none ${prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-4 duration-200'
+          className={`mo-fast md:hidden px-4 pt-2 pb-6 border-b transition-all outline-none ${prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-4 duration-200'
             } ${darkMode
               ? 'bg-slate-900/98 border-slate-800 text-white'
               : 'bg-white/98 border-slate-200 text-slate-900 shadow-xl'
             }`}
         >
           <div className="flex flex-col space-y-1">
-            {NAV_ENTRIES.map((entry) => {
-              const drawerLink = (link: NavItem, nested: boolean) => {
+            {NAV_ENTRIES.map((entry, entryIdx) => {
+              const drawerLink = (link: NavItem, nested: boolean, order: number) => {
                 const isActive = isItemActive(link);
                 return (
                   <a
@@ -456,7 +458,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                     href={itemHref(link)}
                     aria-current={isActive ? 'page' : undefined}
                     onClick={(e) => handleItemClick(e, link)}
-                    className={`${nested ? 'pl-8 pr-4' : 'px-4'} py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
+                    style={{ '--i': order } as React.CSSProperties}
+                    className={`mo-rise ${nested ? 'pl-8 pr-4' : 'px-4'} py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
                       ? darkMode
                         ? 'bg-teal-500/20 text-teal-400 font-semibold'
                         : 'bg-teal-50 text-teal-700 font-semibold'
@@ -477,11 +480,11 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
                     <p className={`px-4 pt-2 pb-1 text-xs font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
                       {entry.name}
                     </p>
-                    {entry.children.map((child) => drawerLink(child, true))}
+                    {entry.children.map((child, ci) => drawerLink(child, true, entryIdx + 1 + ci))}
                   </div>
                 );
               }
-              return drawerLink(entry, false);
+              return drawerLink(entry, false, entryIdx);
             })}
           </div>
 

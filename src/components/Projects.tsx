@@ -223,6 +223,8 @@ ChatbotPreviewWidget.displayName = 'ChatbotPreviewWidget';
 
 export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
   const [activeFilter, setActiveFilter] = useState<string>('Semua');
+  // Animasi stagger hanya dijalankan setelah user benar-benar mengganti filter
+  const [hasFiltered, setHasFiltered] = useState(false);
   const [activeModalProject, setActiveModalProject] = useState<ProjectItem | null>(null);
   const [isChatbotOpen, setIsChatbotOpen] = useState(false);
   const [chatbotInitialPrompt, setChatbotInitialPrompt] = useState<string>('');
@@ -392,8 +394,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveFilter(cat)}
-              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-200 shadow-sm ${
+              onClick={() => { setHasFiltered(true); setActiveFilter(cat); }}
+              className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold border transition-all duration-200 shadow-sm active:scale-95 ${
                 activeFilter === cat
                   ? 'bg-teal-600 text-white border-teal-600 shadow-teal-600/20 shadow-md scale-105'
                   : darkMode
@@ -409,7 +411,7 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
         {/* Layout: Projects Grid (kiri) + Sidebar (kanan) */}
         <div className="md:grid md:grid-cols-12 md:gap-6 mb-14">
           {/* LEFT: Projects Grid */}
-          <div className="md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div key={activeFilter} className={`md:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6 ${hasFiltered ? 'mo-stagger' : ''}`}>
             {filteredProjects.map((project) => {
               const isFeatured = project.isFeatured;
 
@@ -897,11 +899,11 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
       {isChatbotOpen && (
         <Portal>
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md mo-backdrop"
             onClick={() => setIsChatbotOpen(false)}
           >
             <div
-              className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
+              className={`mo-modal w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
                 darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
               }`}
               style={{ height: 'min(640px, calc(100vh - 2rem))', maxHeight: 'calc(100vh - 2rem)' }}
@@ -991,14 +993,14 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
       {isServiceOpen && (
         <Portal>
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200 motion-reduce:animate-none"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md mo-backdrop"
             onClick={() => setIsServiceOpen(false)}
           >
             <div
               role="dialog"
               aria-modal="true"
               aria-labelledby="jasa-chatbot-title"
-              className={`w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
+              className={`mo-modal w-full max-w-2xl rounded-2xl border shadow-2xl overflow-hidden flex flex-col ${
                 darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
               }`}
               style={{ maxHeight: 'calc(100vh - 2rem)' }}
@@ -1316,11 +1318,11 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
       {activeModalProject && (
         <Portal>
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md mo-backdrop"
             onClick={() => setActiveModalProject(null)}
           >
             <div
-              className={`w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border shadow-2xl ${
+              className={`mo-modal w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl border shadow-2xl ${
                 darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
               }`}
               onClick={(e) => e.stopPropagation()}

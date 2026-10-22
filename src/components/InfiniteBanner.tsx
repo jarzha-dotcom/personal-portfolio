@@ -253,7 +253,7 @@ export const InfiniteBanner: React.FC<InfiniteBannerProps> = ({
                 ? 'bg-slate-900/80 border-y border-slate-700/50'
                 : 'bg-white/80 border-y border-slate-200/60'
             }
-            backdrop-blur-xl transition-[padding,background] duration-300
+            backdrop-blur-md sm:backdrop-blur-xl transition-[padding,background] duration-300
           `}
         >
           {/* Animated gradient border — garis atas & bawah yang "mengalir" */}
@@ -292,7 +292,7 @@ export const InfiniteBanner: React.FC<InfiniteBannerProps> = ({
           {/* Shimmer sweep — cahaya lewat sesekali */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 hidden sm:block"
             style={{
               background: `linear-gradient(110deg, transparent 30%, ${
                 darkMode ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.5)'
@@ -306,6 +306,7 @@ export const InfiniteBanner: React.FC<InfiniteBannerProps> = ({
           <div
             className={`relative flex w-max items-center gap-2 kaj-marquee-${reactId}`}
             style={{
+              willChange: 'transform',
               maskImage:
                 'linear-gradient(to right, transparent, black 8%, black 92%, transparent)',
               WebkitMaskImage:

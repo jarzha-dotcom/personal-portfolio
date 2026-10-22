@@ -92,19 +92,19 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-1.5 text-xs text-slate-400">
               <li>
-                <a href="#beranda" className="hover:text-teal-400 transition-colors">Beranda Utama</a>
+                <a href="#beranda" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Beranda Utama</a>
               </li>
               <li>
-                <a href="#tentang" className="hover:text-teal-400 transition-colors">Tentang Saya</a>
+                <a href="#tentang" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Tentang Saya</a>
               </li>
               <li>
-                <a href="#layanan" className="hover:text-teal-400 transition-colors">Jasa Development</a>
+                <a href="#layanan" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Jasa Development</a>
               </li>
               <li>
-                <a href="#keahlian" className="hover:text-teal-400 transition-colors">Keahlian</a>
+                <a href="#keahlian" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Keahlian</a>
               </li>
               <li>
-                <a href="#kontak" className="hover:text-teal-400 transition-colors">Kontak</a>
+                <a href="#kontak" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Kontak</a>
               </li>
             </ul>
           </div>
@@ -123,12 +123,12 @@ export const Footer: React.FC = () => {
                 href={`mailto:${CONTACT_INFO.email}`}
                 onClick={handleEmailClick}
                 title={copiedEmail ? 'Email disalin!' : 'Kirim Email'}
-                className={`w-8 h-8 rounded-lg bg-slate-900 border flex items-center justify-center transition-colors ${copiedEmail
+                className={`w-11 h-11 sm:w-8 sm:h-8 active:scale-95 rounded-lg bg-slate-900 border flex items-center justify-center transition-colors ${copiedEmail
                   ? 'border-teal-500 text-teal-400'
                   : 'border-slate-800 hover:border-teal-500 hover:text-teal-400 text-slate-300'
                   }`}
               >
-                {copiedEmail ? <CheckCircle className="w-3.5 h-3.5" /> : <Mail className="w-3.5 h-3.5" />}
+                {copiedEmail ? <CheckCircle className="mo-pop w-4 h-4 sm:w-3.5 sm:h-3.5" /> : <Mail className="w-3.5 h-3.5" />}
               </a>
 
               <a
@@ -136,7 +136,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 title="WhatsApp"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:text-emerald-400 flex items-center justify-center transition-colors text-slate-300"
+                className="w-11 h-11 sm:w-8 sm:h-8 active:scale-95 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500 hover:text-emerald-400 flex items-center justify-center transition-colors text-slate-300"
               >
                 <Phone className="w-3.5 h-3.5" />
               </a>
@@ -146,7 +146,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 title="LinkedIn"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:text-indigo-400 flex items-center justify-center transition-colors text-slate-300"
+                className="w-11 h-11 sm:w-8 sm:h-8 active:scale-95 rounded-lg bg-slate-900 border border-slate-800 hover:border-indigo-500 hover:text-indigo-400 flex items-center justify-center transition-colors text-slate-300"
               >
                 <Linkedin className="w-3.5 h-3.5" />
               </a>
@@ -156,7 +156,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 title="GitHub"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-400 hover:text-white flex items-center justify-center transition-colors text-slate-300"
+                className="w-11 h-11 sm:w-8 sm:h-8 active:scale-95 rounded-lg bg-slate-900 border border-slate-800 hover:border-slate-400 hover:text-white flex items-center justify-center transition-colors text-slate-300"
               >
                 <Github className="w-3.5 h-3.5" />
               </a>
@@ -166,7 +166,7 @@ export const Footer: React.FC = () => {
                 target="_blank"
                 rel="noreferrer"
                 title="Instagram"
-                className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-800 hover:border-pink-500 hover:text-pink-400 flex items-center justify-center transition-colors text-slate-300"
+                className="w-11 h-11 sm:w-8 sm:h-8 active:scale-95 rounded-lg bg-slate-900 border border-slate-800 hover:border-pink-500 hover:text-pink-400 flex items-center justify-center transition-colors text-slate-300"
               >
                 <Instagram className="w-3.5 h-3.5" />
               </a>
@@ -201,10 +201,10 @@ export const Footer: React.FC = () => {
 
           <button
             onClick={scrollToTop}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors border border-slate-800 text-xs"
+            className="group inline-flex items-center gap-1.5 px-3.5 py-2.5 sm:px-2.5 sm:py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white active:scale-95 transition-all border border-slate-800 text-xs"
           >
             <span>Kembali ke Atas</span>
-            <ArrowUp className="w-3 h-3" />
+            <ArrowUp className="w-3 h-3 transition-transform duration-200 group-hover:-translate-y-0.5" />
           </button>
         </div>
 

@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { MessageCircle, Sparkles, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { announceNudgeShown, announceNudgeDismissed } from '../utils/attentionNudge';
+import { usePresence } from '../hooks/usePresence';
 
 const SHOW_AFTER_MS = 3500;
 
@@ -40,6 +41,9 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
   const dialogRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
   const prefersReducedMotion = usePrefersReducedMotion();
+  // Animasi keluar: `visible` tetap jadi sumber kebenaran (fokus, event, Escape);
+  // hanya render yang ditunda sampai animasi selesai.
+  const { mounted, closing } = usePresence(visible, 200);
 
   useEffect(() => {
     if (!enabled || alreadyHandledRef.current) return;
@@ -112,7 +116,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
     window.dispatchEvent(new Event('open-zannah-chat'));
   };
 
-  if (!visible) return null;
+  if (!mounted) return null;
 
   return (
     <div
@@ -121,12 +125,12 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
       role="dialog"
       aria-label="Sambutan dari Zannah"
       aria-modal="false"
-      className={`fixed bottom-24 left-6 z-[60] w-80 max-w-[calc(100vw-2rem)] outline-none ${
-        prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-bottom-3 zoom-in-95 duration-300'
+      className={`fixed bottom-24 left-4 sm:left-6 z-[60] w-[calc(100vw-2rem)] sm:w-80 max-w-sm outline-none ${
+        prefersReducedMotion ? '' : closing ? 'mo-nudge-out' : 'mo-nudge-in'
       }`}
     >
       <div
-        className={`relative overflow-hidden rounded-3xl border p-5 ring-1 ${
+        className={`relative overflow-hidden rounded-3xl border p-4 sm:p-5 ring-1 ${
           darkMode
             ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_25px_60px_-20px_rgba(45,212,191,0.3)]'
             : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_25px_60px_-20px_rgba(13,148,136,0.35)]'
@@ -155,7 +159,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
               kecil & redup jadi nggak mengganggu fokus ke pesan utamanya, dan
               dimatikan sepenuhnya kalau user minta reduced motion. */}
           <div className="relative shrink-0">
-            <div className={`flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-lg shadow-teal-500/30 ring-4 ${darkMode ? 'ring-slate-900' : 'ring-white'}`}>
+            <div className={`${prefersReducedMotion ? '' : 'mo-wiggle'} flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-lg shadow-teal-500/30 ring-4 ${darkMode ? 'ring-slate-900' : 'ring-white'}`}>
               <Sparkles className="h-6 w-6 text-white" />
             </div>
             <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
@@ -172,7 +176,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
           </div>
           <div className="pt-0.5">
             <p className="text-base font-semibold leading-tight">Halo, saya Zannah 👋</p>
-            <p className={`mt-1.5 text-sm leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`mt-1.5 text-sm leading-relaxed line-clamp-2 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
               Asisten AI di sini — siap bantu jelaskan jasa, proyek, sampai estimasi biaya kalau Kakak butuh.
             </p>
           </div>
@@ -205,7 +209,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
 
       {/* Ekor kecil menunjuk ke arah tombol chat di pojok kiri bawah */}
       <div
-        className={`absolute -bottom-1.5 left-8 h-3.5 w-3.5 rotate-45 border-r border-b ${
+        className={`absolute -bottom-1.5 left-6 sm:left-8 h-3.5 w-3.5 rotate-45 border-r border-b ${
           darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200'
         }`}
       />

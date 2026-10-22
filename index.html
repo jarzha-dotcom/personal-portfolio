@@ -261,90 +261,288 @@
   <link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
 
-  <!-- Splash screen: mencegah flash konten statis SEO sebelum React & CSS
-       Tailwind selesai load. Konten SEO tetap ada di DOM (tidak dihapus,
-       cuma ditutup layer ini secara visual), jadi tidak berpengaruh ke
-       crawling/indexing. -->
+  <!-- Splash screen: menutupi flash konten statis SEO sebelum React & CSS Tailwind
+       selesai load, sekaligus memutar animasi pembuka secara PENUH (lihat skrip
+       di akhir body untuk durasi minimum). Konten SEO tetap ada di DOM — cuma
+       ditutup layer ini secara visual, jadi tidak berpengaruh ke crawling. -->
+  <link rel="preload" as="image" href="/icons/icon-maskable-512.png" />
+  <noscript>
+    <style>
+      #app-splash {
+        display: none !important;
+      }
+    </style>
+  </noscript>
   <style>
+    /* ---------- Token & kontainer ---------- */
     #app-splash {
+      --sp-bg: #f8fafc;
+      --sp-text: #0f172a;
+      --sp-muted: #475569;
+      --sp-teal: #0d9488;
+      --sp-teal-soft: rgba(13, 148, 136, 0.16);
+      --sp-track: rgba(15, 23, 42, 0.09);
+      --sp-out: cubic-bezier(0.05, 0.7, 0.1, 1);
       position: fixed;
       inset: 0;
-      z-index: 9999;
+      z-index: 2147483000;
+      /* di atas ShowcaseBanner (z-99999) */
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 24px;
-      background: #f8fafc;
-      transition: opacity 0.4s ease, visibility 0.4s ease;
+      background: var(--sp-bg);
+      color: var(--sp-text);
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      will-change: transform;
+      transition: transform 0.65s cubic-bezier(0.7, 0, 0.2, 1) 0.12s;
     }
 
-    #app-splash img {
-      width: 96px;
-      height: 96px;
-      border-radius: 20px;
-      animation: app-splash-pulse 1.6s ease-in-out infinite;
+    /* Mengikuti tema pengunjung (diset skrip awal) supaya tidak ada kilatan terang→gelap */
+    #app-splash.app-splash--dark {
+      --sp-bg: #020617;
+      --sp-text: #f1f5f9;
+      --sp-muted: #94a3b8;
+      --sp-teal: #2dd4bf;
+      --sp-teal-soft: rgba(45, 212, 191, 0.16);
+      --sp-track: rgba(148, 163, 184, 0.18);
     }
 
-    #app-splash .app-splash-dots {
-      display: flex;
-      gap: 8px;
+    /* Tepi bawah melengkung saat tirai terangkat */
+    #app-splash::after {
+      content: '';
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      top: calc(100% - 1px);
+      height: 56px;
+      background: var(--sp-bg);
+      border-radius: 0 0 50% 50% / 0 0 100% 100%;
     }
 
-    #app-splash .app-splash-dots span {
-      width: 10px;
-      height: 10px;
-      border-radius: 9999px;
-      background: #0d9488;
-      animation: app-splash-dot 1s ease-in-out infinite;
-    }
-
-    #app-splash .app-splash-dots span:nth-child(2) {
-      animation-delay: 0.15s;
-    }
-
-    #app-splash .app-splash-dots span:nth-child(3) {
-      animation-delay: 0.3s;
-    }
-
-    #app-splash.app-splash-hidden {
-      opacity: 0;
-      visibility: hidden;
+    /* ---------- Latar: glow yang "bernapas" ---------- */
+    #app-splash .sp-bg {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
       pointer-events: none;
     }
 
-    @keyframes app-splash-pulse {
+    #app-splash .sp-glow {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: min(130vw, 640px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--sp-teal-soft) 0%, transparent 65%);
+      transform: translate(-50%, -50%);
+      animation:
+        sp-glow-in 1.2s var(--sp-out) backwards,
+        sp-breathe 4s ease-in-out 1.2s infinite alternate;
+    }
 
-      0%,
-      100% {
-        transform: scale(1);
-      }
+    /* ---------- Konten ---------- */
+    #app-splash .sp-content {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 0 24px;
+      text-align: center;
+      transition: opacity 0.25s ease, transform 0.35s cubic-bezier(0.3, 0, 1, 1);
+    }
 
-      50% {
-        transform: scale(1.045);
+    /* Logo + cincin yang "digambar" mengelilinginya */
+    #app-splash .sp-logo {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      display: grid;
+      place-items: center;
+    }
+
+    #app-splash .sp-logo img {
+      width: 96px;
+      height: 96px;
+      border-radius: 20px;
+      box-shadow: 0 14px 40px -12px var(--sp-teal-soft), 0 2px 8px rgba(15, 23, 42, 0.12);
+      animation: sp-logo 0.6s var(--sp-out) 0.15s backwards;
+    }
+
+    #app-splash .sp-ring {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    #app-splash .sp-ring rect {
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+    }
+
+    #app-splash .sp-ring .sp-track {
+      stroke: var(--sp-track);
+    }
+
+    #app-splash .sp-ring .sp-draw {
+      stroke: var(--sp-teal);
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+      animation: sp-ring 1.2s cubic-bezier(0.65, 0, 0.25, 1) 0.1s backwards;
+    }
+
+    /* Nama: tiap kata naik dari balik mask */
+    #app-splash .sp-name {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0 0.28em;
+      margin: 0;
+      font-size: clamp(22px, 5.5vw, 30px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    #app-splash .sp-w {
+      display: inline-block;
+      overflow: hidden;
+      padding-bottom: 0.14em;
+      margin-bottom: -0.14em;
+    }
+
+    #app-splash .sp-w>span {
+      display: inline-block;
+      animation: sp-word 0.6s var(--sp-out) backwards;
+      animation-delay: calc(0.8s + var(--i) * 0.09s);
+    }
+
+    /* Tagline + bar progres yang selesai tepat saat animasi usai */
+    #app-splash .sp-tag {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: -8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--sp-muted);
+      letter-spacing: 0.02em;
+    }
+
+    #app-splash .sp-tag>* {
+      animation: sp-fade 0.45s var(--sp-out) backwards;
+      animation-delay: calc(1.2s + var(--i) * 0.12s);
+    }
+
+    #app-splash .sp-tag i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--sp-teal);
+    }
+
+    #app-splash .sp-bar {
+      width: 140px;
+      height: 3px;
+      border-radius: 3px;
+      background: var(--sp-track);
+      overflow: hidden;
+      animation: sp-fade 0.3s ease 1.2s backwards;
+    }
+
+    #app-splash .sp-bar::before {
+      content: '';
+      display: block;
+      height: 100%;
+      background: var(--sp-teal);
+      transform-origin: left;
+      animation: sp-bar 1.1s cubic-bezier(0.4, 0, 0.2, 1) 1.3s backwards;
+    }
+
+    /* ---------- Keluar: konten naik sedikit, lalu tirai terangkat ---------- */
+    #app-splash.app-splash-hidden {
+      transform: translateY(calc(-100% - 60px));
+      pointer-events: none;
+      visibility: hidden;
+      transition: transform 0.65s cubic-bezier(0.7, 0, 0.2, 1) 0.12s, visibility 0s linear 0.85s;
+    }
+
+    #app-splash.app-splash-hidden .sp-content {
+      opacity: 0;
+      transform: translateY(-14px);
+    }
+
+    /* ---------- Keyframes (state akhir = style dasar; animasi pakai fill backwards) ---------- */
+    @keyframes sp-glow-in {
+      from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.6);
       }
     }
 
-    @keyframes app-splash-dot {
-
-      0%,
-      80%,
-      100% {
-        transform: translateY(0);
-        opacity: 0.5;
+    @keyframes sp-breathe {
+      to {
+        transform: translate(-50%, -50%) scale(1.07);
       }
+    }
 
-      40% {
-        transform: translateY(-6px);
-        opacity: 1;
+    @keyframes sp-logo {
+      from {
+        opacity: 0;
+        transform: scale(0.85);
       }
+    }
+
+    @keyframes sp-ring {
+      from {
+        stroke-dashoffset: 1;
+      }
+    }
+
+    @keyframes sp-word {
+      from {
+        transform: translateY(110%);
+      }
+    }
+
+    @keyframes sp-fade {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+    }
+
+    @keyframes sp-bar {
+      from {
+        transform: scaleX(0);
+      }
+    }
+
+    /* Kunjungan berikutnya (bila ALWAYS_FULL=false): langsung tampil final, singkat */
+    #app-splash.app-splash--quick *,
+    #app-splash.app-splash--quick .sp-glow {
+      animation: none !important;
     }
 
     @media (prefers-reduced-motion: reduce) {
 
-      #app-splash img,
-      #app-splash .app-splash-dots span {
+      #app-splash *,
+      #app-splash .sp-glow {
         animation: none !important;
+      }
+
+      #app-splash.app-splash-hidden {
+        transform: none;
+        opacity: 0;
+        transition: opacity 0.2s linear, visibility 0s linear 0.2s;
+      }
+
+      #app-splash.app-splash-hidden .sp-content {
+        transform: none;
       }
     }
   </style>
@@ -354,14 +552,45 @@
   class="bg-slate-50 text-slate-800 antialiased selection:bg-teal-500 selection:text-white transition-colors duration-300">
   <!-- Splash: tampil instan, disembunyikan otomatis begitu React mount
        (lihat skrip di akhir body). Konten SEO di bawahnya tetap utuh. -->
-  <div id="app-splash">
-    <img src="/icons/icon-maskable-512.png" alt="K. Arzhaning Jagad" />
-    <div class="app-splash-dots">
-      <span></span>
-      <span></span>
-      <span></span>
+  <div id="app-splash" role="status" aria-label="Memuat halaman">
+    <div class="sp-bg" aria-hidden="true">
+      <div class="sp-glow"></div>
+    </div>
+    <div class="sp-content">
+      <div class="sp-logo">
+        <svg class="sp-ring" viewBox="0 0 132 132" aria-hidden="true">
+          <rect class="sp-track" x="6" y="6" width="120" height="120" rx="32" pathLength="1" />
+          <rect class="sp-draw" x="6" y="6" width="120" height="120" rx="32" pathLength="1" />
+        </svg>
+        <img src="/icons/icon-maskable-512.png" alt="K. Arzhaning Jagad" width="96" height="96" />
+      </div>
+      <p class="sp-name" aria-hidden="true">
+        <span class="sp-w"><span style="--i:0">K.</span></span>
+        <span class="sp-w"><span style="--i:1">Arzhaning</span></span>
+        <span class="sp-w"><span style="--i:2">Jagad</span></span>
+      </p>
+      <div class="sp-tag" aria-hidden="true">
+        <span style="--i:0">Web</span><i style="--i:0.5"></i>
+        <span style="--i:1">Mobile</span><i style="--i:1.5"></i>
+        <span style="--i:2">Game</span>
+      </div>
+      <div class="sp-bar" aria-hidden="true"></div>
     </div>
   </div>
+  <script>
+    /* Skrip awal (sinkron, sebelum paint pertama): sesuaikan tema & tandai splash aktif.
+       html.splash-active dipakai motion.css untuk menahan animasi Hero sampai splash selesai. */
+    (function () {
+      var d = document.documentElement;
+      d.classList.add('splash-active');
+      window.__splashT0 = performance.now();
+      try {
+        var t = localStorage.getItem('theme');
+        var dark = t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.getElementById('app-splash').classList.add('app-splash--dark');
+      } catch (e) { }
+    })();
+  </script>
 
   <div id="root">
     <!-- Semantic Static Shell (Untuk Googlebot Crawler & Instant SEO Indexing) -->
@@ -370,23 +599,33 @@
         K. Arzhaning Jagad (Arzha) — Jasa Pembuatan Web, Mobile App, Game & AI Development
       </h1>
       <p style="font-size: 1.1rem; color: #475569; max-width: 800px; margin: 0 auto;">
-        Indie Developer & Data Specialist berpengalaman di Cibitung, Bekasi. Membangun solusi aplikasi web performa tinggi, aplikasi mobile Android/cross-platform, platform game multiplayer realtime, serta integrasi AI Multi-Agent & Chatbot cerdas.
+        Indie Developer & Data Specialist berpengalaman di Cibitung, Bekasi. Membangun solusi aplikasi web performa
+        tinggi, aplikasi mobile Android/cross-platform, platform game multiplayer realtime, serta integrasi AI
+        Multi-Agent & Chatbot cerdas.
       </p>
       <div style="margin-top: 1.5rem;">
-        <a href="https://wa.me/6282312312734" style="display: inline-block; background-color: #0d9488; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; font-weight: 600;">Hubungi via WhatsApp (+62 823-1231-2734)</a>
-        <a href="/hasil-kerja" style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Lihat Hasil Kerja untuk Klien Nyata</a>
-        <a href="/artikel" style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Baca Artikel</a>
+        <a href="https://wa.me/6282312312734"
+          style="display: inline-block; background-color: #0d9488; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; font-weight: 600;">Hubungi
+          via WhatsApp (+62 823-1231-2734)</a>
+        <a href="/hasil-kerja"
+          style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Lihat
+          Hasil Kerja untuk Klien Nyata</a>
+        <a href="/artikel"
+          style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Baca
+          Artikel</a>
       </div>
     </header>
 
     <main style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
       <!-- Hasil Kerja — Studi Kasus Klien Nyata -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           <a href="/hasil-kerja" style="color: inherit; text-decoration: none;">Hasil Kerja untuk Klien Nyata</a>
         </h2>
         <p style="color: #475569; margin-top: 0.5rem;">
-          Studi kasus proyek yang sudah dipakai langsung oleh bisnis, lengkap dengan masalah awal, solusi yang dibangun, dan dampaknya — termasuk sistem manajemen aset untuk PT Global Multiparts.
+          Studi kasus proyek yang sudah dipakai langsung oleh bisnis, lengkap dengan masalah awal, solusi yang dibangun,
+          dan dampaknya — termasuk sistem manajemen aset untuk PT Global Multiparts.
           <a href="/hasil-kerja" style="color: #0d9488; font-weight: 600;">Lihat studi kasus lengkap &rarr;</a>
         </p>
       </section>
@@ -395,7 +634,8 @@
            src/data/articles.ts oleh scripts/prerender.ts setiap build (isi di
            antara penanda START/END akan tertimpa). -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           <a href="/artikel" style="color: inherit; text-decoration: none;">Artikel</a>
         </h2>
         <ul style="list-style-type: none; padding-left: 0; display: grid; gap: 0.75rem; margin-top: 1rem;">
@@ -405,124 +645,184 @@
 
       <!-- Layanan & Harga -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           Layanan & Estimasi Biaya Pengerjaan
         </h2>
         <ul style="list-style-type: none; padding-left: 0; display: grid; gap: 1rem; margin-top: 1rem;">
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Landing Page & Web Profil Bisnis</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp800.000 • Pengerjaan 1-2 minggu • Desain responsif, SEO-friendly, integrasi WhatsApp otomatis.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Landing Page & Web Profil Bisnis
+            </h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp800.000 • Pengerjaan 1-2 minggu • Desain responsif,
+              SEO-friendly, integrasi WhatsApp otomatis.</p>
           </li>
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Company Profile & Web App Sederhana</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp2.500.000 • Pengerjaan 2-3 minggu • Fitur multi-halaman, katalog interaktif, dynamic content.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Company Profile & Web App
+              Sederhana</h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp2.500.000 • Pengerjaan 2-3 minggu • Fitur
+              multi-halaman, katalog interaktif, dynamic content.</p>
           </li>
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">AI Chatbot & Autonomous Agent Bisnis</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp1.500.000 • Pengerjaan 1-2 minggu • Gemini Interactions API, multi-turn context, custom knowledge base.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">AI Chatbot & Autonomous Agent
+              Bisnis</h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp1.500.000 • Pengerjaan 1-2 minggu • Gemini
+              Interactions API, multi-turn context, custom knowledge base.</p>
           </li>
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Web App Custom & Dashboard Operasional</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • Autentikasi user, database Supabase/PostgreSQL, export Excel/PDF, audit log.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Web App Custom & Dashboard
+              Operasional</h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • Autentikasi user,
+              database Supabase/PostgreSQL, export Excel/PDF, audit log.</p>
           </li>
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Aplikasi Mobile (Android / Cross-Platform)</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • React Native / Expo / Capacitor PWA, offline cache, notifikasi.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Aplikasi Mobile (Android /
+              Cross-Platform)</h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • React Native /
+              Expo / Capacitor PWA, offline cache, notifikasi.</p>
           </li>
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Realtime Multiplayer Game & Platform Interaktif</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp12.000.000 • Pengerjaan 6-10 minggu • WebSockets, state synchronization, low latency (&lt;50ms), bot AI adaptif.</p>
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Realtime Multiplayer Game &
+              Platform Interaktif</h3>
+            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp12.000.000 • Pengerjaan 6-10 minggu • WebSockets,
+              state synchronization, low latency (&lt;50ms), bot AI adaptif.</p>
           </li>
         </ul>
       </section>
 
       <!-- Portofolio Unggulan -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           Portofolio & Aplikasi Live
         </h2>
         <div style="display: grid; gap: 1rem; margin-top: 1rem;">
           <article style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h3 style="font-size: 1.2rem; font-weight: 600; color: #0d9488; margin: 0;">
-              <a href="https://bgames.arzhaning.my.id" target="_blank" rel="noopener noreferrer">B-Games (bgames.arzhaning.my.id)</a>
+              <a href="https://bgames.arzhaning.my.id" target="_blank" rel="noopener noreferrer">B-Games
+                (bgames.arzhaning.my.id)</a>
             </h3>
-            <p style="color: #475569;">Platform arena board game klasik digital realtime bebas iklan (Ludo Classic, Ludo Hexagon 6 pemain, Ular Tangga 3D, Tic Tac Toe) dengan WebSockets, Smart Bot Anti-AFK takeover, visual Skia 60 FPS, Web Audio, dan Supabase Cloud Save.</p>
+            <p style="color: #475569;">Platform arena board game klasik digital realtime bebas iklan (Ludo Classic, Ludo
+              Hexagon 6 pemain, Ular Tangga 3D, Tic Tac Toe) dengan WebSockets, Smart Bot Anti-AFK takeover, visual Skia
+              60 FPS, Web Audio, dan Supabase Cloud Save.</p>
           </article>
           <article style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h3 style="font-size: 1.2rem; font-weight: 600; color: #0d9488; margin: 0;">
-              <a href="https://rapin.arzhaning.my.id" target="_blank" rel="noopener noreferrer">Rajendra Pintar (rapin.arzhaning.my.id)</a>
+              <a href="https://rapin.arzhaning.my.id" target="_blank" rel="noopener noreferrer">Rajendra Pintar
+                (rapin.arzhaning.my.id)</a>
             </h3>
-            <p style="color: #475569;">Platform edukasi interaktif anak usia 4-8 tahun bebas iklan dengan kurikulum adaptif 5 usia, 9 kategori tematik, Flashcard TTS dwibahasa (ID/EN), kuis suara + confetti, 6 maskot interaktif, full-offline PWA cache, dan native Android Capacitor.</p>
+            <p style="color: #475569;">Platform edukasi interaktif anak usia 4-8 tahun bebas iklan dengan kurikulum
+              adaptif 5 usia, 9 kategori tematik, Flashcard TTS dwibahasa (ID/EN), kuis suara + confetti, 6 maskot
+              interaktif, full-offline PWA cache, dan native Android Capacitor.</p>
           </article>
           <article style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h3 style="font-size: 1.2rem; font-weight: 600; color: #0d9488; margin: 0;">
-              <a href="https://assets.arzhaning.my.id" target="_blank" rel="noopener noreferrer">Assets DEMO (assets.arzhaning.my.id)</a>
+              <a href="https://assets.arzhaning.my.id" target="_blank" rel="noopener noreferrer">Assets DEMO
+                (assets.arzhaning.my.id)</a>
             </h3>
-            <p style="color: #475569;">Sistem inventaris & audit aset korporat berbiaya server nol (Klien: PT Global Multiparts) berbasis Google Apps Script + Sheets/Drive, pemindai QR/barcode kamera, kalkulasi depresiasi otomatis, dan ekspor laporan Excel/PDF.</p>
+            <p style="color: #475569;">Sistem inventaris & audit aset korporat berbiaya server nol (Klien: PT Global
+              Multiparts) berbasis Google Apps Script + Sheets/Drive, pemindai QR/barcode kamera, kalkulasi depresiasi
+              otomatis, dan ekspor laporan Excel/PDF.</p>
           </article>
         </div>
       </section>
 
       <!-- Keahlian & Tech Stack -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           Tech Stack & Nilai Unik
         </h2>
         <p style="color: #475569; margin-top: 0.5rem;">
-          Kombinasi 7+ tahun pengalaman operasional dan audit korporat (akurasi data 99%, 100+ audit SOP terselesaikan) dengan kapabilitas software engineering modern (React 19, TypeScript, React Native, Expo, Capacitor 8, boardgame.io, Koa.js, Serverless Google Apps Script, Supabase, Tailwind CSS v4, Google Antigravity Agent, AI Multi-LLM, SAP Business One).
+          Kombinasi 7+ tahun pengalaman operasional dan audit korporat (akurasi data 99%, 100+ audit SOP terselesaikan)
+          dengan kapabilitas software engineering modern (React 19, TypeScript, React Native, Expo, Capacitor 8,
+          boardgame.io, Koa.js, Serverless Google Apps Script, Supabase, Tailwind CSS v4, Google Antigravity Agent, AI
+          Multi-LLM, SAP Business One).
         </p>
       </section>
 
       <!-- FAQ Singkat -->
       <section style="margin-bottom: 3rem;">
-        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
+        <h2
+          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
           Pertanyaan yang Sering Diajukan (FAQ)
         </h2>
         <div style="margin-top: 1rem;">
-          <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Berapa lama waktu pembuatan website atau aplikasi?</h3>
-          <p style="color: #475569;">Landing page selesai dalam 1-2 minggu, aplikasi web/mobile custom 3-6 minggu, dan platform game 6-10 minggu.</p>
+          <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Berapa lama waktu pembuatan website atau
+            aplikasi?</h3>
+          <p style="color: #475569;">Landing page selesai dalam 1-2 minggu, aplikasi web/mobile custom 3-6 minggu, dan
+            platform game 6-10 minggu.</p>
           <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Apakah ada garansi setelah rilis?</h3>
-          <p style="color: #475569;">Setiap proyek mendapatkan garansi maintenance dan perbaikan bug gratis selama 1 bulan penuh.</p>
+          <p style="color: #475569;">Setiap proyek mendapatkan garansi maintenance dan perbaikan bug gratis selama 1
+            bulan penuh.</p>
           <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Bagaimana cara berkonsultasi?</h3>
-          <p style="color: #475569;">Anda bisa langsung berkonsultasi dengan Zannah AI di widget chat website ini atau menghubungi WhatsApp Mas Arzha di +62 823-1231-2734.</p>
+          <p style="color: #475569;">Anda bisa langsung berkonsultasi dengan Zannah AI di widget chat website ini atau
+            menghubungi WhatsApp Mas Arzha di +62 823-1231-2734.</p>
         </div>
       </section>
     </main>
 
-    <footer style="text-align: center; padding: 2rem 1rem; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem;">
+    <footer
+      style="text-align: center; padding: 2rem 1rem; border-top: 1px solid #e2e8f0; color: #64748b; font-size: 0.9rem;">
       <p>© 2026 K. Arzhaning Jagad (Arzha) • Cibitung, Bekasi, Jawa Barat, Indonesia.</p>
       <p>Jasa Pembuatan Website, Aplikasi Mobile, Game Multiplayer & Integrasi AI.</p>
     </footer>
   </div>
 
-  <!-- Menyembunyikan splash begitu React mengganti isi #root. Tidak perlu
-       ubah App.tsx: cukup amati perubahan childList di #root, plus
-       fallback timeout jika karena suatu hal React gagal mount. -->
+  <!-- Splash: animasi diputar PENUH. Splash baru keluar kalau (1) durasi minimum
+       terlewati DAN (2) React sudah mount (#root diganti). Fallback 4 detik
+       setelah load kalau React tidak kunjung mount, supaya pengguna tak terkunci. -->
   <script>
     (function () {
+      // true  = animasi penuh di setiap pemuatan halaman
+      // false = penuh hanya sekali per sesi tab; muat ulang berikutnya singkat
+      var ALWAYS_FULL = true;
+      var FULL_MS = 2400;   // sedikit lebih lama dari akhir bar progres (±2.4 dtk)
+      var QUICK_MS = 600;
+      var REDUCED_MS = 700;
+
+      var d = document.documentElement;
       var splash = document.getElementById('app-splash');
       var root = document.getElementById('root');
-      if (!splash || !root) return;
-      var hidden = false;
+      if (!splash || !root) { d.classList.remove('splash-active'); return; }
+
+      var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var seen = false;
+      try {
+        seen = sessionStorage.getItem('splash-seen') === '1';
+        sessionStorage.setItem('splash-seen', '1');
+      } catch (e) { }
+
+      var full = !reduced && (ALWAYS_FULL || !seen);
+      if (!full && !reduced) splash.classList.add('app-splash--quick');
+      var minMs = reduced ? REDUCED_MS : full ? FULL_MS : QUICK_MS;
+
+      var hidden = false, minDone = false, mounted = false, fallback = false;
 
       function hideSplash() {
         if (hidden) return;
         hidden = true;
+        d.classList.remove('splash-active'); // lepas animasi Hero tepat saat tirai terangkat
         splash.classList.add('app-splash-hidden');
-        setTimeout(function () { splash.remove(); }, 500);
+        setTimeout(function () { splash.remove(); }, reduced ? 300 : 1000);
+      }
+      function maybeHide() {
+        if (minDone && (mounted || fallback)) hideSplash();
       }
 
-      var observer = new MutationObserver(function () {
-        hideSplash();
-        observer.disconnect();
-      });
-      observer.observe(root, { childList: true });
+      var elapsed = performance.now() - (window.__splashT0 || 0);
+      setTimeout(function () { minDone = true; maybeHide(); }, Math.max(0, minMs - elapsed));
 
-      // Fallback: kalau React tidak kunjung mount, splash tetap hilang
-      // setelah 4 detik supaya tidak mengunci pengguna.
-      window.addEventListener('load', function () {
-        setTimeout(hideSplash, 4000);
-      });
+      new MutationObserver(function (_, obs) {
+        mounted = true;
+        obs.disconnect();
+        maybeHide();
+      }).observe(root, { childList: true });
+
+      function armFallback() {
+        setTimeout(function () { fallback = true; maybeHide(); }, 4000);
+      }
+      if (document.readyState === 'complete') armFallback();
+      else window.addEventListener('load', armFallback);
     })();
   </script>
 

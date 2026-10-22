@@ -11,6 +11,7 @@ import {
   Loader2,
 } from 'lucide-react';
 import { CONTACT_INFO } from '../data/portfolioData';
+import { InView } from './InView';
 
 // Access Key dari https://web3forms.com, diset di .env.local sebagai VITE_WEB3FORMS_ACCESS_KEY
 const WEB3FORMS_ACCESS_KEY = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
@@ -108,9 +109,9 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
         </div>
 
         {/* 3 Contact Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <InView className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {/* Email */}
-          <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
+          <div style={{ '--i': 0 } as React.CSSProperties} className={`mo-item p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
             }`}>
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/15 text-emerald-600'
@@ -119,10 +120,10 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
               </div>
               <button
                 onClick={() => copyToClipboard(CONTACT_INFO.email, 'email')}
-                className={`p-1.5 rounded-lg transition-colors flex items-center gap-1 text-[11px] ${darkMode ? 'text-slate-400 hover:text-emerald-400 hover:bg-slate-800' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
+                className={`p-2.5 sm:p-1.5 -m-1 sm:m-0 rounded-lg transition-colors flex items-center gap-1 text-[11px] ${darkMode ? 'text-slate-400 hover:text-emerald-400 hover:bg-slate-800' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
                   }`}
               >
-                {copiedEmail ? <><CheckCircle className="w-3 h-3" /> Tersalin</> : <Copy className="w-3.5 h-3.5" />}
+                {copiedEmail ? <><CheckCircle className="mo-pop w-3 h-3" /> Tersalin</> : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
             <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-400'
@@ -138,7 +139,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
           </div>
 
           {/* Phone */}
-          <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
+          <div style={{ '--i': 1 } as React.CSSProperties} className={`mo-item p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
             }`}>
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${darkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-500/15 text-indigo-600'
@@ -164,7 +165,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
           </div>
 
           {/* Location */}
-          <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
+          <div style={{ '--i': 2 } as React.CSSProperties} className={`mo-item p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
             }`}>
             <div className="flex items-center justify-between mb-3">
               <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${darkMode ? 'bg-emerald-500/20 text-emerald-400' : 'bg-emerald-500/15 text-emerald-600'
@@ -183,7 +184,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
               Remote & on-site Jabodetabek
             </p>
           </div>
-        </div>
+        </InView>
 
         {/* Contact Form */}
         <div className={`max-w-2xl mx-auto p-5 sm:p-6 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-700' : 'bg-white border-slate-200 shadow-sm'
@@ -198,9 +199,9 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
           </div>
 
           {formStatus === 'success' ? (
-            <div className={`p-4 rounded-xl border text-center space-y-2 ${darkMode ? 'bg-emerald-950/60 border-emerald-800' : 'bg-emerald-50 border-emerald-200'
+            <div className={`mo-rise p-4 rounded-xl border text-center space-y-2 ${darkMode ? 'bg-emerald-950/60 border-emerald-800' : 'bg-emerald-50 border-emerald-200'
               }`}>
-              <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto">
+              <div className="mo-pop w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center mx-auto" style={{ animationDelay: '150ms' }}>
                 <CheckCircle className="w-5 h-5" />
               </div>
               <h4 className={`text-sm font-bold ${darkMode ? 'text-emerald-200' : 'text-emerald-900'}`}>
@@ -220,29 +221,29 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
                 <input type="text" required placeholder="Nama Anda" value={formData.name}
                   disabled={formStatus === 'submitting'}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                  className={`w-full p-3 sm:p-2.5 rounded-lg text-base sm:text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                     }`} />
                 <input type="email" required placeholder="Alamat Email" value={formData.email}
                   disabled={formStatus === 'submitting'}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                  className={`w-full p-3 sm:p-2.5 rounded-lg text-base sm:text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                     }`} />
               </div>
               <input type="text" placeholder="Subjek / Proyek Development / Konsultasi..." value={formData.subject}
                 disabled={formStatus === 'submitting'}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                className={`w-full p-3 sm:p-2.5 rounded-lg text-base sm:text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`} />
               <textarea required rows={3} placeholder="Pesan Anda..." value={formData.message}
                 disabled={formStatus === 'submitting'}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className={`w-full p-2.5 rounded-lg text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                className={`w-full p-3 sm:p-2.5 rounded-lg text-base sm:text-xs border focus:outline-none focus:ring-2 focus:ring-teal-500 resize-none disabled:opacity-60 ${darkMode ? 'bg-slate-800 border-slate-600 text-white placeholder-slate-500' : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
                   }`} />
-              {formStatus === 'error' && <p className="text-xs text-rose-500 font-medium">{errorMessage}</p>}
+              {formStatus === 'error' && <p key={errorMessage} role="alert" className="mo-shake text-xs text-rose-500 font-medium">{errorMessage}</p>}
               <div className="pt-1 flex items-center justify-between">
                 <span className={`text-[11px] ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>Data dijaga kerahasiaannya.</span>
                 <button type="submit" disabled={formStatus === 'submitting'}
-                  className={`py-2 px-5 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 transition-colors disabled:opacity-75 disabled:cursor-not-allowed ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800'
+                  className={`py-3 sm:py-2 px-5 rounded-lg text-xs font-bold text-white flex items-center gap-1.5 transition-all active:scale-95 disabled:opacity-75 disabled:cursor-not-allowed ${darkMode ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-slate-900 hover:bg-slate-800'
                     }`}>
                   {formStatus === 'submitting' ? (
                     <>

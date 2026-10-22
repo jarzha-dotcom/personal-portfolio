@@ -14,6 +14,7 @@ import {
   Layers,
   CheckCircle2
 } from 'lucide-react';
+import { InView } from './InView';
 
 interface SkillsProps {
   darkMode: boolean;
@@ -166,7 +167,10 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
 
         {/* Global Floating Project Pill (Saat Skill Ditekan / Dihilangkan) */}
         {activeSkill && (
-          <div className="mb-6 p-3 rounded-xl border bg-teal-500/10 border-teal-500/30 text-xs flex items-center justify-between gap-3 animate-in fade-in duration-200">
+          <div
+            key={activeSkill.name}
+            className={`mo-rise sticky top-20 z-20 mb-6 p-3 rounded-xl border border-teal-500/40 shadow-lg backdrop-blur-md text-xs flex items-center justify-between gap-3 ${darkMode ? 'bg-slate-900/95' : 'bg-white/95'}`}
+          >
             <div className="flex items-center gap-2 flex-wrap">
               <span className={`w-2.5 h-2.5 rounded-full ${activeSkill.dotColor}`} />
               <span className={`font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>{activeSkill.name}</span>
@@ -185,13 +189,14 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           {/* Tech Stack (Kiri) - 4 Cards (2x2 Grid) */}
-          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <InView className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {techStackCards.map((group, idx) => {
               const Icon = group.icon;
               return (
                 <div
                   key={idx}
-                  className={`p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-1 relative group ${group.accentBorder} ${
+                  style={{ '--i': idx } as React.CSSProperties}
+                  className={`mo-item p-4 rounded-2xl border transition-all duration-200 hover:-translate-y-1 relative group ${group.accentBorder} ${
                     darkMode
                       ? 'bg-slate-900/90 border-slate-700/80 shadow-md shadow-black/20'
                       : 'bg-white border-slate-200 shadow-sm'
@@ -219,7 +224,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
                           <button
                             type="button"
                             onClick={() => setActiveSkill(isActive ? null : item)}
-                            className={`text-[10px] px-2.5 py-1 rounded-lg font-medium border flex items-center gap-1.5 transition-all text-left ${
+                            className={`text-[10px] px-2.5 py-2 sm:py-1 rounded-lg font-medium border flex items-center gap-1.5 transition-all active:scale-95 text-left ${
                               isActive
                                 ? 'bg-teal-500/20 border-teal-500 text-teal-300 font-bold shadow-sm'
                                 : darkMode
@@ -253,14 +258,14 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
                 </div>
               );
             })}
-          </div>
+          </InView>
 
           {/* Cara Kerja (Kanan) - 6 Cards (2x3 Grid) */}
-          <div className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <InView className="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
             {wayOfWorking.map((item, idx) => {
               const Icon = item.icon;
               return (
-                <div key={idx} className={`p-4 rounded-xl border transition-all duration-200 hover:-translate-y-1 ${darkMode ? 'bg-slate-800/90 border-slate-700 hover:border-indigo-500/40' : 'bg-slate-50 border-slate-200 hover:border-indigo-300'}`}>
+                <div key={idx} style={{ '--i': idx } as React.CSSProperties} className={`mo-item p-4 rounded-xl border transition-all duration-200 hover:-translate-y-1 ${darkMode ? 'bg-slate-800/90 border-slate-700 hover:border-indigo-500/40' : 'bg-slate-50 border-slate-200 hover:border-indigo-300'}`}>
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-2.5 ${darkMode ? 'bg-indigo-500/20 text-indigo-400' : 'bg-indigo-500/15 text-indigo-600'}`}>
                     <Icon className="w-4 h-4" />
                   </div>
@@ -269,7 +274,7 @@ export const Skills: React.FC<SkillsProps> = ({ darkMode }) => {
                 </div>
               );
             })}
-          </div>
+          </InView>
         </div>
 
         {/* Full-width: Pengalaman membangun produk nyata */}

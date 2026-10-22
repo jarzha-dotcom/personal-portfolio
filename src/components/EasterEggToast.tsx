@@ -1,5 +1,6 @@
 import React from 'react';
 import { PartyPopper } from 'lucide-react';
+import { usePresence } from '../hooks/usePresence';
 
 interface EasterEggToastProps {
   show: boolean;
@@ -9,15 +10,17 @@ interface EasterEggToastProps {
 // 5x) berhasil di-trigger, sebelum Mode CV terlihat penuh. Murni dekoratif
 // — pointer-events-none supaya tidak menghalangi interaksi apa pun.
 export const EasterEggToast: React.FC<EasterEggToastProps> = ({ show }) => {
-  if (!show) return null;
+  const { mounted, closing } = usePresence(show, 250);
+  if (!mounted) return null;
 
+  // tx/ty = titik tujuan confetti (px) relatif ke pusat — meledak keluar sekali
   const confettiDots = [
-    { color: 'bg-teal-400', delay: '0ms', pos: '-translate-x-16 -translate-y-10' },
-    { color: 'bg-amber-400', delay: '80ms', pos: 'translate-x-14 -translate-y-12' },
-    { color: 'bg-emerald-400', delay: '120ms', pos: '-translate-x-10 translate-y-10' },
-    { color: 'bg-indigo-400', delay: '40ms', pos: 'translate-x-10 translate-y-12' },
-    { color: 'bg-rose-400', delay: '160ms', pos: '-translate-x-20 translate-y-2' },
-    { color: 'bg-sky-400', delay: '200ms', pos: 'translate-x-20 translate-y-0' },
+    { color: 'bg-teal-400', delay: '0ms', tx: -64, ty: -40 },
+    { color: 'bg-amber-400', delay: '60ms', tx: 56, ty: -48 },
+    { color: 'bg-emerald-400', delay: '100ms', tx: -40, ty: 44 },
+    { color: 'bg-indigo-400', delay: '30ms', tx: 40, ty: 48 },
+    { color: 'bg-rose-400', delay: '120ms', tx: -84, ty: 6 },
+    { color: 'bg-sky-400', delay: '150ms', tx: 84, ty: 0 },
   ];
 
   return (
@@ -25,16 +28,16 @@ export const EasterEggToast: React.FC<EasterEggToastProps> = ({ show }) => {
       aria-hidden="true"
       className="fixed inset-0 z-[95] flex items-center justify-center pointer-events-none"
     >
-      <div className="relative animate-in zoom-in fade-in duration-300">
+      <div className={`relative ${closing ? 'mo-nudge-out' : 'mo-nudge-in'}`}>
         {confettiDots.map((dot, i) => (
           <span
             key={i}
-            className={`absolute top-1/2 left-1/2 w-2 h-2 rounded-full ${dot.color} ${dot.pos} animate-ping`}
-            style={{ animationDelay: dot.delay, animationDuration: '900ms' }}
+            className={`mo-burst absolute top-1/2 left-1/2 w-2 h-2 -ml-1 -mt-1 rounded-full ${dot.color}`}
+            style={{ '--tx': `${dot.tx}px`, '--ty': `${dot.ty}px`, animationDelay: dot.delay } as React.CSSProperties}
           />
         ))}
         <div className="relative flex items-center gap-2.5 px-5 py-3.5 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xl">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center animate-bounce">
+          <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center animate-bounce motion-reduce:animate-none">
             <PartyPopper className="w-5 h-5" />
           </div>
           <div>

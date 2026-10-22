@@ -98,7 +98,7 @@ export const bodies: Record<string, ArticleBlock[]> = {
     {
       heading: '2. Data Sudah Mendekati Batas Sel Spreadsheet',
       paragraphs: [
-        'Google Sheets sebagai database punya batas jumlah sel — per September 2026 batas ini baru saja dinaikkan jadi 20 juta sel per spreadsheet (dari sebelumnya 10 juta), dihitung dari total semua tab di dalamnya. Terdengar besar, tapi untuk data transaksional yang terus bertambah setiap hari (tiap baris = puluhan kolom), batas ini bisa tercapai lebih cepat dari yang dibayangkan. Kalau kamu sudah mulai memecah data ke banyak spreadsheet cuma supaya tidak kena limit, itu tandanya arsitektur ini sudah dipaksakan.',
+        'Google Sheets sebagai database punya batas jumlah sel — batas ini sekarang 20 juta sel per spreadsheet (dari sebelumnya 10 juta), dihitung dari total semua tab di dalamnya. Terdengar besar, tapi untuk data transaksional yang terus bertambah setiap hari (tiap baris = puluhan kolom), batas ini bisa tercapai lebih cepat dari yang dibayangkan. Kalau kamu sudah mulai memecah data ke banyak spreadsheet cuma supaya tidak kena limit, itu tandanya arsitektur ini sudah dipaksakan.',
       ],
     },
     {

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { CountUp } from './CountUp';
+import { InView } from './InView';
 
 interface AboutProps {
   darkMode: boolean;
@@ -90,7 +91,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
       <div className={`absolute top-0 left-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 -z-0 ${
         darkMode ? 'bg-teal-600' : 'bg-teal-300'
       }`} />
-      <div className={`absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 -z-0 ${
+      <div className={`hidden sm:block absolute bottom-0 right-1/4 w-96 h-96 rounded-full blur-3xl opacity-20 -z-0 ${
         darkMode ? 'bg-cyan-600' : 'bg-emerald-300'
       }`} />
 
@@ -126,14 +127,15 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
         </div>
 
         {/* 4 Info Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
-          {infoCards.map((card) => {
+        <InView className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5 mb-12">
+          {infoCards.map((card, idx) => {
             const Icon = card.icon;
             return (
               <div
                 key={card.id}
                 id={card.id}
-                className={`group relative p-5 rounded-2xl border transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-default ${
+                style={{ '--i': idx } as React.CSSProperties}
+                className={`mo-item group relative p-4 sm:p-5 rounded-2xl border transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl cursor-default ${
                   darkMode
                     ? 'bg-slate-900/60 backdrop-blur-sm border-slate-800 hover:border-teal-500/50 hover:shadow-teal-500/10'
                     : 'bg-white/70 backdrop-blur-sm border-slate-200 hover:border-teal-400/60 hover:shadow-teal-500/10'
@@ -153,7 +155,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
                 }`}>
                   {card.title}
                 </h3>
-                <p className={`text-lg font-bold mb-1 ${
+                <p className={`text-base sm:text-lg font-bold mb-1 ${
                   darkMode ? 'text-white' : 'text-slate-900'
                 }`}>
                   {card.value}
@@ -166,7 +168,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
               </div>
             );
           })}
-        </div>
+        </InView>
 
         {/* Main Bio Paragraph & Pillars Layout */}
         <div className={`relative p-6 sm:p-10 rounded-3xl border overflow-hidden ${
@@ -224,13 +226,14 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
             </div>
 
             {/* Core Pillars 2x2 */}
-            <div className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <InView className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
               {corePillars.map((pillar, idx) => {
                 const Icon = pillar.icon;
                 return (
                   <div
                     key={idx}
-                    className={`group p-5 rounded-2xl border transition-all duration-300 hover:-translate-y-1 ${
+                    style={{ '--i': idx } as React.CSSProperties}
+                    className={`mo-item group p-5 rounded-2xl border transition-all duration-300 hover:-translate-y-1 ${
                       darkMode
                         ? 'bg-slate-800/50 border-slate-700/50 hover:border-teal-500/40 hover:bg-slate-800/80'
                         : 'bg-slate-50/80 border-slate-200 hover:border-teal-300 hover:bg-white hover:shadow-md'
@@ -256,16 +259,17 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
                   </div>
                 );
               })}
-            </div>
+            </InView>
           </div>
         </div>
 
         {/* Highlight Stats Row */}
-        <div className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
+        <InView className="mt-10 grid grid-cols-2 md:grid-cols-4 gap-4">
           {JASA_STATS.map((stat, i) => (
             <div
               key={i}
-              className={`group relative p-5 text-center rounded-2xl border transition-all duration-300 hover:-translate-y-1 ${
+              style={{ '--i': i } as React.CSSProperties}
+              className={`mo-item group relative p-5 text-center rounded-2xl border transition-all duration-300 hover:-translate-y-1 ${
                 darkMode 
                   ? 'bg-slate-900/60 backdrop-blur-sm border-slate-800 hover:border-teal-500/40' 
                   : 'bg-white/70 backdrop-blur-sm border-slate-200 hover:border-teal-400/50 hover:shadow-lg'
@@ -290,7 +294,7 @@ export const About: React.FC<AboutProps> = ({ darkMode }) => {
               </p>
             </div>
           ))}
-        </div>
+        </InView>
       </div>
     </section>
   );

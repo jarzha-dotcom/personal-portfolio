@@ -100,7 +100,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'panduan-bisnis',
     published: true,
-    publishedAt: '2026-09-28',
+    publishedAt: '2026-09-27',
   },
   {
     slug: 'checklist-sebelum-konsultasi-pertama-dengan-developer',
@@ -111,18 +111,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'panduan-bisnis',
     published: true,
-    publishedAt: '2026-09-27',
-  },
-  {
-    slug: 'web-app-vs-mobile-app-vs-pwa',
-    title: 'Perbedaan Web App, Mobile App, dan PWA — Mana yang Kamu Butuhkan?',
-    excerpt:
-      'Penjelasan sederhana tanpa jargon, plus pertanyaan panduan untuk menentukan mana yang paling cocok dengan kebutuhan bisnismu.',
-    category: 'Panduan',
-    readMinutes: 6,
-    pillar: 'panduan-bisnis',
-    published: true,
-    publishedAt: '2026-09-26',
+    publishedAt: '2026-09-23',
   },
   {
     slug: 'kenapa-harga-proposal-bisa-beda-beda',
@@ -133,18 +122,18 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'panduan-bisnis',
     published: true,
-    publishedAt: '2026-09-25',
+    publishedAt: '2026-09-20',
   },
   {
-    slug: '5-pertanyaan-sebelum-pakai-jasa-developer-freelance',
-    title: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer Freelance',
+    slug: 'web-app-vs-mobile-app-vs-pwa',
+    title: 'Perbedaan Web App, Mobile App, dan PWA — Mana yang Kamu Butuhkan?',
     excerpt:
-      'Dari siapa yang pegang kode sampai apa yang terjadi kalau developer hilang kontak di tengah jalan — dijawab lewat cara kerja saya sendiri.',
+      'Penjelasan sederhana tanpa jargon, plus pertanyaan panduan untuk menentukan mana yang paling cocok dengan kebutuhan bisnismu.',
     category: 'Panduan',
     readMinutes: 6,
     pillar: 'panduan-bisnis',
     published: true,
-    publishedAt: '2026-09-24',
+    publishedAt: '2026-09-16',
   },
   {
     slug: 'berapa-lama-bikin-website-aplikasi-bisnis-kecil',
@@ -155,7 +144,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'panduan-bisnis',
     published: true,
-    publishedAt: '2026-09-23',
+    publishedAt: '2026-09-13',
   },
   {
     slug: 'studi-kasus-devrab-proposal-30-detik',
@@ -166,7 +155,18 @@ export const ARTICLES: Article[] = [
     readMinutes: 7,
     pillar: 'studi-kasus-produk',
     published: true,
-    publishedAt: '2026-09-22',
+    publishedAt: '2026-09-09',
+  },
+  {
+    slug: '5-pertanyaan-sebelum-pakai-jasa-developer-freelance',
+    title: '5 Pertanyaan yang Harus Ditanyakan Sebelum Pakai Jasa Developer Freelance',
+    excerpt:
+      'Dari siapa yang pegang kode sampai apa yang terjadi kalau developer hilang kontak di tengah jalan — dijawab lewat cara kerja saya sendiri.',
+    category: 'Panduan',
+    readMinutes: 6,
+    pillar: 'panduan-bisnis',
+    published: true,
+    publishedAt: '2026-09-06',
   },
   {
     slug: 'apa-itu-cascade-ai-system',
@@ -177,7 +177,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'ai-chatbot-agent',
     published: true,
-    publishedAt: '2026-09-21',
+    publishedAt: '2026-09-02',
   },
   {
     slug: 'apa-itu-autonomous-agent-beda-chatbot-biasa',
@@ -188,7 +188,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 2,
     pillar: 'ai-chatbot-agent',
     published: true,
-    publishedAt: '2026-09-20',
+    publishedAt: '2026-08-29',
   },
   {
     slug: 'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda',
@@ -199,29 +199,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 5,
     pillar: 'zero-server-cost',
     published: true,
-    publishedAt: '2026-09-19',
-  },
-  {
-    slug: 'kenapa-google-apps-script-untuk-klien-kecil-menengah',
-    title: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri untuk Klien Kecil-Menengah',
-    excerpt:
-      'Alasan biaya dan maintenance di balik keputusan arsitektur untuk klien dengan budget terbatas — lengkap dengan kapan pendekatan ini TIDAK cocok dipakai.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'zero-server-cost',
-    published: true,
-    publishedAt: '2026-09-18',
-  },
-  {
-    slug: 'arsitektur-multiplayer-real-time-b-games',
-    title: 'Arsitektur Multiplayer Real-Time di B-Games',
-    excerpt:
-      'Bagaimana sinkronisasi giliran pemain di Ludo dan Ular Tangga dibangun tanpa lag, dan cara menangani pemain yang tiba-tiba disconnect.',
-    category: 'Teknis',
-    readMinutes: 8,
-    pillar: 'studi-kasus-produk',
-    published: true,
-    publishedAt: '2026-09-17',
+    publishedAt: '2026-08-26',
   },
   {
     slug: 'tanda-waktunya-migrasi-dari-apps-script',
@@ -232,7 +210,29 @@ export const ARTICLES: Article[] = [
     readMinutes: 4,
     pillar: 'zero-server-cost',
     published: true,
-    publishedAt: '2026-09-15',
+    publishedAt: '2026-08-22',
+  },
+  {
+    slug: 'arsitektur-multiplayer-real-time-b-games',
+    title: 'Arsitektur Multiplayer Real-Time di B-Games',
+    excerpt:
+      'Bagaimana sinkronisasi giliran pemain di Ludo dan Ular Tangga dibangun tanpa lag, dan cara menangani pemain yang tiba-tiba disconnect.',
+    category: 'Teknis',
+    readMinutes: 8,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-08-19',
+  },
+  {
+    slug: 'kenapa-google-apps-script-untuk-klien-kecil-menengah',
+    title: 'Kenapa Saya Pilih Google Apps Script Ketimbang Server Sendiri untuk Klien Kecil-Menengah',
+    excerpt:
+      'Alasan biaya dan maintenance di balik keputusan arsitektur untuk klien dengan budget terbatas — lengkap dengan kapan pendekatan ini TIDAK cocok dipakai.',
+    category: 'Teknis',
+    readMinutes: 3,
+    pillar: 'zero-server-cost',
+    published: true,
+    publishedAt: '2026-08-15',
   },
   {
     slug: 'amankah-data-bisnis-di-google-sheets-drive',
@@ -243,7 +243,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 2,
     pillar: 'keamanan-data',
     published: true,
-    publishedAt: '2026-09-12',
+    publishedAt: '2026-08-12',
   },
   {
     slug: 'custom-chatbot-vs-chatbot-template',
@@ -254,7 +254,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'ai-chatbot-agent',
     published: true,
-    publishedAt: '2026-09-10',
+    publishedAt: '2026-08-08',
   },
   {
     slug: 'biaya-bikin-chatbot-custom-rincian',
@@ -265,7 +265,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 3,
     pillar: 'ai-chatbot-agent',
     published: true,
-    publishedAt: '2026-09-08',
+    publishedAt: '2026-08-05',
   },
   {
     slug: 'cara-kerja-sistem-aset-pt-gmp',
@@ -276,7 +276,7 @@ export const ARTICLES: Article[] = [
     readMinutes: 6,
     pillar: 'studi-kasus-produk',
     published: true,
-    publishedAt: '2026-09-05',
+    publishedAt: '2026-08-01',
   },
 
   // ===== Draft (published: false) — belum ada body, dikumpulkan di akhir,

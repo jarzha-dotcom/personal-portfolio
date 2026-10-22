@@ -15,7 +15,7 @@ export const ShowcaseBanner: React.FC = () => {
   return (
     <aside
       aria-label="Informasi Lisensi Showcase"
-      className="bg-gradient-to-r from-amber-600 via-red-600 to-amber-700 text-white text-[11px] font-medium py-1.5 px-3 sticky top-0 z-[99999] shadow-md border-b border-red-500/30 flex items-center justify-between gap-2 flex-wrap"
+      className="mo-banner bg-gradient-to-r from-amber-600 via-red-600 to-amber-700 text-white text-[11px] font-medium py-1.5 px-3 sticky top-0 z-[99999] shadow-md border-b border-red-500/30 flex items-center justify-between gap-2 flex-wrap"
     >
       <div className="flex items-center gap-2 mx-auto text-center sm:text-left">
         <ShieldAlert className="w-4 h-4 text-amber-200 shrink-0" />

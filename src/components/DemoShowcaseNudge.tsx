@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ExternalLink, LayoutGrid, X } from 'lucide-react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useIsMobile } from '../hooks/useIsMobile';
+import { usePresence } from '../hooks/usePresence';
 import { announceNudgeShown, announceNudgeDismissed, scheduleAttentionReveal } from '../utils/attentionNudge';
 
 interface DemoShowcaseNudgeProps {
@@ -219,7 +220,9 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  if (!visible || !demo) return null;
+  // Animasi keluar: render ditunda sampai selesai, `visible` tetap sumber kebenaran.
+  const { mounted, closing } = usePresence(visible && !!demo, 200);
+  if (!mounted || !demo) return null;
 
   // Link biasa ke file HTML statis di luar SPA → buka tab baru, bukan navigate().
   const handleVisit = () => {
@@ -239,7 +242,7 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
         aria-label="Contoh desain"
         aria-modal="false"
         className={`fixed top-32 inset-x-3 z-[60] outline-none ${
-          prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-3 duration-300'
+          prefersReducedMotion ? '' : closing ? 'mo-drop-out' : 'mo-drop-in'
         }`}
       >
         <div
@@ -325,7 +328,7 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
       aria-label="Contoh desain"
       aria-modal="false"
       className={`pointer-events-auto w-80 max-w-[calc(100vw-2rem)] outline-none ${
-        prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-3 zoom-in-95 duration-300'
+        prefersReducedMotion ? '' : closing ? 'mo-drop-out' : 'mo-drop-in'
       }`}
     >
       <div

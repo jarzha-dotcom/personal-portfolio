@@ -9,6 +9,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { EXPERIENCES } from '../data/portfolioData';
+import { InView } from './InView';
 
 interface ExperienceProps {
   darkMode: boolean;
@@ -46,11 +47,11 @@ export const Experience: React.FC<ExperienceProps> = ({ darkMode }) => {
         </div>
 
         {/* Timeline Container */}
-        <div className="max-w-4xl mx-auto relative">
+        <InView scope="line" className="max-w-4xl mx-auto relative">
           {/* Vertical Line (disembunyikan saat print) */}
           <div
             id="cv-timeline-line"
-            className={`absolute left-4 sm:left-6 md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'
+            className={`mo-line absolute left-4 sm:left-6 md:left-1/2 top-4 bottom-4 w-0.5 -translate-x-1/2 ${darkMode ? 'bg-slate-800' : 'bg-slate-200'
               }`}
             aria-hidden="true"
           />
@@ -59,7 +60,7 @@ export const Experience: React.FC<ExperienceProps> = ({ darkMode }) => {
               const isEven = index % 2 === 0;
               const isCurrent = exp.roles.some((r) => r.isCurrent);
               return (
-                <div
+                <InView
                   key={exp.id}
                   id={exp.id}
                   className={`cv-timeline-item relative flex flex-col md:flex-row items-start ${isEven ? 'md:flex-row-reverse' : ''
@@ -68,7 +69,7 @@ export const Experience: React.FC<ExperienceProps> = ({ darkMode }) => {
                   {/* Timeline Dot */}
                   <div className="absolute left-4 sm:left-6 md:left-1/2 -translate-x-1/2 flex items-center justify-center z-20">
                     <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${isCurrent
+                      className={`mo-dot w-6 h-6 rounded-full flex items-center justify-center border-2 ${isCurrent
                           ? 'bg-teal-600 border-teal-500 ring-2 ring-teal-500/20'
                           : darkMode
                             ? 'bg-slate-700 border-slate-600'
@@ -81,7 +82,7 @@ export const Experience: React.FC<ExperienceProps> = ({ darkMode }) => {
                   </div>
 
                   {/* Content Card */}
-                  <div className={`pl-10 sm:pl-14 md:pl-0 w-full md:w-1/2 ${isEven ? 'md:pr-8' : 'md:pl-8'
+                  <div className={`mo-item pl-10 sm:pl-14 md:pl-0 w-full md:w-1/2 ${isEven ? 'md:pr-8' : 'md:pl-8'
                     }`}>
                     <div className={`p-4 sm:p-5 rounded-2xl border transition-colors ${darkMode
                         ? 'bg-slate-900 border-slate-700'
@@ -163,11 +164,11 @@ export const Experience: React.FC<ExperienceProps> = ({ darkMode }) => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </InView>
               );
             })}
           </div>
-        </div>
+        </InView>
       </div>
     </section>
   );

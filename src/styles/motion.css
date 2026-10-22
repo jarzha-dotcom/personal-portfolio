@@ -1,0 +1,550 @@
+/* ==========================================================================
+   Motion system — kepribadian "Corporate": 150–500ms, easing decelerate,
+   tanpa overshoot. Hanya animasi transform & opacity.
+   Import SEKALI di main.tsx. File ini plain CSS (tidak bergantung config Tailwind).
+   ========================================================================== */
+
+:root {
+  --mo-ease: cubic-bezier(0.2, 0, 0, 1);
+  /* on-screen */
+  --mo-ease-out: cubic-bezier(0.05, 0.7, 0.1, 1);
+  /* entrance (decelerate) */
+  --mo-ease-in: cubic-bezier(0.3, 0, 1, 1);
+  /* exit (accelerate) */
+  --mo-quick: 150ms;
+  --mo-base: 300ms;
+  --mo-slow: 500ms;
+  --mo-step: 60ms;
+  /* jeda stagger antar item */
+}
+
+/* ---------- Keyframes ---------- */
+@keyframes mo-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-settle {
+  from {
+    transform: scale(0.94);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes mo-glow {
+
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes mo-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-icon {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.7);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mo-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes mo-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-modal-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@keyframes mo-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes mo-sheet-out {
+  from {
+    transform: none;
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes mo-nudge-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-nudge-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+@keyframes mo-wiggle {
+
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+
+  25% {
+    transform: rotate(-8deg);
+  }
+
+  50% {
+    transform: rotate(6deg);
+  }
+
+  75% {
+    transform: rotate(-3deg);
+  }
+}
+
+@keyframes mo-banner-in {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@keyframes mo-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-draw {
+  from {
+    transform: scaleY(0);
+  }
+
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ---------- Entrance sekali jalan (load / mount) ---------- */
+.mo-rise {
+  animation: mo-rise var(--mo-base) var(--mo-ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-fast {
+  --mo-step: 35ms;
+}
+
+.mo-settle {
+  animation: mo-settle var(--mo-slow) var(--mo-ease-out) backwards;
+}
+
+.mo-glow {
+  animation: mo-glow 4s ease-in-out infinite;
+}
+
+.mo-pop {
+  animation: mo-pop var(--mo-quick) var(--mo-ease-out) backwards;
+}
+
+.mo-icon-swap {
+  animation: mo-icon var(--mo-quick) var(--mo-ease-out) backwards;
+}
+
+.mo-wiggle {
+  animation: mo-wiggle 600ms var(--mo-ease) 700ms 1 both;
+}
+
+.mo-banner {
+  animation: mo-banner-in 250ms var(--mo-ease-out) backwards;
+}
+
+.mo-menu {
+  animation: mo-menu-in 180ms var(--mo-ease-out) backwards;
+  transform-origin: top left;
+}
+
+/* Filter proyek: grid di-remount (key) → anak-anaknya masuk berurutan */
+.mo-stagger>* {
+  animation: mo-rise var(--mo-base) var(--mo-ease-out) backwards;
+}
+
+.mo-stagger>*:nth-child(2) {
+  animation-delay: 50ms;
+}
+
+.mo-stagger>*:nth-child(3) {
+  animation-delay: 100ms;
+}
+
+.mo-stagger>*:nth-child(4) {
+  animation-delay: 150ms;
+}
+
+.mo-stagger>*:nth-child(n+5) {
+  animation-delay: 200ms;
+}
+
+/* ---------- Presence (butuh usePresence: kelas is-closing saat keluar) ---------- */
+.mo-backdrop {
+  animation: mo-fade-in 200ms var(--mo-ease-out) both;
+}
+
+.mo-backdrop.is-closing {
+  animation: mo-fade-out 180ms var(--mo-ease-in) both;
+  pointer-events: none;
+}
+
+.mo-modal {
+  animation: mo-modal-in 280ms var(--mo-ease-out) both;
+}
+
+.mo-modal.is-closing {
+  animation: mo-modal-out 180ms var(--mo-ease-in) both;
+}
+
+/* Bottom sheet di mobile, modal biasa di desktop */
+.mo-sheet {
+  animation: mo-sheet-in 320ms var(--mo-ease-out) both;
+}
+
+.mo-sheet.is-closing {
+  animation: mo-sheet-out 220ms var(--mo-ease-in) both;
+}
+
+@media (min-width: 640px) {
+  .mo-sheet {
+    animation-name: mo-modal-in;
+    animation-duration: 280ms;
+  }
+
+  .mo-sheet.is-closing {
+    animation-name: mo-modal-out;
+    animation-duration: 180ms;
+  }
+}
+
+.mo-nudge-in {
+  animation: mo-nudge-in 300ms var(--mo-ease-out) both;
+}
+
+.mo-nudge-out {
+  animation: mo-nudge-out 200ms var(--mo-ease-in) both;
+  pointer-events: none;
+}
+
+/* ---------- Scroll-triggered (butuh InView / useInView) ----------
+   Item menunggu (paused di keyframe awal) sampai induk langsung ber-
+   atribut data-inview="true". Pakai animation + fill backwards (bukan
+   transition) supaya tidak bentrok dengan hover:translate milik Tailwind. */
+.mo-scope>.mo-item {
+  animation: mo-rise var(--mo-base) var(--mo-ease-out) backwards paused;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-scope[data-inview="true"]>.mo-item {
+  animation-play-state: running;
+}
+
+.mo-scope .mo-dot {
+  animation: mo-pop var(--mo-quick) var(--mo-ease-out) 120ms backwards paused;
+}
+
+.mo-scope[data-inview="true"] .mo-dot {
+  animation-play-state: running;
+}
+
+.mo-scope-line>.mo-line {
+  transform-origin: top;
+  animation: mo-draw 900ms var(--mo-ease) backwards paused;
+}
+
+.mo-scope-line[data-inview="true"]>.mo-line {
+  animation-play-state: running;
+}
+
+/* ---------- Indikator link navbar ---------- */
+.mo-underline {
+  position: relative;
+}
+
+.mo-underline::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--mo-base) var(--mo-ease);
+}
+
+.mo-underline[data-active="true"]::after {
+  transform: scaleX(1);
+}
+
+@media (hover: hover) {
+  .mo-underline:hover::after {
+    transform: scaleX(0.6);
+  }
+
+  .mo-underline[data-active="true"]:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------- Aksesibilitas & cetak ---------- */
+@media (prefers-reduced-motion: reduce) {
+
+  .mo-rise,
+  .mo-settle,
+  .mo-glow,
+  .mo-pop,
+  .mo-icon-swap,
+  .mo-wiggle,
+  .mo-banner,
+  .mo-menu,
+  .mo-stagger>*,
+  .mo-backdrop,
+  .mo-modal,
+  .mo-sheet,
+  .mo-nudge-in,
+  .mo-nudge-out,
+  .mo-scope>.mo-item,
+  .mo-scope .mo-dot,
+  .mo-scope-line>.mo-line {
+    animation: none !important;
+  }
+
+  .mo-underline::after {
+    transition: none;
+  }
+}
+
+@media print {
+
+  .mo-rise,
+  .mo-settle,
+  .mo-glow,
+  .mo-pop,
+  .mo-wiggle,
+  .mo-stagger>*,
+  .mo-scope>.mo-item,
+  .mo-scope .mo-dot,
+  .mo-scope-line>.mo-line {
+    animation: none !important;
+  }
+}
+
+/* ---------- Koordinasi dengan splash screen (index.html) ----------
+   Selama html.splash-active, entrance Hero ditahan di keyframe awal supaya
+   tidak habis terputar di balik splash; begitu kelas dilepas, animasi jalan. */
+html.splash-active .mo-rise,
+html.splash-active .mo-settle,
+html.splash-active .mo-banner {
+  animation-play-state: paused;
+}
+
+/* ---------- Tambahan batch 2: nudge dari atas, confetti, shake, isi progress ---------- */
+@keyframes mo-drop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-drop-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.97);
+  }
+}
+
+@keyframes mo-burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.4);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx, 0), var(--ty, 0)) scale(1);
+  }
+}
+
+@keyframes mo-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+@keyframes mo-fill {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.mo-drop-in {
+  animation: mo-drop-in 300ms var(--mo-ease-out) both;
+}
+
+.mo-drop-out {
+  animation: mo-drop-out 200ms var(--mo-ease-in) both;
+  pointer-events: none;
+}
+
+.mo-burst {
+  animation: mo-burst 800ms var(--mo-ease-out) both;
+}
+
+.mo-shake {
+  animation: mo-shake 350ms var(--mo-ease);
+}
+
+/* Bar yang terisi dari nol saat section terlihat (butuh induk .mo-scope) */
+.mo-scope .mo-fill {
+  transform-origin: left;
+  animation: mo-fill 900ms var(--mo-ease) 200ms backwards paused;
+}
+
+.mo-scope[data-inview="true"] .mo-fill {
+  animation-play-state: running;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+  .mo-drop-in,
+  .mo-drop-out,
+  .mo-burst,
+  .mo-shake,
+  .mo-scope .mo-fill {
+    animation: none !important;
+  }
+}
+
+@media print {
+  .mo-scope .mo-fill {
+    animation: none !important;
+  }
+}
