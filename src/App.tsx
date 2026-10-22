@@ -26,6 +26,7 @@ import {
 } from './context/NavigationHistoryContext';
 import { ExitConfirmModal } from './components/ExitConfirmModal';
 import { ROUTES } from './routes';
+import { RouteLoader } from './components/RouteLoader';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 
 // Lazy-loaded: keduanya tidak perlu masuk bundle awal. CVPage (berat — isinya
@@ -38,8 +39,16 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 // sendiri cuma menjamin code-splitting (chunk terpisah), bukan menunda kapan
 // import()-nya dipanggil; itu baru terjadi begitu komponennya benar-benar
 // dirender.
+// Loader dipisah dari lazy() supaya chunk-nya bisa di-prefetch saat browser idle
+// (lihat prefetchRouteChunks) — modul yang sudah diunduh dipakai ulang oleh
+// lazy(), jadi pindah halaman terasa instan, bukan menunggu download dulu.
+const loadChatWidget = () => import('./components/ChatWidget');
+const loadCaseStudyPage = () => import('./components/CaseStudyPage');
+const loadArticlesIndexPage = () => import('./components/ArticlesIndexPage');
+const loadArticlePage = () => import('./components/ArticlePage');
+
 const ChatWidget = lazy(() =>
-  import('./components/ChatWidget').then((m) => ({ default: m.ChatWidget }))
+  loadChatWidget().then((m) => ({ default: m.ChatWidget }))
 );
 const CVPage = lazy(() =>
   import('./components/CVPage').then((m) => ({ default: m.CVPage }))
@@ -47,23 +56,30 @@ const CVPage = lazy(() =>
 // Halaman /hasil-kerja (studi kasus klien). Lazy juga: pengunjung yang cuma
 // membuka beranda tidak perlu mengunduhnya.
 const CaseStudyPage = lazy(() =>
-  import('./components/CaseStudyPage').then((m) => ({ default: m.CaseStudyPage }))
+  loadCaseStudyPage().then((m) => ({ default: m.CaseStudyPage }))
 );
 // Halaman /artikel dan /artikel/:slug — sama-sama lazy, jarang dibuka
 // dibanding beranda.
 const ArticlesIndexPage = lazy(() =>
-  import('./components/ArticlesIndexPage').then((m) => ({ default: m.ArticlesIndexPage }))
+  loadArticlesIndexPage().then((m) => ({ default: m.ArticlesIndexPage }))
 );
 const ArticlePage = lazy(() =>
-  import('./components/ArticlePage').then((m) => ({ default: m.ArticlePage }))
+  loadArticlePage().then((m) => ({ default: m.ArticlePage }))
 );
 
-// Fallback ringan dipakai di semua Suspense boundary rute lazy-loaded.
-const PageLoadingSpinner: React.FC = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full animate-spin" />
-  </div>
-);
+// Unduh chunk halaman lain di latar belakang setelah beranda interaktif, supaya
+// ketukan ke "Hasil Kerja" / "Artikel" tidak menunggu jaringan (penyebab layar
+// kosong di HP). Dilewati kalau user menyalakan Hemat Data atau koneksi 2G.
+const prefetchRouteChunks = () => {
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? '')) return;
+  [loadCaseStudyPage, loadArticlesIndexPage, loadArticlePage].forEach((load, i) => {
+    window.setTimeout(() => { load().catch(() => { /* gagal prefetch tidak fatal: lazy() akan coba lagi saat dibutuhkan */ }); }, i * 600);
+  });
+};
+
+// Fallback semua Suspense boundary rute lazy-loaded: logo saja (RouteLoader),
+// muncul tertunda ±150ms supaya tidak berkedip kalau chunk sudah siap.
 
 function MainPortfolio() {
   const { showExitConfirm, handleStay, handleLeave } = useNavigationHistory();
@@ -247,6 +263,14 @@ function MainPortfolio() {
     };
   }, []);
 
+  // Setelah beranda interaktif (chatWidgetReady = idle / interaksi pertama),
+  // unduh chunk halaman lain pelan-pelan di latar belakang.
+  useEffect(() => {
+    if (!chatWidgetReady) return;
+    const t = window.setTimeout(prefetchRouteChunks, 1200);
+    return () => window.clearTimeout(t);
+  }, [chatWidgetReady]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
   };
@@ -294,7 +318,7 @@ function MainPortfolio() {
                 variant="center"
                 message="Gagal memuat halaman Hasil Kerja. Cek koneksi internet Kakak, lalu coba lagi."
               >
-                <Suspense fallback={<PageLoadingSpinner />}>
+                <Suspense fallback={<RouteLoader />}>
                   <CaseStudyPage darkMode={darkMode} />
                 </Suspense>
               </ChunkErrorBoundary>
@@ -308,7 +332,7 @@ function MainPortfolio() {
                 variant="center"
                 message="Gagal memuat halaman Artikel. Cek koneksi internet Kakak, lalu coba lagi."
               >
-                <Suspense fallback={<PageLoadingSpinner />}>
+                <Suspense fallback={<RouteLoader />}>
                   <ArticlesIndexPage darkMode={darkMode} />
                 </Suspense>
               </ChunkErrorBoundary>
@@ -322,7 +346,7 @@ function MainPortfolio() {
                 variant="center"
                 message="Gagal memuat artikel. Cek koneksi internet Kakak, lalu coba lagi."
               >
-                <Suspense fallback={<PageLoadingSpinner />}>
+                <Suspense fallback={<RouteLoader />}>
                   <ArticlePage darkMode={darkMode} />
                 </Suspense>
               </ChunkErrorBoundary>

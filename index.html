@@ -346,8 +346,8 @@
       background: radial-gradient(circle, var(--sp-teal-soft) 0%, transparent 65%);
       transform: translate(-50%, -50%);
       animation:
-        sp-glow-in 1.2s var(--sp-out) backwards,
-        sp-breathe 4s ease-in-out 1.2s infinite alternate;
+        sp-glow-in 1.4s var(--sp-out) backwards,
+        sp-breathe 5s ease-in-out 1.4s infinite alternate;
     }
 
     /* ---------- Konten ---------- */
@@ -387,7 +387,7 @@
       opacity: 0;
       /* state akhir = tersembunyi (sudah menyatu jadi logo) */
       transform: translateX(var(--x)) scale(0.3);
-      animation: sp-ico 1.6s cubic-bezier(0.5, 0, 0.75, 0) both;
+      animation: sp-ico 2.5s cubic-bezier(0.55, 0, 0.25, 1) both;
     }
 
     #app-splash .sp-ico svg {
@@ -403,12 +403,12 @@
     #app-splash .sp-d {
       stroke-dasharray: 1;
       stroke-dashoffset: 0;
-      animation: sp-draw 0.45s cubic-bezier(0.65, 0, 0.25, 1) calc(0.05s + var(--n) * 0.25s) backwards;
+      animation: sp-draw 0.65s cubic-bezier(0.45, 0, 0.2, 1) calc(0.15s + var(--n) * 0.38s) backwards;
     }
 
     #app-splash .sp-dot {
       stroke-width: 3;
-      animation: sp-dotfade 0.2s ease calc(0.3s + var(--n) * 0.25s) backwards;
+      animation: sp-dotfade 0.3s ease calc(0.4s + var(--n) * 0.38s) backwards;
     }
 
     #app-splash .sp-ico b {
@@ -416,7 +416,7 @@
       font-weight: 600;
       letter-spacing: 0.03em;
       color: var(--sp-muted);
-      animation: sp-fade 0.35s var(--sp-out) calc(0.35s + var(--n) * 0.25s) backwards;
+      animation: sp-fade 0.45s var(--sp-out) calc(0.45s + var(--n) * 0.38s) backwards;
     }
 
     /* Fase 2 — logo muncul di titik temu, cincin digambar */
@@ -432,7 +432,7 @@
       height: 96px;
       border-radius: 20px;
       box-shadow: 0 14px 40px -12px var(--sp-teal-soft), 0 2px 8px rgba(15, 23, 42, 0.12);
-      animation: sp-logo 0.5s var(--sp-out) 1.2s backwards;
+      animation: sp-logo 0.65s var(--sp-out) 1.9s backwards;
     }
 
     #app-splash .sp-ring {
@@ -451,14 +451,14 @@
 
     #app-splash .sp-ring .sp-track {
       stroke: var(--sp-track);
-      animation: sp-dotfade 0.3s ease 1.2s backwards;
+      animation: sp-dotfade 0.4s ease 1.9s backwards;
     }
 
     #app-splash .sp-ring .sp-draw2 {
       stroke: var(--sp-teal);
       stroke-dasharray: 1;
       stroke-dashoffset: 0;
-      animation: sp-ring 0.6s cubic-bezier(0.65, 0, 0.25, 1) 1.2s backwards;
+      animation: sp-ring 0.9s cubic-bezier(0.45, 0, 0.2, 1) 1.9s backwards;
     }
 
     /* Fase 3 — nama: tiap kata naik dari balik mask */
@@ -483,8 +483,8 @@
 
     #app-splash .sp-w>span {
       display: inline-block;
-      animation: sp-word 0.55s var(--sp-out) backwards;
-      animation-delay: calc(1.55s + var(--i) * 0.08s);
+      animation: sp-word 0.75s var(--sp-out) backwards;
+      animation-delay: calc(2.35s + var(--i) * 0.13s);
     }
 
     /* Petunjuk lewati — muncul setelah ±1 detik */
@@ -498,14 +498,14 @@
       color: var(--sp-muted);
       opacity: 0;
       pointer-events: none;
-      animation: sp-hint 0.4s ease 1s both;
+      animation: sp-hint 0.5s ease 1.2s both;
     }
 
     /* ---------- Keluar A: logo terbang ke navbar ---------- */
     #app-splash.app-splash-fly {
       background: transparent;
       pointer-events: none;
-      transition: background-color 0.5s ease 0.05s;
+      transition: background-color 0.7s ease 0.05s;
     }
 
     #app-splash.app-splash-fly::after {
@@ -517,7 +517,7 @@
     #app-splash.app-splash-fly .sp-ring,
     #app-splash.app-splash-fly .sp-ico {
       opacity: 0;
-      transition: opacity 0.3s ease;
+      transition: opacity 0.45s ease;
     }
 
     #app-splash.app-splash-fly .sp-skip {
@@ -609,6 +609,28 @@
       to {
         opacity: 0.7;
       }
+    }
+
+    /* Animasi sudah selesai tapi aplikasi belum siap (HP/jaringan lambat): logo "bernapas"
+       supaya layar tidak terlihat membeku */
+    @keyframes sp-wait {
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes sp-waitring {
+      50% {
+        opacity: 0.35;
+      }
+    }
+
+    #app-splash.app-splash--waiting .sp-logo img {
+      animation: sp-wait 1.4s ease-in-out infinite;
+    }
+
+    #app-splash.app-splash--waiting .sp-ring .sp-draw2 {
+      animation: sp-waitring 1.4s ease-in-out infinite;
     }
 
     /* Dilewati / kunjungan singkat / reduced motion: langsung ke state akhir */
@@ -895,10 +917,10 @@
       // true  = animasi penuh di setiap pemuatan halaman
       // false = penuh hanya sekali per sesi tab; muat ulang berikutnya singkat
       var ALWAYS_FULL = true;
-      var FULL_MS = 2400;     // urutan animasi ±2.2 dtk + jeda singkat
+      var FULL_MS = 3700;     // urutan animasi ±3.5 dtk, ritme santai
       var QUICK_MS = 600;
       var REDUCED_MS = 700;
-      var SKIP_AFTER_MS = 1000; // sebelum ini ketukan diabaikan (hindari tak sengaja)
+      var SKIP_AFTER_MS = 1200; // sebelum ini ketukan diabaikan (hindari tak sengaja)
 
       var d = document.documentElement;
       var splash = document.getElementById('app-splash');
@@ -931,7 +953,7 @@
         var dy = (b.top + b.height / 2) - (a.top + a.height / 2);
         var sc = b.width / a.width;
         splash.classList.add('app-splash-fly');
-        logo.style.transition = 'transform 0.65s cubic-bezier(0.7, 0, 0.2, 1), box-shadow 0.4s ease';
+        logo.style.transition = 'transform 0.9s cubic-bezier(0.65, 0, 0.25, 1), box-shadow 0.5s ease';
         void logo.offsetWidth; // paksa reflow supaya transisi jalan
         logo.style.boxShadow = 'none';
         logo.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
@@ -949,9 +971,10 @@
       function hideSplash() {
         if (hidden) return;
         hidden = true;
+        splash.classList.remove('app-splash--waiting');
         d.classList.remove('splash-active'); // lepas animasi Hero tepat saat splash keluar
         if (!reduced && flyToNavbar()) {
-          setTimeout(finish, 720);
+          setTimeout(finish, 980);
         } else {
           d.classList.remove('splash-hold');
           splash.classList.add('app-splash-hidden');
@@ -959,7 +982,9 @@
         }
       }
       function maybeHide() {
-        if (minDone && (mounted || fallback)) hideSplash();
+        if (!minDone || hidden) return;
+        if (mounted || fallback) hideSplash();
+        else splash.classList.add('app-splash--waiting'); // animasi selesai, aplikasi belum siap
       }
 
       // Ketuk / tombol untuk lewati (setelah ±1 dtk). Animasi langsung loncat ke state akhir.

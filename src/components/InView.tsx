@@ -8,7 +8,7 @@ type InViewProps = React.HTMLAttributes<HTMLDivElement> & {
 
 /** Wrapper div yang memberi data-inview="true" begitu terlihat (memakai hooks/useInView yang sudah ada). */
 export const InView: React.FC<InViewProps> = ({ scope = 'items', className = '', children, ...rest }) => {
-  const { ref, isInView } = useInView<HTMLDivElement>();
+  const { ref, isInView } = useInView<HTMLDivElement>(0, '0px 0px 15% 0px');
   return (
     <div
       ref={ref}

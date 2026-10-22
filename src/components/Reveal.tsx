@@ -6,14 +6,20 @@ interface RevealProps {
   delay?: number;
 }
 
-const TRANSITION_MS = 700;
+const TRANSITION_MS = 500;
+
+// Dipicu saat bagian atas section masih ±30% tinggi layar di bawah tepi layar,
+// jadi fade-in sudah berjalan sebelum user sampai. Sebelumnya (threshold 15%
+// dari TINGGI section) section yang panjang di HP baru muncul setelah ratusan
+// piksel-nya terlihat — layar tampak blank selama itu.
+const PRELOAD_MARGIN = '0px 0px 30% 0px';
 
 // Fade-in-up sekali saat elemen pertama kali kelihatan di layar. Dipakai
 // membungkus section-section di App.tsx & CVPage.tsx — Hero/HeroCV sengaja
 // TIDAK dibungkus karena keduanya langsung kelihatan tanpa perlu discroll,
 // jadi animasinya justru bikin first impression lebih lambat, bukan bagus.
 export const Reveal: React.FC<RevealProps> = ({ children, delay = 0 }) => {
-  const { ref, isInView } = useInView<HTMLDivElement>();
+  const { ref, isInView } = useInView<HTMLDivElement>(0, PRELOAD_MARGIN);
   const [settled, setSettled] = useState(false);
 
   // Begitu transisi selesai, class translate-y-* dilepas SELURUHNYA dari
@@ -32,12 +38,12 @@ export const Reveal: React.FC<RevealProps> = ({ children, delay = 0 }) => {
     return () => window.clearTimeout(t);
   }, [isInView, settled, delay]);
 
-  const translateClass = settled ? '' : isInView ? 'translate-y-0' : 'translate-y-6';
+  const translateClass = settled ? '' : isInView ? 'translate-y-0' : 'translate-y-4';
 
   return (
     <div
       ref={ref}
-      className={`transition-all duration-700 ease-out ${
+      className={`transition-all duration-500 ease-out ${
         isInView ? 'opacity-100' : 'opacity-0'
       } ${translateClass}`}
       style={{ transitionDelay: isInView ? `${delay}ms` : '0ms' }}

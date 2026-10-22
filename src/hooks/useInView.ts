@@ -3,11 +3,12 @@ import { useEffect, useRef, useState } from 'react';
 /**
  * Mendeteksi kapan sebuah elemen pertama kali masuk viewport, lalu
  * berhenti mengamati (animasi cuma jalan sekali, tidak "kedip" lagi
- * saat user scroll naik-turun berulang). Menghormati preferensi
+ * saat user scroll naik-turun berulang). `rootMargin` positif di sisi bawah
+ * (mis. '0px 0px 30% 0px') memicu LEBIH AWAL, sebelum elemen masuk layar. Menghormati preferensi
  * prefers-reduced-motion — kalau user mengaktifkan itu di OS-nya,
  * elemen langsung dianggap "in view" tanpa observer sama sekali.
  */
-export function useInView<T extends HTMLElement>(threshold = 0.15) {
+export function useInView<T extends HTMLElement>(threshold = 0.15, rootMargin = '0px') {
   const ref = useRef<T>(null);
   const [isInView, setIsInView] = useState(false);
 
@@ -31,12 +32,12 @@ export function useInView<T extends HTMLElement>(threshold = 0.15) {
           observer.disconnect();
         }
       },
-      { threshold }
+      { threshold, rootMargin }
     );
 
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold]);
+  }, [threshold, rootMargin]);
 
   return { ref, isInView };
 }
