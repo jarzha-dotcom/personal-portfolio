@@ -125,7 +125,7 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
       role="dialog"
       aria-label="Sambutan dari Zannah"
       aria-modal="false"
-      className={`fixed bottom-24 left-4 sm:left-6 z-[60] w-[calc(100vw-2rem)] sm:w-80 max-w-sm outline-none ${
+      className={`bnav-lift-2 fixed bottom-24 left-4 sm:left-6 z-[60] w-[calc(100vw-2rem)] sm:w-80 max-w-sm outline-none ${
         prefersReducedMotion ? '' : closing ? 'mo-nudge-out' : 'mo-nudge-in'
       }`}
     >

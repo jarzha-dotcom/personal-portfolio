@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Download, X, Share, SquarePlus } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
+import { usePresence } from '../hooks/usePresence';
 import { announceNudgeShown, announceNudgeDismissed, scheduleAttentionReveal } from '../utils/attentionNudge';
 
 interface PWAInstallPromptProps {
@@ -44,6 +45,8 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
     const { canInstall, isInstalled, isStandalone, isIOS, promptInstall } = usePWAInstall();
     const [visible, setVisible] = useState(false);
     const [showIOSSteps, setShowIOSSteps] = useState(false);
+    // Animasi keluar: `visible` tetap sumber kebenaran, hanya render yang ditunda
+    const { mounted, closing } = usePresence(visible, 200);
 
     const eligible = !isInstalled && !isStandalone && (canInstall || isIOS) && !isDismissedForNow();
 
@@ -68,7 +71,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         }
     }, [visible]);
 
-    if (!visible) return null;
+    if (!mounted) return null;
 
     const handleDismiss = () => {
         dismissForDays(REMIND_AFTER_DAYS);
@@ -89,7 +92,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
         <div
             role="dialog"
             aria-label="Install aplikasi"
-            className={`fixed z-40 bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 rounded-2xl border shadow-xl p-4 animate-pop-in ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'
+            className={`bnav-lift-2 fixed z-40 bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:w-96 rounded-2xl border shadow-xl p-4 ${closing ? 'mo-nudge-out' : 'mo-nudge-in'} ${darkMode ? 'bg-slate-900 border-slate-700 text-white' : 'bg-white border-slate-200 text-slate-900'
                 }`}
         >
             {!showIOSSteps ? (
@@ -103,14 +106,14 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                         <div className="flex gap-2 mt-3">
                             <button
                                 onClick={handleInstallClick}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 text-white transition-colors"
+                                className="inline-flex items-center gap-1.5 px-3.5 py-2.5 sm:px-3 sm:py-1.5 rounded-lg text-xs font-bold bg-teal-600 hover:bg-teal-700 active:scale-95 text-white transition-all"
                             >
                                 <Download className="w-3.5 h-3.5" />
                                 Install
                             </button>
                             <button
                                 onClick={handleDismiss}
-                                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${darkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
+                                className={`px-3 py-2.5 sm:py-1.5 rounded-lg text-xs font-semibold active:scale-95 transition-all ${darkMode ? 'text-slate-300 hover:bg-slate-800' : 'text-slate-600 hover:bg-slate-100'
                                     }`}
                             >
                                 Nanti saja
@@ -120,7 +123,7 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                     <button
                         onClick={handleDismiss}
                         aria-label="Tutup"
-                        className={`p-1 h-fit rounded-lg transition-colors ${darkMode ? 'text-slate-500 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                        className={`p-2 sm:p-1 -m-1 sm:m-0 h-fit rounded-lg transition-colors ${darkMode ? 'text-slate-500 hover:text-white hover:bg-slate-800' : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
                             }`}
                     >
                         <X className="w-4 h-4" />
@@ -140,19 +143,19 @@ export const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({
                         </button>
                     </div>
                     <ol className={`space-y-2.5 text-xs ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                        <li className="flex items-center gap-2">
+                        <li style={{ '--i': 0 }} className="mo-rise flex items-center gap-2">
                             <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold flex-shrink-0 ${darkMode ? 'bg-slate-800 text-teal-400' : 'bg-slate-100 text-teal-600'}`}>
                                 1
                             </span>
                             Tap ikon <Share className="w-3.5 h-3.5 inline mx-1" /> Share di bar Safari.
                         </li>
-                        <li className="flex items-center gap-2">
+                        <li style={{ '--i': 1 }} className="mo-rise flex items-center gap-2">
                             <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold flex-shrink-0 ${darkMode ? 'bg-slate-800 text-teal-400' : 'bg-slate-100 text-teal-600'}`}>
                                 2
                             </span>
                             Pilih <SquarePlus className="w-3.5 h-3.5 inline mx-1" /> "Add to Home Screen".
                         </li>
-                        <li className="flex items-center gap-2">
+                        <li style={{ '--i': 2 }} className="mo-rise flex items-center gap-2">
                             <span className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-bold flex-shrink-0 ${darkMode ? 'bg-slate-800 text-teal-400' : 'bg-slate-100 text-teal-600'}`}>
                                 3
                             </span>

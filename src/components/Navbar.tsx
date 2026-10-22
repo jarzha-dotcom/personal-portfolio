@@ -1,19 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
-  Menu,
-  X,
   Sun,
   Moon,
-  Send,
   ChevronDown
 } from 'lucide-react';
 import { PERSONAL_INFO } from '../data/portfolioData';
-import { useFocusTrap } from '../hooks/useFocusTrap';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useRegisterModal, useNavigationHistory } from '../context/NavigationHistoryContext';
+import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { ROUTES } from '../routes';
 import { useLocation } from 'react-router-dom';
 import { ARTICLES } from '../data/articles';
+import { MobileBottomNav } from './MobileBottomNav';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -91,7 +88,6 @@ const FOCUS_RING =
 
 export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterEgg }) => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('beranda');
   const [karyaOpen, setKaryaOpen] = useState(false);
   const karyaRef = useRef<HTMLDivElement>(null);
@@ -103,29 +99,8 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   // Path tak dikenal ikut menampilkan beranda (sama seperti App.tsx)
   const isHome = pathname !== ROUTES.caseStudy && pathname !== ROUTES.articles && !pathname.startsWith(`${ROUTES.articles}/`);
 
-  // Hubungkan tombol kembali browser agar menutup menu navigasi mobile
-  useRegisterModal('mobile-nav-drawer', mobileMenuOpen, () => setMobileMenuOpen(false));
-
   // Menyimpan timestamp klik logo untuk deteksi easter egg
   const logoClickTimestamps = useRef<number[]>([]);
-  const drawerRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(drawerRef, mobileMenuOpen);
-
-  // Ref ke tombol hamburger, dipakai untuk mengembalikan fokus ke situ
-  // setelah drawer ditutup lewat cara SELAIN klik tombol itu sendiri
-  // (Escape, klik link di dalam drawer) — lihat effect di bawah.
-  const mobileMenuBtnRef = useRef<HTMLButtonElement>(null);
-  const wasMenuOpenRef = useRef(false);
-
-  useEffect(() => {
-    if (wasMenuOpenRef.current && !mobileMenuOpen) {
-      // Drawer baru saja tertutup (transisi true -> false). Tanpa ini,
-      // fokus keyboard/screen-reader "hilang jejak" balik ke awal <body>
-      // alih-alih kembali logis ke tombol yang membuka drawer tadi.
-      mobileMenuBtnRef.current?.focus();
-    }
-    wasMenuOpenRef.current = mobileMenuOpen;
-  }, [mobileMenuOpen]);
 
   // Cache elemen section sekali di mount — sebelumnya di-query ulang lewat
   // `document.getElementById` di SETIAP tick scroll (lewat requestAnimationFrame),
@@ -164,16 +139,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Escape menutup drawer mobile
-  useEffect(() => {
-    if (!mobileMenuOpen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setMobileMenuOpen(false);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mobileMenuOpen]);
-
   // Dropdown Karya: tutup saat klik di luar, Escape, atau pindah rute
   useEffect(() => {
     if (!karyaOpen) return;
@@ -208,7 +173,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const goToRoute = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
-    setMobileMenuOpen(false);
     if (pathname === path) {
       window.scrollTo({ top: 0, behavior: prefersReducedMotion ? 'auto' : 'smooth' });
       return;
@@ -218,7 +182,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
 
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setMobileMenuOpen(false);
     if (!isHome) {
       navigate(`/${href}`);
       return;
@@ -249,7 +212,6 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, l: NavItem) => {
     setKaryaOpen(false);
     if (l.external) {
-      setMobileMenuOpen(false);
       return; // biarkan browser pindah halaman di tab yang sama
     }
     if (l.route) goToRoute(e, l.href);
@@ -273,6 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   };
 
   return (
+    <>
     <header
       id="main-navbar"
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${isScrolled
@@ -406,7 +369,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
             </button>
           </div>
 
-          {/* Mobile Actions: Dark Mode & Hamburger */}
+          {/* Mobile Actions: Dark Mode (navigasi utama pindah ke navbar bawah — MobileBottomNav) */}
           <div className="flex md:hidden items-center gap-2">
             <button
               id="theme-toggle-mobile"
@@ -418,88 +381,22 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
               {darkMode ? <Sun key="sun" className="mo-icon-swap w-4 h-4" /> : <Moon key="moon" className="mo-icon-swap w-4 h-4" />}
             </button>
 
-            <button
-              id="mobile-menu-btn"
-              ref={mobileMenuBtnRef}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu navigasi"
-              aria-expanded={mobileMenuOpen}
-              aria-controls="mobile-nav-drawer"
-              className={`p-2.5 rounded-lg active:scale-95 transition-transform ${FOCUS_RING} ${darkMode ? 'bg-slate-900 text-slate-200 border border-slate-800' : 'bg-slate-100 text-slate-700 border border-slate-200'
-                }`}
-            >
-              {mobileMenuOpen ? <X key="x" className="mo-icon-swap w-5 h-5" /> : <Menu key="menu" className="mo-icon-swap w-5 h-5" />}
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer Navigation */}
-      {mobileMenuOpen && (
-        <div
-          id="mobile-nav-drawer"
-          ref={drawerRef}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Menu navigasi"
-          className={`mo-fast md:hidden px-4 pt-2 pb-6 border-b transition-all outline-none ${prefersReducedMotion ? '' : 'animate-in fade-in slide-in-from-top-4 duration-200'
-            } ${darkMode
-              ? 'bg-slate-900/98 border-slate-800 text-white'
-              : 'bg-white/98 border-slate-200 text-slate-900 shadow-xl'
-            }`}
-        >
-          <div className="flex flex-col space-y-1">
-            {NAV_ENTRIES.map((entry, entryIdx) => {
-              const drawerLink = (link: NavItem, nested: boolean, order: number) => {
-                const isActive = isItemActive(link);
-                return (
-                  <a
-                    key={link.id}
-                    href={itemHref(link)}
-                    aria-current={isActive ? 'page' : undefined}
-                    onClick={(e) => handleItemClick(e, link)}
-                    style={{ '--i': order } as React.CSSProperties}
-                    className={`mo-rise ${nested ? 'pl-8 pr-4' : 'px-4'} py-3 rounded-lg text-base font-medium flex items-center justify-between ${FOCUS_RING} ${isActive
-                      ? darkMode
-                        ? 'bg-teal-500/20 text-teal-400 font-semibold'
-                        : 'bg-teal-50 text-teal-700 font-semibold'
-                      : darkMode
-                        ? 'text-slate-200 hover:bg-slate-800'
-                        : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                  >
-                    <span>{link.name}</span>
-                    {isActive && <span className="w-2 h-2 rounded-full bg-teal-500"></span>}
-                  </a>
-                );
-              };
-
-              if (isGroup(entry)) {
-                return (
-                  <div key={entry.id} className="pt-1">
-                    <p className={`px-4 pt-2 pb-1 text-xs font-semibold ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                      {entry.name}
-                    </p>
-                    {entry.children.map((child, ci) => drawerLink(child, true, entryIdx + 1 + ci))}
-                  </div>
-                );
-              }
-              return drawerLink(entry, false, entryIdx);
-            })}
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2">
-            <a
-              href="#kontak"
-              onClick={(e) => scrollToSection(e, '#kontak')}
-              className={`w-full py-2.5 px-4 rounded-lg text-sm font-semibold bg-gradient-to-r from-teal-600 to-indigo-600 text-white flex items-center justify-center gap-2 shadow-md ${FOCUS_RING}`}
-            >
-              <Send className="w-4 h-4" />
-              <span>Hubungi Saya Sekarang</span>
-            </a>
-          </div>
-        </div>
-      )}
     </header>
+
+    {/* Navigasi utama di mobile: dock bawah (tautan <a> asli, selalu ada di DOM untuk SEO) */}
+    <MobileBottomNav
+      darkMode={darkMode}
+      isHome={isHome}
+      pathname={pathname}
+      activeSection={activeSection}
+      hasArticles={hasPublishedArticles}
+      itemHref={itemHref}
+      onItemClick={handleItemClick}
+    />
+    </>
   );
 };

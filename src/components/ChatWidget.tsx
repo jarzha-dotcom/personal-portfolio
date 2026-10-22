@@ -1511,7 +1511,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
   const lastFinalizedBotMessage = [...messages].reverse().find((m) => m.sender === 'bot' && !m.isStreaming);
 
   return (
-    <div className="fixed bottom-6 left-6 z-50 no-print">
+    <div className="bnav-lift fixed bottom-6 left-6 z-50 no-print">
       {isOpen && (
         <Portal>
           {/* Backdrop — full overlay on mobile (layar sempit) so user fokus ke chat; invisible & click-through on desktop */}
