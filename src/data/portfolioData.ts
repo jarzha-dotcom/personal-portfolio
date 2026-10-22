@@ -352,7 +352,7 @@ export const PROJECTS: ProjectItem[] = [
     role: 'UI Designer & Front-end Developer',
     year: '2026',
     demoUrl: '/demos/index.html',
-    coverImage: '/demos/thumbs/demo-galeri-seni.webp',
+    coverImage: '/demos/thumbs/og-image.png',
     isFeatured: true,
     colorScheme: 'amber',
     businessCase: {
