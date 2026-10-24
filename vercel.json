@@ -69,6 +69,18 @@
       "destination": "/hasil-kerja/index.html"
     },
     {
+      "source": "/layanan",
+      "destination": "/layanan/index.html"
+    },
+    {
+      "source": "/tentang",
+      "destination": "/tentang/index.html"
+    },
+    {
+      "source": "/kontak",
+      "destination": "/kontak/index.html"
+    },
+    {
       "source": "/artikel",
       "has": [{ "type": "query", "key": "page", "value": "2" }],
       "destination": "/artikel/page/2/index.html"

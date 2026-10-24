@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { PERSONAL_INFO, CONTACT_INFO } from '../data/portfolioData';
 import { TtsQuotaModal } from './TtsQuotaModal';
+import { useNavigationHistory } from '../context/NavigationHistoryContext';
+import { ROUTES } from '../routes';
 
 // Easter egg "rahasia" buat ngecek kuota TTS: tap/klik teks copyright 5x
 // dalam 2 detik. Window waktu pendek sengaja dipilih biar gak ke-trigger
@@ -25,6 +27,14 @@ export const Footer: React.FC = () => {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [showQuotaModal, setShowQuotaModal] = useState(false);
   const tapTimestamps = useRef<number[]>([]);
+  const { navigate } = useNavigationHistory();
+
+  // Pindah rute lewat SPA (tanpa reload); <a href> asli tetap ada untuk crawler.
+  const go = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    navigate(path);
+  };
 
   const scrollToTop = () => {
     window.scrollTo({
@@ -92,19 +102,22 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-1.5 text-xs text-slate-400">
               <li>
-                <a href="#beranda" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Beranda Utama</a>
+                <a href={ROUTES.home} onClick={(e) => go(e, ROUTES.home)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Beranda Utama</a>
               </li>
               <li>
-                <a href="#tentang" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Tentang Saya</a>
+                <a href={ROUTES.about} onClick={(e) => go(e, ROUTES.about)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Tentang Saya</a>
               </li>
               <li>
-                <a href="#layanan" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Jasa Development</a>
+                <a href={ROUTES.services} onClick={(e) => go(e, ROUTES.services)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Jasa Development</a>
               </li>
               <li>
-                <a href="#keahlian" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Keahlian</a>
+                <a href={ROUTES.caseStudy} onClick={(e) => go(e, ROUTES.caseStudy)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Hasil Kerja</a>
               </li>
               <li>
-                <a href="#kontak" className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Kontak</a>
+                <a href={ROUTES.articles} onClick={(e) => go(e, ROUTES.articles)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Artikel</a>
+              </li>
+              <li>
+                <a href={ROUTES.contact} onClick={(e) => go(e, ROUTES.contact)} className="inline-block py-1 sm:py-0 hover:text-teal-400 transition-colors">Kontak</a>
               </li>
             </ul>
           </div>

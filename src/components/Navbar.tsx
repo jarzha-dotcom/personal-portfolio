@@ -39,18 +39,21 @@ const isGroup = (e: NavEntry): e is NavGroup => 'children' in e;
 
 const NAV_ITEMS: NavItem[] = [
   { name: 'Beranda', href: '#beranda', id: 'beranda' },
-  { name: 'Tentang', href: '#tentang', id: 'tentang' },
+  { name: 'Tentang', href: ROUTES.about, id: 'tentang', route: true },
   { name: 'Portofolio', href: '#proyek', id: 'proyek' },
-  { name: 'Layanan', href: '#layanan', id: 'layanan' },
+  { name: 'Layanan', href: ROUTES.services, id: 'layanan', route: true },
   { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
   { name: 'Artikel', href: ROUTES.articles, id: 'artikel', route: true },
-  { name: 'Keahlian', href: '#keahlian', id: 'keahlian' },
-  { name: 'Kontak', href: '#kontak', id: 'kontak' },
+  { name: 'Kontak', href: ROUTES.contact, id: 'kontak', route: true },
 ];
 
-// Hanya anchor beranda yang ikut scroll-spy; index-nya harus sejajar dengan
-// sectionElementsRef di bawah.
-const navLinks = NAV_ITEMS.filter((l) => !l.route);
+// Section beranda yang dipantau scroll-spy (termasuk teaser Tentang/Layanan/Kontak
+// yang menautkan ke halamannya sendiri — id-nya tetap ada di beranda). Index-nya
+// harus sejajar dengan sectionElementsRef di bawah.
+const navLinks = ['beranda', 'tentang', 'proyek', 'layanan', 'kontak'].map((id) => ({ id }));
+
+// Rute yang punya halaman sendiri; path lain (termasuk yang tak dikenal) = beranda.
+const PAGE_ROUTES: string[] = [ROUTES.caseStudy, ROUTES.articles, ROUTES.services, ROUTES.about, ROUTES.contact];
 
 // Link "Artikel" baru tampil kalau minimal satu artikel sudah dipublikasikan
 // — supaya tidak ada link ke halaman yang isinya kosong.
@@ -97,7 +100,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, onEasterE
   const pathname = location.pathname;
   const { navigate } = useNavigationHistory();
   // Path tak dikenal ikut menampilkan beranda (sama seperti App.tsx)
-  const isHome = pathname !== ROUTES.caseStudy && pathname !== ROUTES.articles && !pathname.startsWith(`${ROUTES.articles}/`);
+  const isHome = !PAGE_ROUTES.includes(pathname) && !pathname.startsWith(`${ROUTES.articles}/`);
 
   // Menyimpan timestamp klik logo untuk deteksi easter egg
   const logoClickTimestamps = useRef<number[]>([]);

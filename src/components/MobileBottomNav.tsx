@@ -6,7 +6,6 @@ import {
   Send,
   MoreHorizontal,
   User,
-  Wrench,
   BadgeCheck,
   Newspaper,
   LayoutGrid,
@@ -46,13 +45,12 @@ interface MobileBottomNavProps {
 const SLOTS: { item: BottomNavItem; icon: LucideIcon }[] = [
   { item: { name: 'Beranda', href: '#beranda', id: 'beranda' }, icon: Home },
   { item: { name: 'Karya', href: '#proyek', id: 'proyek' }, icon: FolderOpen },
-  { item: { name: 'Layanan', href: '#layanan', id: 'layanan' }, icon: Code2 },
-  { item: { name: 'Kontak', href: '#kontak', id: 'kontak' }, icon: Send },
+  { item: { name: 'Layanan', href: ROUTES.services, id: 'layanan', route: true }, icon: Code2 },
+  { item: { name: 'Kontak', href: ROUTES.contact, id: 'kontak', route: true }, icon: Send },
 ];
 
 const MORE_ITEMS: { item: BottomNavItem; icon: LucideIcon; desc: string; needsArticles?: boolean }[] = [
-  { item: { name: 'Tentang', href: '#tentang', id: 'tentang' }, icon: User, desc: 'Latar belakang & cara kerja' },
-  { item: { name: 'Keahlian', href: '#keahlian', id: 'keahlian' }, icon: Wrench, desc: 'Tech stack yang dikuasai' },
+  { item: { name: 'Tentang', href: ROUTES.about, id: 'tentang', route: true }, icon: User, desc: 'Profil, tech stack & keahlian' },
   { item: { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true }, icon: BadgeCheck, desc: 'Studi kasus klien nyata' },
   { item: { name: 'Artikel', href: ROUTES.articles, id: 'artikel', route: true }, icon: Newspaper, desc: 'Tulisan & panduan', needsArticles: true },
   { item: { name: 'Contoh Desain', href: '/demos/index.html', id: 'contoh-desain', external: true }, icon: LayoutGrid, desc: 'Galeri demo interaktif' },
@@ -174,16 +172,19 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   }, [visible]);
 
   // --- Status aktif ---
-  const slotActive = (id: string) =>
-    id === 'proyek'
+  // Slot rute (Layanan/Kontak) aktif di halamannya sendiri ATAU saat teasernya
+  // sedang terlihat di beranda (id section teaser = id slot).
+  const slotActive = (item: BottomNavItem) =>
+    item.id === 'proyek'
       ? (isHome && activeSection === 'proyek') || pathname === ROUTES.caseStudy
-      : isHome && activeSection === id;
+      : (item.route && pathname === item.href) || (isHome && activeSection === item.id);
   const moreActive =
-    (isHome && (activeSection === 'tentang' || activeSection === 'keahlian')) ||
+    (isHome && activeSection === 'tentang') ||
+    pathname === ROUTES.about ||
     pathname === ROUTES.articles ||
     pathname.startsWith(`${ROUTES.articles}/`);
 
-  const activeFlags = [...SLOTS.map((s) => slotActive(s.item.id)), moreActive || sheetOpen];
+  const activeFlags = [...SLOTS.map((s) => slotActive(s.item)), moreActive || sheetOpen];
   const activeIndex = activeFlags.indexOf(true);
 
   const moreItems = MORE_ITEMS.filter((m) => !m.needsArticles || hasArticles);

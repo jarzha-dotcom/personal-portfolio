@@ -31,6 +31,14 @@ import {
 } from '../src/data/articles.ts';
 import { PROJECTS, CONTACT_INFO } from '../src/data/portfolioData.ts';
 import { TESTIMONIALS } from '../src/data/testimonials.ts';
+import {
+  SERVICE_DETAILS,
+  SERVICE_CATALOG,
+  WORKFLOW_STEPS,
+  FAQ_ITEMS,
+  ABOUT_INTRO,
+  ABOUT_TECH,
+} from '../src/data/seoContent.ts';
 import { ROUTES, articleRoute, CANONICAL_BASE } from '../src/routes.ts';
 import { formatIDDate, toISODate } from '../src/utils/formatDate.ts';
 import type { ProjectItem } from '../src/types.ts';
@@ -460,6 +468,284 @@ const buildHasilKerjaPage = () => {
 };
 
 // ---------------------------------------------------------------------------
+// Halaman per-tab: /layanan, /tentang, /kontak
+// ---------------------------------------------------------------------------
+// DIGATE lewat src/routes.ts: tiap builder cuma jalan kalau ROUTES punya kunci
+// `services` / `about` / `contact`. Artinya file ini AMAN di-deploy lebih dulu —
+// selama kunci itu belum ada di routes.ts, tidak ada halaman baru yang dibuat
+// (dan tidak ada halaman yang menjanjikan konten yang belum didukung SPA-nya).
+// Aktifkan SEKALIGUS dengan komponen React-nya + rewrite di vercel.json: kalau
+// halaman statis ada tapi SPA belum punya rutenya, pengunjung/Googlebot yang
+// menjalankan JS akan melihat isi beranda di URL itu (konten ganda).
+//
+// Prinsip SEO yang dijaga di sini:
+//   - Teks diambil dari src/data/seoContent.ts (sama dengan yang dibaca React).
+//   - JSON-LD beranda (FAQPage, ItemList, dst) TIDAK diwarisi mentah-mentah:
+//     tiap halaman hanya membawa tipe yang relevan dengan isi yang terlihat.
+//   - Antar-halaman saling terhubung lewat <nav> statis (jalur crawl).
+// ---------------------------------------------------------------------------
+
+type TabRouteKey = 'services' | 'about' | 'contact';
+
+const tabRoute = (key: TabRouteKey): string | null =>
+  (ROUTES as unknown as Record<string, string | undefined>)[key] ?? null;
+
+const jsonLdTypesOf = (obj: Record<string, unknown>): string[] => {
+  const t = obj['@type'];
+  return Array.isArray(t) ? t.map(String) : t ? [String(t)] : [];
+};
+
+// dist/index.html membawa SEMUA JSON-LD beranda. Halaman lain hanya boleh membawa
+// yang sesuai isinya (mis. FAQPage hanya di halaman yang menampilkan FAQ-nya).
+const keepJsonLdTypes = (html: string, allowed: string[]): string =>
+  html.replace(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g, (full: string, body: string) => {
+    try {
+      const types = jsonLdTypesOf(JSON.parse(body) as Record<string, unknown>);
+      return types.some((t) => allowed.includes(t)) ? full : '';
+    } catch {
+      return full; // JSON-LD yang tak bisa diparse dibiarkan (jangan merusak diam-diam)
+    }
+  });
+
+const siteNav = (currentPath: string): string => {
+  const entries: { href: string | null; label: string }[] = [
+    { href: '/', label: 'Beranda' },
+    { href: tabRoute('services'), label: 'Layanan & Biaya' },
+    { href: ROUTES.caseStudy, label: 'Hasil Kerja' },
+    { href: tabRoute('about'), label: 'Tentang' },
+    { href: ROUTES.articles, label: 'Artikel' },
+    { href: tabRoute('contact'), label: 'Kontak' },
+  ];
+  const items = entries
+    .filter((e): e is { href: string; label: string } => Boolean(e.href) && e.href !== currentPath)
+    .map((e) => `<li><a href="${e.href}" style="color: #0d9488; font-weight: 600; text-decoration: none;">${escapeHtml(e.label)}</a></li>`)
+    .join('\n        ');
+  return `
+    <nav aria-label="Navigasi situs" style="max-width: 1200px; margin: 0 auto; padding: 0 1rem 1.5rem;">
+      <ul style="list-style: none; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; padding: 0; margin: 0;">
+        ${items}
+      </ul>
+    </nav>`;
+};
+
+const tabSection = (heading: string, body: string): string => `
+        <section style="${styleSection}">
+          <h2 style="${styleH2}">${escapeHtml(heading)}</h2>
+          ${body}
+        </section>`;
+
+interface TabPageOptions {
+  key: TabRouteKey;
+  /** <h1> halaman (boleh lebih panjang/kaya kata kunci daripada <title>) */
+  h1: string;
+  /** <title> (tanpa suffix situs — ditambahkan applyHead) */
+  title: string;
+  description: string;
+  breadcrumbLabel: string;
+  body: string;
+  /** Tipe JSON-LD dari index.html yang boleh ikut di halaman ini */
+  keepJsonLd: string[];
+  extraJsonLd?: unknown[];
+}
+
+const buildTabPage = (o: TabPageOptions): string | null => {
+  const route = tabRoute(o.key);
+  if (!route) return null;
+  const canonicalUrl = `${CANONICAL_BASE}${route}`;
+
+  const inner = `
+    <div id="prerendered-shell">${pageHeader(o.h1, o.description, o.breadcrumbLabel)}
+      <main style="max-width: 1200px; margin: 0 auto; padding: 0 1rem;">${o.body}
+      </main>${siteNav(route)}${pageFooter()}
+    </div>`;
+
+  const html = applyHead(keepJsonLdTypes(readBaseHtml(), o.keepJsonLd), {
+    title: o.title,
+    description: o.description,
+    canonicalUrl,
+    breadcrumb: [
+      { name: 'Beranda', url: `${CANONICAL_BASE}/` },
+      { name: o.breadcrumbLabel, url: canonicalUrl },
+    ],
+    extraJsonLd: o.extraJsonLd,
+  });
+
+  return writePage(route, replaceRootShell(html, inner));
+};
+
+const whatsappUrl = (): string => `https://wa.me/${CONTACT_INFO.phone.replace(/[^0-9]/g, '')}`;
+
+const ctaButton = (label: string): string =>
+  `<p style="margin-top: 1.5rem;"><a href="${whatsappUrl()}" style="display: inline-block; background-color: #0d9488; color: #ffffff; padding: 0.75rem 1.5rem; border-radius: 9999px; text-decoration: none; font-weight: 600;">${escapeHtml(label)}</a></p>`;
+
+const AUTHOR_NAME = 'K. Arzhaning Jagad';
+
+// --- /layanan --------------------------------------------------------------
+
+const buildLayananPage = (): string | null => {
+  const detailCards = SERVICE_DETAILS.map(
+    (s) => `
+          <article style="${styleCard} margin-bottom: 1rem;">
+            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0 0 0.25rem 0;">${escapeHtml(s.title)}</h3>
+            <p style="${styleBodyText}">${escapeHtml(s.description)}</p>
+            <ul style="margin: 0.5rem 0 0 0; padding-left: 1.1rem; color: #475569;">
+              ${s.features.map((f) => `<li>${escapeHtml(f)}</li>`).join('\n              ')}
+            </ul>
+          </article>`
+  ).join('');
+
+  const priceList = SERVICE_CATALOG.map(
+    (s) => `
+            <li style="${styleCard}">
+              <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">${escapeHtml(s.name)}</h3>
+              <p style="color: #64748b; margin: 0.25rem 0;">${escapeHtml(`${s.priceLabel} • ${s.duration} • ${s.details}`)}</p>
+            </li>`
+  ).join('');
+
+  const workflow = WORKFLOW_STEPS.map(
+    (w) => `<li style="margin-bottom: 0.5rem;"><strong style="color: #0f172a;">${escapeHtml(w.title)}</strong> &mdash; ${escapeHtml(w.desc)}</li>`
+  ).join('\n            ');
+
+  // Seluruh FAQ yang ada di JSON-LD FAQPage HARUS terlihat di halaman ini.
+  const faq = FAQ_ITEMS.map(
+    (f) => `
+            <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">${escapeHtml(f.q)}</h3>
+            <p style="${styleBodyText}">${escapeHtml(f.a)}</p>`
+  ).join('');
+
+  const body =
+    tabSection('Layanan Utama', detailCards) +
+    tabSection(
+      'Estimasi Biaya & Waktu Pengerjaan',
+      `<ul style="list-style-type: none; padding-left: 0; display: grid; gap: 1rem; margin-top: 1rem;">${priceList}
+          </ul>
+          <p style="${styleMetaText} margin-top: 1rem;">Harga di atas adalah estimasi awal; harga final ditentukan setelah diskusi kebutuhan detail. Konsultasi awal gratis.</p>`
+    ) +
+    tabSection('Alur Kerja', `<ol style="${styleBodyText} padding-left: 1.25rem;">\n            ${workflow}\n          </ol>`) +
+    tabSection('Pertanyaan yang Sering Diajukan (FAQ)', `<div style="margin-top: 1rem;">${faq}\n          </div>`) +
+    ctaButton('Diskusikan Proyek via WhatsApp');
+
+  const offerCatalog = {
+    '@context': 'https://schema.org',
+    '@type': 'OfferCatalog',
+    name: `Layanan ${AUTHOR_NAME}`,
+    itemListElement: SERVICE_CATALOG.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: {
+        '@type': 'Service',
+        name: s.name,
+        description: s.details,
+        provider: { '@type': 'Person', name: AUTHOR_NAME },
+      },
+      priceSpecification: { '@type': 'PriceSpecification', priceCurrency: 'IDR', minPrice: s.priceFrom },
+    })),
+  };
+
+  // FAQPage dibuat dari data yang SAMA dengan FAQ yang tampil di halaman (FAQ_ITEMS),
+  // bukan diwarisi dari index.html — supaya data terstruktur selalu cocok dengan isi terlihat.
+  const faqPage = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: FAQ_ITEMS.map((f) => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  };
+
+  return buildTabPage({
+    key: 'services',
+    h1: 'Layanan & Estimasi Biaya Jasa Pembuatan Website, Aplikasi Mobile, Game & AI',
+    title: 'Jasa Pembuatan Website, Aplikasi & AI — Layanan dan Biaya',
+    description:
+      'Jasa pembuatan website, aplikasi mobile, web app custom, AI chatbot & game multiplayer. Estimasi biaya mulai Rp800.000, lama pengerjaan, alur kerja, dan FAQ.',
+    breadcrumbLabel: 'Layanan',
+    body,
+    keepJsonLd: ['WebSite', 'ProfessionalService'],
+    extraJsonLd: [offerCatalog, faqPage],
+  });
+};
+
+// --- /tentang --------------------------------------------------------------
+
+const buildTentangPage = (): string | null => {
+  const techStack = [...new Set(PROJECTS.flatMap((p) => p.techStack))];
+  const projectLinks = PROJECTS.map(
+    (p) => `<li><a href="${ROUTES.caseStudy}" style="color: #0d9488; font-weight: 600;">${escapeHtml(p.title)}</a> &mdash; ${escapeHtml(p.tagline)}</li>`
+  ).join('\n            ');
+
+  const body =
+    tabSection('Profil', `<p style="${styleBodyText}">${escapeHtml(ABOUT_INTRO)}</p>`) +
+    tabSection('Tech Stack & Nilai Unik', `<p style="${styleBodyText}">${escapeHtml(ABOUT_TECH)}</p>`) +
+    tabSection(
+      'Teknologi yang Dipakai di Proyek',
+      `<p style="${styleBodyText}">${techStack.map(escapeHtml).join(' &bull; ')}</p>`
+    ) +
+    tabSection('Proyek Terpilih', `<ul style="${styleBodyText} padding-left: 1.25rem;">\n            ${projectLinks}\n          </ul>`) +
+    ctaButton('Hubungi via WhatsApp');
+
+  const route = tabRoute('about');
+  const aboutPage = {
+    '@context': 'https://schema.org',
+    '@type': 'AboutPage',
+    name: `Tentang ${AUTHOR_NAME}`,
+    url: route ? `${CANONICAL_BASE}${route}` : undefined,
+    mainEntity: { '@type': 'Person', name: AUTHOR_NAME, jobTitle: 'Indie Developer & Data Specialist' },
+  };
+
+  return buildTabPage({
+    key: 'about',
+    h1: 'Tentang Arzha — Indie Developer & Data Specialist di Bekasi',
+    title: 'Tentang Arzha — Indie Developer & Data Specialist',
+    description:
+      'Profil Arzha: indie developer & data specialist di Bekasi dengan 7+ tahun pengalaman korporat. Tech stack, cara kerja, dan portofolio aplikasi web, mobile & game.',
+    breadcrumbLabel: 'Tentang',
+    body,
+    keepJsonLd: ['WebSite', 'Person'],
+    extraJsonLd: [aboutPage],
+  });
+};
+
+// --- /kontak ---------------------------------------------------------------
+
+const buildKontakPage = (): string | null => {
+  const body =
+    tabSection(
+      'Cara Menghubungi',
+      `<ul style="list-style-type: none; padding-left: 0; display: grid; gap: 0.75rem; margin-top: 1rem;">
+            <li style="${styleCard}"><strong style="color: #0f172a;">WhatsApp / Telepon:</strong> <a href="${whatsappUrl()}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.displayPhone)}</a></li>
+            <li style="${styleCard}"><strong style="color: #0f172a;">Email:</strong> <a href="mailto:${escapeHtml(CONTACT_INFO.email)}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.email)}</a></li>
+            <li style="${styleCard}"><strong style="color: #0f172a;">Domisili:</strong> ${escapeHtml(CONTACT_INFO.location)} &mdash; remote &amp; on-site Jabodetabek</li>
+          </ul>`
+    ) +
+    tabSection(
+      'Konsultasi Proyek',
+      `<p style="${styleBodyText}">Konsultasi awal gratis dan tanpa komitmen. Ceritakan kebutuhan website, aplikasi mobile, game, atau AI chatbot Anda — atau tanyakan estimasi biaya langsung ke Zannah AI lewat widget chat di situs ini.</p>`
+    ) +
+    ctaButton('Chat via WhatsApp');
+
+  const route = tabRoute('contact');
+  const contactPage = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: `Kontak ${AUTHOR_NAME}`,
+    url: route ? `${CANONICAL_BASE}${route}` : undefined,
+  };
+
+  return buildTabPage({
+    key: 'contact',
+    h1: 'Kontak & Konsultasi Proyek Gratis',
+    title: 'Kontak & Konsultasi Proyek Gratis',
+    description:
+      'Hubungi Arzha untuk konsultasi gratis pembuatan website, aplikasi mobile, game, atau AI chatbot lewat WhatsApp, email, atau chat dengan Zannah AI.',
+    breadcrumbLabel: 'Kontak',
+    body,
+    keepJsonLd: ['WebSite', 'ProfessionalService'],
+    extraJsonLd: [contactPage],
+  });
+};
+
+// ---------------------------------------------------------------------------
 // Halaman: /artikel (+ /artikel/page/N)
 // ---------------------------------------------------------------------------
 
@@ -757,6 +1043,21 @@ const STATIC_SITEMAP_ENTRIES: SitemapEntry[] = [
   { loc: `${CANONICAL_BASE}/terms/`, lastmod: '2026-09-20', changefreq: 'yearly', priority: '0.3' },
 ];
 
+// Rute per-tab (aktif hanya bila ada di src/routes.ts — lihat catatan di builder).
+// lastmod mengikuti perubahan nyata sumber teksnya (seoContent.ts).
+const tabRouteSitemapEntries = (): SitemapEntry[] => {
+  const lastmod = fileLastmod(join(ROOT_DIR, 'src', 'data', 'seoContent.ts'));
+  const defs: { key: TabRouteKey; priority: string; changefreq: SitemapEntry['changefreq'] }[] = [
+    { key: 'services', priority: '0.9', changefreq: 'monthly' },
+    { key: 'about', priority: '0.7', changefreq: 'monthly' },
+    { key: 'contact', priority: '0.6', changefreq: 'yearly' },
+  ];
+  return defs.flatMap(({ key, priority, changefreq }) => {
+    const route = tabRoute(key);
+    return route ? [{ loc: `${CANONICAL_BASE}${route}`, lastmod, changefreq, priority }] : [];
+  });
+};
+
 const buildSitemap = (paginationInfo: { totalPages: number; pageUrl: (page: number) => string }) => {
   const published = publishedArticles();
 
@@ -791,7 +1092,14 @@ const buildSitemap = (paginationInfo: { totalPages: number; pageUrl: (page: numb
     });
   }
 
-  const allEntries = [...STATIC_SITEMAP_ENTRIES.slice(0, 4), ...articleEntries, ...paginationEntries, ...STATIC_SITEMAP_ENTRIES.slice(4)];
+  const allEntries = [
+    ...STATIC_SITEMAP_ENTRIES.slice(0, 2), // beranda, hasil-kerja
+    ...tabRouteSitemapEntries(),
+    ...STATIC_SITEMAP_ENTRIES.slice(2, 4),
+    ...articleEntries,
+    ...paginationEntries,
+    ...STATIC_SITEMAP_ENTRIES.slice(4),
+  ];
 
   const xml =
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
@@ -846,6 +1154,27 @@ const checkIndexHtmlCanonicalDrift = () => {
       `\n[prerender] PERINGATAN: dist/index.html (homepage) tidak sinkron dengan CANONICAL_BASE ("${CANONICAL_BASE}") di src/routes.ts:\n` +
       mismatches.map((m) => `  - ${m}`).join('\n') +
       `\n  index.html tidak ikut diimpor otomatis (bukan modul JS) — update og:url dan <link rel="canonical"> di index.html secara manual supaya cocok.\n`
+    );
+  }
+};
+
+// Rute per-tab butuh rewrite exact-match di vercel.json HANYA kalau /hasil-kerja
+// sendiri memakainya (artinya server tidak otomatis menyajikan <rute>/index.html).
+// Kalau tidak ada rewrite padahal seharusnya, crawler jatuh ke shell beranda.
+const checkTabRouteRewrites = () => {
+  if (!existsSync(VERCEL_JSON_PATH)) return;
+  const vercelConfig = JSON.parse(readFileSync(VERCEL_JSON_PATH, 'utf-8'));
+  const sources = new Set<string>((vercelConfig.rewrites ?? []).map((r: { source: string }) => r.source));
+  if (!sources.has(ROUTES.caseStudy)) return;
+
+  const missing = (['services', 'about', 'contact'] as TabRouteKey[])
+    .map(tabRoute)
+    .filter((r): r is string => r !== null && !sources.has(r));
+  if (missing.length) {
+    console.warn(
+      `\n[prerender] PERINGATAN: rute per-tab berikut belum punya rewrite exact-match di vercel.json:\n` +
+      missing.map((r) => `  - ${r}`).join('\n') +
+      `\n  Tambahkan { "source": "${missing[0]}", "destination": "${missing[0]}/index.html" } (sebelum rewrite catch-all SPA), meniru entri ${ROUTES.caseStudy}.\n`
     );
   }
 };
@@ -1172,6 +1501,13 @@ const main = async () => {
 
   written.push(buildHasilKerjaPage());
 
+  // Halaman per-tab (aktif hanya jika ROUTES.services/about/contact ada di src/routes.ts)
+  const tabPages = [buildLayananPage(), buildTentangPage(), buildKontakPage()].filter((p): p is string => p !== null);
+  written.push(...tabPages);
+  if (tabPages.length === 0) {
+    console.log('[prerender] Rute per-tab (layanan/tentang/kontak) belum aktif di src/routes.ts — dilewati.');
+  }
+
   const { outputs: artikelIndexOutputs, totalPages, publishedCount, pageUrl } = buildArtikelIndexPages();
   written.push(...artikelIndexOutputs);
 
@@ -1198,6 +1534,7 @@ const main = async () => {
     published.map((a) => a.slug),
     totalPages
   );
+  checkTabRouteRewrites();
   checkIndexHtmlCanonicalDrift();
 
   console.log(`\n[prerender] Selesai. ${written.length} file ditulis:`);

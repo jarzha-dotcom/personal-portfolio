@@ -1,6 +1,6 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1.1.1';
+const CACHE_VERSION = 'v1.1.2';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
@@ -12,10 +12,11 @@ const OFFLINE_URL = '/offline.html';
 const DEMOS_PREFIX = '/demos/';
 const DEMOS_MANIFEST = '/demos/demos.json';
 
-// Rute client-side yang dilayani index.html (lihat ROUTES di hooks/usePathname.ts).
+// Rute client-side yang dilayani index.html (lihat ROUTES di src/routes.ts —
+// slug di sini harus sama persis, termasuk rute per-tab layanan/tentang/kontak).
 // Kalau offline dan halaman ini belum pernah dibuka, jatuh ke app shell '/'
 // (React yang merender halamannya) alih-alih offline.html.
-const SPA_ROUTES = ['/hasil-kerja', '/artikel'];
+const SPA_ROUTES = ['/hasil-kerja', '/artikel', '/layanan', '/tentang', '/kontak'];
 // Artikel pakai slug dinamis (/artikel/xxx) — dicek lewat prefix, bukan
 // daftar tetap seperti SPA_ROUTES di atas.
 const SPA_ROUTE_PREFIXES = ['/artikel/'];

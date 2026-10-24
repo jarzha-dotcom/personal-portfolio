@@ -1,12 +1,19 @@
 // Definisi rute client-side (React Router). Ubah slug di sini saja — Navbar,
-// App, dan halaman terkait mengikuti. Kalau slug diganti, samakan juga di
-// SPA_ROUTES di public/sw.js.
+// App, dan halaman terkait mengikuti. Kalau slug diganti ATAU rute baru
+// ditambah, samakan juga di SPA_ROUTES di public/sw.js dan tambahkan rewrite
+// exact-match-nya di vercel.json (lihat contoh /hasil-kerja).
+//
+// services/about/contact: halaman per-tab. scripts/prerender.ts hanya membuat
+// HTML statis untuk kunci-kunci ini kalau ada di sini.
 // (sitemap.xml TIDAK perlu disamakan manual lagi — sekarang digenerate
 // otomatis oleh scripts/prerender.ts dari ROUTES + articles.ts.)
 export const ROUTES = {
   home: '/',
   caseStudy: '/hasil-kerja',
   articles: '/artikel',
+  services: '/layanan',
+  about: '/tentang',
+  contact: '/kontak',
 } as const;
 
 export const articleRoute = (slug: string) => `${ROUTES.articles}/${slug}`;

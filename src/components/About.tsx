@@ -11,18 +11,14 @@ import {
 import { PERSONAL_INFO } from '../data/portfolioData';
 import { CountUp } from './CountUp';
 import { InView } from './InView';
+import { ABOUT_STATS } from '../data/seoContent';
 
 interface AboutProps {
   darkMode: boolean;
 }
 
-// Stats khusus halaman JASA
-const JASA_STATS = [
-  { value: '7+', label: 'Tahun Pengalaman', desc: 'Termasuk disiplin kerja korporat' },
-  { value: '3', label: 'Proyek Dirilis', desc: 'Web, mobile & game — live & dipakai user' },
-  { value: '15+', label: 'Tech Stack Dikuasai', desc: 'Frontend, backend, hingga deployment' },
-  { value: '4', label: 'Tahap Kerja Transparan', desc: 'Dari konsultasi sampai rilis' },
-];
+// Statistik ada di data/seoContent.ts (dipakai juga oleh teaser beranda)
+const JASA_STATS = ABOUT_STATS;
 
 export const About: React.FC<AboutProps> = ({ darkMode }) => {
   const infoCards = [

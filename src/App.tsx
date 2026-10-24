@@ -1,12 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { About } from './components/About';
 import { Projects } from './components/Projects';
-import { Services } from './components/Services';
-import { Skills } from './components/Skills';
 import { ArticlesPreview } from './components/ArticlesPreview';
-import { Contact } from './components/Contact';
+import { AboutTeaser, ServicesTeaser, ContactCTA } from './components/HomeTeasers';
 import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
@@ -46,6 +43,9 @@ const loadChatWidget = () => import('./components/ChatWidget');
 const loadCaseStudyPage = () => import('./components/CaseStudyPage');
 const loadArticlesIndexPage = () => import('./components/ArticlesIndexPage');
 const loadArticlePage = () => import('./components/ArticlePage');
+const loadLayananPage = () => import('./components/LayananPage');
+const loadTentangPage = () => import('./components/TentangPage');
+const loadKontakPage = () => import('./components/KontakPage');
 
 const ChatWidget = lazy(() =>
   loadChatWidget().then((m) => ({ default: m.ChatWidget }))
@@ -66,6 +66,15 @@ const ArticlesIndexPage = lazy(() =>
 const ArticlePage = lazy(() =>
   loadArticlePage().then((m) => ({ default: m.ArticlePage }))
 );
+const LayananPage = lazy(() =>
+  loadLayananPage().then((m) => ({ default: m.LayananPage }))
+);
+const TentangPage = lazy(() =>
+  loadTentangPage().then((m) => ({ default: m.TentangPage }))
+);
+const KontakPage = lazy(() =>
+  loadKontakPage().then((m) => ({ default: m.KontakPage }))
+);
 
 // Unduh chunk halaman lain di latar belakang setelah beranda interaktif, supaya
 // ketukan ke "Hasil Kerja" / "Artikel" tidak menunggu jaringan (penyebab layar
@@ -73,7 +82,8 @@ const ArticlePage = lazy(() =>
 const prefetchRouteChunks = () => {
   const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
   if (conn?.saveData || /(^|-)2g$/.test(conn?.effectiveType ?? '')) return;
-  [loadCaseStudyPage, loadArticlesIndexPage, loadArticlePage].forEach((load, i) => {
+  // Halaman per-tab dulu (paling sering dituju dari dock/navbar), lalu sisanya.
+  [loadLayananPage, loadKontakPage, loadTentangPage, loadCaseStudyPage, loadArticlesIndexPage, loadArticlePage].forEach((load, i) => {
     window.setTimeout(() => { load().catch(() => { /* gagal prefetch tidak fatal: lazy() akan coba lagi saat dibutuhkan */ }); }, i * 600);
   });
 };
@@ -191,12 +201,12 @@ function MainPortfolio() {
       isFirstRouteEffectRef.current = false;
       return;
     }
-    const hash = location.pathname === ROUTES.home ? location.hash : '';
+    const hash = location.hash;
     if (!hash) {
       window.scrollTo(0, 0);
       return;
     }
-    // Tunggu section beranda selesai dirender ulang
+    // Tunggu halaman/section selesai dirender (halaman lazy butuh waktu lebih lama)
     const timeout = window.setTimeout(() => {
       try {
         const target = document.querySelector(hash);
@@ -352,6 +362,48 @@ function MainPortfolio() {
               </ChunkErrorBoundary>
             }
           />
+          <Route
+            path={ROUTES.services}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat halaman Layanan. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<RouteLoader />}>
+                  <LayananPage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
+          <Route
+            path={ROUTES.about}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat halaman Tentang. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<RouteLoader />}>
+                  <TentangPage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
+          <Route
+            path={ROUTES.contact}
+            element={
+              <ChunkErrorBoundary
+                darkMode={darkMode}
+                variant="center"
+                message="Gagal memuat halaman Kontak. Cek koneksi internet Kakak, lalu coba lagi."
+              >
+                <Suspense fallback={<RouteLoader />}>
+                  <KontakPage darkMode={darkMode} />
+                </Suspense>
+              </ChunkErrorBoundary>
+            }
+          />
           {/* Path tak dikenal ikut menampilkan beranda tanpa mengubah URL yang
               sedang terbuka di address bar (path="*" tidak melakukan redirect). */}
           <Route
@@ -362,23 +414,22 @@ function MainPortfolio() {
                   <InfiniteBanner darkMode={darkMode} />
                 </div>
                 <Hero darkMode={darkMode} />
+                {/* Beranda = ringkasan + Portofolio interaktif. Detail Layanan, Tentang
+                    (+Keahlian), dan Kontak ada di halamannya sendiri (lazy) — lihat teasers. */}
                 <Reveal>
-                  <About darkMode={darkMode} />
+                  <AboutTeaser darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
                   <Projects darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
-                  <Services darkMode={darkMode} />
-                </Reveal>
-                <Reveal>
-                  <Skills darkMode={darkMode} />
+                  <ServicesTeaser darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
                   <ArticlesPreview darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
-                  <Contact darkMode={darkMode} />
+                  <ContactCTA darkMode={darkMode} />
                 </Reveal>
               </>
             }
