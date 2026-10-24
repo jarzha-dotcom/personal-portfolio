@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Check, Clock, Calendar, Copy, Sparkles } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ArrowUp, Check, Clock, Calendar, Copy, Sparkles } from 'lucide-react';
 import { getArticleBySlug, getAdjacentArticles, type ArticleBlock } from '../data/articles';
 import { loadArticleBody } from '../data/loadArticleBody';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
@@ -13,6 +13,8 @@ import { AuthorCard } from '../components/AuthorCard';
 import { ArticleIllustration, hasArticleImages } from '../components/ArticleIllustration';
 import { RelatedArticles } from '../components/RelatedArticles';
 import { ArticleAudioPlayer } from '../components/ArticleAudioPlayer';
+import { Breadcrumb } from '../components/Breadcrumb';
+import { ArticleTableOfContents, getHeadingId } from '../components/ArticleTableOfContents';
 
 interface ArticlePageProps {
   darkMode: boolean;
@@ -151,6 +153,15 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
     };
   }, [article]);
 
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const goTo = (e: React.MouseEvent<HTMLAnchorElement>, path: string) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
@@ -228,15 +239,16 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,42rem)_1fr] gap-10 lg:gap-16 items-start">
             <div className="min-w-0">
-              {/* Back link */}
-              <a
-                href={ROUTES.articles}
-                onClick={(e) => goTo(e, ROUTES.articles)}
-                className={backLinkClass}
-              >
-                <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-                Semua artikel
-              </a>
+              {/* Visual Breadcrumb */}
+              <Breadcrumb
+                darkMode={darkMode}
+                items={[
+                  { name: 'Beranda', href: ROUTES.home },
+                  { name: 'Artikel', href: ROUTES.articles },
+                  { name: article.title },
+                ]}
+                className="mb-6"
+              />
 
               {/* Ilustrasi hero */}
               <ArticleIllustration
@@ -327,6 +339,15 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
               {/* Pemutar audio — otomatis tidak tampil kalau artikel belum punya audio */}
               <ArticleAudioPlayer slug={article.slug} darkMode={darkMode} />
 
+              {/* Mobile Table of Contents (collapsible di layar kecil) */}
+              <div className="lg:hidden">
+                <ArticleTableOfContents
+                  blocks={bodyBlocks}
+                  darkMode={darkMode}
+                  isMobile={true}
+                />
+              </div>
+
               {/* Body artikel dengan drop cap di paragraf pertama */}
               <div
                 className={`space-y-8 ${darkMode ? 'text-slate-300' : 'text-slate-700'}`}
@@ -355,7 +376,8 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
                       <div className="space-y-3" data-audio-block={i}>
                         {block.heading && (
                           <h2
-                            className={`text-xl sm:text-2xl font-bold mt-10 first:mt-0 ${
+                            id={getHeadingId(block.heading, i)}
+                            className={`text-xl sm:text-2xl font-bold mt-10 first:mt-0 scroll-mt-24 sm:scroll-mt-28 ${
                               darkMode ? 'text-white' : 'text-slate-900'
                             }`}
                           >
@@ -505,18 +527,40 @@ export const ArticlePage: React.FC<ArticlePageProps> = ({ darkMode }) => {
               )}
             </div>
 
-            {/* Sidebar Artikel Terkait — sticky di layar lebar (lg+), turun jadi
-            section biasa di bawah konten saat layar sempit (grid-cols-1). */}
+            {/* Sidebar Artikel Terkait & Table of Contents — sticky di layar lebar (lg+),
+                turun jadi section biasa di bawah konten saat layar sempit (grid-cols-1). */}
             <aside
-              className={`lg:sticky lg:top-28 lg:border-l lg:pl-10 ${
+              className={`lg:sticky lg:top-28 lg:border-l lg:pl-10 space-y-6 ${
                 darkMode ? 'lg:border-slate-800' : 'lg:border-slate-200'
               }`}
             >
+              <div className="hidden lg:block">
+                <ArticleTableOfContents
+                  blocks={bodyBlocks}
+                  darkMode={darkMode}
+                />
+              </div>
               <RelatedArticles slug={article.slug} darkMode={darkMode} />
             </aside>
           </div>
         </div>
       </article>
+
+      {/* Floating Back to Top Button */}
+      {showBackToTop && (
+        <button
+          type="button"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Kembali ke atas"
+          className={`fixed bottom-20 right-5 sm:right-8 z-40 p-3 rounded-full shadow-lg border transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 hover:scale-110 active:scale-95 ${
+            darkMode
+              ? 'bg-slate-900/90 border-slate-700 text-teal-400 hover:bg-slate-800'
+              : 'bg-white/95 border-slate-200 text-teal-600 hover:bg-slate-50'
+          }`}
+        >
+          <ArrowUp className="w-4 h-4" aria-hidden="true" />
+        </button>
+      )}
     </>
   );
 };

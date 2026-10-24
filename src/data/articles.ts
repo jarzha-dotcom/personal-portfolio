@@ -92,6 +92,50 @@ export interface Article {
 export const ARTICLES: Article[] = [
   // ===== Artikel published, diurutkan dari PALING BARU ke PALING LAMA =====
   {
+    slug: 'kenapa-1-website-butuh-3-karakter-ai-berbeda',
+    title: 'Kenapa 1 Website Butuh 3 Karakter AI Berbeda (Zannah, Rajendra, Radit)',
+    excerpt:
+      'Bukan gimmick — pembagian peran ini yang bikin kuota AI tetap awet dan tiap pengunjung dapat respons yang paling sesuai kebutuhannya.',
+    category: 'Teknis',
+    readMinutes: 4,
+    pillar: 'ai-chatbot-agent',
+    published: true,
+    publishedAt: '2026-10-09',
+  },
+  {
+    slug: 'dari-audit-internal-ke-software-development',
+    title: 'Dari Audit Internal ke Software Development: Kenapa Latar Belakang Data Membentuk Cara Saya Bangun Sistem',
+    excerpt:
+      'Kebiasaan mengecek selisih data dan menelusuri audit trail dari dunia audit ternyata jadi fondasi cara saya merancang sistem sekarang.',
+    category: 'Reflektif',
+    readMinutes: 5,
+    pillar: 'personal-brand',
+    published: true,
+    publishedAt: '2026-10-06',
+  },
+  {
+    slug: 'dari-scan-kamera-ke-data-aset-1-detik',
+    title: 'Dari Scan Kamera ke Data Aset dalam 1 Detik: Cara Kerja QR/Barcode di Assets DEMO',
+    excerpt:
+      'Expo Camera dan mesin pemindai ZXing — bagaimana kamera HP biasa bisa menggantikan alat scanner barcode fisik yang mahal.',
+    category: 'Teknis',
+    readMinutes: 4,
+    pillar: 'bedah-fitur-teknis',
+    published: true,
+    publishedAt: '2026-10-03',
+  },
+  {
+    slug: 'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu',
+    title: 'Kenapa Riwayat Chat AI Disimpan di Browser Kamu (IndexedDB), Bukan di Server Saya',
+    excerpt:
+      'Pilihan arsitektur yang sengaja dibuat demi privasi — dan apa konsekuensinya kalau kamu ganti perangkat atau bersihkan cache browser.',
+    category: 'Teknis',
+    readMinutes: 4,
+    pillar: 'keamanan-data',
+    published: true,
+    publishedAt: '2026-09-30',
+  },
+  {
     slug: 'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh',
     title: 'Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh Fitur Ini Lebih dari yang Kamu Kira',
     excerpt:
@@ -304,16 +348,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
   {
-    slug: 'kenapa-1-website-butuh-3-karakter-ai-berbeda',
-    title: 'Kenapa 1 Website Butuh 3 Karakter AI Berbeda (Zannah, Rajendra, Radit)',
-    excerpt:
-      'Bukan gimmick — pembagian peran ini yang bikin kuota AI tetap awet dan tiap pengunjung dapat respons yang paling sesuai kebutuhannya.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'ai-chatbot-agent',
-    published: false,
-  },
-  {
     slug: 'bagaimana-ai-membaca-dokumen-yang-kamu-upload',
     title: 'Bagaimana AI Bisa "Membaca" Sketsa, PDF, dan CSV yang Kamu Upload',
     excerpt:
@@ -373,16 +407,7 @@ export const ARTICLES: Article[] = [
     pillar: 'panduan-bisnis',
     published: false,
   },
-  {
-    slug: 'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu',
-    title: 'Kenapa Riwayat Chat AI Disimpan di Browser Kamu (IndexedDB), Bukan di Server Saya',
-    excerpt:
-      'Pilihan arsitektur yang sengaja dibuat demi privasi — dan apa konsekuensinya kalau kamu ganti perangkat atau bersihkan cache browser.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'keamanan-data',
-    published: false,
-  },
+
   {
     slug: 'single-active-session-mencegah-akun-dibajak',
     title: 'Single Active Session: Fitur Kecil yang Mencegah Akun Dibajak atau Dipakai Bersama',
@@ -401,16 +426,6 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     pillar: 'keamanan-data',
-    published: false,
-  },
-  {
-    slug: 'dari-scan-kamera-ke-data-aset-1-detik',
-    title: 'Dari Scan Kamera ke Data Aset dalam 1 Detik: Cara Kerja QR/Barcode di Assets DEMO',
-    excerpt:
-      'Expo Camera dan mesin pemindai ZXing — bagaimana kamera HP biasa bisa menggantikan alat scanner barcode fisik yang mahal.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'bedah-fitur-teknis',
     published: false,
   },
   {
@@ -451,16 +466,6 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
-    published: false,
-  },
-  {
-    slug: 'dari-audit-internal-ke-software-development',
-    title: 'Dari Audit Internal ke Software Development: Kenapa Latar Belakang Data Membentuk Cara Saya Bangun Sistem',
-    excerpt:
-      'Kebiasaan mengecek selisih data dan menelusuri audit trail dari dunia audit ternyata jadi fondasi cara saya merancang sistem sekarang.',
-    category: 'Reflektif',
-    readMinutes: 4,
-    pillar: 'personal-brand',
     published: false,
   },
   {

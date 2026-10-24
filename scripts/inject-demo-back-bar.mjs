@@ -23,7 +23,7 @@ const ROOT = join(__dirname, '..');
 const DEMOS_DIR = join(ROOT, 'public', 'demos');
 const MANIFEST = join(DEMOS_DIR, 'demos.json');
 const CANONICAL_BASE = 'https://arzhaning.my.id';
-const GALLERY_URL = `${CANONICAL_BASE}/demos/index.html`;
+const GALLERY_URL = `${CANONICAL_BASE}/demos/`;
 
 // Ambil nomor WA dari portfolioData.ts
 const portfolioSrc = readFileSync(join(ROOT, 'src', 'data', 'portfolioData.ts'), 'utf-8');
@@ -107,7 +107,7 @@ function buildOgTags(entry) {
   const desc = entry.desc ?? '';
   const thumb = entry.thumb ?? '';
   const file = entry.file ?? '';
-  const pageUrl = `${CANONICAL_BASE}/demos/${file}`;
+  const pageUrl = `${CANONICAL_BASE}/demos/${file.replace(/\.html$/, '')}`;
   const imageUrl = thumb ? `${CANONICAL_BASE}/demos/${thumb}` : '';
 
   const lines = [

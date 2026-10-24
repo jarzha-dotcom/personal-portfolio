@@ -217,10 +217,106 @@
   }
 }
 
+@keyframes mo-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-scale-up {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mo-pulse-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+
+  60% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes mo-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes mo-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
 /* ---------- Entrance sekali jalan (load / mount) ---------- */
 .mo-rise {
   animation: mo-rise var(--mo-base) var(--mo-ease-out) backwards;
   animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-slide-l {
+  animation: mo-slide-left var(--mo-base) var(--mo-ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-slide-r {
+  animation: mo-slide-right var(--mo-base) var(--mo-ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-scale {
+  animation: mo-scale-up var(--mo-base) var(--mo-ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-float {
+  animation: mo-float 4s ease-in-out infinite;
+}
+
+.mo-pulse-ring {
+  animation: mo-pulse-ring 2.4s cubic-bezier(0.2, 0, 0, 1) infinite;
 }
 
 .mo-fast {
@@ -335,6 +431,33 @@
 }
 
 .mo-scope[data-inview="true"]>.mo-item {
+  animation-play-state: running;
+}
+
+.mo-scope>.mo-slide-l {
+  animation: mo-slide-left var(--mo-base) var(--mo-ease-out) backwards paused;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-scope[data-inview="true"]>.mo-slide-l {
+  animation-play-state: running;
+}
+
+.mo-scope>.mo-slide-r {
+  animation: mo-slide-right var(--mo-base) var(--mo-ease-out) backwards paused;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-scope[data-inview="true"]>.mo-slide-r {
+  animation-play-state: running;
+}
+
+.mo-scope>.mo-scale {
+  animation: mo-scale-up var(--mo-base) var(--mo-ease-out) backwards paused;
+  animation-delay: calc(var(--i, 0) * var(--mo-step));
+}
+
+.mo-scope[data-inview="true"]>.mo-scale {
   animation-play-state: running;
 }
 

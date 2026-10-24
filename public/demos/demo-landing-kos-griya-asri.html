@@ -32,7 +32,7 @@
   <meta property="og:title" content="Landing Page Kos-Kosan & Hunian | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
     content="Landing page kos dengan foto kamar asli, filter tipe kamar, kalkulator simulasi sewa dan diskon durasi, waktu tempuh ke titik penting, tata tertib, jadwal survei ke WhatsApp, serta tautan ke aplikasi ">
-  <meta property="og:url" content="https://arzhaning.my.id/demos/demo-landing-kos-griya-asri.html">
+  <meta property="og:url" content="https://arzhaning.my.id/demos/demo-landing-kos-griya-asri">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-landing-kos-griya-asri.webp">
   <meta property="og:image:width" content="1280">
@@ -1805,166 +1805,14 @@
   <!-- @jz-no-tw -->
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-landing-kos-griya-asri.css">
-</head>
-
-<body>
-  <!-- @jz-bar-start -->
-  <style>
-    /* Sembunyikan watermark badge lama jika masih ada di cache */
-    #__jzwm {
-      display: none !important
-    }
-
-    body {
-      padding-bottom: 46px !important;
-      box-sizing: border-box !important
-    }
-
-    #__jz-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 2147483640;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 0 16px;
-      height: 46px;
-      background: rgba(15, 23, 42, .95);
-      border-top: 1px solid rgba(255, 255, 255, .12);
-      box-shadow: 0 -4px 18px rgba(0, 0, 0, .4);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      font: 600 13px/1 system-ui, -apple-system, sans-serif;
-      color: #cbd5e1;
-      box-sizing: border-box
-    }
-
-    #__jz-bar * {
-      box-sizing: border-box
-    }
-
-    #__jz-bar .jz-bar-nav {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-shrink: 0
-    }
-
-    #__jz-bar .jz-btn-gallery {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: #2dd4bf;
-      text-decoration: none;
-      white-space: nowrap;
-      padding: 6px 10px;
-      border-radius: 8px;
-      background: rgba(45, 212, 191, .1);
-      border: 1px solid rgba(45, 212, 191, .25);
-      transition: all .15s
-    }
-
-    #__jz-bar .jz-btn-gallery:hover {
-      background: rgba(45, 212, 191, .2);
-      color: #5eead4
-    }
-
-    #__jz-bar .jz-btn-home {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      color: #94a3b8;
-      text-decoration: none;
-      white-space: nowrap;
-      padding: 6px 9px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 500;
-      transition: all .15s
-    }
-
-    #__jz-bar .jz-btn-home:hover {
-      color: #f8fafc;
-      background: rgba(255, 255, 255, .06)
-    }
-
-    #__jz-bar .jz-dot {
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      background: #2dd4bf;
-      opacity: .7
-    }
-
-    #__jz-bar .jz-sep {
-      color: rgba(255, 255, 255, .18);
-      font-weight: 300
-    }
-
-    #__jz-bar .jz-title {
-      font-size: 12px;
-      opacity: .75;
-      color: #e2e8f0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      max-width: 320px;
-      text-align: center
-    }
-
-    #__jz-bar .jz-wa {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: #25d366;
-      color: #052e16 !important;
-      font-weight: 700;
-      font-size: 12.5px;
-      text-decoration: none;
-      white-space: nowrap;
-      padding: 7px 13px;
-      border-radius: 999px;
-      box-shadow: 0 2px 10px rgba(37, 211, 102, .35);
-      transition: all .15s;
-      flex-shrink: 0
-    }
-
-    #__jz-bar .jz-wa:hover {
-      background: #22c35e;
-      box-shadow: 0 4px 14px rgba(37, 211, 102, .5);
-      transform: translateY(-1px)
-    }
-
-    @media(max-width:720px) {
-      #__jz-bar .jz-title {
-        display: none
-      }
-    }
-
-    @media(max-width:500px) {
-      #__jz-bar {
-        padding: 0 10px;
-        gap: 6px
-      }
-
-      #__jz-bar .jz-btn-gallery span {
-        font-size: 12px
-      }
-
-      #__jz-bar .jz-btn-home .jz-domain {
-        display: none
-      }
-
-      #__jz-bar .jz-wa {
-        padding: 6px 11px;
-        font-size: 11.5px
-      }
-    }
-
+  <style id="motion-css">
     /*HERO-MOTION*/
+    /* cahaya latar dekoratif tidak boleh melebarkan halaman */
+    html.hx,
+    html.hx body {
+      overflow-x: clip
+    }
+
     /* Premium motion: decelerate in, 0% overshoot, transform+opacity only */
     .hero-img-wrap {
       position: relative;
@@ -2311,7 +2159,7 @@
     @media (max-width:760px) {
       .hx .hero-glow {
         width: 70%;
-        right: -20%
+        right: -4%
       }
 
       .hx .hero.go .hero-ticks span {
@@ -2494,6 +2342,326 @@
       }
     }
 
+    /* PAGE-MOTION — seluruh halaman (Premium: decelerate masuk, accelerate keluar, tanpa overshoot) */
+    .hx .rv {
+      opacity: 0;
+      translate: 0 18px
+    }
+
+    .hx .rv.in {
+      opacity: 1;
+      translate: 0 0;
+      transition: opacity .6s cubic-bezier(.2, 0, 0, 1) var(--d, 0ms), translate .6s cubic-bezier(.2, 0, 0, 1) var(--d, 0ms)
+    }
+
+    .fact-val {
+      font-variant-numeric: tabular-nums
+    }
+
+    /* kartu kamar */
+    @media (hover:hover) {
+      .hx .room-card {
+        transition: translate .4s cubic-bezier(.2, 0, 0, 1), box-shadow .4s cubic-bezier(.2, 0, 0, 1)
+      }
+
+      .hx .room-card:hover {
+        translate: 0 -4px;
+        box-shadow: 0 20px 32px -14px rgba(0, 0, 0, .2)
+      }
+    }
+
+    .hx .room-thumb-wrap img {
+      transition: transform .9s cubic-bezier(.2, 0, 0, 1)
+    }
+
+    .hx .room-card:hover .room-thumb-wrap img {
+      transform: scale(1.07)
+    }
+
+    .hx .room-card.featured {
+      position: relative
+    }
+
+    .hx .room-card.featured::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 230px;
+      pointer-events: none;
+      z-index: 2;
+      background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .26), rgba(255, 255, 255, 0));
+      transform: translateX(-140%) skewX(-18deg);
+      animation: hx-sheen 7s linear 2.5s infinite
+    }
+
+    /* tombol: umpan balik tekan */
+    .hx .btn:hover {
+      translate: 0 -1px
+    }
+
+    .hx .btn:active {
+      scale: .97;
+      translate: 0 0
+    }
+
+    .hx .tab-btn:active {
+      scale: .96
+    }
+
+    /* ikon tema */
+    .theme-toggle {
+      overflow: hidden
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal
+    }
+
+    ::view-transition-old(root) {
+      z-index: 1
+    }
+
+    ::view-transition-new(root) {
+      z-index: 2
+    }
+
+    /* modal: masuk lembut, keluar cepat */
+    .hx .modal-overlay.active {
+      animation: hx-fade .3s cubic-bezier(.2, 0, 0, 1) both
+    }
+
+    .hx .modal-overlay.active .modal-dialog {
+      animation: hx-modal .42s cubic-bezier(.2, 0, 0, 1) both
+    }
+
+    .hx .modal-overlay.closing {
+      animation: hx-fade-out .22s cubic-bezier(.3, 0, 1, 1) both
+    }
+
+    .hx .modal-overlay.closing .modal-dialog {
+      animation: hx-modal-out .22s cubic-bezier(.3, 0, 1, 1) both
+    }
+
+    /* peta: riak lokasi */
+    .map-pulse {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      z-index: 2
+    }
+
+    .map-pulse i {
+      position: absolute;
+      left: -15px;
+      top: -15px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      opacity: 0
+    }
+
+    .map-pulse b {
+      position: absolute;
+      left: -4px;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0
+    }
+
+    .map-pulse span {
+      position: absolute;
+      left: 0;
+      top: 16px;
+      translate: -50% 0;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 99px;
+      background: #fff;
+      color: #111827;
+      font: 700 12px 'Atkinson Hyperlegible', sans-serif;
+      box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .35);
+      opacity: 0
+    }
+
+    [data-theme=dark] .map-pulse span {
+      background: #1F2937;
+      color: #F3F4F6
+    }
+
+    .map-pulse.in i {
+      animation: hx-ripple 3.2s cubic-bezier(0, 0, .2, 1) infinite
+    }
+
+    .map-pulse.in i+i {
+      animation-delay: 1.6s
+    }
+
+    .map-pulse.in b {
+      animation: hx-fade .5s cubic-bezier(.2, 0, 0, 1) .2s both
+    }
+
+    .map-pulse.in span {
+      animation: hx-drop .7s cubic-bezier(.2, 0, 0, 1) .5s both
+    }
+
+    /* FAQ */
+    .faq details.is-closing[open] summary::after {
+      content: '+'
+    }
+
+    /* penutup */
+    .cta-band {
+      position: relative;
+      overflow: hidden
+    }
+
+    .cta-band>.wrap {
+      position: relative;
+      z-index: 1
+    }
+
+    .hx .cta-band::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      pointer-events: none;
+      background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .11), rgba(255, 255, 255, 0));
+      transform: translateX(-120%) skewX(-16deg);
+      animation: hx-cta 10s linear 1s infinite
+    }
+
+    .hx .cta-band .btn {
+      position: relative;
+      overflow: visible
+    }
+
+    .hx .cta-band .btn::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      border: 2px solid rgba(255, 255, 255, .9);
+      opacity: 0;
+      pointer-events: none;
+      animation: hx-ring 3s cubic-bezier(0, 0, .2, 1) 1.2s infinite
+    }
+
+    @keyframes hx-sheen {
+      0% {
+        transform: translateX(-140%) skewX(-18deg)
+      }
+
+      22%,
+      100% {
+        transform: translateX(420%) skewX(-18deg)
+      }
+    }
+
+    @keyframes hx-fade {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes hx-fade-out {
+      from {
+        opacity: 1
+      }
+
+      to {
+        opacity: 0
+      }
+    }
+
+    @keyframes hx-modal {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @keyframes hx-modal-out {
+      from {
+        opacity: 1;
+        transform: none
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(14px) scale(.985)
+      }
+    }
+
+    @keyframes hx-ripple {
+      0% {
+        opacity: .6;
+        transform: scale(.3)
+      }
+
+      80%,
+      100% {
+        opacity: 0;
+        transform: scale(3)
+      }
+    }
+
+    @keyframes hx-drop {
+      from {
+        opacity: 0;
+        translate: -50% -16px
+      }
+
+      to {
+        opacity: 1;
+        translate: -50% 0
+      }
+    }
+
+    @keyframes hx-cta {
+      0% {
+        transform: translateX(-120%) skewX(-16deg)
+      }
+
+      30%,
+      100% {
+        transform: translateX(330%) skewX(-16deg)
+      }
+    }
+
+    @keyframes hx-ring {
+      0% {
+        opacity: .55;
+        transform: scale(1)
+      }
+
+      70%,
+      100% {
+        opacity: 0;
+        transform: scale(1.14, 1.4)
+      }
+    }
+
     @media (prefers-reduced-motion:reduce) {
 
       .hero-mask,
@@ -2502,13 +2670,490 @@
         display: none !important
       }
     }
+
+    /* PAGE-MOTION — seluruh halaman (Premium: decelerate masuk, accelerate keluar, tanpa overshoot) */
+    .hx .rv {
+      opacity: 0;
+      translate: 0 18px
+    }
+
+    .hx .rv.in {
+      opacity: 1;
+      translate: 0 0;
+      transition: opacity .6s cubic-bezier(.2, 0, 0, 1) var(--d, 0ms), translate .6s cubic-bezier(.2, 0, 0, 1) var(--d, 0ms)
+    }
+
+    .fact-val {
+      font-variant-numeric: tabular-nums
+    }
+
+    /* kartu kamar */
+    @media (hover:hover) {
+      .hx .room-card {
+        transition: translate .4s cubic-bezier(.2, 0, 0, 1), box-shadow .4s cubic-bezier(.2, 0, 0, 1)
+      }
+
+      .hx .room-card:hover {
+        translate: 0 -4px;
+        box-shadow: 0 20px 32px -14px rgba(0, 0, 0, .2)
+      }
+    }
+
+    .hx .room-thumb-wrap img {
+      transition: transform .9s cubic-bezier(.2, 0, 0, 1)
+    }
+
+    .hx .room-card:hover .room-thumb-wrap img {
+      transform: scale(1.07)
+    }
+
+    .hx .room-card.featured {
+      position: relative
+    }
+
+    .hx .room-card.featured::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 230px;
+      pointer-events: none;
+      z-index: 2;
+      background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .26), rgba(255, 255, 255, 0));
+      transform: translateX(-140%) skewX(-18deg);
+      animation: hx-sheen 7s linear 2.5s infinite
+    }
+
+    /* tombol: umpan balik tekan */
+    .hx .btn:hover {
+      translate: 0 -1px
+    }
+
+    .hx .btn:active {
+      scale: .97;
+      translate: 0 0
+    }
+
+    .hx .tab-btn:active {
+      scale: .96
+    }
+
+    /* ikon tema */
+    .theme-toggle {
+      overflow: hidden
+    }
+
+    ::view-transition-old(root),
+    ::view-transition-new(root) {
+      animation: none;
+      mix-blend-mode: normal
+    }
+
+    ::view-transition-old(root) {
+      z-index: 1
+    }
+
+    ::view-transition-new(root) {
+      z-index: 2
+    }
+
+    /* modal: masuk lembut, keluar cepat */
+    .hx .modal-overlay.active {
+      animation: hx-fade .3s cubic-bezier(.2, 0, 0, 1) both
+    }
+
+    .hx .modal-overlay.active .modal-dialog {
+      animation: hx-modal .42s cubic-bezier(.2, 0, 0, 1) both
+    }
+
+    .hx .modal-overlay.closing {
+      animation: hx-fade-out .22s cubic-bezier(.3, 0, 1, 1) both
+    }
+
+    .hx .modal-overlay.closing .modal-dialog {
+      animation: hx-modal-out .22s cubic-bezier(.3, 0, 1, 1) both
+    }
+
+    /* peta: riak lokasi */
+    .map-pulse {
+      position: absolute;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+      z-index: 2
+    }
+
+    .map-pulse i {
+      position: absolute;
+      left: -15px;
+      top: -15px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--primary);
+      opacity: 0
+    }
+
+    .map-pulse b {
+      position: absolute;
+      left: -4px;
+      top: -4px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--primary);
+      opacity: 0
+    }
+
+    .map-pulse span {
+      position: absolute;
+      left: 0;
+      top: 16px;
+      translate: -50% 0;
+      white-space: nowrap;
+      padding: 5px 10px;
+      border-radius: 99px;
+      background: #fff;
+      color: #111827;
+      font: 700 12px 'Atkinson Hyperlegible', sans-serif;
+      box-shadow: 0 8px 18px -8px rgba(0, 0, 0, .35);
+      opacity: 0
+    }
+
+    [data-theme=dark] .map-pulse span {
+      background: #1F2937;
+      color: #F3F4F6
+    }
+
+    .map-pulse.in i {
+      animation: hx-ripple 3.2s cubic-bezier(0, 0, .2, 1) infinite
+    }
+
+    .map-pulse.in i+i {
+      animation-delay: 1.6s
+    }
+
+    .map-pulse.in b {
+      animation: hx-fade .5s cubic-bezier(.2, 0, 0, 1) .2s both
+    }
+
+    .map-pulse.in span {
+      animation: hx-drop .7s cubic-bezier(.2, 0, 0, 1) .5s both
+    }
+
+    /* FAQ */
+    .faq details.is-closing[open] summary::after {
+      content: '+'
+    }
+
+    /* penutup */
+    .cta-band {
+      position: relative;
+      overflow: hidden
+    }
+
+    .cta-band>.wrap {
+      position: relative;
+      z-index: 1
+    }
+
+    .hx .cta-band::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 50%;
+      pointer-events: none;
+      background: linear-gradient(100deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, .11), rgba(255, 255, 255, 0));
+      transform: translateX(-120%) skewX(-16deg);
+      animation: hx-cta 10s linear 1s infinite
+    }
+
+    .hx .cta-band .btn {
+      position: relative;
+      overflow: visible
+    }
+
+    .hx .cta-band .btn::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: 14px;
+      border: 2px solid rgba(255, 255, 255, .9);
+      opacity: 0;
+      pointer-events: none;
+      animation: hx-ring 3s cubic-bezier(0, 0, .2, 1) 1.2s infinite
+    }
+
+    @keyframes hx-sheen {
+      0% {
+        transform: translateX(-140%) skewX(-18deg)
+      }
+
+      22%,
+      100% {
+        transform: translateX(420%) skewX(-18deg)
+      }
+    }
+
+    @keyframes hx-fade {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    @keyframes hx-fade-out {
+      from {
+        opacity: 1
+      }
+
+      to {
+        opacity: 0
+      }
+    }
+
+    @keyframes hx-modal {
+      from {
+        opacity: 0;
+        transform: translateY(24px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    @keyframes hx-modal-out {
+      from {
+        opacity: 1;
+        transform: none
+      }
+
+      to {
+        opacity: 0;
+        transform: translateY(14px) scale(.985)
+      }
+    }
+
+    @keyframes hx-ripple {
+      0% {
+        opacity: .6;
+        transform: scale(.3)
+      }
+
+      80%,
+      100% {
+        opacity: 0;
+        transform: scale(3)
+      }
+    }
+
+    @keyframes hx-drop {
+      from {
+        opacity: 0;
+        translate: -50% -16px
+      }
+
+      to {
+        opacity: 1;
+        translate: -50% 0
+      }
+    }
+
+    @keyframes hx-cta {
+      0% {
+        transform: translateX(-120%) skewX(-16deg)
+      }
+
+      30%,
+      100% {
+        transform: translateX(330%) skewX(-16deg)
+      }
+    }
+
+    @keyframes hx-ring {
+      0% {
+        opacity: .55;
+        transform: scale(1)
+      }
+
+      70%,
+      100% {
+        opacity: 0;
+        transform: scale(1.14, 1.4)
+      }
+    }
   </style>
   <script>/*HERO-MOTION*/try { if (!matchMedia('(prefers-reduced-motion:reduce)').matches) document.documentElement.classList.add('hx') } catch (e) { }</script>
+</head>
 
+<body>
+  <!-- @jz-bar-start -->
+  <style>
+    /* Sembunyikan watermark badge lama jika masih ada di cache */
+    #__jzwm {
+      display: none !important
+    }
+
+    body {
+      padding-bottom: 46px !important;
+      box-sizing: border-box !important
+    }
+
+    #__jz-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2147483640;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px;
+      height: 46px;
+      background: rgba(15, 23, 42, .95);
+      border-top: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, .4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      font: 600 13px/1 system-ui, -apple-system, sans-serif;
+      color: #cbd5e1;
+      box-sizing: border-box
+    }
+
+    #__jz-bar * {
+      box-sizing: border-box
+    }
+
+    #__jz-bar .jz-bar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    #__jz-bar .jz-btn-gallery {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #2dd4bf;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(45, 212, 191, .1);
+      border: 1px solid rgba(45, 212, 191, .25);
+      transition: all .15s
+    }
+
+    #__jz-bar .jz-btn-gallery:hover {
+      background: rgba(45, 212, 191, .2);
+      color: #5eead4
+    }
+
+    #__jz-bar .jz-btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #94a3b8;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all .15s
+    }
+
+    #__jz-bar .jz-btn-home:hover {
+      color: #f8fafc;
+      background: rgba(255, 255, 255, .06)
+    }
+
+    #__jz-bar .jz-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      opacity: .7
+    }
+
+    #__jz-bar .jz-sep {
+      color: rgba(255, 255, 255, .18);
+      font-weight: 300
+    }
+
+    #__jz-bar .jz-title {
+      font-size: 12px;
+      opacity: .75;
+      color: #e2e8f0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 320px;
+      text-align: center
+    }
+
+    #__jz-bar .jz-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #25d366;
+      color: #052e16 !important;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 7px 13px;
+      border-radius: 999px;
+      box-shadow: 0 2px 10px rgba(37, 211, 102, .35);
+      transition: all .15s;
+      flex-shrink: 0
+    }
+
+    #__jz-bar .jz-wa:hover {
+      background: #22c35e;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, .5);
+      transform: translateY(-1px)
+    }
+
+    @media(max-width:720px) {
+      #__jz-bar .jz-title {
+        display: none
+      }
+    }
+
+    @media(max-width:500px) {
+      #__jz-bar {
+        padding: 0 10px;
+        gap: 6px
+      }
+
+      #__jz-bar .jz-btn-gallery span {
+        font-size: 12px
+      }
+
+      #__jz-bar .jz-btn-home .jz-domain {
+        display: none
+      }
+
+      #__jz-bar .jz-wa {
+        padding: 6px 11px;
+        font-size: 11.5px
+      }
+    }
+  </style>
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
     <div class="jz-bar-nav">
-      <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/index.html"
-        aria-label="Kembali ke Galeri Contoh Desain">
+      <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -2563,7 +3208,7 @@
         <a href="#biaya">Biaya</a>
         <a href="#lokasi">Lokasi &amp; Akses</a>
         <a href="#faq">FAQ</a><a href="#aturan">Peraturan</a>
-        <a href="https://arzhaning.my.id/demos/demo-kospro-mudah.html" target="_blank" rel="noopener">Masuk Penghuni
+        <a href="https://arzhaning.my.id/demos/demo-kospro-mudah" target="_blank" rel="noopener">Masuk Penghuni
           ↗</a>
       </div>
       <div class="nav-cta" style="display:flex; gap:10px;">
@@ -2577,7 +3222,7 @@
     </div>
     <nav class="m-nav" aria-label="Menu cepat"><a href="#kamar">Kamar</a><a href="#fasilitas">Fasilitas</a><a
         href="#biaya">Biaya</a><a href="#lokasi">Lokasi</a><a href="#faq">FAQ</a><a href="#aturan">Peraturan</a><a
-        class="m-ext" href="https://arzhaning.my.id/demos/demo-kospro-mudah.html" target="_blank" rel="noopener">Masuk
+        class="m-ext" href="https://arzhaning.my.id/demos/demo-kospro-mudah" target="_blank" rel="noopener">Masuk
         Penghuni ↗</a></nav>
   </header>
   <section class="wrap hero">
@@ -3057,7 +3702,7 @@
         </div>
       </div>
       <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:28px;">
-        <a class="btn" href="https://arzhaning.my.id/demos/demo-kospro-mudah.html" target="_blank" rel="noopener">Masuk
+        <a class="btn" href="https://arzhaning.my.id/demos/demo-kospro-mudah" target="_blank" rel="noopener">Masuk
           ke KosPro (penghuni)</a>
         <button class="btn btn-outline" onclick="openBookingModal()">Belum jadi penghuni? Hitung sewa</button>
       </div>
@@ -3509,6 +4154,208 @@
           tx = Math.max(-1, Math.min(1, e.gamma / 22)); ty = Math.max(-1, Math.min(1, ((e.beta || 45) - 45) / 22)); kick()
         }, { passive: true })
       }
+    })();
+  </script>
+  <script>/*PAGE-MOTION*/
+    (function () {
+      var root = document.documentElement;
+      if (!root.classList.contains('hx')) return;            // hx = gerak aktif (tidak ada jika "kurangi gerakan")
+      var EASE = 'cubic-bezier(.2,0,0,1)', mobile = function () { return matchMedia('(max-width:760px)').matches };
+      function q(sel, ctx) { return [].slice.call((ctx || document).querySelectorAll(sel)) }
+      var ease3 = function (t) { return 1 - Math.pow(1 - t, 3) };
+
+      function init() {
+        /* 1) scroll reveal bertahap */
+        try {
+          if ('IntersectionObserver' in window) {
+            var sel = '.sec-eyebrow,.sec-title,.fact-item,.fac-feature,.fac-card,.faq details,.map-box,.cmpwrap,.cta-band .wrap>*';
+            if (!mobile()) sel += ',.room-card,#tGrid>*';
+            var els = q(sel).filter(function (e) { return !e.closest('.hero') });
+            els.forEach(function (e) { e.classList.add('rv') });
+            var io = new IntersectionObserver(function (es) {
+              var vis = es.filter(function (x) { return x.isIntersecting }).sort(function (a, b) { return (a.target.compareDocumentPosition(b.target) & 2) ? 1 : -1 });
+              vis.forEach(function (x, i) {
+                var e = x.target, d = Math.min(i, 4) * 80; io.unobserve(e);
+                e.style.setProperty('--d', d + 'ms'); e.classList.add('in');
+                setTimeout(function () { e.classList.remove('rv', 'in'); e.style.removeProperty('--d') }, d + 900)
+              });
+            }, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
+            els.forEach(function (e) { io.observe(e) });
+          }
+        } catch (e) { }
+
+        /* 2) strip fakta: hitung naik */
+        try {
+          var strip = document.querySelector('.facts-strip');
+          if (strip && 'IntersectionObserver' in window) {
+            var items = q('.fact-val', strip).map(function (el) {
+              var m = el.textContent.trim().match(/^(\D*?)(\d[\d.,]*)(.*)$/); if (!m) return null;
+              var raw = m[2], dec = raw.indexOf(',') > -1 ? raw.split(',')[1].length : 0, val = parseFloat(raw.replace(',', '.'));
+              return isNaN(val) ? null : { el: el, pre: m[1], suf: m[3], val: val, dec: dec, full: el.textContent }
+            }).filter(Boolean);
+            var fmt = function (it, n) { return it.pre + n.toFixed(it.dec).replace('.', ',') + it.suf };
+            items.forEach(function (it) { it.el.style.minWidth = it.el.offsetWidth + 'px' });
+            var sio = new IntersectionObserver(function (es) {
+              if (!es[0].isIntersecting) return; sio.disconnect();
+              items.forEach(function (it, i) {
+                var t0 = null; it.el.textContent = fmt(it, 0);
+                setTimeout(function () {
+                  requestAnimationFrame(function step(t) {
+                    if (t0 === null) t0 = t; var p = Math.min((t - t0) / 1000, 1);
+                    it.el.textContent = p >= 1 ? it.full : fmt(it, it.val * ease3(p)); if (p < 1) requestAnimationFrame(step)
+                  })
+                }, i * 90)
+              });
+              setTimeout(function () { items.forEach(function (it) { it.el.textContent = it.full }) }, 2600);
+            }, { threshold: .45 });
+            items.forEach(function (it) { it.el.textContent = fmt(it, 0) });
+            sio.observe(strip);
+          }
+        } catch (e) { }
+
+        /* 3) filter kamar: kartu bergeser ke posisi baru (FLIP) */
+        try {
+          var of = window.filterRooms;
+          if (typeof of === 'function') window.filterRooms = function () {
+            var cards = q('.room-card'), before = new Map();
+            cards.forEach(function (c) { if (c.offsetParent !== null) before.set(c, c.getBoundingClientRect()) });
+            var r = of.apply(this, arguments), mob = mobile(), k = 0;
+            cards.forEach(function (c) {
+              if (c.offsetParent === null || !c.animate) return;
+              var b = before.get(c);
+              if (b && !mob) {
+                var a = c.getBoundingClientRect(), dx = b.left - a.left, dy = b.top - a.top;
+                if (Math.abs(dx) > 1 || Math.abs(dy) > 1) c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }], { duration: 480, easing: 'cubic-bezier(.4,0,.2,1)' })
+              }
+              else { c.animate([{ opacity: 0, transform: 'translateY(14px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: Math.min(k++, 3) * 60, easing: EASE, fill: 'backwards' }) }
+            });
+            return r
+          };
+        } catch (e) { }
+
+        /* petunjuk geser di HP: sentilan kecil sekali */
+        try {
+          var rc = document.getElementById('roomsContainer');
+          if (rc && mobile() && 'IntersectionObserver' in window) {
+            var nio = new IntersectionObserver(function (es) {
+              if (!es[0].isIntersecting) return; nio.disconnect();
+              setTimeout(function () { q('.room-card', rc).forEach(function (c) { if (c.animate) c.animate([{ translate: '0 0' }, { translate: '-22px 0', offset: .4 }, { translate: '0 0' }], { duration: 900, easing: 'cubic-bezier(.4,0,.2,1)' }) }) }, 350)
+            }, { threshold: .7 });
+            nio.observe(rc);
+          }
+        } catch (e) { }
+
+        /* 4) tema: lingkaran melebar dari tombol + ikon berputar */
+        try {
+          var lastBtn = null;
+          document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('.theme-toggle'); if (b) lastBtn = b }, true);
+          var ot = window.toggleTheme;
+          if (typeof ot === 'function') window.toggleTheme = function () {
+            var btn = lastBtn && lastBtn.offsetParent !== null ? lastBtn : q('.theme-toggle').filter(function (b) { return b.offsetParent !== null })[0];
+            var spin = function () { q('.theme-toggle').forEach(function (b) { if (b.animate) b.animate([{ transform: 'rotate(-120deg) scale(.5)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 520, easing: EASE }) }) };
+            if (!document.startViewTransition || !btn) { ot.apply(this, arguments); spin(); return }
+            var rc = btn.getBoundingClientRect(), x = rc.left + rc.width / 2, y = rc.top + rc.height / 2,
+              R = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y)), self = this, args = arguments;
+            var t = document.startViewTransition(function () { ot.apply(self, args) });
+            t.ready.then(function () {
+              spin();
+              root.animate({ clipPath: ['circle(0px at ' + x + 'px ' + y + 'px)', 'circle(' + R + 'px at ' + x + 'px ' + y + 'px)'] },
+                { duration: 750, easing: 'cubic-bezier(.4,0,.2,1)', pseudoElement: '::view-transition-new(root)' })
+            }).catch(function () { });
+          };
+        } catch (e) { }
+
+        /* 5) modal: keluar lembut, simulasi: angka berguling */
+        try {
+          var oc = window.closeModal;
+          if (typeof oc === 'function') window.closeModal = function (id) {
+            var m = document.getElementById(id);
+            if (m && m.classList.contains('closing')) return;
+            if (!m || !m.classList.contains('active')) return oc.apply(this, arguments);
+            m.classList.add('closing'); var self = this, args = arguments;
+            setTimeout(function () { m.classList.remove('closing'); oc.apply(self, args) }, 230)
+          };
+          var ids = ['resGross', 'resDiscount', 'resDeposit', 'resTotal', 'resTotalS'], roll = {};
+          var num = function (t) { var m = String(t).match(/^(\D*)([\d.]+)(\D*)$/); return m ? { pre: m[1], n: parseInt(m[2].replace(/\./g, ''), 10), suf: m[3] } : null };
+          var money = function (n) { return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.') };
+          var settle = function () { ids.forEach(function (id) { var r = roll[id]; if (r) { r.gen++; var el = document.getElementById(id); if (el && r.final != null) el.textContent = r.final } }) };
+          ids.forEach(function (id) { roll[id] = { gen: 0, cur: null, final: null } });
+          var oR = window.calculateRent;
+          if (typeof oR === 'function') {
+            window.calculateRent = function () {
+              var prev = {}; ids.forEach(function (id) { var el = document.getElementById(id); prev[id] = el ? num(el.textContent) : null });
+              var r = oR.apply(this, arguments);
+              ids.forEach(function (id) {
+                var el = document.getElementById(id), to = el && num(el.textContent); if (!to) return;
+                var st = roll[id], from = prev[id], final = el.textContent; st.final = final;
+                if (!from || from.n === to.n || !document.getElementById('bookingModal').classList.contains('active') && false) return;
+                var gen = ++st.gen, t0 = null, a = from.n, b = to.n; el.textContent = from.pre + money(from.n) + from.suf;
+                requestAnimationFrame(function step(t) {
+                  if (gen !== st.gen) return; if (t0 === null) t0 = t; var p = Math.min((t - t0) / 520, 1);
+                  el.textContent = p >= 1 ? final : to.pre + money(Math.round(a + (b - a) * ease3(p))) + to.suf; if (p < 1) requestAnimationFrame(step)
+                })
+              });
+              return r
+            };
+            var oW = window.sendBookingWA;
+            if (typeof oW === 'function') window.sendBookingWA = function () { settle(); return oW.apply(this, arguments) };
+          }
+        } catch (e) { }
+
+        /* 6) lokasi: riak + label jatuh di titik peta */
+        try {
+          var mb = document.querySelector('.map-box'), fr = mb && mb.querySelector('iframe');
+          if (mb && fr) {
+            mb.style.position = 'relative';
+            var pu = document.createElement('aside'); pu.className = 'map-pulse'; pu.setAttribute('aria-hidden', 'true');
+            pu.innerHTML = '<i></i><i></i><b></b><span>Griya Asri Residence</span>'; mb.appendChild(pu);
+            var place = function () { pu.style.left = (fr.offsetLeft + fr.offsetWidth / 2) + 'px'; pu.style.top = (fr.offsetTop + fr.offsetHeight / 2) + 'px' };
+            place(); if ('ResizeObserver' in window) new ResizeObserver(place).observe(mb); else addEventListener('resize', place);
+            if ('IntersectionObserver' in window) { var pio = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { pu.classList.add('in'); pio.disconnect() } }, { threshold: .5 }); pio.observe(mb) }
+            else pu.classList.add('in');
+          }
+        } catch (e) { }
+
+        /* 7) FAQ & perbandingan: tinggi membuka/menutup mulus */
+        try {
+          q('.faq details,details.cmpwrap').forEach(function (det) {
+            var sum = det.querySelector('summary'); if (!sum || !det.animate) return;
+            sum.addEventListener('click', function (e) {
+              e.preventDefault();
+              var cs = getComputedStyle(det), bb = cs.boxSizing === 'border-box',
+                pb = parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + parseFloat(cs.borderTopWidth) + parseFloat(cs.borderBottomWidth),
+                start = det.getBoundingClientRect().height - (bb ? 0 : pb), opening;
+              if (det._a) { det._a.cancel(); det._a = null }
+              opening = !det.open || det._closing; det._closing = false; det.classList.remove('is-closing');
+              var end;
+              if (opening) { det.open = true; end = det.getBoundingClientRect().height - (bb ? 0 : pb) }
+              else { end = sum.getBoundingClientRect().height + (bb ? pb : 0); det._closing = true; det.classList.add('is-closing') }
+              det.style.overflow = 'hidden';
+              var a = det._a = det.animate({ height: [start + 'px', end + 'px'] }, { duration: 380, easing: 'cubic-bezier(.4,0,.2,1)' });
+              if (opening) q(':scope>:not(summary)', det).forEach(function (c) { c.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 320, delay: 80, easing: EASE, fill: 'backwards' }) });
+              var fin = function () {
+                if (det._a !== a) return; det._a = null; det.style.overflow = '';
+                if (det._closing) { det.open = false; det._closing = false; det.classList.remove('is-closing') }
+              };
+              a.onfinish = fin; a.oncancel = function () { if (det._a === a) det.style.overflow = '' };
+            });
+          });
+        } catch (e) { }
+
+        /* 8) lightbox: foto bergeser searah panah */
+        try {
+          var og = window.lbGo, os = window.lbShow, dir = 0;
+          if (typeof og === 'function' && typeof os === 'function') {
+            window.lbGo = function (d) { dir = d; return og.apply(this, arguments) };
+            window.lbShow = function () {
+              var r = os.apply(this, arguments), el = document.getElementById('lbStage'); el = el && el.firstElementChild;
+              if (el && el.animate) el.animate([{ opacity: 0, transform: 'translateX(' + (dir * 36) + 'px) scale(.985)' }, { opacity: 1, transform: 'none' }], { duration: 400, easing: EASE });
+              dir = 0; return r
+            };
+          }
+        } catch (e) { }
+      }
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
     })();
   </script>
 </body>

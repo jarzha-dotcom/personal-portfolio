@@ -32,7 +32,7 @@
   <meta property="og:title" content="Aplikasi Kelola Kos Sederhana | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
     content="Aplikasi kelola kos dengan huruf besar dan tombol jelas, ringkasan uang masuk dan keluar, penagihan lewat WhatsApp, kwitansi, pengumuman, uang jaminan, laporan keuangan 6 bulan, portal penghuni, dan t">
-  <meta property="og:url" content="https://arzhaning.my.id/demos/demo-kospro-mudah.html">
+  <meta property="og:url" content="https://arzhaning.my.id/demos/demo-kospro-mudah">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-kospro-mudah.webp">
   <meta property="og:image:width" content="1280">
@@ -1542,6 +1542,32 @@
         flex: 1
       }
     }
+
+    /* Ukuran huruf kecil/normal/besar dan perbaikan lebar */
+    body.sm #app,
+    body.sm .sheet {
+      zoom: .85
+    }
+
+    .pay {
+      flex-wrap: wrap
+    }
+
+    .pay>span:first-child:not(.av),
+    .pay .mid {
+      flex: 1 1 140px;
+      min-width: 0
+    }
+
+    .agrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+      gap: 12px
+    }
+
+    .agrid .btn {
+      min-width: 0
+    }
   </style>
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-kospro-mudah.css">
@@ -2105,28 +2131,6 @@
 </head>
 
 <body>
-  <div id="splash" aria-hidden="true">
-    <div class="glow"></div><i class="orb o1"></i><i class="orb o2"></i>
-    <svg width="176" height="176" viewBox="0 0 200 200">
-      <path class="h" pathLength="1" d="M28 98 L100 36 L172 98 M44 86 V164 a9 9 0 0 0 9 9 H147 a9 9 0 0 0 9 -9 V86" />
-      <g id="spw"></g>
-    </svg>
-    <div class="t"><span>KosPro</span><span>Mudah</span></div>
-    <div class="n"></div>
-    <div class="s">Kelola kos jadi mudah</div>
-    <div class="pb"><i></i></div>
-    <div class="sk">Ketuk untuk lewati</div>
-  </div>
-  <script>
-      (function () {
-        var s = document.getElementById('splash'), skip = false, g = '';
-        try { var nt = performance.getEntriesByType('navigation')[0]; skip = matchMedia('(prefers-reduced-motion: reduce)').matches || (nt && nt.type === 'reload') || /sebagai=|tur=/.test(location.hash) } catch (e) { }
-        if (skip) { s.remove(); window.__spOn = false; return }
-        for (var i = 0; i < 12; i++) { var c = i % 4, r = (i / 4) | 0; g += '<rect class="w' + (i === 3 || i === 11 ? ' d' : '') + '" x="' + (51 + c * 26) + '" y="' + (106 + r * 20) + '" width="20" height="14" rx="3" style="--k:' + (c + r) + '"/>' }
-        document.getElementById('spw').innerHTML = g; window.__spOn = true
-      })()
-  </script>
-
   <!-- @jz-bar-start -->
   <style>
     /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -2285,8 +2289,7 @@
   </style>
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
     <div class="jz-bar-nav">
-      <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/index.html"
-        aria-label="Kembali ke Galeri Contoh Desain">
+      <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M19 12H5M12 5l-7 7 7 7" />
@@ -2316,6 +2319,28 @@
     </a>
   </div>
   <!-- @jz-bar-end -->
+  <div id="splash" aria-hidden="true">
+    <div class="glow"></div><i class="orb o1"></i><i class="orb o2"></i>
+    <svg width="176" height="176" viewBox="0 0 200 200">
+      <path class="h" pathLength="1" d="M28 98 L100 36 L172 98 M44 86 V164 a9 9 0 0 0 9 9 H147 a9 9 0 0 0 9 -9 V86" />
+      <g id="spw"></g>
+    </svg>
+    <div class="t"><span>KosPro</span><span>Mudah</span></div>
+    <div class="n"></div>
+    <div class="s">Kelola kos jadi mudah</div>
+    <div class="pb"><i></i></div>
+    <div class="sk">Ketuk untuk lewati</div>
+  </div>
+  <script>
+      (function () {
+        var s = document.getElementById('splash'), skip = false, g = '';
+        try { var nt = performance.getEntriesByType('navigation')[0]; skip = matchMedia('(prefers-reduced-motion: reduce)').matches || (nt && nt.type === 'reload') || /sebagai=|tur=/.test(location.hash) } catch (e) { }
+        if (skip) { s.remove(); window.__spOn = false; return }
+        for (var i = 0; i < 12; i++) { var c = i % 4, r = (i / 4) | 0; g += '<rect class="w' + (i === 3 || i === 11 ? ' d' : '') + '" x="' + (51 + c * 26) + '" y="' + (106 + r * 20) + '" width="20" height="14" rx="3" style="--k:' + (c + r) + '"/>' }
+        document.getElementById('spw').innerHTML = g; window.__spOn = true
+      })()
+  </script>
+
   <main id="app"></main>
   <div id="toast" role="status"></div>
   <div id="modal"></div>
@@ -2396,12 +2421,15 @@
     function openM0(h) { document.getElementById('modal').innerHTML = '<div class="ov" onclick="if(event.target===this)closeM()"><div class="sheet" role="dialog" aria-modal="true">' + h + '</div></div>' }
     function closeM() { document.getElementById('modal').innerHTML = '' }
     function go(t) { closeM(); if (t === 'laporan' && tab !== 'laporan') bulanSel = 0; tab = t; draw(); window.scrollTo(0, 0) }
-    function huruf() { big = !big; save(); draw() }
+    var FONT = (function () { try { return localStorage.getItem('kospro_huruf') } catch (e) { return null } })() || 'normal';
+    function fontNama() { return { kecil: 'Kecil', normal: 'Normal', besar: 'Besar' }[FONT] }
+    function setHuruf(v) { FONT = v; big = (v === 'besar'); try { localStorage.setItem('kospro_huruf', v) } catch (e) { } draw() }
+    function huruf() { var o = ['kecil', 'normal', 'besar']; setHuruf(o[(o.indexOf(FONT) + 1) % 3]) }
     var TEMA = (function () { try { return localStorage.getItem('kospro_tema') || 'auto' } catch (e) { return 'auto' } })(), LANG = (function () { try { return localStorage.getItem('kospro_bahasa') || 'id' } catch (e) { return 'id' } })(), mq = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
     function applyTema() { var d = TEMA === 'gelap' || (TEMA === 'auto' && mq && mq.matches); document.documentElement.setAttribute('data-theme', d ? 'dark' : 'light'); document.documentElement.lang = LANG }
     var EN_SORT;
-    var EX = { 'Selesai': 'Finish', 'Beranda': 'Home', 'Uang': 'Money', 'Kamar': 'Rooms', 'Penghuni': 'Tenants', 'Lainnya': 'More', 'Profil': 'Profile', 'Lapor': 'Report', 'Riwayat': 'History', 'Masuk': 'Log in', 'Keluar': 'Log out', 'Tutup': 'Close', 'Simpan': 'Save', 'Batal': 'Cancel', 'Semua': 'All', 'Hapus': 'Delete', 'Kembali': 'Back', 'Telepon': 'Call', 'Tanggal': 'Date', 'Untuk': 'For', 'Pemilik': 'Owner', 'Keduanya': 'Both', 'Berakhir': 'Ends', 'Air': 'Water', 'Listrik': 'Electricity', 'Kebersihan': 'Cleaning', 'Perbaikan': 'Repairs', 'Galeri': 'Gallery', 'Kosong': 'Vacant', 'Terang': 'Light', 'Gelap': 'Dark', 'Biasa': 'Normal', 'Besar': 'Large', 'Akun': 'Account', 'Tema': 'Theme', 'Bahasa': 'Language', 'Tampilan': 'Appearance', 'Pengaturan': 'Settings', 'Pengumuman': 'Announcements', 'Pembayaran': 'Payments', 'Otomatisasi': 'Automation', 'Perpanjang': 'Extend', 'Tolak': 'Reject', 'Nonaktifkan': 'Deactivate', 'Kwitansi': 'Receipt', 'Tunai': 'Cash', 'Menu utama': 'Main menu', 'Sudah bayar': 'Paid', 'Belum bayar': 'Unpaid', 'Menunggak': 'Overdue', 'Sewa kos': 'Boarding house rent', 'Ya, hapus': 'Yes, delete', 'Tidak jadi': 'Never mind', 'Lihat detail': 'View details', 'Pilih bulan': 'Choose month', 'Perbaikan selesai': 'Repair done', 'Aplikasi Kelola Kos Sederhana': 'Simple boarding house management app' };
-    var PH = [['Baru pertama kali di sini?', 'First time here?'], ['Ikut tur 2 menit supaya langsung paham alurnya dari penghuni sampai pemilik.', 'Take the 2-minute tour to understand the flow from tenant to owner right away.'], ['Mulai tur demo', 'Start demo tour'], ['Kembali ke halaman utama', 'Back to main page'], ['Tekan Selesai untuk kembali ke tempat Anda memulai tur.', 'Press Finish to return to where you started the tour.'], ['Coba sendiri di aplikasi', 'Try it yourself in the app'], ['Tur ditutup. Kembali ke halaman awal.', 'Tour closed. Back to the start page.'], ['Tur ditutup.', 'Tour closed.'], ['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
+    var EX = { 'Kecil': 'Small', 'Normal': 'Normal', 'Selesai': 'Finish', 'Beranda': 'Home', 'Uang': 'Money', 'Kamar': 'Rooms', 'Penghuni': 'Tenants', 'Lainnya': 'More', 'Profil': 'Profile', 'Lapor': 'Report', 'Riwayat': 'History', 'Masuk': 'Log in', 'Keluar': 'Log out', 'Tutup': 'Close', 'Simpan': 'Save', 'Batal': 'Cancel', 'Semua': 'All', 'Hapus': 'Delete', 'Kembali': 'Back', 'Telepon': 'Call', 'Tanggal': 'Date', 'Untuk': 'For', 'Pemilik': 'Owner', 'Keduanya': 'Both', 'Berakhir': 'Ends', 'Air': 'Water', 'Listrik': 'Electricity', 'Kebersihan': 'Cleaning', 'Perbaikan': 'Repairs', 'Galeri': 'Gallery', 'Kosong': 'Vacant', 'Terang': 'Light', 'Gelap': 'Dark', 'Biasa': 'Normal', 'Besar': 'Large', 'Akun': 'Account', 'Tema': 'Theme', 'Bahasa': 'Language', 'Tampilan': 'Appearance', 'Pengaturan': 'Settings', 'Pengumuman': 'Announcements', 'Pembayaran': 'Payments', 'Otomatisasi': 'Automation', 'Perpanjang': 'Extend', 'Tolak': 'Reject', 'Nonaktifkan': 'Deactivate', 'Kwitansi': 'Receipt', 'Tunai': 'Cash', 'Menu utama': 'Main menu', 'Sudah bayar': 'Paid', 'Belum bayar': 'Unpaid', 'Menunggak': 'Overdue', 'Sewa kos': 'Boarding house rent', 'Ya, hapus': 'Yes, delete', 'Tidak jadi': 'Never mind', 'Lihat detail': 'View details', 'Pilih bulan': 'Choose month', 'Perbaikan selesai': 'Repair done', 'Aplikasi Kelola Kos Sederhana': 'Simple boarding house management app' };
+    var PH = [['Huruf: Kecil', 'Text: Small'], ['Huruf: Normal', 'Text: Normal'], ['Huruf: Besar', 'Text: Large'], ['Kecil (ketuk untuk ganti)', 'Small (tap to change)'], ['Normal (ketuk untuk ganti)', 'Normal (tap to change)'], ['Besar (ketuk untuk ganti)', 'Large (tap to change)'], ['Baru pertama kali di sini?', 'First time here?'], ['Ikut tur 2 menit supaya langsung paham alurnya dari penghuni sampai pemilik.', 'Take the 2-minute tour to understand the flow from tenant to owner right away.'], ['Mulai tur demo', 'Start demo tour'], ['Kembali ke halaman utama', 'Back to main page'], ['Tekan Selesai untuk kembali ke tempat Anda memulai tur.', 'Press Finish to return to where you started the tour.'], ['Coba sendiri di aplikasi', 'Try it yourself in the app'], ['Tur ditutup. Kembali ke halaman awal.', 'Tour closed. Back to the start page.'], ['Tur ditutup.', 'Tour closed.'], ['Selamat datang di demo KosPro Mudah', 'Welcome to the KosPro Mudah demo'], ['Mau ikut tur singkat 2 menit? Kami tunjukkan alur dari penghuni sampai pemilik, jadi Anda tidak perlu menebak-nebak.', 'Want a quick 2-minute tour? We show the flow from tenant to owner, so you do not have to guess.'], ['Mulai tur', 'Start tour'], ['Lewati', 'Skip'], ['Berikutnya', 'Next'], ['Keluar tur', 'Exit tour'], ['Langkah', 'Step'], ['Tur demo singkat', 'Quick demo tour'], ['Tur demo', 'Demo tour'], ['Tur singkat (2 menit)', 'Short tour (2 min)'], ['Tur lengkap dan rencana fitur', 'Full tour and planned features'], ['Lihat alur aplikasi dari penghuni sampai pemilik.', 'See the app flow from tenant to owner.'], ['Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.', 'OK. You can reopen the tour from the login page or the Profile menu.'], ['Tur tidak akan ditawarkan lagi. Tetap bisa dibuka dari menu Profil.', 'The tour will not be offered again. You can still open it from the Profile menu.'], ['Tampilan dan bahasa', 'Appearance and language'], ['Unggah foto', 'Upload photo'], ['Ganti foto', 'Change photo'], ['Buka profil', 'Open profile'], ['Belum ada catatan pembayaran.', 'No payment records yet.'], ['Foto bukti transfer dari', 'Photo of the transfer proof from'], ['Uang masuk, uang keluar, dan grafik bulanan', 'Income, expenses, and monthly chart'], ['uang keluar', 'expenses'], ['uang masuk', 'income'], ['Belum bayar', 'Unpaid'], ['Sudah bayar', 'Paid'], ['Status:', 'Status:'],
     ['Buka Lainnya, lalu Laporan keuangan. Ketuk "Catat uang keluar", pilih untuk apa (listrik, perbaikan, dan lainnya), isi jumlahnya, lalu Simpan.', 'Open More, then Financial report. Tap "Record expense", choose what it is for (electricity, repairs, and so on), enter the amount, then Save.'],
     ['Buka Lainnya, lalu Pengaturan. Isi nama bank, nomor rekening, dan gambar QRIS agar tampil di "Cara membayar" milik penghuni. Tulis peraturan kos satu per baris, penghuni akan diberi tahu.', 'Open More, then Settings. Enter the bank name, account number, and QRIS image so they show in the tenant "How to pay". Write the house rules one per line and tenants will be notified.'],
     ['Buka menu Penghuni, ketuk "Kirim pengumuman ke semua penghuni". Tulis pesan lalu ketuk "Tampilkan di portal penghuni". Untuk WhatsApp, ketuk nama penghuni satu per satu.', 'Open Tenants and tap "Send announcement to all tenants". Write the message, then tap "Show in tenant portal". For WhatsApp, tap each tenant name.'],
@@ -2488,7 +2516,7 @@
     function seg(opts, cur, fn) { return '<div class="fchips">' + opts.map(function (o) { return '<button class="btn alt mini" aria-pressed="' + (cur === o[0]) + '" onclick="' + fn + '(\'' + o[0] + '\')">' + o[1] + '</button>' }).join('') + '</div>' }
     function profil() {
       var t = sess.role === 'penghuni', n = dispNama(sess), peran = t ? 'Kamar ' + sess.no : (sess === ownerAcc() ? 'Pemilik kos' : 'Pengelola');
-      return '<div><h1>Profil</h1></div><div class="card phead">' + av(n, 'xl3') + '<div class="pinfo"><b class="title">' + esc(n) + '</b><span class="muted">' + peran + ' · @' + esc(sess.user) + '</span></div><div class="pact"><label class="btn alt" for="fp">' + (sess.foto ? 'Ganti foto' : 'Unggah foto') + '</label><input id="fp" class="vh" type="file" accept="image/*" onchange="simpanFoto()">' + (sess.foto ? '<button class="btn alt dangerbtn" onclick="hapusFoto()">Hapus foto</button>' : '') + '</div></div><div class="pgrid"><div class="card"><p class="title">Akun</p><button class="btn alt" onclick="ubahUserAsk(\'' + sess.user + '\')">Ubah nama pengguna</button><button class="btn alt" onclick="sandiSaya()">Ubah kata sandi saya</button><button class="btn alt dangerbtn" onclick="logout()">Keluar dari akun</button></div><div class="card"><p class="title">Tampilan dan bahasa</p><p class="muted">Tema</p>' + seg([['auto', 'Ikuti perangkat'], ['terang', 'Terang'], ['gelap', 'Gelap']], TEMA, 'setTema') + '<p class="muted">Ukuran huruf</p><div class="fchips"><button class="btn alt mini" aria-pressed="' + !big + '" onclick="if(big)huruf()">Biasa</button><button class="btn alt mini" aria-pressed="' + big + '" onclick="if(!big)huruf()">Besar</button></div><p class="muted">Bahasa</p>' + seg([['id', 'Indonesia'], ['en', 'English']], LANG, 'setBahasa') + '</div><div class="card"><p class="title">Tur demo</p><p class="muted">Lihat alur aplikasi dari penghuni sampai pemilik.</p><button class="btn alt" onclick="turMulai(\'singkat\')">Tur singkat (2 menit)</button><button class="btn alt" onclick="turMulai(\'lengkap\')">Tur lengkap dan rencana fitur</button></div></div>'
+      return '<div><h1>Profil</h1></div><div class="card phead">' + av(n, 'xl3') + '<div class="pinfo"><b class="title">' + esc(n) + '</b><span class="muted">' + peran + ' · @' + esc(sess.user) + '</span></div><div class="pact"><label class="btn alt" for="fp">' + (sess.foto ? 'Ganti foto' : 'Unggah foto') + '</label><input id="fp" class="vh" type="file" accept="image/*" onchange="simpanFoto()">' + (sess.foto ? '<button class="btn alt dangerbtn" onclick="hapusFoto()">Hapus foto</button>' : '') + '</div></div><div class="pgrid"><div class="card"><p class="title">Akun</p><button class="btn alt" onclick="ubahUserAsk(\'' + sess.user + '\')">Ubah nama pengguna</button><button class="btn alt" onclick="sandiSaya()">Ubah kata sandi saya</button><button class="btn alt dangerbtn" onclick="logout()">Keluar dari akun</button></div><div class="card"><p class="title">Tampilan dan bahasa</p><p class="muted">Tema</p>' + seg([['auto', 'Ikuti perangkat'], ['terang', 'Terang'], ['gelap', 'Gelap']], TEMA, 'setTema') + '<p class="muted">Ukuran huruf</p>' + seg([['kecil', 'Kecil'], ['normal', 'Normal'], ['besar', 'Besar']], FONT, 'setHuruf') + '<p class="muted">Bahasa</p>' + seg([['id', 'Indonesia'], ['en', 'English']], LANG, 'setBahasa') + '</div><div class="card"><p class="title">Tur demo</p><p class="muted">Lihat alur aplikasi dari penghuni sampai pemilik.</p><button class="btn alt" onclick="turMulai(\'singkat\')">Tur singkat (2 menit)</button><button class="btn alt" onclick="turMulai(\'lengkap\')">Tur lengkap dan rencana fitur</button></div></div>'
     }
     function bayar(no) { closeM(); var r = R(no); openM('<p class="title">Catat pembayaran</p><p>' + esc(r.name) + ' · Kamar ' + no + '</p><p class="big2">' + rp(sisaBayar(r)) + '</p>' + (r.paid ? '<p class="muted">Sudah dibayar ' + rp(r.paid) + ' dari ' + rp(r.price) + '</p>' : '') + '<div><label for="bj">Jumlah dibayar (Rp). Kurangi kalau baru dibayar sebagian.</label><input id="bj" type="number" inputmode="numeric" value="' + sisaBayar(r) + '"></div><p><b>Dibayar dengan apa?</b></p>' + ['Tunai', 'Transfer bank', 'QRIS'].map(function (v) { return '<button class="btn" onclick="catat(\'' + no + '\',\'' + v + '\',document.getElementById(\'bj\').value)">' + v + '</button>' }).join('') + '<button class="btn alt" onclick="closeM()">Batal</button>') }
     function ingatkan(no) {
@@ -2520,7 +2548,7 @@
     function av(n, z) { var P = [['#E5F2EB', '#14573B'], ['#DBEAFE', '#1E3A8A'], ['#FEF3C7', '#78350F'], ['#FCE7F3', '#831843'], ['#EDE9FE', '#4C1D95'], ['#CCFBF1', '#134E4A']], w = String(n).trim().split(/\s+/), i = ((w[0] || '?').charCodeAt(0) + (w[1] || '').length) % P.length, t = (w[0][0] + (w[1] ? w[1][0] : '')).toUpperCase(); var f = fotoDari(n); if (f) return '<span class="av' + (z ? ' ' + z : '') + '" style="background:#E5E7EB" aria-hidden="true"><img src="' + f + '" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%"></span>'; return '<span class="av' + (z ? ' ' + z : '') + '" style="background:' + P[i][0] + ';color:' + P[i][1] + '" aria-hidden="true">' + esc(t) + '</span>' }
     function beranda() {
       var u = unpaid(), tot = u.reduce(function (s, r) { return s + sisaBayar(r) }, 0), isi = rooms.filter(function (r) { return r.st !== 'kosong' }).length, pc = Math.min(100, Math.round(income / cfg.target * 100)), kurang = Math.max(cfg.target - income, 0), keluar = totalKeluar(), kos = rooms.filter(function (r) { return r.st === 'kosong' }).map(function (r) { return r.no });
-      var h = '<div class="hd"><div><p class="muted">' + salam() + ', ' + sess.nama + '<br>' + fmtH(TODAY) + '</p><h1 class="mobonly">' + cfg.nama + '</h1><h1 class="deskblk">Ringkasan hari ini</h1></div><button class="btn alt mini mobonly" onclick="huruf()" aria-pressed="' + big + '">' + (big ? 'Huruf biasa' : 'Perbesar huruf') + '</button><button class="btn deskonly" style="flex:none;width:auto" onclick="pick=\'\';go(\'tambah\')">Tambah penghuni baru</button></div>';
+      var h = '<div class="hd"><div><p class="muted">' + salam() + ', ' + sess.nama + '<br>' + fmtH(TODAY) + '</p><h1 class="mobonly">' + cfg.nama + '</h1><h1 class="deskblk">Ringkasan hari ini</h1></div><button class="btn alt mini mobonly" onclick="huruf()">' + 'Huruf: ' + fontNama() + '</button><button class="btn deskonly" style="flex:none;width:auto" onclick="pick=\'\';go(\'tambah\')">Tambah penghuni baru</button></div>';
       h += '<div class="kpi"><div class="card hero"><p>Uang sewa yang sudah masuk bulan ini</p><p class="big">' + rp(income) + '</p><div class="bar" role="img" aria-label="Tercapai ' + pc + ' persen dari target"><i style="width:' + pc + '%"></i></div><p>' + pc + '% dari target ' + rp(cfg.target) + (kurang ? ' · kurang ' + rp(kurang) : '') + '</p></div>';
       if (u.length) h += '<div class="card warn"><p class="title">' + u.length + ' penghuni belum bayar sewa</p><p class="big2">' + rp(tot) + '</p><button class="btn dark" onclick="go(\'uang\')">Lihat siapa saja</button></div>';
       else h += '<div class="card"><p class="title">Semua penghuni sudah bayar</p><p class="muted">Tidak ada yang perlu ditagih.</p></div>';
@@ -2583,7 +2611,7 @@
     function lainnya() {
       var h = '<div><h1>Lainnya</h1><p class="muted">Pilih yang Anda perlukan</p></div><div class="menu">';
       [['laporan', 'Laporan keuangan', 'Uang masuk, uang keluar, dan grafik bulanan'], ['pengumuman', 'Pengumuman untuk penghuni', 'Pesan yang tampil di portal penghuni'], ['pengaturan', 'Pengaturan', 'Data kos, rekening, QRIS, dan peraturan kos'], ['akun', 'Akun pengguna', 'Atur siapa yang boleh masuk'], ['fitur', 'Fitur tambahan', 'Rencana fitur dan daftar minat'], ['bantuan', 'Bantuan dan panduan', 'Cara memakai aplikasi']].forEach(function (m) { h += '<button class="btn alt mi" onclick="go(\'' + m[0] + '\')"><span><b>' + m[1] + '</b><br><small>' + m[2] + '</small></span><span aria-hidden="true">›</span></button>' });
-      h += '<button class="btn alt mi mobonly" onclick="huruf()" aria-pressed="' + big + '"><span><b>Ukuran huruf</b><br><small>' + (big ? 'Besar (ketuk untuk biasa)' : 'Biasa (ketuk untuk besar)') + '</small></span></button></div>';
+      h += '<button class="btn alt mi mobonly" onclick="huruf()"><span><b>Ukuran huruf</b><br><small>' + fontNama() + ' (ketuk untuk ganti)' + '</small></span></button></div>';
       return h + '<button class="btn alt mobonly" onclick="logout()">Keluar dari akun</button><button class="btn alt dangerbtn" onclick="resetAsk()">Kembalikan demo seperti awal</button>'
     }
     function resetAsk() { openM('<p class="title">Kembalikan demo seperti awal?</p><p>Semua pembayaran, penghuni baru, laporan, dan pengaturan yang tadi dicatat akan dihapus.</p><button class="btn" style="background:var(--bad);border-color:var(--bad)" onclick="resetDemo()">Ya, kembalikan</button><button class="btn alt" onclick="closeM()">Tidak jadi</button>') }
@@ -2662,7 +2690,7 @@
       h += '<div class="card"><p><b>Kamar Anda</b></p><p class="muted">' + r.type + '<br>' + rp(r.price) + ' per bulan' + (r.dep ? '<br>Uang jaminan: ' + rp(r.dep) + ' (dipegang pemilik)' : '') + '<br>' + cfg.nama + '</p></div></div><div class="colR">' + demoCard() + laporCard() + aturanCard();
       if (ann.length) h += '<div class="card"><p><b>Pengumuman dari pemilik</b></p>' + ann.slice(0, 3).map(function (a) { return '<div class="pay"><span>' + esc(a.txt) + '<br><small>' + whenTxt(a) + '</small></span></div>' }).join('') + '</div>';
       if (mine.length) h += '<div class="card deskonly" style="padding-bottom:8px"><p><b>Pembayaran terakhir</b></p>' + mine.map(function (x) { return '<div class="pay"><span>Sewa kos' + (x.cicil ? ' (cicilan)' : '') + '<br><small>' + x.via + ' · ' + whenTxt(x) + '</small></span><span style="display:flex;align-items:center;gap:10px;flex:none"><b>' + rp(x.amt) + '</b><button class="btn alt mini" onclick="kwitansi(' + hist.indexOf(x) + ')">Kwitansi</button></span></div>' }).join('') + '</div>';
-      h += '<div class="stack"><button class="btn" onclick="go(\'p_lapor\')">Ada yang rusak? Lapor di sini</button><a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.wa || WA_PEMILIK) + '">Hubungi pemilik kos</a><button class="btn alt mobonly" onclick="huruf()">' + (big ? 'Huruf biasa' : 'Perbesar huruf') + '</button><button class="btn alt dangerbtn" onclick="resetAsk()">Kembalikan demo seperti awal</button></div></div></div>'; return h
+      h += '<div class="stack"><button class="btn" onclick="go(\'p_lapor\')">Ada yang rusak? Lapor di sini</button><a class="btn alt" target="_blank" rel="noopener" href="https://wa.me/' + (cfg.wa || WA_PEMILIK) + '">Hubungi pemilik kos</a><button class="btn alt mobonly" onclick="huruf()">' + 'Huruf: ' + fontNama() + '</button><button class="btn alt dangerbtn" onclick="resetAsk()">Kembalikan demo seperti awal</button></div></div></div>'; return h
     }
     function pRiwayat0() {
       var r = R(me), mine = hist.filter(function (x) { return x.no === me });
@@ -2714,7 +2742,7 @@
     function dispNama(a) { var r = a.no && R(a.no); return r && r.name || a.nama }
     function akun() {
       var h = '<div class="hd"><div><h1>Akun pengguna</h1><p class="muted">Atur siapa yang boleh masuk ke aplikasi</p></div><div class="deskonly" style="gap:12px;flex-wrap:wrap"><button class="btn alt" style="width:auto" onclick="pengelolaBaru()">Tambah pengelola</button><button class="btn" style="width:auto" onclick="go(\'akunBaru\')">Tambah akun penghuni</button></div></div>';
-      accounts.forEach(function (a) { var own = a.role === 'pemilik', main = a === ownerAcc(), self = sess && sess.user === a.user; h += '<div class="card"><div class="row"><span style="display:flex;align-items:center;gap:12px">' + av(dispNama(a)) + '<span class="title">' + esc(dispNama(a)) + '</span></span><span class="muted">' + (own ? (main ? 'Pemilik' : 'Pengelola') : 'Kamar ' + a.no) + (a.off ? ' · Nonaktif' : '') + '</span></div><p class="muted">Nama pengguna: <b>' + esc(a.user) + '</b></p><div class="grid2"><button class="btn alt" onclick="sandiAsk(\'' + a.user + '\')">Ubah sandi</button><button class="btn alt" onclick="resetSandi(\'' + a.user + '\')">Reset sandi</button><button class="btn alt" onclick="ubahUserAsk(\'' + a.user + '\')">Ubah nama pengguna</button>' + (main || self ? '' : '<button class="btn alt" onclick="toggleAkun(\'' + a.user + '\')">' + (a.off ? 'Aktifkan' : 'Nonaktifkan') + '</button><button class="btn alt dangerbtn" onclick="hapusAskAkun(\'' + a.user + '\')">Hapus akun</button>') + '</div></div>' });
+      accounts.forEach(function (a) { var own = a.role === 'pemilik', main = a === ownerAcc(), self = sess && sess.user === a.user; h += '<div class="card"><div class="row"><span style="display:flex;align-items:center;gap:12px">' + av(dispNama(a)) + '<span class="title">' + esc(dispNama(a)) + '</span></span><span class="muted">' + (own ? (main ? 'Pemilik' : 'Pengelola') : 'Kamar ' + a.no) + (a.off ? ' · Nonaktif' : '') + '</span></div><p class="muted">Nama pengguna: <b>' + esc(a.user) + '</b></p><div class="agrid"><button class="btn alt" onclick="sandiAsk(\'' + a.user + '\')">Ubah sandi</button><button class="btn alt" onclick="resetSandi(\'' + a.user + '\')">Reset sandi</button><button class="btn alt" onclick="ubahUserAsk(\'' + a.user + '\')">Ubah nama pengguna</button>' + (main || self ? '' : '<button class="btn alt" onclick="toggleAkun(\'' + a.user + '\')">' + (a.off ? 'Aktifkan' : 'Nonaktifkan') + '</button><button class="btn alt dangerbtn" onclick="hapusAskAkun(\'' + a.user + '\')">Hapus akun</button>') + '</div></div>' });
       return h + '<button class="btn mobonly" onclick="go(\'akunBaru\')">Tambah akun penghuni</button><button class="btn alt mobonly" onclick="pengelolaBaru()">Tambah pengelola</button>'
     }
     function resetSandi(u) { findAcc(u).pass = 'kos123'; save(); toast('Sandi ' + u + ' dikembalikan ke kos123.') }
@@ -2838,7 +2866,9 @@
     function hapusFoto() { delete sess.foto; save(); toast('Foto profil dihapus.'); draw() }
     var TUR = null;
     function turRoot() { var r = document.getElementById('tur'); if (!r) { r = document.createElement('div'); r.id = 'tur'; document.body.appendChild(r); document.documentElement.classList.add('tur-lock') } return r }
-    function turTutup() { var r = document.getElementById('tur'); if (r) r.remove(); document.documentElement.classList.remove('tur-lock'); TUR = null }
+    var turSettleT;
+    function turSettle() { clearInterval(turSettleT); var n = 0; turSettleT = setInterval(function () { if (!TUR || ++n > 24) { clearInterval(turSettleT); return } turFokus(); turLayout() }, 50) }
+    function turTutup() { clearInterval(turSettleT); var r = document.getElementById('tur'); if (r) r.remove(); document.documentElement.classList.remove('tur-lock'); TUR = null }
     function turSnap() { return { u: sess ? sess.user : null, tab: tab } }
     function turKeluar(stay) { var pv = TUR && TUR.prev; turTutup(); if (stay || !pv) { toast('Tur ditutup.'); return } if (!pv.u) { logout(); toast('Tur ditutup. Kembali ke halaman awal.') } else { var a = findAcc(pv.u); if (a) { setSess(a); go(pv.tab) } toast('Tur ditutup.') } }
     function turNanti() { try { sessionStorage.setItem('kospro_tur_nanti', '1') } catch (e) { } turTutup(); toast('Baik. Tur bisa dibuka lagi dari halaman login atau menu Profil.') }
@@ -2889,7 +2919,7 @@
     function turRender() {
       if (!TUR) return; var st = TUR.s[TUR.i], r = turRoot(), n = TUR.s.length, el = turEl(), last = TUR.i === n - 1, x = typeof st.x === 'function' ? st.x() : st.x;
       r.innerHTML = '<div class="tur-block"' + (el ? '' : ' style="background:rgba(0,0,0,.55)"') + '></div>' + (el ? '<div class="tur-spot"></div>' : '') + '<div class="tur-card' + (el ? '' : ' tur-mid') + '" role="dialog" aria-modal="true" aria-labelledby="turh"><small class="muted">Langkah ' + (TUR.i + 1) + ' dari ' + n + '</small><p class="title" id="turh">' + st.t + '</p><p>' + x + '</p>' + (st.a ? '<button class="btn" id="tura">' + st.a[0] + '</button>' : '') + '<div class="tur-row">' + (TUR.i > 0 ? '<button class="btn alt" onclick="turGo(-1)">Kembali</button>' : '') + '<button class="btn' + (st.a ? ' alt' : '') + '" onclick="turGo(1)">' + (last ? 'Selesai' : 'Berikutnya') + '</button></div>' + (last ? '<p class="muted"><small>Tekan Selesai untuk kembali ke tempat Anda memulai tur.</small></p><button class="btn alt" onclick="turKeluar(true)">Coba sendiri di aplikasi</button>' : '<button class="tur-x" onclick="turKeluar()">Keluar tur</button>') + '</div>';
-      trAll(r); turFokus(); turLayout(); var a = document.getElementById('tura'); if (a) a.onclick = function () { st.a[1](); if (!st.na) setTimeout(function () { turGo(1) }, 500) };
+      trAll(r); turFokus(); turLayout(); turSettle(); var a = document.getElementById('tura'); if (a) a.onclick = function () { st.a[1](); if (!st.na) setTimeout(function () { turGo(1) }, 500) };
       var f = r.querySelector('.tur-row .btn:last-child'); if (f) f.focus({ preventScroll: true })
     }
     function turLayout() {
@@ -2924,7 +2954,7 @@
     function draw() { draw0(); setTopbar(); trAll(document.body) }
     function draw0() {
       var app = document.getElementById('app'), nv = document.querySelector('nav');
-      document.body.className = (big ? 'xl' : '') + (sess ? '' : ' nologin');
+      document.body.className = (FONT === 'besar' ? 'xl' : FONT === 'kecil' ? 'sm' : '') + (sess ? '' : ' nologin');
       if (!sess) { app.dataset.tab = 'login'; app.innerHTML = loginPage(); nv.style.display = 'none'; return }
       var t = sess.role === 'penghuni'; if (t && tab.indexOf('p_') !== 0) tab = 'p_beranda'; if (!t && tab.indexOf('p_') === 0) tab = 'beranda';
       var pages = { beranda: beranda, uang: uang, kamar: kamar, penghuni: penghuni, tambah: tambah, lainnya: lainnya, laporan: laporan, pengaturan: pengaturan, bantuan: bantuan, akun: akun, akunBaru: akunBaru, pengumuman: pengumuman, fitur: fitur, profil: profil, p_profil: profil, p_beranda: pBeranda, p_lapor: pLapor, p_riwayat: pRiwayat };

@@ -290,7 +290,7 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
               <h3 className="line-clamp-2 text-[13px] font-bold leading-snug">{demo.title}</h3>
               <div className="mt-1.5 flex items-center gap-3">
                 <a
-                  href={`${DEMO_BASE}${demo.file}`}
+                  href={`${DEMO_BASE}${demo.file.replace(/\.html$/, '')}`}
                   target="_blank"
                   rel="noopener"
                   onClick={handleVisit}
@@ -410,7 +410,7 @@ export const DemoShowcaseNudge: React.FC<DemoShowcaseNudgeProps> = ({ darkMode, 
 
           <div className="flex flex-col gap-2">
             <a
-              href={`${DEMO_BASE}${demo.file}`}
+              href={`${DEMO_BASE}${demo.file.replace(/\.html$/, '')}`}
               target="_blank"
               rel="noopener"
               onClick={handleVisit}

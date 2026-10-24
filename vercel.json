@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -87,7 +88,28 @@
     },
     {
       "source": "/artikel",
+      "has": [{ "type": "query", "key": "page", "value": "3" }],
+      "destination": "/artikel/page/3/index.html"
+    },
+    {
+      "source": "/artikel",
       "destination": "/artikel/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-1-website-butuh-3-karakter-ai-berbeda",
+      "destination": "/artikel/kenapa-1-website-butuh-3-karakter-ai-berbeda/index.html"
+    },
+    {
+      "source": "/artikel/dari-audit-internal-ke-software-development",
+      "destination": "/artikel/dari-audit-internal-ke-software-development/index.html"
+    },
+    {
+      "source": "/artikel/dari-scan-kamera-ke-data-aset-1-detik",
+      "destination": "/artikel/dari-scan-kamera-ke-data-aset-1-detik/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu",
+      "destination": "/artikel/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu/index.html"
     },
     {
       "source": "/artikel/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh",

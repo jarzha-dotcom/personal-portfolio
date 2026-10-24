@@ -36,6 +36,7 @@ import {
   History,
   ListChecks,
   Handshake,
+  DatabaseZap,
 } from 'lucide-react';
 
 import { ARTICLE_IMAGES, type ArticleImageSet } from '../data/articleImages';
@@ -99,6 +100,10 @@ const SLUG_ILLUSTRATIONS: Record<string, IconPair> = {
   'kenapa-harga-proposal-bisa-beda-beda': { Icon: Calculator, Accent: Scale },
   'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': { Icon: History, Accent: ShieldCheck },
   'checklist-sebelum-konsultasi-pertama-dengan-developer': { Icon: ListChecks, Accent: Handshake },
+  'kenapa-1-website-butuh-3-karakter-ai-berbeda': { Icon: Bot, Accent: Users },
+  'dari-audit-internal-ke-software-development': { Icon: FileSpreadsheet, Accent: Code2 },
+  'dari-scan-kamera-ke-data-aset-1-detik': { Icon: QrCode, Accent: Smartphone },
+  'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu': { Icon: DatabaseZap, Accent: ShieldCheck },
 };
 
 const CATEGORY_ILLUSTRATIONS: Record<string, IconPair> = {

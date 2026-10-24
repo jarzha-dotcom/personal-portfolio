@@ -130,44 +130,37 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
       }`}
     >
       <div
-        className={`relative overflow-hidden rounded-3xl border p-4 sm:p-5 ring-1 ${
+        className={`relative overflow-hidden rounded-2xl sm:rounded-3xl border p-3.5 sm:p-5 ring-1 ${
           darkMode
-            ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_25px_60px_-20px_rgba(45,212,191,0.3)]'
-            : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_25px_60px_-20px_rgba(13,148,136,0.35)]'
+            ? 'bg-slate-900 border-slate-700 text-slate-100 ring-white/5 shadow-[0_20px_50px_-15px_rgba(45,212,191,0.25)]'
+            : 'bg-white border-slate-200 text-slate-900 ring-black/5 shadow-[0_20px_50px_-15px_rgba(13,148,136,0.3)]'
         }`}
       >
-        {/* Aksen tipis di tepi atas — satu-satunya sentuhan gradien di kartu
-            ini, menegaskan identitas warna Zannah (teal → indigo) yang sama
-            dipakai di avatar, tanpa menambah gradien di tempat lain. */}
+        {/* Aksen tipis di tepi atas */}
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500 via-teal-400 to-indigo-500" />
         <button
           type="button"
           aria-label="Tutup sambutan"
           onClick={markAsSeen}
-          className={`absolute top-4 right-3 flex h-7 w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
+          className={`absolute top-3 sm:top-4 right-2.5 sm:right-3 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full transition-colors ${FOCUS_RING} ${
             darkMode ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200' : 'text-slate-400 hover:bg-slate-100 hover:text-slate-600'
           }`}
         >
-          <X className="h-4 w-4" />
+          <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
         </button>
 
-        <div className="flex items-start gap-3 pr-5 pt-1">
-          {/* Avatar: icon Sparkles (bukan inisial teks) supaya langsung kebaca
-              "asisten AI", + badge titik hijau kecil buat kesan "siap merespons
-              sekarang" — pola familiar dari widget live-chat. Ping di belakang
-              titik hijau memang berulang terus selama bubble tampil, tapi
-              kecil & redup jadi nggak mengganggu fokus ke pesan utamanya, dan
-              dimatikan sepenuhnya kalau user minta reduced motion. */}
+        <div className="flex items-start gap-2.5 sm:gap-3 pr-5 pt-0.5 sm:pt-1">
+          {/* Avatar: Sparkles */}
           <div className="relative shrink-0">
-            <div className={`${prefersReducedMotion ? '' : 'mo-wiggle'} flex h-11 w-11 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-lg shadow-teal-500/30 ring-4 ${darkMode ? 'ring-slate-900' : 'ring-white'}`}>
-              <Sparkles className="h-6 w-6 text-white" />
+            <div className={`${prefersReducedMotion ? '' : 'mo-wiggle'} flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-gradient-to-br from-teal-500 to-indigo-600 shadow-md shadow-teal-500/25 ring-2 sm:ring-4 ${darkMode ? 'ring-slate-900' : 'ring-white'}`}>
+              <Sparkles className="h-4 w-4 sm:h-6 sm:w-6 text-white" />
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 flex h-3.5 w-3.5">
+            <span className="absolute -bottom-0.5 -right-0.5 flex h-3 w-3 sm:h-3.5 sm:w-3.5">
               {!prefersReducedMotion && (
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
               )}
               <span
-                className={`relative inline-flex h-3.5 w-3.5 rounded-full bg-green-400 border-2 ${
+                className={`relative inline-flex h-3 w-3 sm:h-3.5 sm:w-3.5 rounded-full bg-green-400 border-2 ${
                   darkMode ? 'border-slate-900' : 'border-white'
                 }`}
                 aria-hidden="true"
@@ -175,18 +168,18 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
             </span>
           </div>
           <div className="pt-0.5">
-            <p className="text-base font-semibold leading-tight">Halo, saya Zannah 👋</p>
-            <p className={`mt-1.5 text-sm leading-relaxed line-clamp-2 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Asisten AI di sini — siap bantu jelaskan jasa, proyek, sampai estimasi biaya kalau Kakak butuh.
+            <p className="text-sm sm:text-base font-semibold leading-tight">Halo, saya Zannah 👋</p>
+            <p className={`mt-0.5 sm:mt-1.5 text-xs sm:text-sm leading-relaxed line-clamp-2 sm:line-clamp-none ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+              Asisten AI di sini — siap bantu jelaskan jasa, proyek, & estimasi biaya.
             </p>
           </div>
         </div>
 
-        <div className="mt-4 flex gap-2.5">
+        <div className="mt-2.5 sm:mt-4 flex gap-2">
           <button
             type="button"
             onClick={markAsSeen}
-            className={`flex-1 rounded-xl border py-2.5 text-sm font-medium transition-colors ${FOCUS_RING} ${
+            className={`flex-1 rounded-lg sm:rounded-xl border py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium transition-colors ${FOCUS_RING} ${
               darkMode
                 ? 'border-slate-700 text-slate-300 hover:bg-slate-800'
                 : 'border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -197,11 +190,11 @@ export const ZannahWelcomeNudge: React.FC<ZannahWelcomeNudgeProps> = ({ darkMode
           <button
             type="button"
             onClick={handleOpenChat}
-            className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-teal-600 py-2.5 text-sm font-medium text-white shadow-md shadow-teal-600/30 transition-all hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-600/40 ${
+            className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg sm:rounded-xl bg-teal-600 py-1.5 sm:py-2.5 text-xs sm:text-sm font-medium text-white shadow-md shadow-teal-600/30 transition-all hover:bg-teal-700 hover:shadow-lg hover:shadow-teal-600/40 ${
               prefersReducedMotion ? '' : 'hover:-translate-y-0.5'
             } ${FOCUS_RING}`}
           >
-            <MessageCircle className="h-4 w-4" />
+            <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             Ngobrol yuk
           </button>
         </div>

@@ -6,7 +6,6 @@ import {
   Send,
   MoreHorizontal,
   User,
-  BadgeCheck,
   Newspaper,
   LayoutGrid,
   Bot,
@@ -44,16 +43,15 @@ interface MobileBottomNavProps {
 // 4 slot utama + 1 slot "Lainnya" (tombol yang membuka sheet).
 const SLOTS: { item: BottomNavItem; icon: LucideIcon }[] = [
   { item: { name: 'Beranda', href: '#beranda', id: 'beranda' }, icon: Home },
-  { item: { name: 'Karya', href: '#proyek', id: 'proyek' }, icon: FolderOpen },
+  { item: { name: 'Karya', href: ROUTES.caseStudy, id: 'proyek', route: true }, icon: FolderOpen },
   { item: { name: 'Layanan', href: ROUTES.services, id: 'layanan', route: true }, icon: Code2 },
   { item: { name: 'Kontak', href: ROUTES.contact, id: 'kontak', route: true }, icon: Send },
 ];
 
 const MORE_ITEMS: { item: BottomNavItem; icon: LucideIcon; desc: string; needsArticles?: boolean }[] = [
   { item: { name: 'Tentang', href: ROUTES.about, id: 'tentang', route: true }, icon: User, desc: 'Profil, tech stack & keahlian' },
-  { item: { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true }, icon: BadgeCheck, desc: 'Studi kasus klien nyata' },
   { item: { name: 'Artikel', href: ROUTES.articles, id: 'artikel', route: true }, icon: Newspaper, desc: 'Tulisan & panduan', needsArticles: true },
-  { item: { name: 'Contoh Desain', href: '/demos/index.html', id: 'contoh-desain', external: true }, icon: LayoutGrid, desc: 'Galeri demo interaktif' },
+  { item: { name: 'Contoh Desain', href: '/demos/', id: 'contoh-desain', external: true }, icon: LayoutGrid, desc: 'Galeri demo interaktif' },
 ];
 
 const FIELD_SELECTOR =
@@ -175,11 +173,8 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   // Slot rute (Layanan/Kontak) aktif di halamannya sendiri ATAU saat teasernya
   // sedang terlihat di beranda (id section teaser = id slot).
   const slotActive = (item: BottomNavItem) =>
-    item.id === 'proyek'
-      ? (isHome && activeSection === 'proyek') || pathname === ROUTES.caseStudy
-      : (item.route && pathname === item.href) || (isHome && activeSection === item.id);
+    (item.route && pathname === item.href) || (isHome && activeSection === item.id);
   const moreActive =
-    (isHome && activeSection === 'tentang') ||
     pathname === ROUTES.about ||
     pathname === ROUTES.articles ||
     pathname.startsWith(`${ROUTES.articles}/`);

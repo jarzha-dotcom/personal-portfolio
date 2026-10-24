@@ -210,10 +210,18 @@ function localStaticRoutesPlugin(): Plugin {
       server.middlewares.use((req, res, next) => {
         const rawUrl = req.url || '';
         const pathOnly = rawUrl.split('?')[0];
+        const query = rawUrl.includes('?') ? rawUrl.slice(rawUrl.indexOf('?')) : '';
+
         if (pathOnly === '/zhanotes' || pathOnly === '/zhanotes/') {
-          req.url = '/zhanotes/index.html' + (rawUrl.includes('?') ? rawUrl.slice(rawUrl.indexOf('?')) : '');
+          req.url = '/zhanotes/index.html' + query;
         } else if (pathOnly === '/demos' || pathOnly === '/demos/') {
-          req.url = '/demos/index.html' + (rawUrl.includes('?') ? rawUrl.slice(rawUrl.indexOf('?')) : '');
+          req.url = '/demos/index.html' + query;
+        } else if (pathOnly.startsWith('/demos/')) {
+          // Clean URLs: jika file HTML ada di public/demos/<path>.html, otomatis rewrite
+          const candidate = path.join(ROOT_DIR, 'public', pathOnly + '.html');
+          if (fs.existsSync(candidate)) {
+            req.url = pathOnly + '.html' + query;
+          }
         }
         next();
       });

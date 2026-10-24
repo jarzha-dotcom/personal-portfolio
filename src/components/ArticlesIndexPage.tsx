@@ -20,6 +20,7 @@ import { useBreadcrumbSchema } from '../hooks/useBreadcrumbSchema';
 import { formatIDDate, toISODate } from '../utils/formatDate';
 import { ArticleIllustration } from '../components/ArticleIllustration';
 import { hasArticleAudio } from '../components/ArticleAudioPlayer';
+import { Breadcrumb } from '../components/Breadcrumb';
 
 // Penanda kecil "Ada audio" di baris meta kartu. Sengaja BUKAN tombol putar:
 // kartu artikel adalah satu tautan utuh, dan audio akan terputus saat pindah halaman.
@@ -78,8 +79,35 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const listTopRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Shortcut keyboard "/" untuk fokus ke kolom pencarian
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === '/' &&
+        document.activeElement !== searchInputRef.current &&
+        !(document.activeElement instanceof HTMLInputElement) &&
+        !(document.activeElement instanceof HTMLTextAreaElement)
+      ) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const published = useMemo(() => ARTICLES.filter((a) => a.published), []);
+
+  // Hitung jumlah artikel per kategori
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    published.forEach((a) => {
+      counts[a.category] = (counts[a.category] || 0) + 1;
+    });
+    return counts;
+  }, [published]);
 
   // Kategori unik dari artikel yang published
   const categories = useMemo(() => {
@@ -223,17 +251,15 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
       />
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Back link */}
-        <a
-          href={ROUTES.home}
-          onClick={goHome}
-          className={`inline-flex items-center gap-1.5 text-sm font-medium mb-10 rounded-md transition-colors hover:text-teal-500 ${FOCUS_RING} ${
-            darkMode ? 'text-slate-400' : 'text-slate-500'
-          }`}
-        >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Kembali ke beranda
-        </a>
+        {/* Visual Breadcrumb */}
+        <Breadcrumb
+          darkMode={darkMode}
+          items={[
+            { name: 'Beranda', href: ROUTES.home },
+            { name: 'Artikel' },
+          ]}
+          className="mb-8"
+        />
 
         {/* Hero Section */}
         <header className="mb-12">
@@ -294,36 +320,50 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
           <div className="relative">
             <Search
               className={`absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 ${
-                darkMode ? 'text-slate-500' : 'text-slate-400'
+                darkMode ? "text-slate-500" : "text-slate-400"
               }`}
               aria-hidden="true"
             />
             <input
+              ref={searchInputRef}
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Cari artikel..."
+              placeholder="Cari artikel... (tekan / untuk cari)"
               aria-label="Cari artikel"
-              className={`w-full pl-11 pr-10 py-3 rounded-xl text-sm transition-all duration-200 ${FOCUS_RING} ${
+              className={`w-full pl-11 pr-14 py-3 rounded-xl text-sm transition-all duration-200 ${FOCUS_RING} ${
                 darkMode
-                  ? 'bg-slate-900/60 border border-slate-800 text-white placeholder-slate-500 focus:border-teal-500/50'
-                  : 'bg-white border border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm focus:border-teal-400'
+                  ? "bg-slate-900/60 border border-slate-800 text-white placeholder-slate-500 focus:border-teal-500/50"
+                  : "bg-white border border-slate-200 text-slate-900 placeholder-slate-400 shadow-sm focus:border-teal-400"
               }`}
             />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery('')}
-                aria-label="Hapus pencarian"
-                className={`absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors ${
-                  darkMode
-                    ? 'text-slate-500 hover:text-slate-300 hover:bg-slate-800'
-                    : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
-                }`}
-              >
-                <X className="w-4 h-4" aria-hidden="true" />
-              </button>
-            )}
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {searchQuery ? (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Hapus pencarian"
+                  className={`p-1 rounded-full transition-colors ${
+                    darkMode
+                      ? "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+                      : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                  }`}
+                >
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
+              ) : (
+                <kbd
+                  aria-hidden="true"
+                  className={`hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono rounded border ${
+                    darkMode
+                      ? "border-slate-800 bg-slate-800/80 text-slate-400"
+                      : "border-slate-200 bg-slate-100 text-slate-500"
+                  }`}
+                >
+                  /
+                </kbd>
+              )}
+            </div>
           </div>
 
           {/* Category Filter Pills */}
@@ -335,35 +375,61 @@ export const ArticlesIndexPage: React.FC<ArticlesIndexPageProps> = ({ darkMode }
               className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${FOCUS_RING} ${
                 activeCategory === null
                   ? darkMode
-                    ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/25'
-                    : 'bg-teal-600 text-white shadow-lg shadow-teal-600/25'
+                    ? "bg-teal-500 text-white shadow-lg shadow-teal-500/25"
+                    : "bg-teal-600 text-white shadow-lg shadow-teal-600/25"
                   : darkMode
-                  ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                  ? "bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
               }`}
             >
               <Sparkles className="w-3 h-3" aria-hidden="true" />
-              Semua
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                type="button"
-                onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
-                aria-pressed={activeCategory === cat}
-                className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${FOCUS_RING} ${
-                  activeCategory === cat
-                    ? darkMode
-                      ? 'bg-teal-500 text-white shadow-lg shadow-teal-500/25'
-                      : 'bg-teal-600 text-white shadow-lg shadow-teal-600/25'
+              <span>Semua</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                  activeCategory === null
+                    ? "bg-white/20 text-white"
                     : darkMode
-                    ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                    ? "bg-slate-700 text-slate-400"
+                    : "bg-slate-200 text-slate-600"
                 }`}
               >
-                {cat}
-              </button>
-            ))}
+                {published.length}
+              </span>
+            </button>
+            {categories.map((cat) => {
+              const count = categoryCounts[cat] || 0;
+              const isCatActive = activeCategory === cat;
+              return (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setActiveCategory(isCatActive ? null : cat)}
+                  aria-pressed={isCatActive}
+                  className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all duration-200 ${FOCUS_RING} ${
+                    isCatActive
+                      ? darkMode
+                        ? "bg-teal-500 text-white shadow-lg shadow-teal-500/25"
+                        : "bg-teal-600 text-white shadow-lg shadow-teal-600/25"
+                      : darkMode
+                      ? "bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200"
+                  }`}
+                >
+                  <span>{cat}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.5 rounded-full font-mono ${
+                      isCatActive
+                        ? "bg-white/20 text-white"
+                        : darkMode
+                        ? "bg-slate-700 text-slate-400"
+                        : "bg-slate-200 text-slate-600"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
           {/* Active filter indicator */}

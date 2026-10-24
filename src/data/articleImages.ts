@@ -51,6 +51,18 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/custom-chatbot-vs-chatbot-template-top-bff3b780.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/custom-chatbot-vs-chatbot-template-middle-b115fd76.jpeg',
   },
+  'dari-audit-internal-ke-software-development': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-audit-internal-ke-software-development-top-23b987fe.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-audit-internal-ke-software-development-middle-a56a8a59.jpeg',
+  },
+  'dari-scan-kamera-ke-data-aset-1-detik': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-top-f41e899f.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-middle-9c23e955.jpeg',
+  },
+  'kenapa-1-website-butuh-3-karakter-ai-berbeda': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-top-f9c694b1.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-middle-8d0ce023.jpeg',
+  },
   'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-top-e06ae23f.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-middle-23c858cc.jpeg',
@@ -62,6 +74,10 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
   'kenapa-harga-proposal-bisa-beda-beda': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-harga-proposal-bisa-beda-beda-top-c05bbae6.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-harga-proposal-bisa-beda-beda-middle-7e72881e.jpeg',
+  },
+  'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu-top-7881d5ec.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu-middle-957a2eee.jpeg',
   },
   'studi-kasus-devrab-proposal-30-detik': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/studi-kasus-devrab-proposal-30-detik-top-1615f26d.jpeg',

@@ -145,4 +145,53 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'kenapa-1-website-butuh-3-karakter-ai-berbeda': [
+    {
+      paragraphs: [
+        'Saat berinteraksi dengan fitur asisten di website ini, pengunjung akan menjumpai pembagian peran yang terstruktur: ada Zannah di widget konsultasi mengambang, Rajendra di halaman AI Showcase, serta Radit yang siap siaga di mode direktori. Sekilas, orang mungkin mengira pembagian ini sekadar "kosmetik" atau gimmick visual untuk membuat website kelihatan ramai.',
+        'Kenyataannya, pembagian peran ini adalah manifestasi langsung dari arsitektur backend di balik sistem kami. Memisahkan tanggung jawab ke persona independen dengan system instruction ramping, didukung Multi-Model Cascade dan sistem fallback cerdas, adalah rahasia kenapa website ini sanggup menyajikan obrolan AI yang presisi sekaligus menghemat biaya token cloud hingga 85%.',
+      ],
+    },
+    {
+      heading: 'Problem "One-Bot-Fits-All": Context Bloat & Prompt Drift',
+      paragraphs: [
+        'Model bahasa besar (LLM) bekerja berdasarkan konteks awal yang diinjeksikan lewat system prompt. Jika satu bot dipaksa merangkap seluruh tugas—menjadi konsultan proposal bisnis yang formal, pembedah arsitektur teknis yang mendalam, sekaligus customer service direktori FAQ—system prompt-nya akan membengkak menjadi ribuan token berisi aturan yang saling bertolak belakang.',
+        'Kondisi tersebut memicu dua kegagalan fatal pada chatbot bisnis konvensional:',
+        '1. Context Bloat & Pemborosan Token: Setiap kali pengunjung hanya menyapa "Halo", server cloud terpaksa membaca ulang ribuan token instruksi yang tidak relevan. Waktu tunggu respon (latency) menjadi lambat dan kuota token cepat terkuras sia-sia.',
+        '2. Prompt Drift (Halusinasi Karakter): Ketika aturan terlalu banyak dan berlawanan, AI mudah mengalami kebingungan nada bicara—terkadang menjawab kalkulasi bisnis dengan gaya bahasa gaul, atau sebaliknya menjawab pertanyaan ramah dengan bahasa kontrak yang kaku.',
+      ],
+    },
+    {
+      heading: 'Matriks Peran Riil: Zannah, Rajendra, dan Radit',
+      paragraphs: [
+        'Kami menerapkan prinsip Single Responsibility Principle (SRP) ke dalam rancangan interaksi pengunjung:',
+        '• Zannah — AI Tech & Business Consultant (ChatWidget Utama): Zannah bertindak sebagai konsultan profesional. Misinya menganalisis kebutuhan aplikasi calon klien, memvalidasi 7 checklist proyek (platform, fitur utama, target audiens, deadline, budget, nama, dan email), dan terhubung langsung ke DevRAB Engine untuk menyusun proposal estimasi biaya resmi melalui penanda pemicu terstruktur.',
+        '• Rajendra — AI Portfolio Assistant & Tech Demonstrator (AI Showcase): Dirancang dengan persona pria tech-savvy, Rajendra memandu pengunjung membedah arsitektur teknis produk secara mendalam—mulai dari engine realtime WebSocket B-Games (<50ms), arsitektur PWA Full-Offline Rajendra Pintar, hingga model Serverless Zero-Cost Assets DEMO, lengkap dengan mode live demo Antigravity Agent.',
+        '• Radit — Local Fallback Engine (Non-AI Safety Net): Radit adalah komponen terpenting dari keandalan situs ini. Radit BUKAN model AI eksternal yang memakan kuota cloud, melainkan engine direktori pencocokan pola lokal berbasis Fuse.js dan semantic search embedding. Saat kuota API cloud sedang limit, jaringan internet pengguna tidak stabil, atau terjadi lonjakan traffic, Radit langsung mengambil alih secara instan agar pengunjung tetap mendapat jawaban tanpa error.',
+      ],
+    },
+    {
+      heading: 'Cross-Persona Intent Router & Google Search Grounding',
+      paragraphs: [
+        'Bagaimana jika pengunjung menanyakan hal teknis kepada Zannah, atau menanyakan pembuatan proposal anggaran kepada Rajendra? Di sinilah arsitektur Cross-Persona Intent Router bekerja.',
+        'Melalui lapisan deteksi intent di backend, sistem secara cerdas mengenali arah percakapan. Jika terdeteksi kebutuhan lintas persona, sistem menyuntikkan catatan konteks halus kepada model AI untuk merekomendasikan pengguna beralih ke asisten yang paling kompeten tanpa memutus alur percakapan.',
+        'Tak hanya itu, sistem juga dilengkapi Google Search Grounding dan Intent Classifier spekulatif. Ketika pengunjung menanyakan riset harga pasar atau tren teknologi terkini, sistem otomatis menjalankan pencarian web real-time sebelum menyusun jawaban, memisahkan fakta riset luar dari data resmi penawaran secara transparan dan anti-halusinasi.',
+      ],
+    },
+    {
+      heading: 'Multi-Model Cascade & Circuit Breaker: Tanpa Downtime',
+      paragraphs: [
+        'Di balik layar Zannah dan Rajendra, kami tidak bergantung pada satu model AI tunggal. Sistem menerapkan tangga Multi-Model Cascade bertingkat:',
+        'Permintaan pertama diarahkan ke Gemini Flash generasi terbaru. Jika kuota API habis (error 429) atau server Google mengalami lonjakan permintaan (error 503), sistem menerapkan In-Memory Cooldown Circuit Breaker selama 3 menit untuk model tersebut dan secara otomatis mengalihkan request ke model cadangan berikutnya dalam hitungan milidetik, hingga lapisan pertahanan model open-weights Gemma MoE.',
+        'Hasilnya? Pengunjung tidak pernah melihat pesan error teknis, dan situs tetap beroperasi mulus 24 jam sehari.',
+      ],
+    },
+    {
+      heading: 'Pelajaran untuk Arsitektur AI di Bisnis Anda',
+      paragraphs: [
+        'Mengadopsi AI ke dalam operasional bisnis bukan soal memasang model tercanggih lalu membiarkannya menebak segalanya. Keberhasilan sistem AI ditentukan oleh arsitektur di sekelilingnya: pembagian persona yang terarah, sistem routing intent, mekanisme failover multi-model, serta jaring pengaman offline.',
+        'Jika bisnis Anda ingin membangun chatbot atau autonomous agent yang benar-benar siap produksi—tahan banting terhadap lonjakan traffic, hemat biaya operasional, dan menghadirkan pengalaman pengguna yang solid—pendekatan modular seperti inilah yang terbukti paling andal di lapangan.',
+      ],
+    },
+  ],
 };

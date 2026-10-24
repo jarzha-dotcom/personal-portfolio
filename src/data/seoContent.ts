@@ -187,3 +187,17 @@ export const ABOUT_STATS = [
   { value: '15+', label: 'Tech Stack Dikuasai', desc: 'Frontend, backend, hingga deployment' },
   { value: '4', label: 'Tahap Kerja Transparan', desc: 'Dari konsultasi sampai rilis' },
 ];
+
+/**
+ * Jumlah artikel terbaru di beranda — dipakai ArticlesPreview (yang terlihat) DAN
+ * scripts/prerender.ts (shell statis + JSON-LD ItemList beranda), supaya jumlah
+ * yang dibaca crawler sama dengan yang dilihat pengunjung. Daftar lengkap ada di /artikel.
+ */
+export const HOME_ARTICLE_LIMIT = 6;
+
+/**
+ * 3 paket yang ditampilkan di beranda (sisanya di /layanan): entry-level, AI chatbot
+ * (layanan pembeda), dan web app custom. Blok "Layanan" di shell statis index.html
+ * harus memuat daftar yang sama.
+ */
+export const HOME_SERVICES: SeoServiceOffer[] = [SERVICE_CATALOG[0], SERVICE_CATALOG[2], SERVICE_CATALOG[3]];

@@ -97,18 +97,78 @@ const fuse = new Fuse(FAQ_ITEMS, {
 });
 
 /**
- * Cari FAQ paling relevan buat Radit: coba semantic search dulu (Gemini
- * Embedding di backend, lewat `searchFaqSemantic`), baru fallback ke Fuse.js
- * keyword-match kalau semantic search gak ketemu/gagal/timeout. Radit gak
- * pernah lebih "bodoh" dari sebelumnya — paling jelek ya balik ke perilaku
- * Fuse.js yang sudah ada.
+ * Smart Budget Matcher lokal untuk Radit:
+ * Mengekstrak nominal jika user menanyakan paket berdasarkan budget tertentu
+ * misal: "budget 2jt dapet apa?", "ada dana 1,5 juta", "uang 500rb", "punya 10 juta"
+ */
+function matchBudgetRecommendation(text: string): FAQItem | null {
+  const budgetKeywords = /\b(budget|dana|uang|biaya|modal|punya|ada)\b/i;
+  // Match format: 1.5jt, 2 juta, 500rb, 500.000, 2000000, 3jt, 5jt, dll.
+  const regex = /(?:rp\.?\s*)?(\d+(?:[.,]\d+)?)\s*(jt|juta|k|ribu|rb)?\b/i;
+
+  if (!budgetKeywords.test(text)) return null;
+  const match = text.match(regex);
+  if (!match) return null;
+
+  const rawNum = parseFloat(match[1].replace(',', '.'));
+  const unit = (match[2] || '').toLowerCase();
+
+  let totalNominal = rawNum;
+  if (unit === 'jt' || unit === 'juta') {
+    totalNominal = rawNum * 1_000_000;
+  } else if (unit === 'rb' || unit === 'ribu' || unit === 'k') {
+    totalNominal = rawNum * 1_000;
+  } else if (rawNum < 100) {
+    totalNominal = rawNum * 1_000_000;
+  }
+
+  if (totalNominal <= 0 || isNaN(totalNominal)) return null;
+
+  const formatJuta = (nom: number) => {
+    if (nom >= 1_000_000) return `Rp${(nom / 1_000_000).toLocaleString('id-ID')} Juta`;
+    return `Rp${nom.toLocaleString('id-ID')}`;
+  };
+
+  let recommendation = '';
+  if (totalNominal < 800_000) {
+    recommendation = `Untuk budget sekitar ${formatJuta(totalNominal)}, Mas Arzha bisa membantu setup landing page profil sederhana berbasis template kustom atau konsultasi optimalisasi fitur esensial terlebih dahulu. Ada juga promo diskon 15% untuk 5 klien pertama! Yuk diskusikan langsung via WhatsApp.`;
+  } else if (totalNominal < 2_500_000) {
+    recommendation = `Dengan budget sekitar ${formatJuta(totalNominal)}, paket yang SANGAT PAS adalah **Landing Page / Company Profile Modern (mulai Rp800rb)** atau pembuatan **AI Chatbot Kustom (mulai Rp1,5jt)**. Desain responsif, cepat, SEO-friendly, dan ada tombol checkout WhatsApp otomatis!`;
+  } else if (totalNominal < 6_000_000) {
+    recommendation = `Dengan budget sekitar ${formatJuta(totalNominal)}, Kakak bisa mendapatkan **Web App Sederhana (mulai Rp2,5jt)** yang sudah dilengkapi database terintegrasi (Google Sheets / Supabase), form input tersimpan, login user, atau katalog produk dinamis!`;
+  } else if (totalNominal < 12_000_000) {
+    recommendation = `Dengan budget sekitar ${formatJuta(totalNominal)}, Kakak bisa membangun **Web App Custom / Dashboard Operasional** atau **Aplikasi Mobile Android & iOS (mulai Rp6jt)** seperti sistem inventaris Assets DEMO, lengkap dengan scan barcode kamera dan ekspor PDF/Excel!`;
+  } else {
+    recommendation = `Dengan budget sekitar ${formatJuta(totalNominal)}, proyek ini siap mencakup **Sistem Skala Penuh, Dashboard Kustom Komprehensif, atau Realtime Game Platform (mulai Rp12jt)** berbasis WebSocket low-latency seperti B-Games!`;
+  }
+
+  return {
+    id: 'dynamic-budget-match',
+    categoryId: 'harga',
+    quickLabel: `Rekomendasi Paket ${formatJuta(totalNominal)}`,
+    keywords: ['budget', 'rekomendasi'],
+    answer: `💡 [Rekomendasi Radit untuk Budget ${formatJuta(totalNominal)}]\n${recommendation}`,
+  };
+}
+
+/**
+ * Cari FAQ paling relevan buat Radit: coba matcher budget dinamis dulu,
+ * lalu semantic search (Gemini Embedding di backend, lewat `searchFaqSemantic`),
+ * baru fallback ke Fuse.js keyword-match kalau gak ketemu/gagal/timeout.
  */
 async function findFaqAnswer(text: string): Promise<FAQItem | null> {
+  // 1. Cek rule-based budget matcher terlebih dahulu
+  const budgetMatch = matchBudgetRecommendation(text);
+  if (budgetMatch) return budgetMatch;
+
+  // 2. Cek semantic vector search
   const matchedId = await searchFaqSemantic(text);
   if (matchedId) {
     const matched = FAQ_ITEMS.find((f) => f.id === matchedId);
     if (matched) return matched;
   }
+
+  // 3. Fallback ke Fuse.js keyword matching
   const results = fuse.search(text);
   return results.length > 0 ? results[0].item : null;
 }
@@ -2048,6 +2108,37 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ darkMode }) => {
                 )}
                 {uploadError && (
                   <p className="text-[10px] text-red-500 mb-1.5">{uploadError}</p>
+                )}
+
+                {isRadit && (
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-2 pt-0.5 no-scrollbar text-[10px]">
+                    <span className="text-[9.5px] font-semibold text-amber-500 whitespace-nowrap">Pilihan Cepat:</span>
+                    {CATEGORIES.map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => showCategoryQuestions(c)}
+                        className={`whitespace-nowrap px-2 py-0.5 rounded-full border transition-all text-[10px] ${
+                          darkMode
+                            ? 'border-amber-800/60 text-amber-300 bg-amber-950/40 hover:bg-amber-900/50'
+                            : 'border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100'
+                        }`}
+                      >
+                        {c.label}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => handleOptionClick('retry_zannah', 'Panggil Zannah')}
+                      className={`whitespace-nowrap px-2 py-0.5 rounded-full border font-medium transition-all text-[10px] ${
+                        darkMode
+                          ? 'border-teal-700 text-teal-300 bg-teal-950/40 hover:bg-teal-900/50'
+                          : 'border-teal-300 text-teal-700 bg-teal-50 hover:bg-teal-100'
+                      }`}
+                    >
+                      ✨ Panggil Zannah
+                    </button>
+                  </div>
                 )}
 
                 <div className="flex items-center gap-2">

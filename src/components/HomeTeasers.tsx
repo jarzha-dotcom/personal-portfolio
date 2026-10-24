@@ -1,10 +1,9 @@
 import React from 'react';
-import { ArrowRight, Sparkles, Tag, MessageCircle, Mail, User } from 'lucide-react';
-import { CONTACT_INFO } from '../data/portfolioData';
-import { ABOUT_INTRO, ABOUT_STATS, SERVICE_CATALOG } from '../data/seoContent';
+import { ArrowRight, Sparkles, Tag, MessageCircle, Mail, FolderOpen } from 'lucide-react';
+import { CONTACT_INFO, PROJECTS } from '../data/portfolioData';
+import { HOME_SERVICES } from '../data/seoContent';
 import { useNavigationHistory } from '../context/NavigationHistoryContext';
 import { ROUTES } from '../routes';
-import { CountUp } from './CountUp';
 import { InView } from './InView';
 
 interface TeaserProps {
@@ -28,50 +27,71 @@ const waUrl = (text: string) =>
   `https://wa.me/${CONTACT_INFO.phone.replace(/\D/g, '')}?text=${encodeURIComponent(text)}`;
 
 /* ------------------------------------------------------------------ */
-/* Tentang — ringkas; selengkapnya di /tentang                         */
+/* Karya unggulan — 3 proyek; semuanya ada di /hasil-kerja              */
 /* ------------------------------------------------------------------ */
-export const AboutTeaser: React.FC<TeaserProps> = ({ darkMode }) => {
+export const FeaturedProjectsTeaser: React.FC<TeaserProps> = ({ darkMode }) => {
   const go = useGo();
+  // Proyek unggulan dulu, lalu proyek lain sampai genap 3.
+  const featured = [...PROJECTS]
+    .sort((a, b) => Number(Boolean(b.isFeatured)) - Number(Boolean(a.isFeatured)))
+    .slice(0, 3);
+
   return (
     <section
-      id="tentang"
-      aria-labelledby="tentang-teaser-heading"
+      id="proyek"
+      aria-labelledby="proyek-teaser-heading"
       className={`py-12 md:py-16 transition-colors duration-200 ${darkMode ? 'bg-slate-950' : 'bg-slate-50'}`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        <div className="lg:col-span-7">
-          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-3 border ${darkMode ? 'text-teal-300 bg-teal-950/60 border-teal-700/50' : 'text-teal-700 bg-teal-50 border-teal-200'}`}>
-            <User className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Tentang Saya</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center max-w-3xl mx-auto mb-8">
+          <div className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-2 border ${darkMode ? 'text-teal-300 bg-teal-950/60 border-teal-700/50' : 'text-teal-700 bg-teal-50 border-teal-200'}`}>
+            <FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />
+            <span>Karya Unggulan</span>
           </div>
-          <h2 id="tentang-teaser-heading" className={`text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-3 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
-            Developer di Balik Layanan Ini
+          <h2 id="proyek-teaser-heading" className={`text-2xl sm:text-3xl font-extrabold tracking-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+            Proyek yang Sudah Live & Dipakai
           </h2>
-          <p className={`text-sm sm:text-base leading-relaxed max-w-2xl ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>{ABOUT_INTRO}</p>
+          <p className={`text-xs sm:text-sm ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            Tiga contoh pilihan. Portofolio lengkap, demo interaktif, dan studi kasus klien ada di halaman Hasil Kerja.
+          </p>
+        </div>
+
+        <InView className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4">
+          {featured.map((p, i) => {
+            const motionClass = i === 0 ? 'mo-slide-l' : i === 1 ? 'mo-scale' : 'mo-slide-r';
+            return (
+              <a
+                key={p.id}
+                href={ROUTES.caseStudy}
+                onClick={(e) => go(e, ROUTES.caseStudy)}
+                style={{ '--i': i } as React.CSSProperties}
+                className={`${motionClass} group p-5 rounded-2xl border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg ${FOCUS_RING} ${darkMode ? 'bg-slate-900 border-slate-700 hover:border-teal-500/40' : 'bg-white border-slate-200 shadow-sm hover:border-teal-400/60 hover:shadow-md'}`}
+              >
+              <span className={`self-start text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full mb-3 ${darkMode ? 'text-teal-300 bg-teal-500/10 border border-teal-500/20' : 'text-teal-700 bg-teal-50 border border-teal-200'}`}>
+                {p.category}
+              </span>
+              <h3 className={`text-base font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>{p.title}</h3>
+              <p className={`text-xs sm:text-sm leading-relaxed mb-4 line-clamp-3 ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>{p.tagline}</p>
+              <div className="mt-auto flex flex-wrap gap-1.5">
+                {p.techStack.slice(0, 3).map((t) => (
+                  <span key={t} className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${darkMode ? 'text-slate-300 bg-slate-800 border-slate-700' : 'text-slate-600 bg-slate-100 border-slate-200'}`}>{t}</span>
+                ))}
+              </div>
+            </a>
+            );
+          })}
+        </InView>
+
+        <div className="mt-8 flex justify-center">
           <a
-            href={ROUTES.about}
-            onClick={(e) => go(e, ROUTES.about)}
-            className={`group mt-5 inline-flex items-center gap-2 rounded-lg px-1 py-2 text-sm font-bold ${darkMode ? 'text-teal-300 hover:text-teal-200' : 'text-teal-700 hover:text-teal-600'} ${FOCUS_RING}`}
+            href={ROUTES.caseStudy}
+            onClick={(e) => go(e, ROUTES.caseStudy)}
+            className={`group inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 rounded-xl border text-sm font-bold active:scale-95 transition-all ${FOCUS_RING} ${darkMode ? 'border-teal-700/70 text-teal-300 bg-teal-950/40 hover:bg-teal-900/50' : 'border-teal-300 text-teal-800 bg-teal-50/80 hover:bg-teal-100'}`}
           >
-            Profil lengkap, tech stack & cara kerja
+            Lihat Semua Karya & Studi Kasus
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
           </a>
         </div>
-
-        <InView className="lg:col-span-5 grid grid-cols-2 gap-3">
-          {ABOUT_STATS.map((stat, i) => (
-            <div
-              key={stat.label}
-              style={{ '--i': i } as React.CSSProperties}
-              className={`mo-item p-4 text-center rounded-2xl border ${darkMode ? 'bg-slate-900/60 border-slate-800' : 'bg-white border-slate-200 shadow-sm'}`}
-            >
-              <p className={`text-3xl font-black mb-1 bg-clip-text text-transparent bg-gradient-to-br ${darkMode ? 'from-teal-300 to-cyan-400' : 'from-teal-600 to-emerald-500'}`}>
-                <CountUp value={stat.value} />
-              </p>
-              <p className={`text-[11px] font-bold uppercase tracking-wide ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>{stat.label}</p>
-            </div>
-          ))}
-        </InView>
       </div>
     </section>
   );
@@ -102,8 +122,8 @@ export const ServicesTeaser: React.FC<TeaserProps> = ({ darkMode }) => {
           </p>
         </div>
 
-        <InView className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-          {SERVICE_CATALOG.map((s, i) => (
+        <InView className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          {HOME_SERVICES.map((s, i) => (
             <div
               key={s.name}
               style={{ '--i': i } as React.CSSProperties}
@@ -124,7 +144,7 @@ export const ServicesTeaser: React.FC<TeaserProps> = ({ darkMode }) => {
             className={`group inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 rounded-xl bg-teal-600 hover:bg-teal-700 active:scale-95 text-white text-sm font-bold shadow-lg shadow-teal-600/20 transition-all ${FOCUS_RING}`}
           >
             <Sparkles className="w-4 h-4" aria-hidden="true" />
-            Lihat Detail Layanan, Alur Kerja & FAQ
+            Lihat Semua Layanan, Alur Kerja & FAQ
             <ArrowRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
           </a>
         </div>

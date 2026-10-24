@@ -25,6 +25,26 @@
   <meta name="wa-number" content="__WA_NUMBER__">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Galeri Contoh Desain</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Beranda",
+        "item": "https://arzhaning.my.id/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Contoh Desain",
+        "item": "https://arzhaning.my.id/demos/"
+      }
+    ]
+  }
+  </script>
   <script>(function () { var r = document.documentElement, t = "light"; try { var q = new URLSearchParams(location.search).get("theme"); if (q === "dark" || q === "light") { t = q; localStorage.setItem("demo-theme", q) } else { var v = localStorage.getItem("demo-theme"); t = (v === "dark" || v === "light") ? v : (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light") } } catch (e) { } r.setAttribute("data-theme", t) })()</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -189,6 +209,52 @@
       max-width: 1200px;
       margin: 0 auto;
       padding: 88px 20px 56px
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      margin-bottom: -16px;
+      font-size: 13px
+    }
+
+    .breadcrumb ol {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      color: var(--sub)
+    }
+
+    .breadcrumb li {
+      display: inline-flex;
+      align-items: center
+    }
+
+    .breadcrumb a {
+      color: var(--sub);
+      text-decoration: none;
+      transition: color .2s
+    }
+
+    .breadcrumb a:hover,
+    .breadcrumb a:focus-visible {
+      color: var(--accent);
+      outline: none
+    }
+
+    .breadcrumb .sep {
+      opacity: .5;
+      display: inline-flex;
+      align-items: center
+    }
+
+    .breadcrumb li[aria-current=page] {
+      font-weight: 600;
+      color: var(--ink)
     }
 
     .nav {
@@ -1105,7 +1171,7 @@
           <div class="menu" id="karyaMenu" hidden>
             <a href="/#proyek">Proyek</a>
             <a href="/hasil-kerja">Hasil Kerja</a>
-            <a href="/demos/index.html" aria-current="page" class="cur">Contoh Desain</a>
+            <a href="/demos/" aria-current="page" class="cur">Contoh Desain</a>
           </div>
         </div>
         <a href="/#layanan">Layanan</a>
@@ -1145,7 +1211,7 @@
       <p>Karya</p>
       <a class="sub" href="/#proyek">Proyek</a>
       <a class="sub" href="/hasil-kerja">Hasil Kerja</a>
-      <a class="sub cur" href="/demos/index.html" aria-current="page">Contoh Desain</a>
+      <a class="sub cur" href="/demos/" aria-current="page">Contoh Desain</a>
       <a href="/#layanan">Layanan</a>
       <!-- PRERENDER:DEMOS_DRAWER_ARTICLES:START --><!-- PRERENDER:DEMOS_DRAWER_ARTICLES:END -->
       <a href="/#keahlian">Keahlian</a>
@@ -1157,6 +1223,15 @@
   <div class="particles" id="particles" aria-hidden="true"></div>
   <div class="glow" id="glow" aria-hidden="true"></div>
   <main class="wrap">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Beranda</a></li>
+        <li aria-hidden="true" class="sep">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </li>
+        <li aria-current="page">Contoh Desain</li>
+      </ol>
+    </nav>
     <section class="hero">
       <div class="badge"><i></i>Galeri Desain</div>
       <h1>Galeri Contoh <span>Desain</span></h1>
@@ -1279,7 +1354,7 @@
       a.dataset.title = (d.title || "").toLowerCase();
       a.dataset.desc = (d.desc || "").toLowerCase();
       /* Tautan utama dipisah dari tombol WA karena <a> tidak boleh bersarang di dalam <a>. */
-      var main = el("a", "main"); main.href = d.file; main.target = "_blank"; main.rel = "noopener";
+      var main = el("a", "main"); main.href = (d.file || "").replace(/\.html$/, ""); main.target = "_blank"; main.rel = "noopener";
       var th = el("div", "thumb");
       if (d.thumb) {
         var img = new Image(); img.alt = "Cuplikan " + d.title; img.loading = "lazy";

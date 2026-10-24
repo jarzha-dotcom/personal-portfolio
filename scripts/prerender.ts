@@ -38,6 +38,7 @@ import {
   FAQ_ITEMS,
   ABOUT_INTRO,
   ABOUT_TECH,
+  HOME_ARTICLE_LIMIT,
 } from '../src/data/seoContent.ts';
 import { ROUTES, articleRoute, CANONICAL_BASE } from '../src/routes.ts';
 import { formatIDDate, toISODate } from '../src/utils/formatDate.ts';
@@ -55,7 +56,7 @@ const INDEX_HTML_PATH = join(DIST_DIR, 'index.html');
 // Galeri contoh desain: folder statis di luar SPA (lihat catatan DEMOS_PREFIX di public/sw.js).
 const DEMOS_SRC_DIR = join(ROOT_DIR, 'public', 'demos');
 const DEMOS_DIST_INDEX = join(DIST_DIR, 'demos', 'index.html');
-const DEMOS_GALLERY_PATH = '/demos/index.html';
+const DEMOS_GALLERY_PATH = '/demos/';
 // ZhaNotes: aplikasi statis mandiri (satu file HTML) di public/zhanotes, di luar SPA
 // (rewrite catch-all di vercel.json sudah mengecualikan zhanotes/).
 const ZHANOTES_SRC_DIR = join(ROOT_DIR, 'public', 'zhanotes');
@@ -112,7 +113,6 @@ const breadcrumbJsonLd = (items: { name: string; url: string }[]) => ({
 
 // Batas jumlah artikel di blok homepage — artikel yang lebih lama tetap ada di
 // /artikel dan sitemap.xml, hanya tidak ikut di-link dari beranda.
-const HOME_ARTICLE_LIMIT = 20;
 
 const fillMarkedBlock = (html: string, name: string, content: string, label = 'dist/index.html'): string => {
   const start = `<!-- PRERENDER:${name}:START -->`;

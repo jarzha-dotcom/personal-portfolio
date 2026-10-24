@@ -151,54 +151,7 @@
     </script>
 
   <!-- FAQPage Schema — untuk Google Rich Results / Snippet FAQ di hasil pencarian -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {
-        "@type": "Question",
-        "name": "Berapa biaya pembuatan website atau landing page?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Landing page 1 halaman mulai dari Rp800.000. Untuk Web Application custom atau dashboard admin mulai dari Rp6.000.000, tergantung kompleksitas fitur dan database."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Berapa biaya pembuatan aplikasi mobile Android dan iOS?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Pembuatan aplikasi mobile custom (Android & iOS) mulai dari Rp6.000.000 menggunakan React Native & Expo untuk performa optimal di kedua platform."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Berapa lama estimasi waktu pengerjaan proyek?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Landing page memakan waktu 1-2 minggu, Web App / Mobile App 3-6 minggu, dan Game multiplayer 6-10 minggu."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Apakah ada garansi maintenance setelah website/aplikasi rilis?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Ya, setiap proyek mendapatkan garansi technical support gratis selama 1 bulan penuh pasca rilis untuk penanganan bug atau kendala teknis."
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "Apakah source code diserahkan 100% ke klien?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": "Ya, seluruh source code repositori GitHub dan aset proyek diserahkan penuh menjadi hak milik klien tanpa biaya lisensi tersembunyi."
-        }
-      }
-    ]
-  }
-  </script>
+  <!-- FAQPage JSON-LD dipindah ke /layanan (digenerate scripts/prerender.ts dari data/seoContent.ts): FAQ lengkapnya tampil di sana. -->
 
   <!-- Portofolio Proyek Live — SoftwareApplication Schema -->
   <script type="application/ld+json">
@@ -754,6 +707,14 @@
         <a href="/artikel"
           style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Baca
           Artikel</a>
+        <a href="/layanan"
+          style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Layanan
+          &amp; Biaya</a>
+        <a href="/tentang"
+          style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Tentang
+          Saya</a>
+        <a href="/kontak"
+          style="display: inline-block; margin-left: 1rem; color: #0d9488; text-decoration: underline; font-weight: 600;">Kontak</a>
       </div>
     </header>
 
@@ -788,7 +749,7 @@
       <section style="margin-bottom: 3rem;">
         <h2
           style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
-          Layanan & Estimasi Biaya Pengerjaan
+          <a href="/layanan" style="color: inherit; text-decoration: none;">Layanan & Estimasi Biaya Pengerjaan</a>
         </h2>
         <ul style="list-style-type: none; padding-left: 0; display: grid; gap: 1rem; margin-top: 1rem;">
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
@@ -797,12 +758,7 @@
             <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp800.000 • Pengerjaan 1-2 minggu • Desain responsif,
               SEO-friendly, integrasi WhatsApp otomatis.</p>
           </li>
-          <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Company Profile & Web App
-              Sederhana</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp2.500.000 • Pengerjaan 2-3 minggu • Fitur
-              multi-halaman, katalog interaktif, dynamic content.</p>
-          </li>
+
           <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
             <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">AI Chatbot & Autonomous Agent
               Bisnis</h3>
@@ -815,19 +771,11 @@
             <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • Autentikasi user,
               database Supabase/PostgreSQL, export Excel/PDF, audit log.</p>
           </li>
-          <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Aplikasi Mobile (Android /
-              Cross-Platform)</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp6.000.000 • Pengerjaan 3-6 minggu • React Native /
-              Expo / Capacitor PWA, offline cache, notifikasi.</p>
-          </li>
-          <li style="padding: 1rem; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px;">
-            <h3 style="font-size: 1.2rem; font-weight: 600; color: #0f172a; margin: 0;">Realtime Multiplayer Game &
-              Platform Interaktif</h3>
-            <p style="color: #64748b; margin: 0.25rem 0;">Mulai Rp12.000.000 • Pengerjaan 6-10 minggu • WebSockets,
-              state synchronization, low latency (&lt;50ms), bot AI adaptif.</p>
-          </li>
+
+
         </ul>
+        <p style="margin-top: 1rem;"><a href="/layanan" style="color: #0d9488; font-weight: 600;">Lihat detail layanan,
+            alur kerja &amp; FAQ lengkap &rarr;</a></p>
       </section>
 
       <!-- Portofolio Unggulan -->
@@ -868,38 +816,7 @@
       </section>
 
       <!-- Keahlian & Tech Stack -->
-      <section style="margin-bottom: 3rem;">
-        <h2
-          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
-          Tech Stack & Nilai Unik
-        </h2>
-        <p style="color: #475569; margin-top: 0.5rem;">
-          Kombinasi 7+ tahun pengalaman operasional dan audit korporat (akurasi data 99%, 100+ audit SOP terselesaikan)
-          dengan kapabilitas software engineering modern (React 19, TypeScript, React Native, Expo, Capacitor 8,
-          boardgame.io, Koa.js, Serverless Google Apps Script, Supabase, Tailwind CSS v4, Google Antigravity Agent, AI
-          Multi-LLM, SAP Business One).
-        </p>
-      </section>
-
       <!-- FAQ Singkat -->
-      <section style="margin-bottom: 3rem;">
-        <h2
-          style="font-size: 1.5rem; font-weight: 700; color: #1e293b; border-bottom: 2px solid #0d9488; padding-bottom: 0.5rem;">
-          Pertanyaan yang Sering Diajukan (FAQ)
-        </h2>
-        <div style="margin-top: 1rem;">
-          <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Berapa lama waktu pembuatan website atau
-            aplikasi?</h3>
-          <p style="color: #475569;">Landing page selesai dalam 1-2 minggu, aplikasi web/mobile custom 3-6 minggu, dan
-            platform game 6-10 minggu.</p>
-          <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Apakah ada garansi setelah rilis?</h3>
-          <p style="color: #475569;">Setiap proyek mendapatkan garansi maintenance dan perbaikan bug gratis selama 1
-            bulan penuh.</p>
-          <h3 style="font-size: 1.1rem; font-weight: 600; color: #0f172a;">Bagaimana cara berkonsultasi?</h3>
-          <p style="color: #475569;">Anda bisa langsung berkonsultasi dengan Zannah AI di widget chat website ini atau
-            menghubungi WhatsApp Mas Arzha di +62 823-1231-2734.</p>
-        </div>
-      </section>
     </main>
 
     <footer

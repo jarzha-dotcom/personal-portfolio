@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState, lazy, Suspense } from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
-import { Projects } from './components/Projects';
 import { ArticlesPreview } from './components/ArticlesPreview';
-import { AboutTeaser, ServicesTeaser, ContactCTA } from './components/HomeTeasers';
+import { FeaturedProjectsTeaser, ServicesTeaser, ContactCTA } from './components/HomeTeasers';
 import { Footer } from './components/Footer';
 import { EasterEggToast } from './components/EasterEggToast';
 import { Reveal } from './components/Reveal';
@@ -414,13 +413,10 @@ function MainPortfolio() {
                   <InfiniteBanner darkMode={darkMode} />
                 </div>
                 <Hero darkMode={darkMode} />
-                {/* Beranda = ringkasan + Portofolio interaktif. Detail Layanan, Tentang
-                    (+Keahlian), dan Kontak ada di halamannya sendiri (lazy) — lihat teasers. */}
+                {/* Beranda = ringkasan singkat. Portofolio interaktif ada di /hasil-kerja;
+                    Layanan, Tentang (+Keahlian), dan Kontak di halamannya sendiri (semua lazy). */}
                 <Reveal>
-                  <AboutTeaser darkMode={darkMode} />
-                </Reveal>
-                <Reveal>
-                  <Projects darkMode={darkMode} />
+                  <FeaturedProjectsTeaser darkMode={darkMode} />
                 </Reveal>
                 <Reveal>
                   <ServicesTeaser darkMode={darkMode} />

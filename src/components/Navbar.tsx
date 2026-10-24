@@ -50,7 +50,7 @@ const NAV_ITEMS: NavItem[] = [
 // Section beranda yang dipantau scroll-spy (termasuk teaser Tentang/Layanan/Kontak
 // yang menautkan ke halamannya sendiri — id-nya tetap ada di beranda). Index-nya
 // harus sejajar dengan sectionElementsRef di bawah.
-const navLinks = ['beranda', 'tentang', 'proyek', 'layanan', 'kontak'].map((id) => ({ id }));
+const navLinks = ['beranda', 'proyek', 'layanan', 'kontak'].map((id) => ({ id }));
 
 // Rute yang punya halaman sendiri; path lain (termasuk yang tak dikenal) = beranda.
 const PAGE_ROUTES: string[] = [ROUTES.caseStudy, ROUTES.articles, ROUTES.services, ROUTES.about, ROUTES.contact];
@@ -60,15 +60,14 @@ const PAGE_ROUTES: string[] = [ROUTES.caseStudy, ROUTES.articles, ROUTES.service
 const hasPublishedArticles = ARTICLES.some((a) => a.published);
 
 // Halaman galeri contoh desain (statis, di public/demos)
-const DESIGN_GALLERY_URL = '/demos/index.html';
+const DESIGN_GALLERY_URL = '/demos/';
 
-// Grup dropdown "Karya": menggabungkan Portofolio, Hasil Kerja, dan Contoh Desain
+// Grup dropdown "Karya": Portofolio & Hasil Kerja (satu halaman) dan Contoh Desain
 const KARYA_GROUP: NavGroup = {
   id: 'karya',
   name: 'Karya',
   children: [
-    { name: 'Proyek', href: '#proyek', id: 'proyek' },
-    { name: 'Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
+    { name: 'Portofolio & Hasil Kerja', href: ROUTES.caseStudy, id: 'hasil-kerja', route: true },
     { name: 'Contoh Desain', href: DESIGN_GALLERY_URL, id: 'contoh-desain', external: true },
   ],
 };

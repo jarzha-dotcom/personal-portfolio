@@ -69,7 +69,7 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
               <div style={{ '--i': 3 } as React.CSSProperties} className="mo-rise flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                 <button
                   onClick={() => scrollTo('layanan')}
-                  className="w-full sm:w-auto justify-center bg-white text-slate-900 px-4 py-3 sm:py-2 rounded-lg text-xs font-bold hover:bg-slate-100 active:scale-[0.98] transition-all flex items-center gap-2"
+                  className="w-full sm:w-auto justify-center bg-white text-slate-900 px-4 py-3 sm:py-2.5 rounded-xl text-xs font-bold hover:bg-slate-100 active:scale-[0.97] hover:-translate-y-0.5 shadow-sm transition-all flex items-center gap-2"
                 >
                   <Code2 className="w-3.5 h-3.5" />
                   <span>Lihat Jasa Development</span>
@@ -77,14 +77,14 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
                 </button>
                 <button
                   onClick={() => scrollTo('proyek')}
-                  className="flex-1 sm:flex-none justify-center bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30 px-4 py-3 sm:py-2 rounded-lg text-xs font-bold active:scale-[0.98] transition-all flex items-center gap-2"
+                  className="flex-1 sm:flex-none justify-center bg-emerald-500/20 border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/30 px-4 py-3 sm:py-2.5 rounded-xl text-xs font-bold active:scale-[0.97] hover:-translate-y-0.5 transition-all flex items-center gap-2"
                 >
                   <FolderGit2 className="w-3.5 h-3.5" />
                   <span>Lihat Portofolio Proyek</span>
                 </button>
                 <button
                   onClick={() => scrollTo('kontak')}
-                  className="flex-1 sm:flex-none justify-center bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-4 py-3 sm:py-2 rounded-lg text-xs font-semibold active:scale-[0.98] transition-all flex items-center gap-2"
+                  className="flex-1 sm:flex-none justify-center bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-4 py-3 sm:py-2.5 rounded-xl text-xs font-semibold active:scale-[0.97] hover:-translate-y-0.5 transition-all flex items-center gap-2"
                 >
                   <Mail className="w-3.5 h-3.5" />
                   <span>Hubungi Saya</span>
@@ -95,8 +95,8 @@ export const Hero: React.FC<HeroProps> = ({ darkMode }) => {
             {/* Right Col: Profile */}
             <div className="lg:col-span-4 flex flex-col items-center lg:items-end justify-center">
               <div className="relative">
-                <div aria-hidden="true" className="mo-glow absolute -inset-3 rounded-3xl bg-emerald-500/25 blur-xl pointer-events-none hidden sm:block" />
-              <div className="mo-settle relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl p-1 bg-gradient-to-tr from-emerald-500 to-indigo-600 shadow-md">
+                <div aria-hidden="true" className="mo-glow mo-float absolute -inset-3 rounded-3xl bg-emerald-500/25 blur-xl pointer-events-none hidden sm:block" />
+              <div className="mo-settle mo-scale relative w-36 h-36 sm:w-44 sm:h-44 rounded-2xl p-1 bg-gradient-to-tr from-emerald-500 to-indigo-600 shadow-md">
                 <div className="w-full h-full rounded-xl overflow-hidden bg-slate-900 relative">
                   <img
                     src={PERSONAL_INFO.avatar}

@@ -351,7 +351,7 @@ export const PROJECTS: ProjectItem[] = [
     techStack: ['HTML', 'Tailwind CSS', 'JavaScript', 'Lucide Icons'],
     role: 'UI Designer & Front-end Developer',
     year: '2026',
-    demoUrl: '/demos/index.html',
+    demoUrl: '/demos/',
     coverImage: '/demos/thumbs/og-image.png',
     isFeatured: true,
     colorScheme: 'amber',
