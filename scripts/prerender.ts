@@ -1368,18 +1368,25 @@ const fillDemosGallery = (hasPublishedArticles: boolean): string | null => {
 
 const ZHANOTES_META = {
   name: 'ZhaNotes',
-  title: 'ZhaNotes — Catatan, Kanvas & Anotasi PDF Offline, Gratis Tanpa Iklan',
+  title: 'ZhaNotes — Workspace PKM, Catatan, Kanvas Bebas & Anotasi PDF Offline Gratis',
   description:
-    'ZhaNotes: aplikasi catatan, kanvas, dan anotasi PDF yang gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Data tersimpan di perangkat Anda.',
+    'ZhaNotes: ruang kerja Personal Knowledge Management (PKM) local-first gratis tanpa iklan pihak ketiga. Dilengkapi editor teks kaya, 72 template, tabel berhitung otomatis, modul latihan anak terproteksi PIN, kanvas visual dengan pengenal bentuk otomatis (shape recognition), anotator PDF, wiki backlinks, dan audio recorder. 100% offline & data tersimpan di perangkat Anda.',
+  keywords:
+    'zhanotes, personal knowledge management, aplikasi catatan offline, pkm indonesia, kanvas visual, anotasi pdf offline, local first app, zero server cost, catatan matematika anak, aplikasi produktivitas web, wiki backlinks, smart table, shape recognition canvas',
   features: [
-    'Editor teks kaya dengan checklist, tabel, kotak catatan, dan perintah cepat /',
-    'Kanvas bebas dengan pena peka tekanan, bentuk, kartu teks, dan konektor',
-    'Pembaca dan anotator PDF: stabilo teks, coretan, kartu catatan, ekspor PDF beranotasi',
-    'Riset dan kliping terstruktur: tautan, kutipan, tangkapan layar, catatan pribadi',
-    'Wiki backlinks [[ ]] dan peta grafis antar catatan',
-    'Perekam suara dengan penanda waktu',
-    'Ekspor ke Word, PDF, Markdown, HTML, PNG, dan SVG tanpa backend',
-    'Cadangan ZIP lengkap; sinkron awan terenkripsi tersedia pada edisi kustom',
+    'Editor teks kaya dengan 11 kotak callout, 24 kategori simbol, checklist, sitasi 8 format standar, dan pintasan /',
+    '72 Template siap pakai lintas 9 kategori (produktivitas, belajar, rapat, jurnal, keuangan, dll.)',
+    'Tabel berhitung otomatis (subtotal, total, sisa anggaran, inventaris stok, bagi tagihan, tombol aksi cepat)',
+    'Modul latihan anak acak (hitung, jam, uang Rp, perkalian) dengan proteksi PIN 4-6 digit orang tua',
+    'Kanvas bebas dengan pena peka tekanan, pengenal bentuk otomatis (23 bentuk & konektor), 4 preset pena, dan minimap',
+    'Pembaca dan anotator PDF lengkap: stabilo teks seleksi, tombol "Ke Catatan" ekstraksi otomatis, dan ekspor presisi',
+    'Riset dan kliping terstruktur: 4 blok (Tautan, Kutipan, Tangkapan Layar, Catatan Pribadi)',
+    'Pencarian global cepat (Ctrl+K) dengan multi-filter (#tag, tipe:, folder:, dalam:, sejak:, sebelum:)',
+    'Wiki backlinks [[ ]] dua arah dan peta grafis jejaring pemikiran antar catatan',
+    'Perekam memo suara terintegrasi dengan penanda waktu (audio timestamps)',
+    'Tampilan tugas terpusat dengan pengulangan cerdas (~harian, ~mingguan, ~bulanan)',
+    'Ekspor fleksibel ke Word (.docx) murni di browser, PDF, Markdown, HTML, JSON, PNG, dan SVG',
+    '100% Local-First di peramban via IndexedDB tanpa server; cadangan ZIP mandiri tanpa langganan',
   ],
 };
 
@@ -1415,7 +1422,7 @@ const fillZhaNotesPage = (): string | null => {
   const url = `${CANONICAL_BASE}${ZHANOTES_PATH}`;
   const hasOg = existsSync(join(ZHANOTES_SRC_DIR, 'og-image.png'));
   const image = `${CANONICAL_BASE}${ZHANOTES_PATH}og-image.png`;
-  const { title, description, features, name } = ZHANOTES_META;
+  const { title, description, keywords, features, name } = ZHANOTES_META;
 
   const titlePattern = /<title>[\s\S]*?<\/title>/;
   const descPattern = /<meta name="description" content="[^"]*">/;
@@ -1432,20 +1439,30 @@ const fillZhaNotesPage = (): string | null => {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name,
+    alternateName: 'ZhaNotes PKM & Visual Canvas',
     url,
     description,
-    inLanguage: 'id',
+    keywords,
+    inLanguage: 'id-ID',
     applicationCategory: 'ProductivityApplication',
-    operatingSystem: 'Web (Chrome, Edge, Safari, Firefox)',
-    browserRequirements: 'Memerlukan JavaScript dan IndexedDB',
+    operatingSystem: 'All modern web browsers (Chrome, Edge, Safari, Firefox), Android, iOS, Windows, macOS',
+    browserRequirements: 'Memerlukan JavaScript dan IndexedDB (100% Local-First)',
     isAccessibleForFree: true,
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'IDR' },
+    offers: { '@type': 'Offer', price: '0', priceCurrency: 'IDR', availability: 'https://schema.org/OnlineOnly' },
     featureList: features,
-    author: { '@type': 'Person', name: 'K. Arzhaning Jagad', url: `${CANONICAL_BASE}/` },
-    ...(hasOg ? { image } : {}),
+    author: {
+      '@type': 'Person',
+      name: 'K. Arzhaning Jagad (Arzha)',
+      url: `${CANONICAL_BASE}/`,
+      jobTitle: 'Indie Developer & Data/System Specialist',
+    },
+    ...(hasOg ? { image, screenshot: image } : {}),
   };
   const head = [
     `<link rel="canonical" href="${url}">`,
+    `<meta name="keywords" content="${escapeHtml(keywords)}">`,
+    '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">',
+    '<meta name="author" content="K. Arzhaning Jagad (Arzha)">',
     og('og:type', 'website'),
     og('og:site_name', name),
     og('og:locale', 'id_ID'),
@@ -1472,12 +1489,22 @@ const fillZhaNotesPage = (): string | null => {
   const wa = waDigits ? ` &bull; <a href="https://wa.me/${waDigits}">WhatsApp</a>` : '';
   const shell = `
 <noscript>
-  <div style="padding:24px;max-width:720px;margin:0 auto;font:16px/1.6 system-ui,sans-serif;grid-column:1/-1;overflow:auto">
-    <h1>${escapeHtml(name)}</h1>
-    <p>${escapeHtml(description)}</p>
-    <p><b>Aplikasi ini membutuhkan JavaScript.</b> Aktifkan JavaScript di peramban Anda untuk membuka ${escapeHtml(name)}.</p>
-    <ul>${features.map((f) => `<li>${escapeHtml(f)}</li>`).join('')}</ul>
-    <p>Dibuat oleh ${escapeHtml(SITE_SUFFIX)}. Edisi kustom (nama, logo, dan desain sendiri) tersedia: <a href="${CANONICAL_BASE}/">${CANONICAL_BASE.replace(/^https?:\/\//, '')}</a>${wa}</p>
+  <div style="padding:32px 24px;max-width:840px;margin:0 auto;font:16px/1.65 system-ui,-apple-system,Segoe UI,sans-serif;grid-column:1/-1;overflow:auto;color:#1d1d1f">
+    <h1>${escapeHtml(name)} — Workspace PKM, Catatan, Kanvas &amp; Anotasi PDF Offline</h1>
+    <p><strong>${escapeHtml(description)}</strong></p>
+    
+    <div style="background:#f4f6f8;border-left:4px solid #2d4399;padding:14px 18px;margin:20px 0;border-radius:6px">
+      <p style="margin:0"><b>Aplikasi ini berjalan 100% di peramban Anda (Local-First).</b> Seluruh catatan, coretan kanvas, memo suara, dan PDF tersimpan secara aman di IndexedDB perangkat Anda tanpa server perantara (Zero Server Cost). Untuk membuka dan menggunakan aplikasi interaktif, silakan aktifkan JavaScript di peramban Anda.</p>
+    </div>
+
+    <h2>Fitur Utama &amp; Keunggulan ZhaNotes</h2>
+    <ul>${features.map((f) => `<li style="margin-bottom:8px">${escapeHtml(f)}</li>`).join('')}</ul>
+
+    <h2>Edisi Mandiri &amp; Edisi Kustom Bisnis</h2>
+    <p>Versi publik ini 100% gratis, tanpa iklan pihak ketiga, dan tanpa langganan selamanya. Untuk kebutuhan korporat atau tim bisnis, tersedia <strong>Edisi Kustom Beli-Putus</strong> (branding nama/logo perusahaan sendiri, sinkronisasi awan terenkripsi E2EE AES-GCM antar-perangkat di infrastruktur pribadi klien, KaTeX MathML, Mermaid Diagram SVG, dan OCR multi-bahasa).</p>
+    
+    <p>Dikembangkan oleh <strong>K. Arzhaning Jagad (Arzha)</strong> — Pengembang Web &amp; Spesialis Sistem/Data.<br>
+    Portofolio Utama: <a href="${CANONICAL_BASE}/">${CANONICAL_BASE.replace(/^https?:\/\//, '')}</a>${wa}</p>
   </div>
 </noscript>
 `;

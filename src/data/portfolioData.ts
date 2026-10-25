@@ -187,7 +187,7 @@ export const STATS = [
   { label: 'Tahun Pengalaman', value: '7+', suffix: 'Tahun', desc: 'Di berbagai sektor industri & korporat' },
   { label: 'Akurasi Rekonsiliasi', value: '99%', suffix: '', desc: 'Dalam audit stok & data finansial' },
   { label: 'Siklus Audit Terselesaikan', value: '100+', suffix: 'Laporan', desc: 'Dokumentasi kepatuhan SOP' },
-  { label: 'Aplikasi & Game Dirilis', value: '4+', suffix: 'Proyek', desc: 'Web, Mobile, AI Agent & Realtime Game' },
+  { label: 'Aplikasi & Game Dirilis', value: '5+', suffix: 'Proyek', desc: 'Web, Mobile, AI Agent & Realtime Game' },
 ];
 
 export const PROJECTS: ProjectItem[] = [
@@ -301,18 +301,20 @@ export const PROJECTS: ProjectItem[] = [
   {
     id: 'proj-zhanotes',
     title: 'ZhaNotes — Personal Knowledge Management & Canvas Workspace',
-    tagline: 'Catatan, kanvas & anotasi PDF yang gratis, offline, dan tanpa iklan pihak ketiga. Tersedia edisi kustom beli putus.',
+    tagline: 'Catatan, kanvas & anotasi PDF: gratis, offline, 72 template pintar (tabel hitung otomatis & latihan anak acak), serta edisi kustom beli putus.',
     category: 'Web App',
     badge: 'Produktivitas & PKM',
-    description: 'Workspace catatan visual berbasis web yang berjalan 100% di browser tanpa backend (Zero Server Cost): gratis, tanpa iklan pihak ketiga, dan bisa dipakai offline. Dilengkapi editor halaman, kanvas coretan bebas (pressure sensitivity), annotator PDF, perekam audio berpenanda waktu, wiki backlinks [[ ]], dan ekspor Word (.docx)/PDF murni client-side. Tersedia edisi kustom (nama, logo, dan desain sendiri) dengan opsi sinkron awan terenkripsi.',
-    longDescription: 'ZhaNotes lahir dari kebutuhan mencatat ide, riset, serta sketsa sistem yang terstruktur tanpa ketergantungan pada server pihak ketiga maupun biaya langganan bulanan. Mengusung arsitektur Local-First berbasis IndexedDB, seluruh data teks, coretan tangan, rekaman suara, dan file PDF tersimpan aman di perangkat lokal pengguna. Mendukung 4 jenis lembar kerja fleksibel: Halaman Rich-Text dengan bi-directional linking [[ ]] otomatis; Kanvas Bebas (Infinite Canvas) dengan deteksi tekanan pena stylus, pan-zoom, dan floating text boxes; Lembar Riset terstruktur untuk kurasi tautan web, kutipan, dan tangkapan layar; serta PDF Annotator terintegrasi ditenagai PDF.js dan PDF-Lib untuk membaca sekaligus mengekspor PDF beranotasi. Dilengkapi perekam audio dengan penanda momen penting (Markers), version history snapshot dengan perbandingan diff visual, pencarian fuzzy berbobot skor (Ctrl+K), quick capture (Alt+J), expiring notes, tema Gelap/Terang adaptif, serta ekspor format lengkap (Markdown, TXT, HTML, Word .docx via JSZip, PDF, JSON, PNG, SVG, dan backup ZIP utuh). Untuk bisnis yang membutuhkannya, tersedia edisi kustom beli putus (tanpa langganan) dengan branding pelanggan dan sinkron awan otomatis antar perangkat: isi catatan, PDF, dan rekaman dienkripsi AES-GCM di peramban sebelum diunggah, dengan penggabungan otomatis saat satu catatan diubah di dua perangkat, dan penyimpanan di akun Vercel milik pelanggan sendiri. Versi umum tetap gratis dan sepenuhnya lokal. Aplikasi membawa contoh bawaan: laporan audit PDF beranotasi, diagram kanvas alur rekonsiliasi bank, dan catatan riset arsitektur.',
+    description: 'Workspace catatan visual & PKM berbasis web berkonsep Local-First (Zero Server Cost) tanpa iklan pihak ketiga. Dilengkapi editor teks kaya dengan wiki backlinks [[ ]], 72 template cerdas (tabel berhitung otomatis & modul latihan anak dengan PIN orang tua), kanvas bebas dengan pengenal bentuk otomatis & minimap, PDF annotator terintegrasi, perekam audio memo berpenanda waktu, tugas berulang otomatis, pencarian berfilter multi-kriteria, serta ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown). Tersedia edisi kustom beli putus dengan sinkron awan terenkripsi (E2EE AES-GCM).',
+    longDescription: 'ZhaNotes lahir dari kebutuhan mencatat ide, riset, serta sketsa sistem yang terstruktur tanpa ketergantungan pada server pihak ketiga maupun biaya langganan bulanan. Mengusung arsitektur Local-First berbasis IndexedDB, seluruh data teks, coretan tangan, rekaman suara, dan file PDF tersimpan aman di perangkat lokal pengguna. Mendukung 4 jenis lembar kerja fleksibel: Halaman Rich-Text dengan 11 jenis kotak callout interaktif, 24 kategori simbol/emoji (1.795 simbol), sitasi ilmiah 8 format (APA 7, Harvard, IEEE, Chicago, MLA 9, Vancouver, BibTeX, RIS) dengan daftar pustaka otomatis, daftar isi otomatis, catatan kaki, dan bi-directional linking [[ ]] otomatis; Kanvas Bebas (Infinite Canvas) dengan deteksi tekanan pena stylus, pengenal coretan bentuk otomatis (merapikan garis, kotak, elips, belah ketupat, bintang, kurva S, hingga lingkaran kuas), 23 bentuk manual & konektor dinamis, 4 slot preset pena, pipet warna, minimap interaktif, pemotongan gambar, dan penyisipan lembar PDF; Lembar Riset terstruktur untuk kurasi tautan web, kutipan, tangkapan layar, dan analisis mandiri; serta PDF Annotator terintegrasi untuk membaca, menyorot teks seleksi, memberi garis bawah/coret, menempel catatan, mengekstrak anotasi ke dokumen catatan baru bertaut balik, dan mengekspor PDF beranotasi presisi. Dilengkapi koleksi 72 template dalam 9 kategori, tabel berhitung cerdas (otomatis mengkalkulasi subtotal, total, sisa anggaran, dan stok belanja dengan tombol tambah/hapus/urungkan baris cepat), modul latihan anak dengan soal yang diacak otomatis setiap dibuat (berhitung, membaca jam, uang rupiah, perkalian) dengan 3 cara menjawab serta kunci jawaban terlipat berproteksi PIN orang tua, tampilan tugas sentral dengan tenggat dan pengulangan cerdas (~harian, ~mingguan, ~bulanan), pencarian global multi-filter (Ctrl+K), pencetakan presisi (Ctrl+P) ramah kertas A4/Letter/Legal/F4, perekam audio dengan penanda waktu (Markers), snapshot riwayat versi, serta ekspor format lengkap (Word .docx via JSZip, PDF, Markdown, HTML, JSON, PNG, SVG, dan backup ZIP utuh). Untuk bisnis, tersedia edisi kustom beli putus tanpa langganan dengan nama, logo, dan desain sendiri, dilengkapi sinkron awan terenkripsi AES-GCM antar perangkat, tautan hidup & edit bersama, rumus KaTeX (MathML offline), diagram Mermaid (SVG offline), OCR teks multi-bahasa, dikte suara bahasa Indonesia, dan integrasi kutip Wikipedia/DOI Crossref.',
     highlights: [
-      'Gratis, Offline & Tanpa Iklan Pihak Ketiga: Berjalan 100% di browser via IndexedDB, tanpa akun, tanpa pelacak, tanpa langganan; privasi data aman di perangkat',
-      '4 Mode Catatan Fleksibel: Halaman Rich-Text, Kanvas Bebas (Stylus/Touch + Zoom 20%-600%), Riset Terstruktur, & PDF Reader/Annotator dengan stabilo teks',
-      'Wiki Backlinks [[ ]] & Rename Otomatis: Hubungkan catatan dengan sintaks wiki, auto-suggest, pelacakan backlink, peta grafis (Alt+G), dan refactor judul otomatis',
-      'Perekam Audio Terintegrasi & Penanda Momen: Rekam suara via MediaRecorder langsung ke IndexedDB dengan tombol penanda momen penting (📍 Markers)',
-      'Mesin Ekspor Klien Terlengkap: Hasilkan Word (.docx) murni via JSZip, PDF beranotasi via PDF-Lib, Markdown, JSON, SVG, dan cadangan penuh .ZIP',
-      'Edisi Kustom Beli Putus: Nama, logo, dan desain sesuai bisnis pelanggan, opsional dengan sinkron awan terenkripsi (E2EE, AES-GCM) di akun Vercel/penyimpanan milik pelanggan sendiri'
+      'Gratis, 100% Offline & Local-First: Berjalan murni di browser via IndexedDB tanpa akun, pelacak, atau langganan; data dan privasi aman di perangkat',
+      '4 Mode Terintegrasi: Halaman Rich-Text, Kanvas Bebas (Stylus/Touch, Zoom 20%-600% & Minimap), Riset Terstruktur, & PDF Reader/Annotator lengkap',
+      '72 Template & Tabel Berhitung Otomatis: Formula instan subtotal/total/anggaran, tombol baris cepat, pelacak kebiasaan, serta inventaris stok',
+      'Modul Latihan Anak & PIN Orang Tua: Soal acak otomatis (hitung, jam, uang Rp, perkalian), 3 cara jawab (angka, stylus, cetak), dan kunci terproteksi PIN',
+      'Pengenal Bentuk Kanvas & 23 Bentuk: Coretan tangan otomatis dirapikan (garis, lingkaran, bintang, kurva S, dll.), 4 slot preset pena & pipet warna',
+      'Tugas Berulang & Filter Cari Canggih: Pengulangan tugas otomatis (~harian, ~mingguan), pencarian multi-filter (Ctrl+K), dan simpan bookmark pencarian',
+      'Mesin Ekspor Dokumen Mandiri: Hasilkan Word (.docx) murni, PDF beranotasi presisi, Markdown, HTML, JSON, SVG, dan cadangan penuh .ZIP',
+      'Edisi Kustom Beli Putus: Sinkron awan terenkripsi E2EE AES-GCM, tautan hidup & edit bersama, rumus KaTeX, diagram Mermaid, dan OCR teks'
     ],
     techStack: ['HTML5 Canvas', 'IndexedDB', 'PDF.js', 'PDF-Lib', 'JSZip', 'Web Audio API', 'MediaRecorder', 'Web Crypto (AES-GCM)', 'Local-First PWA', 'Zero Server Cost'],
     role: 'Solo Creator (Architecture, Canvas Engine, Client-side Export, UI/UX)',
@@ -322,17 +324,56 @@ export const PROJECTS: ProjectItem[] = [
     colorScheme: 'emerald',
     iconType: 'Notebook',
     businessCase: {
-      problem: 'Aplikasi pencatatan populer umumnya menuntut langganan berbayar, memerlukan koneksi internet untuk sinkronisasi, serta mengunci data pengguna (vendor lock-in) tanpa opsi ekspor dokumen mandiri yang fleksibel.',
-      solution: 'Workspace catatan visual all-in-one yang berjalan 100% di browser tanpa backend (Zero Server Cost), menyimpan data secara lokal di IndexedDB, dan menyediakan mesin ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown). Bagi bisnis yang butuh kerja lintas perangkat, tersedia edisi kustom dengan sinkron awan terenkripsi end-to-end di akun milik pelanggan sendiri, tanpa biaya langganan.',
-      impact: 'Privasi data pengguna terjamin, akses kerja tanpa hambatan internet (full offline), biaya infrastruktur server mendekati nol, dan kebebasan mengunduh seluruh data kapan saja dalam format standar industri. Edisi kustom memberi pelanggan kepemilikan penuh atas aplikasi dan datanya.'
+      problem: 'Aplikasi pencatatan populer umumnya menuntut biaya langganan bulanan mahal, mewajibkan koneksi internet untuk bekerja, mengunci format data pengguna (vendor lock-in), serta tidak menyediakan kanvas bebas, annotator PDF, tabel berhitung, dan modul edukasi keluarga dalam satu tempat.',
+      solution: 'Workspace catatan visual all-in-one yang berjalan 100% di browser tanpa backend (Zero Server Cost), menyimpan data lokal di IndexedDB, menyediakan 72 template siap pakai (tabel hitung otomatis, modul latihan anak acak berproteksi PIN orang tua), serta mesin ekspor dokumen mandiri (Word .docx, PDF, ZIP, Markdown). Tersedia edisi kustom beli putus dengan sinkron awan terenkripsi end-to-end tanpa langganan.',
+      impact: 'Privasi data pengguna 100% terlindungi di perangkat, akses kerja lancar tanpa ketergantungan internet (full offline), nol biaya server bulanan, produktivitas harian dan keluarga meningkat dalam satu aplikasi, serta kepemilikan data penuh tanpa risiko vendor lock-in.'
     },
     architectureFlow: [
       'Pilih Lembar: Halaman, Kanvas, Riset, atau PDF',
-      'Pencatatan & Anotasi (Stylus, Teks, Audio)',
-      'Wiki Backlinks [[ ]] & Indexing Pencarian',
-      'Penyimpanan Lokal IndexedDB (Auto-Save & Diff)',
+      '72 Template Cerdas, Tabel Hitung Otomatis & Latihan Anak',
+      'Pencatatan & Anotasi (Stylus, Teks, Audio, Pengenal Bentuk)',
+      'Wiki Backlinks [[ ]], Tugas Berulang & Filter Cari Global',
+      'Penyimpanan Lokal IndexedDB (Auto-Save, Snapshots & Diff)',
       'Ekspor Klien (Word, PDF, ZIP, Markdown)',
-      'Opsional (edisi kustom): Sinkron Awan Terenkripsi AES-GCM + Gabung Otomatis Antar Perangkat'
+      'Opsional (edisi kustom): Sinkron Awan Terenkripsi AES-GCM + Tautan Hidup'
+    ]
+  },
+  {
+    id: 'proj-itrack',
+    title: 'Issue Tracker — Sistem Pelacakan Keluhan & Manajemen Vendor',
+    tagline: 'Platform terpusat pelacakan keluhan pelanggan, portal vendor terisolasi, penanda SLA otomatis & Zero Server Cost.',
+    category: 'Web App',
+    badge: 'Sistem Keluhan & Vendor',
+    description: 'Sistem pelacakan keluhan pelanggan terpusat dan portal vendor terisolasi berbasis PWA dengan kalkulasi waktu respon otomatis, form balasan terstruktur (akar masalah & tindakan perbaikan), knowledge base solusi, laporan analitik PDF, dan arsitektur Zero Server Cost (Google Apps Script + Google Sheets DB).',
+    longDescription: 'Issue Tracker dibangun untuk mengatasi masalah klasik operasional bisnis: keluhan pelanggan yang tercecer di WhatsApp/email/Excel, progres tindak lanjut vendor yang tidak terpantau tanpa batas waktu respon yang jelas, serta laporan bulanan yang harus direkap manual dari berbagai sumber. Beroperasi dengan arsitektur Serverless Zero Server Cost berbasis Google Apps Script, Google Sheets (12 sheet basis data terstruktur), Google Drive (penyimpanan lampiran foto/PDF privat), dan Cloudflare Worker sebagai PWA shell. Setiap kasus memiliki nomor urut otomatis (CS-2026-xxxx), kronologi lengkap, urgensi bertingkat (Rendah hingga Mendesak), dan dapat dipecah menjadi beberapa bagian masalah yang ditugaskan ke vendor berbeda. Vendor memiliki portal terpisah yang terisolasi total tanpa pernah melihat nama atau data pelanggan Anda, serta wajib mengisi form terstruktur akar masalah (kategori Man, Machine, Material, Method) dan tindakan perbaikan. Sistem memantau batas waktu respon (SLA) secara real-time, mengirim pengingat email otomatis sebelum dan sesudah jatuh tempo, mengubah penyelesaian kasus menjadi artikel Knowledge Base dengan fitur saran solusi otomatis untuk kasus serupa di masa depan, serta menghasilkan laporan berkala siap cetak PDF. Dilengkapi PWA (dapat diinstal di Android & iOS), mode Gelap/Terang, optimistic UI instan, antrean offline anti-hilang data, kompresi foto otomatis, komentar bertingkat dengan catatan internal tim, dan keamanan enterprise (password salted hash SHA-256, token sesi, lockout 5x gagal login). Tersedia edisi kustom (beli putus tanpa biaya langganan bulanan) dengan nama, logo, slogan, dan warna tema sesuai identitas perusahaan Anda di akun Google milik Anda sendiri.',
+    highlights: [
+      'Manajemen Kasus Terpusat: Penomoran otomatis CS-2026-xxxx, kronologi audit lengkap, urgensi bertingkat, dan pembagian masalah per vendor',
+      'Portal Vendor Terisolasi: Vendor hanya mengakses tugas miliknya tanpa melihat data/nama pelanggan, wajib mengisi akar masalah & corrective action',
+      'Pelacakan SLA & Reminder Otomatis: Batas waktu balas otomatis per level urgensi, penanda terlambat real-time, dan pengingat email otomatis harian',
+      'Knowledge Base & Auto-Suggest: Mengubah resolusi kasus jadi solusi terverifikasi dengan rekomendasi otomatis saat membuat kasus serupa',
+      'Laporan & Analitik PDF: Metrik waktu respon tim/vendor, grafik tren 6 bulan, deteksi masalah berulang, dan klasifikasi akar masalah (4M)',
+      'PWA, Mode Gelap & Tahan Offline: Optimistic UI instan di HP & desktop, kompresi foto cerdas, dan antrean sinkronisasi offline',
+      'Arsitektur Zero Server Cost: Ditenagai Google Apps Script + Google Sheets DB (12 sheet) + Cloudflare Worker — Rp 0 biaya sewa server bulanan'
+    ],
+    techStack: ['Google Apps Script', 'Google Sheets DB', 'Google Drive API', 'Cloudflare Worker', 'PWA / Service Worker', 'Optimistic UI', 'Vanilla JS & CSS Vars', 'Zero Server Cost'],
+    role: 'Full-stack Solution Architect & Indie Developer',
+    year: '2026',
+    demoUrl: 'https://itrack.arzhaning.my.id/',
+    isFeatured: true,
+    colorScheme: 'teal',
+    iconType: 'ShieldCheck',
+    businessCase: {
+      problem: 'Keluhan pelanggan tercecer di WhatsApp, email, dan spreadsheet berbeda; progres respon vendor tidak terpantau tanpa SLA transparan; serta laporan manajemen bulanan harus direkap manual.',
+      solution: 'Platform Issue Tracker all-in-one dengan portal vendor terisolasi (nama pelanggan dirahasiakan), pelacakan batas waktu otomatis, form balasan terstruktur akar masalah & perbaikan, serta knowledge base solusi.',
+      impact: 'Waktu penanganan keluhan terpangkas signifikan, evaluasi kinerja vendor berbasis data akurat, masalah berulang terdeteksi cepat, dan efisiensi biaya 100% tanpa sewa server (Rp0/bulan).'
+    },
+    architectureFlow: [
+      'Pengguna / Vendor (Browser & PWA)',
+      'Cloudflare Worker (PWA Shell & Custom Domain)',
+      'Google Apps Script (Auth & Business Logic)',
+      'Google Sheets (Database 12 Sheets)',
+      'Google Drive (Lampiran Terproteksi)',
+      'Email Notifikasi Otomatis (Gmail API)'
     ]
   },
   {

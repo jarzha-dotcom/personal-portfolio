@@ -161,7 +161,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
     keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 5 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server), 5) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
+    answer: 'Ada 6 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server), 5) Issue Tracker (sistem pelacakan keluhan & portal vendor terisolasi zero-cost), 6) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
   },
   {
     id: 'portfolio-bgames',
@@ -188,8 +188,15 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'portfolio-zhanotes',
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek ZhaNotes?',
-    keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator'],
-    answer: 'ZhaNotes adalah workspace pencatatan visual & PKM modern yang beroperasi 100% di browser tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan kartu teks bebas dipindah & diubah ukurannya, Riset Terstruktur, PDF Reader/Annotator), Wiki Backlinks [[ ]] otomatis, perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip serta cetak PDF. Coba langsung di: arzhaning.my.id/zhanotes/',
+    keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator', 'template', 'tabel hitung'],
+    answer: 'ZhaNotes adalah workspace catatan visual & PKM modern Local-First tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan pengenal bentuk otomatis & minimap, Riset Terstruktur, PDF Annotator dengan stabilo & ekstrak catatan), 72 template siap pakai (tabel hitung otomatis, modul latihan anak acak berproteksi PIN orang tua), tugas berulang otomatis, filter cari canggih, Wiki Backlinks [[ ]], perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip, PDF, serta ZIP. Coba langsung di: arzhaning.my.id/zhanotes/',
+  },
+  {
+    id: 'portfolio-itrack',
+    categoryId: 'portfolio',
+    quickLabel: 'Tentang proyek Issue Tracker?',
+    keywords: ['issue tracker', 'itrack', 'keluhan pelanggan', 'manajemen vendor', 'komplain', 'sla', 'customer service'],
+    answer: 'Issue Tracker adalah sistem pelacakan keluhan pelanggan dan manajemen vendor dengan arsitektur Zero Server Cost (Google Apps Script + Google Sheets DB 12 sheet + Cloudflare Worker). Fitur: nomor urut otomatis CS-2026-xxxx, portal vendor terisolasi (nama pelanggan dirahasiakan), form balasan terstruktur akar masalah & tindakan perbaikan, batas waktu respon (SLA) otomatis, reminder email otomatis, knowledge base solusi serupa, laporan analitik PDF, dan PWA tahan offline. Coba langsung di: itrack.arzhaning.my.id',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

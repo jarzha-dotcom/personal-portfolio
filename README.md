@@ -121,14 +121,26 @@ Saya lebih percaya pada bukti nyata daripada sekadar janji. Berikut adalah beber
     *   **Ekspor Laporan Otomatis**: Laporan resmi berformat PDF dan Excel terkirim langsung ke email manajemen.
 
 4.  **📝 ZhaNotes — Catatan, Kanvas & Anotasi PDF: Gratis, Offline, Tanpa Iklan Pihak Ketiga**  
-    *Kunjungi & Coba: [arzhaning.my.id/zhanotes](https://arzhaning.my.id/zhanotes/)*  
-    *   **4 Mode Kerja dalam Satu Aplikasi**: Halaman rich-text (checklist, tabel, kotak callout, perintah cepat `/`), Kanvas bebas (pena peka tekanan, bentuk, kartu teks, konektor), Riset & Kliping (tautan, kutipan, tangkapan layar, catatan pribadi), dan PDF Reader & Annotator (stabilo teks, coretan, kartu catatan, ekspor PDF beranotasi).
-    *   **Local-First & Zero Server Cost**: Berjalan 100% di browser (IndexedDB) tanpa akun. Catatan, PDF, dan rekaman suara tersimpan di perangkat Anda, dengan cadangan ZIP kapan saja dan bisa dipakai offline.
-    *   **Wiki Backlinks & Peta Grafis**: Hubungkan catatan dengan sintaks `[[ ]]`, lihat tautan masuk/keluar, dan jelajahi peta keterkaitan antar catatan.
-    *   **Perekam Suara Berpenanda Waktu**: Rekam rapat atau kuliah, lalu tandai momen penting untuk dilompati nanti.
-    *   **Ekspor Tanpa Backend**: Word (.docx), PDF, Markdown, HTML, JSON, PNG, dan SVG dihasilkan langsung di browser.
-    *   **Contoh Bawaan**: Laporan audit PDF beranotasi dan diagram kanvas alur rekonsiliasi bank, siap dicoba begitu aplikasi dibuka.
-    *   **Edisi Kustom (Beli Putus)**: Tersedia untuk bisnis dengan nama, logo, dan desain sesuai permintaan, tanpa biaya langganan. Opsional sinkron awan antar perangkat yang dienkripsi AES-GCM di peramban, disiapkan di akun Vercel dan penyimpanan milik pelanggan sendiri. Versi umum tidak memiliki sinkron awan.
+    *Kunjungi & Coba: [arzhaning.my.id/zhanotes](https://arzhaning.my.id/zhanotes/)* · *Baca Panduan Lengkap: [panduan-lengkap.md](/zhanotes/panduan-lengkap.md)*  
+    *   **4 Mode Kerja dalam Satu Aplikasi**: Halaman rich-text (11 callout, 24 kategori simbol, sitasi 8 format standar, daftar isi otomatis, perintah cepat `/`), Kanvas bebas (pena stylus peka tekanan, pengenal bentuk otomatis, 23 bentuk & konektor, minimap), Riset & Kliping (4 blok terstruktur), dan PDF Reader & Annotator (stabilo seleksi, garis bawah/coret, kartu catatan, ekstrak ke catatan baru, ekspor PDF beranotasi).
+    *   **72 Template Cerdas & Tabel Berhitung Otomatis**: Formula instan menghitung subtotal, total, sisa anggaran, dan stok belanja otomatis; dilengkapi tombol baris cepat (+Baris, Hapus, Urungkan) serta pelacak kebiasaan & tabungan.
+    *   **Modul Latihan Anak & Proteksi PIN Orang Tua**: Soal berhitung, membaca jam, uang rupiah, dan perkalian diacak otomatis setiap dibuat; 3 cara jawab (ketik angka dengan papan virtual, stylus/jari dengan penilaian ○→✓/✗ dan skor otomatis, serta cetak); kunci jawaban terlipat dilindungi PIN orang tua 4–6 digit.
+    *   **Kanvas Bebas & Pengenal Coretan Bentuk**: Tahan coretan pena setengah detik untuk merapikan otomatis menjadi garis, kotak, lingkaran/elips, belah ketupat, bintang, kurva S, hingga lingkaran kuas; dilengkapi 4 slot preset pena, pipet warna, pemotongan gambar, dan sisipkan halaman PDF.
+    *   **PDF Annotator Lengkap & Ekstraksi "Ke Catatan"**: Cari kata di seluruh lembar PDF + daftar anotasi, thumbnail & bookmark halaman, tombol "Ke Catatan" untuk menyalin kutipan & anotasi ke dokumen baru bertaut balik, dan ekspor PDF beranotasi presisi.
+    *   **Tugas Berulang & Filter Pencarian Global**: Tampilan sentral tugas dengan pengulangan cerdas (`~harian`, `~mingguan`, `~bulanan`), pencarian multi-kriteria (`Ctrl+K` dengan filter `#tag`, `tipe:`, `folder:`, `dalam:`, `sejak:`, `sebelum:`), serta simpan pencarian favorit.
+    *   **Local-First & Zero Server Cost**: Berjalan 100% di browser (IndexedDB) tanpa akun dan tanpa iklan. Catatan, gambar, PDF, dan memo suara tersimpan aman di perangkat Anda; dilengkapi perekam suara berpenanda waktu, snapshot riwayat versi, serta ekspor Word (.docx) murni, PDF, Markdown, HTML, JSON, SVG, dan cadangan utuh ZIP.
+    *   **Edisi Kustom (Beli Putus)**: Tersedia untuk bisnis dengan nama, logo, dan desain sesuai permintaan, tanpa biaya langganan bulanan. Dilengkapi sinkron awan terenkripsi AES-GCM (E2EE), tautan hidup & edit bersama, rumus matematika KaTeX (MathML offline), diagram Mermaid (SVG offline), OCR teks multi-bahasa dari foto/PDF, dikte suara bahasa Indonesia, dan integrasi kutip Wikipedia/DOI Crossref. Versi umum tetap 100% lokal dan gratis.
+
+5.  **🛡️ Issue Tracker — Sistem Pelacakan Keluhan Pelanggan & Manajemen Vendor**  
+    *Kunjungi Demo: [itrack.arzhaning.my.id](https://itrack.arzhaning.my.id)* | *Hubungi untuk kustomisasi: [WhatsApp](https://wa.me/6282312312734)*  
+    *   **Arsitektur Serverless Biaya Rp0**: Seluruh backend berjalan di Google Apps Script dengan Google Sheets sebagai database dan Google Drive untuk lampiran — tanpa biaya sewa server bulanan.
+    *   **Portal Vendor Terisolasi Penuh**: Vendor login ke akunnya sendiri dan **hanya melihat tugas miliknya** — tanpa nama pelanggan, tanpa data sensitif. Form balasan terstruktur memaksa vendor mengisi **akar masalah** dan **tindakan perbaikan** secara lengkap.
+    *   **Pelacakan Waktu Respon & Penanda Terlambat Otomatis**: Setiap bagian masalah punya batas waktu balas berdasarkan urgensi (Rendah → Mendesak). Pengingat email otomatis dikirim ke vendor sebelum dan sesudah jatuh tempo.
+    *   **Knowledge Base & Saran Solusi Otomatis**: Ubah penyelesaian kasus menjadi artikel solusi terverifikasi. Saat membuat kasus baru, sistem otomatis menyarankan solusi serupa — masalah yang sama tidak perlu diselidiki ulang.
+    *   **PWA (Pasang di HP) & Antrean Offline**: Dipasang di layar utama seperti aplikasi native. Perubahan langsung terlihat (optimistic UI) dan tersimpan di antrean offline bila koneksi putus, dikirim otomatis saat online kembali.
+    *   **Laporan & Analitik Siap Cetak PDF**: Waktu respon, kinerja vendor, tren 6 bulan, masalah berulang, dan akar masalah menurut kategori (Manusia, Mesin, Material, Metode, dll.).
+    *   **4 Peran dengan Hak Akses Ketat**: Admin (akses penuh), Staff (operasional), Viewer (pantau saja), Vendor (tugas miliknya saja). Keamanan: password hash+salt, sesi token, rate limiting, isolasi vendor di server.
+    *   **Edisi Kustom (Beli Putus)**: Nama, logo, slogan, warna tema, dan domain disesuaikan per pelanggan. Semua aset diserahkan ke akun Google pelanggan sendiri — sepenuhnya milik mereka. Setup hanya 1-2 jam.
 
 ---
 
@@ -205,7 +217,9 @@ Saya siap membantu mewujudkan kebutuhan digital bisnis Anda, mulai dari tahap ko
     Pembuatan sistem pencatatan stok, aset, pelacakan barcode/QR, dan rekonsiliasi data berbasis cloud hemat biaya yang dirancang siap pakai dan rapi diaudit.
 4.  **Platform Game Realtime & Gamifikasi Interaktif**  
     Pembangunan game edukasi interaktif maupun platform permainan papan multiplayer online untuk kebutuhan promosi brand, komunitas, atau media edukasi keluarga.
-5.  **Edisi Kustom Aplikasi Siap Pakai (ZhaNotes)**  
+5.  **Sistem Pelacakan Keluhan Pelanggan & Manajemen Vendor (Issue Tracker)**  
+    Pembuatan sistem terpusat untuk mencatat, melacak, dan menyelesaikan keluhan pelanggan lintas vendor. Portal vendor terisolasi (tanpa akses data pelanggan), form corrective action terstruktur, pelacakan waktu respon otomatis, knowledge base solusi, notifikasi email, laporan PDF, PWA, dan antrean offline. Arsitektur Zero Server Cost (Google Apps Script + Sheets + Drive). Edisi kustom beli putus dengan branding dan domain perusahaan Anda.
+6.  **Edisi Kustom Aplikasi Siap Pakai (ZhaNotes)**  
     Aplikasi catatan, kanvas, dan anotasi PDF dengan nama, logo, dan desain bisnis Anda. Sistem beli putus tanpa langganan, opsional dengan sinkron awan terenkripsi di akun milik Anda sendiri.
 
 ---

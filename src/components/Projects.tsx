@@ -295,6 +295,8 @@ export const Projects: React.FC<ProjectsProps> = ({ darkMode }) => {
       case 'Notebook':
       case 'BookOpen':
         return <BookOpen className="w-4 h-4" />;
+      case 'ShieldCheck':
+        return <ShieldCheck className="w-4 h-4" />;
       default:
         return <Code2 className="w-4 h-4" />;
     }
