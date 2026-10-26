@@ -3151,6 +3151,272 @@
       }
     }
   </style>
+  <style>
+    /* ===== navbar: rapi & lebih cantik ===== */
+    header {
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      -webkit-backdrop-filter: saturate(1.4) blur(14px);
+      backdrop-filter: saturate(1.4) blur(14px);
+      transition: box-shadow .25s ease, border-color .25s ease
+    }
+
+    [data-theme=dark] header {
+      background: color-mix(in srgb, var(--bg) 88%, transparent)
+    }
+
+    header.is-scrolled {
+      border-bottom-color: transparent;
+      box-shadow: 0 8px 24px -14px rgba(15, 23, 42, .28)
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+      flex: none;
+      border-radius: 12px
+    }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 4px 10px -4px var(--primary);
+      transition: transform .25s ease
+    }
+
+    .brand:hover .brand-mark {
+      transform: rotate(-6deg)
+    }
+
+    [data-theme=dark] .brand-mark {
+      background: #1F7A55
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.15
+    }
+
+    .brand-name {
+      font-size: 19px;
+      color: var(--text)
+    }
+
+    .brand-name span {
+      color: var(--primary)
+    }
+
+    .brand-tag {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      margin-top: 2px
+    }
+
+    .nav {
+      gap: 16px;
+      padding: 12px 0
+    }
+
+    .nav-links a,
+    .nav-cta .btn {
+      white-space: nowrap
+    }
+
+    .brand-tag {
+      display: none
+    }
+
+    @media (min-width:1280px) {
+      header .wrap.nav {
+        max-width: 1240px
+      }
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: none
+    }
+
+    .nav-cta .btn {
+      min-height: 40px;
+      padding: 0 18px;
+      border-radius: 999px
+    }
+
+    .nav-cta .theme-toggle {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 17px;
+      transition: background .2s, transform .2s
+    }
+
+    .nav-cta .theme-toggle:hover {
+      background: var(--primary-light)
+    }
+
+    @media (min-width:861px) {
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        margin-left: auto
+      }
+
+      header .nav-links a {
+        position: relative;
+        padding: 9px 12px;
+        border-radius: 999px;
+        font-size: 14.5px;
+        white-space: nowrap;
+        font-weight: 700;
+        color: var(--text-muted);
+        transition: color .2s, background .2s
+      }
+
+      header .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 3px;
+        width: 18px;
+        height: 3px;
+        border-radius: 3px;
+        background: var(--primary);
+        transform: translateX(-50%) scaleX(0);
+        transition: transform .25s cubic-bezier(.4, 0, .2, 1)
+      }
+
+      header .nav-links a:hover {
+        color: var(--primary);
+        background: var(--primary-light)
+      }
+
+      header .nav-links a.is-active {
+        color: var(--primary)
+      }
+
+      header .nav-links a.is-active::after {
+        transform: translateX(-50%) scaleX(1)
+      }
+
+      header .nav-links a.nav-ext {
+        margin-left: 10px;
+        padding-left: 16px;
+        border-radius: 0 999px 999px 0
+      }
+
+      header .nav-links a.nav-ext::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        height: 18px;
+        width: 1px;
+        background: var(--border-dark);
+        transform: translateY(-50%)
+      }
+
+      header .nav-links a.nav-ext::after {
+        display: none
+      }
+
+      header .nav-links a.nav-ext:hover {
+        border-radius: 999px
+      }
+    }
+
+    @media (min-width:861px) and (max-width:1279px) {
+      .nav-cta .btn-outline {
+        display: none
+      }
+    }
+
+    @media (min-width:861px) and (max-width:1100px) {
+      header .nav-links a {
+        padding: 9px 9px;
+        font-size: 14px
+      }
+
+      .nav {
+        gap: 10px
+      }
+    }
+
+    @media (min-width:861px) and (max-width:960px) {
+      header .nav-links a.nav-ext {
+        display: none
+      }
+    }
+
+    header a:focus-visible,
+    header button:focus-visible {
+      outline: 3px solid var(--primary);
+      outline-offset: 2px
+    }
+
+    @media (max-width:860px) {
+      .brand-tag {
+        display: none
+      }
+
+      .brand-mark {
+        width: 36px;
+        height: 36px;
+        font-size: 20px;
+        border-radius: 11px
+      }
+
+      .brand-name {
+        font-size: 17.5px
+      }
+
+      .m-nav {
+        gap: 6px;
+        padding: 8px 16px 10px;
+        box-shadow: 0 10px 18px -16px rgba(15, 23, 42, .35)
+      }
+
+      .m-nav a {
+        min-height: 38px;
+        padding: 0 15px;
+        font-size: 13.5px;
+        border-color: var(--border);
+        box-shadow: 0 1px 2px rgba(15, 23, 42, .05)
+      }
+
+      .m-nav a.is-active {
+        box-shadow: 0 4px 10px -4px var(--primary)
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      header,
+      .brand-mark,
+      header .nav-links a,
+      header .nav-links a::after {
+        transition: none
+      }
+    }
+  </style>
+
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
     <div class="jz-bar-nav">
       <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain">
@@ -3191,32 +3457,25 @@
   </div>
   <header>
     <div class="wrap nav">
-      <a href="#" style="text-decoration:none; color:inherit; display:flex; align-items:center; gap:10px;">
-        <div
-          style="width:36px; height:36px; background:var(--primary); color:#fff; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:bold; font-size:18px;">
-          G
-        </div>
-        <div>
-          <b class="font-serif" style="font-size:20px; color:#111827;">Griya Asri <span
-              style="color:var(--primary);">Residence</span></b>
-          <div class="brand-tag" style="font-size:11px; color:#6B7280;">Kos Nyaman Jakarta Selatan</div>
-        </div>
+      <a class="brand" href="#" aria-label="Griya Asri Residence, ke atas">
+        <span class="brand-mark font-serif" aria-hidden="true">G</span>
+        <span class="brand-text">
+          <b class="brand-name font-serif">Griya Asri <span>Residence</span></b>
+          <small class="brand-tag">Kos Nyaman Jakarta Selatan</small>
+        </span>
       </a>
-      <div class="nav-links">
-        <a href="#kamar">Pilihan Kamar</a>
-        <a href="#fasilitas">Fasilitas</a>
-        <a href="#biaya">Biaya</a>
-        <a href="#lokasi">Lokasi &amp; Akses</a>
-        <a href="#faq">FAQ</a><a href="#aturan">Peraturan</a>
-        <a href="https://arzhaning.my.id/demos/demo-kospro-mudah" target="_blank" rel="noopener">Masuk Penghuni
-          ↗</a>
-      </div>
-      <div class="nav-cta" style="display:flex; gap:10px;">
+      <nav class="nav-links" aria-label="Menu utama">
+        <a href="#kamar">Kamar</a><a href="#fasilitas">Fasilitas</a><a href="#biaya">Biaya</a><a
+          href="#lokasi">Lokasi</a><a href="#faq">FAQ</a><a href="#aturan">Peraturan</a>
+        <a class="nav-ext" href="https://arzhaning.my.id/demos/demo-kospro-mudah" target="_blank" rel="noopener">Masuk
+          Penghuni <span aria-hidden="true">↗</span></a>
+      </nav>
+      <div class="nav-cta">
         <button class="theme-toggle" onclick="toggleTheme()" aria-label="Ganti mode gelap/terang">🌙</button>
         <button class="btn btn-outline btn-sm" onclick="openBookingModal()">Simulasi Sewa</button>
         <a class="btn btn-sm"
           href="https://wa.me/6282312312734?text=Halo%2C%20saya%20ingin%20tanya%20kamar%20Griya%20Asri%20Residence"
-          target="_blank">Chat WA</a>
+          target="_blank" rel="noopener">Chat WA</a>
       </div>
       <button class="theme-toggle nav-theme-m" onclick="toggleTheme()" aria-label="Ganti mode gelap/terang">🌙</button>
     </div>
@@ -4356,6 +4615,24 @@
         } catch (e) { }
       }
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    })();
+  </script>
+  <script>
+    /* navbar: bayangan saat scroll + penanda menu aktif di desktop */
+    (function () {
+      var hd = document.querySelector('header'); if (!hd) return;
+      var ls = [].slice.call(document.querySelectorAll('.nav-links a[href^="#"]'));
+      var clr = function () { ls.forEach(function (l) { l.classList.remove('is-active'); l.removeAttribute('aria-current') }) };
+      var on = function () { hd.classList.toggle('is-scrolled', scrollY > 8); if (scrollY < 80) clr() };
+      on(); addEventListener('scroll', on, { passive: true });
+      if (!('IntersectionObserver' in window)) return;
+      var map = {}; ls.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a });
+      var io = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (!e.isIntersecting || scrollY < 80) return; var a = map[e.target.id]; clr(); if (a) { a.classList.add('is-active'); a.setAttribute('aria-current', 'true') }
+        })
+      }, { rootMargin: '-35% 0px -35% 0px' });
+      document.querySelectorAll('section[id]').forEach(function (s) { io.observe(s) });
     })();
   </script>
 </body>
