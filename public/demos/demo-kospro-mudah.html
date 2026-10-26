@@ -2128,6 +2128,45 @@
       }
     }
   </style>
+  <style id="modal-fit">
+    /* Popup selalu utuh: area popup yang bisa di-scroll, bukan kartu yang terpotong */
+    @media screen {
+      #modal .ov {
+        box-sizing: border-box;
+        align-items: flex-start;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px 0 0
+      }
+
+      #modal .sheet {
+        margin: auto 0 0;
+        flex: none;
+        max-height: none;
+        overflow: visible
+      }
+
+      .tur-card {
+        max-height: min(80vh, calc(100dvh - 46px - 24px))
+      }
+
+      .tur-card.tur-mid {
+        max-height: min(80vh, calc(100dvh - 46px - 24px))
+      }
+    }
+
+    @media screen and (min-width:960px) {
+      #modal .ov {
+        padding: 20px 16px
+      }
+
+      #modal .sheet {
+        margin: auto
+      }
+    }
+  </style>
 </head>
 
 <body>
