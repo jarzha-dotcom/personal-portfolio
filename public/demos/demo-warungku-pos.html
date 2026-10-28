@@ -58,6 +58,7 @@
 
 
 
+  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-warungku-pos.css">
   <!-- FontAwesome 6 Icons CDN -->
@@ -450,6 +451,220 @@
       font: 700 11px 'JetBrains Mono', monospace;
       color: #404040;
       cursor: pointer;
+    }
+
+    .wk-tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px
+    }
+
+    .wk-tabs button {
+      flex: 1;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      color: #525252
+    }
+
+    .wk-tabs button.on {
+      background: #171717;
+      color: #fff;
+      border-color: #171717
+    }
+
+    .wk-kpis {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 6px
+    }
+
+    .wk-kpi {
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff
+    }
+
+    .wk-kpi small {
+      display: block;
+      font-size: 10px;
+      color: #737373;
+      font-weight: 600
+    }
+
+    .wk-kpi b {
+      font: 800 15px 'JetBrains Mono', monospace;
+      color: #171717
+    }
+
+    .wk-h4 {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #737373;
+      margin: 16px 0 8px
+    }
+
+    .wk-barrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 5px 0;
+      font-size: 11px
+    }
+
+    .wk-barrow .lb {
+      width: 120px;
+      flex: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600
+    }
+
+    .wk-barrow .tr {
+      flex: 1;
+      height: 10px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      overflow: hidden
+    }
+
+    .wk-barrow .tr i {
+      display: block;
+      height: 100%;
+      background: #f59e0b;
+      border-radius: 6px
+    }
+
+    .wk-barrow .vl {
+      width: 84px;
+      text-align: right;
+      font: 700 11px 'JetBrains Mono', monospace
+    }
+
+    .wk-pl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px
+    }
+
+    .wk-pl td {
+      padding: 7px 0;
+      border-bottom: 1px solid #f0f0f0
+    }
+
+    .wk-pl td:last-child {
+      text-align: right;
+      font: 700 12px 'JetBrains Mono', monospace
+    }
+
+    .wk-pl tr.sub td {
+      font-weight: 800;
+      color: #171717;
+      background: #fafafa
+    }
+
+    .wk-pl tr.tot td {
+      font-weight: 800;
+      font-size: 13px;
+      border-top: 2px solid #171717;
+      border-bottom: 0
+    }
+
+    .wk-pl .neg {
+      color: #be123c
+    }
+
+    .wk-pl .pos {
+      color: #047857
+    }
+
+    .wk-in {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #e5e5e5;
+      border-radius: 8px;
+      font: 600 12px 'JetBrains Mono', monospace;
+      background: #fff
+    }
+
+    .wk-tbl {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 520px
+    }
+
+    .wk-tbl th {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #737373;
+      text-align: left;
+      padding: 6px 4px
+    }
+
+    .wk-tbl td {
+      padding: 5px 4px;
+      border-top: 1px solid #f0f0f0;
+      vertical-align: middle
+    }
+
+    html.wk-dark {
+      filter: invert(.92) hue-rotate(180deg);
+    }
+
+    html.wk-dark img,
+    html.wk-dark #printable-receipt {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    .wk-tour-hl {
+      position: relative;
+      z-index: 80;
+      outline: 3px solid #f59e0b;
+      outline-offset: 4px;
+      border-radius: 12px;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, .5);
+    }
+
+    #wk-tour-card {
+      position: fixed;
+      left: 50%;
+      bottom: 76px;
+      transform: translateX(-50%);
+      width: min(92vw, 380px);
+      z-index: 90;
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .35);
+    }
+
+    #wk-tour-card h4 {
+      font-size: 14px;
+      font-weight: 800;
+      color: #171717;
+      margin-bottom: 4px;
+    }
+
+    #wk-tour-card p {
+      font-size: 12px;
+      color: #525252;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .wk-chip.on {
+      background: #f59e0b;
+      border-color: #f59e0b;
+      color: #fff;
     }
 
     .wk-chip:hover {
@@ -1470,11 +1685,37 @@
           class="ml-0.5 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-blue-600 text-white">0</span>
       </button>
 
+      <button onclick="wkOpenFloor()" type="button" title="Denah Meja &amp; Dapur"
+        class="relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
+          class="fa-solid fa-table-cells-large text-neutral-600"></i><span class="hidden md:inline">Meja</span><span
+          id="floor-badge"
+          style="display:none;position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:#e11d48;color:#fff;font:800 10px/17px 'JetBrains Mono',monospace;text-align:center;padding:0 4px">0</span></button>
+
+      <button id="btn-report" onclick="wkOpenReport()" type="button" title="Laporan Penjualan &amp; Laba Rugi"
+        class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
+          class="fa-solid fa-chart-column text-neutral-600"></i><span class="hidden md:inline">Laporan</span></button>
+
+      <button onclick="wkOpenMenu()" type="button" title="Kelola Menu &amp; Stok"
+        class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
+          class="fa-solid fa-boxes-stacked text-neutral-600"></i><span class="hidden md:inline">Menu</span></button>
+
       <button onclick="openSettingsModal()" type="button" title="Pengaturan Toko"
         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer border border-neutral-200/60">
         <i class="fa-solid fa-gear text-neutral-600"></i>
         <span class="hidden md:inline">Pengaturan</span>
       </button>
+
+      <button onclick="wkToggleTheme()" type="button" title="Mode Gelap"
+        class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"><i
+          id="theme-icon" class="fa-solid fa-moon text-sm"></i></button>
+
+      <button onclick="wkTourStart()" type="button" title="Tur Demo"
+        class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"><i
+          class="fa-solid fa-circle-question text-sm"></i></button>
+
+      <button onclick="wkResetDemo()" type="button" title="Reset Demo"
+        class="p-2 text-neutral-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"><i
+          class="fa-solid fa-rotate-left text-sm"></i></button>
 
       <button onclick="toggleFullscreen()" type="button" title="Layar Penuh"
         class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer">
@@ -1643,6 +1884,12 @@
           </div>
         </div>
 
+        <div class="wk-row" style="margin-bottom:8px">
+          <button type="button" class="wk-btn ghost xs grow" onclick="wkKitchenTicket()"><i
+              class="fa-solid fa-print"></i>Tiket Dapur</button>
+          <button type="button" class="wk-btn ghost xs grow" onclick="wkOpenSplit()"><i
+              class="fa-solid fa-people-arrows"></i>Split Bill</button>
+        </div>
         <!-- Big Checkout CTA Button -->
         <div class="wk-payrow">
           <button type="button" onclick="wkHold()" class="wk-holdbtn" title="Simpan pesanan (F8)"><i
@@ -2193,6 +2440,117 @@
     </div>
   </div>
 
+  <!-- ================= BAHAN BAKU & RESEP ================= -->
+  <div id="ing-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:800px;max-height:92vh">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#dcfce7;color:#15803d"><i
+              class="fa-solid fa-wheat-awn"></i></span><span>Bahan Baku &amp; Resep<small>Stok bahan berkurang otomatis,
+              HPP dihitung dari resep</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseIng()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="ing-body"></div>
+    </div>
+  </div>
+
+  <!-- ================= DENAH MEJA & DAPUR ================= -->
+  <div id="floor-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:780px;max-height:92vh">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#fee2e2;color:#be123c"><i
+              class="fa-solid fa-table-cells-large"></i></span><span>Meja &amp; Dapur<small>Pantau pesanan dari kasir
+              dan QR meja</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseFloor()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="floor-body"></div>
+      <div class="wk-mfoot"><button type="button" class="wk-btn ghost grow" onclick="wkOpenCust()"><i
+            class="fa-solid fa-qrcode"></i>Simulasi: Pelanggan Scan QR Meja</button></div>
+    </div>
+  </div>
+
+  <!-- ================= TAMPILAN PELANGGAN (QR MEJA) ================= -->
+  <div id="cust-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:360px;max-height:94vh;border:7px solid #171717;border-radius:34px">
+      <div class="wk-mhead" style="background:#f59e0b;border:0">
+        <h3 style="color:#fff"><span id="cust-title">WarungKU</span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseCust()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="cust-body"></div>
+      <div class="wk-mfoot"><button type="button" class="wk-btn amber grow" onclick="wkCustSend()"><i
+            class="fa-solid fa-paper-plane"></i><span id="cust-send">Kirim Pesanan</span></button></div>
+    </div>
+  </div>
+
+  <!-- ================= SPLIT BILL ================= -->
+  <div id="split-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:420px;max-height:92vh">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#d1fae5;color:#047857"><i
+              class="fa-solid fa-people-arrows"></i></span><span>Split Bill<small>Hitung patungan, lalu bayar seperti
+              biasa</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseSplit()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="split-body"></div>
+      <div class="wk-mfoot"><button type="button" class="wk-btn green grow" onclick="wkShareSplit()"><i
+            class="fa-brands fa-whatsapp"></i>Kirim Rincian ke WhatsApp</button></div>
+    </div>
+  </div>
+
+  <!-- ================= LAPORAN ================= -->
+  <div id="report-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:640px;max-height:92vh">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#dbeafe;color:#1d4ed8"><i
+              class="fa-solid fa-chart-column"></i></span><span>Laporan<small id="rep-sub">Shift ini</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseReport()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="rep-body"></div>
+      <div class="wk-mfoot">
+        <button type="button" class="wk-btn ghost grow" onclick="wkExportCSV()"><i
+            class="fa-solid fa-file-csv"></i>Ekspor CSV</button>
+        <button type="button" class="wk-btn green grow" onclick="wkShareReportWA()"><i
+            class="fa-brands fa-whatsapp"></i>Kirim ke WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= KELOLA MENU & STOK ================= -->
+  <div id="menu-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:720px;max-height:92vh">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#ede9fe;color:#6d28d9"><i
+              class="fa-solid fa-boxes-stacked"></i></span><span>Kelola Menu &amp; Stok<small>Harga jual, HPP (modal),
+              dan stok</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseMenu()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="menu-body"></div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL VARIAN / ADD-ON ================= -->
+  <div id="opt-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:400px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#fef3c7;color:#b45309"><i class="fa-solid fa-sliders"></i></span><span
+            id="opt-title">Pilih Varian<small>Sesuaikan pesanan</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseOpt()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="opt-body"></div>
+      <div class="wk-mfoot">
+        <button type="button" class="wk-btn ghost" onclick="wkCloseOpt()">Batal</button>
+        <button type="button" class="wk-btn amber grow" onclick="wkConfirmOpt()"><i class="fa-solid fa-plus"></i><span
+            id="opt-price">Tambah</span></button>
+      </div>
+    </div>
+  </div>
+
   <!-- ================= DIALOG KONFIRMASI ================= -->
   <div id="confirm-modal" role="dialog" aria-modal="true" class="wk-overlay top hidden">
     <div class="wk-modal" style="max-width:390px">
@@ -2503,8 +2861,7 @@
       }
 
       grid.innerHTML = filtered.map(item => {
-        const inCart = cart.find(c => c.id === item.id);
-        const inCartQty = inCart ? inCart.quantity : 0;
+        const inCartQty = wkQty(item.id);
         const remainingStock = item.stock - inCartQty;
         const isOutOfStock = remainingStock <= 0;
 
@@ -2558,13 +2915,6 @@
       }).join('');
     }
 
-    function removeCartItem(itemId) {
-      cart = cart.filter(c => c.id !== itemId);
-      playBeep();
-      renderCart();
-      renderProducts();
-    }
-
     function setOrderType(type) {
       orderType = type;
       const btnDine = document.getElementById('btn-dine-in');
@@ -2588,7 +2938,7 @@
 
     function openNoteModal(itemId) {
       editingNoteItemId = itemId;
-      const item = cart.find(c => c.id === itemId);
+      const item = cart.find(c => (c.uid || c.id) === itemId);
       document.getElementById('temp-note-input').value = item && item.notes ? item.notes : '';
       document.getElementById('note-modal').classList.remove('hidden');
       document.getElementById('note-modal').classList.add('flex');
@@ -2602,7 +2952,7 @@
 
     function saveItemNote() {
       if (editingNoteItemId) {
-        const item = cart.find(c => c.id === editingNoteItemId);
+        const item = cart.find(c => (c.uid || c.id) === editingNoteItemId);
         if (item) {
           item.notes = document.getElementById('temp-note-input').value.trim();
         }
@@ -2915,30 +3265,83 @@
     /* ================================================================
        KERANJANG
     ================================================================ */
-    function addToCart(itemId) {
+    const wkQty = pid => cart.reduce((a, c) => a + (c.id === pid ? c.quantity : 0), 0);
+
+    /* ---------- Varian / add-on menu ---------- */
+    const WK_OPT = {
+      makanan: [{ t: 'Level Pedas', m: false, d: 1, c: [['Tidak Pedas', 0], ['Sedang', 0], ['Pedas', 0], ['Extra Pedas', 0]] },
+      { t: 'Tambahan', m: true, c: [['Telur', 4000], ['Extra Nasi', 5000], ['Kerupuk', 2000]] }],
+      minuman: [{ t: 'Suhu', m: false, d: 0, c: [['Dingin', 0], ['Hangat', 0]] },
+      { t: 'Gula', m: false, d: 0, c: [['Normal', 0], ['Less Sugar', 0], ['Tanpa Gula', 0]] }],
+      cemilan: [{ t: 'Tambahan', m: true, c: [['Saus Sambal', 1000], ['Mayones', 2000]] }]
+    };
+    function wkOptionsFor(p) {
+      const base = (WK_OPT[p.category] || []).map(g => ({ ...g }));
+      if (p.id === 'm6') base.push({ t: 'Tambahan', m: true, c: [['Extra Shot', 5000]] });
+      return base;
+    }
+    let wkOptP = null, wkOptSel = {};
+    function wkOpenOpt(id) {
+      wkOptP = wkProduct(id); wkOptSel = {};
+      wkOptionsFor(wkOptP).forEach((g, i) => { wkOptSel[i] = g.m ? [] : [g.d || 0]; });
+      wk$('opt-title').innerHTML = wkEsc(wkOptP.name) + '<small>Sesuaikan pesanan</small>';
+      wkRenderOpt();
+      wk$('opt-modal').classList.remove('hidden');
+    }
+    function wkRenderOpt() {
+      const gs = wkOptionsFor(wkOptP);
+      wk$('opt-body').innerHTML = gs.map((g, i) => `<span class="wk-label"${i ? ' style="margin-top:12px"' : ''}>${g.t}${g.m ? ' (boleh lebih dari satu)' : ''}</span><div class="wk-chips">` +
+        g.c.map((c, j) => `<button type="button" class="wk-chip${wkOptSel[i].includes(j) ? ' on' : ''}" onclick="wkPickOpt(${i},${j})">${c[0]}${c[1] ? ' +' + formatRupiah(c[1]) : ''}</button>`).join('') + '</div>').join('');
+      wk$('opt-price').textContent = 'Tambah · ' + formatRupiah(wkProduct(wkOptP.id).price + wkOptExtra());
+    }
+    function wkOptExtra() { return wkOptionsFor(wkOptP).reduce((a, g, i) => a + wkOptSel[i].reduce((b, j) => b + g.c[j][1], 0), 0); }
+    function wkPickOpt(i, j) {
+      const g = wkOptionsFor(wkOptP)[i], cur = wkOptSel[i];
+      wkOptSel[i] = g.m ? (cur.includes(j) ? cur.filter(x => x !== j) : [...cur, j]) : [j];
+      wkRenderOpt();
+    }
+    function wkCloseOpt() { wk$('opt-modal').classList.add('hidden'); wkOptP = null; }
+    function wkConfirmOpt() {
+      const gs = wkOptionsFor(wkOptP);
+      const labels = gs.flatMap((g, i) => wkOptSel[i].map(j => g.c[j][0]));
+      const key = gs.map((g, i) => wkOptSel[i].join('.')).join('-');
+      const id = wkOptP.id, line = { key, label: labels.join(', '), extra: wkOptExtra() };
+      wkCloseOpt();
+      addToCart(id, line);
+    }
+
+    function addToCart(itemId, optLine) {
       if (!wkShiftGuard()) return;
       const product = wkProduct(itemId);
       if (!product) return;
-      const existing = cart.find(c => c.id === itemId);
-      const cur = existing ? existing.quantity : 0;
-      if (cur >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
+      if (!optLine && wkOptionsFor(product).length) { wkOpenOpt(itemId); return; }
+      if (wkQty(itemId) >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
+      const uid = optLine ? itemId + '|' + optLine.key : itemId;
+      const existing = cart.find(c => (c.uid || c.id) === uid);
       if (existing) existing.quantity += 1;
-      else cart.push({ id: product.id, name: product.name, price: product.price, quantity: 1, notes: '' });
+      else cart.push(optLine
+        ? { id: itemId, uid, name: product.name + ' (' + optLine.label + ')', price: product.price + optLine.extra, cost: product.cost + Math.round(optLine.extra * 0.4), quantity: 1, notes: '' }
+        : { id: product.id, name: product.name, price: product.price, cost: product.cost, quantity: 1, notes: '' });
       playBeep();
       renderCart();
       renderProducts();
     }
 
-    function updateCartQty(itemId, delta) {
-      const item = cart.find(c => c.id === itemId);
-      const product = wkProduct(itemId);
+    function updateCartQty(uid, delta) {
+      const item = cart.find(c => (c.uid || c.id) === uid);
       if (!item) return;
-      if (delta > 0 && product && item.quantity >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
+      const product = wkProduct(item.id);
+      if (delta > 0 && product && wkQty(item.id) >= product.stock) { wkToast('Stok ' + product.name + ' hanya tersisa ' + product.stock + '.', 'warn'); return; }
       item.quantity += delta;
-      if (item.quantity <= 0) cart = cart.filter(c => c.id !== itemId);
+      if (item.quantity <= 0) cart = cart.filter(c => (c.uid || c.id) !== uid);
       playBeep();
       renderCart();
       renderProducts();
+    }
+
+    function removeCartItem(uid) {
+      cart = cart.filter(c => (c.uid || c.id) !== uid);
+      playBeep(); renderCart(); renderProducts();
     }
 
     function clearCart() {
@@ -2969,24 +3372,24 @@
     <div class="pt-2.5 first:pt-0 flex flex-col gap-1.5">
       <div class="flex items-start justify-between gap-2">
         <div class="flex-1 min-w-0">
-          <h4 class="font-bold text-xs text-neutral-900 truncate">${wkEsc(item.name)}</h4>
+          <h4 class="font-bold text-xs text-neutral-900 leading-snug break-words">${wkEsc(item.name)}</h4>
           <p class="text-[11px] text-neutral-500 font-mono tabular-nums">${formatRupiah(item.price)}</p>
         </div>
         <span class="font-bold text-xs text-neutral-900 font-mono tabular-nums">${formatRupiah(item.price * item.quantity)}</span>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="openNoteModal('${item.id}')" type="button" class="text-[11px] flex items-center gap-1 px-1.5 py-0.5 rounded transition cursor-pointer ${item.notes ? 'text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium' : 'text-neutral-400 hover:text-neutral-600'}">
+        <button onclick="openNoteModal('${item.uid || item.id}')" type="button" class="text-[11px] flex items-center gap-1 px-1.5 py-0.5 rounded transition cursor-pointer ${item.notes ? 'text-amber-700 bg-amber-50 hover:bg-amber-100 font-medium' : 'text-neutral-400 hover:text-neutral-600'}">
           <i class="fa-regular fa-comment-dots text-xs"></i>
           <span class="max-w-[170px] truncate">${item.notes ? wkEsc(item.notes) : '+ Catatan khusus'}</span>
         </button>
       </div>
       <div class="flex items-center justify-between mt-1">
         <div class="flex items-center gap-1.5 bg-neutral-100 p-0.5 rounded-lg border border-neutral-200/60">
-          <button onclick="updateCartQty('${item.id}', -1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-minus text-[10px]"></i></button>
+          <button onclick="updateCartQty('${item.uid || item.id}', -1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-minus text-[10px]"></i></button>
           <span class="w-7 text-center font-bold text-xs font-mono tabular-nums text-neutral-900">${item.quantity}</span>
-          <button onclick="updateCartQty('${item.id}', 1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-plus text-[10px]"></i></button>
+          <button onclick="updateCartQty('${item.uid || item.id}', 1)" type="button" class="w-6 h-6 rounded-md bg-white hover:bg-neutral-50 flex items-center justify-center text-neutral-700 shadow-2xs cursor-pointer"><i class="fa-solid fa-plus text-[10px]"></i></button>
         </div>
-        <button onclick="removeCartItem('${item.id}')" type="button" class="p-1 text-neutral-400 hover:text-rose-600 transition cursor-pointer"><i class="fa-regular fa-trash-can text-xs"></i></button>
+        <button onclick="removeCartItem('${item.uid || item.id}')" type="button" class="p-1 text-neutral-400 hover:text-rose-600 transition cursor-pointer"><i class="fa-regular fa-trash-can text-xs"></i></button>
       </div>
     </div>`).join('');
       calculateTotals();
@@ -3071,6 +3474,7 @@
       if (b) { b.textContent = wkHeld.length; b.classList.toggle('zero', wkHeld.length === 0); }
       const active = transactions.filter(t => !t.voided).length;
       wk$('history-badge').innerText = active;
+      wkFloorBadge();
     }
 
     function wkHold() {
@@ -3104,7 +3508,7 @@
         const tot = wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate).total;
         return '<div class="wk-card"><div class="main"><div class="top">' + h.id +
           '<span class="wk-tag ' + (h.orderType === 'dine_in' ? 'amber' : 'blue') + '">' + (h.orderType === 'dine_in' ? wkEsc(h.table) : 'Takeaway') + '</span>' +
-          (h.customer ? '<span class="wk-tag">' + wkEsc(h.customer) + '</span>' : '') + '</div>' +
+          (h.customer ? '<span class="wk-tag">' + wkEsc(h.customer) + '</span>' : '') + '<span class="wk-tag">' + WK_ST[wkStat(h)][0] + (h.src === 'qr' ? ' · QR' : '') + '</span></div>' +
           '<div class="sub">' + wkEsc(names) + '</div><div class="meta">Disimpan ' + wkHM(h.time) + ' WIB · ' + qty + ' item</div></div>' +
           '<div class="side"><div class="money">' + formatRupiah(tot) + '</div><div class="acts">' +
           '<button type="button" class="wk-btn amber xs" onclick="wkRecall(\'' + h.id + '\')"><i class="fa-solid fa-rotate-left"></i>Panggil</button>' +
@@ -3373,6 +3777,7 @@
       wkAsk('Void transaksi ' + no + '?', 'Stok menu dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari omset serta laporan shift' + (t.paymentMethod === 'cash' ? ' (uang dikembalikan dari laci).' : '.'), 'Ya, Void Transaksi', () => {
         t.voided = true;
         t.items.forEach(i => { const p = wkProduct(i.id); if (p) p.stock += i.quantity; });
+        wkConsume(t.items, 1, true);
         if (t.paymentMethod === 'cash') drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'void', amount: t.total, note: 'Void #' + no + ' (uang dikembalikan)', timestamp: wkHM(new Date()) + ' WIB' });
         renderHistoryList(); renderProducts(); updateDrawerStats(); wkUpdateBadges();
         wkToast(no + ' di-void. Stok dikembalikan.', 'warn');
@@ -3588,7 +3993,7 @@
 
     /* Urutan modal dari paling atas; Esc hanya menutup satu modal teratas */
     const WK_MODALS = [
-      ['confirm-modal', () => wkConfirmCancel()], ['discount-modal', () => wkCloseDiscount()],
+      ['confirm-modal', () => wkConfirmCancel()], ['opt-modal', () => wkCloseOpt()], ['ing-modal', () => wkCloseIng()], ['cust-modal', () => wkCloseCust()], ['floor-modal', () => wkCloseFloor()], ['split-modal', () => wkCloseSplit()], ['report-modal', () => wkCloseReport()], ['menu-modal', () => wkCloseMenu()], ['discount-modal', () => wkCloseDiscount()],
       ['transfer-modal', () => wkCloseTransfer()], ['held-modal', () => wkCloseHeld()],
       ['shift-modal', () => wkCloseShift()], ['qris-modal', () => closeQrisModal()],
       ['note-modal', () => closeNoteModal()], ['receipt-modal', () => closeReceiptModal()],
@@ -3605,6 +4010,12 @@
     document.addEventListener('mousedown', e => {
       const t = e.target;
       if (t.id === 'held-modal') wkCloseHeld();
+      else if (t.id === 'opt-modal') wkCloseOpt();
+      else if (t.id === 'report-modal') wkCloseReport();
+      else if (t.id === 'split-modal') wkCloseSplit();
+      else if (t.id === 'floor-modal') wkCloseFloor();
+      else if (t.id === 'ing-modal') wkCloseIng();
+      else if (t.id === 'menu-modal') wkCloseMenu();
       else if (t.id === 'discount-modal') wkCloseDiscount();
       else if (t.id === 'transfer-modal') wkCloseTransfer();
       else if (t.id === 'shift-modal') wkCloseShift();
@@ -3678,10 +4089,561 @@
 
     /* ---------- Inisialisasi ulang ---------- */
     wkTables = [...document.querySelectorAll('#table-number option')].map(o => o.value);
-    wkSeed();
+    /* ---------- HPP, kelola menu, laporan penjualan & laba rugi ---------- */
+    const WK_COST = { m1: 11000, m2: 9500, m3: 13000, m4: 14500, m5: 1800, m6: 7500, m7: 3500, m8: 6000, m9: 5000, m10: 6500, m11: 12500, m12: 10000 };
+    PRODUCTS.forEach(p => { if (p.cost == null) p.cost = WK_COST[p.id] != null ? WK_COST[p.id] : Math.round(p.price * 0.45); });
+    const WK_PLACEHOLDER = 'data:image/svg+xml,' + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 90'><rect width='120' height='90' fill='#fef3c7'/><text x='60' y='60' font-size='40' text-anchor='middle'>🍽️</text></svg>");
+    let wkExpenses = [];
+    const wkInt = v => Math.max(0, parseInt(v, 10) || 0);
+
+    /* Kelola menu */
+    function wkOpenMenu() { wkRenderMenu(); wk$('menu-modal').classList.remove('hidden'); }
+    function wkCloseMenu() { wk$('menu-modal').classList.add('hidden'); }
+    function wkRenderMenu() {
+      const cats = categories.filter(c => c.id !== 'semua');
+      const rows = PRODUCTS.map(p => {
+        const m = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0, dis = wkHasRecipe(p.id) ? ' disabled title="Otomatis dari resep"' : '';
+        return `<tr><td><b>${wkEsc(p.name)}</b><br><span style="font-size:10px;color:#a3a3a3">${wkEsc(p.sku || '')}</span></td>
+      <td><input class="wk-in" type="number" min="0" value="${p.price}" onchange="wkEditProd('${p.id}','price',this.value)" aria-label="Harga jual"></td>
+      <td><input class="wk-in" type="number" min="0" value="${p.cost}"${dis} onchange="wkEditProd('${p.id}','cost',this.value)" aria-label="HPP"></td>
+      <td style="font:700 11px 'JetBrains Mono',monospace;color:${m >= 40 ? '#047857' : m >= 20 ? '#b45309' : '#be123c'}">${m}%</td>
+      <td><input class="wk-in" type="number" min="0" value="${p.stock}"${dis} onchange="wkEditProd('${p.id}','stock',this.value)" aria-label="Stok"></td>
+      <td style="white-space:nowrap"><button type="button" class="wk-btn ghost xs"${dis} onclick="wkEditProd('${p.id}','stock',${p.stock + 10})">+10</button>
+      <button type="button" class="wk-btn xs" style="background:#fee2e2;color:#be123c" onclick="wkDelProd('${p.id}')" aria-label="Hapus menu"><i class="fa-regular fa-trash-can"></i></button></td></tr>`;
+      }).join('');
+      wk$('menu-body').innerHTML = `
+    <button type="button" class="wk-btn ghost" onclick="wkOpenIng()" style="width:100%;margin-bottom:14px"><i class="fa-solid fa-wheat-awn"></i>Bahan Baku &amp; Resep${wkLowIngs().length ? ' <span class="wk-tag amber">' + wkLowIngs().length + ' menipis</span>' : ''}</button>
+    <span class="wk-label">Tambah Menu Baru</span>
+    <div style="display:grid;grid-template-columns:2fr 1.2fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px">
+      <input id="np-name" class="wk-in" placeholder="Nama menu" style="font-family:inherit">
+      <select id="np-cat" class="wk-in">${cats.map(c => `<option value="${c.id}">${c.label}</option>`).join('')}</select>
+      <input id="np-price" class="wk-in" type="number" min="0" placeholder="Harga">
+      <input id="np-cost" class="wk-in" type="number" min="0" placeholder="HPP">
+      <input id="np-stock" class="wk-in" type="number" min="0" placeholder="Stok">
+    </div>
+    <button type="button" class="wk-btn amber" onclick="wkAddProd()" style="width:100%;margin-bottom:14px"><i class="fa-solid fa-plus"></i>Tambah Menu</button>
+    <div style="overflow-x:auto"><table class="wk-tbl"><thead><tr><th>Menu</th><th>Harga</th><th>HPP</th><th>Margin</th><th>Stok</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+    function wkEditProd(id, f, v) {
+      const p = wkProduct(id); if (!p) return;
+      p[f] = wkInt(v); renderProducts(); wkRenderMenu();
+      cart.forEach(c => { if (c.id === id && f === 'stock' && c.quantity > p.stock) c.quantity = Math.max(1, p.stock); });
+      renderCart();
+    }
+    function wkAddProd() {
+      const name = wk$('np-name').value.trim(), price = wkInt(wk$('np-price').value);
+      if (!name || !price) { wkToast('Isi nama dan harga menu.', 'warn'); return; }
+      const cost = wk$('np-cost').value === '' ? Math.round(price * 0.45) : wkInt(wk$('np-cost').value);
+      PRODUCTS.push({ id: 'c' + Date.now(), sku: 'CST-' + String(PRODUCTS.length + 1).padStart(3, '0'), name, category: wk$('np-cat').value, price, cost, stock: wkInt(wk$('np-stock').value), image: WK_PLACEHOLDER, desc: 'Menu tambahan', custom: true });
+      renderProducts(); wkRenderMenu(); wkToast(name + ' ditambahkan ke menu.', 'success');
+    }
+    function wkDelProd(id) {
+      const p = wkProduct(id); if (!p) return;
+      wkAsk('Hapus menu?', p.name + ' akan dihapus dari daftar menu. Riwayat transaksi lama tidak berubah.', 'Ya, Hapus', () => {
+        PRODUCTS.splice(PRODUCTS.indexOf(p), 1); cart = cart.filter(c => c.id !== id);
+        renderCart(); renderProducts(); wkRenderMenu(); wkToast('Menu dihapus.', 'warn');
+      }, true);
+    }
+
+    /* Laporan */
+    let wkRepTab = 'jual';
+    function wkReportData() {
+      const act = transactions.filter(t => !t.voided);
+      const R = { n: act.length, gross: 0, disc: 0, tax: 0, hpp: 0, items: 0, menu: {}, hour: {}, pay: {} };
+      act.forEach(t => {
+        R.gross += t.subtotal; R.disc += t.discount; R.tax += t.tax;
+        t.items.forEach(it => {
+          const p = wkProduct(it.id), c = it.cost != null ? it.cost : (p ? p.cost : 0), k = it.id;
+          R.hpp += c * it.quantity; R.items += it.quantity;
+          const m = R.menu[k] || (R.menu[k] = { name: p ? p.name : it.name, q: 0, rev: 0 }); m.q += it.quantity; m.rev += it.price * it.quantity;
+        });
+        const h = parseInt(t.timeStr, 10); R.hour[h] = (R.hour[h] || 0) + t.subtotal - t.discount;
+        R.pay[t.methodLabel] = (R.pay[t.methodLabel] || 0) + t.total;
+      });
+      R.net = R.gross - R.disc; R.gp = R.net - R.hpp;
+      R.opex = wkExpenses.reduce((a, e) => a + e.a, 0); R.np = R.gp - R.opex;
+      return R;
+    }
+    const wkPct = (a, b) => b ? Math.round(a / b * 1000) / 10 + '%' : '0%';
+    function wkBars(rows, fmt) {
+      const max = Math.max(1, ...rows.map(r => r[1]));
+      return rows.map(([l, v]) => `<div class="wk-barrow"><span class="lb">${wkEsc(l)}</span><span class="tr"><i style="width:${Math.round(v / max * 100)}%"></i></span><span class="vl">${fmt(v)}</span></div>`).join('') || '<div class="wk-note">Belum ada transaksi.</div>';
+    }
+    function wkOpenReport() { wkRepTab = 'jual'; wkRenderReport(); wk$('report-modal').classList.remove('hidden'); }
+    function wkCloseReport() { wk$('report-modal').classList.add('hidden'); }
+    function wkRepSetTab(t) { wkRepTab = t; wkRenderReport(); }
+    function wkRenderReport() {
+      const R = wkReportData();
+      wk$('rep-sub').textContent = 'Shift #' + wkShift.number + ' · ' + R.n + ' transaksi (tanpa void)';
+      const tabs = `<div class="wk-tabs"><button type="button" class="${wkRepTab === 'jual' ? 'on' : ''}" onclick="wkRepSetTab('jual')">Penjualan</button><button type="button" class="${wkRepTab === 'laba' ? 'on' : ''}" onclick="wkRepSetTab('laba')">Laba Rugi</button></div>`;
+      let body;
+      if (wkRepTab === 'jual') {
+        const top = Object.values(R.menu).sort((a, b) => b.q - a.q).slice(0, 5).map(m => [m.name, m.q]);
+        const hrs = Object.keys(R.hour).map(Number).sort((a, b) => a - b).map(h => [wkPad(h) + ':00', R.hour[h]]);
+        body = `<div class="wk-kpis">
+      <div class="wk-kpi"><small>Penjualan Bersih</small><b>${formatRupiah(R.net)}</b></div>
+      <div class="wk-kpi"><small>Jumlah Transaksi</small><b>${R.n}</b></div>
+      <div class="wk-kpi"><small>Rata-rata / Transaksi</small><b>${formatRupiah(R.n ? Math.round(R.net / R.n) : 0)}</b></div>
+      <div class="wk-kpi"><small>Item Terjual</small><b>${R.items}</b></div></div>
+      <div class="wk-h4">Menu Terlaris (porsi)</div>${wkBars(top, v => v + ' porsi')}
+      <div class="wk-h4">Penjualan per Jam</div>${wkBars(hrs, formatRupiah)}
+      <div class="wk-h4">Metode Pembayaran</div>${wkBars(Object.entries(R.pay), formatRupiah)}`;
+      } else {
+        const row = (l, v, cls, neg) => `<tr class="${cls || ''}"><td>${l}</td><td class="${neg ? 'neg' : ''}">${neg ? '− ' : ''}${formatRupiah(Math.abs(v))}</td></tr>`;
+        const exp = wkExpenses.map(e => `<tr><td>${wkEsc(e.n)}</td><td style="text-align:right;font:700 12px 'JetBrains Mono',monospace">${formatRupiah(e.a)}</td><td style="width:34px;text-align:right"><button type="button" class="wk-x" onclick="wkDelExpense(${e.id})" aria-label="Hapus biaya"><i class="fa-solid fa-xmark"></i></button></td></tr>`).join('');
+        body = `<table class="wk-pl">
+      ${row('Penjualan kotor', R.gross)}${row('Diskon', R.disc, '', true)}${row('Penjualan bersih', R.net, 'sub')}
+      ${row('HPP (harga pokok penjualan)', R.hpp, '', true)}${row('Laba kotor <small style="color:#737373">(margin ' + wkPct(R.gp, R.net) + ')</small>', R.gp, 'sub')}
+      ${row('Biaya operasional', R.opex, '', true)}
+      <tr class="tot"><td>${R.np >= 0 ? 'LABA BERSIH' : 'RUGI BERSIH'} <small style="color:#737373;font-weight:600">(margin ${wkPct(R.np, R.net)})</small></td><td class="${R.np >= 0 ? 'pos' : 'neg'}">${formatRupiah(R.np)}</td></tr></table>
+      <div class="wk-note" style="margin-top:8px">Pajak ${formatRupiah(R.tax)} dipungut dari pelanggan dan tidak dihitung sebagai pendapatan. HPP add-on diasumsikan 40% dari harga add-on. Belanja bahan shift ini ${formatRupiah(wkPurchases.filter(x => x.shift === wkShift.number).reduce((a, x) => a + x.total, 0))} adalah arus kas dan tidak dihitung lagi sebagai biaya karena bahannya sudah masuk HPP.</div>
+      <div class="wk-h4">Biaya Operasional</div>
+      <table class="wk-pl">${exp || '<tr><td colspan="3" style="color:#a3a3a3">Belum ada biaya.</td></tr>'}</table>
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-top:8px">
+        <input id="exp-n" class="wk-in" placeholder="Mis. listrik, gas, upah harian" style="font-family:inherit"><input id="exp-a" class="wk-in" type="number" min="0" placeholder="Nominal">
+        <button type="button" class="wk-btn amber xs" onclick="wkAddExpense()"><i class="fa-solid fa-plus"></i>Tambah</button></div>`;
+      }
+      wk$('rep-body').innerHTML = tabs + body;
+    }
+    function wkAddExpense() {
+      const n = wk$('exp-n').value.trim(), a = wkInt(wk$('exp-a').value);
+      if (!n || !a) { wkToast('Isi nama dan nominal biaya.', 'warn'); return; }
+      wkExpenses.push({ id: Date.now(), n, a }); wkSaveSoon(); wkRenderReport();
+    }
+    function wkDelExpense(id) { wkExpenses = wkExpenses.filter(e => e.id !== id); wkSaveSoon(); wkRenderReport(); }
+
+    function wkExportCSV() {
+      const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+      const rows = [['No Struk', 'Tanggal', 'Jam', 'Tipe', 'Meja', 'Pembayaran', 'Status', 'Item', 'Qty', 'Harga', 'HPP/unit', 'Subtotal'].map(q).join(',')];
+      transactions.forEach(t => t.items.forEach(it => {
+        const p = wkProduct(it.id), c = it.cost != null ? it.cost : (p ? p.cost : 0);
+        rows.push([t.orderNumber, t.dateStr, t.timeStr, t.orderType, t.tableNumber, t.methodLabel, t.voided ? 'VOID' : 'OK', it.name, it.quantity, it.price, c, it.price * it.quantity].map(q).join(','));
+      }));
+      const blob = new Blob(['\ufeff' + rows.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+      a.download = 'laporan-warungku-shift-' + wkShift.number + '.csv'; document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      wkToast('CSV diekspor (' + transactions.length + ' transaksi).', 'success');
+    }
+    function wkShareReportWA() {
+      const R = wkReportData(), f = formatRupiah;
+      const top = Object.values(R.menu).sort((a, b) => b.q - a.q).slice(0, 3).map((m, i) => (i + 1) + '. ' + m.name + ' (' + m.q + ')');
+      const txt = ['*RINGKASAN SHIFT #' + wkShift.number + ' - ' + storeSettings.storeName.toUpperCase() + '*',
+      new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }), '',
+      'Transaksi: ' + R.n + ' | Item: ' + R.items, 'Penjualan bersih: ' + f(R.net), 'HPP: ' + f(R.hpp), 'Laba kotor: ' + f(R.gp),
+      'Biaya operasional: ' + f(R.opex), '*' + (R.np >= 0 ? 'Laba' : 'Rugi') + ' bersih: ' + f(R.np) + '*', '',
+        'Terlaris:', ...top].join('\n');
+      window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+    }
+
+    /* ---------- LAPISAN DATA TUNGGAL ----------
+       Semua akses penyimpanan lewat `db`. Saat backend siap, cukup ganti isi db (mis. fetch ke API / Supabase).
+       Rancangan tabel: products(id,sku,name,category,price,cost,stock) | orders(id,type,table,customer,status,src,created_at)
+       order_items(order_id,product_id,name,price,cost,qty,notes) | payments(order_id,method,amount,ref,paid_at)
+       shifts(id,cashier,opened_at,closed_at,opening_cash) | cash_logs(shift_id,type,amount,note) | expenses(id,name,amount,date) | settings(key,value) */
+    const db = {
+      get(k, d = null) { try { const v = localStorage.getItem(k); if (v == null) return d; try { return JSON.parse(v); } catch (e) { return v; } } catch (e) { return d; } },
+      set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+      del(k) { try { localStorage.removeItem(k); } catch (e) { } }
+    };
+
+    /* ---------- Denah meja, dapur (KDS), dan pesanan QR meja ---------- */
+    const WK_ST = { baru: ['Pesanan baru', '#b45309', '#fef3c7'], masak: ['Dimasak', '#1d4ed8', '#dbeafe'], siap: ['Siap saji', '#047857', '#d1fae5'], saji: ['Disajikan', '#525252', '#e5e5e5'] };
+    const WK_NEXT = { baru: ['masak', 'Mulai Masak'], masak: ['siap', 'Tandai Siap'], siap: ['saji', 'Sudah Disajikan'] };
+    const wkStat = h => h.status || 'baru';
+    const wkAge = h => Math.max(0, Math.floor((Date.now() - new Date(h.time).getTime()) / 60000));
+    let wkFloorTab = 'denah';
+    function wkOpenFloor(tab) { if (tab) wkFloorTab = tab; wkRenderFloor(); wk$('floor-modal').classList.remove('hidden'); }
+    function wkCloseFloor() { wk$('floor-modal').classList.add('hidden'); }
+    function wkFloorSet(t) { wkFloorTab = t; wkRenderFloor(); }
+    function wkFloorBadge() {
+      const n = wkHeld.filter(h => wkStat(h) === 'baru' || wkStat(h) === 'siap').length, b = wk$('floor-badge');
+      if (b) { b.textContent = n; b.style.display = n ? '' : 'none'; }
+    }
+    function wkChip(st) { const c = WK_ST[st]; return `<span style="font:700 10px 'Plus Jakarta Sans',sans-serif;padding:2px 7px;border-radius:7px;color:${c[1]};background:${c[2]}">${c[0]}</span>`; }
+    function wkRenderFloor() {
+      const tabs = `<div class="wk-tabs"><button type="button" class="${wkFloorTab === 'denah' ? 'on' : ''}" onclick="wkFloorSet('denah')">Denah Meja</button><button type="button" class="${wkFloorTab === 'dapur' ? 'on' : ''}" onclick="wkFloorSet('dapur')">Dapur (${wkHeld.filter(h => wkStat(h) !== 'saji').length})</button></div>`;
+      let body;
+      if (wkFloorTab === 'denah') {
+        body = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px">' + wkTables.map(t => {
+          const h = wkHeld.find(x => x.orderType === 'dine_in' && x.table === t);
+          const inCashier = orderType === 'dine_in' && cart.length && wk$('table-number').value === t;
+          let chip, info = '', bg = '#fff', bd = '#d4d4d4;border-style:dashed';
+          if (h) {
+            const c = WK_ST[wkStat(h)]; chip = wkChip(wkStat(h)); bg = c[2]; bd = c[1] + ';border-style:solid';
+            info = `<div style="font-size:10px;margin-top:4px">${h.customer ? wkEsc(h.customer) + ' · ' : ''}${wkAge(h)} mnt</div><div style="font:800 11px 'JetBrains Mono',monospace;margin-top:2px">${formatRupiah(wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate).total)}</div>`;
+          }
+          else if (inCashier) { chip = '<span style="font:700 10px sans-serif;padding:2px 7px;border-radius:7px;color:#6d28d9;background:#ede9fe">Di kasir</span>'; bg = '#faf5ff'; bd = '#6d28d9;border-style:solid'; }
+          else chip = '<span style="font:700 10px sans-serif;color:#a3a3a3">Kosong</span>';
+          return `<button type="button" onclick="wkTableClick('${t}')" style="text-align:left;padding:10px;border-radius:14px;border:2px ${'solid'};border-color:${bd};background:${bg};cursor:pointer;color:#171717"><b style="font-size:13px">${wkEsc(t)}</b><div style="margin-top:4px">${chip}</div>${info}</button>`;
+        }).join('') + '</div><div class="wk-note" style="margin-top:10px">Ketuk meja kosong untuk mulai pesanan di kasir, atau meja terisi untuk memanggil tagihannya.</div>';
+      } else {
+        const list = [...wkHeld].sort((a, b) => (wkStat(a) === 'saji') - (wkStat(b) === 'saji') || new Date(a.time) - new Date(b.time));
+        body = list.map(h => {
+          const st = wkStat(h), nx = WK_NEXT[st], age = wkAge(h);
+          return `<div style="border:1px solid #e5e5e5;border-radius:14px;padding:10px 12px;margin-bottom:8px;opacity:${st === 'saji' ? .6 : 1}">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><b style="font-size:13px">${h.orderType === 'dine_in' ? wkEsc(h.table) : 'Takeaway'}</b>${h.customer ? '<span style="font-size:11px;color:#737373">' + wkEsc(h.customer) + '</span>' : ''}${wkChip(st)}${h.src === 'qr' ? '<span class="wk-tag amber">QR</span>' : ''}<span style="margin-left:auto;font:800 11px \'JetBrains Mono\',monospace;color:${age > 15 && st !== 'saji' ? '#be123c' : '#737373'}">${age} mnt</span></div>
+        <div style="margin:8px 0;font-size:12px">${h.cart.map(c => `<div><b>${c.quantity}x</b> ${wkEsc(c.name)}${c.notes ? ' <i style="color:#b45309">» ' + wkEsc(c.notes) + '</i>' : ''}</div>`).join('')}</div>
+        <button type="button" class="wk-btn ${nx ? 'amber' : 'ghost'} xs" onclick="${nx ? `wkAdvance('${h.id}')` : `wkCloseFloor();wkRecall('${h.id}')`}">${nx ? nx[1] : 'Panggil ke Kasir untuk Bayar'}</button>
+        ${nx && st === 'siap' ? `<button type="button" class="wk-btn ghost xs" style="margin-left:6px" onclick="wkCloseFloor();wkRecall('${h.id}')">Bayar Sekarang</button>` : ''}</div>`;
+        }).join('') || '<div class="wk-empty"><i class="fa-solid fa-kitchen-set"></i>Belum ada pesanan di dapur.</div>';
+      }
+      wk$('floor-body').innerHTML = tabs + body; wkFloorBadge();
+    }
+    function wkTableClick(t) {
+      const h = wkHeld.find(x => x.orderType === 'dine_in' && x.table === t);
+      wkCloseFloor();
+      if (h) { wkRecall(h.id); return; }
+      setOrderType('dine_in'); wkRenderTableOptions(); wk$('table-number').value = t; wkTab(cart.length ? 'cart' : 'menu');
+    }
+    function wkAdvance(id) {
+      const h = wkHeld.find(x => x.id === id); if (!h) return;
+      h.status = WK_NEXT[wkStat(h)][0]; wkSaveSoon(); wkUpdateBadges(); wkRenderFloor(); if (!wk$('held-modal').classList.contains('hidden')) wkRenderHeld();
+      wkToast((h.orderType === 'dine_in' ? h.table : 'Takeaway') + ': ' + WK_ST[h.status][0] + '.', 'success');
+    }
+    setInterval(() => { if (!wk$('floor-modal').classList.contains('hidden')) wkRenderFloor(); }, 30000);
+
+    /* Tampilan pelanggan (simulasi scan QR meja) */
+    let wkCust = { t: '', n: '', q: {} };
+    function wkOpenCust() {
+      wkCust = { t: wkTables.find(t => !wkHeld.some(h => h.orderType === 'dine_in' && h.table === t)) || wkTables[0], n: '', q: {} };
+      wkRenderCust(); wk$('cust-modal').classList.remove('hidden');
+    }
+    function wkCloseCust() { wk$('cust-modal').classList.add('hidden'); }
+    function wkCustQty(id, d) { const p = wkProduct(id); wkCust.q[id] = Math.min(p.stock, Math.max(0, (wkCust.q[id] || 0) + d)); wkRenderCust(); }
+    function wkCustTotal() { return Object.entries(wkCust.q).reduce((a, [id, q]) => a + (wkProduct(id) ? wkProduct(id).price * q : 0), 0); }
+    function wkRenderCust() {
+      wk$('cust-title').textContent = 'WarungKU · ' + wkCust.t;
+      wk$('cust-body').innerHTML = `<div style="display:flex;gap:6px;margin-bottom:10px"><select class="wk-in" style="width:40%" onchange="wkCust.t=this.value;wkRenderCust()" aria-label="Nomor meja">${wkTables.map(t => `<option${t === wkCust.t ? ' selected' : ''}>${wkEsc(t)}</option>`).join('')}</select><input class="wk-in" style="font-family:inherit" placeholder="Nama Anda" value="${wkEsc(wkCust.n)}" oninput="wkCust.n=this.value" aria-label="Nama"></div>` +
+        PRODUCTS.filter(p => p.stock > 0).map(p => `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #f0f0f0"><img src="${p.image}" alt="" style="width:42px;height:42px;border-radius:10px;object-fit:cover;flex:none"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12px;color:#171717">${wkEsc(p.name)}</div><div style="font:600 11px 'JetBrains Mono',monospace;color:#737373">${formatRupiah(p.price)}</div></div>
+      <span style="display:flex;align-items:center;gap:6px"><button type="button" class="wk-btn ghost xs" onclick="wkCustQty('${p.id}',-1)" aria-label="Kurangi">−</button><b style="min-width:16px;text-align:center">${wkCust.q[p.id] || 0}</b><button type="button" class="wk-btn amber xs" onclick="wkCustQty('${p.id}',1)" aria-label="Tambah">+</button></span></div>`).join('');
+      wk$('cust-send').textContent = 'Kirim Pesanan · ' + formatRupiah(wkCustTotal());
+    }
+    function wkCustSend() {
+      const lines = Object.entries(wkCust.q).filter(([, q]) => q > 0).map(([id, q]) => { const p = wkProduct(id); return { id, name: p.name, price: p.price, cost: p.cost, quantity: q, notes: '' }; });
+      if (!lines.length) { wkToast('Pilih minimal satu menu.', 'warn'); return; }
+      const t = wkCust.t, n = wkCust.n.trim();
+      const ex = wkHeld.find(h => h.orderType === 'dine_in' && h.table === t);
+      if (ex) {
+        lines.forEach(l => { const m = ex.cart.find(c => c.id === l.id && !c.uid); if (m) m.quantity += l.quantity; else ex.cart.push(l); });
+        ex.status = 'baru'; if (n && !ex.customer) ex.customer = n;
+      } else {
+        wkHeldSeq++;
+        wkHeld.push({ id: 'HLD-' + wkPad(wkHeldSeq), orderType: 'dine_in', table: t, customer: n, cart: lines, discount: { type: 'pct', value: 0 }, time: new Date(), status: 'baru', src: 'qr' });
+      }
+      try { playRegisterBell(); } catch (e) { }
+      wkCloseCust(); wkUpdateBadges(); wkRenderTableOptions(); wkRenderFloor(); wkSaveSoon();
+      wkToast('Pesanan QR masuk dari ' + t + (n ? ' (' + n + ')' : '') + '.', 'success');
+    }
+
+    /* ---------- Bahan baku, resep, HPP otomatis, stok terpotong otomatis ---------- */
+    let wkIngs = [
+      { id: 'i1', name: 'Beras', unit: 'kg', stock: 25, cost: 14000, min: 8, step: 10 },
+      { id: 'i2', name: 'Telur ayam', unit: 'butir', stock: 120, cost: 2400, min: 40, step: 60 },
+      { id: 'i3', name: 'Ayam potong', unit: 'kg', stock: 12, cost: 38000, min: 4, step: 5 },
+      { id: 'i4', name: 'Mie basah', unit: 'kg', stock: 8, cost: 16000, min: 3, step: 5 },
+      { id: 'i5', name: 'Bakso & pangsit', unit: 'pcs', stock: 80, cost: 1200, min: 30, step: 50 },
+      { id: 'i6', name: 'Daging sapi', unit: 'kg', stock: 6, cost: 120000, min: 2, step: 3 },
+      { id: 'i7', name: 'Teh celup', unit: 'pcs', stock: 150, cost: 400, min: 50, step: 100 },
+      { id: 'i8', name: 'Gula pasir', unit: 'kg', stock: 10, cost: 16000, min: 3, step: 5 },
+      { id: 'i9', name: 'Kopi bubuk', unit: 'kg', stock: 3, cost: 140000, min: 1, step: 2 },
+      { id: 'i10', name: 'Gula aren', unit: 'kg', stock: 4, cost: 28000, min: 1.5, step: 2 },
+      { id: 'i11', name: 'Susu cair', unit: 'liter', stock: 15, cost: 18000, min: 5, step: 10 },
+      { id: 'i12', name: 'Jeruk peras', unit: 'kg', stock: 10, cost: 22000, min: 3, step: 5 },
+      { id: 'i13', name: 'Pisang', unit: 'buah', stock: 60, cost: 1800, min: 20, step: 40 },
+      { id: 'i14', name: 'Keju', unit: 'kg', stock: 3, cost: 90000, min: 1, step: 2 },
+      { id: 'i15', name: 'Cokelat meses', unit: 'kg', stock: 2, cost: 60000, min: 0.5, step: 1 },
+      { id: 'i16', name: 'Tahu putih', unit: 'pcs', stock: 80, cost: 800, min: 30, step: 50 },
+      { id: 'i17', name: 'Tempe', unit: 'papan', stock: 25, cost: 4000, min: 10, step: 20 },
+      { id: 'i18', name: 'Kentang', unit: 'kg', stock: 10, cost: 22000, min: 3, step: 5 },
+      { id: 'i19', name: 'Minyak goreng', unit: 'liter', stock: 15, cost: 18000, min: 5, step: 10 },
+      { id: 'i20', name: 'Kerupuk', unit: 'pcs', stock: 100, cost: 500, min: 30, step: 50 },
+      { id: 'i21', name: 'Sayur & lalapan', unit: 'porsi', stock: 60, cost: 1500, min: 20, step: 40 },
+      { id: 'i22', name: 'Bumbu racik', unit: 'porsi', stock: 120, cost: 1500, min: 40, step: 80 }
+    ];
+    let wkRecipes = {
+      m1: [['i1', .15], ['i2', 1], ['i3', .05], ['i22', 1], ['i19', .03], ['i20', 1], ['i21', 1]],
+      m2: [['i4', .15], ['i3', .06], ['i5', 3], ['i22', 1]],
+      m3: [['i3', .25], ['i1', .15], ['i21', 1], ['i22', 1]],
+      m4: [['i6', .05], ['i11', .05], ['i1', .12], ['i22', 1], ['i21', 1]],
+      m5: [['i7', 1], ['i8', .02]],
+      m6: [['i9', .015], ['i11', .1], ['i10', .03]],
+      m7: [['i12', .2], ['i8', .02]],
+      m8: [['i13', 3], ['i14', .03], ['i15', .02], ['i19', .05]],
+      m9: [['i16', 3], ['i17', .5], ['i19', .04]],
+      m10: [['i18', .2], ['i14', .02], ['i19', .05]],
+      m11: [['i1', .15], ['i3', .15], ['i7', 1], ['i21', 1], ['i22', 1]],
+      m12: [['i9', .015], ['i11', .1], ['i10', .03], ['i13', 3], ['i19', .05]]
+    };
+    const wkIng = id => wkIngs.find(i => i.id === id);
+    const wkHasRecipe = pid => !!(wkRecipes[pid] && wkRecipes[pid].length);
+    const wkRound = n => Math.round(n * 1000) / 1000;
+    const wkLowIngs = () => wkIngs.filter(i => i.stock <= i.min);
+    function wkRecalcCosts() {
+      PRODUCTS.forEach(p => { if (wkHasRecipe(p.id)) p.cost = Math.round(wkRecipes[p.id].reduce((a, [iid, q]) => a + (wkIng(iid) ? wkIng(iid).cost * q : 0), 0)); });
+    }
+    function wkSyncStock() {
+      PRODUCTS.forEach(p => {
+        if (!wkHasRecipe(p.id)) return;
+        p.stock = Math.max(0, Math.min(...wkRecipes[p.id].map(([iid, q]) => wkIng(iid) && q > 0 ? Math.floor(wkIng(iid).stock / q + 1e-9) : 9999)));
+      });
+    }
+    /* dir = -1 memotong bahan (penjualan), +1 mengembalikan (void) */
+    function wkConsume(items, dir, silent) {
+      const before = new Set(wkLowIngs().map(i => i.id));
+      items.forEach(it => (wkRecipes[it.id] || []).forEach(([iid, q]) => { const g = wkIng(iid); if (g) g.stock = Math.max(0, wkRound(g.stock + dir * q * it.quantity)); }));
+      wkSyncStock();
+      if (!silent) { const nw = wkLowIngs().filter(i => !before.has(i.id)); if (nw.length) wkToast('Stok menipis: ' + nw.map(i => i.name).join(', ') + '.', 'warn'); }
+    }
+
+    let wkIngTab = 'stok', wkRecipeProd = 'm1';
+    function wkOpenIng() { wkRenderIng(); wk$('ing-modal').classList.remove('hidden'); }
+    function wkCloseIng() { wk$('ing-modal').classList.add('hidden'); if (!wk$('menu-modal').classList.contains('hidden')) wkRenderMenu(); }
+    function wkIngSet(t) { wkIngTab = t; wkRenderIng(); }
+    const wkFmt = n => String(wkRound(n)).replace('.', ',');
+    function wkRenderIng() {
+      const tabs = `<div class="wk-tabs"><button type="button" class="${wkIngTab === 'stok' ? 'on' : ''}" onclick="wkIngSet('stok')">Stok Bahan</button><button type="button" class="${wkIngTab === 'resep' ? 'on' : ''}" onclick="wkIngSet('resep')">Resep Menu</button></div>`;
+      let body;
+      if (wkIngTab === 'stok') {
+        const low = wkLowIngs();
+        const rows = wkIngs.map(i => {
+          const st = i.stock <= 0 ? ['Habis', '#be123c', '#fee2e2'] : i.stock <= i.min ? ['Menipis', '#b45309', '#fef3c7'] : ['Aman', '#047857', '#d1fae5'];
+          return `<tr><td><b>${wkEsc(i.name)}</b><br><span style="font-size:10px;color:#a3a3a3">per ${wkEsc(i.unit)}</span></td>
+        <td><input class="wk-in" type="number" step="any" min="0" value="${i.stock}" onchange="wkEditIng('${i.id}','stock',this.value)" aria-label="Stok ${wkEsc(i.name)}"></td>
+        <td><input class="wk-in" type="number" min="0" value="${i.cost}" onchange="wkEditIng('${i.id}','cost',this.value)" aria-label="Harga"></td>
+        <td><input class="wk-in" type="number" step="any" min="0" value="${i.min}" onchange="wkEditIng('${i.id}','min',this.value)" aria-label="Batas minimum"></td>
+        <td><span style="font:700 10px sans-serif;padding:2px 7px;border-radius:7px;color:${st[1]};background:${st[2]}">${st[0]}</span></td>
+        <td style="white-space:nowrap"><button type="button" class="wk-btn ghost xs" onclick="wkEditIng('${i.id}','stock',${wkRound(i.stock + i.step)})">+${i.step}</button>
+        <button type="button" class="wk-btn xs" style="background:#fee2e2;color:#be123c" onclick="wkDelIng('${i.id}')" aria-label="Hapus bahan"><i class="fa-regular fa-trash-can"></i></button></td></tr>`;
+        }).join('');
+        body = (low.length ? `<div class="wk-note" style="background:#fffbeb;color:#b45309;margin-bottom:10px"><b>Perlu belanja:</b> ${low.map(i => wkEsc(i.name) + ' (' + wkFmt(i.stock) + ' ' + wkEsc(i.unit) + ')').join(', ')}</div>` : '') +
+          `<span class="wk-label">Catat Belanja Bahan</span><div style="display:grid;grid-template-columns:2fr 1fr 1.3fr;gap:6px;margin-bottom:6px">
+      <select id="pb-ing" class="wk-in" style="font-family:inherit" aria-label="Bahan">${wkIngs.map(i => `<option value="${i.id}">${wkEsc(i.name)} (${wkEsc(i.unit)})</option>`).join('')}</select>
+      <input id="pb-qty" class="wk-in" type="number" step="any" min="0" placeholder="Jumlah"><input id="pb-total" class="wk-in" type="number" min="0" placeholder="Total harga"></div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11px;margin-bottom:8px"><input id="pb-cash" type="checkbox" checked> Dibayar dari kas laci (tercatat sebagai kas keluar)</label>
+      <button type="button" class="wk-btn amber" onclick="wkAddPurchase()" style="width:100%;margin-bottom:14px"><i class="fa-solid fa-basket-shopping"></i>Simpan Belanja</button>
+      ` + `<span class="wk-label">Tambah Bahan Baru</span><div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:6px">
+      <input id="ni-name" class="wk-in" placeholder="Nama bahan" style="font-family:inherit"><input id="ni-unit" class="wk-in" placeholder="Satuan" style="font-family:inherit"><input id="ni-stock" class="wk-in" type="number" step="any" min="0" placeholder="Stok"><input id="ni-cost" class="wk-in" type="number" min="0" placeholder="Harga/satuan"><input id="ni-min" class="wk-in" type="number" step="any" min="0" placeholder="Minimum"></div>
+      <button type="button" class="wk-btn amber" onclick="wkAddIng()" style="width:100%;margin-bottom:14px"><i class="fa-solid fa-plus"></i>Tambah Bahan</button>
+      <div style="overflow-x:auto"><table class="wk-tbl"><thead><tr><th>Bahan</th><th>Stok</th><th>Harga/satuan</th><th>Minimum</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>
+      <div class="wk-h4">Riwayat Belanja</div>${wkPurchases.slice(0, 8).map(x => `<div class="wk-barrow"><span class="lb" style="width:auto;flex:1">${x.time} · ${wkEsc(x.name)} <span style="color:#737373;font-weight:500">${wkFmt(x.qty)} ${wkEsc(x.unit)} @ ${formatRupiah(x.price)}</span></span><span class="wk-tag${x.cash ? ' amber' : ''}">${x.cash ? 'Kas' : 'Non-kas'}</span><span class="vl">${formatRupiah(x.total)}</span></div>`).join('') || '<div class="wk-note">Belum ada belanja tercatat.</div>'}`;
+      } else {
+        const p = wkProduct(wkRecipeProd) || PRODUCTS[0]; wkRecipeProd = p.id;
+        const rec = wkRecipes[p.id] || [];
+        const m = p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0;
+        body = `<select class="wk-in" style="font-family:inherit;margin-bottom:10px" onchange="wkRecipeProd=this.value;wkRenderIng()" aria-label="Pilih menu">${PRODUCTS.map(x => `<option value="${x.id}"${x.id === p.id ? ' selected' : ''}>${wkEsc(x.name)}</option>`).join('')}</select>
+      <div class="wk-kpis"><div class="wk-kpi"><small>HPP per porsi (otomatis)</small><b>${formatRupiah(p.cost)}</b></div><div class="wk-kpi"><small>Margin dari harga ${formatRupiah(p.price)}</small><b>${m}%</b></div></div>
+      <div class="wk-note" style="margin-bottom:8px">Porsi tersedia dari stok bahan: <b>${rec.length ? p.stock : 'tidak memakai resep (stok manual: ' + p.stock + ')'}</b></div>
+      <table class="wk-pl">${rec.map(([iid, q], k) => { const g = wkIng(iid); return `<tr><td>${g ? wkEsc(g.name) : '(bahan dihapus)'}</td><td style="width:110px"><input class="wk-in" type="number" step="any" min="0" value="${q}" onchange="wkEditRecipe(${k},this.value)" aria-label="Takaran"></td><td style="width:54px;text-align:left;font:600 11px sans-serif;color:#737373">${g ? wkEsc(g.unit) : ''}</td><td style="width:34px"><button type="button" class="wk-x" onclick="wkDelRecipe(${k})" aria-label="Hapus"><i class="fa-solid fa-xmark"></i></button></td></tr>`; }).join('') || '<tr><td colspan="4" style="color:#a3a3a3">Belum ada resep. Tambahkan bahan di bawah.</td></tr>'}</table>
+      <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-top:10px"><select id="rc-ing" class="wk-in" style="font-family:inherit">${wkIngs.map(i => `<option value="${i.id}">${wkEsc(i.name)} (${wkEsc(i.unit)})</option>`).join('')}</select><input id="rc-q" class="wk-in" type="number" step="any" min="0" placeholder="Takaran/porsi"><button type="button" class="wk-btn amber xs" onclick="wkAddRecipe()"><i class="fa-solid fa-plus"></i>Tambah</button></div>`;
+      }
+      wk$('ing-body').innerHTML = tabs + body;
+    }
+    function wkAfterIng() { wkRecalcCosts(); wkSyncStock(); renderProducts(); renderCart(); wkSaveSoon(); wkRenderIng(); }
+    function wkEditIng(id, f, v) { const g = wkIng(id); if (!g) return; const n = Math.max(0, parseFloat(v) || 0); g[f] = f === 'cost' ? Math.round(n) : wkRound(n); wkAfterIng(); }
+    function wkAddIng() {
+      const name = wk$('ni-name').value.trim(), unit = wk$('ni-unit').value.trim() || 'pcs';
+      if (!name) { wkToast('Isi nama bahan.', 'warn'); return; }
+      const g = id => parseFloat(wk$(id).value) || 0;
+      wkIngs.push({ id: 'i' + Date.now(), name, unit, stock: g('ni-stock'), cost: Math.round(g('ni-cost')), min: g('ni-min'), step: 10 });
+      wkAfterIng(); wkToast(name + ' ditambahkan.', 'success');
+    }
+    function wkDelIng(id) {
+      const g = wkIng(id); if (!g) return;
+      wkAsk('Hapus bahan?', g.name + ' akan dihapus dari semua resep.', 'Ya, Hapus', () => {
+        wkIngs = wkIngs.filter(i => i.id !== id); Object.keys(wkRecipes).forEach(k => { wkRecipes[k] = wkRecipes[k].filter(r => r[0] !== id); });
+        wkAfterIng();
+      }, true);
+    }
+    function wkEditRecipe(k, v) { wkRecipes[wkRecipeProd][k][1] = Math.max(0, parseFloat(v) || 0); wkAfterIng(); }
+    function wkDelRecipe(k) { wkRecipes[wkRecipeProd].splice(k, 1); wkAfterIng(); }
+    function wkAddRecipe() {
+      const q = parseFloat(wk$('rc-q').value) || 0, iid = wk$('rc-ing').value;
+      if (!q) { wkToast('Isi takaran per porsi.', 'warn'); return; }
+      const rec = wkRecipes[wkRecipeProd] || (wkRecipes[wkRecipeProd] = []), ex = rec.find(r => r[0] === iid);
+      if (ex) ex[1] = q; else rec.push([iid, q]);
+      wkAfterIng();
+    }
+
+    /* ---------- Belanja bahan (rata-rata tertimbang) + hitung kas per pecahan ---------- */
+    let wkPurchases = [];
+    function wkAddPurchase() {
+      const g = wkIng(wk$('pb-ing').value), q = parseFloat(wk$('pb-qty').value) || 0, tot = Math.round(parseFloat(wk$('pb-total').value) || 0), fromCash = wk$('pb-cash').checked;
+      if (!g || q <= 0 || tot <= 0) { wkToast('Isi bahan, jumlah, dan total harga.', 'warn'); return; }
+      if (fromCash) {
+        if (!wkShiftGuard()) return;
+        if (tot > wkDrawerCash()) { wkToast('Belanja melebihi saldo laci (' + formatRupiah(wkDrawerCash()) + ').', 'error'); return; }
+        drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'kas_keluar', amount: tot, note: 'Belanja ' + g.name + ' (' + wkFmt(q) + ' ' + g.unit + ')', timestamp: wkHM(new Date()) + ' WIB' });
+        updateDrawerStats();
+      }
+      const unit = tot / q;
+      g.cost = Math.round((g.stock * g.cost + q * unit) / (g.stock + q));
+      g.stock = wkRound(g.stock + q);
+      wkPurchases.unshift({ id: Date.now(), shift: wkShift.number, name: g.name, unit: g.unit, qty: q, total: tot, price: Math.round(unit), cash: fromCash, time: wkHM(new Date()) });
+      wkPurchases = wkPurchases.slice(0, 60);
+      wkAfterIng();
+      wkToast('Belanja ' + g.name + ' tercatat. Harga rata-rata kini ' + formatRupiah(g.cost) + '/' + g.unit + '.', 'success');
+    }
+
+    const WK_DENOM = [100000, 50000, 20000, 10000, 5000, 2000, 1000, 500];
+    const _wkRenderShift = wkRenderShift;
+    wkRenderShift = function () {
+      _wkRenderShift.apply(this, arguments);
+      const inp = wk$('sh-counted'); if (!inp) return;
+      inp.previousElementSibling.insertAdjacentHTML('beforebegin',
+        `<span class="wk-label" style="margin-top:14px">Hitung per pecahan (isi jumlah lembar/keping)</span><div style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px">${WK_DENOM.map(d => `<label style="display:flex;align-items:center;gap:6px;font:600 11px 'JetBrains Mono',monospace"><span style="flex:1">${d >= 1000 ? d / 1000 + ' rb' : d + ' koin'}</span><input class="wk-in" style="width:64px" type="number" min="0" data-d="${d}" oninput="wkDenomSum()" aria-label="Jumlah pecahan ${d}"></label>`).join('')}</div>`);
+    };
+    function wkDenomSum() {
+      const sum = [...document.querySelectorAll('#sh-body input[data-d]')].reduce((a, i) => a + (parseInt(i.value, 10) || 0) * Number(i.dataset.d), 0);
+      const inp = wk$('sh-counted'); inp.value = sum ? String(sum) : ''; wkOnCount(inp);
+    }
+
+    /* ---------- Tiket dapur, split bill, mode gelap, tur demo ---------- */
+    function wkKitchenTicket() {
+      if (!cart.length) { wkToast('Keranjang masih kosong.', 'info'); return; }
+      const now = new Date(), cust = wk$('customer-name').value.trim();
+      const where = orderType === 'dine_in' ? wk$('table-number').value : 'TAKEAWAY';
+      const items = cart.map(c => `<div class="i">${c.quantity}x ${wkEsc(c.name)}</div>${c.notes ? '<div class="n">» ' + wkEsc(c.notes) + '</div>' : ''}`).join('');
+      const qty = cart.reduce((a, c) => a + c.quantity, 0);
+      const html = `<html><head><meta charset="utf-8"><style>@page{margin:4mm}body{font:13px/1.35 monospace;width:72mm;margin:0}h1{font-size:17px;text-align:center;margin:0 0 2px}.c{text-align:center}hr{border:0;border-top:1px dashed #000;margin:6px 0}.i{font-weight:bold;font-size:14px;margin-top:5px}.n{padding-left:14px;font-weight:bold}</style></head><body><h1>TIKET DAPUR</h1><div class="c">${wkEsc(storeSettings.storeName)}</div><hr><div>${now.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })} ${wkHM(now)}</div><div><b>${wkEsc(where)}</b>${cust ? ' · ' + wkEsc(cust) : ''}</div><hr>${items}<hr><div class="c">Total item: ${qty}</div></body></html>`;
+      const f = document.createElement('iframe');
+      f.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+      document.body.appendChild(f);
+      const d = f.contentWindow.document; d.open(); d.write(html); d.close();
+      setTimeout(() => { f.contentWindow.focus(); f.contentWindow.print(); setTimeout(() => f.remove(), 1500); }, 250);
+      wkToast('Tiket dapur dikirim ke printer.', 'success');
+    }
+
+    let wkSplitN = 2, wkSplitMode = 'rata', wkSplitAsg = [];
+    function wkOpenSplit() {
+      if (!cart.length) { wkToast('Keranjang masih kosong.', 'info'); return; }
+      wkSplitAsg = []; wkRenderSplit(); wk$('split-modal').classList.remove('hidden');
+    }
+    function wkCloseSplit() { wk$('split-modal').classList.add('hidden'); }
+    function wkSplitSet(k, v) {
+      if (k === 'n') wkSplitN = Math.min(10, Math.max(2, wkSplitN + v)); else wkSplitMode = v;
+      wkRenderSplit();
+    }
+    function wkSplitUnits() { const u = []; cart.forEach(c => { for (let i = 0; i < c.quantity; i++) u.push({ n: c.name, p: c.price }); }); return u; }
+    function wkSplitCalc() {
+      const t = wkCurrent(), N = wkSplitN; let amt = new Array(N).fill(0);
+      if (wkSplitMode === 'rata') {
+        let base = Math.round(t.total / N / 100) * 100;
+        if (t.total - base * (N - 1) < 0) base = Math.floor(t.total / N);
+        for (let i = 0; i < N - 1; i++) amt[i] = base;
+        amt[N - 1] = t.total - base * (N - 1);
+      } else {
+        wkSplitUnits().forEach((x, i) => { amt[Math.min(wkSplitAsg[i] || 0, N - 1)] += x.p; });
+        const f = t.subtotal ? t.total / t.subtotal : 0;
+        amt = amt.map(v => Math.round(v * f));
+        amt[amt.indexOf(Math.max(...amt))] += t.total - amt.reduce((a, b) => a + b, 0);
+      }
+      return { t, amt };
+    }
+    function wkSplitAssign(i, v) { wkSplitAsg[i] = parseInt(v, 10); wkRenderSplit(); }
+    function wkRenderSplit() {
+      const { t, amt } = wkSplitCalc(), N = wkSplitN;
+      let h = `<div class="wk-tabs"><button type="button" class="${wkSplitMode === 'rata' ? 'on' : ''}" onclick="wkSplitSet('m','rata')">Bagi Rata</button><button type="button" class="${wkSplitMode === 'item' ? 'on' : ''}" onclick="wkSplitSet('m','item')">Per Item</button></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><span class="wk-label" style="margin:0">Jumlah orang</span>
+    <span style="display:flex;align-items:center;gap:10px"><button type="button" class="wk-btn ghost xs" onclick="wkSplitSet('n',-1)" aria-label="Kurangi">−</button><b style="font:800 15px 'JetBrains Mono',monospace;min-width:22px;text-align:center">${N}</b><button type="button" class="wk-btn ghost xs" onclick="wkSplitSet('n',1)" aria-label="Tambah">+</button></span></div>`;
+      if (wkSplitMode === 'item') {
+        h += '<span class="wk-label">Siapa yang makan apa?</span>' + wkSplitUnits().map((u, i) => `<div class="wk-barrow"><span class="lb" style="width:auto;flex:1">${wkEsc(u.n)}</span><span class="vl" style="width:80px">${formatRupiah(u.p)}</span><select class="wk-in" style="width:86px" onchange="wkSplitAssign(${i},this.value)" aria-label="Penanggung">${Array.from({ length: N }, (_, p) => `<option value="${p}"${(Math.min(wkSplitAsg[i] || 0, N - 1)) === p ? ' selected' : ''}>Orang ${p + 1}</option>`).join('')}</select></div>`).join('');
+      }
+      h += '<div class="wk-h4">Tagihan per orang</div><table class="wk-pl">' + amt.map((a, i) => `<tr><td>Orang ${i + 1}</td><td>${formatRupiah(a)}</td></tr>`).join('') +
+        `<tr class="tot"><td>Total</td><td>${formatRupiah(t.total)}</td></tr></table><div class="wk-note" style="margin-top:8px">Sudah termasuk diskon dan pajak. Tagihan dibayar satu per satu oleh pelanggan, lalu kasir memproses satu pembayaran seperti biasa.</div>`;
+      wk$('split-body').innerHTML = h;
+    }
+    function wkShareSplit() {
+      const { t, amt } = wkSplitCalc();
+      const txt = ['*SPLIT BILL - ' + storeSettings.storeName.toUpperCase() + '*', 'Total: ' + formatRupiah(t.total), '', ...amt.map((a, i) => 'Orang ' + (i + 1) + ': ' + formatRupiah(a))].join('\n');
+      window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+    }
+
+    /* Mode gelap (filter invert; gambar dan struk dibalik lagi) */
+    const WK_THEME_KEY = 'warungku-theme';
+    function wkApplyTheme(dark) {
+      document.documentElement.classList.toggle('wk-dark', dark);
+      wk$('theme-icon').className = 'fa-solid ' + (dark ? 'fa-sun' : 'fa-moon') + ' text-sm';
+    }
+    function wkToggleTheme() {
+      const dark = !document.documentElement.classList.contains('wk-dark');
+      wkApplyTheme(dark); try { db.set(WK_THEME_KEY, dark ? 'dark' : 'light'); } catch (e) { }
+    }
+
+    /* Tur demo 3 langkah */
+    const WK_TOUR = [
+      { sel: '#product-grid', tab: 'menu', t: '1. Pilih menu', d: 'Ketuk kartu menu untuk menambah pesanan. Menu makanan dan minuman punya pilihan varian dan add-on.' },
+      { sel: '#cart-list', tab: 'cart', t: '2. Atur dan bayar', d: 'Pesanan muncul di sini. Atur catatan, diskon, dan tipe pesanan, lalu bayar tunai, QRIS, atau debit. Ada Tiket Dapur dan Split Bill untuk patungan.' },
+      { sel: '#btn-report', tab: 'menu', t: '3. Pantau usaha', d: 'Laporan menampilkan penjualan, menu terlaris, dan laba rugi. Tombol Menu mengatur harga, HPP, dan stok.' }
+    ];
+    let wkTourI = -1;
+    function wkTourClear() { document.querySelectorAll('.wk-tour-hl').forEach(e => e.classList.remove('wk-tour-hl')); }
+    function wkTourStart() { if (wkTopModal()) return; wkTourI = 0; wkTourShow(); }
+    function wkTourShow() {
+      wkTourClear();
+      const st = WK_TOUR[wkTourI]; if (!st) return wkTourEnd();
+      try { wkTab(st.tab); } catch (e) { }
+      const el = document.querySelector(st.sel); if (el) { el.classList.add('wk-tour-hl'); el.scrollIntoView({ block: 'nearest' }); }
+      let c = wk$('wk-tour-card');
+      if (!c) { c = document.createElement('div'); c.id = 'wk-tour-card'; c.setAttribute('role', 'dialog'); c.setAttribute('aria-label', 'Tur demo'); document.body.appendChild(c); }
+      const last = wkTourI === WK_TOUR.length - 1;
+      c.innerHTML = `<h4>${st.t}</h4><p>${st.d}</p><div class="wk-row"><button type="button" class="wk-btn ghost xs" onclick="wkTourEnd()">Lewati</button><button type="button" class="wk-btn amber xs grow" onclick="wkTourNext()">${last ? 'Selesai' : 'Lanjut'}</button></div>`;
+    }
+    function wkTourNext() { wkTourI++; wkTourShow(); }
+    function wkTourEnd() {
+      wkTourI = -1; wkTourClear(); const c = wk$('wk-tour-card'); if (c) c.remove();
+      try { db.set('warungku-tour', '1'); } catch (e) { }
+    }
+    window.addEventListener('keydown', e => { if (e.key === 'Escape' && wkTourI >= 0) wkTourEnd(); });
+
+    /* ---------- Penyimpanan lokal (aman jika diblokir browser) + Reset Demo ---------- */
+    const WK_KEY = 'warungku-pos-demo-v1';
+    let wkRestored = false, wkSaveT = null, wkNoSave = false;
+    function wkSaveNow() {
+      if (wkNoSave) return;
+      try {
+        db.set(WK_KEY, ({
+          v: 1, products: PRODUCTS.map(p => ({ id: p.id, sku: p.sku, name: p.name, category: p.category, price: p.price, cost: p.cost, stock: p.stock, desc: p.desc, custom: !!p.custom })), expenses: wkExpenses, ingredients: wkIngs, recipes: wkRecipes, purchases: wkPurchases,
+          transactions, drawerLogs, held: wkHeld, shift: wkShift, trxSeq: wkTrxSeq, heldSeq: wkHeldSeq,
+          settings: storeSettings, cart, discount: wkDiscount, orderType
+        }));
+      } catch (e) { }
+    }
+    function wkSaveSoon() { clearTimeout(wkSaveT); wkSaveT = setTimeout(wkSaveNow, 400); }
+    function wkLoadState() {
+      try {
+        const d = db.get(WK_KEY);
+        if (!d || d.v !== 1) return false;
+        if (d.products) {
+          const keep = new Set(d.products.map(x => x.id));
+          for (let i = PRODUCTS.length - 1; i >= 0; i--) if (!keep.has(PRODUCTS[i].id)) PRODUCTS.splice(i, 1);
+          d.products.forEach(x => { const p = wkProduct(x.id); if (p) Object.assign(p, x); else PRODUCTS.push({ ...x, image: WK_PLACEHOLDER }); });
+        } else if (d.stock) PRODUCTS.forEach(p => { if (d.stock[p.id] != null) p.stock = d.stock[p.id]; });
+        wkExpenses = d.expenses || [];
+        wkPurchases = d.purchases || [];
+        if (d.ingredients) { wkIngs = d.ingredients; wkRecipes = d.recipes || wkRecipes; }
+        transactions = d.transactions || []; drawerLogs = d.drawerLogs || drawerLogs;
+        wkHeld = (d.held || []).map(h => ({ ...h, time: new Date(h.time) }));
+        Object.assign(wkShift, d.shift || {});
+        wkTrxSeq = d.trxSeq || 0; wkHeldSeq = d.heldSeq || 0;
+        Object.assign(storeSettings, d.settings || {});
+        cart = d.cart || []; wkDiscount = d.discount || wkDiscount; orderType = d.orderType || orderType;
+        return true;
+      } catch (e) { return false; }
+    }
+    function wkResetDemo() {
+      wkAsk('Reset demo?', 'Transaksi, stok, laci kas, dan pengaturan akan kembali ke data contoh awal.', 'Ya, Reset', () => {
+        wkNoSave = true; try { db.del(WK_KEY); db.del('warungku-tour'); } catch (e) { }
+        location.reload();
+      }, true);
+    }
+
+    wkRestored = wkLoadState();
+    wkRecalcCosts(); wkSyncStock();
+    if (!wkRestored) { wkSeed(); transactions.forEach(t => wkConsume(t.items, -1, true)); wkExpenses = [{ id: 1, n: 'Gas LPG', a: 22000 }, { id: 2, n: 'Es batu & kemasan', a: 18000 }]; }
     wkRenderTableOptions();
     wk$('table-number').value = wkFirstFreeTable();
-    wkShift.openedAt = '08:00 WIB';
+    if (!wkRestored) wkShift.openedAt = '08:00 WIB';
     renderCategories();
     renderProducts();
     renderCart();
@@ -3689,6 +4651,22 @@
     updateDrawerStats();
     wkUpdateShiftUI();
 
+    if (wkRestored) {
+      wk$('topbar-store-name').innerText = storeSettings.storeName; wk$('topbar-branch-name').innerText = storeSettings.branchName;
+      wk$('topbar-cashier-name').innerText = storeSettings.cashierName; wk$('topbar-shift-cashier').innerText = storeSettings.cashierName;
+      setOrderType(orderType); renderCart(); renderProducts(); wkUpdateBadges();
+    }
+    const _wkFinish = finishCheckout;
+    finishCheckout = function () { const r = _wkFinish.apply(this, arguments); if (transactions[0]) wkConsume(transactions[0].items, -1); renderProducts(); return r; };
+    ['renderCart', 'renderProducts', 'calculateTotals', 'updateDrawerStats', 'wkUpdateBadges'].forEach(n => {
+      const f = window[n];
+      window[n] = function () { const r = f.apply(this, arguments); wkSaveSoon(); return r; };
+    });
+    window.addEventListener('pagehide', wkSaveNow);
+    document.addEventListener('visibilitychange', () => { if (document.hidden) wkSaveNow(); });
+    wkSaveSoon();
+    try { wkApplyTheme(db.get(WK_THEME_KEY) === 'dark'); } catch (e) { }
+    try { if (!wkRestored && !db.get('warungku-tour')) setTimeout(wkTourStart, 900); } catch (e) { }
   </script>
 </body>
 

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<!-- @jz-wm-start -->
+<!--
+  ╬══════════════════════════════════════════════════════════════╬
+  ║  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id        ║
+  ║  DEMO ONLY. All rights reserved.                             ║
+  ║  Dilarang keras menyalin, menjual, atau menggunakan ulang    ║
+  ║  desain ini tanpa izin tertulis dari pemilik.                ║
+  ║  Unauthorized use constitutes copyright infringement.        ║
+  ╪══════════════════════════════════════════════════════════════╪
+-->
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<script>
+(function(){
+  var L=console.log.bind(console);
+  L('%c                                              ','background:#0d9488;padding:2px 0;display:block');
+  L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px;display:block');
+  L('%c  Hak Cipta Dilindungi. Unauthorized Use Prohibited.  ','background:#0f766e;color:#99f6e4;font:500 10.5px/1.8 monospace;padding:0 12px;display:block');
+  L('%c                                              ','background:#0f766e;padding:2px 0;display:block');
+  L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang keras menyalin, mendistribusikan, atau menjual\ndesain ini tanpa izin tertulis.\n\nUnauthorized use constitutes copyright infringement\nunder the Berne Convention & DMCA.','color:#b45309;font-size:10.5px;line-height:1.7');
+})()
+</script>
+<!-- @jz-wm-end -->
+<!-- @jz-og-start -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aplikasi Absensi & HRIS Mobile v2 | K. Arzhaning Jagad (Arzha)">
+<meta property="og:description" content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, tim dan libur">
+<meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2">
+<meta property="og:site_name" content="arzhaning.my.id">
+<meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
+<!-- @jz-og-end -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AbsenPro v2 — Aplikasi Absensi & HRIS Mobile</title>
+<meta name="description" content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, tim dan libur nasional, riwayat slip gaji, cetak slip, bahasa Indonesia/English, dan pratinjau empat ukuran layar.">
+<meta name="author" content="K. Arzhaning Jagad (Arzha)">
+<!--
+  © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id
+  DEMO ONLY. All rights reserved.
+  Dilarang keras menyalin, menjual, atau menggunakan ulang desain ini tanpa izin tertulis dari pemilik.
+-->
+<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+<meta name="robots" content="noindex, nofollow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Aplikasi Absensi & HRIS Mobile v2 | K. Arzhaning Jagad (Arzha)">
+<meta property="og:description" content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, tim dan libur nasional, riwayat slip gaji, cetak slip, bahasa Indonesia/English, dan pratinjau empat ukuran layar.">
+<meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2">
+<meta property="og:site_name" content="arzhaning.my.id">
+<meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
+<meta property="og:image:width" content="1280">
+<meta property="og:image:height" content="800">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
+<script>
+(function(){var L=console.log.bind(console);
+L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px');
+L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang menyalin, mendistribusikan, atau menjual desain ini tanpa izin tertulis.','color:#b45309;font-size:10.5px;line-height:1.7')})()
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EDF1F5;--card:#fff;--ink:#12263F;--mute:#6A7B90;--line:#DCE3EB;--sun:#F2B01E;--sunink:#3A2A00;--ok:#1F9D77;--late:#E5584B;--chip:#E4EAF1;--frame:#12263F}
+:root:not([data-theme="light"]){}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1624;--card:#13243A;--ink:#EAF0F7;--mute:#8FA3BA;--line:#233750;--chip:#1B3049;--frame:#050B13}}
+:root[data-theme="dark"]{--bg:#0B1624;--card:#13243A;--ink:#EAF0F7;--mute:#8FA3BA;--line:#233750;--chip:#1B3049;--frame:#050B13}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:500 14px/1.45 Figtree,system-ui,sans-serif;display:flex;justify-content:center;align-items:center;padding:0}
+@media(min-width:520px){body{padding:20px;background:var(--frame)}}
+.app{width:100%;max-width:400px;height:100%;max-height:820px;background:var(--bg);display:flex;flex-direction:column;overflow:hidden;position:relative;padding-top:env(safe-area-inset-top,0px)}
+@media(min-width:520px){.app{border-radius:36px;box-shadow:0 0 0 7px #0003,0 30px 60px #0006}}
+h1,h2,h3,.num{font-family:"Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.02em}
+main{flex:1;overflow-y:auto;padding:18px 18px 12px;scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+.tab{display:none}.tab.on{display:block}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.top h1{font-size:22px;font-weight:700}
+.top p{color:var(--mute);font-size:13px}
+.av{width:42px;height:42px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 15px "Bricolage Grotesque"}
+.geo{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:14px}
+.geo i{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 4px #1F9D7733;flex:none}
+.geo b{display:block;font-size:13px}.geo span{font-size:12px;color:var(--mute)}
+.seg{display:flex;background:var(--chip);border-radius:12px;padding:3px;margin-bottom:6px}
+.seg button{flex:1;border:0;background:none;color:var(--mute);font:600 13px Figtree;padding:8px;border-radius:9px;cursor:pointer}
+.seg button.on{background:var(--card);color:var(--ink);box-shadow:0 1px 3px #0002}
+.dial{position:relative;width:272px;height:272px;margin:10px auto 6px}
+.dial svg{width:100%;height:100%;transform:rotate(-90deg)}
+.dial circle{fill:none;stroke-width:12;stroke-linecap:round}
+.dial .tr{stroke:var(--chip)}.dial .pr{stroke:var(--sun);transition:stroke-dashoffset .8s}
+.dial.done .pr{stroke:var(--ok)}
+.mid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
+.mid small{color:var(--mute);font-size:12px}
+.clock{font-size:50px;font-weight:800;line-height:1}
+.mid em{font-style:normal;color:var(--mute);font-size:12px;margin-bottom:10px}
+.go{border:0;border-radius:99px;background:var(--sun);color:var(--sunink);font:700 15px "Bricolage Grotesque";padding:12px 26px;cursor:pointer;box-shadow:0 6px 16px #F2B01E55;transition:transform .12s}
+.go:active{transform:scale(.95)}
+.go.out{background:var(--ink);color:var(--bg);box-shadow:none}
+.go[disabled]{background:var(--chip);color:var(--mute);box-shadow:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-top:12px}
+.card h3{font-size:15px;margin-bottom:10px}
+.tl{list-style:none;padding:0}
+.tl li{display:flex;gap:12px;padding:8px 0;position:relative}
+.tl li+li::before{content:"";position:absolute;left:5px;top:-10px;height:20px;border-left:2px solid var(--line)}
+.tl i{width:12px;height:12px;border-radius:50%;border:2px solid var(--line);margin-top:4px;flex:none;background:var(--card)}
+.tl li.d i{background:var(--ok);border-color:var(--ok)}
+.tl li.l i{background:var(--late);border-color:var(--late)}
+.tl b{display:block}.tl span{color:var(--mute);font-size:12px}
+.tl .t{margin-left:auto;font:700 15px "Bricolage Grotesque"}
+.wk{display:flex;gap:6px}
+.wk div{flex:1;text-align:center;border-radius:12px;padding:8px 0;background:var(--chip);font-size:11px;color:var(--mute)}
+.wk b{display:block;font:700 15px "Bricolage Grotesque";color:var(--ink);margin:2px 0}
+.wk .p{background:var(--ok);color:#fff}.wk .p b{color:#fff}
+.wk .x{background:var(--late);color:#fff}.wk .x b{color:#fff}
+.wk .n{outline:2px solid var(--sun)}
+.big{font-size:34px;font-weight:800}
+.bar{height:10px;border-radius:9px;background:var(--chip);overflow:hidden;margin:8px 0 4px}
+.bar span{display:block;height:100%;background:var(--sun);border-radius:9px;transition:width .5s}
+label{display:block;font-size:12px;color:var(--mute);margin:12px 0 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 13px Figtree;padding:8px 13px;border-radius:99px;cursor:pointer}
+.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+input,textarea{width:100%;font:500 14px Figtree;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;margin-top:14px;border:0;border-radius:14px;background:var(--ink);color:var(--bg);font:700 15px "Bricolage Grotesque";padding:13px;cursor:pointer}
+.row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0}
+.tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:#F2B01E33;color:#9A6B00}
+.tag.ok{background:#1F9D7722;color:var(--ok)}
+.neg{color:var(--late)}
+.eye{background:none;border:1px solid var(--line);color:var(--mute);border-radius:99px;font:600 12px Figtree;padding:5px 11px;cursor:pointer}
+nav{display:flex;background:var(--card);border-top:1px solid var(--line);padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:600 11px Figtree;padding:6px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+nav button.on{color:var(--ink)}
+nav button.on span{background:var(--sun);color:var(--sunink);border-radius:99px;padding:3px 16px;margin:-3px 0}
+nav button span{display:grid;place-items:center;padding:3px 16px;margin:-3px 0}
+.toast{position:absolute;left:18px;right:18px;top:14px;background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:14px;font-weight:600;transform:translateY(-90px);transition:transform .3s;z-index:9}
+.toast.on{transform:none}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.cal small{text-align:center;color:var(--mute);font-size:12px}.cd{aspect-ratio:1;border:0;border-radius:12px;background:var(--chip);color:var(--ink);font:700 14px "Bricolage Grotesque";cursor:pointer}.cd.p{background:var(--ok);color:#fff}.cd.l{background:var(--late);color:#fff}.cd.i{background:var(--sun);color:var(--sunink)}.cd.w,.cd.f{background:none;color:var(--mute);font-weight:500}.cd.t{outline:2px solid var(--ink)}
+.st{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.st div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}.st b{display:block;font:800 26px "Bricolage Grotesque"}.st span{font-size:12px;color:var(--mute)}
+.lg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin-top:12px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.sheet{position:absolute;inset:0;background:#0007;display:flex;align-items:flex-end;z-index:8}.sheet[hidden]{display:none}.sb{background:var(--card);width:100%;border-radius:24px 24px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0px));animation:up .25s}@keyframes up{from{transform:translateY(40px);opacity:0}}
+details summary{font-weight:700;cursor:pointer;font-family:"Bricolage Grotesque";font-size:15px}
+.top .r{display:flex;gap:10px;align-items:center}
+.bell{position:relative;width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:grid;place-items:center}.bell svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}.bell b{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:var(--late);color:#fff;font:700 11px Figtree;display:grid;place-items:center;padding:0 4px}.bell b[hidden]{display:none}
+#__jz-bar{position:fixed;bottom:0;left:0;right:0;z-index:2147483640;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;height:46px;background:rgba(15,23,42,.95);border-top:1px solid rgba(255,255,255,.12);box-shadow:0 -4px 18px rgba(0,0,0,.4);backdrop-filter:blur(12px);font:600 13px/1 system-ui,-apple-system,sans-serif;color:#cbd5e1}
+#__jz-bar *{box-sizing:border-box}#__jz-bar .jz-bar-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#__jz-bar .jz-btn-gallery{display:inline-flex;align-items:center;gap:6px;color:#2dd4bf;text-decoration:none;white-space:nowrap;padding:6px 10px;border-radius:8px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25)}
+#__jz-bar .jz-btn-home{display:inline-flex;align-items:center;gap:5px;color:#94a3b8;text-decoration:none;white-space:nowrap;padding:6px 9px;border-radius:8px;font-size:12px;font-weight:500}
+#__jz-bar .jz-dot{width:4px;height:4px;border-radius:50%;background:#2dd4bf;opacity:.7}#__jz-bar .jz-sep{color:rgba(255,255,255,.18)}
+#__jz-bar .jz-title{font-size:12px;opacity:.75;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
+#__jz-bar .jz-wa{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#052e16!important;font-weight:700;font-size:12.5px;text-decoration:none;white-space:nowrap;padding:7px 13px;border-radius:999px;box-shadow:0 2px 10px rgba(37,211,102,.35);flex-shrink:0}
+@media(max-width:720px){#__jz-bar .jz-title{display:none}}@media(max-width:500px){#__jz-bar{padding:0 10px;gap:6px}#__jz-bar .jz-btn-home .jz-domain{display:none}#__jz-bar .jz-wa{padding:6px 11px;font-size:11.5px}}
+body{padding-bottom:46px!important;box-sizing:border-box!important}
+.pho{display:none}
+@media print{body{background:#fff!important;padding:0!important;display:block!important}.app{max-height:none!important;height:auto!important;box-shadow:none!important;border-radius:0!important}nav,#__jz-bar,.toast,.sheet,.eye,.tab{display:none!important}#t2{display:block!important}.pho{display:block;margin-bottom:12px;font-size:14px}main{overflow:visible!important}}
+.app{container-type:inline-size}
+#devbar{display:none}
+@media(min-width:520px){
+body{padding-top:68px!important}
+#devbar{display:flex;position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:20;align-items:center;gap:14px;background:#ffffff1c;backdrop-filter:blur(10px);border:1px solid #ffffff26;border-radius:16px;padding:6px 8px 6px 14px;color:#fff;max-width:calc(100% - 20px);flex-wrap:wrap;justify-content:center}
+#devbar .dl{display:flex;gap:8px;align-items:center;font:800 15px "Bricolage Grotesque"}
+#devbar em{font:600 11px Figtree;background:var(--sun);color:var(--sunink);border-radius:99px;padding:2px 8px;font-style:normal}
+.dseg{display:flex;gap:2px;background:#0003;border-radius:11px;padding:3px}
+.dseg button,#devtheme{border:0;background:none;color:#cfd9e6;font:600 12.5px Figtree;padding:7px 11px;border-radius:8px;cursor:pointer}
+.dseg button.on{background:#fff;color:#12263F}
+.dr{display:flex;align-items:center;gap:8px;font:500 12px Figtree;color:#9fb0c4}
+#devtheme{background:#ffffff1c;color:#fff}
+.app[data-dev=s]{max-width:360px;max-height:640px}
+.app[data-dev=m]{max-width:390px;max-height:844px}
+.app[data-dev=t]{max-width:820px;max-height:1024px;border-radius:26px}
+.app[data-dev=d]{max-width:1180px;max-height:760px;border-radius:14px}
+}
+@media(max-width:760px){.dr span{display:none}}
+@media(max-width:700px){#devbar .dl{display:none}}
+@container (min-width:700px){
+nav{position:absolute;left:0;top:0;bottom:0;width:210px;flex-direction:column;justify-content:flex-start;border-top:0;border-right:1px solid var(--line);padding:20px 12px;gap:4px;z-index:2}
+nav::before{content:"AbsenPro";font:800 22px "Bricolage Grotesque";padding:4px 12px 20px}
+nav button{flex:none;flex-direction:row;justify-content:flex-start;gap:12px;font-size:14px;padding:11px 12px;border-radius:12px}
+nav button span,nav button.on span{padding:0;margin:0;background:none;border-radius:0;color:inherit}
+nav button.on{background:var(--sun);color:var(--sunink)}
+main{margin-left:210px;padding:28px 34px}
+.tab{max-width:740px;margin:0 auto}
+#t0.on{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px;align-items:start}
+#t0 .top,#t0 .geo{grid-column:1/-1}
+#t0 .seg,#t0 .dial{grid-column:1}
+#t0 .card{grid-column:2;margin-top:0}
+.sheet{align-items:center;justify-content:center}.sb{max-width:440px;border-radius:24px}
+}
+@media print{main{margin-left:0!important}}
+.pa{width:36px;height:36px;border-radius:50%;background:var(--chip);display:grid;place-items:center;font:700 13px "Bricolage Grotesque";flex:none}
+.tag.mu{background:var(--chip);color:var(--mute)}.ppl{display:flex;gap:10px;align-items:center}.sm{color:var(--mute);font-size:12px}
+.mapb svg{width:100%;display:block;margin:8px 0}
+.sb{max-height:92%;overflow-y:auto}
+.fv{width:100%;display:flex;align-items:center;gap:10px;border:1px dashed var(--line);background:var(--card);color:var(--ink);font:600 14px Figtree;padding:11px 12px;border-radius:14px;cursor:pointer}
+.fvi{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--sun);flex:none}
+.fv.sc .fvi{animation:spin .8s linear infinite}.fv.ok{border:1px solid var(--ok);color:var(--ok)}.fv.ok .fvi{border-color:var(--ok);background:var(--ok)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pop{0%{transform:scale(.96)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.dial.pop{animation:pop .5s}.btn[disabled]{opacity:.45;cursor:not-allowed}
+.ld{position:relative;overflow:hidden}.ld::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--chip),transparent);animation:shm .8s infinite}.ld .m,.ld #net{color:transparent}
+@keyframes shm{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+@container (max-width:699px){nav button span,nav button.on span{padding:3px 12px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+#login{position:absolute;inset:0;z-index:40;background:var(--bg);overflow-y:auto;padding:calc(28px + env(safe-area-inset-top,0px)) 20px 28px}#login[hidden]{display:none}
+.lg-in{max-width:420px;margin:0 auto}.lg-brand{font:800 26px "Bricolage Grotesque"}.lg-brand span{color:var(--sun)}
+#login h1{font-size:28px;font-weight:800;margin:18px 0 4px}
+.pw{position:relative}.pw .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+.err{color:var(--late);font-weight:600;font-size:13px;min-height:20px;margin-top:8px}
+.acc{width:100%;display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:10px 12px;cursor:pointer;margin-top:8px;font:500 14px Figtree}
+.acc.on{border-color:var(--sun);box-shadow:0 0 0 2px var(--sun)}
+.toast{z-index:60}.btn.dg{background:var(--late);color:#fff}
+.app{--rl-card:var(--card);--rl-ink:var(--ink);--rl-mute:var(--mute);--rl-line:var(--line);--rl-chip:var(--chip);--rl-acc:var(--sun);--rl-accink:var(--sunink);--rl-ok:var(--ok);--rl-late:var(--late)}
+.mm{display:flex;justify-content:space-between;width:100%;background:none;border:0;border-top:1px solid var(--line);color:var(--ink);font:600 14px Figtree;cursor:pointer;text-align:left;padding:13px 0}.mm:first-of-type{border-top:0}.bk{margin-bottom:10px}
+.app[data-role=spv]{--sun:#2FB5A3;--sunink:#04302B}.app[data-role=admin]{--sun:#8B7BF0;--sunink:#17103F}
+nav button{position:relative}.nb{position:absolute;top:-2px;left:calc(50% + 6px);background:var(--late);color:#fff;border-radius:99px;font:700 10px Figtree;padding:1px 5px;min-width:16px;text-align:center}.nb[hidden]{display:none}
+@container (min-width:700px){.nb{position:static;margin-left:auto}}
+:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<script>
+/* AbsenPro role views (c) 2026 K. Arzhaning Jagad - demo only */
+(function(g){
+var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
+var ini=function(n){return String(n).split(' ').map(function(x){return x[0]}).slice(0,2).join('').toUpperCase()};
+var EMP=[['arzha','Arzha','Product Designer','Digital','Hadir','07:52'],['raka','Raka Mahendra','Engineer','Digital','WFH','08:03'],['salsa','Salsa Anindya','QA','Digital','Hadir','07:58'],['bima','Bima Satria','Engineer','Digital','Cuti','\u2013'],['laras','Laras Wulandari','Designer','Digital','Dinas luar','08:10'],['nadia','Nadia Putri','Akuntan','Keuangan','Hadir','07:45'],['fajar','Fajar Nugroho','Staf Keuangan','Keuangan','Terlambat','08:41'],['maya','Maya Lestari','Rekrutmen','SDM','Hadir','07:55'],['yoga','Yoga Pratama','Sales','Penjualan','Terlambat','08:27'],['intan','Intan Permata','Sales','Penjualan','Hadir','08:02'],['dimas','Dimas Aditya','Support','Layanan','WFH','08:00'],['rani','Rani Kusuma','Support','Layanan','Hadir','07:49'],['dina','Dina Prameswari','Supervisor Digital','Digital','Hadir','07:40'],['hendra','Hendra Wijaya','Admin HR','SDM','Hadir','07:35']];
+var LV={spv:'Supervisor',admin:'Admin',dir:'Direksi'};var O={prefix:'x',live:null,toast:function(){},onChange:function(){}},REQ=[],RK='',F='Semua',Q='';
+function load(){try{var r=JSON.parse(localStorage.getItem(RK));if(r&&r.length)return r}catch(e){}return null}
+function save(){try{localStorage.setItem(RK,JSON.stringify(REQ))}catch(e){}}
+function seed(){var d=function(i,u,w,v,t,x,s,l){return{id:i,uid:u,who:w,div:v,type:t,detail:x,st:s,lvl:l}};return[d(1,'bima','Bima Satria','Digital','Cuti tahunan','2\u20134 Nov \u00b7 3 hari','Menunggu','spv'),d(2,'raka','Raka Mahendra','Digital','Lembur','27 Okt \u00b7 2 j 30 m','Menunggu','spv'),d(3,'fajar','Fajar Nugroho','Keuangan','Koreksi absen','26 Okt \u00b7 lupa absen pulang 17:05','Menunggu','spv'),d(4,'yoga','Yoga Pratama','Penjualan','Izin','30 Okt \u00b7 urusan keluarga','Menunggu','spv'),d(6,'dina','Dina Prameswari','Digital','Cuti tahunan','20\u201321 Nov \u00b7 2 hari','Menunggu','admin'),d(5,'arzha','Arzha','Digital','Cuti tahunan','12\u201313 Agu \u00b7 2 hari','Disetujui','spv')]}
+function init(o){for(var k in o)O[k]=o[k];RK='absenpro-req2-'+O.prefix;REQ=load()||seed();window.addEventListener('storage',function(e){if(e.key===RK){REQ=load()||REQ;O.onChange()}})}
+function add(u,type,detail){REQ.unshift({id:Date.now(),uid:u.id,who:u.name,div:String(u.div).replace('Divisi ',''),type:type,detail:detail,st:'Menunggu',lvl:u.r==='admin'?'dir':u.r==='spv'?'admin':'spv'});save();O.onChange()}
+function mine(id){return REQ.filter(function(r){return r.uid===id})}
+function pending(scope){return REQ.filter(function(r){return r.st==='Menunggu'&&(!scope||scope(r))})}
+function decide(id,ok){REQ.forEach(function(r){if(r.id===id)r.st=ok?'Disetujui':'Ditolak'});save();O.onChange()}
+function status(e){var l=O.live&&O.live(e[0]);return l||{st:e[4],t:e[5]}}
+function counts(L){var c={h:0,l:0,c:0,b:0};L.forEach(function(e){var s=status(e).st;if(s==='Terlambat'){c.l++;c.h++}else if(s==='Cuti')c.c++;else if(s==='Belum absen')c.b++;else c.h++});return c}
+function tagc(s){return s==='Hadir'?'ok':s==='Terlambat'?'late':(s==='Cuti'||s==='Belum absen')?'mu':''}
+function person(e){var s=status(e);return '<div class="rl-row"><div class="rl-p"><span class="rl-a">'+ini(e[1])+'</span><div><b>'+esc(e[1])+'</b><br><small>'+esc(e[2])+' \u00b7 '+esc(e[3])+(s.t&&s.t!=='\u2013'?' \u00b7 '+s.t:'')+'</small></div></div><span class="rl-tag '+tagc(s.st)+'">'+s.st+'</span></div>'}
+function today(){return new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}
+function hd(s,h){return '<div class="rl-hd"><small>'+s+'</small><h2>'+h+'</h2></div>'}
+function team(el,div,label){var L=EMP.filter(function(e){return e[3]===div}),c=counts(L);
+ el.innerHTML='<div class="rl">'+hd(label,'Tim saya')+'<div class="rl-st"><div><b>'+c.h+'</b><small>Hadir</small></div><div><b>'+c.l+'</b><small>Terlambat</small></div><div><b>'+c.b+'</b><small>Belum absen</small></div><div><b>'+c.c+'</b><small>Cuti</small></div></div><div class="rl-card"><h3>Hari ini</h3>'+L.map(person).join('')+'</div></div>'}
+function approvals(el,scope,label){var P=pending(scope),D=REQ.filter(function(r){return r.st!=='Menunggu'&&(!scope||scope(r))}).slice(0,6);
+ el.innerHTML='<div class="rl">'+hd(label,'Persetujuan')+'<div class="rl-card">'+(P.length?P.map(function(r){return '<div class="rl-req"><div class="rl-p"><span class="rl-a">'+ini(r.who)+'</span><div><b>'+esc(r.who)+' \u00b7 '+esc(r.type)+'</b><br><small>'+esc(r.detail)+'</small></div></div>'+((O.can?O.can(r):true)?'<div class="rl-acts"><button class="y" data-id="'+r.id+'" data-ok="1">Setujui</button><button class="n" data-id="'+r.id+'">Tolak</button></div>':'<span class="rl-tag mu">Menunggu '+LV[r.lvl||'spv']+'</span>')+'</div>'}).join(''):'<p class="rl-em">Semua pengajuan sudah ditangani.</p>')+'</div>'
+ +(D.length?'<div class="rl-card"><h3>Keputusan terakhir</h3>'+D.map(function(r){return '<div class="rl-row"><div><b>'+esc(r.who)+'</b><br><small>'+esc(r.type)+' \u00b7 '+esc(r.detail)+'</small></div><span class="rl-tag '+(r.st==='Disetujui'?'ok':'mu')+'">'+r.st+'</span></div>'}).join('')+'</div>':'')+'</div>';
+ el.querySelector('.rl').onclick=function(e){var b=e.target.closest('button[data-id]');if(!b)return;var id=+b.dataset.id,r=REQ.filter(function(x){return x.id===id})[0];if(!r||(O.can&&!O.can(r)))return;decide(id,!!b.dataset.ok);O.toast((b.dataset.ok?'Disetujui: ':'Ditolak: ')+r.type+' '+r.who)}}
+function summary(el){var c=counts(EMP),n=EMP.length,pct=Math.round(c.h/n*100),days=[['Sen',94],['Sel',96],['Rab',91],['Kam',89],['Jum',95],['Sen',92],['Hari ini',pct]],dv={};
+ EMP.forEach(function(e){(dv[e[3]]=dv[e[3]]||[]).push(e)});
+ el.innerHTML='<div class="rl">'+hd(today(),'Ringkasan perusahaan')+'<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>'+c.h+'</b><span>dari '+n+' \u00b7 '+pct+'%</span></div><div class="rl-card"><small>Terlambat</small><b>'+c.l+'</b><span>setelah 08:15</span></div><div class="rl-card"><small>Belum absen</small><b>'+c.b+'</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>'+pending().length+'</b><span>persetujuan</span></div></div>'
+ +'<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">'+days.map(function(d,i){return '<div class="'+(i==6?'t':'')+'"><b>'+d[1]+'%</b><i style="height:'+((d[1]-70)*3.6)+'px"></i><small>'+d[0]+'</small></div>'}).join('')+'</div></div>'
+ +'<div class="rl-card"><h3>Per divisi</h3>'+Object.keys(dv).map(function(k){var p=Math.round(counts(dv[k]).h/dv[k].length*100);return '<div class="rl-dv"><span>'+k+'</span><i><u style="width:'+p+'%"></u></i><b>'+p+'%</b></div>'}).join('')+'</div></div>'}
+function employees(el){var ST=['Semua','Hadir','Terlambat','WFH','Dinas luar','Cuti','Belum absen'];
+ el.innerHTML='<div class="rl">'+hd(EMP.length+' karyawan','Pegawai')+'<input class="rl-q" type="search" placeholder="Cari nama atau divisi" aria-label="Cari pegawai"><div class="rl-ch">'+ST.map(function(s){return '<button class="'+(s===F?'on':'')+'">'+s+'</button>'}).join('')+'</div><div class="rl-card rl-lst"></div></div>';
+ var q=el.querySelector('.rl-q'),lst=el.querySelector('.rl-lst');q.value=Q;
+ function d(){var L=EMP.filter(function(e){var s=status(e).st;return(F==='Semua'||s===F)&&(!Q||(e[1]+' '+e[3]+' '+e[2]).toLowerCase().indexOf(Q)>-1)});lst.innerHTML=L.length?L.map(person).join(''):'<p class="rl-em">Tidak ada yang cocok.</p>'}
+ q.oninput=function(){Q=q.value.trim().toLowerCase();d()};
+ el.querySelector('.rl-ch').onclick=function(e){var b=e.target.closest('button');if(!b)return;F=b.textContent;[].forEach.call(this.children,function(x){x.className=x===b?'on':''});d()};d()}
+var st=document.createElement('style');st.textContent='.rl-hd{margin-bottom:12px}.rl-hd small{color:var(--rl-mute)}.rl-hd h2{font-size:24px;font-weight:800;margin:0;letter-spacing:-.02em;color:var(--rl-ink)}'
++'.rl-card{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:18px;padding:14px;margin-bottom:12px;color:var(--rl-ink)}.rl-card h3{font-size:15px;margin:0 0 8px}'
++'.rl-st{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.rl-st div{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:14px;padding:9px 4px;text-align:center;color:var(--rl-ink)}.rl-st b{display:block;font-size:22px;font-weight:800}.rl-st small{font-size:11px;color:var(--rl-mute)}'
++'.rl-row,.rl-req{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--rl-line);color:var(--rl-ink)}.rl-row:first-of-type,.rl-req:first-of-type{border-top:0}'
++'.rl-p{display:flex;gap:10px;align-items:center;min-width:0}.rl-a{width:34px;height:34px;border-radius:50%;background:var(--rl-chip);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}.rl small{color:var(--rl-mute);font-size:12px}'
++'.rl-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--rl-chip);color:var(--rl-ink);white-space:nowrap}.rl-tag.ok{background:#1F9D7722;color:var(--rl-ok)}.rl-tag.late{background:#E5584B22;color:var(--rl-late)}.rl-tag.mu{background:var(--rl-chip);color:var(--rl-mute)}'
++'.rl-acts{display:flex;gap:6px;flex:none}.rl-acts button{border:0;border-radius:10px;font-weight:700;font-size:12px;padding:9px 12px;cursor:pointer;min-height:36px}.rl-acts .y{background:var(--rl-ok);color:#fff}.rl-acts .n{background:var(--rl-chip);color:var(--rl-ink)}'
++'.rl-em{text-align:center;color:var(--rl-mute);padding:18px 0;margin:0}.rl-kp{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.rl-kp .rl-card{margin:0}.rl-kp small{color:var(--rl-mute)}.rl-kp b{display:block;font-size:30px;font-weight:800}.rl-kp span{font-size:12px;color:var(--rl-mute)}'
++'.rl-hl{background:var(--rl-acc)!important;color:var(--rl-accink)!important;border-color:var(--rl-acc)!important}.rl-hl small,.rl-hl span{color:inherit!important;opacity:.8}'
++'.rl-bars{display:flex;align-items:flex-end;gap:8px;height:150px}.rl-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}.rl-bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--rl-chip)}.rl-bars .t i{background:var(--rl-acc)}.rl-bars b{font-size:11px}.rl-bars small{font-size:11px}'
++'.rl-dv{display:flex;align-items:center;gap:10px;margin:8px 0}.rl-dv span{width:80px;font-size:13px}.rl-dv i{flex:1;height:10px;border-radius:9px;background:var(--rl-chip);overflow:hidden}.rl-dv u{display:block;height:100%;background:var(--rl-acc);border-radius:9px}.rl-dv b{font-size:12px;width:38px;text-align:right}'
++'.rl-q{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);margin-bottom:10px}'
++'.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
++'@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
+document.head.appendChild(st);
+g.RL={init:init,add:add,mine:mine,pending:pending,team:team,approvals:approvals,summary:summary,employees:employees,esc:esc};
+})(window);
+
+</script>
+  <!-- @jz-tw-css -->
+  <link rel="stylesheet" href="./css/demo-absenpro-hris-v2.css">
+</head>
+<body>
+<!-- @jz-bar-start -->
+<style>
+/* Sembunyikan watermark badge lama jika masih ada di cache */
+#__jzwm{display:none!important}
+body{padding-bottom:46px!important;box-sizing:border-box!important}
+
+#__jz-bar{position:fixed;bottom:0;left:0;right:0;z-index:2147483640;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;height:46px;background:rgba(15,23,42,.95);border-top:1px solid rgba(255,255,255,.12);box-shadow:0 -4px 18px rgba(0,0,0,.4);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:600 13px/1 system-ui,-apple-system,sans-serif;color:#cbd5e1;box-sizing:border-box}
+#__jz-bar *{box-sizing:border-box}
+#__jz-bar .jz-bar-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
+#__jz-bar .jz-btn-gallery{display:inline-flex;align-items:center;gap:6px;color:#2dd4bf;text-decoration:none;white-space:nowrap;padding:6px 10px;border-radius:8px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25);transition:all .15s}
+#__jz-bar .jz-btn-gallery:hover{background:rgba(45,212,191,.2);color:#5eead4}
+#__jz-bar .jz-btn-home{display:inline-flex;align-items:center;gap:5px;color:#94a3b8;text-decoration:none;white-space:nowrap;padding:6px 9px;border-radius:8px;font-size:12px;font-weight:500;transition:all .15s}
+#__jz-bar .jz-btn-home:hover{color:#f8fafc;background:rgba(255,255,255,.06)}
+#__jz-bar .jz-dot{width:4px;height:4px;border-radius:50%;background:#2dd4bf;opacity:.7}
+#__jz-bar .jz-sep{color:rgba(255,255,255,.18);font-weight:300}
+#__jz-bar .jz-title{font-size:12px;opacity:.75;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px;text-align:center}
+#__jz-bar .jz-wa{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#052e16!important;font-weight:700;font-size:12.5px;text-decoration:none;white-space:nowrap;padding:7px 13px;border-radius:999px;box-shadow:0 2px 10px rgba(37,211,102,.35);transition:all .15s;flex-shrink:0}
+#__jz-bar .jz-wa:hover{background:#22c35e;box-shadow:0 4px 14px rgba(37,211,102,.5);transform:translateY(-1px)}
+@media(max-width:720px){#__jz-bar .jz-title{display:none}}
+@media(max-width:500px){#__jz-bar{padding:0 10px;gap:6px}#__jz-bar .jz-btn-gallery span{font-size:12px}#__jz-bar .jz-btn-home .jz-domain{display:none}#__jz-bar .jz-wa{padding:6px 11px;font-size:11.5px}}
+</style>
+<div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
+  <div class="jz-bar-nav">
+    <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <span>Galeri</span>
+    </a>
+    <span class="jz-sep" aria-hidden="true">|</span>
+    <a class="jz-btn-home" href="https://arzhaning.my.id" target="_blank" rel="noopener noreferrer" title="Kunjungi situs utama K. Arzhaning Jagad" aria-label="Kunjungi situs utama arzhaning.my.id">
+      <span class="jz-dot" aria-hidden="true"></span>
+      <span class="jz-domain">arzhaning.my.id</span>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+    </a>
+  </div>
+  <span class="jz-title" title="Aplikasi Absensi & HRIS Mobile v2">Aplikasi Absensi & HRIS Mobile v2</span>
+  <a class="jz-wa" href="https://wa.me/6282312312734?text=Halo%20Arzha%2C%20saya%20tertarik%20dengan%20demo%20%22Aplikasi%20Absensi%20%26%20HRIS%20Mobile%20v2%22.%20Boleh%20diskusi%20untuk%20dibuatkan%20yang%20seperti%20ini%3F" target="_blank" rel="noopener noreferrer" aria-label="Tanya via WhatsApp tentang Aplikasi Absensi & HRIS Mobile v2">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.27-1.38A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.3 15l-.3-.18-3.1.8.83-3.02-.2-.31A8.1 8.1 0 0 1 12.04 3.8zm-3.1 3.9c-.2 0-.5.07-.76.35-.26.28-1 .98-1 2.4s1.03 2.78 1.17 2.97c.14.2 2 3.2 4.93 4.36 2.44.96 2.93.77 3.46.72.53-.05 1.7-.7 1.94-1.37.24-.67.24-1.25.17-1.37-.07-.12-.26-.2-.55-.34-.29-.14-1.7-.84-1.96-.93-.27-.1-.46-.14-.65.14-.19.29-.74.93-.9 1.12-.17.2-.34.22-.63.07-.29-.14-1.22-.45-2.32-1.43-.86-.76-1.44-1.7-1.6-1.99-.17-.29-.02-.44.12-.58.13-.13.29-.34.43-.5.14-.17.19-.29.29-.48.1-.2.05-.36-.02-.5-.07-.15-.65-1.57-.9-2.15-.23-.56-.47-.48-.65-.49h-.55z"/></svg>
+    <span>Mau seperti ini?</span>
+  </a>
+</div>
+<!-- @jz-bar-end -->
+<div id="devbar" role="toolbar" aria-label="Pratinjau perangkat"><div class="dl"><b>AbsenPro</b><em>v2</em></div><div class="dseg"><button data-d="s">Ponsel kecil</button><button data-d="m" class="on">Ponsel</button><button data-d="t">Tablet</button><button data-d="d">Desktop</button></div><div class="dr"><span id="dsz">390 × 844</span><button id="devtheme">Mode</button></div></div>
+<div class="app" data-dev="m">
+<div id="login" role="dialog" aria-modal="true" aria-labelledby="lgt"><div class="lg-in">
+<div class="lg-brand">Absen<span>Pro</span></div>
+<h1 id="lgt">Selamat datang kembali</h1><p class="sm">Masuk untuk mulai absen, ajukan cuti, dan lihat slip gaji.</p>
+<label for="le">Email</label><input id="le" type="email" autocomplete="username" placeholder="nama@absenpro.demo">
+<label for="lp">Kata sandi</label><div class="pw"><input id="lp" type="password" autocomplete="current-password" placeholder="Kata sandi"><button class="eye" id="lv" type="button">Lihat</button></div>
+<p class="err" id="lerr" role="alert"></p>
+<button class="btn" id="lgo" style="margin-top:6px">Masuk ke aplikasi</button>
+<h3 style="margin:22px 0 4px;font-size:15px">Akun demo</h3><p class="sm">Pilih akun untuk mengisi form otomatis dan lihat tampilan tiap peran: Staf, Supervisor, atau Admin. Kata sandi semua akun: demo123</p>
+<div id="lacc"></div>
+<p class="sm" style="margin-top:14px">Ini simulasi untuk demo. Tidak ada data yang dikirim ke server.</p></div></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="sheet" id="sheet" hidden><div class="sb" role="dialog" aria-modal="true" aria-labelledby="shT"><h3 id="shT" style="font-size:18px;margin-bottom:6px"></h3>
+<div class="row"><span>Waktu</span><b id="shTime"></b></div><div class="row"><span>Lokasi</span><b>Kinerja Tower · 38 m</b></div><div class="row"><span>Mode kerja</span><b id="shMode"></b></div>
+<div class="mapb"><svg viewBox="0 0 300 120" role="img" aria-label="Peta lokasi: Anda 38 meter dari titik absen kantor"><rect width="300" height="120" rx="14" fill="var(--chip)"/><path d="M0 85H300M0 38H300M80 0V120M215 0V120" stroke="var(--line)" stroke-width="6"/><circle cx="150" cy="60" r="46" fill="#1F9D7722" stroke="#1F9D77" stroke-dasharray="5 4"/><circle cx="150" cy="60" r="6" fill="var(--ink)"/><circle cx="163" cy="70" r="7" fill="#F2B01E" stroke="#fff" stroke-width="2"/><text x="150" y="112" text-anchor="middle" font-size="10" fill="var(--mute)" font-family="Figtree">Titik absen · radius 100 m</text></svg></div>
+<button class="fv" id="fv"><span class="fvi"></span><span id="fvt">Verifikasi wajah</span></button>
+<p class="sm" style="margin-top:6px">Simulasi untuk demo, tanpa kamera</p>
+<button class="btn" id="shOk" disabled>Konfirmasi</button><button class="btn" id="shNo" style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button></div></div>
+<div class="sheet" id="lsheet" hidden><div class="sb" role="dialog" aria-modal="true" aria-labelledby="lst"><h3 id="lst" style="font-size:18px;margin-bottom:6px">Keluar dari AbsenPro?</h3><p class="sm">Status absen hari ini tetap tersimpan untuk akun ini.</p><button class="btn dg" id="lyes">Keluar</button><button class="btn" id="lno" style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button></div></div>
+<div class="sheet" id="nsheet" hidden><div class="sb" role="dialog" aria-modal="true" aria-label="Notifikasi"><h3 style="font-size:18px;margin-bottom:6px">Notifikasi</h3><div id="nl" style="max-height:50vh;overflow:auto"></div><button class="btn" id="nx" style="background:var(--chip);color:var(--ink)">Tutup</button></div></div>
+<main>
+
+<section class="tab on" id="t0">
+  <div class="top"><div><p id="hi">Selamat pagi</p><h1>Arzha</h1></div><div class="r"><button class="bell" id="bell" aria-label="Notifikasi"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8M10 21a2 2 0 0 0 4 0"/></svg><b id="bd">2</b></button><div class="av">AR</div></div></div>
+  <div class="geo"><i></i><div><b>Di dalam area kantor</b><span>Kinerja Tower, SCBD · 38 m dari titik absen</span></div></div>
+  <div class="seg" id="mode"><button class="on">Kantor</button><button>Rumah</button><button>Dinas luar</button></div>
+  <div class="dial" id="dial">
+    <svg viewBox="0 0 272 272"><circle class="tr" cx="136" cy="136" r="124"/><circle class="pr" id="pr" cx="136" cy="136" r="124" stroke-dasharray="779" stroke-dashoffset="779"/></svg>
+    <div class="mid"><small id="date"></small><div class="clock num" id="clock">00:00</div><em id="sub">Shift 08:00 – 17:00</em><button class="go" id="go">Absen masuk</button></div>
+  </div>
+  <div class="card"><h3>Hari ini</h3>
+    <ul class="tl">
+      <li id="li-in"><i></i><div><b>Masuk</b><span id="in-s">Belum absen</span></div><div class="t" id="in-t">--:--</div></li>
+      <li id="li-out"><i></i><div><b>Pulang</b><span id="out-s">Setelah 17:00</span></div><div class="t" id="out-t">--:--</div></li>
+    </ul></div>
+  <div class="card"><h3>Minggu ini</h3><div class="wk" id="wk"></div></div>
+</section>
+
+<section class="tab" id="tr">
+  <div class="top"><div><p>Riwayat kehadiran</p><h1 id="mon"></h1></div><div style="display:flex;gap:6px"><button class="eye" id="cp" aria-label="Bulan sebelumnya">‹</button><button class="eye" id="cn" aria-label="Bulan berikutnya">›</button></div></div>
+  <div class="st"><div><b id="sh">0</b><span>Hadir</span></div><div><b id="sl">0</b><span>Terlambat</span></div><div><b id="si">0</b><span>Izin</span></div></div>
+  <div class="card"><div class="cal" id="cal"></div>
+    <div class="lg"><span><i style="background:var(--ok)"></i>Tepat waktu</span><span><i style="background:var(--late)"></i>Terlambat</span><span><i style="background:var(--sun)"></i>Izin</span></div></div>
+  <div class="card"><p id="cinfo" style="color:var(--mute)">Ketuk tanggal untuk melihat detail.</p></div>
+  <div class="card"><details><summary>Lupa absen? Ajukan koreksi</summary>
+    <div class="two"><div><label>Tanggal</label><input type="date" id="kd"></div><div><label>Jam</label><input type="time" id="kj" value="08:00"></div></div>
+    <label>Alasan</label><textarea id="kr" rows="2" placeholder="Contoh: ponsel mati saat tiba di kantor"></textarea>
+    <button class="btn" id="kk">Kirim koreksi</button></details></div>
+</section>
+
+<section class="tab" id="t1">
+  <div class="top"><div><p>Sisa cuti tahunan</p><h1>Cuti dan lembur</h1></div></div>
+  <div class="card" style="margin-top:0"><div class="big num"><span id="left">9</span> <small style="font:500 14px Figtree;color:var(--mute)">dari 12 hari</small></div><div class="bar"><span id="lb" style="width:75%"></span></div></div>
+  <div class="card"><h3>Form pengajuan</h3>
+    <label>Jenis</label><div class="chips" id="type"><button class="on">Cuti tahunan</button><button>Sakit</button><button>Izin</button></div>
+    <div class="two"><div><label>Mulai</label><input type="date" id="d1"></div><div><label>Selesai</label><input type="date" id="d2"></div></div>
+    <label>Alasan</label><textarea id="why" rows="2" placeholder="Contoh: acara keluarga di Bandung"></textarea>
+    <button class="btn" id="send">Kirim pengajuan</button></div>
+  <div class="card"><h3>Ajukan lembur</h3><div class="two"><div><label>Tanggal</label><input type="date" id="ld"></div><div><label>Mulai</label><input type="time" id="la" value="17:00"></div></div><label>Selesai</label><input type="time" id="lb2" value="19:00"><label>Pekerjaan</label><textarea id="lr" rows="2" placeholder="Contoh: rilis fitur absensi"></textarea><button class="btn" id="lk">Kirim lembur</button></div>
+  <div class="card"><h3>Riwayat pengajuan</h3><div id="hist"><div class="row"><div><b>Cuti tahunan</b><br><span style="color:var(--mute);font-size:12px">12–13 Agu · 2 hari</span></div><span class="tag ok">Disetujui</span></div></div></div>
+</section>
+
+<section class="tab" id="sp-team"></section>
+<section class="tab" id="sp-appr"></section>
+<section class="tab" id="ad-sum"></section>
+<section class="tab" id="ad-emp"></section>
+<section class="tab" id="ad-appr"></section>
+<section class="tab" id="tm">
+  <div class="top"><div><p>Tim Produk Digital</p><h1>Tim</h1></div></div>
+  <div class="card" style="margin-top:0"><h3>Hari ini</h3>
+    <div class="row"><div class="ppl"><span class="pa">DP</span><div><b>Dina Prameswari</b><br><span class="sm">Manajer</span></div></div><span class="tag ok">Kantor</span></div>
+    <div class="row"><div class="ppl"><span class="pa">RM</span><div><b>Raka Mahendra</b><br><span class="sm">Engineer</span></div></div><span class="tag">Rumah</span></div>
+    <div class="row"><div class="ppl"><span class="pa">SA</span><div><b>Salsa Anindya</b><br><span class="sm">QA</span></div></div><span class="tag ok">Kantor</span></div>
+    <div class="row"><div class="ppl"><span class="pa">BS</span><div><b>Bima Satria</b><br><span class="sm">Engineer</span></div></div><span class="tag mu">Cuti</span></div>
+    <div class="row"><div class="ppl"><span class="pa">LW</span><div><b>Laras Wulandari</b><br><span class="sm">Designer</span></div></div><span class="tag">Dinas luar</span></div></div>
+  <div class="card"><h3>Libur mendatang</h3>
+    <div class="row"><div><b>Cuti bersama Natal</b><br><span class="sm">24 Des 2026 · Kamis</span></div><span class="tag mu">Opsional</span></div>
+    <div class="row"><div><b>Hari Raya Natal</b><br><span class="sm">25 Des 2026 · Jumat</span></div><span class="tag">Libur nasional</span></div>
+    <p class="sm" style="margin-top:8px">Sumber: SKB 3 Menteri tahun 2026. Cuti bersama bersifat opsional bagi karyawan swasta, sesuai kebijakan perusahaan.</p></div>
+  <div class="card"><h3>Pengumuman</h3>
+    <div class="row"><b>Kebijakan WFH baru berlaku 1 Nov</b><span class="tag">Penting</span></div>
+    <div class="row"><b>Town hall kuartal 4 · Jumat 30 Okt, 15:00</b><span class="tag mu">Acara</span></div>
+    <div class="row"><b>Survei kepuasan karyawan dibuka sampai 5 Nov</b><span class="tag mu">Info</span></div></div>
+</section>
+
+<section class="tab" id="t2">
+  <div class="pho"><b>AbsenPro</b> · Arzha · EMP-2041 · Product Designer</div>
+  <div class="top"><div><p>Slip gaji</p><h1>Oktober 2026</h1></div><div style="display:flex;gap:6px"><button class="eye" id="eye">Tampilkan</button><button class="eye" id="prt">Cetak</button></div></div>
+  <div class="chips" id="mchips" style="margin-bottom:12px"><button>Agu</button><button>Sep</button><button class="on">Okt</button></div>
+  <div class="card" style="margin-top:0"><p style="color:var(--mute)">Gaji bersih</p><div class="big num" id="net">Rp •••••••</div><p style="color:var(--mute);font-size:12px">Dibayar 25 Okt 2026 · ke rekening BCA •••• 4821</p></div>
+  <div class="card"><h3>Pendapatan</h3>
+    <div class="row"><span>Gaji pokok</span><b class="m" data-v="12000000"></b></div>
+    <div class="row"><span>Tunjangan transport</span><b class="m" data-v="1200000"></b></div>
+    <div class="row"><span>Tunjangan makan</span><b class="m" data-v="880000"></b></div>
+    <h3 style="margin-top:14px">Potongan</h3>
+    <div class="row"><span>BPJS Kesehatan</span><b class="m neg" data-v="-140000"></b></div>
+    <div class="row"><span>BPJS Ketenagakerjaan</span><b class="m neg" data-v="-260000"></b></div>
+    <div class="row"><span>PPh 21</span><b class="m neg" data-v="-420000"></b></div></div>
+</section>
+
+<section class="tab" id="t3">
+  <div class="top"><div><p>Product Designer · Divisi Digital</p><h1>Arzha</h1></div><div class="av">AR</div></div>
+  <div class="card" style="margin-top:0">
+    <div class="row"><span>ID karyawan</span><b>EMP-2041</b></div>
+    <div class="row"><span>Atasan</span><b>Dina Prameswari</b></div>
+    <div class="row"><span>Bergabung</span><b>3 Mar 2023</b></div>
+    <div class="row"><span>Kehadiran bulan ini</span><b>21 dari 22 hari</b></div></div>
+  <div class="card"><div class="row"><div><b>Mode gelap</b><br><span style="color:var(--mute);font-size:12px">Nyaman untuk mata di malam hari</span></div><button class="eye" id="theme">Ganti</button></div></div>
+  <div class="card"><div class="row"><div><b>Foto profil</b><br><span style="color:var(--mute);font-size:12px">JPG atau PNG, dipotong persegi</span></div><button class="eye" id="pfb">Ganti foto</button><input type="file" id="pf" accept="image/*" hidden></div>
+    <div class="row"><div><b>Bahasa</b><br><span style="color:var(--mute);font-size:12px">Indonesia atau English</span></div><button class="eye" id="lng">Indonesia</button></div></div>
+  <div class="card" id="mymenu" hidden><h3>Menu saya</h3><button class="mm" data-go="t2"><span>Slip gaji</span><span>›</span></button><button class="mm" data-go="tr"><span>Riwayat kehadiran</span><span>›</span></button><button class="mm" data-go="t1"><span>Ajuan cuti dan lembur</span><span>›</span></button></div>
+  <div class="card"><button class="btn dg" id="lo" style="margin-top:0">Keluar</button></div>
+  <p style="text-align:center;color:var(--mute);font-size:12px;margin-top:18px">AbsenPro v2 · Desain oleh K. Arzhaning Jagad</p>
+</section>
+
+</main>
+<nav id="nav">
+  <button class="on"><span><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></span>Beranda</button>
+  <button><span><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Riwayat</button>
+  <button><span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg></span>Ajuan</button>
+  <button><span><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 20c.6-3.5 3.5-5 7-5s6.4 1.5 7 5M16 5a3.5 3.5 0 0 1 0 7M18 15c2.2.5 3.6 2 4 5"/></svg></span>Tim</button>
+  <button><span><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="3"/><circle cx="12" cy="12.5" r="3"/></svg></span>Gaji</button>
+  <button><span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg></span>Profil</button>
+</nav>
+</div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const pad=n=>String(n).padStart(2,'0');
+const rp=n=>(n<0?'−':'')+'Rp '+Math.abs(n).toLocaleString('id-ID');
+let inAt=null,outAt=null,hide=true;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
+function tick(){
+  const d=new Date(),h=d.getHours(),m=d.getMinutes();
+  $('#clock').textContent=pad(h)+':'+pad(m);
+  $('#date').textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'});
+  $('#hi').textContent=h<11?'Selamat pagi':h<15?'Selamat siang':h<18?'Selamat sore':'Selamat malam';
+  const mins=h*60+m,p=Math.min(1,Math.max(0,(mins-480)/540));
+  $('#pr').style.strokeDashoffset=779*(1-p);
+  const go=$('#go');
+  if(!inAt){go.textContent='Absen masuk';go.className='go'}
+  else if(!outAt){go.textContent='Absen pulang';go.className='go out'}
+  if(inAt&&!outAt){const w=mins-(inAt.h*60+inAt.m);$('#sub').textContent='Sudah bekerja '+Math.floor(w/60)+' j '+w%60+' m'}
+}
+function stamp(){const d=new Date();return{h:d.getHours(),m:d.getMinutes(),s:pad(d.getHours())+':'+pad(d.getMinutes())}}
+function doAbsen(){
+  if(!inAt){inAt=stamp();const late=inAt.h*60+inAt.m>495;
+    $('#in-t').textContent=inAt.s;$('#in-s').textContent=late?'Terlambat dari batas 08:15':'Tepat waktu';
+    $('#li-in').className=late?'l':'d';toast('Absen masuk tercatat pukul '+inAt.s)}
+  else if(!outAt){outAt=stamp();$('#out-t').textContent=outAt.s;$('#out-s').textContent='Selesai bekerja';$('#li-out').className='d';
+    $('#dial').classList.add('done');$('#go').textContent='Sampai besok';$('#go').disabled=true;$('#sub').textContent='Terima kasih untuk hari ini';toast('Absen pulang tercatat pukul '+outAt.s)}
+  save();tick()};
+function openSheet(){const out=inAt&&!outAt;$('#shT').textContent=out?'Konfirmasi absen pulang':'Konfirmasi absen masuk';$('#shTime').textContent=stamp().s;$('#shMode').textContent=$('#mode .on').textContent;$('#sheet').hidden=false;resetFv();$('#fv').focus()}
+$('#go').onclick=openSheet;
+$('#shOk').onclick=()=>{$('#sheet').hidden=true;doAbsen();popDial()};
+$('#shNo').onclick=()=>{$('#sheet').hidden=true};
+$('#sheet').onclick=e=>{if(e.target.id==='sheet')e.target.hidden=true};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#sheet').hidden=true});
+$('#kk').onclick=()=>{if(!$('#kd').value||!$('#kr').value.trim()){toast('Isi tanggal dan alasan koreksi');return}toast('Koreksi dikirim ke atasan');addN('Koreksi absen dikirim','Menunggu persetujuan atasan');$('#kr').value=''};
+let USER=null;let K='absenpro-demo-'+new Date().toDateString();
+function save(){try{localStorage.setItem(K,JSON.stringify({inAt,outAt}))}catch(e){}}
+try{const r=JSON.parse(localStorage.getItem(K));if(r&&r.inAt){inAt=r.inAt;const late=inAt.h*60+inAt.m>495;$('#in-t').textContent=inAt.s;$('#in-s').textContent=late?'Terlambat dari batas 08:15':'Tepat waktu';$('#li-in').className=late?'l':'d';
+ if(r.outAt){outAt=r.outAt;$('#out-t').textContent=outAt.s;$('#out-s').textContent='Selesai bekerja';$('#li-out').className='d';$('#dial').classList.add('done');$('#go').textContent='Sampai besok';$('#go').disabled=true;$('#sub').textContent='Terima kasih untuk hari ini'}}}catch(e){}
+$$('#mode button').forEach(b=>b.onclick=()=>{$$('#mode button').forEach(x=>x.classList.remove('on'));b.classList.add('on');toast('Mode kerja: '+b.textContent)});
+// minggu ini
+(function(){const d=new Date(),dow=(d.getDay()+6)%7,names=['Sen','Sel','Rab','Kam','Jum'];
+  $('#wk').innerHTML=names.map((n,i)=>{const day=new Date(d);day.setDate(d.getDate()-dow+i);
+    const c=i<dow?(i==2?'x':'p'):i==dow?'n':'';return`<div class="${c}">${n}<b>${day.getDate()}</b>${c=='p'?'Hadir':c=='x'?'Izin':c=='n'?'Hari ini':'–'}</div>`}).join('')})();
+// tabs
+$$('#nav button').forEach((b,i)=>b.onclick=()=>{$$('#nav button').forEach(x=>x.classList.remove('on'));b.classList.add('on');$$('#nav button').forEach(x=>x.removeAttribute('aria-current'));b.setAttribute('aria-current','page');$$('.tab').forEach((t,j)=>t.classList.toggle('on',i==j));$('main').scrollTop=0});
+// cuti
+const d1=$('#d1'),d2=$('#d2'),iso=d=>d.toISOString().slice(0,10);
+const t1=new Date(Date.now()+864e5*3),t2=new Date(Date.now()+864e5*4);d1.value=iso(t1);d2.value=iso(t2);
+$$('#type button').forEach(b=>b.onclick=()=>{$$('#type button').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+let left=9;
+$('#send').onclick=()=>{
+  const a=new Date(d1.value),b=new Date(d2.value);
+  if(isNaN(a)||isNaN(b)||b<a){toast('Tanggal selesai harus sama atau setelah tanggal mulai');return}
+  const days=Math.round((b-a)/864e5)+1,type=$('#type .on').textContent;
+  if(type==='Cuti tahunan'){if(days>left){toast('Sisa cuti tinggal '+left+' hari');return}left-=days;$('#left').textContent=left;$('#lb').style.width=left/12*100+'%'}
+  const f=x=>x.toLocaleDateString('id-ID',{day:'numeric',month:'short'});
+  $('#hist').insertAdjacentHTML('afterbegin',`<div class="row"><div><b>${type}</b><br><span style="color:var(--mute);font-size:12px">${f(a)} – ${f(b)} · ${days} hari</span></div><span class="tag">Menunggu</span></div>`);
+  $('#why').value='';toast('Pengajuan terkirim ke atasan')};
+// gaji
+const SL={'08':{n:'Agustus',a:'Agu',v:[12000000,1200000,820000,-140000,-260000,-410000]},'09':{n:'September',a:'Sep',v:[12000000,1200000,860000,-140000,-260000,-415000]},'10':{n:'Oktober',a:'Okt',v:[12000000,1200000,880000,-140000,-260000,-420000]}};
+let SM='10';
+function slipNet(){return SL[SM].v.reduce((a,b)=>a+b,0)}
+function money(){$$('.m').forEach(e=>e.textContent=hide?'Rp ••••••':rp(+e.dataset.v));
+  $('#net').textContent=hide?'Rp •••••••':rp(slipNet());$('#eye').textContent=hide?'Tampilkan':'Sembunyikan'}
+$('#eye').onclick=()=>{hide=!hide;money()};money();
+// tema
+$('#theme').onclick=()=>{const r=document.documentElement,dark=getComputedStyle(r).getPropertyValue('--bg').trim()==='#0B1624';r.dataset.theme=dark?'light':'dark'};
+// kalender riwayat
+function buildCal(off){const n=new Date(),y=n.getFullYear(),mo=n.getMonth()+off,td=off===0?n.getDate():off<0?99:0,m0=new Date(y,mo,1),first=(new Date(y,mo,1).getDay()+6)%7,len=new Date(y,mo+1,0).getDate(),c={h:0,l:0,i:0};
+ let html=['Sen','Sel','Rab','Kam','Jum','Sab','Min'].map(x=>`<small>${x}</small>`).join('')+'<span></span>'.repeat(first);
+ for(let d=1;d<=len;d++){const w=(first+d-1)%7;let st='f',info='Belum terjadi';
+  if(w>4){st='w';info='Akhir pekan'}
+  else if(d<td){const k=(d*7+mo)%11;if(k==3){st='i';c.i++;info='Izin atau cuti'}else if(k==6||k==9){st='l';c.l++;c.h++;info='Masuk 08:'+(20+k)+' · terlambat · pulang 17:05'}else{st='p';c.h++;info='Masuk 07:'+(40+k)+' · tepat waktu · pulang 17:0'+(k%5)}}
+  else if(d==td){st='t';info='Hari ini: lihat linimasa di Beranda'}
+  html+=`<button class="cd ${st}" data-i="${info}" data-d="${d}">${d}</button>`}
+ $('#cal').innerHTML=html;$('#mon').textContent=m0.toLocaleDateString('id-ID',{month:'long',year:'numeric'});
+ $('#sh').textContent=c.h;$('#sl').textContent=c.l;$('#si').textContent=c.i;
+ $('#cal').onclick=e=>{const b=e.target.closest('.cd');if(b)$('#cinfo').innerHTML='<b>'+b.dataset.d+' '+m0.toLocaleDateString('id-ID',{month:'long'})+'</b><br>'+b.dataset.i}}
+let CM=0;buildCal(0);
+function navCal(dx){if(CM+dx>0||CM+dx<-5)return;CM+=dx;buildCal(CM);$('#cinfo').textContent='Ketuk tanggal untuk melihat detail.';$('#cn').style.opacity=CM>=0?.35:1;$('#cp').style.opacity=CM<=-5?.35:1}
+$('#cp').onclick=()=>navCal(-1);$('#cn').onclick=()=>navCal(1);$('#cn').style.opacity=.35;
+// notifikasi
+const N=[{t:'Cuti 12–13 Agu disetujui',s:'Dina Prameswari · 2 hari lalu',u:1},{t:'Slip gaji Oktober tersedia',s:'Dibayar 25 Okt',u:1},{t:'Koreksi absen 21 Okt menunggu atasan',s:'Kemarin',u:0}];
+function drawN(){$('#nl').innerHTML=N.map(n=>`<div class="row"><div><b>${n.t}</b><br><span style="color:var(--mute);font-size:12px">${n.s}</span></div>${n.u?'<span class="tag">Baru</span>':''}</div>`).join('');const c=N.filter(n=>n.u).length;$('#bd').textContent=c;$('#bd').hidden=!c}
+function addN(t,s){N.unshift({t,s,u:1});drawN()}
+drawN();
+$('#bell').onclick=()=>{drawN();$('#nsheet').hidden=false;N.forEach(n=>n.u=0);$('#bd').hidden=true};
+$('#nx').onclick=()=>{$('#nsheet').hidden=true};
+$('#nsheet').onclick=e=>{if(e.target.id==='nsheet')e.target.hidden=true};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#nsheet').hidden=true});
+setInterval(()=>{if(inAt&&!outAt&&new Date().getHours()>=17&&!window._r){window._r=1;addN('Waktunya absen pulang','Shift selesai pukul 17:00');toast('Waktunya absen pulang')}},15000);
+// lembur
+$('#ld').value=iso(new Date());
+$('#lk').onclick=()=>{const d=$('#ld').value,a=$('#la').value,b=$('#lb2').value;if(!d||!a||!b||b<=a){toast('Isi tanggal, dan jam selesai harus setelah jam mulai');return}
+ const[h1,m1]=a.split(':'),[h2,m2]=b.split(':'),mins=(h2*60+ +m2)-(h1*60+ +m1);
+ $('#hist').insertAdjacentHTML('afterbegin',`<div class="row"><div><b>Lembur</b><br><span style="color:var(--mute);font-size:12px">${new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short'})} · ${Math.floor(mins/60)} j ${mins%60} m</span></div><span class="tag">Menunggu</span></div>`);
+ $('#lr').value='';addN('Lembur diajukan','Menunggu persetujuan atasan');toast('Pengajuan lembur terkirim')};
+// cetak slip
+$('#prt').onclick=()=>{const was=hide;hide=false;money();toast('Jika dialog cetak tidak muncul, gunakan Ctrl+P atau menu cetak browser');setTimeout(()=>{try{window.print()}catch(e){}hide=was;money()},300)};
+// foto profil
+function setAv(u){$$('.av').forEach(a=>{a.style.backgroundImage=u?`url(${u})`:'';a.style.backgroundSize='cover';a.style.backgroundPosition='center';a.textContent=u?'':(USER?USER.ini:'AR')})}
+$('#pfb').onclick=()=>$('#pf').click();
+$('#pf').onchange=e=>{const f=e.target.files[0];if(!f||!f.type.startsWith('image/')){toast('Pilih berkas gambar');return}
+ const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const c=document.createElement('canvas');c.width=c.height=160;const s=Math.min(img.width,img.height);c.getContext('2d').drawImage(img,(img.width-s)/2,(img.height-s)/2,s,s,0,0,160,160);const d=c.toDataURL('image/jpeg',.8);setAv(d);try{localStorage.setItem('absenpro-foto-'+(USER?USER.id:'x'),d)}catch(x){}toast('Foto profil diperbarui')};img.src=r.result};r.readAsDataURL(f)};
+
+// bahasa
+let LANG='id';try{LANG=localStorage.getItem('absenpro-lang')||'id'}catch(e){}
+const _tl=Date.prototype.toLocaleDateString;Date.prototype.toLocaleDateString=function(l,o){return _tl.call(this,LANG==='en'?'en-GB':l,o)};
+const EN=Object.fromEntries([['Beranda','Home'],['Riwayat','History'],['Ajuan','Requests'],['Gaji','Pay'],['Profil','Profile'],['Selamat pagi','Good morning'],['Selamat siang','Good afternoon'],['Selamat sore','Good afternoon'],['Selamat malam','Good evening'],['Di dalam area kantor','Inside office area'],['Kinerja Tower, SCBD · 38 m dari titik absen','Kinerja Tower, SCBD · 38 m from check-in point'],['Kantor','Office'],['Rumah','Home'],['Dinas luar','Field work'],['Absen masuk','Clock in'],['Absen pulang','Clock out'],['Sampai besok','See you tomorrow'],['Hari ini','Today'],['Masuk','Clock in'],['Pulang','Clock out'],['Belum absen','Not clocked in'],['Setelah 17:00','After 17:00'],['Tepat waktu','On time'],['Terlambat dari batas 08:15','Late (after 08:15)'],['Selesai bekerja','Work done'],['Terima kasih untuk hari ini','Thanks for today'],['Minggu ini','This week'],['Sen','Mon'],['Sel','Tue'],['Rab','Wed'],['Kam','Thu'],['Jum','Fri'],['Sab','Sat'],['Min','Sun'],['Hadir','Present'],['Izin','Leave'],['Terlambat','Late'],['Riwayat kehadiran','Attendance history'],['Ketuk tanggal untuk melihat detail.','Tap a date to see details.'],['Izin atau cuti','Leave'],['Akhir pekan','Weekend'],['Belum terjadi','Not yet'],['Hari ini: lihat linimasa di Beranda','Today: see the timeline on Home'],['Lupa absen? Ajukan koreksi','Forgot to clock in? Request a correction'],['Tanggal','Date'],['Jam','Time'],['Alasan','Reason'],['Kirim koreksi','Send correction'],['Contoh: ponsel mati saat tiba di kantor','e.g. phone died when I arrived'],['Sisa cuti tahunan','Annual leave left'],['Cuti dan lembur','Leave and overtime'],['dari 12 hari','of 12 days'],['Form pengajuan','Leave request'],['Jenis','Type'],['Cuti tahunan','Annual leave'],['Sakit','Sick'],['Mulai','Start'],['Selesai','End'],['Kirim pengajuan','Submit request'],['Contoh: acara keluarga di Bandung','e.g. family event in Bandung'],['Ajukan lembur','Request overtime'],['Pekerjaan','Task'],['Contoh: rilis fitur absensi','e.g. release attendance feature'],['Kirim lembur','Submit overtime'],['Riwayat pengajuan','Request history'],['Disetujui','Approved'],['Menunggu','Pending'],['Lembur','Overtime'],['Slip gaji','Payslip'],['Oktober 2026','October 2026'],['Tampilkan','Show'],['Sembunyikan','Hide'],['Cetak','Print'],['Gaji bersih','Net pay'],['Dibayar 25 Okt 2026 · ke rekening BCA •••• 4821','Paid 25 Oct 2026 · to BCA account •••• 4821'],['Pendapatan','Earnings'],['Gaji pokok','Base salary'],['Tunjangan transport','Transport allowance'],['Tunjangan makan','Meal allowance'],['Potongan','Deductions'],['Product Designer · Divisi Digital','Product Designer · Digital Division'],['ID karyawan','Employee ID'],['Atasan','Manager'],['Bergabung','Joined'],['Kehadiran bulan ini','Attendance this month'],['21 dari 22 hari','21 of 22 days'],['Mode gelap','Dark mode'],['Nyaman untuk mata di malam hari','Easier on the eyes at night'],['Ganti','Switch'],['Foto profil','Profile photo'],['JPG atau PNG, dipotong persegi','JPG or PNG, cropped square'],['Ganti foto','Change photo'],['Bahasa','Language'],['Indonesia atau English','Indonesian or English'],['AbsenPro v2 · Desain oleh K. Arzhaning Jagad','AbsenPro v2 · Designed by K. Arzhaning Jagad'],['Notifikasi','Notifications'],['Tutup','Close'],['Baru','New'],['Cuti 12–13 Agu disetujui','Leave 12–13 Aug approved'],['Dina Prameswari · 2 hari lalu','Dina Prameswari · 2 days ago'],['Slip gaji Oktober tersedia','October payslip available'],['Dibayar 25 Okt','Paid 25 Oct'],['Koreksi absen 21 Okt menunggu atasan','Correction for 21 Oct awaiting manager'],['Kemarin','Yesterday'],['Waktunya absen pulang','Time to clock out'],['Shift selesai pukul 17:00','Shift ended at 17:00'],['Koreksi absen dikirim','Correction sent'],['Menunggu persetujuan atasan','Awaiting manager approval'],['Lembur diajukan','Overtime requested'],['Konfirmasi absen masuk','Confirm clock in'],['Konfirmasi absen pulang','Confirm clock out'],['Waktu','Time'],['Lokasi','Location'],['Mode kerja','Work mode'],['Konfirmasi','Confirm'],['Batal','Cancel'],['Isi tanggal dan alasan koreksi','Enter a date and a reason'],['Koreksi dikirim ke atasan','Correction sent to your manager'],['Pengajuan terkirim ke atasan','Request sent to your manager'],['Tanggal selesai harus sama atau setelah tanggal mulai','End date must be on or after the start date'],['Isi tanggal, dan jam selesai harus setelah jam mulai','Enter a date; end time must be after start time'],['Pengajuan lembur terkirim','Overtime request sent'],['Pilih berkas gambar','Choose an image file'],['Foto profil diperbarui','Profile photo updated'],['Jika dialog cetak tidak muncul, gunakan Ctrl+P atau menu cetak browser','If the print dialog does not open, use Ctrl+P or your browser print menu'],['Mau seperti ini?','Want one like this?'],['Galeri','Gallery'],['Aplikasi Absensi & HRIS Mobile','Attendance & HRIS Mobile App']]);
+const TOK=[[/ hari\b/g,' days'],[/(\d+) j (\d+) m/,'$1 h $2 m'],[/\bAgu\b/,'Aug'],[/\bOkt\b/,'Oct'],[/Masuk (\d)/,'Clock-in $1'],[/tepat waktu/,'on time'],[/terlambat/,'late'],[/pulang/g,'clock-out']];
+function rule(s){let m;
+ if(m=s.match(/^Sudah bekerja (\d+) j (\d+) m$/))return `Worked ${m[1]} h ${m[2]} m`;
+ if(m=s.match(/^Absen (masuk|pulang) tercatat pukul (.+)$/))return `Clock-${m[1]==='masuk'?'in':'out'} recorded at ${m[2]}`;
+ if(m=s.match(/^Mode kerja: (.+)$/))return 'Work mode: '+(EN[m[1]]||m[1]);
+ if(m=s.match(/^Sisa cuti tinggal (\d+) hari$/))return `Only ${m[1]} days of leave left`;
+ return TOK.reduce((a,[r,t])=>a.replace(r,t),s)}
+const orig=new WeakMap();
+function trNode(n){const p=n.parentNode&&n.parentNode.nodeName;if(p==='SCRIPT'||p==='STYLE')return;let o=orig.get(n);if(o===undefined){o=n.nodeValue;orig.set(n,o)}const b=o.trim();if(!b)return;const out=LANG==='en'?(EN[b]!==undefined?EN[b]:rule(b)):b;n.nodeValue=o.replace(b,()=>out)}
+function walk(r){const w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT);let n;while(n=w.nextNode())trNode(n)}
+new MutationObserver(ms=>{if(LANG!=='en')return;ms.forEach(m=>m.addedNodes.forEach(n=>{if(n.nodeType===3)trNode(n);else if(n.nodeType===1)walk(n)}))}).observe(document.body,{childList:true,subtree:true});
+function applyLang(l){LANG=l;document.documentElement.lang=l;walk(document.body);
+ $$('[placeholder]').forEach(e=>{if(!e.dataset.ph)e.dataset.ph=e.placeholder;e.placeholder=l==='en'?(EN[e.dataset.ph]||e.dataset.ph):e.dataset.ph});
+ $('#lng').textContent=l==='en'?'English':'Indonesia';buildCal(CM);drawN();tick();
+ try{localStorage.setItem('absenpro-lang',l)}catch(e){}}
+$('#lng').onclick=()=>applyLang(LANG==='en'?'id':'en');
+tick();setInterval(tick,15000);
+// pratinjau perangkat
+Object.assign(EN,{'Ponsel kecil':'Small phone','Ponsel':'Phone','Mode':'Theme'});
+const DEV={s:'360 × 640',m:'390 × 844',t:'820 × 1024',d:'1180 × 760'};
+function setDev(k){$('.app').dataset.dev=k;$$('#devbar [data-d]').forEach(x=>x.classList.toggle('on',x.dataset.d===k));$('#dsz').textContent=DEV[k];try{localStorage.setItem('absenpro-dev',k)}catch(e){}}
+$$('#devbar [data-d]').forEach(b=>b.onclick=()=>setDev(b.dataset.d));
+$('#devtheme').onclick=()=>$('#theme').click();
+try{const k=localStorage.getItem('absenpro-dev');if(k&&DEV[k])setDev(k)}catch(e){}
+// riwayat slip gaji
+function setSlip(k){SM=k;$$('.m').forEach((e,i)=>e.dataset.v=SL[k].v[i]);$('#t2 .top h1').textContent=SL[k].n+' 2026';$('#t2 .card p:nth-of-type(2)').textContent='Dibayar 25 '+SL[k].a+' 2026 · ke rekening BCA •••• 4821';money()}
+$$('#mchips button').forEach((b,i)=>b.onclick=()=>{$$('#mchips button').forEach(x=>x.classList.toggle('on',x===b));const cs=$$('#t2 .card');cs.forEach(c=>c.classList.add('ld'));setTimeout(()=>{setSlip(['08','09','10'][i]);cs.forEach(c=>c.classList.remove('ld'))},350)});
+TOK.push([/Dibayar/,'Paid'],[/ke rekening/,'to account'],[/Agustus/,'August'],[/Oktober/,'October']);
+// verifikasi wajah (simulasi) dan animasi
+function resetFv(){const f=$('#fv');f.className='fv';$('#fvt').textContent='Verifikasi wajah';$('#shOk').disabled=true}
+$('#fv').onclick=()=>{const f=$('#fv');if(f.classList.contains('sc')||f.classList.contains('ok'))return;f.classList.add('sc');$('#fvt').textContent='Memindai…';setTimeout(()=>{f.classList.remove('sc');f.classList.add('ok');$('#fvt').textContent='Wajah terverifikasi';$('#shOk').disabled=false;$('#shOk').focus()},1600)};
+function popDial(){const d=$('#dial');d.classList.remove('pop');void d.offsetWidth;d.classList.add('pop')}
+// terjemahan tab Tim dan verifikasi
+Object.assign(EN,{'Tim':'Team','Tim Produk Digital':'Digital Product Team','Libur mendatang':'Upcoming holidays','Pengumuman':'Announcements','Manajer':'Manager','Cuti':'On leave','Cuti bersama Natal':'Christmas collective leave','Hari Raya Natal':'Christmas Day','Opsional':'Optional','Libur nasional':'Public holiday','Sumber: SKB 3 Menteri tahun 2026. Cuti bersama bersifat opsional bagi karyawan swasta, sesuai kebijakan perusahaan.':'Source: 2026 Joint Ministerial Decree. Collective leave is optional for private-sector employees, per company policy.','Kebijakan WFH baru berlaku 1 Nov':'New WFH policy takes effect 1 Nov','Town hall kuartal 4 · Jumat 30 Okt, 15:00':'Q4 town hall · Fri 30 Oct, 15:00','Survei kepuasan karyawan dibuka sampai 5 Nov':'Employee satisfaction survey open until 5 Nov','Penting':'Important','Acara':'Event','Verifikasi wajah':'Face verification','Memindai…':'Scanning…','Wajah terverifikasi':'Face verified','Simulasi untuk demo, tanpa kamera':'Demo simulation, no camera used','Titik absen · radius 100 m':'Check-in point · 100 m radius'});
+TOK.push([/Kamis/,'Thu'],[/Jumat/,'Fri'],[/\bDes\b/,'Dec']);
+// login, logout, akun demo
+const PW='demo123';
+const ACC=[{id:'arzha',email:'arzha@absenpro.demo',short:'Arzha',name:'Arzha',ini:'AR',role:'Product Designer',div:'Divisi Digital',eid:'EMP-2041',boss:'Dina Prameswari',a:0},{id:'raka',email:'raka@absenpro.demo',short:'Raka',name:'Raka Mahendra',ini:'RM',role:'Engineer',div:'Divisi Digital',eid:'EMP-2057',boss:'Dina Prameswari',a:0},{id:'salsa',email:'salsa@absenpro.demo',short:'Salsa',name:'Salsa Anindya',ini:'SA',role:'QA',div:'Divisi Digital',eid:'EMP-2063',boss:'Dina Prameswari',a:0},{id:'dina',email:'dina@absenpro.demo',short:'Dina',name:'Dina Prameswari',ini:'DP',role:'Manajer SDM',div:'Divisi SDM',eid:'EMP-1002',boss:'Direksi',a:1}];
+$('#lacc').innerHTML=ACC.map(a=>`<button class="acc" data-id="${a.id}"><span class="pa">${a.ini}</span><span style="flex:1"><b>${a.name}</b><br><span class="sm">${a.role} · ${a.email}</span></span><span class="tag ${a.a?'':'ok'}">${a.a?'Manajer':'Karyawan'}</span></button>`).join('');
+function lock(on){$('main').inert=on;$('#nav').inert=on}
+function resetDay(){inAt=null;outAt=null;$('#in-t').textContent='--:--';$('#in-s').textContent='Belum absen';$('#li-in').className='';$('#out-t').textContent='--:--';$('#out-s').textContent='Setelah 17:00';$('#li-out').className='';$('#dial').classList.remove('done');$('#go').disabled=false;tick()}
+function loadDay(){try{const r=JSON.parse(localStorage.getItem(K));if(r&&r.inAt){inAt=r.inAt;const late=inAt.h*60+inAt.m>495;$('#in-t').textContent=inAt.s;$('#in-s').textContent=late?'Terlambat dari batas 08:15':'Tepat waktu';$('#li-in').className=late?'l':'d';
+ if(r.outAt){outAt=r.outAt;$('#out-t').textContent=outAt.s;$('#out-s').textContent='Selesai bekerja';$('#li-out').className='d';$('#dial').classList.add('done');$('#go').textContent='Sampai besok';$('#go').disabled=true;$('#sub').textContent='Terima kasih untuk hari ini'}}}catch(e){}tick()}
+function applyUser(u){USER=u;K='absenpro-'+u.id+'-'+new Date().toDateString();
+ $('#t0 .top h1').textContent=u.short;$('#t3 .top h1').textContent=u.short;$('#t3 .top p').textContent=u.role+' · '+u.div;
+ const bs=$$('#t3 .row b');bs[0].textContent=u.eid;bs[1].textContent=u.boss;
+ $('.pho').innerHTML='<b>AbsenPro</b> · '+u.name+' · '+u.eid+' · '+u.role;
+ resetDay();loadDay();let f=null;try{f=localStorage.getItem('absenpro-foto-'+u.id)}catch(e){}setAv(f);
+ $$('#nav button')[0].click();$('main').scrollTop=0}
+function doLogin(u){try{localStorage.setItem('absenpro-session',u.id)}catch(e){}$('#login').hidden=true;lock(false);applyUser(u);toast('Selamat datang, '+u.short)}
+function doLogout(){try{localStorage.removeItem('absenpro-session')}catch(e){}USER=null;resetDay();$('#le').value='';$('#lp').value='';$('#lp').type='password';$('#lv').textContent='Lihat';$('#lerr').textContent='';$$('.acc').forEach(x=>x.classList.remove('on'));$('#login').hidden=false;lock(true);toast('Anda telah keluar');$('#le').focus()}
+function trySubmit(){const e=$('#le').value.trim().toLowerCase(),p=$('#lp').value,er=$('#lerr');if(!e||!p){er.textContent='Isi email dan kata sandi';return}const u=ACC.find(a=>a.email===e);if(!u||p!==PW){er.textContent='Email atau kata sandi salah';return}er.textContent='';doLogin(u)}
+$('#lgo').onclick=trySubmit;[$('#le'),$('#lp')].forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')trySubmit()});
+$('#lacc').onclick=e=>{const b=e.target.closest('.acc');if(!b)return;const u=ACC.find(a=>a.id===b.dataset.id);$('#le').value=u.email;$('#lp').value=PW;$('#lerr').textContent='';$$('.acc').forEach(x=>x.classList.toggle('on',x===b));$('#lgo').focus()};
+$('#lv').onclick=()=>{const p=$('#lp'),s=p.type==='password';p.type=s?'text':'password';$('#lv').textContent=s?'Sembunyi':'Lihat'};
+$('#lo').onclick=()=>{$('#lsheet').hidden=false;$('#lyes').focus()};
+$('#lyes').onclick=()=>{$('#lsheet').hidden=true;doLogout()};$('#lno').onclick=()=>{$('#lsheet').hidden=true};
+$('#lsheet').onclick=e=>{if(e.target.id==='lsheet')e.target.hidden=true};
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#lsheet').hidden=true});
+Object.assign(EN,{'Selamat datang kembali':'Welcome back','Masuk untuk mulai absen, ajukan cuti, dan lihat slip gaji.':'Sign in to clock in, request leave, and view your payslip.','Kata sandi':'Password','Lihat':'Show','Sembunyi':'Hide','Masuk ke aplikasi':'Sign in','Akun demo':'Demo accounts','Pilih salah satu akun untuk mengisi form otomatis. Kata sandi semua akun: demo123':'Pick an account to fill the form automatically. Password for all accounts: demo123','Ini simulasi untuk demo. Tidak ada data yang dikirim ke server.':'This is a demo simulation. No data is sent to a server.','Keluar dari AbsenPro?':'Sign out of AbsenPro?','Status absen hari ini tetap tersimpan untuk akun ini.':'Today\u2019s attendance stays saved for this account.','Keluar':'Sign out','Isi email dan kata sandi':'Enter your email and password','Email atau kata sandi salah':'Incorrect email or password','Anda telah keluar':'You have signed out','Karyawan':'Employee','Manajer SDM':'HR Manager'});
+TOK.push([/^Selamat datang, /,'Welcome, '],[/ · Divisi Digital/,' · Digital Division'],[/ · Divisi SDM/,' · HR Division']);
+// peran: staf, supervisor, admin
+const RMAP={arzha:'staff',raka:'staff',salsa:'staff',dina:'spv'};ACC.forEach(a=>a.r=RMAP[a.id]);
+const dn=ACC.find(a=>a.id==='dina');dn.role='Supervisor Digital';dn.div='Divisi Digital';
+ACC.push({id:'hendra',email:'hendra@absenpro.demo',short:'Hendra',name:'Hendra Wijaya',ini:'HW',role:'Admin HR',div:'Divisi SDM',eid:'EMP-1001',boss:'Direksi',r:'admin'});
+const RLB={staff:'Staf',spv:'Supervisor',admin:'Admin'};
+$('#lacc').innerHTML=ACC.map(a=>`<button class="acc" data-id="${a.id}"><span class="pa">${a.ini}</span><span style="flex:1"><b>${a.name}</b><br><span class="sm">${a.role} \u00b7 ${a.email}</span></span><span class="tag ${a.r==='staff'?'ok':a.r==='spv'?'':'mu'}">${RLB[a.r]}</span></button>`).join('');
+function liveSt(id){if(!['arzha','raka','salsa','dina','hendra'].includes(id))return null;try{const r=JSON.parse(localStorage.getItem('absenpro-'+id+'-'+new Date().toDateString()));if(r&&r.inAt){const late=r.inAt.h*60+r.inAt.m>495;return{st:late?'Terlambat':'Hadir',t:r.inAt.s}}}catch(e){}return{st:'Belum absen',t:'\u2013'}}
+const IC={home:'<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',hist:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',req:'<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/>',team:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.6-3.5 3.5-5 7-5s6.4 1.5 7 5M16 5a3.5 3.5 0 0 1 0 7M18 15c2.2.5 3.6 2 4 5"/>',pay:'<rect x="2" y="6" width="20" height="13" rx="3"/><circle cx="12" cy="12.5" r="3"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>',ok:'<path d="M4 12l5 5L20 6"/>',chart:'<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>'};
+const NV={staff:[['t0','Beranda','home'],['tr','Riwayat','hist'],['t1','Ajuan','req'],['tm','Tim','team'],['t2','Gaji','pay'],['t3','Profil','user']],
+ spv:[['t0','Beranda','home'],['sp-team','Tim saya','team'],['sp-appr','Persetujuan','ok',1],['t1','Ajuan','req'],['t2','Gaji','pay'],['t3','Profil','user']],
+ admin:[['t0','Beranda','home'],['ad-sum','Ringkasan','chart'],['ad-emp','Pegawai','team'],['ad-appr','Persetujuan','ok',1],['t3','Profil','user']]};
+function setNav(r){$('#nav').innerHTML=NV[r].map(x=>`<button data-t="${x[0]}"><span><svg viewBox="0 0 24 24">${IC[x[2]]}</svg></span>${x[1]}${x[3]?'<b class="nb" hidden></b>':''}</button>`).join('');$$('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.t))}
+function showTab(id){$$('.tab').forEach(t=>t.classList.toggle('on',t.id===id));$$('#nav button').forEach(b=>{const on=b.dataset.t===id;b.classList.toggle('on',on);if(on)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});const inNav=!!$('#nav [data-t="'+id+'"]');$$('.bk').forEach(b=>{b.hidden=inNav});if(!inNav){const pb=$('#nav [data-t="t3"]');if(pb)pb.classList.add('on')}
+ $('main').scrollTop=0;if(id==='t1')renderHist();if(/^(sp|ad)-/.test(id))renderRole()}
+function badges(){const n=USER?RL.pending(canAct).length:0;$$('#nav .nb').forEach(b=>{b.textContent=n;b.hidden=!n})}
+function renderRole(){if(!USER)return;if(USER.r==='spv'){RL.team($('#sp-team'),'Digital','Divisi Digital');RL.approvals($('#sp-appr'),r=>r.div==='Digital'&&r.lvl==='spv','Tim Digital')}else if(USER.r==='admin'){RL.summary($('#ad-sum'));RL.employees($('#ad-emp'));RL.approvals($('#ad-appr'),null,'Semua divisi')}}
+function renderHist(){if(!USER)return;const L=RL.mine(USER.id);$('#hist').innerHTML=L.length?L.map(r=>`<div class="row"><div><b>${RL.esc(r.type)}</b><br><span class="sm">${RL.esc(r.detail)}</span></div><span class="tag ${r.st==='Disetujui'?'ok':r.st==='Ditolak'?'mu':''}">${r.st==='Menunggu'?'Menunggu '+({spv:'Supervisor',admin:'Admin',dir:'Direksi'})[r.lvl||'spv']:r.st}</span></div>`).join(''):'<p class="sm">Belum ada pengajuan.</p>'}
+function rolesChanged(){badges();renderRole();renderHist()}
+function canAct(r){return !!USER&&r.uid!==USER.id&&((USER.r==='spv'&&r.lvl==='spv'&&r.div==='Digital')||(USER.r==='admin'&&(r.lvl==='admin'||(r.lvl==='spv'&&r.div!=='Digital'))))}
+['t1','t2','tr'].forEach(id=>{$('#'+id).insertAdjacentHTML('afterbegin','<button class="eye bk" type="button" hidden>\u2039 Profil</button>');$('#'+id+' .bk').onclick=()=>showTab('t3')});
+$('#mymenu').onclick=e=>{const b=e.target.closest('[data-go]');if(b)showTab(b.dataset.go)};
+RL.init({prefix:'v2',toast:toast,live:liveSt,can:canAct,onChange:rolesChanged});
+// pengajuan staf kini masuk antrean supervisor dan admin
+$('#send').onclick=()=>{const a=new Date(d1.value),b=new Date(d2.value);if(isNaN(a)||isNaN(b)||b<a){toast('Tanggal selesai harus sama atau setelah tanggal mulai');return}const days=Math.round((b-a)/864e5)+1,type=$('#type .on').textContent;if(type==='Cuti tahunan'){if(days>left){toast('Sisa cuti tinggal '+left+' hari');return}left-=days;$('#left').textContent=left;$('#lb').style.width=left/12*100+'%'}const f=x=>x.toLocaleDateString('id-ID',{day:'numeric',month:'short'});RL.add(USER,type,f(a)+' \u2013 '+f(b)+' \u00b7 '+days+' hari');$('#why').value='';toast('Pengajuan terkirim ke atasan');addN('Pengajuan '+type+' dikirim','Menunggu persetujuan supervisor')};
+$('#lk').onclick=()=>{const d=$('#ld').value,a=$('#la').value,b=$('#lb2').value;if(!d||!a||!b||b<=a){toast('Isi tanggal, dan jam selesai harus setelah jam mulai');return}const[h1,m1]=a.split(':'),[h2,m2]=b.split(':'),mins=(h2*60+ +m2)-(h1*60+ +m1);RL.add(USER,'Lembur',new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short'})+' \u00b7 '+Math.floor(mins/60)+' j '+mins%60+' m');$('#lr').value='';toast('Pengajuan lembur terkirim');addN('Lembur diajukan','Menunggu persetujuan supervisor')};
+$('#kk').onclick=()=>{if(!$('#kd').value||!$('#kr').value.trim()){toast('Isi tanggal dan alasan koreksi');return}RL.add(USER,'Koreksi absen',new Date($('#kd').value).toLocaleDateString('id-ID',{day:'numeric',month:'short'})+' \u00b7 '+$('#kr').value.trim().slice(0,60));$('#kr').value='';toast('Koreksi dikirim ke atasan');addN('Koreksi absen dikirim','Menunggu persetujuan supervisor')};
+function applyUser(u){USER=u;K='absenpro-'+u.id+'-'+new Date().toDateString();$('.app').dataset.role=u.r;
+ $('#t0 .top h1').textContent=u.short;$('#t3 .top h1').textContent=u.short;$('#t3 .top p').textContent=u.role+' \u00b7 '+u.div;
+ const bs=$$('#t3 .row b');bs[0].textContent=u.eid;bs[1].textContent=u.boss;
+ $('.pho').innerHTML='<b>AbsenPro</b> \u00b7 '+u.name+' \u00b7 '+u.eid+' \u00b7 '+u.role;
+ resetDay();loadDay();let f=null;try{f=localStorage.getItem('absenpro-foto-'+u.id)}catch(e){}setAv(f);
+ $('#mymenu').hidden=u.r==='staff';setNav(u.r);renderHist();renderRole();badges();showTab(NV[u.r][0][0])}
+Object.assign(EN,{'Menu saya':'My menu','Ajuan cuti dan lembur':'Leave and overtime requests','Menunggu Supervisor':'Pending Supervisor','Menunggu Admin':'Pending Admin','Menunggu Direksi':'Pending Directors','Pilih akun untuk mengisi form otomatis dan lihat tampilan tiap peran: Staf, Supervisor, atau Admin. Kata sandi semua akun: demo123':'Pick an account to fill the form and see each role view: Staff, Supervisor or Admin. Password for all accounts: demo123','Tim saya':'My team','Persetujuan':'Approvals','Ringkasan':'Summary','Pegawai':'Employees','Staf':'Staff','Supervisor Digital':'Digital Supervisor','Admin HR':'HR Admin','Ditolak':'Rejected','Belum ada pengajuan.':'No requests yet.','Belum absen':'Not clocked in','Setujui':'Approve','Tolak':'Reject','Semua pengajuan sudah ditangani.':'All requests have been handled.','Keputusan terakhir':'Latest decisions','Ringkasan perusahaan':'Company summary','Kehadiran 7 hari kerja':'7-day attendance','Per divisi':'By division','Tim Digital':'Digital Team','Divisi Digital':'Digital Division','Semua divisi':'All divisions','Tidak ada yang cocok.':'No matches.','Semua':'All','Menunggu persetujuan supervisor':'Awaiting supervisor approval','Hari ini':'Today'});
+lock(true);
+try{const u=ACC.find(a=>a.id===localStorage.getItem('absenpro-session'));if(u){$('#login').hidden=true;lock(false);applyUser(u)}}catch(e){}
+if(LANG==='en')applyLang('en');
+</script>
+<div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
+  <div class="jz-bar-nav">
+    <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span>Galeri</span></a>
+    <span class="jz-sep" aria-hidden="true">|</span>
+    <a class="jz-btn-home" href="https://arzhaning.my.id" target="_blank" rel="noopener noreferrer" title="Kunjungi situs utama K. Arzhaning Jagad"><span class="jz-dot" aria-hidden="true"></span><span class="jz-domain">arzhaning.my.id</span></a>
+  </div>
+  <span class="jz-title">Aplikasi Absensi &amp; HRIS Mobile v2</span>
+  <a class="jz-wa" href="https://wa.me/6282312312734?text=Halo%20Arzha%2C%20saya%20tertarik%20dengan%20demo%20%22Aplikasi%20Absensi%20%26%20HRIS%20Mobile%20v2%22.%20Boleh%20diskusi%20untuk%20dibuatkan%20yang%20seperti%20ini%3F" target="_blank" rel="noopener noreferrer" aria-label="Tanya via WhatsApp tentang Aplikasi Absensi dan HRIS Mobile"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.27-1.38A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.3 15l-.3-.18-3.1.8.83-3.02-.2-.31A8.1 8.1 0 0 1 12.04 3.8z"/></svg><span>Mau seperti ini?</span></a>
+</div>
+</body>
+</html>
