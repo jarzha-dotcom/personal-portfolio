@@ -73,7 +73,13 @@ async function compileDemo(demoFile) {
 
     // Ekstrak kandidat class name dari HTML
     // Gunakan regex pencari token class
-    const tokens = html.match(/[a-zA-Z0-9_\-\:\[\]\/\#\%]+/g) || [];
+    // Regex lama tidak menangkap '.', '(' dan ')' sehingga py-2.5, gap-1.5, h-[calc(100vh-61px)] dll.
+    // tidak pernah dikompilasi. Kandidat berlebih aman: Tailwind mengabaikan yang bukan utility.
+    const tokens = [
+      ...(html.match(/[a-zA-Z0-9_\-\:\[\]\/\#\%]+/g) || []),
+      ...(html.match(/[^\s"'`<>]+/g) || []),
+      ...(html.match(/[a-zA-Z0-9_\-:\[\]\/#%.()!,@&*+]+/g) || [])
+    ];
     const uniqueCandidates = Array.from(new Set(tokens));
 
     const rawCss = compiler.build(uniqueCandidates);

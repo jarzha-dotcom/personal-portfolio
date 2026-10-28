@@ -49,7 +49,6 @@
 
 
 
-  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-martexpress-pos.css">
   <!-- Font Awesome 6 CDN -->
@@ -1828,6 +1827,80 @@
     body.mx-dark #thermal-print-area .border-slate-300,
     body.mx-dark #thermal-print-area .border-slate-400 {
       border-color: #94a3b8 !important;
+    }
+
+    /* ===== Layout desktop: panel kanan scroll sendiri, daftar keranjang mengikuti isi ===== */
+    @media (min-width: 1024px) {
+      #mx-sec-cart {
+        overflow-y: auto;
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+        scroll-padding-bottom: 90px;
+      }
+
+      #mx-sec-cart>div:first-child {
+        position: sticky;
+        top: 0;
+        z-index: 6;
+      }
+
+      #mx-sec-cart #cart-items-container {
+        flex: none !important;
+        overflow: visible !important;
+        min-height: 120px;
+      }
+
+      #mx-sec-cart .mx-payrow {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        background: #f8fafc;
+        margin: 6px -12px -12px;
+        padding: 10px 12px 12px;
+        border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -10px 18px -12px rgba(15, 23, 42, .25);
+      }
+
+      #mx-sec-cart .mx-payrow>button {
+        min-height: 50px;
+      }
+
+      #products-grid {
+        overscroll-behavior: contain;
+      }
+    }
+
+    body.mx-dark #mx-sec-cart .mx-payrow {
+      background: #0e1626;
+      border-color: #243250;
+    }
+
+    /* ===== Header: tidak ada teks yang turun baris ===== */
+    header button,
+    header p,
+    header span,
+    header h1 {
+      white-space: nowrap;
+    }
+
+    header>div {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 1599px) {
+      header kbd {
+        display: none;
+      }
+    }
+
+    @media (max-width: 1499px) {
+
+      header p>span:first-child,
+      header p>span:nth-child(2) {
+        display: none;
+      }
     }
   </style>
 </head>
@@ -4136,6 +4209,21 @@
       }
       return '<svg viewBox="0 0 ' + x + ' 34" preserveAspectRatio="none" role="img" aria-label="Hiasan barcode">' + bars + '</svg><span>' + esc(text) + '</span>';
     }
+
+    /* Gulir otomatis ke barang yang baru ditambahkan (panel kanan scroll sendiri) */
+    (function () {
+      var base = renderCart, prev = 0;
+      renderCart = function () {
+        base.apply(this, arguments);
+        try {
+          if (cart.length > prev) {
+            var last = $('cart-items-container').lastElementChild;
+            if (last) setTimeout(function () { last.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 30);
+          }
+          prev = cart.length;
+        } catch (e) { }
+      };
+    })();
 
     /* ---------- Ringkasan live (strip KPI) ---------- */
     function mxUpdateKpi() {

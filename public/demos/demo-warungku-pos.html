@@ -58,7 +58,6 @@
 
 
 
-  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-warungku-pos.css">
   <!-- FontAwesome 6 Icons CDN -->
@@ -659,6 +658,101 @@
       color: #525252;
       line-height: 1.5;
       margin-bottom: 12px;
+    }
+
+    #ing-modal {
+      z-index: 62;
+    }
+
+    .wk-mi {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 8px;
+      background: none;
+      font: 600 12px 'Plus Jakarta Sans', sans-serif;
+      color: #404040;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .wk-mi:hover {
+      background: #f5f5f5;
+    }
+
+    .wk-mi.danger {
+      color: #be123c;
+    }
+
+    .wk-mi i {
+      width: 16px;
+      text-align: center;
+    }
+
+    header h1 {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 260px;
+    }
+
+    header>div:first-child {
+      min-width: 0;
+      flex: 0 1 auto;
+    }
+
+    header>div:first-child p {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 300px;
+    }
+
+    @media (min-width: 1280px) and (max-width: 1599px) {
+
+      header .wk-lbl,
+      header h1+span {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      main>aside {
+        overflow-y: auto !important;
+      }
+
+      main>aside>div:first-child {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+
+      main>aside #cart-list {
+        flex: 1 1 auto;
+        min-height: 150px;
+      }
+
+      main>aside>div:last-child {
+        padding: 10px 14px;
+        gap: 8px;
+      }
+
+      main>aside>div:last-child .grid button {
+        padding-top: 6px;
+        padding-bottom: 6px;
+      }
+
+      #cash-calculator-box {
+        padding: 8px 10px;
+        gap: 6px;
+      }
+
+      #btn-process-checkout {
+        padding-top: 11px;
+        padding-bottom: 11px;
+      }
     }
 
     .wk-chip.on {
@@ -1646,13 +1740,11 @@
 
     <!-- Zone 2: Shift Status & Live Clock -->
     <div
-      class="hidden lg:flex items-center gap-5 text-neutral-600 bg-neutral-50 px-3.5 py-1.5 rounded-lg border border-neutral-200/70">
+      class="hidden xl:flex items-center gap-4 text-neutral-600 bg-neutral-50 px-3.5 py-1.5 rounded-lg border border-neutral-200/70">
       <div class="flex items-center gap-2 text-xs font-medium">
         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
         <span id="shift-status-label" class="text-emerald-700 font-semibold">Shift Aktif</span>
-        <span class="text-neutral-300">|</span>
-        <i class="fa-regular fa-user text-neutral-400"></i>
-        <span id="topbar-shift-cashier">Radit Pratama</span>
+        <span id="topbar-shift-cashier" class="hidden">Radit Pratama</span>
       </div>
       <div class="h-3 w-px bg-neutral-200"></div>
       <div class="flex items-center gap-2 text-xs font-mono tabular-nums text-neutral-700">
@@ -1667,60 +1759,65 @@
       <button onclick="wkOpenHeld()" type="button" title="Pesanan Tersimpan (Hold)"
         class="relative flex items-center gap-2 px-3 py-2 rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50 text-xs font-semibold text-neutral-700 cursor-pointer transition-colors">
         <i class="fa-solid fa-pause text-amber-600"></i>
-        <span class="hidden sm:inline">Tersimpan</span>
+        <span class="hidden sm:inline wk-lbl">Tersimpan</span>
         <span id="held-badge" class="wk-hbadge zero">0</span>
       </button>
 
       <button onclick="openCashDrawerModal()" type="button" title="Buka Laci Kasir"
         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer border border-neutral-200/60">
         <i class="fa-solid fa-coins text-amber-600"></i>
-        <span class="hidden sm:inline">Laci Kasir</span>
+        <span class="hidden sm:inline wk-lbl">Laci Kasir</span>
       </button>
 
       <button onclick="openHistoryModal()" type="button" title="Riwayat Transaksi"
         class="relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer border border-neutral-200/60">
         <i class="fa-solid fa-clock-rotate-left text-blue-600"></i>
-        <span class="hidden sm:inline">Riwayat</span>
+        <span class="hidden sm:inline wk-lbl">Riwayat</span>
         <span id="history-badge"
           class="ml-0.5 px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-blue-600 text-white">0</span>
       </button>
 
       <button onclick="wkOpenFloor()" type="button" title="Denah Meja &amp; Dapur"
         class="relative flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
-          class="fa-solid fa-table-cells-large text-neutral-600"></i><span class="hidden md:inline">Meja</span><span
-          id="floor-badge"
+          class="fa-solid fa-table-cells-large text-neutral-600"></i><span
+          class="hidden md:inline wk-lbl">Meja</span><span id="floor-badge"
           style="display:none;position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:9px;background:#e11d48;color:#fff;font:800 10px/17px 'JetBrains Mono',monospace;text-align:center;padding:0 4px">0</span></button>
 
       <button id="btn-report" onclick="wkOpenReport()" type="button" title="Laporan Penjualan &amp; Laba Rugi"
         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
-          class="fa-solid fa-chart-column text-neutral-600"></i><span class="hidden md:inline">Laporan</span></button>
+          class="fa-solid fa-chart-column text-neutral-600"></i><span
+          class="hidden md:inline wk-lbl">Laporan</span></button>
 
       <button onclick="wkOpenMenu()" type="button" title="Kelola Menu &amp; Stok"
         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer"><i
-          class="fa-solid fa-boxes-stacked text-neutral-600"></i><span class="hidden md:inline">Menu</span></button>
+          class="fa-solid fa-boxes-stacked text-neutral-600"></i><span
+          class="hidden md:inline wk-lbl">Menu</span></button>
 
       <button onclick="openSettingsModal()" type="button" title="Pengaturan Toko"
         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-neutral-100 hover:bg-neutral-200/80 active:bg-neutral-200 rounded-lg transition-colors cursor-pointer border border-neutral-200/60">
         <i class="fa-solid fa-gear text-neutral-600"></i>
-        <span class="hidden md:inline">Pengaturan</span>
+        <span class="hidden md:inline wk-lbl">Pengaturan</span>
       </button>
 
-      <button onclick="wkToggleTheme()" type="button" title="Mode Gelap"
+      <button id="role-btn" onclick="wkToggleRole()" type="button" title="Ganti peran"
+        class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-700 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors cursor-pointer"><i
+          id="role-icon" class="fa-solid fa-user-shield text-amber-600"></i><span id="role-label">Owner</span></button>
+
+      <div id="more-menu" role="menu"
+        style="display:none;position:fixed;z-index:60;min-width:200px;background:#fff;border:1px solid #e5e5e5;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.18);padding:6px">
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkToggleTheme()"><i id="theme-icon"
+            class="fa-solid fa-moon text-sm"></i>Mode Gelap / Terang</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();toggleFullscreen()"><i id="fullscreen-icon"
+            class="fa-solid fa-expand text-sm"></i>Layar Penuh</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkTourStart()"><i
+            class="fa-solid fa-circle-question"></i>Tur Demo</button>
+        <button type="button" class="wk-mi danger" onclick="wkMoreClose();wkResetDemo()"><i
+            class="fa-solid fa-rotate-left"></i>Reset Demo</button>
+      </div>
+      <button id="more-btn" onclick="wkMoreToggle(event)" type="button" title="Lainnya" aria-haspopup="true"
         class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"><i
-          id="theme-icon" class="fa-solid fa-moon text-sm"></i></button>
+          class="fa-solid fa-ellipsis-vertical text-sm"></i></button>
 
-      <button onclick="wkTourStart()" type="button" title="Tur Demo"
-        class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"><i
-          class="fa-solid fa-circle-question text-sm"></i></button>
-
-      <button onclick="wkResetDemo()" type="button" title="Reset Demo"
-        class="p-2 text-neutral-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"><i
-          class="fa-solid fa-rotate-left text-sm"></i></button>
-
-      <button onclick="toggleFullscreen()" type="button" title="Layar Penuh"
-        class="p-2 text-neutral-500 hover:text-neutral-800 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer">
-        <i id="fullscreen-icon" class="fa-solid fa-expand text-sm"></i>
-      </button>
     </div>
   </header>
 
@@ -1884,7 +1981,7 @@
           </div>
         </div>
 
-        <div class="wk-row" style="margin-bottom:8px">
+        <div class="wk-row" style="margin:0">
           <button type="button" class="wk-btn ghost xs grow" onclick="wkKitchenTicket()"><i
               class="fa-solid fa-print"></i>Tiket Dapur</button>
           <button type="button" class="wk-btn ghost xs grow" onclick="wkOpenSplit()"><i
@@ -2437,6 +2534,28 @@
       </div>
       <div class="wk-mbody" id="sh-body"></div>
       <div class="wk-mfoot" id="sh-foot"></div>
+    </div>
+  </div>
+
+  <!-- ================= PIN OWNER ================= -->
+  <div id="pin-modal" role="dialog" aria-modal="true" class="wk-overlay top hidden">
+    <div class="wk-modal" style="max-width:320px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#fef3c7;color:#b45309"><i class="fa-solid fa-lock"></i></span><span>PIN
+            Owner<small id="pin-msg">Masukkan PIN</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkClosePin()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody">
+        <input id="pin-input" type="password" inputmode="numeric" maxlength="6" autocomplete="off" class="wk-in"
+          aria-label="PIN" style="text-align:center;font-size:20px;letter-spacing:.4em"
+          onkeydown="if(event.key==='Enter')wkPinSubmit()">
+        <div id="pin-err" class="wk-note" style="display:none;color:#be123c;margin-top:8px">PIN salah, coba lagi.</div>
+        <div class="wk-note" style="margin-top:8px">Demo: PIN Owner 1234</div>
+      </div>
+      <div class="wk-mfoot"><button type="button" class="wk-btn ghost" onclick="wkClosePin()">Batal</button><button
+          type="button" class="wk-btn amber grow" onclick="wkPinSubmit()"><i
+            class="fa-solid fa-unlock"></i>Buka</button></div>
     </div>
   </div>
 
@@ -3110,9 +3229,6 @@
     }
 
 
-    renderCategories();
-    renderProducts();
-    renderCart();
   </script>
   <script>
     /* ================================================================
@@ -3924,6 +4040,7 @@
       const counted = Number(wk$('sh-close-btn').dataset.counted) || 0;
       if (!counted) return;
       const doClose = () => {
+        wkArchiveShift();
         wkShift.open = false; wkShift.closedAt = wkHM(new Date()) + ' WIB'; wkShift.counted = counted;
         wkUpdateShiftUI(); wkRenderShift();
         wkToast('Shift #' + wkShift.number + ' ditutup. Laporan siap dicetak.', 'success');
@@ -3993,7 +4110,7 @@
 
     /* Urutan modal dari paling atas; Esc hanya menutup satu modal teratas */
     const WK_MODALS = [
-      ['confirm-modal', () => wkConfirmCancel()], ['opt-modal', () => wkCloseOpt()], ['ing-modal', () => wkCloseIng()], ['cust-modal', () => wkCloseCust()], ['floor-modal', () => wkCloseFloor()], ['split-modal', () => wkCloseSplit()], ['report-modal', () => wkCloseReport()], ['menu-modal', () => wkCloseMenu()], ['discount-modal', () => wkCloseDiscount()],
+      ['pin-modal', () => wkClosePin()], ['confirm-modal', () => wkConfirmCancel()], ['opt-modal', () => wkCloseOpt()], ['ing-modal', () => wkCloseIng()], ['cust-modal', () => wkCloseCust()], ['floor-modal', () => wkCloseFloor()], ['split-modal', () => wkCloseSplit()], ['report-modal', () => wkCloseReport()], ['menu-modal', () => wkCloseMenu()], ['discount-modal', () => wkCloseDiscount()],
       ['transfer-modal', () => wkCloseTransfer()], ['held-modal', () => wkCloseHeld()],
       ['shift-modal', () => wkCloseShift()], ['qris-modal', () => closeQrisModal()],
       ['note-modal', () => closeNoteModal()], ['receipt-modal', () => closeReceiptModal()],
@@ -4014,6 +4131,7 @@
       else if (t.id === 'report-modal') wkCloseReport();
       else if (t.id === 'split-modal') wkCloseSplit();
       else if (t.id === 'floor-modal') wkCloseFloor();
+      else if (t.id === 'pin-modal') wkClosePin();
       else if (t.id === 'ing-modal') wkCloseIng();
       else if (t.id === 'menu-modal') wkCloseMenu();
       else if (t.id === 'discount-modal') wkCloseDiscount();
@@ -4121,6 +4239,7 @@
       <input id="np-cost" class="wk-in" type="number" min="0" placeholder="HPP">
       <input id="np-stock" class="wk-in" type="number" min="0" placeholder="Stok">
     </div>
+    <label style="display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:8px;cursor:pointer"><span class="wk-btn ghost xs"><i class="fa-regular fa-image"></i>Foto (opsional)</span><input type="file" accept="image/*" hidden onchange="wkPickImg(this)"><span style="color:#737373">${wkNewImg ? 'Foto dipilih' : 'Tanpa foto, memakai gambar bawaan'}</span>${wkNewImg ? `<img src="${wkNewImg}" alt="" style="width:34px;height:34px;border-radius:8px;object-fit:cover">` : ''}</label>
     <button type="button" class="wk-btn amber" onclick="wkAddProd()" style="width:100%;margin-bottom:14px"><i class="fa-solid fa-plus"></i>Tambah Menu</button>
     <div style="overflow-x:auto"><table class="wk-tbl"><thead><tr><th>Menu</th><th>Harga</th><th>HPP</th><th>Margin</th><th>Stok</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
     }
@@ -4134,7 +4253,8 @@
       const name = wk$('np-name').value.trim(), price = wkInt(wk$('np-price').value);
       if (!name || !price) { wkToast('Isi nama dan harga menu.', 'warn'); return; }
       const cost = wk$('np-cost').value === '' ? Math.round(price * 0.45) : wkInt(wk$('np-cost').value);
-      PRODUCTS.push({ id: 'c' + Date.now(), sku: 'CST-' + String(PRODUCTS.length + 1).padStart(3, '0'), name, category: wk$('np-cat').value, price, cost, stock: wkInt(wk$('np-stock').value), image: WK_PLACEHOLDER, desc: 'Menu tambahan', custom: true });
+      PRODUCTS.push({ id: 'c' + Date.now(), sku: 'CST-' + String(PRODUCTS.length + 1).padStart(3, '0'), name, category: wk$('np-cat').value, price, cost, stock: wkInt(wk$('np-stock').value), image: wkNewImg || WK_PLACEHOLDER, desc: 'Menu tambahan', custom: true });
+      wkNewImg = null;
       renderProducts(); wkRenderMenu(); wkToast(name + ' ditambahkan ke menu.', 'success');
     }
     function wkDelProd(id) {
@@ -4175,7 +4295,7 @@
     function wkRenderReport() {
       const R = wkReportData();
       wk$('rep-sub').textContent = 'Shift #' + wkShift.number + ' · ' + R.n + ' transaksi (tanpa void)';
-      const tabs = `<div class="wk-tabs"><button type="button" class="${wkRepTab === 'jual' ? 'on' : ''}" onclick="wkRepSetTab('jual')">Penjualan</button><button type="button" class="${wkRepTab === 'laba' ? 'on' : ''}" onclick="wkRepSetTab('laba')">Laba Rugi</button></div>`;
+      const tabs = `<div class="wk-tabs"><button type="button" class="${wkRepTab === 'jual' ? 'on' : ''}" onclick="wkRepSetTab('jual')">Penjualan</button><button type="button" class="${wkRepTab === 'laba' ? 'on' : ''}" onclick="wkRepSetTab('laba')">Laba Rugi</button><button type="button" class="${wkRepTab === 'dash' ? 'on' : ''}" onclick="wkRepSetTab('dash')">Dashboard</button></div>`;
       let body;
       if (wkRepTab === 'jual') {
         const top = Object.values(R.menu).sort((a, b) => b.q - a.q).slice(0, 5).map(m => [m.name, m.q]);
@@ -4188,6 +4308,8 @@
       <div class="wk-h4">Menu Terlaris (porsi)</div>${wkBars(top, v => v + ' porsi')}
       <div class="wk-h4">Penjualan per Jam</div>${wkBars(hrs, formatRupiah)}
       <div class="wk-h4">Metode Pembayaran</div>${wkBars(Object.entries(R.pay), formatRupiah)}`;
+      } else if (wkRepTab === 'dash') {
+        body = wkDashHTML();
       } else {
         const row = (l, v, cls, neg) => `<tr class="${cls || ''}"><td>${l}</td><td class="${neg ? 'neg' : ''}">${neg ? '− ' : ''}${formatRupiah(Math.abs(v))}</td></tr>`;
         const exp = wkExpenses.map(e => `<tr><td>${wkEsc(e.n)}</td><td style="text-align:right;font:700 12px 'JetBrains Mono',monospace">${formatRupiah(e.a)}</td><td style="width:34px;text-align:right"><button type="button" class="wk-x" onclick="wkDelExpense(${e.id})" aria-label="Hapus biaya"><i class="fa-solid fa-xmark"></i></button></td></tr>`).join('');
@@ -4498,6 +4620,122 @@
       const inp = wk$('sh-counted'); inp.value = sum ? String(sum) : ''; wkOnCount(inp);
     }
 
+    /* ---------- Dashboard multi-hari ---------- */
+    let wkDaily = [], wkDashN = 7;
+    const wkDayKey = d => d.getFullYear() + '-' + wkPad(d.getMonth() + 1) + '-' + wkPad(d.getDate());
+    const wkDayLabel = d => d.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short' });
+    function wkSeedDaily() {
+      wkDaily = [];
+      for (let i = 14; i >= 1; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const dow = d.getDay(), mult = (dow === 0 || dow === 6) ? 1.4 : dow === 5 ? 1.2 : 1;
+        const net = Math.round(1450000 * mult * (0.8 + ((i * 37 + 11) % 31) / 100) / 1000) * 1000;
+        const n = Math.round(net / 52000);
+        wkDaily.push({ k: wkDayKey(d), net, hpp: Math.round(net * (0.36 + ((i * 13) % 7) / 100) / 1000) * 1000, n, items: n * 2 + (i * 5) % 9 });
+      }
+    }
+    function wkArchiveShift() {
+      const R = wkReportData(), k = wkDayKey(new Date());
+      let e = wkDaily.find(x => x.k === k); if (!e) { e = { k, net: 0, hpp: 0, n: 0, items: 0 }; wkDaily.push(e); }
+      e.net += R.net; e.hpp += R.hpp; e.n += R.n; e.items += R.items;
+      wkDaily = wkDaily.slice(-60); wkSaveSoon();
+    }
+    function wkSeries(n, off) {
+      off = off || 0; const out = [];
+      for (let i = n - 1 + off; i >= off; i--) {
+        const d = new Date(); d.setDate(d.getDate() - i);
+        const e = wkDaily.find(x => x.k === wkDayKey(d)) || { net: 0, hpp: 0, n: 0, items: 0 };
+        const v = { d, net: e.net, hpp: e.hpp, n: e.n, items: e.items, today: i === 0 };
+        if (i === 0 && wkShift.open) { const R = wkReportData(); v.net += R.net; v.hpp += R.hpp; v.n += R.n; v.items += R.items; }
+        out.push(v);
+      }
+      return out;
+    }
+    function wkDashSet(n) { wkDashN = n; wkRenderReport(); }
+    function wkDashHTML() {
+      const cur = wkSeries(wkDashN), prev = wkSeries(wkDashN, wkDashN);
+      const sum = (a, f) => a.reduce((t, x) => t + x[f], 0);
+      const net = sum(cur, 'net'), gp = net - sum(cur, 'hpp'), trx = sum(cur, 'n'), pNet = sum(prev, 'net');
+      const delta = pNet > 0 ? Math.round((net - pNet) / pNet * 100) : null;
+      const dChip = delta == null ? '' : `<span style="font:800 10px sans-serif;color:${delta >= 0 ? '#047857' : '#be123c'}"> ${delta >= 0 ? '▲' : '▼'} ${Math.abs(delta)}% vs ${wkDashN} hari sebelumnya</span>`;
+      const max = Math.max(1, ...cur.map(x => x.net));
+      const past = cur.filter(x => !x.today && x.net > 0).sort((a, b) => b.net - a.net);
+      const R = wkReportData(), topMenu = Object.values(R.menu).sort((a, b) => b.q - a.q)[0];
+      const lowM = PRODUCTS.filter(p => p.price && (p.price - p.cost) / p.price < 0.35).map(p => wkEsc(p.name) + ' (' + Math.round((p.price - p.cost) / p.price * 100) + '%)').slice(0, 3);
+      const ins = [];
+      if (delta != null) ins.push([delta >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down', delta >= 0 ? '#047857' : '#be123c', `Penjualan ${wkDashN} hari terakhir ${delta >= 0 ? 'naik' : 'turun'} ${Math.abs(delta)}% dibanding periode sebelumnya.`]);
+      if (past.length > 1) ins.push(['fa-calendar-day', '#b45309', `Hari terbaik: <b>${wkDayLabel(past[0].d)}</b> (${formatRupiah(past[0].net)}). Terendah: ${wkDayLabel(past[past.length - 1].d)} (${formatRupiah(past[past.length - 1].net)}).`]);
+      if (topMenu) ins.push(['fa-fire', '#b45309', `Terlaris shift ini: <b>${wkEsc(topMenu.name)}</b> (${topMenu.q} porsi).`]);
+      if (lowM.length) ins.push(['fa-triangle-exclamation', '#be123c', `Margin di bawah 35%: ${lowM.join(', ')}. Pertimbangkan naikkan harga atau cek resep.`]);
+      if (wkLowIngs().length) ins.push(['fa-basket-shopping', '#b45309', `${wkLowIngs().length} bahan baku menipis, perlu belanja.`]);
+      return `<div class="wk-chips" style="margin-bottom:10px"><button type="button" class="wk-chip${wkDashN === 7 ? ' on' : ''}" onclick="wkDashSet(7)">7 hari</button><button type="button" class="wk-chip${wkDashN === 14 ? ' on' : ''}" onclick="wkDashSet(14)">14 hari</button></div>
+    <div class="wk-kpis"><div class="wk-kpi" style="grid-column:span 2"><small>Penjualan bersih ${wkDashN} hari</small><b>${formatRupiah(net)}</b>${dChip}</div>
+    <div class="wk-kpi"><small>Laba kotor</small><b>${formatRupiah(gp)}</b></div><div class="wk-kpi"><small>Transaksi / rata-rata harian</small><b>${trx} / ${formatRupiah(Math.round(net / wkDashN))}</b></div></div>
+    <div class="wk-h4">Penjualan per hari <span style="text-transform:none;font-weight:600">(hari ini = oranye, termasuk shift berjalan)</span></div>
+    <div style="display:flex;align-items:flex-end;gap:4px;height:130px">${cur.map(x => `<div title="${wkDayLabel(x.d)}: ${formatRupiah(x.net)}" style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%"><div style="height:${Math.max(2, Math.round(x.net / max * 100))}%;background:${x.today ? '#f59e0b' : '#fcd34d'};border-radius:5px 5px 0 0"></div></div>`).join('')}</div>
+    <div style="display:flex;gap:4px">${cur.map(x => `<span style="flex:1;text-align:center;font:600 9px sans-serif;color:#737373">${x.d.getDate()}</span>`).join('')}</div>
+    <div class="wk-h4">Insight otomatis</div>${ins.map(i => `<div style="display:flex;gap:8px;padding:6px 0;border-top:1px solid #f0f0f0;font-size:12px"><i class="fa-solid ${i[0]}" style="color:${i[1]};margin-top:2px"></i><span>${i[2]}</span></div>`).join('') || '<div class="wk-note">Belum cukup data.</div>'}`;
+    }
+
+    /* ---------- Peran (Owner / Kasir) + PIN ---------- */
+    const WK_PIN = '1234';
+    let wkRole = 'owner', wkPinCb = null;
+    const WK_OWNER_FNS = ['wkOpenReport', 'wkOpenMenu', 'wkOpenIng', 'openSettingsModal', 'wkResetDemo', 'wkVoid'];
+    function wkAskPin(msg, cb) {
+      wkPinCb = cb; wk$('pin-msg').textContent = msg; wk$('pin-err').style.display = 'none'; wk$('pin-input').value = '';
+      wk$('pin-modal').classList.remove('hidden'); setTimeout(() => wk$('pin-input').focus(), 40);
+    }
+    function wkClosePin() { wk$('pin-modal').classList.add('hidden'); wkPinCb = null; }
+    function wkPinSubmit() {
+      if (wk$('pin-input').value !== WK_PIN) { wk$('pin-err').style.display = ''; wk$('pin-input').value = ''; wk$('pin-input').focus(); return; }
+      const cb = wkPinCb; wkClosePin(); if (cb) cb();
+    }
+    function wkRoleUI() {
+      const o = wkRole === 'owner';
+      wk$('role-label').textContent = o ? 'Owner' : 'Kasir';
+      wk$('role-icon').className = 'fa-solid ' + (o ? 'fa-user-shield text-amber-600' : 'fa-user text-neutral-500');
+      wk$('role-btn').title = o ? 'Beralih ke Kasir' : 'Masuk sebagai Owner (PIN)';
+      document.querySelectorAll(WK_OWNER_FNS.map(f => `[onclick^="${f}("]`).join(',')).forEach(b => { b.style.opacity = o ? '' : '.55'; });
+    }
+    function wkSetRole(r) {
+      wkRole = r;
+      if (r === 'kasir') { wkCloseReport(); wkCloseMenu(); wkCloseIng(); closeSettingsModal(); }
+      wkRoleUI(); wkToast('Peran aktif: ' + (r === 'owner' ? 'Owner (akses penuh).' : 'Kasir (laporan, menu, dan pengaturan butuh PIN Owner).'), 'info');
+    }
+    function wkToggleRole() { if (wkRole === 'owner') wkSetRole('kasir'); else wkAskPin('Masuk sebagai Owner', () => wkSetRole('owner')); }
+
+    /* ---------- Menu "Lainnya" di header + foto menu opsional ---------- */
+    function wkMoreToggle(e) {
+      e.stopPropagation();
+      const m = wk$('more-menu');
+      if (m.style.display === 'block') { wkMoreClose(); return; }
+      const r = wk$('more-btn').getBoundingClientRect();
+      m.style.display = 'block'; m.style.top = (r.bottom + 6) + 'px'; m.style.right = Math.max(8, innerWidth - r.right) + 'px';
+    }
+    function wkMoreClose() { wk$('more-menu').style.display = 'none'; }
+    document.addEventListener('click', e => { if (!e.target.closest('#more-menu')) wkMoreClose(); });
+    window.addEventListener('keydown', e => { if (e.key === 'Escape') wkMoreClose(); });
+
+    let wkNewImg = null;
+    function wkPickImg(inp) {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      const ids = ['np-name', 'np-cat', 'np-price', 'np-cost', 'np-stock'], keep = ids.map(id => wk$(id).value);
+      const r = new FileReader();
+      r.onload = () => {
+        const im = new Image();
+        im.onload = () => {
+          const W = 360, H = 270, c = document.createElement('canvas'); c.width = W; c.height = H;
+          const sc = Math.max(W / im.width, H / im.height), w = im.width * sc, h = im.height * sc;
+          c.getContext('2d').drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+          wkNewImg = c.toDataURL('image/jpeg', 0.78);
+          wkRenderMenu(); ids.forEach((id, i) => { wk$(id).value = keep[i]; });
+        };
+        im.onerror = () => wkToast('File bukan gambar yang valid.', 'warn');
+        im.src = r.result;
+      };
+      r.readAsDataURL(f);
+    }
+
     /* ---------- Tiket dapur, split bill, mode gelap, tur demo ---------- */
     function wkKitchenTicket() {
       if (!cart.length) { wkToast('Keranjang masih kosong.', 'info'); return; }
@@ -4603,7 +4841,7 @@
       if (wkNoSave) return;
       try {
         db.set(WK_KEY, ({
-          v: 1, products: PRODUCTS.map(p => ({ id: p.id, sku: p.sku, name: p.name, category: p.category, price: p.price, cost: p.cost, stock: p.stock, desc: p.desc, custom: !!p.custom })), expenses: wkExpenses, ingredients: wkIngs, recipes: wkRecipes, purchases: wkPurchases,
+          v: 1, products: PRODUCTS.map(p => ({ id: p.id, sku: p.sku, name: p.name, category: p.category, price: p.price, cost: p.cost, stock: p.stock, desc: p.desc, custom: !!p.custom, image: p.custom ? p.image : undefined })), expenses: wkExpenses, ingredients: wkIngs, recipes: wkRecipes, purchases: wkPurchases, daily: wkDaily,
           transactions, drawerLogs, held: wkHeld, shift: wkShift, trxSeq: wkTrxSeq, heldSeq: wkHeldSeq,
           settings: storeSettings, cart, discount: wkDiscount, orderType
         }));
@@ -4617,10 +4855,10 @@
         if (d.products) {
           const keep = new Set(d.products.map(x => x.id));
           for (let i = PRODUCTS.length - 1; i >= 0; i--) if (!keep.has(PRODUCTS[i].id)) PRODUCTS.splice(i, 1);
-          d.products.forEach(x => { const p = wkProduct(x.id); if (p) Object.assign(p, x); else PRODUCTS.push({ ...x, image: WK_PLACEHOLDER }); });
+          d.products.forEach(x => { const p = wkProduct(x.id); if (p) Object.assign(p, x); else PRODUCTS.push({ ...x, image: x.image || WK_PLACEHOLDER }); });
         } else if (d.stock) PRODUCTS.forEach(p => { if (d.stock[p.id] != null) p.stock = d.stock[p.id]; });
         wkExpenses = d.expenses || [];
-        wkPurchases = d.purchases || [];
+        wkPurchases = d.purchases || []; wkDaily = d.daily || [];
         if (d.ingredients) { wkIngs = d.ingredients; wkRecipes = d.recipes || wkRecipes; }
         transactions = d.transactions || []; drawerLogs = d.drawerLogs || drawerLogs;
         wkHeld = (d.held || []).map(h => ({ ...h, time: new Date(h.time) }));
@@ -4640,6 +4878,7 @@
 
     wkRestored = wkLoadState();
     wkRecalcCosts(); wkSyncStock();
+    if (!wkDaily.length) wkSeedDaily();
     if (!wkRestored) { wkSeed(); transactions.forEach(t => wkConsume(t.items, -1, true)); wkExpenses = [{ id: 1, n: 'Gas LPG', a: 22000 }, { id: 2, n: 'Es batu & kemasan', a: 18000 }]; }
     wkRenderTableOptions();
     wk$('table-number').value = wkFirstFreeTable();
@@ -4656,6 +4895,11 @@
       wk$('topbar-cashier-name').innerText = storeSettings.cashierName; wk$('topbar-shift-cashier').innerText = storeSettings.cashierName;
       setOrderType(orderType); renderCart(); renderProducts(); wkUpdateBadges();
     }
+    WK_OWNER_FNS.forEach(n => {
+      const f = window[n];
+      window[n] = function () { const a = arguments, self = this; if (wkRole === 'owner') return f.apply(self, a); wkAskPin('Aksi ini butuh PIN Owner', () => f.apply(self, a)); };
+    });
+    wkRoleUI();
     const _wkFinish = finishCheckout;
     finishCheckout = function () { const r = _wkFinish.apply(this, arguments); if (transactions[0]) wkConsume(transactions[0].items, -1); renderProducts(); return r; };
     ['renderCart', 'renderProducts', 'calculateTotals', 'updateDrawerStats', 'wkUpdateBadges'].forEach(n => {

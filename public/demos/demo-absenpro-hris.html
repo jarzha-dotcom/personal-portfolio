@@ -31,7 +31,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Absensi & HRIS Mobile | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti dan lembur dengan persetujuan berjenjang, agenda kehadiran, slip gaji, dan mode gelap/terang.">
+    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti dan lembur dengan persetujuan berjenjang, agenda kehadiran, slip gaji, dan tautan ke Portal Admin.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris.webp">
@@ -357,6 +357,7 @@
     input:where([type=reset]),
     input:where([type=submit]) {
       -webkit-appearance: button;
+      appearance: button;
       background-color: transparent;
       background-image: none
     }
@@ -380,15 +381,18 @@
 
     [type=search] {
       -webkit-appearance: textfield;
+      appearance: textfield;
       outline-offset: -2px
     }
 
     ::-webkit-search-decoration {
-      -webkit-appearance: none
+      -webkit-appearance: none;
+      appearance: none
     }
 
     ::-webkit-file-upload-button {
       -webkit-appearance: button;
+      appearance: button;
       font: inherit
     }
 
@@ -460,8 +464,7 @@
     object,
     svg,
     video {
-      display: block;
-      vertical-align: middle
+      display: block
     }
 
     img,
@@ -3152,7 +3155,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -3276,13 +3279,38 @@
       font-family: "Plus Jakarta Sans", system-ui, sans-serif
     }
 
+    .rlp {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: #0f172a;
+      color: #fff;
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      text-decoration: none
+    }
+
+    .dark .rlp {
+      background: #e2e8f0;
+      color: #0f172a
+    }
+
+    .rlp small {
+      opacity: .75
+    }
+
+    .rlp[hidden],
+    .rlportal[hidden] {
+      display: none
+    }
+
     #lg1 .tg.m2 {
       background: #ede9fe;
       color: #5b21b6
     }
   </style>
-  <!-- @jz-tw-css -->
-  <link rel="stylesheet" href="./css/demo-absenpro-hris.css">
 </head>
 
 <body
@@ -4065,9 +4093,6 @@
               </div>
               <div id="tabContent-spvteam" class="p-4 hidden"></div>
               <div id="tabContent-spvappr" class="p-4 hidden"></div>
-              <div id="tabContent-adsum" class="p-4 hidden"></div>
-              <div id="tabContent-ademp" class="p-4 hidden"></div>
-              <div id="tabContent-adappr" class="p-4 hidden"></div>
               <div id="tabContent-agenda" class="p-4 hidden"></div>
 
               <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
@@ -5411,11 +5436,13 @@
       var $ = function (s) { return document.querySelector(s) }, APP = $('#appContainer'), NAV0 = APP.querySelector('nav'), USER = null;
       var ACT = 'flex-1 flex flex-col items-center justify-center py-1 text-brand-600 dark:text-brand-400 transition', INACT = 'flex-1 flex flex-col items-center justify-center py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition';
       var IC = { home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>', team: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.6-3.5 3.5-5 7-5s6.4 1.5 7 5M16 5a3.5 3.5 0 0 1 0 7M18 15c2.2.5 3.6 2 4 5"/>', ok: '<path d="M4 12l5 5L20 6"/>', req: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', chart: '<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>' };
-      var NV = { spv: [['home', 'Beranda', 'home'], ['spvteam', 'Tim', 'team'], ['spvappr', 'Persetujuan', 'ok', 1], ['agenda', 'Agenda', 'req'], ['profile', 'Profil', 'user']], admin: [['home', 'Beranda', 'home'], ['adsum', 'Ringkasan', 'chart'], ['ademp', 'Pegawai', 'team'], ['adappr', 'Persetujuan', 'ok', 1], ['profile', 'Profil', 'user']] };
-      var TABS = ['home', 'leave', 'agenda', 'payroll', 'profile', 'spvteam', 'spvappr', 'adsum', 'ademp', 'adappr'];
+      var NV = { spv: [['home', 'Beranda', 'home'], ['spvteam', 'Tim', 'team'], ['spvappr', 'Persetujuan', 'ok', 1], ['agenda', 'Agenda', 'req'], ['profile', 'Profil', 'user']], admin: [['home', 'Beranda', 'home'], ['spvteam', 'Tim', 'team'], ['spvappr', 'Persetujuan', 'ok', 1], ['agenda', 'Agenda', 'req'], ['profile', 'Profil', 'user']] };
+      var TABS = ['home', 'leave', 'agenda', 'payroll', 'profile', 'spvteam', 'spvappr'];
       var NAV2 = NAV0.cloneNode(false); NAV2.id = 'roleNav'; NAV2.style.display = 'none'; NAV0.parentNode.insertBefore(NAV2, NAV0.nextSibling);
       var pf = $('#tabContent-profile'); pf.insertAdjacentHTML('afterbegin', '<div class="ag-card" id="rlMenu" hidden><h3>Menu saya</h3><button class="rlmm" onclick="switchTab(\'payroll\')"><span>Slip gaji</span><span>\u203a</span></button><button class="rlmm" onclick="switchTab(\'leave\')"><span>Cuti dan lembur</span><span>\u203a</span></button><button class="rlmm" onclick="switchTab(\'agenda\')"><span>Agenda dan riwayat</span><span>\u203a</span></button></div>');
       ['payroll', 'leave', 'agenda'].forEach(function (id) { var c = document.getElementById('tabContent-' + id); if (c) { c.insertAdjacentHTML('afterbegin', '<button class="rlbk" type="button" hidden onclick="switchTab(\'profile\')">\u2039 Profil</button>') } });
+      var hm = $('#tabContent-home'); hm.insertAdjacentHTML('afterbegin', '<a class="rlp rlportal" href="demo-absenpro-hris-admin.html" hidden><span><b>Portal Admin</b><br><small>Ringkasan, tabel kehadiran, dan laporan di layar lebar</small></span><span>\u203a</span></a>');
+      pf.insertAdjacentHTML('afterbegin', '<div class="ag-card rlportal" hidden><a class="rlmm" href="demo-absenpro-hris-admin.html" style="text-decoration:none"><span>Portal Admin</span><span>\u203a</span></a></div>');
       var rib = document.createElement('div'); rib.id = 'rlRib'; APP.appendChild(rib);
       function canAct(r) { return !!USER && r.uid !== USER.id && ((USER.r === 'spv' && r.lvl === 'spv' && r.div === 'Digital') || (USER.r === 'admin' && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')))) }
       function cur() { return typeof appState !== 'undefined' ? appState.activeTab : 'home' }
@@ -5423,12 +5450,9 @@
       function fmt(d) { return new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }
       function badges() { var n = USER ? RL.pending(canAct).length : 0;[].forEach.call(document.querySelectorAll('#roleNav .rlb'), function (b) { b.textContent = n; b.hidden = !n }) }
       function rolesRender(t) {
-        if (!USER) return;
-        if (t === 'spvteam') RL.team($('#tabContent-spvteam'), 'Digital', 'Divisi Digital');
-        else if (t === 'spvappr') RL.approvals($('#tabContent-spvappr'), function (r) { return r.div === 'Digital' && r.lvl === 'spv' }, 'Tim Digital');
-        else if (t === 'adsum') RL.summary($('#tabContent-adsum'));
-        else if (t === 'ademp') RL.employees($('#tabContent-ademp'));
-        else if (t === 'adappr') RL.approvals($('#tabContent-adappr'), null, 'Semua divisi')
+        if (!USER) return; var ad = USER.r === 'admin';
+        if (t === 'spvteam') { if (ad) RL.team($('#tabContent-spvteam'), 'SDM', 'Divisi SDM'); else RL.team($('#tabContent-spvteam'), 'Digital', 'Divisi Digital') }
+        else if (t === 'spvappr') { if (ad) RL.approvals($('#tabContent-spvappr'), function (r) { return r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital') }, 'Admin'); else RL.approvals($('#tabContent-spvappr'), function (r) { return r.div === 'Digital' && r.lvl === 'spv' }, 'Tim Digital') }
       }
       RL.init({ prefix: 'v1', can: canAct, live: function (id) { if (!USER || id !== USER.id || typeof appState === 'undefined') return null; if (!appState.checkedIn) return { st: 'Belum absen', t: '\u2013' }; var t = appState.checkInTime; t = t && t.toLocaleTimeString ? t.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : String(t || ''); return { st: appState.checkedOut ? 'Selesai' : 'Hadir', t: t } }, toast: function (m) { if (typeof showToast === 'function') showToast(m, 'success') }, onChange: function () { badges(); rolesRender(cur()) } });
       window.switchTab = function (t) {
@@ -5447,7 +5471,7 @@
       if (bell && bell.onclick) { var ob = bell.onclick; bell.onclick = function () { ob.call(bell); var l = $('#agNl'); if (!USER || !l) return; RL.mine(USER.id).filter(function (r) { return r.st !== 'Menunggu' }).forEach(function (r) { l.insertAdjacentHTML('afterbegin', '<div class="ag-row"><div><b>' + RL.esc(r.type) + ' ' + r.st.toLowerCase() + '</b><br><span class="ag-sm">' + RL.esc(r.detail) + '</span></div></div>') }) } }
       window.RoleUI = {
         apply: function (u) {
-          USER = u; $('#rlMenu').hidden = u.r === 'staff'; document.body.dataset.role = u.r;
+          USER = u; $('#rlMenu').hidden = u.r === 'staff';[].forEach.call(document.querySelectorAll('.rlportal'), function (e) { e.hidden = u.r !== 'admin' }); document.body.dataset.role = u.r;
           if (u.r === 'staff') { NAV0.style.display = ''; NAV2.style.display = 'none' }
           else { NAV2.innerHTML = NV[u.r].map(function (x) { return '<button onclick="switchTab(\'' + x[0] + '\')" data-t="' + x[0] + '" class="' + INACT + '" aria-label="' + x[1] + '"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + IC[x[2]] + '</svg><span class="text-[10px] font-semibold mt-1">' + x[1] + '</span>' + (x[3] ? '<b class="rlb" hidden></b>' : '') + '</button>' }).join(''); NAV0.style.display = 'none'; NAV2.style.display = '' }
           badges(); window.switchTab('home')
@@ -5457,7 +5481,7 @@
   </script>
   <script>
     (function () {
-      var $ = function (s) { return document.querySelector(s) }, PW = 'demo123', KEY = 'absenpro-session', APP = $('#appContainer');
+      var $ = function (s) { return document.querySelector(s) }, PW = 'demo123', KEY = 'absenpro-v1-session', APP = $('#appContainer');
       var ACC = [{ id: 'arzha', email: 'arzha@absenpro.demo', short: 'Arzha', name: 'K. Arzhaning Jagad', ini: 'AR', role: 'Lead Dev', eid: 'EMP-20240982', a: 0, r: 'staff', div: 'Divisi Digital' },
       { id: 'raka', email: 'raka@absenpro.demo', short: 'Raka', name: 'Raka Mahendra', ini: 'RM', role: 'Engineer', eid: 'EMP-20250114', a: 0, r: 'staff', div: 'Divisi Digital' },
       { id: 'salsa', email: 'salsa@absenpro.demo', short: 'Salsa', name: 'Salsa Anindya', ini: 'SA', role: 'QA Engineer', eid: 'EMP-20250131', a: 0, r: 'staff', div: 'Divisi Digital' },
