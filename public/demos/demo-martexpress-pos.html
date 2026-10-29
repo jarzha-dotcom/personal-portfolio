@@ -1902,6 +1902,100 @@
         display: none;
       }
     }
+
+    /* Voucher & diskon item */
+    .mx-vch {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 6px 0 2px;
+    }
+
+    .mx-vch input {
+      flex: 1;
+      min-width: 90px;
+      height: 32px;
+      padding: 0 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: 700 12px 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      background: #fff;
+      color: #0f172a;
+    }
+
+    .mx-vch>button.use {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 8px;
+      border: 0;
+      background: #0f172a;
+      color: #fff;
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .mx-vch .chip {
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 99px;
+      border: 1px dashed #6ee7b7;
+      background: #ecfdf5;
+      color: #047857;
+      font: 700 10.5px 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
+
+    .mx-vch.on {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: 10px;
+      padding: 6px 8px;
+      margin: 4px 0;
+      justify-content: space-between;
+    }
+
+    .mx-vch.on b {
+      color: #047857;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+    }
+
+    .mx-vch.on span {
+      font-size: 11px;
+      color: #475569;
+      flex: 1;
+    }
+
+    .mx-vch.on button {
+      border: 0;
+      background: transparent;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .mx-vwarn {
+      font-size: 11px;
+      color: #b45309;
+      padding: 0 2px 4px;
+    }
+
+    body.mx-dark .mx-vch input {
+      background: #0e1626;
+      color: #e2e8f0;
+      border-color: #2b3a58;
+    }
+
+    body.mx-dark .mx-vch.on {
+      background: rgba(16, 185, 129, .14);
+      border-color: rgba(16, 185, 129, .4);
+    }
+
+    body.mx-dark .mx-vch.on span {
+      color: #94a3b8;
+    }
   </style>
 </head>
 
@@ -2294,9 +2388,19 @@
             <span>Subtotal (<span id="bill-total-qty">0 Pcs</span>)</span>
             <span class="font-bold text-slate-800 font-num" id="bill-subtotal">Rp 0</span>
           </div>
+          <div class="flex justify-between text-emerald-600 font-medium hidden" id="bill-itemdisc-row">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-scissors text-[10px]"></i> Diskon Item</span>
+            <span class="font-bold font-num" id="bill-itemdisc">-Rp 0</span>
+          </div>
           <div class="flex justify-between text-emerald-600 font-medium hidden" id="bill-discount-row">
             <span class="flex items-center gap-1"><i class="fa-solid fa-tag text-[10px]"></i> Diskon Promo Member</span>
             <span class="font-bold font-num" id="bill-discount">-Rp 0</span>
+          </div>
+          <div id="mx-voucher-box"></div>
+          <div class="flex justify-between text-emerald-600 font-medium hidden" id="bill-voucher-row">
+            <span class="flex items-center gap-1"><i class="fa-solid fa-ticket text-[10px]"></i> <span
+                id="bill-voucher-label">Voucher</span></span>
+            <span class="font-bold font-num" id="bill-voucher">-Rp 0</span>
           </div>
           <div id="mx-redeem-box" class="mx-redeem hidden">
             <label><input type="checkbox" id="mx-redeem-chk" onchange="mxToggleRedeem(this.checked)"><span
@@ -2543,6 +2647,21 @@
         <button type="button" class="mx-btn ghost" onclick="mxCloseSplit()">Batal</button>
         <button type="button" id="sp-confirm" class="mx-btn green grow" onclick="mxConfirmSplit()"><i
             class="fa-solid fa-check"></i><span>Konfirmasi Pembayaran</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div id="disc-modal" class="mx-overlay hidden">
+    <div class="mx-modal" style="max-width:380px">
+      <div class="mx-mhead">
+        <h3><i class="fa-solid fa-tag" style="color:#34d399"></i> Diskon Item</h3>
+        <button type="button" onclick="mxCloseDisc()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mx-mbody" id="dc-body"></div>
+      <div class="mx-mfoot">
+        <button type="button" class="mx-btn ghost" onclick="mxClearDisc()">Hapus</button>
+        <button type="button" class="mx-btn green grow" onclick="mxApplyDisc()"><i
+            class="fa-solid fa-check"></i><span>Terapkan</span></button>
       </div>
     </div>
   </div>
@@ -2856,29 +2975,50 @@
     function pad2(n) { return String(n).padStart(2, '0'); }
     function hm(d) { return pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
     function productById(id) { return PRODUCTS.find(function (p) { return p.id === id; }); }
-    function cloneLines(lines) { return lines.map(function (l) { return { productId: l.productId, quantity: l.quantity }; }); }
+    function cloneLines(lines) { return lines.map(function (l) { return { productId: l.productId, quantity: l.quantity, disc: l.disc || null }; }); }
 
     var POINT_VALUE = 100, redeemOn = false, redeemFor = null, mxCurrentReceipt = null, mxPriceCheck = false, mxStockFilter = 'all', mxStockLog = [];
     function mxRedeemActive() { return !!(redeemOn && selectedMember && redeemFor === selectedMember.id); }
+    var MX_VOUCHERS = {
+      HEMAT10: { label: 'Diskon 10% (maks Rp 20.000)', pct: 10, max: 20000, min: 50000 },
+      POTONG5K: { label: 'Potongan Rp 5.000', rp: 5000, min: 30000 },
+      WEEKEND15: { label: 'Diskon 15% (maks Rp 50.000)', pct: 15, max: 50000, min: 150000 }
+    };
+    var mxVoucher = null;
+    function mxLineDisc(l, price) {
+      var g = price * l.quantity, d = 0;
+      if (l.disc) d = l.disc.t === 'pct' ? Math.round(g * l.disc.v / 100) : l.disc.v * l.quantity;
+      return Math.max(0, Math.min(g, d));
+    }
     function calcBill(lines, member, method, redeem) {
-      var qty = 0, subtotal = 0;
+      var qty = 0, subtotal = 0, itemDisc = 0;
       lines.forEach(function (l) {
         var p = productById(l.productId);
-        if (p) { qty += l.quantity; subtotal += p.price * l.quantity; }
+        if (p) { qty += l.quantity; subtotal += p.price * l.quantity; itemDisc += mxLineDisc(l, p.price); }
       });
-      var discount = member ? Math.round(subtotal * (member.discount / 100)) : 0;
-      var afterMember = Math.max(0, subtotal - discount);
+      var base = subtotal - itemDisc;
+      var discount = member ? Math.round(base * (member.discount / 100)) : 0;
+      var afterMember = Math.max(0, base - discount);
+      var vch = (lines === cart && mxVoucher) ? MX_VOUCHERS[mxVoucher] : null, vAmt = 0, vNote = '';
+      if (vch) {
+        if (base < vch.min) vNote = 'Belum memenuhi min. belanja ' + formatRupiah(vch.min);
+        else vAmt = Math.min(afterMember, vch.pct ? Math.min(vch.max, Math.round(afterMember * vch.pct / 100)) : vch.rp);
+      }
+      var afterVoucher = afterMember - vAmt;
       var pointsUsed = 0, redeemAmt = 0;
       if (redeem && member) {
-        pointsUsed = Math.max(0, Math.min(member.points, Math.floor(afterMember * 0.5 / POINT_VALUE)));
+        pointsUsed = Math.max(0, Math.min(member.points, Math.floor(afterVoucher * 0.5 / POINT_VALUE)));
         redeemAmt = pointsUsed * POINT_VALUE;
       }
-      var taxable = Math.max(0, afterMember - redeemAmt);
+      var taxable = Math.max(0, afterVoucher - redeemAmt);
       var ppn = Math.round(taxable * 0.11);
       var exact = taxable + ppn;
       // Pembulatan ke Rp100 terdekat khusus pembayaran tunai
       var rounding = (method === 'cash' && exact > 0) ? Math.round(exact / 100) * 100 - exact : 0;
-      return { qty: qty, subtotal: subtotal, discount: discount, pointsUsed: pointsUsed, redeemAmt: redeemAmt, ppn: ppn, rounding: rounding, exact: exact, total: exact + rounding };
+      return {
+        qty: qty, subtotal: subtotal, itemDisc: itemDisc, discount: discount, voucherAmt: vAmt, voucherCode: vAmt > 0 ? mxVoucher : null, voucherNote: vNote,
+        pointsUsed: pointsUsed, redeemAmt: redeemAmt, ppn: ppn, rounding: rounding, exact: exact, total: exact + rounding
+      };
     }
     function currentBill() { return calcBill(cart, selectedMember, paymentMethod, mxRedeemActive()); }
 
@@ -3135,7 +3275,8 @@
             '<div class="min-w-0">' +
             '<h4 class="text-xs font-semibold text-slate-800 truncate">' + esc(p.name) + '</h4>' +
             '<div class="text-[11px] text-slate-500 font-num">' + formatRupiah(p.price) + ' / ' + p.unit +
-            (p.originalPrice ? ' <s style="color:#94a3b8">' + formatRupiah(p.originalPrice) + '</s>' : '') + '</div>' +
+            (p.originalPrice ? ' <s style="color:#94a3b8">' + formatRupiah(p.originalPrice) + '</s>' : '') +
+            (item.disc ? ' <b style="color:#059669">· diskon ' + (item.disc.t === 'pct' ? item.disc.v + '%' : formatRupiah(item.disc.v) + '/unit') + '</b>' : '') + '</div>' +
             '</div>' +
             '</div>' +
             '<div class="flex items-center gap-2 shrink-0">' +
@@ -3144,7 +3285,8 @@
             '<input type="number" class="mx-qty" min="1" max="' + p.stock + '" value="' + item.quantity + '" aria-label="Jumlah" onfocus="this.select()" onchange="setCartQty(\x27' + p.id + '\x27, this.value)" />' +
             '<button onclick="updateCartQty(\x27' + p.id + '\x27, 1)" class="w-6 h-6 flex items-center justify-center hover:bg-slate-200 text-xs cursor-pointer">+</button>' +
             '</div>' +
-            '<div class="text-right text-xs font-bold font-num text-slate-900" style="min-width:74px">' + formatRupiah(p.price * item.quantity) + '</div>' +
+            '<div class="text-right text-xs font-bold font-num text-slate-900" style="min-width:74px">' + (mxLineDisc(item, p.price) > 0 ? '<s style="display:block;font-weight:500;color:#94a3b8;font-size:10px">' + formatRupiah(p.price * item.quantity) + '</s>' : '') + formatRupiah(p.price * item.quantity - mxLineDisc(item, p.price)) + '</div>' +
+            '<button onclick="mxOpenDisc(\x27' + p.id + '\x27)" title="Diskon item" aria-label="Diskon item" class="p-1 cursor-pointer ' + (item.disc ? 'text-emerald-600' : 'text-slate-400 hover:text-emerald-600') + '"><i class="fa-solid fa-tag text-xs"></i></button>' +
             '<button onclick="removeCartItem(\x27' + p.id + '\x27)" class="p-1 text-slate-400 hover:text-rose-600 cursor-pointer">' +
             '<i class="fa-solid fa-trash-can text-xs"></i>' +
             '</button>' +
@@ -3167,6 +3309,7 @@
       if (b.discount > 0) { discRow.classList.remove('hidden'); $('bill-discount').innerText = '-' + formatRupiah(b.discount); }
       else discRow.classList.add('hidden');
 
+      mxUpdateDiscUI(b);
       mxUpdateRedeemUI(b);
       $('bill-ppn').innerText = formatRupiah(b.ppn);
 
@@ -3280,11 +3423,12 @@
       var b = calcBill(lines, member, method, extra.redeem);
       var items = lines.map(function (l) {
         var p = productById(l.productId);
-        return { productId: p.id, name: p.name, unit: p.unit, price: p.price, orig: p.originalPrice || p.price, quantity: l.quantity, subtotal: p.price * l.quantity };
+        var dsc = mxLineDisc(l, p.price);
+        return { productId: p.id, name: p.name, unit: p.unit, price: p.price, orig: p.originalPrice || p.price, quantity: l.quantity, disc: dsc, subtotal: p.price * l.quantity - dsc };
       });
       return {
         number: nextReceiptNumber(date), date: date, cashier: shift.cashier, member: member, items: items,
-        subtotal: b.subtotal, discount: b.discount, tax: b.ppn, rounding: b.rounding, total: b.total,
+        subtotal: b.subtotal, itemDiscount: b.itemDisc, voucherCode: b.voucherCode, voucherAmount: b.voucherAmt, discount: b.discount, tax: b.ppn, rounding: b.rounding, total: b.total,
         method: method,
         methodLabel: method === 'cash' ? 'TUNAI' : (extra.label || method.toUpperCase()),
         ref: extra.ref || null,
@@ -3409,8 +3553,9 @@
           '<div class="font-semibold text-slate-800">' + esc(item.name) + '</div>' +
           '<div class="flex justify-between text-slate-600">' +
           '<span>' + item.quantity + ' ' + item.unit + ' x ' + formatRupiah(item.price) + '</span>' +
-          '<span class="font-bold text-slate-900">' + formatRupiah(item.subtotal) + '</span>' +
+          '<span class="font-bold text-slate-900">' + formatRupiah(item.price * item.quantity) + '</span>' +
           '</div>' +
+          (item.disc > 0 ? '<div class="flex justify-between text-emerald-700"><span>&nbsp;Diskon item</span><span>-' + formatRupiah(item.disc) + '</span></div>' : '') +
           '</div>';
       }).join('');
 
@@ -3418,6 +3563,8 @@
       $('receipt-totals').innerHTML =
         '<div class="flex justify-between text-slate-500"><span>Jumlah barang:</span><span>' + r.items.reduce(function (a, i) { return a + i.quantity; }, 0) + ' pcs</span></div>' +
         '<div class="flex justify-between"><span>Subtotal:</span><span>' + formatRupiah(r.subtotal) + '</span></div>' +
+        (r.itemDiscount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Diskon Item:</span><span>-' + formatRupiah(r.itemDiscount) + '</span></div>' : '') +
+        (r.voucherAmount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Voucher ' + esc(r.voucherCode) + ':</span><span>-' + formatRupiah(r.voucherAmount) + '</span></div>' : '') +
         (r.discount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Diskon Member:</span><span>-' + formatRupiah(r.discount) + '</span></div>' : '') +
         (r.pointsUsed > 0 ? '<div class="flex justify-between text-emerald-700"><span>Tukar Poin (' + r.pointsUsed + ' poin):</span><span>-' + formatRupiah(r.redeemAmount) + '</span></div>' : '') +
         '<div class="flex justify-between text-slate-600"><span>PPN 11%:</span><span>' + formatRupiah(r.tax) + '</span></div>' +
@@ -3610,9 +3757,10 @@
         var i = t.items[Number(inp.dataset.idx)];
         var max = i.quantity - (i.returned || 0);
         var q = Math.max(0, Math.min(max, Math.floor(Number(inp.value) || 0)));
-        if (q > 0) { lines.push({ idx: Number(inp.dataset.idx), productId: i.productId, qty: q }); sum += i.price * q; }
+        if (q > 0) { lines.push({ idx: Number(inp.dataset.idx), productId: i.productId, qty: q }); sum += (i.subtotal / i.quantity) * q; }
       });
-      var ratio = t.subtotal > 0 ? (t.total - t.rounding) / t.subtotal : 1;
+      var net = t.subtotal - (t.itemDiscount || 0);
+      var ratio = net > 0 ? (t.total - t.rounding) / net : 1;
       var amount = Math.round(sum * ratio);
       if (t.method === 'cash') amount = Math.round(amount / 100) * 100;
       return { lines: lines, amount: amount };
@@ -3865,7 +4013,7 @@
     /* ================================================================
        SHORTCUT & MODAL UMUM
     ================================================================ */
-    var MODAL_ORDER = ['split-modal', 'confirm-modal', 'return-modal', 'stock-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
+    var MODAL_ORDER = ['disc-modal', 'split-modal', 'confirm-modal', 'return-modal', 'stock-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
     function openModalId() {
       for (var i = 0; i < MODAL_ORDER.length; i++) {
         var el = $(MODAL_ORDER[i]);
@@ -3879,6 +4027,7 @@
       else if (id === 'stock-modal') mxCloseStock();
       else if (id === 'payment-modal') closePaymentModal();
       else if (id === 'split-modal') mxCloseSplit();
+      else if (id === 'disc-modal') mxCloseDisc();
       else if (id === 'receipt-modal') finishReceipt();
       else if (id === 'scanner-modal') closeScannerModal();
       else if (id === 'member-modal') closeMemberModal();
@@ -3943,7 +4092,7 @@
     /* ---------- Struk: hemat & WhatsApp ---------- */
     function mxSaving(r) {
       var promo = r.items.reduce(function (a, i) { return a + Math.max(0, (i.orig || i.price) - i.price) * i.quantity; }, 0);
-      return promo + (r.discount || 0) + (r.redeemAmount || 0);
+      return promo + (r.itemDiscount || 0) + (r.voucherAmount || 0) + (r.discount || 0) + (r.redeemAmount || 0);
     }
     function mxShareWA() {
       var r = mxCurrentReceipt;
@@ -4223,6 +4372,69 @@
           prev = cart.length;
         } catch (e) { }
       };
+    })();
+
+    /* ---------- Diskon per item & voucher ---------- */
+    var mxDiscId = null, mxDiscType = 'pct';
+    function mxOpenDisc(id) {
+      if (!shiftGuard()) return;
+      var l = cart.find(function (c) { return c.productId === id; }), p = productById(id);
+      if (!l || !p) return;
+      mxDiscId = id; mxDiscType = l.disc ? l.disc.t : 'pct';
+      $('dc-body').innerHTML = '<div class="mx-total"><span>' + esc(p.name) + '</span><strong>' + formatRupiah(p.price * l.quantity) + '</strong></div>' +
+        '<span class="mx-label">Jenis diskon</span>' +
+        '<select id="dc-type" class="mx-input" onchange="mxDiscType=this.value;mxDiscPrev()"><option value="pct">Persen (%)</option><option value="rp">Potongan Rp per unit</option></select>' +
+        '<span class="mx-label">Nilai</span><input id="dc-val" class="mx-input num" inputmode="numeric" placeholder="0" oninput="mxDiscPrev()" value="' + (l.disc ? l.disc.v : '') + '">' +
+        '<div class="mx-diff ok" id="dc-prev"><span>Hemat</span><b>Rp 0</b></div>';
+      $('dc-type').value = mxDiscType;
+      $('disc-modal').classList.remove('hidden');
+      mxDiscPrev(); $('dc-val').focus();
+    }
+    function mxDiscVal() {
+      var v = Math.floor(Number($('dc-val').value) || 0), p = productById(mxDiscId);
+      return mxDiscType === 'pct' ? Math.max(0, Math.min(100, v)) : Math.max(0, Math.min(p.price, v));
+    }
+    function mxDiscPrev() {
+      var l = cart.find(function (c) { return c.productId === mxDiscId; }), p = productById(mxDiscId);
+      if (!l || !p) return;
+      var d = mxLineDisc({ quantity: l.quantity, disc: { t: mxDiscType, v: mxDiscVal() } }, p.price);
+      $('dc-prev').innerHTML = '<span>Hemat</span><b>' + formatRupiah(d) + '</b>';
+    }
+    function mxCloseDisc() { $('disc-modal').classList.add('hidden'); }
+    function mxApplyDisc() {
+      var l = cart.find(function (c) { return c.productId === mxDiscId; }), v = mxDiscVal();
+      if (l) l.disc = v > 0 ? { t: mxDiscType, v: v } : null;
+      mxCloseDisc(); renderCart();
+      showToast(v > 0 ? 'Diskon item diterapkan.' : 'Diskon item dihapus.', 'success');
+    }
+    function mxClearDisc() { $('dc-val').value = ''; mxApplyDisc(); }
+    function mxSetVoucher(code) { mxVoucher = code; calculateBilling(); }
+    function mxUseVoucher(code) {
+      code = String(code || ($('mx-vch-in') ? $('mx-vch-in').value : '')).trim().toUpperCase();
+      if (!MX_VOUCHERS[code]) { showToast('Kode voucher tidak dikenal.', 'error'); return; }
+      mxSetVoucher(code);
+      showToast('Voucher ' + code + ' dipasang.', 'success');
+    }
+    function mxUpdateDiscUI(b) {
+      var r = $('bill-itemdisc-row');
+      r.classList.toggle('hidden', !(b.itemDisc > 0));
+      if (b.itemDisc > 0) $('bill-itemdisc').innerText = '-' + formatRupiah(b.itemDisc);
+      var vr = $('bill-voucher-row');
+      vr.classList.toggle('hidden', !(b.voucherAmt > 0));
+      if (b.voucherAmt > 0) { $('bill-voucher-label').innerText = 'Voucher ' + b.voucherCode; $('bill-voucher').innerText = '-' + formatRupiah(b.voucherAmt); }
+      var box = $('mx-voucher-box');
+      if (!cart.length) { box.innerHTML = ''; return; }
+      if (mxVoucher) {
+        box.innerHTML = '<div class="mx-vch on"><i class="fa-solid fa-ticket" style="color:#059669"></i><b>' + mxVoucher + '</b><span>' + esc(MX_VOUCHERS[mxVoucher].label) + '</span><button type="button" onclick="mxSetVoucher(null)" aria-label="Lepas voucher"><i class="fa-solid fa-xmark"></i></button></div>' +
+          (b.voucherNote ? '<div class="mx-vwarn"><i class="fa-solid fa-triangle-exclamation"></i> ' + esc(b.voucherNote) + '</div>' : '');
+      } else if (!box.firstChild || box.querySelector('.on')) {
+        box.innerHTML = '<div class="mx-vch"><input id="mx-vch-in" placeholder="Kode voucher" maxlength="12" onkeydown="if(event.key===\'Enter\'){event.preventDefault();mxUseVoucher();}"><button type="button" class="use" onclick="mxUseVoucher()">Pakai</button>' +
+          Object.keys(MX_VOUCHERS).map(function (c) { return '<button type="button" class="chip" onclick="mxUseVoucher(\'' + c + '\')">' + c + '</button>'; }).join('') + '</div>';
+      }
+    }
+    (function () {
+      var base = renderCart;
+      renderCart = function () { if (!cart.length) mxVoucher = null; base.apply(this, arguments); };
     })();
 
     /* ---------- Ringkasan live (strip KPI) ---------- */

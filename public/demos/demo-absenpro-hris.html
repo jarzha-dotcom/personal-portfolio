@@ -31,7 +31,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Absensi & HRIS Mobile | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti dan lembur dengan persetujuan berjenjang, agenda kehadiran, slip gaji, dan tautan ke Portal Admin.">
+    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti, lembur, dan klaim biaya dengan persetujuan berjenjang, notifikasi per hari, riwayat slip gaji, dan Portal Admin.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris.webp">
@@ -3155,7 +3155,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -3304,6 +3304,61 @@
     .rlp[hidden],
     .rlportal[hidden] {
       display: none
+    }
+
+    .ag-gh {
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      margin: 12px 0 2px
+    }
+
+    .rlsd {
+      border: 1px solid #cbd5e1;
+      background: transparent;
+      color: inherit;
+      border-radius: 99px;
+      font: 600 12px system-ui;
+      padding: 6px 12px;
+      cursor: pointer;
+      min-height: 0
+    }
+
+    #clm label {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin: 10px 0 6px
+    }
+
+    #clm select,
+    #clm input {
+      width: 100%;
+      font: 500 16px system-ui;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a
+    }
+
+    .dark #clm select,
+    .dark #clm input {
+      background: #0f172a;
+      border-color: #334155;
+      color: #e2e8f0
+    }
+
+    .rlsb {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      background: #0d9488;
+      color: #fff;
+      font: 700 15px system-ui;
+      padding: 12px;
+      cursor: pointer;
+      margin-top: 12px
     }
 
     #lg1 .tg.m2 {
@@ -5443,6 +5498,16 @@
       ['payroll', 'leave', 'agenda'].forEach(function (id) { var c = document.getElementById('tabContent-' + id); if (c) { c.insertAdjacentHTML('afterbegin', '<button class="rlbk" type="button" hidden onclick="switchTab(\'profile\')">\u2039 Profil</button>') } });
       var hm = $('#tabContent-home'); hm.insertAdjacentHTML('afterbegin', '<a class="rlp rlportal" href="demo-absenpro-hris-admin.html" hidden><span><b>Portal Admin</b><br><small>Ringkasan, tabel kehadiran, dan laporan di layar lebar</small></span><span>\u203a</span></a>');
       pf.insertAdjacentHTML('afterbegin', '<div class="ag-card rlportal" hidden><a class="rlmm" href="demo-absenpro-hris-admin.html" style="text-decoration:none"><span>Portal Admin</span><span>\u203a</span></a></div>');
+      var py = $('#tabContent-payroll'), PR = [['okt2026', 'Oktober 2026', '25 Okt 2026'], ['sep2026', 'September 2026', '25 Sep 2026'], ['agu2026', 'Agustus 2026', '25 Agu 2026'], ['jul', 'Juli 2026', '25 Jul 2026'], ['jun', 'Juni 2026', '25 Jun 2026'], ['mei', 'Mei 2026', '25 Mei 2026']];
+      py.insertAdjacentHTML('beforeend', '<div class="ag-card" id="rlHist"><h3>Riwayat slip gaji</h3>' + PR.map(function (r) { return '<div class="ag-row"><div><b>' + r[1] + '</b><br><span class="ag-sm">Dibayar ' + r[2] + '</span></div><button class="rlsd" data-m="' + r[0] + '" data-l="' + r[1] + '">Unduh</button></div>' }).join('') + '</div>');
+      $('#rlHist').onclick = function (e) { var b = e.target.closest('[data-m]'); if (!b) return; var m = b.dataset.m; if (/2026$/.test(m) && typeof changePayrollMonth === 'function') { $('#payrollMonthSelect').value = m; changePayrollMonth(m); if (typeof downloadSalarySlipModal === 'function') downloadSalarySlipModal() } else if (typeof showToast === 'function') showToast('Slip ' + b.dataset.l + ' diunduh (simulasi)', 'success') };
+      var lv = $('#tabContent-leave');
+      lv.insertAdjacentHTML('beforeend', '<div class="ag-card" id="clm"><h3>Klaim biaya</h3><label for="clmCat">Kategori</label><select id="clmCat"><option>Transport</option><option>Makan</option><option>Perjalanan dinas</option><option>Lainnya</option></select><label for="clmAmt">Nominal (Rp)</label><input id="clmAmt" type="number" inputmode="numeric" min="1000" max="50000000" step="1000" placeholder="150000"><label for="clmNote">Keterangan</label><input id="clmNote" type="text" maxlength="60" placeholder="Contoh: taksi ke klien"><button class="rlsb" id="clmGo">Ajukan klaim</button><h3 style="margin-top:16px">Klaim saya</h3><div id="clmList"></div></div>');
+      function clmRender() { var el = $('#clmList'); if (!el || !USER) return; var L = RL.mine(USER.id).filter(function (r) { return r.type === 'Klaim biaya' }); el.innerHTML = L.length ? L.map(function (r) { return '<div class="ag-row"><div><b>' + RL.esc(r.detail.split(' \u00b7 ')[0]) + ' \u00b7 ' + RL.esc(r.detail.split(' \u00b7 ')[1] || '') + '</b><br><span class="ag-sm">' + RL.esc(r.detail.split(' \u00b7 ').slice(2).join(' \u00b7 ') || 'Tanpa keterangan') + '</span></div><span class="ag-tag ' + (r.st === 'Disetujui' ? 'ok' : r.st === 'Ditolak' ? 'mu' : '') + '">' + (r.st === 'Menunggu' ? 'Menunggu ' + ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[r.lvl || 'spv'] : r.st) + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada klaim.</p>' }
+      $('#clmGo').onclick = function () {
+        var a = Math.round(+$('#clmAmt').value), n = $('#clmNote').value.trim(); if (!(a >= 1000 && a <= 50000000)) { if (typeof showToast === 'function') showToast('Isi nominal antara Rp 1.000 dan Rp 50.000.000', 'error'); return } if (!USER) return;
+        RL.add(USER, 'Klaim biaya', $('#clmCat').value + ' \u00b7 Rp ' + a.toLocaleString('id-ID') + (n ? ' \u00b7 ' + n : '')); $('#clmAmt').value = ''; $('#clmNote').value = ''; if (typeof showToast === 'function') showToast('Klaim diajukan ke atasan', 'success'); clmRender()
+      };
       var rib = document.createElement('div'); rib.id = 'rlRib'; APP.appendChild(rib);
       function canAct(r) { return !!USER && r.uid !== USER.id && ((USER.r === 'spv' && r.lvl === 'spv' && r.div === 'Digital') || (USER.r === 'admin' && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')))) }
       function cur() { return typeof appState !== 'undefined' ? appState.activeTab : 'home' }
@@ -5454,21 +5519,31 @@
         if (t === 'spvteam') { if (ad) RL.team($('#tabContent-spvteam'), 'SDM', 'Divisi SDM'); else RL.team($('#tabContent-spvteam'), 'Digital', 'Divisi Digital') }
         else if (t === 'spvappr') { if (ad) RL.approvals($('#tabContent-spvappr'), function (r) { return r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital') }, 'Admin'); else RL.approvals($('#tabContent-spvappr'), function (r) { return r.div === 'Digital' && r.lvl === 'spv' }, 'Tim Digital') }
       }
-      RL.init({ prefix: 'v1', can: canAct, live: function (id) { if (!USER || id !== USER.id || typeof appState === 'undefined') return null; if (!appState.checkedIn) return { st: 'Belum absen', t: '\u2013' }; var t = appState.checkInTime; t = t && t.toLocaleTimeString ? t.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : String(t || ''); return { st: appState.checkedOut ? 'Selesai' : 'Hadir', t: t } }, toast: function (m) { if (typeof showToast === 'function') showToast(m, 'success') }, onChange: function () { badges(); rolesRender(cur()) } });
+      RL.init({ prefix: 'v1', can: canAct, live: function (id) { if (!USER || id !== USER.id || typeof appState === 'undefined') return null; if (!appState.checkedIn) return { st: 'Belum absen', t: '\u2013' }; var t = appState.checkInTime; t = t && t.toLocaleTimeString ? t.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : String(t || ''); return { st: appState.checkedOut ? 'Selesai' : 'Hadir', t: t } }, toast: function (m) { if (typeof showToast === 'function') showToast(m, 'success') }, onChange: function () { badges(); rolesRender(cur()); clmRender() } });
       window.switchTab = function (t) {
         try { playBeep('tap') } catch (e) { }
         if (typeof appState !== 'undefined') appState.activeTab = t;
         TABS.forEach(function (id) { var c = document.getElementById('tabContent-' + id); if (c) c.classList.toggle('hidden', id !== t) });
         var vn = NAV0.style.display === 'none' ? NAV2 : NAV0, inNav = !!vn.querySelector('[data-t="' + t + '"]');[].forEach.call(document.querySelectorAll('.rlbk'), function (b) { b.hidden = inNav });
         [].forEach.call(document.querySelectorAll('#appContainer nav [data-t]'), function (b) { var on = b.dataset.t === t || (!inNav && b.dataset.t === 'profile'); b.className = on ? ACT : INACT; var sp = b.querySelector('span'); if (sp) sp.className = on ? 'text-[10px] font-bold mt-1' : 'text-[10px] font-semibold mt-1'; if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') });
-        var sc = document.getElementById('scrollContent'); if (sc) sc.scrollTop = 0; rolesRender(t)
+        var sc = document.getElementById('scrollContent'); if (sc) sc.scrollTop = 0; rolesRender(t); if (t === 'leave') clmRender()
       };
       // pengajuan staf masuk ke antrean supervisor dan admin
       var _lv = window.handleLeaveSubmit; window.handleLeaveSubmit = function (e) { var t = gv('leaveType'), s = gv('leaveStartDate'), en = gv('leaveEndDate'), r = gv('leaveReason'); _lv(e); if (USER && s && en) { var days = Math.ceil(Math.abs(new Date(en) - new Date(s)) / 864e5) + 1; RL.add(USER, t, fmt(s) + ' \u2013 ' + fmt(en) + ' \u00b7 ' + days + ' hari' + (r ? ' \u00b7 ' + r.slice(0, 40) : '')) } };
       var _ot = window.submitOvertimeAction; window.submitOvertimeAction = function () { var h = gv('otDuration'), t = gv('otTask') || 'Sprint IT Task'; _ot(); if (USER) RL.add(USER, 'Lembur', fmt(new Date()) + ' \u00b7 ' + h + ' jam \u00b7 ' + t.slice(0, 40)) };
-      // keputusan atasan muncul di notifikasi staf
+      // notifikasi dikelompokkan per hari
       var bell = document.querySelector('button[aria-label="Notifikasi"]');
-      if (bell && bell.onclick) { var ob = bell.onclick; bell.onclick = function () { ob.call(bell); var l = $('#agNl'); if (!USER || !l) return; RL.mine(USER.id).filter(function (r) { return r.st !== 'Menunggu' }).forEach(function (r) { l.insertAdjacentHTML('afterbegin', '<div class="ag-row"><div><b>' + RL.esc(r.type) + ' ' + r.st.toLowerCase() + '</b><br><span class="ag-sm">' + RL.esc(r.detail) + '</span></div></div>') }) } }
+      if (bell && bell.onclick) {
+        var ob = bell.onclick; bell.onclick = function () {
+          ob.call(bell); var l = $('#agNl'); if (!USER || !l) return;
+          var today = [], yest = [['Koreksi absen 21 Okt menunggu atasan', 'Kemarin']], week = [['Cuti 12\u201313 Agu disetujui', 'Dina Prameswari \u00b7 2 hari lalu'], ['Slip gaji Oktober tersedia', 'Dibayar 25 Okt']];
+          try { if (appState.checkedIn && !appState.checkedOut && new Date().getHours() >= 17) today.push(['Waktunya absen pulang', 'Shift selesai pukul 17:00']) } catch (e) { }
+          RL.mine(USER.id).filter(function (r) { return r.st !== 'Menunggu' && r.id > 1e9 }).forEach(function (r) { today.push([r.type + ' ' + r.st.toLowerCase(), r.detail]) });
+          if (USER.r !== 'staff') { var n = RL.pending(canAct).length; if (n) today.unshift([n + ' pengajuan menunggu keputusan Anda', 'Buka tab Persetujuan']) }
+          function grp(t, a) { return a.length ? '<div class="ag-gh">' + t + '</div>' + a.map(function (x) { return '<div class="ag-row"><div><b>' + RL.esc(x[0]) + '</b><br><span class="ag-sm">' + RL.esc(x[1]) + '</span></div></div>' }).join('') : '' }
+          l.innerHTML = grp('Hari ini', today) + grp('Kemarin', yest) + grp('Minggu ini', week)
+        }
+      }
       window.RoleUI = {
         apply: function (u) {
           USER = u; $('#rlMenu').hidden = u.r === 'staff';[].forEach.call(document.querySelectorAll('.rlportal'), function (e) { e.hidden = u.r !== 'admin' }); document.body.dataset.role = u.r;

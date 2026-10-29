@@ -1254,6 +1254,45 @@
       }
     }
 
+    /* ===== Mode gelap (filter terbalik; foto, swatch warna, header, dan struk dikembalikan ke warna asli) ===== */
+    html {
+      transition: filter .25s ease;
+    }
+
+    html.tp-dark {
+      filter: invert(1) hue-rotate(180deg);
+      background: #fff;
+    }
+
+    html.tp-dark img,
+    html.tp-dark video,
+    html.tp-dark header,
+    html.tp-dark #tp-sec-cart>div:first-child,
+    html.tp-dark #__jz-bar,
+    html.tp-dark #receipt-modal>div,
+    html.tp-dark [style*="background-color: #"],
+    html.tp-dark .st-sw {
+      filter: invert(1) hue-rotate(180deg);
+    }
+
+    html.tp-dark #receipt-modal img {
+      filter: none;
+    }
+
+    html.tp-dark .tp-overlay,
+    html.tp-dark #receipt-modal,
+    html.tp-dark [class*="bg-slate-950/"] {
+      background: rgba(255, 255, 255, .72) !important;
+    }
+
+    @media print {
+
+      html.tp-dark,
+      html.tp-dark * {
+        filter: none !important;
+      }
+    }
+
     /* ===== Laporan Penjualan ===== */
     .rp-hbtn {
       display: flex;
@@ -1699,6 +1738,10 @@
         <i class="fa-solid fa-cash-register text-emerald-400 text-xs"></i>
         <span class="hidden sm:inline">Buka Laci</span>
       </button>
+
+      <!-- Mode Gelap -->
+      <button onclick="tpToggleDark()" title="Mode gelap / terang" aria-label="Mode gelap / terang" class="rp-hbtn"><i
+          class="fa-solid fa-circle-half-stroke" style="color:#cbd5e1"></i></button>
 
       <!-- Manajemen Stok -->
       <button onclick="openModal('stock-modal'); playAudio('click');" title="Manajemen Stok (F3)" class="rp-hbtn"><i
@@ -4560,6 +4603,19 @@
       window.addEventListener('afterprint', () => document.body.classList.remove('rp-printing'), { once: true });
       window.print();
     }
+  </script>
+  <script>
+    /* ===== Mode gelap: pilihan tersimpan di browser ===== */
+    (function () {
+      const K = 'threadpos-theme', h = document.documentElement;
+      window.tpToggleDark = function () {
+        const d = !h.classList.contains('tp-dark');
+        h.classList.toggle('tp-dark', d);
+        try { localStorage.setItem(K, d ? 'dark' : 'light'); } catch (e) { }
+        playAudio('click');
+      };
+      try { if (localStorage.getItem(K) === 'dark') h.classList.add('tp-dark'); } catch (e) { }
+    })();
   </script>
 </body>
 

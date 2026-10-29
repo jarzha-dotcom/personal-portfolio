@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>AbsenPro v2 — Aplikasi Absensi & HRIS Mobile</title>
   <meta name="description"
-    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, riwayat slip gaji, bahasa Indonesia/English, pratinjau empat ukuran layar, dan tautan ke Portal Admin.">
+    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran, persetujuan berjenjang, kotak masuk notifikasi dengan aksi langsung, slip gaji visual dengan donut dan riwayat 6 bulan, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin.">
   <meta name="author" content="K. Arzhaning Jagad (Arzha)">
   <!--
   © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Absensi & HRIS Mobile v2 | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, riwayat slip gaji, bahasa Indonesia/English, pratinjau empat ukuran layar, dan tautan ke Portal Admin.">
+    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran, persetujuan berjenjang, kotak masuk notifikasi dengan aksi langsung, slip gaji visual dengan donut dan riwayat 6 bulan, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
@@ -52,8 +52,6 @@
       --chip: #E4EAF1;
       --frame: #12263F
     }
-
-    :root:not([data-theme="light"]) {}
 
     @media(prefers-color-scheme:dark) {
       :root:not([data-theme="light"]) {
@@ -1438,6 +1436,139 @@
       margin-bottom: 10px
     }
 
+    .nb2 {
+      background: var(--late);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 10px;
+      padding: 1px 6px;
+      margin-left: 4px
+    }
+
+    .nb2[hidden] {
+      display: none
+    }
+
+    .dn {
+      display: flex;
+      gap: 16px;
+      align-items: center
+    }
+
+    .dn svg {
+      width: 120px;
+      height: 120px;
+      flex: none
+    }
+
+    .lgd {
+      list-style: none;
+      padding: 0;
+      display: grid;
+      gap: 6px;
+      font-size: 13px
+    }
+
+    .lgd i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-right: 8px
+    }
+
+    .b6 {
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+      height: 150px
+    }
+
+    .b6 button {
+      flex: 1;
+      border: 0;
+      background: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      color: var(--ink);
+      font: 600 11px Figtree;
+      cursor: pointer;
+      height: 100%;
+      padding: 0
+    }
+
+    .b6 i {
+      display: block;
+      width: 100%;
+      border-radius: 8px 8px 3px 3px;
+      background: var(--chip)
+    }
+
+    .b6 .t i {
+      background: var(--sun)
+    }
+
+    .b6 small {
+      color: var(--mute);
+      font-size: 11px
+    }
+
+    .pl {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: 600 14px Figtree;
+      padding: 11px 12px;
+      border-radius: 12px;
+      margin-top: 8px;
+      cursor: pointer
+    }
+
+    .pl:hover {
+      border-color: var(--sun)
+    }
+
+    .pr {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 8px 0;
+      font-size: 13px
+    }
+
+    .pr span {
+      width: 70px
+    }
+
+    .pr i {
+      flex: 1;
+      height: 10px;
+      border-radius: 9px;
+      background: var(--chip);
+      overflow: hidden
+    }
+
+    .pr u {
+      display: block;
+      height: 100%;
+      background: var(--sun)
+    }
+
+    .pr.me span {
+      font-weight: 800
+    }
+
+    .pr b {
+      width: 38px;
+      text-align: right
+    }
+
     .pcard {
       display: flex;
       justify-content: space-between;
@@ -1579,7 +1710,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -1646,7 +1777,10 @@
     <div class="sheet" id="nsheet" hidden>
       <div class="sb" role="dialog" aria-modal="true" aria-label="Notifikasi">
         <h3 style="font-size:18px;margin-bottom:6px">Notifikasi</h3>
-        <div id="nl" style="max-height:50vh;overflow:auto"></div><button class="btn" id="nx"
+        <div class="chips" id="ntabs" style="margin:6px 0"><button class="on" data-t="all">Semua</button><button
+            data-t="act">Perlu tindakan <b class="nb2" id="nbAct" hidden></b></button><button
+            data-t="info">Info</button></div>
+        <div id="nl" style="max-height:46vh;overflow:auto"></div><button class="btn" id="nx"
           style="background:var(--chip);color:var(--ink)">Tutup</button>
       </div>
     </div>
@@ -1832,12 +1966,8 @@
           <p class="sm" style="margin-top:8px">Sumber: SKB 3 Menteri tahun 2026. Cuti bersama bersifat opsional bagi
             karyawan swasta, sesuai kebijakan perusahaan.</p>
         </div>
-        <div class="card">
-          <h3>Pengumuman</h3>
-          <div class="row"><b>Kebijakan WFH baru berlaku 1 Nov</b><span class="tag">Penting</span></div>
-          <div class="row"><b>Town hall kuartal 4 · Jumat 30 Okt, 15:00</b><span class="tag mu">Acara</span></div>
-          <div class="row"><b>Survei kepuasan karyawan dibuka sampai 5 Nov</b><span class="tag mu">Info</span></div>
-        </div>
+        <div class="card" id="annCard"></div>
+        <div class="card" id="pollCard"></div>
       </section>
 
       <section class="tab" id="t2">
@@ -1850,12 +1980,21 @@
           <div style="display:flex;gap:6px"><button class="eye" id="eye">Tampilkan</button><button class="eye"
               id="prt">Cetak</button></div>
         </div>
-        <div class="chips" id="mchips" style="margin-bottom:12px"><button>Agu</button><button>Sep</button><button
+        <div class="chips" id="mchips" style="margin-bottom:12px">
+          <button>Mei</button><button>Jun</button><button>Jul</button><button>Agu</button><button>Sep</button><button
             class="on">Okt</button></div>
         <div class="card" style="margin-top:0">
           <p style="color:var(--mute)">Gaji bersih</p>
           <div class="big num" id="net">Rp •••••••</div>
           <p style="color:var(--mute);font-size:12px">Dibayar 25 Okt 2026 · ke rekening BCA •••• 4821</p>
+        </div>
+        <div class="card">
+          <h3>Komposisi pendapatan</h3>
+          <div class="dn" id="dn"></div>
+        </div>
+        <div class="card">
+          <h3>Gaji bersih 6 bulan</h3>
+          <div class="b6" id="b6"></div>
         </div>
         <div class="card">
           <h3>Pendapatan</h3>
@@ -2016,7 +2155,7 @@
     function slipNet() { return SL[SM].v.reduce((a, b) => a + b, 0) }
     function money() {
       $$('.m').forEach(e => e.textContent = hide ? 'Rp ••••••' : rp(+e.dataset.v));
-      $('#net').textContent = hide ? 'Rp •••••••' : rp(slipNet()); $('#eye').textContent = hide ? 'Tampilkan' : 'Sembunyikan'
+      $('#net').textContent = hide ? 'Rp •••••••' : rp(slipNet()); $('#eye').textContent = hide ? 'Tampilkan' : 'Sembunyikan'; if (typeof drawPay === 'function') drawPay()
     }
     $('#eye').onclick = () => { hide = !hide; money() }; money();
     // tema
@@ -2101,7 +2240,7 @@
     try { const k = localStorage.getItem('absenpro-dev'); if (k && DEV[k]) setDev(k) } catch (e) { }
     // riwayat slip gaji
     function setSlip(k) { SM = k; $$('.m').forEach((e, i) => e.dataset.v = SL[k].v[i]); $('#t2 .top h1').textContent = SL[k].n + ' 2026'; $('#t2 .card p:nth-of-type(2)').textContent = 'Dibayar 25 ' + SL[k].a + ' 2026 · ke rekening BCA •••• 4821'; money() }
-    $$('#mchips button').forEach((b, i) => b.onclick = () => { $$('#mchips button').forEach(x => x.classList.toggle('on', x === b)); const cs = $$('#t2 .card'); cs.forEach(c => c.classList.add('ld')); setTimeout(() => { setSlip(['08', '09', '10'][i]); cs.forEach(c => c.classList.remove('ld')) }, 350) });
+    $$('#mchips button').forEach((b, i) => b.onclick = () => { $$('#mchips button').forEach(x => x.classList.toggle('on', x === b)); const cs = $$('#t2 .card'); cs.forEach(c => c.classList.add('ld')); setTimeout(() => { setSlip(['05', '06', '07', '08', '09', '10'][i]); cs.forEach(c => c.classList.remove('ld')) }, 350) });
     TOK.push([/Dibayar/, 'Paid'], [/ke rekening/, 'to account'], [/Agustus/, 'August'], [/Oktober/, 'October']);
     // verifikasi wajah (simulasi) dan animasi
     function resetFv() { const f = $('#fv'); f.className = 'fv'; $('#fvt').textContent = 'Verifikasi wajah'; $('#shOk').disabled = true }
@@ -2160,7 +2299,7 @@
     function setNav(r) { $('#nav').innerHTML = NV[r].map(x => `<button data-t="${x[0]}"><span><svg viewBox="0 0 24 24">${IC[x[2]]}</svg></span>${x[1]}${x[3] ? '<b class="nb" hidden></b>' : ''}</button>`).join(''); $$('#nav button').forEach(b => b.onclick = () => showTab(b.dataset.t)) }
     function showTab(id) {
       $$('.tab').forEach(t => t.classList.toggle('on', t.id === id)); $$('#nav button').forEach(b => { const on = b.dataset.t === id; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') }); const inNav = !!$('#nav [data-t="' + id + '"]'); $$('.bk').forEach(b => { b.hidden = inNav }); if (!inNav) { const pb = $('#nav [data-t="t3"]'); if (pb) pb.classList.add('on') }
-      $('main').scrollTop = 0; if (id === 't1') renderHist(); if (/^(sp|ad)-/.test(id)) renderRole()
+      $('main').scrollTop = 0; if (id === 't1') renderHist(); if (id === 'tm') renderAnn(); if (/^(sp|ad)-/.test(id)) renderRole()
     }
     function badges() { const n = USER ? RL.pending(canAct).length : 0; $$('#nav .nb').forEach(b => { b.textContent = n; b.hidden = !n }) }
     function renderRole() { if (!USER) return; if (USER.r === 'spv') { RL.team($('#sp-team'), 'Digital', 'Divisi Digital'); RL.approvals($('#sp-appr'), r => r.div === 'Digital' && r.lvl === 'spv', 'Tim Digital') } else if (USER.r === 'admin') { RL.team($('#sp-team'), 'SDM', 'Divisi SDM'); RL.approvals($('#sp-appr'), r => r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital'), 'Admin') } }
@@ -2172,7 +2311,7 @@
       setTimeout(() => toast(fresh.length === 1 ? fresh[0].type + (fresh[0].st === 'Disetujui' ? ' disetujui' : ' ditolak') : fresh.length + ' pengajuan sudah diputuskan'), 2600);
       try { localStorage.setItem(key, JSON.stringify(seen.concat(fresh.map(r => r.id)))) } catch (e) { }
     }
-    function rolesChanged() { badges(); renderRole(); renderHist(); checkDecisions() }
+    function rolesChanged() { badges(); renderRole(); renderHist(); checkDecisions(); drawN() }
     function canAct(r) { return !!USER && r.uid !== USER.id && ((USER.r === 'spv' && r.lvl === 'spv' && r.div === 'Digital') || (USER.r === 'admin' && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')))) }
     ['t1', 't2', 'tr'].forEach(id => { $('#' + id).insertAdjacentHTML('afterbegin', '<button class="eye bk" type="button" hidden>\u2039 Profil</button>'); $('#' + id + ' .bk').onclick = () => showTab('t3') });
     $('#mymenu').onclick = e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go) };
@@ -2187,10 +2326,46 @@
       const bs = $$('#t3 .row b'); bs[0].textContent = u.eid; bs[1].textContent = u.boss;
       $('.pho').innerHTML = '<b>AbsenPro</b> \u00b7 ' + u.name + ' \u00b7 ' + u.eid + ' \u00b7 ' + u.role;
       resetDay(); loadDay(); let f = null; try { f = localStorage.getItem('absenpro-foto-' + u.id) } catch (e) { } setAv(f);
-      $('#mymenu').hidden = u.r === 'staff'; $('#portalA').hidden = $('#portalRow').hidden = u.r !== 'admin'; N.splice(0, N.length, { t: 'Slip gaji Oktober tersedia', s: 'Dibayar 25 Okt', u: 1 }); drawN(); setNav(u.r); renderHist(); renderRole(); badges(); showTab(NV[u.r][0][0]); checkDecisions()
+      $('#mymenu').hidden = u.r === 'staff'; $('#portalA').hidden = $('#portalRow').hidden = u.r !== 'admin'; N.splice(0, N.length, { t: 'Slip gaji Oktober tersedia', s: 'Dibayar 25 Okt', u: 1 }); drawN(); setNav(u.r); renderHist(); renderRole(); badges(); showTab(NV[u.r][0][0]); checkDecisions(); renderAnn()
     }
     Object.assign(EN, { 'Cari nama atau divisi': 'Search name or division', 'setelah 08:15': 'after 08:15', 'akun demo': 'demo accounts', 'persetujuan': 'approvals', 'Portal Admin': 'Admin Portal', 'Ringkasan, tabel kehadiran, dan laporan di layar lebar': 'Summary, attendance table and reports on a wide screen', 'Menu saya': 'My menu', 'Ajuan cuti dan lembur': 'Leave and overtime requests', 'Menunggu Supervisor': 'Pending Supervisor', 'Menunggu Admin': 'Pending Admin', 'Menunggu Direksi': 'Pending Directors', 'Pilih akun untuk mengisi form otomatis dan lihat tampilan tiap peran: Staf, Supervisor, atau Admin. Kata sandi semua akun: demo123': 'Pick an account to fill the form and see each role view: Staff, Supervisor or Admin. Password for all accounts: demo123', 'Tim saya': 'My team', 'Persetujuan': 'Approvals', 'Ringkasan': 'Summary', 'Pegawai': 'Employees', 'Staf': 'Staff', 'Supervisor Digital': 'Digital Supervisor', 'Admin HR': 'HR Admin', 'Ditolak': 'Rejected', 'Belum ada pengajuan.': 'No requests yet.', 'Belum absen': 'Not clocked in', 'Setujui': 'Approve', 'Tolak': 'Reject', 'Semua pengajuan sudah ditangani.': 'All requests have been handled.', 'Keputusan terakhir': 'Latest decisions', 'Ringkasan perusahaan': 'Company summary', 'Kehadiran 7 hari kerja': '7-day attendance', 'Per divisi': 'By division', 'Tim Digital': 'Digital Team', 'Divisi Digital': 'Digital Division', 'Semua divisi': 'All divisions', 'Tidak ada yang cocok.': 'No matches.', 'Semua': 'All', 'Menunggu persetujuan supervisor': 'Awaiting supervisor approval', 'Hari ini': 'Today' });
     TOK.push([/^dari (\d+)/, 'of $1'], [/^(\d+) karyawan$/, '$1 employees'], [/Cuti tahunan/, 'Annual leave'], [/Koreksi absen/, 'Attendance correction'], [/Lembur/, 'Overtime'], [/\bdisetujui\b/, 'approved'], [/\bditolak\b/, 'rejected'], [/\boleh /, 'by '], [/Disetujui: /, 'Approved: '], [/Ditolak: /, 'Rejected: '], [/pengajuan sudah diputuskan/, 'requests have been decided']);
+    // ===== Putaran 1 (pilihan B): inbox notifikasi, slip visual, pengumuman dan jajak
+    var NT = 'all';
+    function actItems() { try { return USER && (USER.r === 'spv' || USER.r === 'admin') ? RL.pending(canAct) : [] } catch (e) { return [] } }
+    function drawN() {
+      const act = actItems(), rem = N.filter(n => n.t === 'Waktunya absen pulang');
+      const info = N.filter(n => n.t !== 'Waktunya absen pulang').map(n => `<div class="row"><div><b>${n.t}</b><br><span class="sm">${n.s}</span></div>${n.u ? '<span class="tag">Baru</span>' : ''}</div>`);
+      const acts = rem.map(n => `<div class="row"><div><b>${n.t}</b><br><span class="sm">${n.s}</span></div><div class="rl-acts"><button class="y" data-go="abs">Absen sekarang</button></div></div>`).concat(act.map(r => `<div class="row"><div><b>${RL.esc(r.who)} \u00b7 ${RL.esc(r.type)}</b><br><span class="sm">${RL.esc(r.detail)}</span></div><div class="rl-acts"><button class="y" data-id="${r.id}" data-ok="1">Setujui</button><button class="n" data-id="${r.id}">Tolak</button></div></div>`));
+      const rows = NT === 'act' ? acts : NT === 'info' ? info : acts.concat(info);
+      $('#nl').innerHTML = rows.length ? rows.join('') : '<p class="sm" style="padding:18px 0;text-align:center">' + (NT === 'act' ? 'Tidak ada yang perlu ditindaklanjuti.' : 'Belum ada notifikasi.') + '</p>';
+      const c = N.filter(n => n.u).length + act.length; $('#bd').textContent = c; $('#bd').hidden = !c; $('#nbAct').textContent = acts.length; $('#nbAct').hidden = !acts.length;
+      $$('#ntabs button').forEach(b => b.classList.toggle('on', b.dataset.t === NT))
+    }
+    $('#bell').onclick = () => { NT = 'all'; drawN(); $('#nsheet').hidden = false; N.forEach(n => n.u = 0); const c = actItems().length; $('#bd').textContent = c; $('#bd').hidden = !c };
+    $('#ntabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; NT = b.dataset.t; drawN() };
+    $('#nl').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.go === 'abs') { $('#nsheet').hidden = true; showTab('t0'); return } if (b.dataset.id) { const r = RL.decide(+b.dataset.id, !!b.dataset.ok); if (r) toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) } };
+    Object.assign(SL, { '05': { n: 'Mei', a: 'Mei', v: [12000000, 1200000, 800000, -140000, -260000, -400000] }, '06': { n: 'Juni', a: 'Jun', v: [12000000, 1200000, 840000, -140000, -260000, -405000] }, '07': { n: 'Juli', a: 'Jul', v: [12000000, 1200000, 860000, -140000, -260000, -410000] } });
+    function drawPay() {
+      if (!SL['05']) return; const MK = ['05', '06', '07', '08', '09', '10'], nets = k => SL[k].v.reduce((a, b) => a + b, 0), v = SL[SM].v, e = v.slice(0, 3), tot = e.reduce((a, b) => a + b, 0), C = ['var(--sun)', 'var(--ink)', 'var(--ok)'], NM = ['Gaji pokok', 'Transport', 'Makan'], R = 48, L = 2 * Math.PI * R; let off = 0;
+      $('#dn').innerHTML = `<svg viewBox="0 0 120 120" role="img" aria-label="Komposisi pendapatan"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--chip)" stroke-width="16"/>${e.map((x, i) => { const d = x / tot * L, c = `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${C[i]}" stroke-width="16" stroke-dasharray="${d} ${L - d}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`; off += d; return c }).join('')}<text x="60" y="57" text-anchor="middle" font-size="9" fill="var(--mute)">Bersih</text><text x="60" y="72" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">${hide ? '\u2022\u2022\u2022' : (slipNet() / 1e6).toFixed(1) + ' jt'}</text></svg><ul class="lgd">${e.map((x, i) => `<li><i style="background:${C[i]}"></i>${NM[i]} <b>${Math.round(x / tot * 100)}%</b></li>`).join('')}</ul>`;
+      const mx = Math.max(...MK.map(nets)); $('#b6').innerHTML = MK.map(k => `<button data-k="${k}" class="${k === SM ? 't' : ''}" aria-label="${SL[k].n}"><b>${hide ? '\u2022' : (nets(k) / 1e6).toFixed(1)}</b><i style="height:${40 + nets(k) / mx * 70}px"></i><small>${SL[k].a}</small></button>`).join('')
+    }
+    $('#b6').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#mchips').children[['05', '06', '07', '08', '09', '10'].indexOf(b.dataset.k)].click() };
+    drawPay();
+    const AK = 'absenpro-v2-ann';
+    function annLoad() { try { const r = JSON.parse(localStorage.getItem(AK)); if (r && r.ann) return r } catch (e) { } return { ann: [{ id: 1, title: 'Kebijakan WFH baru berlaku 1 Nov', tag: 'Penting' }, { id: 2, title: 'Town hall kuartal 4 \u00b7 Jumat 30 Okt, 15:00', tag: 'Acara' }, { id: 3, title: 'Survei kepuasan karyawan dibuka sampai 5 Nov', tag: 'Info' }], poll: { q: 'Hari WFH yang paling nyaman buat kamu?', opts: ['Senin', 'Rabu', 'Jumat'], votes: {} } } }
+    function annSave(d) { try { localStorage.setItem(AK, JSON.stringify(d)) } catch (e) { } }
+    function renderAnn() {
+      const d = annLoad(); $('#annCard').innerHTML = '<h3>Pengumuman</h3>' + (d.ann.length ? d.ann.map(a => `<div class="row"><b>${RL.esc(a.title)}</b><span class="tag ${a.tag === 'Penting' ? '' : 'mu'}">${RL.esc(a.tag)}</span></div>`).join('') : '<p class="sm">Belum ada pengumuman.</p>');
+      const p = d.poll; $('#pollCard').hidden = !p; if (!p) return; const mine = USER ? p.votes[USER.id] : undefined, tot = Object.keys(p.votes).length;
+      $('#pollCard').innerHTML = '<h3>Jajak singkat</h3><p style="margin-bottom:6px"><b>' + RL.esc(p.q) + '</b></p>' + (mine === undefined ? p.opts.map((o, i) => `<button class="pl" data-i="${i}">${RL.esc(o)}</button>`).join('') : p.opts.map((o, i) => { const n = Object.values(p.votes).filter(v => v === i).length, pc = tot ? Math.round(n / tot * 100) : 0; return `<div class="pr${i === mine ? ' me' : ''}"><span>${RL.esc(o)}</span><i><u style="width:${pc}%"></u></i><b>${pc}%</b></div>` }).join('') + '<p class="sm" style="margin-top:6px">Terima kasih, suara Anda tercatat \u00b7 ' + tot + ' suara</p>')
+    }
+    $('#pollCard').onclick = e => { const b = e.target.closest('.pl'); if (!b || !USER) return; const d = annLoad(); d.poll.votes[USER.id] = +b.dataset.i; annSave(d); renderAnn(); toast('Suara Anda tercatat') };
+    window.addEventListener('storage', e => { if (e.key === AK) renderAnn() });
+    renderAnn();
+    Object.assign(EN, { 'Perlu tindakan': 'Needs action', 'Semua': 'All', 'Info': 'Info', 'Absen sekarang': 'Clock in/out now', 'Tidak ada yang perlu ditindaklanjuti.': 'Nothing needs your action.', 'Belum ada notifikasi.': 'No notifications yet.', 'Komposisi pendapatan': 'Earnings breakdown', 'Gaji bersih 6 bulan': 'Net pay, last 6 months', 'Transport': 'Transport', 'Makan': 'Meals', 'Bersih': 'Net', 'Jajak singkat': 'Quick poll', 'Belum ada pengumuman.': 'No announcements yet.' });
+    TOK.push([/Terima kasih, suara Anda tercatat/, 'Thanks, your vote is recorded'], [/(\d+) suara/, '$1 votes'], [/\bJuni\b/, 'June'], [/\bJuli\b/, 'July'], [/Waktunya absen pulang/, 'Time to clock out']);
     lock(true);
     try { const u = ACC.find(a => a.id === localStorage.getItem('absenpro-v2-session')); if (u) { $('#login').hidden = true; lock(false); applyUser(u) } } catch (e) { }
     if (LANG === 'en') applyLang('en');

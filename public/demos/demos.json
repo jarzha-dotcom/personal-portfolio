@@ -227,7 +227,7 @@
     "file": "demo-absenpro-hris.html",
     "thumb": "thumbs/demo-absenpro-hris.webp",
     "title": "Aplikasi Absensi & HRIS Mobile",
-    "desc": "Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti dan lembur dengan persetujuan berjenjang, agenda kehadiran, slip gaji, dan tautan ke Portal Admin.",
+    "desc": "Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti, lembur, dan klaim biaya dengan persetujuan berjenjang, notifikasi per hari, riwayat slip gaji, dan Portal Admin.",
     "tags": [
       "Aplikasi Web",
       "HRIS"
@@ -237,7 +237,7 @@
     "file": "demo-absenpro-hris-v2.html",
     "thumb": "thumbs/demo-absenpro-hris-v2.webp",
     "title": "Aplikasi Absensi & HRIS Mobile v2",
-    "desc": "Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran (staf, supervisor, admin), persetujuan berjenjang, kalender kehadiran, riwayat slip gaji, bahasa Indonesia/English, pratinjau empat ukuran layar, dan tautan ke Portal Admin.",
+    "desc": "Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran, persetujuan berjenjang, kotak masuk notifikasi dengan aksi langsung, slip gaji visual dengan donut dan riwayat 6 bulan, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin.",
     "tags": [
       "Aplikasi Web",
       "HRIS"

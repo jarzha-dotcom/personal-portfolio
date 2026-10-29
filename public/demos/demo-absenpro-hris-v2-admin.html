@@ -1,213 +1,843 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
-<!--
+  <!--
   © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id
   DEMO ONLY. All rights reserved.
   Dilarang keras menyalin, menjual, atau menggunakan ulang desain ini tanpa izin tertulis dari pemilik.
 -->
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Portal Admin — AbsenPro v2</title>
-<meta name="description" content="Portal admin HR untuk AbsenPro v2: ringkasan kehadiran, tabel kehadiran dengan ekspor CSV, dan antrean persetujuan.">
-<meta name="author" content="K. Arzhaning Jagad (Arzha)">
-<meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
-<meta name="robots" content="noindex, nofollow">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Portal Admin — AbsenPro v2 | K. Arzhaning Jagad (Arzha)">
-<meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2-admin">
-<meta property="og:site_name" content="arzhaning.my.id">
-<meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script>(function(){var L=console.log.bind(console);L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ','background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px');L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang menyalin, mendistribusikan, atau menjual desain ini tanpa izin tertulis.','color:#b45309;font-size:10.5px;line-height:1.7')})()</script>
-<script>
-/* AbsenPro role views (c) 2026 K. Arzhaning Jagad - demo only */
-(function(g){
-var esc=function(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})};
-var ini=function(n){return String(n).split(' ').map(function(x){return x[0]}).slice(0,2).join('').toUpperCase()};
-var EMP=[['arzha','Arzha','Product Designer','Digital','Hadir','07:52'],['raka','Raka Mahendra','Engineer','Digital','WFH','08:03'],['salsa','Salsa Anindya','QA','Digital','Hadir','07:58'],['bima','Bima Satria','Engineer','Digital','Cuti','\u2013'],['laras','Laras Wulandari','Designer','Digital','Dinas luar','08:10'],['nadia','Nadia Putri','Akuntan','Keuangan','Hadir','07:45'],['fajar','Fajar Nugroho','Staf Keuangan','Keuangan','Terlambat','08:41'],['maya','Maya Lestari','Rekrutmen','SDM','Hadir','07:55'],['yoga','Yoga Pratama','Sales','Penjualan','Terlambat','08:27'],['intan','Intan Permata','Sales','Penjualan','Hadir','08:02'],['dimas','Dimas Aditya','Support','Layanan','WFH','08:00'],['rani','Rani Kusuma','Support','Layanan','Hadir','07:49'],['dina','Dina Prameswari','Supervisor Digital','Digital','Hadir','07:40'],['hendra','Hendra Wijaya','Admin HR','SDM','Hadir','07:35']];
-var LV={spv:'Supervisor',admin:'Admin',dir:'Direksi'};var O={prefix:'x',live:null,toast:function(){},onChange:function(){}},REQ=[],RK='',F='Semua',Q='';
-function load(){try{var r=JSON.parse(localStorage.getItem(RK));if(r&&r.length)return r}catch(e){}return null}
-function save(){try{localStorage.setItem(RK,JSON.stringify(REQ))}catch(e){}}
-function seed(){var d=function(i,u,w,v,t,x,s,l){return{id:i,uid:u,who:w,div:v,type:t,detail:x,st:s,lvl:l}};return[d(1,'bima','Bima Satria','Digital','Cuti tahunan','2\u20134 Nov \u00b7 3 hari','Menunggu','spv'),d(2,'raka','Raka Mahendra','Digital','Lembur','27 Okt \u00b7 2 j 30 m','Menunggu','spv'),d(3,'fajar','Fajar Nugroho','Keuangan','Koreksi absen','26 Okt \u00b7 lupa absen pulang 17:05','Menunggu','spv'),d(4,'yoga','Yoga Pratama','Penjualan','Izin','30 Okt \u00b7 urusan keluarga','Menunggu','spv'),d(6,'dina','Dina Prameswari','Digital','Cuti tahunan','20\u201321 Nov \u00b7 2 hari','Menunggu','admin'),d(5,'arzha','Arzha','Digital','Cuti tahunan','12\u201313 Agu \u00b7 2 hari','Disetujui','spv')]}
-function init(o){for(var k in o)O[k]=o[k];RK='absenpro-req2-'+O.prefix;REQ=load()||seed();window.addEventListener('storage',function(e){if(e.key===RK){REQ=load()||REQ;O.onChange()}})}
-function add(u,type,detail){REQ.unshift({id:Date.now(),uid:u.id,who:u.name,div:String(u.div).replace('Divisi ',''),type:type,detail:detail,st:'Menunggu',lvl:u.r==='admin'?'dir':u.r==='spv'?'admin':'spv'});save();O.onChange()}
-function mine(id){return REQ.filter(function(r){return r.uid===id})}
-function pending(scope){return REQ.filter(function(r){return r.st==='Menunggu'&&(!scope||scope(r))})}
-function decide(id,ok){REQ.forEach(function(r){if(r.id===id)r.st=ok?'Disetujui':'Ditolak'});save();O.onChange()}
-function status(e){var l=O.live&&O.live(e[0]);return l||{st:e[4],t:e[5]}}
-function counts(L){var c={h:0,l:0,c:0,b:0};L.forEach(function(e){var s=status(e).st;if(s==='Terlambat'){c.l++;c.h++}else if(s==='Cuti')c.c++;else if(s==='Belum absen')c.b++;else c.h++});return c}
-function tagc(s){return s==='Hadir'?'ok':s==='Terlambat'?'late':(s==='Cuti'||s==='Belum absen')?'mu':''}
-function person(e){var s=status(e);return '<div class="rl-row"><div class="rl-p"><span class="rl-a">'+ini(e[1])+'</span><div><b>'+esc(e[1])+'</b><br><small>'+esc(e[2])+' \u00b7 '+esc(e[3])+(s.t&&s.t!=='\u2013'?' \u00b7 '+s.t:'')+'</small></div></div><span class="rl-tag '+tagc(s.st)+'">'+s.st+'</span></div>'}
-function today(){return new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long'})}
-function hd(s,h){return '<div class="rl-hd"><small>'+s+'</small><h2>'+h+'</h2></div>'}
-function team(el,div,label){var L=EMP.filter(function(e){return e[3]===div}),c=counts(L);
- el.innerHTML='<div class="rl">'+hd(label,'Tim saya')+'<div class="rl-st"><div><b>'+c.h+'</b><small>Hadir</small></div><div><b>'+c.l+'</b><small>Terlambat</small></div><div><b>'+c.b+'</b><small>Belum absen</small></div><div><b>'+c.c+'</b><small>Cuti</small></div></div><div class="rl-card"><h3>Hari ini</h3>'+L.map(person).join('')+'</div></div>'}
-function approvals(el,scope,label){var P=pending(scope),D=REQ.filter(function(r){return r.st!=='Menunggu'&&(!scope||scope(r))}).slice(0,6);
- el.innerHTML='<div class="rl">'+hd(label,'Persetujuan')+'<div class="rl-card">'+(P.length?P.map(function(r){return '<div class="rl-req"><div class="rl-p"><span class="rl-a">'+ini(r.who)+'</span><div><b>'+esc(r.who)+' \u00b7 '+esc(r.type)+'</b><br><small>'+esc(r.detail)+'</small></div></div>'+((O.can?O.can(r):true)?'<div class="rl-acts"><button class="y" data-id="'+r.id+'" data-ok="1">Setujui</button><button class="n" data-id="'+r.id+'">Tolak</button></div>':'<span class="rl-tag mu">Menunggu '+LV[r.lvl||'spv']+'</span>')+'</div>'}).join(''):'<p class="rl-em">Semua pengajuan sudah ditangani.</p>')+'</div>'
- +(D.length?'<div class="rl-card"><h3>Keputusan terakhir</h3>'+D.map(function(r){return '<div class="rl-row"><div><b>'+esc(r.who)+'</b><br><small>'+esc(r.type)+' \u00b7 '+esc(r.detail)+'</small></div><span class="rl-tag '+(r.st==='Disetujui'?'ok':'mu')+'">'+r.st+'</span></div>'}).join('')+'</div>':'')+'</div>';
- el.querySelector('.rl').onclick=function(e){var b=e.target.closest('button[data-id]');if(!b)return;var id=+b.dataset.id,r=REQ.filter(function(x){return x.id===id})[0];if(!r||(O.can&&!O.can(r)))return;decide(id,!!b.dataset.ok);O.toast((b.dataset.ok?'Disetujui: ':'Ditolak: ')+r.type+' '+r.who)}}
-function summary(el){var c=counts(EMP),n=EMP.length,pct=Math.round(c.h/n*100),days=[['Sen',94],['Sel',96],['Rab',91],['Kam',89],['Jum',95],['Sen',92],['Hari ini',pct]],dv={};
- EMP.forEach(function(e){(dv[e[3]]=dv[e[3]]||[]).push(e)});
- el.innerHTML='<div class="rl">'+hd(today(),'Ringkasan perusahaan')+'<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>'+c.h+'</b><span>dari '+n+' \u00b7 '+pct+'%</span></div><div class="rl-card"><small>Terlambat</small><b>'+c.l+'</b><span>setelah 08:15</span></div><div class="rl-card"><small>Belum absen</small><b>'+c.b+'</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>'+pending().length+'</b><span>persetujuan</span></div></div>'
- +'<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">'+days.map(function(d,i){return '<div class="'+(i==6?'t':'')+'"><b>'+d[1]+'%</b><i style="height:'+((d[1]-70)*3.6)+'px"></i><small>'+d[0]+'</small></div>'}).join('')+'</div></div>'
- +'<div class="rl-card"><h3>Per divisi</h3>'+Object.keys(dv).map(function(k){var p=Math.round(counts(dv[k]).h/dv[k].length*100);return '<div class="rl-dv"><span>'+k+'</span><i><u style="width:'+p+'%"></u></i><b>'+p+'%</b></div>'}).join('')+'</div></div>'}
-function employees(el){var ST=['Semua','Hadir','Terlambat','WFH','Dinas luar','Cuti','Belum absen'];
- el.innerHTML='<div class="rl">'+hd(EMP.length+' karyawan','Pegawai')+'<input class="rl-q" type="search" placeholder="Cari nama atau divisi" aria-label="Cari pegawai"><div class="rl-ch">'+ST.map(function(s){return '<button class="'+(s===F?'on':'')+'">'+s+'</button>'}).join('')+'</div><div class="rl-card rl-lst"></div></div>';
- var q=el.querySelector('.rl-q'),lst=el.querySelector('.rl-lst');q.value=Q;
- function d(){var L=EMP.filter(function(e){var s=status(e).st;return(F==='Semua'||s===F)&&(!Q||(e[1]+' '+e[3]+' '+e[2]).toLowerCase().indexOf(Q)>-1)});lst.innerHTML=L.length?L.map(person).join(''):'<p class="rl-em">Tidak ada yang cocok.</p>'}
- q.oninput=function(){Q=q.value.trim().toLowerCase();d()};
- el.querySelector('.rl-ch').onclick=function(e){var b=e.target.closest('button');if(!b)return;F=b.textContent;[].forEach.call(this.children,function(x){x.className=x===b?'on':''});d()};d()}
-var st=document.createElement('style');st.textContent='.rl-hd{margin-bottom:12px}.rl-hd small{color:var(--rl-mute)}.rl-hd h2{font-size:24px;font-weight:800;margin:0;letter-spacing:-.02em;color:var(--rl-ink)}'
-+'.rl-card{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:18px;padding:14px;margin-bottom:12px;color:var(--rl-ink)}.rl-card h3{font-size:15px;margin:0 0 8px}'
-+'.rl-st{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.rl-st div{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:14px;padding:9px 4px;text-align:center;color:var(--rl-ink)}.rl-st b{display:block;font-size:22px;font-weight:800}.rl-st small{font-size:11px;color:var(--rl-mute)}'
-+'.rl-row,.rl-req{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--rl-line);color:var(--rl-ink)}.rl-row:first-of-type,.rl-req:first-of-type{border-top:0}'
-+'.rl-p{display:flex;gap:10px;align-items:center;min-width:0}.rl-a{width:34px;height:34px;border-radius:50%;background:var(--rl-chip);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}.rl small{color:var(--rl-mute);font-size:12px}'
-+'.rl-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--rl-chip);color:var(--rl-ink);white-space:nowrap}.rl-tag.ok{background:#1F9D7722;color:var(--rl-ok)}.rl-tag.late{background:#E5584B22;color:var(--rl-late)}.rl-tag.mu{background:var(--rl-chip);color:var(--rl-mute)}'
-+'.rl-acts{display:flex;gap:6px;flex:none}.rl-acts button{border:0;border-radius:10px;font-weight:700;font-size:12px;padding:9px 12px;cursor:pointer;min-height:36px}.rl-acts .y{background:var(--rl-ok);color:#fff}.rl-acts .n{background:var(--rl-chip);color:var(--rl-ink)}'
-+'.rl-em{text-align:center;color:var(--rl-mute);padding:18px 0;margin:0}.rl-kp{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.rl-kp .rl-card{margin:0}.rl-kp small{color:var(--rl-mute)}.rl-kp b{display:block;font-size:30px;font-weight:800}.rl-kp span{font-size:12px;color:var(--rl-mute)}'
-+'.rl-hl{background:var(--rl-acc)!important;color:var(--rl-accink)!important;border-color:var(--rl-acc)!important}.rl-hl small,.rl-hl span{color:inherit!important;opacity:.8}'
-+'.rl-bars{display:flex;align-items:flex-end;gap:8px;height:150px}.rl-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}.rl-bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--rl-chip)}.rl-bars .t i{background:var(--rl-acc)}.rl-bars b{font-size:11px}.rl-bars small{font-size:11px}'
-+'.rl-dv{display:flex;align-items:center;gap:10px;margin:8px 0}.rl-dv span{width:80px;font-size:13px}.rl-dv i{flex:1;height:10px;border-radius:9px;background:var(--rl-chip);overflow:hidden}.rl-dv u{display:block;height:100%;background:var(--rl-acc);border-radius:9px}.rl-dv b{font-size:12px;width:38px;text-align:right}'
-+'.rl-q{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);margin-bottom:10px}'
-+'.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
-+'@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
-document.head.appendChild(st);
-g.RL={emp:EMP,status:status,init:init,add:add,mine:mine,pending:pending,team:team,approvals:approvals,summary:summary,employees:employees,esc:esc};
-})(window);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Portal Admin — AbsenPro v2</title>
+  <meta name="description"
+    content="Portal admin HR untuk AbsenPro v2: ringkasan kehadiran, tabel kehadiran dengan ekspor CSV, dan antrean persetujuan.">
+  <meta name="author" content="K. Arzhaning Jagad (Arzha)">
+  <meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Portal Admin — AbsenPro v2 | K. Arzhaning Jagad (Arzha)">
+  <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2-admin">
+  <meta property="og:site_name" content="arzhaning.my.id">
+  <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script>(function () { var L = console.log.bind(console); L('%c  \u00a9 DEMO DESAIN \u2014 arzhaning.my.id  ', 'background:#0d9488;color:#fff;font:700 13px/2 monospace;padding:0 12px'); L('%c\u26a0 File ini adalah milik eksklusif K. Arzhaning Jagad.\nDilarang menyalin, mendistribusikan, atau menjual desain ini tanpa izin tertulis.', 'color:#b45309;font-size:10.5px;line-height:1.7') })()</script>
+  <script>
+      /* AbsenPro role views (c) 2026 K. Arzhaning Jagad - demo only */
+      (function (g) {
+        var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+        var ini = function (n) { return String(n).split(' ').map(function (x) { return x[0] }).slice(0, 2).join('').toUpperCase() };
+        var EMP = [['arzha', 'Arzha', 'Product Designer', 'Digital', 'Hadir', '07:52'], ['raka', 'Raka Mahendra', 'Engineer', 'Digital', 'WFH', '08:03'], ['salsa', 'Salsa Anindya', 'QA', 'Digital', 'Hadir', '07:58'], ['bima', 'Bima Satria', 'Engineer', 'Digital', 'Cuti', '\u2013'], ['laras', 'Laras Wulandari', 'Designer', 'Digital', 'Dinas luar', '08:10'], ['nadia', 'Nadia Putri', 'Akuntan', 'Keuangan', 'Hadir', '07:45'], ['fajar', 'Fajar Nugroho', 'Staf Keuangan', 'Keuangan', 'Terlambat', '08:41'], ['maya', 'Maya Lestari', 'Rekrutmen', 'SDM', 'Hadir', '07:55'], ['yoga', 'Yoga Pratama', 'Sales', 'Penjualan', 'Terlambat', '08:27'], ['intan', 'Intan Permata', 'Sales', 'Penjualan', 'Hadir', '08:02'], ['dimas', 'Dimas Aditya', 'Support', 'Layanan', 'WFH', '08:00'], ['rani', 'Rani Kusuma', 'Support', 'Layanan', 'Hadir', '07:49'], ['dina', 'Dina Prameswari', 'Supervisor Digital', 'Digital', 'Hadir', '07:40'], ['hendra', 'Hendra Wijaya', 'Admin HR', 'SDM', 'Hadir', '07:35']];
+        var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
+        function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
+        function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
+        function seed() { var d = function (i, u, w, v, t, x, s, l) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv')] }
+        function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
+        function add(u, type, detail) { REQ.unshift({ id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }); save(); O.onChange() }
+        function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
+        function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
+        function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
+        function status(e) { var l = O.live && O.live(e[0]); return l || { st: e[4], t: e[5] } }
+        function counts(L) { var c = { h: 0, l: 0, c: 0, b: 0 }; L.forEach(function (e) { var s = status(e).st; if (s === 'Terlambat') { c.l++; c.h++ } else if (s === 'Cuti') c.c++; else if (s === 'Belum absen') c.b++; else c.h++ }); return c }
+        function tagc(s) { return s === 'Hadir' ? 'ok' : s === 'Terlambat' ? 'late' : (s === 'Cuti' || s === 'Belum absen') ? 'mu' : '' }
+        function person(e) { var s = status(e); return '<div class="rl-row"><div class="rl-p"><span class="rl-a">' + ini(e[1]) + '</span><div><b>' + esc(e[1]) + '</b><br><small>' + esc(e[2]) + ' \u00b7 ' + esc(e[3]) + (s.t && s.t !== '\u2013' ? ' \u00b7 ' + s.t : '') + '</small></div></div><span class="rl-tag ' + tagc(s.st) + '">' + s.st + '</span></div>' }
+        function today() { return new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' }) }
+        function hd(s, h) { return '<div class="rl-hd"><small>' + s + '</small><h2>' + h + '</h2></div>' }
+        function team(el, div, label) {
+          var L = EMP.filter(function (e) { return e[3] === div }), c = counts(L);
+          el.innerHTML = '<div class="rl">' + hd(label, 'Tim saya') + '<div class="rl-st"><div><b>' + c.h + '</b><small>Hadir</small></div><div><b>' + c.l + '</b><small>Terlambat</small></div><div><b>' + c.b + '</b><small>Belum absen</small></div><div><b>' + c.c + '</b><small>Cuti</small></div></div><div class="rl-card"><h3>Hari ini</h3>' + L.map(person).join('') + '</div></div>'
+        }
+        function approvals(el, scope, label) {
+          var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && (!scope || scope(r)) }).slice(0, 6);
+          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small></div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
+            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small></div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
+          el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; decide(id, !!b.dataset.ok); O.toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) }
+        }
+        function summary(el) {
+          var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
+          EMP.forEach(function (e) { (dv[e[3]] = dv[e[3]] || []).push(e) });
+          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>setelah 08:15</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
+            + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + ((d[1] - 70) * 3.6) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
+            + '<div class="rl-card"><h3>Per divisi</h3>' + Object.keys(dv).map(function (k) { var p = Math.round(counts(dv[k]).h / dv[k].length * 100); return '<div class="rl-dv"><span>' + k + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>' }).join('') + '</div></div>'
+        }
+        function employees(el) {
+          var ST = ['Semua', 'Hadir', 'Terlambat', 'WFH', 'Dinas luar', 'Cuti', 'Belum absen'];
+          el.innerHTML = '<div class="rl">' + hd(EMP.length + ' karyawan', 'Pegawai') + '<input class="rl-q" type="search" placeholder="Cari nama atau divisi" aria-label="Cari pegawai"><div class="rl-ch">' + ST.map(function (s) { return '<button class="' + (s === F ? 'on' : '') + '">' + s + '</button>' }).join('') + '</div><div class="rl-card rl-lst"></div></div>';
+          var q = el.querySelector('.rl-q'), lst = el.querySelector('.rl-lst'); q.value = Q;
+          function d() { var L = EMP.filter(function (e) { var s = status(e).st; return (F === 'Semua' || s === F) && (!Q || (e[1] + ' ' + e[3] + ' ' + e[2]).toLowerCase().indexOf(Q) > -1) }); lst.innerHTML = L.length ? L.map(person).join('') : '<p class="rl-em">Tidak ada yang cocok.</p>' }
+          q.oninput = function () { Q = q.value.trim().toLowerCase(); d() };
+          el.querySelector('.rl-ch').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; F = b.textContent;[].forEach.call(this.children, function (x) { x.className = x === b ? 'on' : '' }); d() }; d()
+        }
+        var st = document.createElement('style'); st.textContent = '.rl-hd{margin-bottom:12px}.rl-hd small{color:var(--rl-mute)}.rl-hd h2{font-size:24px;font-weight:800;margin:0;letter-spacing:-.02em;color:var(--rl-ink)}'
+          + '.rl-card{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:18px;padding:14px;margin-bottom:12px;color:var(--rl-ink)}.rl-card h3{font-size:15px;margin:0 0 8px}'
+          + '.rl-st{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}.rl-st div{background:var(--rl-card);border:1px solid var(--rl-line);border-radius:14px;padding:9px 4px;text-align:center;color:var(--rl-ink)}.rl-st b{display:block;font-size:22px;font-weight:800}.rl-st small{font-size:11px;color:var(--rl-mute)}'
+          + '.rl-row,.rl-req{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--rl-line);color:var(--rl-ink)}.rl-row:first-of-type,.rl-req:first-of-type{border-top:0}'
+          + '.rl-p{display:flex;gap:10px;align-items:center;min-width:0}.rl-a{width:34px;height:34px;border-radius:50%;background:var(--rl-chip);display:grid;place-items:center;font-weight:700;font-size:12px;flex:none}.rl small{color:var(--rl-mute);font-size:12px}'
+          + '.rl-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--rl-chip);color:var(--rl-ink);white-space:nowrap}.rl-tag.ok{background:#1F9D7722;color:var(--rl-ok)}.rl-tag.late{background:#E5584B22;color:var(--rl-late)}.rl-tag.mu{background:var(--rl-chip);color:var(--rl-mute)}'
+          + '.rl-acts{display:flex;gap:6px;flex:none}.rl-acts button{border:0;border-radius:10px;font-weight:700;font-size:12px;padding:9px 12px;cursor:pointer;min-height:36px}.rl-acts .y{background:var(--rl-ok);color:#fff}.rl-acts .n{background:var(--rl-chip);color:var(--rl-ink)}'
+          + '.rl-em{text-align:center;color:var(--rl-mute);padding:18px 0;margin:0}.rl-kp{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.rl-kp .rl-card{margin:0}.rl-kp small{color:var(--rl-mute)}.rl-kp b{display:block;font-size:30px;font-weight:800}.rl-kp span{font-size:12px;color:var(--rl-mute)}'
+          + '.rl-hl{background:var(--rl-acc)!important;color:var(--rl-accink)!important;border-color:var(--rl-acc)!important}.rl-hl small,.rl-hl span{color:inherit!important;opacity:.8}'
+          + '.rl-bars{display:flex;align-items:flex-end;gap:8px;height:150px}.rl-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}.rl-bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--rl-chip)}.rl-bars .t i{background:var(--rl-acc)}.rl-bars b{font-size:11px}.rl-bars small{font-size:11px}'
+          + '.rl-dv{display:flex;align-items:center;gap:10px;margin:8px 0}.rl-dv span{width:80px;font-size:13px}.rl-dv i{flex:1;height:10px;border-radius:9px;background:var(--rl-chip);overflow:hidden}.rl-dv u{display:block;height:100%;background:var(--rl-acc);border-radius:9px}.rl-dv b{font-size:12px;width:38px;text-align:right}'
+          + '.rl-q{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);margin-bottom:10px}'
+          + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
+          + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
+        document.head.appendChild(st);
+        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+      })(window);
 
-</script>
-<style>
-:root{--bg:#EDF1F5;--card:#fff;--ink:#12263F;--mute:#66778C;--line:#DCE3EB;--chip:#E4EAF1;--acc:#F2B01E;--accink:#3A2A00;--ok:#1F9D77;--late:#E5584B;--ff:Figtree,system-ui,sans-serif;--fh:"Bricolage Grotesque",Figtree,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1624;--card:#13243A;--ink:#EAF0F7;--mute:#8FA3BA;--line:#233750;--chip:#1B3049}}
-:root[data-theme="dark"]{--bg:#0B1624;--card:#13243A;--ink:#EAF0F7;--mute:#8FA3BA;--line:#233750;--chip:#1B3049}
-*{box-sizing:border-box;margin:0}
-body{--rl-card:var(--card);--rl-ink:var(--ink);--rl-mute:var(--mute);--rl-line:var(--line);--rl-chip:var(--chip);--rl-acc:var(--acc);--rl-accink:var(--accink);--rl-ok:var(--ok);--rl-late:var(--late);background:var(--bg);color:var(--ink);font:500 14px/1.45 var(--ff);min-height:100vh;padding-bottom:46px}
-h1,h2,h3,.fh{font-family:var(--fh);letter-spacing:-.02em}
-button{font-family:inherit}
-.shell{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 46px)}
-aside{background:var(--card);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:calc(100vh - 46px)}
-.logo{font:800 22px var(--fh);padding:0 10px 4px}.logo span{color:var(--acc)}.tg{padding:0 10px 16px;color:var(--mute);font-size:12px}
-.nv{display:flex;align-items:center;justify-content:space-between;gap:10px;border:0;background:none;color:var(--mute);font:600 14px var(--ff);padding:11px 12px;border-radius:12px;cursor:pointer;text-align:left;text-decoration:none}
-.nv.on{background:var(--acc);color:var(--accink)}
-.bdg{background:var(--late);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px}.bdg[hidden]{display:none}
-.me{margin-top:auto;border-top:1px solid var(--line);padding:12px 8px 0;display:flex;gap:10px;align-items:center}
-.av{width:38px;height:38px;border-radius:50%;background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 13px var(--fh);flex:none}
-main{padding:26px 30px;max-width:1240px;width:100%;container-type:inline-size}
-.view{display:none}.view.on{display:block}
-.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:14px}
-.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 13px var(--ff);padding:9px 14px;border-radius:12px;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.hd{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:16px}.hd h1{font-size:28px;font-weight:800}.hd p{color:var(--mute)}
-.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-input[type=search],input[type=email],input[type=password]{font:500 14px var(--ff);color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
-.tools input{flex:1;min-width:200px;width:auto}
-.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.chips button{border:1px solid var(--line);background:var(--card);color:var(--ink);font:600 13px var(--ff);padding:8px 13px;border-radius:99px;cursor:pointer}.chips .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.tw{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:620px}th{text-align:left;color:var(--mute);font-size:12px;font-weight:600;padding:8px 10px}td{padding:11px 10px;border-top:1px solid var(--line)}
-.tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--chip);color:var(--ink);white-space:nowrap}.tag.Hadir{background:#1F9D7722;color:var(--ok)}.tag.Terlambat{background:#E5584B22;color:var(--late)}.tag.Cuti,.tag.Belum{background:var(--chip);color:var(--mute)}
-.who{display:flex;gap:10px;align-items:center}.who .av{width:32px;height:32px;font-size:11px}.sm{color:var(--mute);font-size:12.5px}
-#gate{min-height:calc(100vh - 46px);display:grid;place-items:center;padding:24px 20px}
-.gi{width:100%;max-width:440px}.gi h1{font-size:28px;font-weight:800;margin:14px 0 4px}
-.gi label{display:block;font-size:12px;color:var(--mute);margin:12px 0 6px}
-.err{color:var(--late);font-weight:600;font-size:13px;min-height:20px;margin-top:8px}
-.go{width:100%;border:0;border-radius:14px;background:var(--acc);color:var(--accink);font:700 15px var(--fh);padding:13px;cursor:pointer;margin-top:6px}
-.acc{width:100%;display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:10px 12px;cursor:pointer;margin-top:8px;font:500 14px var(--ff)}.acc.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
-.toast{position:fixed;top:14px;left:50%;transform:translate(-50%,-90px);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;transition:transform .3s;z-index:60}.toast.on{transform:translate(-50%,0)}
-[hidden]{display:none!important}
-:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
-@media(max-width:860px){.shell{grid-template-columns:1fr}aside{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px}.me{display:none}.tg{display:none}.logo{padding:6px 10px}main{padding:18px 14px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-#__jz-bar{position:fixed;bottom:0;left:0;right:0;z-index:2147483640;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;height:46px;background:rgba(15,23,42,.95);border-top:1px solid rgba(255,255,255,.12);box-shadow:0 -4px 18px rgba(0,0,0,.4);backdrop-filter:blur(12px);font:600 13px/1 system-ui,-apple-system,sans-serif;color:#cbd5e1}
-#__jz-bar *{box-sizing:border-box}#__jz-bar .jz-bar-nav{display:flex;align-items:center;gap:8px;flex-shrink:0}
-#__jz-bar .jz-btn-gallery{display:inline-flex;align-items:center;gap:6px;color:#2dd4bf;text-decoration:none;white-space:nowrap;padding:6px 10px;border-radius:8px;background:rgba(45,212,191,.1);border:1px solid rgba(45,212,191,.25)}
-#__jz-bar .jz-btn-home{display:inline-flex;align-items:center;gap:5px;color:#94a3b8;text-decoration:none;white-space:nowrap;padding:6px 9px;border-radius:8px;font-size:12px;font-weight:500}
-#__jz-bar .jz-dot{width:4px;height:4px;border-radius:50%;background:#2dd4bf;opacity:.7}#__jz-bar .jz-sep{color:rgba(255,255,255,.18)}
-#__jz-bar .jz-title{font-size:12px;opacity:.75;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:320px}
-#__jz-bar .jz-wa{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#052e16!important;font-weight:700;font-size:12.5px;text-decoration:none;white-space:nowrap;padding:7px 13px;border-radius:999px;box-shadow:0 2px 10px rgba(37,211,102,.35);flex-shrink:0}
-@media(max-width:720px){#__jz-bar .jz-title{display:none}}@media(max-width:500px){#__jz-bar{padding:0 10px;gap:6px}#__jz-bar .jz-btn-home .jz-domain{display:none}#__jz-bar .jz-wa{padding:6px 11px;font-size:11.5px}}
-</style>
+  </script>
+  <style>
+    :root {
+      --bg: #EDF1F5;
+      --card: #fff;
+      --ink: #12263F;
+      --mute: #66778C;
+      --line: #DCE3EB;
+      --chip: #E4EAF1;
+      --acc: #F2B01E;
+      --accink: #3A2A00;
+      --ok: #1F9D77;
+      --late: #E5584B;
+      --ff: Figtree, system-ui, sans-serif;
+      --fh: "Bricolage Grotesque", Figtree, sans-serif
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0B1624;
+        --card: #13243A;
+        --ink: #EAF0F7;
+        --mute: #8FA3BA;
+        --line: #233750;
+        --chip: #1B3049
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0B1624;
+      --card: #13243A;
+      --ink: #EAF0F7;
+      --mute: #8FA3BA;
+      --line: #233750;
+      --chip: #1B3049
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0
+    }
+
+    body {
+      --rl-card: var(--card);
+      --rl-ink: var(--ink);
+      --rl-mute: var(--mute);
+      --rl-line: var(--line);
+      --rl-chip: var(--chip);
+      --rl-acc: var(--acc);
+      --rl-accink: var(--accink);
+      --rl-ok: var(--ok);
+      --rl-late: var(--late);
+      background: var(--bg);
+      color: var(--ink);
+      font: 500 14px/1.45 var(--ff);
+      min-height: 100vh;
+      padding-bottom: 46px
+    }
+
+    h1,
+    h2,
+    h3,
+    .fh {
+      font-family: var(--fh);
+      letter-spacing: -.02em
+    }
+
+    button {
+      font-family: inherit
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      min-height: calc(100vh - 46px)
+    }
+
+    aside {
+      background: var(--card);
+      border-right: 1px solid var(--line);
+      padding: 22px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      position: sticky;
+      top: 0;
+      height: calc(100vh - 46px)
+    }
+
+    .logo {
+      font: 800 22px var(--fh);
+      padding: 0 10px 4px
+    }
+
+    .logo span {
+      color: var(--acc)
+    }
+
+    .tg {
+      padding: 0 10px 16px;
+      color: var(--mute);
+      font-size: 12px
+    }
+
+    .nv {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 0;
+      background: none;
+      color: var(--mute);
+      font: 600 14px var(--ff);
+      padding: 11px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: left;
+      text-decoration: none
+    }
+
+    .nv.on {
+      background: var(--acc);
+      color: var(--accink)
+    }
+
+    .bdg {
+      background: var(--late);
+      color: #fff;
+      border-radius: 99px;
+      font-size: 11px;
+      padding: 1px 7px
+    }
+
+    .bdg[hidden] {
+      display: none
+    }
+
+    .me {
+      margin-top: auto;
+      border-top: 1px solid var(--line);
+      padding: 12px 8px 0;
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--ink);
+      color: var(--bg);
+      display: grid;
+      place-items: center;
+      font: 700 13px var(--fh);
+      flex: none
+    }
+
+    main {
+      padding: 26px 30px;
+      max-width: 1240px;
+      width: 100%;
+      container-type: inline-size
+    }
+
+    .view {
+      display: none
+    }
+
+    .view.on {
+      display: block
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 14px
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: 600 13px var(--ff);
+      padding: 9px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block
+    }
+
+    .btn.pri {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink)
+    }
+
+    .hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+
+    .hd h1 {
+      font-size: 28px;
+      font-weight: 800
+    }
+
+    .hd p {
+      color: var(--mute)
+    }
+
+    .tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    input[type=search],
+    input[type=email],
+    input[type=password],
+    input[type=text],
+    select {
+      font: 500 14px var(--ff);
+      color: var(--ink);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      width: 100%
+    }
+
+    .tools input {
+      flex: 1;
+      min-width: 200px;
+      width: auto
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .chips button {
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      font: 600 13px var(--ff);
+      padding: 8px 13px;
+      border-radius: 99px;
+      cursor: pointer
+    }
+
+    .chips .on {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink)
+    }
+
+    .tw {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 620px
+    }
+
+    th {
+      text-align: left;
+      color: var(--mute);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 10px
+    }
+
+    td {
+      padding: 11px 10px;
+      border-top: 1px solid var(--line)
+    }
+
+    .tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--chip);
+      color: var(--ink);
+      white-space: nowrap
+    }
+
+    .tag.Hadir {
+      background: #1F9D7722;
+      color: var(--ok)
+    }
+
+    .tag.Terlambat {
+      background: #E5584B22;
+      color: var(--late)
+    }
+
+    .tag.Cuti,
+    .tag.Belum {
+      background: var(--chip);
+      color: var(--mute)
+    }
+
+    .who {
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .who .av {
+      width: 32px;
+      height: 32px;
+      font-size: 11px
+    }
+
+    .sm {
+      color: var(--mute);
+      font-size: 12.5px
+    }
+
+    #gate {
+      min-height: calc(100vh - 46px);
+      display: grid;
+      place-items: center;
+      padding: 24px 20px
+    }
+
+    .gi {
+      width: 100%;
+      max-width: 440px
+    }
+
+    .gi h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 14px 0 4px
+    }
+
+    .gi label {
+      display: block;
+      font-size: 12px;
+      color: var(--mute);
+      margin: 12px 0 6px
+    }
+
+    .err {
+      color: var(--late);
+      font-weight: 600;
+      font-size: 13px;
+      min-height: 20px;
+      margin-top: 8px
+    }
+
+    .go {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      background: var(--acc);
+      color: var(--accink);
+      font: 700 15px var(--fh);
+      padding: 13px;
+      cursor: pointer;
+      margin-top: 6px
+    }
+
+    .acc {
+      width: 100%;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 10px 12px;
+      cursor: pointer;
+      margin-top: 8px;
+      font: 500 14px var(--ff)
+    }
+
+    .acc.on {
+      border-color: var(--acc);
+      box-shadow: 0 0 0 2px var(--acc)
+    }
+
+    .toast {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      transform: translate(-50%, -90px);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 600;
+      transition: transform .3s;
+      z-index: 60
+    }
+
+    .toast.on {
+      transform: translate(-50%, 0)
+    }
+
+    [hidden] {
+      display: none !important
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--acc);
+      outline-offset: 2px
+    }
+
+    @media(max-width:860px) {
+      .shell {
+        grid-template-columns: 1fr
+      }
+
+      aside {
+        position: static;
+        height: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 12px
+      }
+
+      .me {
+        display: none
+      }
+
+      .tg {
+        display: none
+      }
+
+      .logo {
+        padding: 6px 10px
+      }
+
+      main {
+        padding: 18px 14px
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        transition: none !important
+      }
+    }
+
+    #__jz-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2147483640;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0 16px;
+      height: 46px;
+      background: rgba(15, 23, 42, .95);
+      border-top: 1px solid rgba(255, 255, 255, .12);
+      box-shadow: 0 -4px 18px rgba(0, 0, 0, .4);
+      backdrop-filter: blur(12px);
+      font: 600 13px/1 system-ui, -apple-system, sans-serif;
+      color: #cbd5e1
+    }
+
+    #__jz-bar * {
+      box-sizing: border-box
+    }
+
+    #__jz-bar .jz-bar-nav {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0
+    }
+
+    #__jz-bar .jz-btn-gallery {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #2dd4bf;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 6px 10px;
+      border-radius: 8px;
+      background: rgba(45, 212, 191, .1);
+      border: 1px solid rgba(45, 212, 191, .25)
+    }
+
+    #__jz-bar .jz-btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: #94a3b8;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 6px 9px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500
+    }
+
+    #__jz-bar .jz-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: #2dd4bf;
+      opacity: .7
+    }
+
+    #__jz-bar .jz-sep {
+      color: rgba(255, 255, 255, .18)
+    }
+
+    #__jz-bar .jz-title {
+      font-size: 12px;
+      opacity: .75;
+      color: #e2e8f0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 320px
+    }
+
+    #__jz-bar .jz-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #25d366;
+      color: #052e16 !important;
+      font-weight: 700;
+      font-size: 12.5px;
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 7px 13px;
+      border-radius: 999px;
+      box-shadow: 0 2px 10px rgba(37, 211, 102, .35);
+      flex-shrink: 0
+    }
+
+    @media(max-width:720px) {
+      #__jz-bar .jz-title {
+        display: none
+      }
+    }
+
+    @media(max-width:500px) {
+      #__jz-bar {
+        padding: 0 10px;
+        gap: 6px
+      }
+
+      #__jz-bar .jz-btn-home .jz-domain {
+        display: none
+      }
+
+      #__jz-bar .jz-wa {
+        padding: 6px 11px;
+        font-size: 11.5px
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="toast" id="toast" role="status"></div>
+  <div class="toast" id="toast" role="status"></div>
 
-<div id="gate" hidden><div class="gi" id="gi"></div></div>
-
-<div class="shell" id="app" hidden>
-<aside>
-  <div class="logo">Absen<span>Pro</span></div><div class="tg">Portal Admin · AbsenPro v2</div>
-  <button class="nv on" data-v="sum">Ringkasan</button>
-  <button class="nv" data-v="att">Kehadiran</button>
-  <button class="nv" data-v="req">Persetujuan <span class="bdg" id="bd" hidden>0</span></button>
-  <a class="nv" id="back" href="demo-absenpro-hris-v2.html" style="margin-top:8px">‹ Kembali ke aplikasi</a>
-  <button class="nv" id="th">Ganti tema</button>
-  <div class="me"><span class="av" id="mav"></span><div style="flex:1;min-width:0"><b id="mnm"></b><br><span class="sm" id="mrl"></span></div></div>
-  <button class="nv" id="lo" style="color:var(--late)">Keluar</button>
-</aside>
-<main>
-  <section class="view on" id="v-sum"></section>
-  <section class="view" id="v-att">
-    <div class="hd"><div><p id="dt"></p><h1>Kehadiran karyawan</h1></div><button class="btn pri" id="csv">Ekspor CSV</button></div>
-    <div class="card">
-      <div class="tools"><input type="search" id="q" placeholder="Cari nama, jabatan, atau divisi" aria-label="Cari karyawan"></div>
-      <div class="chips" id="fl"></div>
-      <div class="tw"><table><thead><tr><th>Karyawan</th><th>Divisi</th><th>Masuk</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>
-      <p class="sm" id="em" hidden style="padding:16px 0;text-align:center">Tidak ada karyawan yang cocok.</p>
-    </div>
-  </section>
-  <section class="view" id="v-req"></section>
-</main>
-</div>
-
-<div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
-  <div class="jz-bar-nav">
-    <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg><span>Galeri</span></a>
-    <span class="jz-sep" aria-hidden="true">|</span>
-    <a class="jz-btn-home" href="https://arzhaning.my.id" target="_blank" rel="noopener noreferrer" title="Kunjungi situs utama K. Arzhaning Jagad"><span class="jz-dot" aria-hidden="true"></span><span class="jz-domain">arzhaning.my.id</span></a>
+  <div id="gate" hidden>
+    <div class="gi" id="gi"></div>
   </div>
-  <span class="jz-title">Portal Admin · AbsenPro v2</span>
-  <a class="jz-wa" href="https://wa.me/6282312312734?text=Halo%20Arzha%2C%20saya%20tertarik%20dengan%20demo%20%22Portal%20Admin%20AbsenPro%22.%20Boleh%20diskusi%20untuk%20dibuatkan%20yang%20seperti%20ini%3F" target="_blank" rel="noopener noreferrer" aria-label="Tanya via WhatsApp tentang Portal Admin AbsenPro"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.27-1.38A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.3 15l-.3-.18-3.1.8.83-3.02-.2-.31A8.1 8.1 0 0 1 12.04 3.8z"/></svg><span>Mau seperti ini?</span></a>
-</div>
 
-<script>
-const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const CFG={prefix:'v2',sess:'absenpro-v2-session',live:true};
-const AC=[{id:'arzha',email:'arzha@absenpro.demo',name:'Arzha',ini:'AR',role:'Product Designer',r:'staff'},{id:'raka',email:'raka@absenpro.demo',name:'Raka Mahendra',ini:'RM',role:'Engineer',r:'staff'},{id:'salsa',email:'salsa@absenpro.demo',name:'Salsa Anindya',ini:'SA',role:'QA',r:'staff'},{id:'dina',email:'dina@absenpro.demo',name:'Dina Prameswari',ini:'DP',role:'Supervisor Digital',r:'spv'},{id:'hendra',email:'hendra@absenpro.demo',name:'Hendra Wijaya',ini:'HW',role:'Admin HR',r:'admin'}];
-const RLB={staff:'Staf',spv:'Supervisor',admin:'Admin'};
-let USER=null,MEM=null,VIEW='sum',F='Semua',Q='';
-const getS=()=>{try{return localStorage.getItem(CFG.sess)}catch(e){return MEM}};
-const setS=v=>{MEM=v;try{if(v)localStorage.setItem(CFG.sess,v);else localStorage.removeItem(CFG.sess)}catch(e){}};
-function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('on'),2600)}
-function liveSt(id){if(!CFG.live||!['arzha','raka','salsa','dina','hendra'].includes(id))return null;try{const r=JSON.parse(localStorage.getItem('absenpro-'+id+'-'+new Date().toDateString()));if(r&&r.inAt){const late=r.inAt.h*60+r.inAt.m>495;return{st:late?'Terlambat':'Hadir',t:r.inAt.s}}}catch(e){}return{st:'Belum absen',t:'\u2013'}}
-function canAct(r){return !!USER&&USER.r==='admin'&&r.uid!==USER.id&&(r.lvl==='admin'||(r.lvl==='spv'&&r.div!=='Digital'))}
-RL.init({prefix:CFG.prefix,toast:toast,live:liveSt,can:canAct,onChange:()=>{if(USER)render()}});
-window.addEventListener('storage',e=>{if(USER&&e.key&&e.key.indexOf('absenpro-')===0)render()});
-// ---- gerbang akses
-function gate(html){$('#app').hidden=true;$('#gate').hidden=false;$('#gi').innerHTML='<div class="fh" style="font-size:24px;font-weight:800">Absen<span style="color:var(--acc)">Pro</span> <span class="sm" style="font:600 12px var(--ff)">Portal Admin</span></div>'+html}
-function showLogin(){gate('<h1>Masuk ke Portal Admin</h1><p class="sm">Satu akun untuk aplikasi dan portal. Khusus akun admin.</p><label for="le">Email</label><input id="le" type="email" autocomplete="username" placeholder="nama@absenpro.demo"><label for="lp">Kata sandi</label><input id="lp" type="password" autocomplete="current-password" placeholder="Kata sandi"><p class="err" id="lerr" role="alert"></p><button class="go" id="lgo">Masuk</button><h3 style="margin:22px 0 4px;font-size:15px">Akun demo</h3><p class="sm">Kata sandi semua akun: demo123. Coba juga akun non-admin untuk melihat pembatasan akses.</p><div id="lacc">'+AC.map(a=>'<button class="acc" data-id="'+a.id+'"><span class="av">'+a.ini+'</span><span style="flex:1"><b>'+a.name+'</b><br><span class="sm">'+a.role+' \u00b7 '+a.email+'</span></span><span class="tag">'+RLB[a.r]+'</span></button>').join('')+'</div><p class="sm" style="margin-top:14px">Simulasi untuk demo. Tidak ada data yang dikirim ke server. <a href="demo-absenpro-hris-v2.html" style="color:var(--ink)">Buka aplikasi</a></p>');
- const go=()=>{const e=$('#le').value.trim().toLowerCase(),p=$('#lp').value,er=$('#lerr');if(!e||!p){er.textContent='Isi email dan kata sandi';return}const u=AC.find(a=>a.email===e);if(!u||p!=='demo123'){er.textContent='Email atau kata sandi salah';return}setS(u.id);boot()};
- $('#lgo').onclick=go;[$('#le'),$('#lp')].forEach(i=>i.onkeydown=e=>{if(e.key==='Enter')go()});
- $('#lacc').onclick=e=>{const b=e.target.closest('.acc');if(!b)return;const u=AC.find(a=>a.id===b.dataset.id);$('#le').value=u.email;$('#lp').value='demo123';$('#lerr').textContent='';$$('.acc').forEach(x=>x.classList.toggle('on',x===b));$('#lgo').focus()}}
-function showDenied(u){gate('<h1>Akses ditolak</h1><p class="sm">Anda masuk sebagai <b>'+u.name+'</b> ('+RLB[u.r]+'). Portal Admin hanya untuk akun admin.</p><div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap"><a class="btn pri" href="demo-absenpro-hris-v2.html">Kembali ke aplikasi</a><button class="btn" id="sw">Ganti akun</button></div>');$('#sw').onclick=()=>{setS(null);showLogin()}}
-function boot(){const u=AC.find(a=>a.id===getS());USER=null;if(!u){showLogin();return}if(u.r!=='admin'){showDenied(u);return}USER=u;$('#gate').hidden=true;$('#app').hidden=false;$('#mav').textContent=u.ini;$('#mnm').textContent=u.name;$('#mrl').textContent=u.role;$('#dt').textContent=new Date().toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});render();toast('Selamat datang, '+u.name.split(' ')[0])}
-// ---- tampilan
-function badge(){const n=USER?RL.pending(canAct).length:0;$('#bd').textContent=n;$('#bd').hidden=!n}
-function list(){return RL.emp.filter(e=>{const s=RL.status(e).st;return(F==='Semua'||s===F)&&(!Q||(e[1]+' '+e[2]+' '+e[3]).toLowerCase().indexOf(Q)>-1)})}
-function drawTable(){const L=list(),ini=n=>n.split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase();
- $('#tb').innerHTML=L.map(e=>{const s=RL.status(e);return '<tr><td><div class="who"><span class="av">'+ini(e[1])+'</span><div><b>'+RL.esc(e[1])+'</b><br><span class="sm">'+RL.esc(e[2])+'</span></div></div></td><td>'+RL.esc(e[3])+'</td><td class="fh">'+s.t+'</td><td><span class="tag '+s.st.split(' ')[0]+'">'+s.st+'</span></td></tr>'}).join('');$('#em').hidden=L.length>0}
-function render(){badge();if(VIEW==='sum')RL.summary($('#v-sum'));else if(VIEW==='req'){RL.approvals($('#v-req'),null,'Semua divisi')}else drawTable()}
-$$('.nv[data-v]').forEach(b=>b.onclick=()=>{VIEW=b.dataset.v;$$('.nv[data-v]').forEach(x=>x.classList.toggle('on',x===b));$$('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+VIEW));render()});
-const ST=['Semua','Hadir','Terlambat','WFH','Dinas luar','Cuti','Belum absen'];
-$('#fl').innerHTML=ST.map(s=>'<button class="'+(s===F?'on':'')+'">'+s+'</button>').join('');
-$('#fl').onclick=e=>{const b=e.target.closest('button');if(!b)return;F=b.textContent;$$('#fl button').forEach(x=>x.classList.toggle('on',x===b));drawTable()};
-$('#q').oninput=()=>{Q=$('#q').value.trim().toLowerCase();drawTable()};
-$('#csv').onclick=()=>{const L=list(),cell=c=>{c=String(c);if(/^[=+\-@]/.test(c))c="'"+c;return '"'+c.replace(/"/g,'""')+'"'};
- const rows=[['Nama','Jabatan','Divisi','Masuk','Status']].concat(L.map(e=>{const s=RL.status(e);return[e[1],e[2],e[3],s.t,s.st]}));
- try{const b=new Blob(['\ufeff'+rows.map(r=>r.map(cell).join(',')).join('\n')],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='kehadiran-'+new Date().toISOString().slice(0,10)+'.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1500);toast('Mengunduh '+L.length+' baris')}catch(e){toast('Ekspor tidak didukung di lingkungan ini')}};
-$('#th').onclick=()=>{const r=document.documentElement,cur=r.dataset.theme||(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark'};
-$('#lo').onclick=()=>{setS(null);USER=null;toast('Anda telah keluar');showLogin()};
-boot();
-</script>
+  <div class="shell" id="app" hidden>
+    <aside>
+      <div class="logo">Absen<span>Pro</span></div>
+      <div class="tg">Portal Admin · AbsenPro v2</div>
+      <button class="nv on" data-v="sum">Ringkasan</button>
+      <button class="nv" data-v="att">Kehadiran</button>
+      <button class="nv" data-v="req">Persetujuan <span class="bdg" id="bd" hidden>0</span></button>
+      <!--ANN--><button class="nv" data-v="ann">Pengumuman</button><!--/ANN-->
+      <a class="nv" id="back" href="demo-absenpro-hris-v2.html" style="margin-top:8px">‹ Kembali ke aplikasi</a>
+      <button class="nv" id="th">Ganti tema</button>
+      <div class="me"><span class="av" id="mav"></span>
+        <div style="flex:1;min-width:0"><b id="mnm"></b><br><span class="sm" id="mrl"></span></div>
+      </div>
+      <button class="nv" id="lo" style="color:var(--late)">Keluar</button>
+    </aside>
+    <main>
+      <section class="view on" id="v-sum"></section>
+      <section class="view" id="v-att">
+        <div class="hd">
+          <div>
+            <p id="dt"></p>
+            <h1>Kehadiran karyawan</h1>
+          </div><button class="btn pri" id="csv">Ekspor CSV</button>
+        </div>
+        <div class="card">
+          <div class="tools"><input type="search" id="q" placeholder="Cari nama, jabatan, atau divisi"
+              aria-label="Cari karyawan"></div>
+          <div class="chips" id="fl"></div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Karyawan</th>
+                  <th>Divisi</th>
+                  <th>Masuk</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tb"></tbody>
+            </table>
+          </div>
+          <p class="sm" id="em" hidden style="padding:16px 0;text-align:center">Tidak ada karyawan yang cocok.</p>
+        </div>
+      </section>
+      <section class="view" id="v-req"></section>
+      <!--ANN-->
+      <section class="view" id="v-ann">
+        <div class="hd">
+          <div>
+            <p>Komunikasi ke karyawan</p>
+            <h1>Pengumuman dan jajak</h1>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Terbitkan pengumuman</h3>
+          <div class="tools"><input type="text" id="at" maxlength="90" placeholder="Judul pengumuman"
+              aria-label="Judul pengumuman"><select id="ag" aria-label="Label">
+              <option>Info</option>
+              <option>Penting</option>
+              <option>Acara</option>
+            </select><button class="btn pri" id="apub">Terbitkan</button></div>
+        </div>
+        <div class="card">
+          <h3>Pengumuman terbit</h3>
+          <div id="alist"></div>
+        </div>
+        <div class="card">
+          <h3>Jajak singkat aktif</h3>
+          <div id="pres"></div>
+          <h3 style="margin-top:18px;font-size:14px">Buat jajak baru</h3>
+          <div class="tools"><input type="text" id="pq" maxlength="90" placeholder="Pertanyaan"
+              aria-label="Pertanyaan jajak"><input type="text" id="po" placeholder="Pilihan, pisahkan dengan koma"
+              aria-label="Pilihan jajak"><button class="btn pri" id="ppub">Terbitkan jajak</button></div>
+        </div>
+      </section><!--/ANN-->
+    </main>
+  </div>
+
+  <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
+    <div class="jz-bar-nav">
+      <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain"><svg
+          width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5M12 5l-7 7 7 7" />
+        </svg><span>Galeri</span></a>
+      <span class="jz-sep" aria-hidden="true">|</span>
+      <a class="jz-btn-home" href="https://arzhaning.my.id" target="_blank" rel="noopener noreferrer"
+        title="Kunjungi situs utama K. Arzhaning Jagad"><span class="jz-dot" aria-hidden="true"></span><span
+          class="jz-domain">arzhaning.my.id</span></a>
+    </div>
+    <span class="jz-title">Portal Admin · AbsenPro v2</span>
+    <a class="jz-wa"
+      href="https://wa.me/6282312312734?text=Halo%20Arzha%2C%20saya%20tertarik%20dengan%20demo%20%22Portal%20Admin%20AbsenPro%22.%20Boleh%20diskusi%20untuk%20dibuatkan%20yang%20seperti%20ini%3F"
+      target="_blank" rel="noopener noreferrer" aria-label="Tanya via WhatsApp tentang Portal Admin AbsenPro"><svg
+        width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path
+          d="M12.04 2a9.9 9.9 0 0 0-8.5 14.9L2 22l5.27-1.38A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.3 15l-.3-.18-3.1.8.83-3.02-.2-.31A8.1 8.1 0 0 1 12.04 3.8z" />
+      </svg><span>Mau seperti ini?</span></a>
+  </div>
+
+  <script>
+    const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+    const CFG = { prefix: 'v2', sess: 'absenpro-v2-session', live: true };
+    const AC = [{ id: 'arzha', email: 'arzha@absenpro.demo', name: 'Arzha', ini: 'AR', role: 'Product Designer', r: 'staff' }, { id: 'raka', email: 'raka@absenpro.demo', name: 'Raka Mahendra', ini: 'RM', role: 'Engineer', r: 'staff' }, { id: 'salsa', email: 'salsa@absenpro.demo', name: 'Salsa Anindya', ini: 'SA', role: 'QA', r: 'staff' }, { id: 'dina', email: 'dina@absenpro.demo', name: 'Dina Prameswari', ini: 'DP', role: 'Supervisor Digital', r: 'spv' }, { id: 'hendra', email: 'hendra@absenpro.demo', name: 'Hendra Wijaya', ini: 'HW', role: 'Admin HR', r: 'admin' }];
+    const RLB = { staff: 'Staf', spv: 'Supervisor', admin: 'Admin' };
+    let USER = null, MEM = null, VIEW = 'sum', F = 'Semua', Q = '';
+    const getS = () => { try { return localStorage.getItem(CFG.sess) } catch (e) { return MEM } };
+    const setS = v => { MEM = v; try { if (v) localStorage.setItem(CFG.sess, v); else localStorage.removeItem(CFG.sess) } catch (e) { } };
+    function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600) }
+    function liveSt(id) { if (!CFG.live || !['arzha', 'raka', 'salsa', 'dina', 'hendra'].includes(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > 495; return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
+    function canAct(r) { return !!USER && USER.r === 'admin' && r.uid !== USER.id && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')) }
+    RL.init({ prefix: CFG.prefix, toast: toast, live: liveSt, can: canAct, onChange: () => { if (USER) render() } });
+    window.addEventListener('storage', e => { if (USER && e.key && e.key.indexOf('absenpro-') === 0) render() });
+    // ---- gerbang akses
+    function gate(html) { $('#app').hidden = true; $('#gate').hidden = false; $('#gi').innerHTML = '<div class="fh" style="font-size:24px;font-weight:800">Absen<span style="color:var(--acc)">Pro</span> <span class="sm" style="font:600 12px var(--ff)">Portal Admin</span></div>' + html }
+    function showLogin() {
+      gate('<h1>Masuk ke Portal Admin</h1><p class="sm">Satu akun untuk aplikasi dan portal. Khusus akun admin.</p><label for="le">Email</label><input id="le" type="email" autocomplete="username" placeholder="nama@absenpro.demo"><label for="lp">Kata sandi</label><input id="lp" type="password" autocomplete="current-password" placeholder="Kata sandi"><p class="err" id="lerr" role="alert"></p><button class="go" id="lgo">Masuk</button><h3 style="margin:22px 0 4px;font-size:15px">Akun demo</h3><p class="sm">Kata sandi semua akun: demo123. Coba juga akun non-admin untuk melihat pembatasan akses.</p><div id="lacc">' + AC.map(a => '<button class="acc" data-id="' + a.id + '"><span class="av">' + a.ini + '</span><span style="flex:1"><b>' + a.name + '</b><br><span class="sm">' + a.role + ' \u00b7 ' + a.email + '</span></span><span class="tag">' + RLB[a.r] + '</span></button>').join('') + '</div><p class="sm" style="margin-top:14px">Simulasi untuk demo. Tidak ada data yang dikirim ke server. <a href="demo-absenpro-hris-v2.html" style="color:var(--ink)">Buka aplikasi</a></p>');
+      const go = () => { const e = $('#le').value.trim().toLowerCase(), p = $('#lp').value, er = $('#lerr'); if (!e || !p) { er.textContent = 'Isi email dan kata sandi'; return } const u = AC.find(a => a.email === e); if (!u || p !== 'demo123') { er.textContent = 'Email atau kata sandi salah'; return } setS(u.id); boot() };
+      $('#lgo').onclick = go;[$('#le'), $('#lp')].forEach(i => i.onkeydown = e => { if (e.key === 'Enter') go() });
+      $('#lacc').onclick = e => { const b = e.target.closest('.acc'); if (!b) return; const u = AC.find(a => a.id === b.dataset.id); $('#le').value = u.email; $('#lp').value = 'demo123'; $('#lerr').textContent = ''; $$('.acc').forEach(x => x.classList.toggle('on', x === b)); $('#lgo').focus() }
+    }
+    function showDenied(u) { gate('<h1>Akses ditolak</h1><p class="sm">Anda masuk sebagai <b>' + u.name + '</b> (' + RLB[u.r] + '). Portal Admin hanya untuk akun admin.</p><div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap"><a class="btn pri" href="demo-absenpro-hris-v2.html">Kembali ke aplikasi</a><button class="btn" id="sw">Ganti akun</button></div>'); $('#sw').onclick = () => { setS(null); showLogin() } }
+    function boot() { const u = AC.find(a => a.id === getS()); USER = null; if (!u) { showLogin(); return } if (u.r !== 'admin') { showDenied(u); return } USER = u; $('#gate').hidden = true; $('#app').hidden = false; $('#mav').textContent = u.ini; $('#mnm').textContent = u.name; $('#mrl').textContent = u.role; $('#dt').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }); render(); toast('Selamat datang, ' + u.name.split(' ')[0]) }
+    // ---- tampilan
+    function badge() { const n = USER ? RL.pending(canAct).length : 0; $('#bd').textContent = n; $('#bd').hidden = !n }
+    function list() { return RL.emp.filter(e => { const s = RL.status(e).st; return (F === 'Semua' || s === F) && (!Q || (e[1] + ' ' + e[2] + ' ' + e[3]).toLowerCase().indexOf(Q) > -1) }) }
+    function drawTable() {
+      const L = list(), ini = n => n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
+      $('#tb').innerHTML = L.map(e => { const s = RL.status(e); return '<tr><td><div class="who"><span class="av">' + ini(e[1]) + '</span><div><b>' + RL.esc(e[1]) + '</b><br><span class="sm">' + RL.esc(e[2]) + '</span></div></div></td><td>' + RL.esc(e[3]) + '</td><td class="fh">' + s.t + '</td><td><span class="tag ' + s.st.split(' ')[0] + '">' + s.st + '</span></td></tr>' }).join(''); $('#em').hidden = L.length > 0
+    }
+    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (window.renderAnnP) renderAnnP() }
+    $$('.nv[data-v]').forEach(b => b.onclick = () => { VIEW = b.dataset.v; $$('.nv[data-v]').forEach(x => x.classList.toggle('on', x === b)); $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + VIEW)); render() });
+    const ST = ['Semua', 'Hadir', 'Terlambat', 'WFH', 'Dinas luar', 'Cuti', 'Belum absen'];
+    $('#fl').innerHTML = ST.map(s => '<button class="' + (s === F ? 'on' : '') + '">' + s + '</button>').join('');
+    $('#fl').onclick = e => { const b = e.target.closest('button'); if (!b) return; F = b.textContent; $$('#fl button').forEach(x => x.classList.toggle('on', x === b)); drawTable() };
+    $('#q').oninput = () => { Q = $('#q').value.trim().toLowerCase(); drawTable() };
+    $('#csv').onclick = () => {
+      const L = list(), cell = c => { c = String(c); if (/^[=+\-@]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
+      const rows = [['Nama', 'Jabatan', 'Divisi', 'Masuk', 'Status']].concat(L.map(e => { const s = RL.status(e); return [e[1], e[2], e[3], s.t, s.st] }));
+      try { const b = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'kehadiran-' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); toast('Mengunduh ' + L.length + ' baris') } catch (e) { toast('Ekspor tidak didukung di lingkungan ini') }
+    };
+    $('#th').onclick = () => { const r = document.documentElement, dk = getComputedStyle(r).getPropertyValue('--bg').trim() === getComputedStyle(r).getPropertyValue('--bgd').trim(); r.dataset.theme = dk ? 'light' : 'dark' };
+    $('#lo').onclick = () => { setS(null); USER = null; toast('Anda telah keluar'); showLogin() };
+    /*ANN*/
+    const AK = 'absenpro-v2-ann';
+    function annLoad() { try { const r = JSON.parse(localStorage.getItem(AK)); if (r && r.ann) return r } catch (e) { } return { ann: [{ id: 1, title: 'Kebijakan WFH baru berlaku 1 Nov', tag: 'Penting' }, { id: 2, title: 'Town hall kuartal 4 \u00b7 Jumat 30 Okt, 15:00', tag: 'Acara' }, { id: 3, title: 'Survei kepuasan karyawan dibuka sampai 5 Nov', tag: 'Info' }], poll: { q: 'Hari WFH yang paling nyaman buat kamu?', opts: ['Senin', 'Rabu', 'Jumat'], votes: {} } } }
+    function annSave(d) { try { localStorage.setItem(AK, JSON.stringify(d)) } catch (e) { } }
+    window.renderAnnP = function () {
+      const d = annLoad();
+      $('#alist').innerHTML = d.ann.length ? d.ann.map(a => '<div class="rl-row"><div><b>' + RL.esc(a.title) + '</b></div><div style="display:flex;gap:8px;align-items:center"><span class="tag">' + RL.esc(a.tag) + '</span><button class="btn" data-del="' + a.id + '" aria-label="Hapus pengumuman">Hapus</button></div></div>').join('') : '<p class="sm">Belum ada pengumuman.</p>';
+      const p = d.poll, tot = p ? Object.keys(p.votes).length : 0;
+      $('#pres').innerHTML = p ? '<p><b>' + RL.esc(p.q) + '</b></p><div style="margin-top:8px">' + p.opts.map((o, i) => { const n = Object.values(p.votes).filter(v => v === i).length, pc = tot ? Math.round(n / tot * 100) : 0; return '<div class="rl-dv"><span>' + RL.esc(o) + '</span><i><u style="width:' + pc + '%"></u></i><b>' + n + '</b></div>' }).join('') + '</div><p class="sm">' + tot + ' suara dari ' + AC.length + ' akun demo</p>' : '<p class="sm">Belum ada jajak aktif.</p>'
+    };
+    $('#apub').onclick = () => { const t = $('#at').value.trim(); if (!t) { toast('Isi judul pengumuman'); return } const d = annLoad(); d.ann.unshift({ id: Date.now(), title: t.slice(0, 90), tag: $('#ag').value }); annSave(d); $('#at').value = ''; renderAnnP(); toast('Pengumuman diterbitkan') };
+    $('#alist').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const d = annLoad(); d.ann = d.ann.filter(a => String(a.id) !== b.dataset.del); annSave(d); renderAnnP(); toast('Pengumuman dihapus') };
+    $('#ppub').onclick = () => { const q = $('#pq').value.trim(), o = $('#po').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 5); if (!q || o.length < 2) { toast('Isi pertanyaan dan minimal dua pilihan'); return } const d = annLoad(); d.poll = { q: q.slice(0, 90), opts: o, votes: {} }; annSave(d); $('#pq').value = ''; $('#po').value = ''; renderAnnP(); toast('Jajak diterbitkan') };
+    /*/ANN*/
+    boot();
+  </script>
 </body>
+
 </html>
