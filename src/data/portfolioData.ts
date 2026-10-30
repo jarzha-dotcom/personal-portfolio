@@ -344,18 +344,18 @@ export const PROJECTS: ProjectItem[] = [
     tagline: 'Platform terpusat pelacakan keluhan pelanggan, portal vendor terisolasi, penanda SLA otomatis & Zero Server Cost.',
     category: 'Web App',
     badge: 'Sistem Keluhan & Vendor',
-    description: 'Sistem pelacakan keluhan pelanggan terpusat dan portal vendor terisolasi berbasis PWA dengan kalkulasi waktu respon otomatis, form balasan terstruktur (akar masalah & tindakan perbaikan), knowledge base solusi, laporan analitik PDF, dan arsitektur Zero Server Cost (Google Apps Script + Google Sheets DB).',
-    longDescription: 'Issue Tracker dibangun untuk mengatasi masalah klasik operasional bisnis: keluhan pelanggan yang tercecer di WhatsApp/email/Excel, progres tindak lanjut vendor yang tidak terpantau tanpa batas waktu respon yang jelas, serta laporan bulanan yang harus direkap manual dari berbagai sumber. Beroperasi dengan arsitektur Serverless Zero Server Cost berbasis Google Apps Script, Google Sheets (12 sheet basis data terstruktur), Google Drive (penyimpanan lampiran foto/PDF privat), dan Cloudflare Worker sebagai PWA shell. Setiap kasus memiliki nomor urut otomatis (CS-2026-xxxx), kronologi lengkap, urgensi bertingkat (Rendah hingga Mendesak), dan dapat dipecah menjadi beberapa bagian masalah yang ditugaskan ke vendor berbeda. Vendor memiliki portal terpisah yang terisolasi total tanpa pernah melihat nama atau data pelanggan Anda, serta wajib mengisi form terstruktur akar masalah (kategori Man, Machine, Material, Method) dan tindakan perbaikan. Sistem memantau batas waktu respon (SLA) secara real-time, mengirim pengingat email otomatis sebelum dan sesudah jatuh tempo, mengubah penyelesaian kasus menjadi artikel Knowledge Base dengan fitur saran solusi otomatis untuk kasus serupa di masa depan, serta menghasilkan laporan berkala siap cetak PDF. Dilengkapi PWA (dapat diinstal di Android & iOS), mode Gelap/Terang, optimistic UI instan, antrean offline anti-hilang data, kompresi foto otomatis, komentar bertingkat dengan catatan internal tim, dan keamanan enterprise (password salted hash SHA-256, token sesi, lockout 5x gagal login). Tersedia edisi kustom (beli putus tanpa biaya langganan bulanan) dengan nama, logo, slogan, dan warna tema sesuai identitas perusahaan Anda di akun Google milik Anda sendiri.',
+    description: 'Sistem pelacakan keluhan pelanggan terpusat dan portal vendor terisolasi berbasis PWA dengan kalkulasi waktu respon (SLA) otomatis, tindakan massal & arsip otomatis, form balasan terstruktur (akar masalah 4M & tindakan perbaikan), tempel tabel langsung dari Excel/Word, knowledge base solusi, laporan analitik PDF & CSV, cetak laporan kasus A4, cadangan harian otomatis, dan arsitektur Zero Server Cost (Google Apps Script + Google Sheets DB 17 sheet).',
+    longDescription: 'Issue Tracker dibangun untuk mengatasi masalah klasik operasional bisnis: keluhan pelanggan yang tercecer di WhatsApp/email/Excel, progres tindak lanjut vendor yang tidak terpantau tanpa batas waktu respon yang jelas, serta laporan bulanan yang harus direkap manual dari berbagai sumber. Beroperasi dengan arsitektur Serverless Zero Server Cost berbasis Google Apps Script, Google Sheets (17 sheet basis data terstruktur Skema v14, teruji hingga ~20.000 kasus), Google Drive (penyimpanan lampiran foto/PDF privat), dan Cloudflare Worker sebagai PWA shell. Setiap kasus memiliki nomor urut otomatis (CS-2026-xxxx), kronologi lengkap & tindakan sementara (mendukung tempel tabel langsung dari Excel, Google Sheets, atau Word), urgensi bertingkat (Rendah hingga Mendesak), dan dapat dipecah menjadi beberapa bagian masalah untuk vendor berbeda dalam 4 peran akses (Admin, Staff, Viewer, Vendor). Vendor memiliki portal terpisah yang terisolasi di sisi server tanpa pernah melihat nama atau data pelanggan Anda, serta wajib mengisi form terstruktur akar masalah (Man, Machine, Material, Method) dan tindakan perbaikan. Sistem memantau batas waktu respon (SLA) secara real-time, menyediakan lonceng notifikasi di dalam aplikasi per pengguna (bebas data pelanggan untuk vendor), mengirim pengingat email otomatis sebelum dan sesudah jatuh tempo serta ringkasan mingguan tiap Senin untuk Admin, dan mengubah penyelesaian kasus menjadi artikel Knowledge Base dengan saran solusi otomatis untuk kasus serupa. Dilengkapi tindakan massal (ubah urgensi/arsipkan sekaligus), arsip otomatis terjadwal (1/3/6/12 bulan), cetak laporan kasus A4 siap PDF, ekspor & impor CSV (customer, vendor, katalog, laporan), pencarian global (Ctrl/Cmd + K), tampilan filter tersimpan (Saved Views), tombol rekap WhatsApp tanpa nama customer, cadangan harian otomatis (14 salinan spreadsheet terakhir & lampiran bertahap) beserta fitur pemulihan, serta keamanan enterprise (hash password PBKDF2-HMAC-SHA256 60.000 putaran bersalt, token sesi & Ingat Saya terenkripsi, penguncian bertahap 5x gagal login, pantauan performa & galat berkode, serta bantuan kontekstual `?`). Tersedia edisi kustom (beli putus tanpa biaya langganan bulanan) dengan identitas perusahaan Anda di akun Google milik Anda sendiri.',
     highlights: [
-      'Manajemen Kasus Terpusat: Penomoran otomatis CS-2026-xxxx, kronologi audit lengkap, urgensi bertingkat, dan pembagian masalah per vendor',
-      'Portal Vendor Terisolasi: Vendor hanya mengakses tugas miliknya tanpa melihat data/nama pelanggan, wajib mengisi akar masalah & corrective action',
-      'Pelacakan SLA & Reminder Otomatis: Batas waktu balas otomatis per level urgensi, penanda terlambat real-time, dan pengingat email otomatis harian',
-      'Knowledge Base & Auto-Suggest: Mengubah resolusi kasus jadi solusi terverifikasi dengan rekomendasi otomatis saat membuat kasus serupa',
-      'Laporan & Analitik PDF: Metrik waktu respon tim/vendor, grafik tren 6 bulan, deteksi masalah berulang, dan klasifikasi akar masalah (4M)',
-      'PWA, Mode Gelap & Tahan Offline: Optimistic UI instan di HP & desktop, kompresi foto cerdas, dan antrean sinkronisasi offline',
-      'Arsitektur Zero Server Cost: Ditenagai Google Apps Script + Google Sheets DB (12 sheet) + Cloudflare Worker — Rp 0 biaya sewa server bulanan'
+      'Manajemen Kasus, Tempel Tabel & Tindakan Massal: Penomoran otomatis CS-2026-xxxx, tempel tabel langsung dari Excel/Word/Sheets, ubah urgensi/arsip massal (Bulk Actions), dan arsip otomatis terjadwal',
+      'Portal Vendor Terisolasi (4 Peran): Akses Admin, Staff, Viewer, & Vendor terpisah; vendor hanya melihat tugasnya tanpa data/nama pelanggan, wajib mengisi akar masalah (4M) & tindakan perbaikan',
+      'SLA Real-Time, Notifikasi Lonceng & WhatsApp: Batas waktu respon otomatis per urgensi, lonceng notifikasi in-app per pengguna, email pengingat & ringkasan mingguan, serta tombol WA tanpa nama pelanggan',
+      'Knowledge Base, Pencarian Ctrl+K & Tampilan Tersimpan: Mengubah resolusi kasus jadi artikel solusi dengan saran otomatis (auto-suggest), pencarian global kilat, dan filter Saved Views satu ketukan',
+      'Laporan Analitik PDF, Cetak Kasus A4 & CSV: Grafik tren 6 bulan, ranking kinerja vendor, deteksi masalah berulang, cetak laporan kasus lengkap A4, serta ekspor & impor data CSV',
+      'Keamanan PBKDF2-SHA256 & Cadangan Harian Otomatis: Hash password 60.000 putaran bersalt, lockout bertahap, backup otomatis harian (14 salinan spreadsheet & lampiran Drive) + fitur pemulihan',
+      'PWA Cepat, Tahan Offline & Zero Server Cost: Optimistic UI instan, thumbnail foto di memori, antrean offline, pantauan performa/galat, dan database 17 sheet — Rp 0 biaya server bulanan'
     ],
-    techStack: ['Google Apps Script', 'Google Sheets DB', 'Google Drive API', 'Cloudflare Worker', 'PWA / Service Worker', 'Optimistic UI', 'Vanilla JS & CSS Vars', 'Zero Server Cost'],
+    techStack: ['Google Apps Script', 'Google Sheets DB (17 Sheets)', 'Google Drive API', 'Cloudflare Worker', 'PWA / Service Worker', 'PBKDF2-SHA256 Auth', 'Vanilla JS & CSS Vars', 'Zero Server Cost'],
     role: 'Full-stack Solution Architect & Indie Developer',
     year: '2026',
     demoUrl: 'https://itrack.arzhaning.my.id/',
@@ -364,16 +364,16 @@ export const PROJECTS: ProjectItem[] = [
     iconType: 'ShieldCheck',
     businessCase: {
       problem: 'Keluhan pelanggan tercecer di WhatsApp, email, dan spreadsheet berbeda; progres respon vendor tidak terpantau tanpa SLA transparan; serta laporan manajemen bulanan harus direkap manual.',
-      solution: 'Platform Issue Tracker all-in-one dengan portal vendor terisolasi (nama pelanggan dirahasiakan), pelacakan batas waktu otomatis, form balasan terstruktur akar masalah & perbaikan, serta knowledge base solusi.',
+      solution: 'Platform Issue Tracker all-in-one dengan portal vendor terisolasi (nama pelanggan dirahasiakan), pelacakan SLA & notifikasi in-app/email otomatis, tindakan massal, cetak laporan A4/PDF/CSV, serta auto-backup harian.',
       impact: 'Waktu penanganan keluhan terpangkas signifikan, evaluasi kinerja vendor berbasis data akurat, masalah berulang terdeteksi cepat, dan efisiensi biaya 100% tanpa sewa server (Rp0/bulan).'
     },
     architectureFlow: [
       'Pengguna / Vendor (Browser & PWA)',
       'Cloudflare Worker (PWA Shell & Custom Domain)',
-      'Google Apps Script (Auth & Business Logic)',
-      'Google Sheets (Database 12 Sheets)',
+      'Google Apps Script (Auth PBKDF2 & Business Logic)',
+      'Google Sheets (Database 17 Sheets & Auto-Backup)',
       'Google Drive (Lampiran Terproteksi)',
-      'Email Notifikasi Otomatis (Gmail API)'
+      'Notifikasi In-App & Email Otomatis (Gmail API)'
     ]
   },
   {

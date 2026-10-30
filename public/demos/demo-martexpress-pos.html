@@ -2666,6 +2666,18 @@
     </div>
   </div>
 
+  <div id="vch-modal" class="mx-overlay hidden">
+    <div class="mx-modal" style="max-width:440px">
+      <div class="mx-mhead">
+        <h3><i class="fa-solid fa-ticket" style="color:#34d399"></i> Kelola Voucher</h3>
+        <button type="button" onclick="mxCloseVch()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="mx-mbody" id="vc-body"></div>
+      <div class="mx-mfoot"><button type="button" class="mx-btn ghost grow" onclick="mxCloseVch()">Selesai</button>
+      </div>
+    </div>
+  </div>
+
   <!-- HELD ORDERS MODAL -->
   <div id="held-modal" class="mx-overlay hidden">
     <div class="mx-modal" style="max-width:520px">
@@ -4013,7 +4025,7 @@
     /* ================================================================
        SHORTCUT & MODAL UMUM
     ================================================================ */
-    var MODAL_ORDER = ['disc-modal', 'split-modal', 'confirm-modal', 'return-modal', 'stock-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
+    var MODAL_ORDER = ['vch-modal', 'disc-modal', 'split-modal', 'confirm-modal', 'return-modal', 'stock-modal', 'payment-modal', 'receipt-modal', 'scanner-modal', 'member-modal', 'held-modal', 'history-modal', 'shift-modal'];
     function openModalId() {
       for (var i = 0; i < MODAL_ORDER.length; i++) {
         var el = $(MODAL_ORDER[i]);
@@ -4028,6 +4040,7 @@
       else if (id === 'payment-modal') closePaymentModal();
       else if (id === 'split-modal') mxCloseSplit();
       else if (id === 'disc-modal') mxCloseDisc();
+      else if (id === 'vch-modal') mxCloseVch();
       else if (id === 'receipt-modal') finishReceipt();
       else if (id === 'scanner-modal') closeScannerModal();
       else if (id === 'member-modal') closeMemberModal();
@@ -4271,11 +4284,11 @@
     function mxStamp() { var d = new Date(); return d.getFullYear() + pad2(d.getMonth() + 1) + pad2(d.getDate()) + '-' + pad2(d.getHours()) + pad2(d.getMinutes()); }
     function mxExportTrx() {
       if (!transactions.length) { showToast('Belum ada transaksi untuk diekspor.', 'warn'); return; }
-      var rows = [['No. Struk', 'Waktu', 'Kasir', 'Member', 'Metode', 'Status', 'Barang', 'Qty', 'Qty diretur', 'Harga', 'Subtotal barang', 'Total struk']];
+      var rows = [['No. Struk', 'Waktu', 'Kasir', 'Member', 'Metode', 'Status', 'Barang', 'Qty', 'Qty diretur', 'Harga', 'Subtotal barang (setelah diskon item)', 'Total struk', 'Diskon item', 'Kode voucher', 'Nilai voucher (per struk)']];
       transactions.slice().reverse().forEach(function (t) {
         t.items.forEach(function (i) {
           rows.push([t.number, t.date.toLocaleString('id-ID'), t.cashier, t.member ? t.member.name : 'Umum', t.methodLabel,
-          t.voided ? 'VOID' : 'Sah', i.name, i.quantity, i.returned || 0, i.price, i.subtotal, t.total]);
+          t.voided ? 'VOID' : 'Sah', i.name, i.quantity, i.returned || 0, i.price, i.subtotal, t.total, i.disc || 0, t.voucherCode || '', t.voucherAmount || 0]);
         });
       });
       mxDownload('transaksi-martexpress-' + mxStamp() + '.csv', mxCsv(rows));
@@ -4283,7 +4296,7 @@
     function mxExportShift() {
       var st = shiftStats();
       var rows = [['Ringkasan shift', ''], ['Kasir', shift.cashier], ['Dibuka', hm(shift.openedAt)], ['Transaksi sah', st.count], ['Transaksi void', st.voided],
-      ['Barang terjual (pcs)', st.items], ['Penjualan kotor', st.subtotal], ['Diskon member', st.discount], ['Tukar poin', st.redeem], ['PPN 11%', st.tax],
+      ['Barang terjual (pcs)', st.items], ['Penjualan kotor', st.subtotal], ['Diskon member', st.discount], ['Tukar poin', st.redeem], ['Diskon item', mxShiftSum('itemDiscount')], ['Voucher', mxShiftSum('voucherAmount')], ['PPN 11%', st.tax],
       ['Retur', st.refunded], ['Tunai', st.cash], ['QRIS', st.qris], ['Kartu (EDC)', st.edc], ['Total penjualan', st.sales],
       ['Kas awal', shift.openingCash], ['Kas masuk manual', st.cashIn], ['Kas keluar manual', st.cashOut], ['Kas seharusnya di laci', st.expectedCash], ['', ''], ['Produk terlaris', 'Qty']];
       Object.keys(st.top).map(function (n) { return [n, st.top[n]]; }).sort(function (a, b) { return b[1] - a[1]; }).forEach(function (r) { rows.push(r); });
@@ -4425,17 +4438,64 @@
       var box = $('mx-voucher-box');
       if (!cart.length) { box.innerHTML = ''; return; }
       if (mxVoucher) {
-        box.innerHTML = '<div class="mx-vch on"><i class="fa-solid fa-ticket" style="color:#059669"></i><b>' + mxVoucher + '</b><span>' + esc(MX_VOUCHERS[mxVoucher].label) + '</span><button type="button" onclick="mxSetVoucher(null)" aria-label="Lepas voucher"><i class="fa-solid fa-xmark"></i></button></div>' +
+        box.innerHTML = '<div class="mx-vch on"><i class="fa-solid fa-ticket" style="color:#059669"></i><b>' + mxVoucher + '</b><span>' + esc(mxVchLabel(MX_VOUCHERS[mxVoucher])) + '</span><button type="button" onclick="mxSetVoucher(null)" aria-label="Lepas voucher"><i class="fa-solid fa-xmark"></i></button></div>' +
           (b.voucherNote ? '<div class="mx-vwarn"><i class="fa-solid fa-triangle-exclamation"></i> ' + esc(b.voucherNote) + '</div>' : '');
       } else if (!box.firstChild || box.querySelector('.on')) {
         box.innerHTML = '<div class="mx-vch"><input id="mx-vch-in" placeholder="Kode voucher" maxlength="12" onkeydown="if(event.key===\'Enter\'){event.preventDefault();mxUseVoucher();}"><button type="button" class="use" onclick="mxUseVoucher()">Pakai</button>' +
-          Object.keys(MX_VOUCHERS).map(function (c) { return '<button type="button" class="chip" onclick="mxUseVoucher(\'' + c + '\')">' + c + '</button>'; }).join('') + '</div>';
+          Object.keys(MX_VOUCHERS).map(function (c) { return '<button type="button" class="chip" onclick="mxUseVoucher(\'' + c + '\')">' + c + '</button>'; }).join('') + '<button type="button" class="chip" style="border-style:solid" onclick="mxOpenVch()" title="Kelola voucher" aria-label="Kelola voucher"><i class="fa-solid fa-gear"></i></button></div>';
       }
     }
     (function () {
       var base = renderCart;
       renderCart = function () { if (!cart.length) mxVoucher = null; base.apply(this, arguments); };
     })();
+
+    /* ---------- Kelola voucher (tersimpan di browser) ---------- */
+    var MX_VCH_KEY = 'martexpress-vouchers';
+    (function () {
+      try { var raw = localStorage.getItem(MX_VCH_KEY); if (raw) { var o = JSON.parse(raw); if (o && typeof o === 'object') MX_VOUCHERS = o; } } catch (e) { }
+    })();
+    function mxSaveVch() { try { localStorage.setItem(MX_VCH_KEY, JSON.stringify(MX_VOUCHERS)); } catch (e) { } }
+    function mxVchLabel(v) { return v.pct ? 'Diskon ' + v.pct + '%' + (v.max < 1e9 ? ' (maks ' + formatRupiah(v.max) + ')' : '') : 'Potongan ' + formatRupiah(v.rp); }
+    function mxShiftSum(key) {
+      return transactions.filter(function (t) { return !t.voided && t.date >= shift.openedAt; }).reduce(function (a, t) { return a + (t[key] || 0); }, 0);
+    }
+    function mxOpenVch() { mxRenderVch(); $('vch-modal').classList.remove('hidden'); }
+    function mxCloseVch() { $('vch-modal').classList.add('hidden'); calculateBilling(); }
+    function mxRenderVch() {
+      var list = Object.keys(MX_VOUCHERS).map(function (c) {
+        var v = MX_VOUCHERS[c];
+        return '<div class="mx-card" style="display:flex;align-items:center;gap:10px"><div style="flex:1;min-width:0"><div class="top" style="font:800 13px \'JetBrains Mono\',monospace">' + esc(c) + '</div>' +
+          '<div style="font-size:11px;color:#64748b">' + esc(mxVchLabel(v)) + ' · min. ' + formatRupiah(v.min) + '</div></div>' +
+          '<button type="button" class="mx-btn ghost" onclick="mxDelVch(\'' + c + '\')" aria-label="Hapus voucher ' + esc(c) + '"><i class="fa-regular fa-trash-can"></i></button></div>';
+      }).join('') || '<div class="mx-note">Belum ada voucher.</div>';
+      $('vc-body').innerHTML = list +
+        '<span class="mx-label" style="margin-top:14px">Tambah voucher</span>' +
+        '<input id="vc-code" class="mx-input" placeholder="Kode (huruf/angka, maks 12)" maxlength="12" style="text-transform:uppercase">' +
+        '<select id="vc-type" class="mx-input" onchange="$(\'vc-max-wrap\').style.display = this.value === \'pct\' ? \'block\' : \'none\'"><option value="pct">Persen (%)</option><option value="rp">Potongan nominal (Rp)</option></select>' +
+        '<input id="vc-val" class="mx-input num" inputmode="numeric" placeholder="Nilai: persen atau rupiah">' +
+        '<div id="vc-max-wrap"><input id="vc-max" class="mx-input num" inputmode="numeric" placeholder="Batas maksimal diskon (Rp)"></div>' +
+        '<input id="vc-min" class="mx-input num" inputmode="numeric" placeholder="Minimal belanja (Rp), kosongkan bila tidak ada">' +
+        '<button type="button" class="mx-btn green" style="width:100%" onclick="mxAddVch()"><i class="fa-solid fa-plus"></i><span>Simpan voucher</span></button>';
+    }
+    function mxDelVch(c) {
+      delete MX_VOUCHERS[c];
+      if (mxVoucher === c) mxVoucher = null;
+      mxSaveVch(); mxRenderVch();
+    }
+    function mxAddVch() {
+      var n = function (id) { return Math.floor(Number($(id).value) || 0); };
+      var code = $('vc-code').value.trim().toUpperCase(), type = $('vc-type').value, val = n('vc-val');
+      if (!/^[A-Z0-9]{3,12}$/.test(code)) { showToast('Kode harus 3-12 huruf/angka tanpa spasi.', 'warn'); return; }
+      if (MX_VOUCHERS[code]) { showToast('Kode ' + code + ' sudah ada.', 'warn'); return; }
+      if (val <= 0 || (type === 'pct' && val > 100)) { showToast('Nilai voucher tidak valid.', 'warn'); return; }
+      var v = { min: n('vc-min') };
+      if (type === 'pct') { v.pct = val; v.max = n('vc-max') || 1e9; } else v.rp = val;
+      v.label = mxVchLabel(v);
+      MX_VOUCHERS[code] = v;
+      mxSaveVch(); mxRenderVch();
+      showToast('Voucher ' + code + ' disimpan.', 'success');
+    }
 
     /* ---------- Ringkasan live (strip KPI) ---------- */
     function mxUpdateKpi() {

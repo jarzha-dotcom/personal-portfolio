@@ -124,7 +124,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'proses',
     quickLabel: 'Kenapa bisa percaya sama Arzha?',
     keywords: ['ga percaya', 'tidak percaya', 'ragu', 'takut ditipu', 'penipuan', 'aman ga', 'terpercaya', 'bukti kerja', 'ga mau', 'kabur'],
-    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang internal audit korporat yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 4 aplikasi live nyata (ditambah chatbot AI dan galeri 30 demo) yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
+    answer: 'Hehe wajar banget kalau ragu di awal kak 😊 Arzha punya latar belakang 7+ tahun pengalaman di operasional dan audit korporat yang terbiasa kerja disiplin dan berintegritas tinggi. Plus ada 6 proyek live nyata (ditambah galeri 32 demo) yang bisa dicoba langsung, dan sistem bayarnya bertahap (hasil kelihatan dulu baru bayar).',
   },
   // ── 🛠️ Skill & Teknis ──
   {
@@ -161,7 +161,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Apa saja contoh proyek yang sudah rilis?',
     keywords: ['portfolio', 'contoh kerjaan', 'proyek apa aja', 'pernah bikin apa', 'demo', 'hasil karya'],
-    answer: 'Ada 4 aplikasi live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server). Selain itu ada AI Chatbot Showcase (multi-agent Gemini & Antigravity) dan galeri 30 demo desain & aplikasi di arzhaning.my.id/demos. Cek demonya di bagian Proyek ya!',
+    answer: 'Ada 6 proyek live yang bisa dicoba langsung: 1) B-Games (multiplayer realtime board game Skia 60 FPS), 2) Rajendra Pintar (platform edukasi anak kurikulum 5 usia + TTS dwibahasa full-offline), 3) Assets DEMO (sistem manajemen aset serverless zero-cost klien PT Global Multiparts), 4) ZhaNotes (PKM & Canvas Workspace offline-first tanpa server), 5) Issue Tracker (sistem pelacakan keluhan & portal vendor terisolasi zero-cost), 6) AI Chatbot Showcase (multi-agent Gemini & Antigravity). Cek demonya di bagian Proyek ya!',
   },
   {
     id: 'portfolio-bgames',
@@ -197,6 +197,13 @@ export const FAQ_ITEMS: FAQItem[] = [
     quickLabel: 'Bisa ZhaNotes dengan nama/logo bisnis saya?',
     keywords: ['zhanotes kustom', 'zhanotes custom', 'edisi kustom', 'beli putus', 'aplikasi catatan sendiri', 'white label', 'sinkron antar perangkat', 'sinkron awan', 'catatan sinkron hp laptop', 'logo sendiri'],
     answer: 'Bisa! Ada edisi kustom ZhaNotes dengan sistem beli putus (tanpa langganan): nama, logo, dan desain disesuaikan dengan bisnis Kakak. Opsional ada sinkron awan otomatis antar perangkat yang terenkripsi, disiapkan di akun Vercel dan penyimpanan milik Kakak sendiri. Versi umumnya tetap gratis dan offline. Estimasi biaya dan detail serah terima dibahas di konsultasi gratis lewat WhatsApp ya 😊',
+  },
+  {
+    id: 'portfolio-itrack',
+    categoryId: 'portfolio',
+    quickLabel: 'Tentang proyek Issue Tracker?',
+    keywords: ['issue tracker', 'itrack', 'keluhan pelanggan', 'manajemen vendor', 'komplain', 'sla', 'customer service', 'tiket keluhan'],
+    answer: 'Issue Tracker adalah sistem pelacakan keluhan pelanggan dan manajemen vendor dengan arsitektur Zero Server Cost (Google Apps Script + Google Sheets DB 17 sheet + Cloudflare Worker). Fitur: penomoran otomatis CS-2026-xxxx, tempel tabel langsung dari Excel/Word, portal vendor terisolasi (nama pelanggan dirahasiakan), form wajib akar masalah (4M) & tindakan perbaikan, batas waktu respon (SLA) otomatis, lonceng notifikasi in-app & email otomatis, tindakan massal & arsip otomatis, knowledge base solusi serupa, pencarian global Ctrl+K & tampilan tersimpan, tombol WA tanpa nama customer, cetak laporan kasus A4, laporan analitik PDF & CSV, cadangan harian otomatis (14 salinan), keamanan PBKDF2-SHA256, dan PWA tahan offline. Tersedia juga edisi kustom beli putus di akun Google sendiri. Coba langsung di: itrack.arzhaning.my.id',
   },
   // ── 📞 Kontak & Konsultasi ──
   {

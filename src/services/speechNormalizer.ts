@@ -416,6 +416,9 @@ type Term = readonly [tulisan: string, cara_baca: string];
 const TERMS_CI: readonly Term[] = [
   // ── Nama proyek & portofolio (khusus) ──
   ['B-Games', 'Bi-Geims'],
+  ['Issue Tracker', 'Isyu Treker'],
+  ['iTrack', 'Ai-Trek'],
+  ['ZhaNotes', 'Za-Nouts'],
   ['Assets GMP', 'Aset Ge Em Pe'],
   ['Asset GMP', 'Aset Ge Em Pe'],
   ['PT GMP', 'Pe Te Ge Em Pe'],

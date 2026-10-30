@@ -37,7 +37,7 @@ Saya membangun aplikasi ini karena frustrasi yang sama — dan sekarang, saya me
 Buat, lacak, dan selesaikan keluhan pelanggan dari satu dashboard. Setiap kasus punya nomor urut otomatis (`CS-2026-0001`), kronologi lengkap, urgensi (Rendah → Mendesak), dan bisa dipecah menjadi beberapa **bagian masalah** — masing-masing ditangani vendor yang berbeda.
 
 ### 🗂️ Arsip, Tindakan Massal & Ekspor CSV
-Kasus Selesai bisa **diarsipkan** (Admin) supaya daftar harian tetap ringkas; arsip tetap bisa dicari dan ikut Laporan. Di daftar Kasus, centang beberapa kasus lalu **ubah urgensi** (Admin dan Staff) atau **arsipkan** (Admin) sekaligus. Halaman Laporan menyediakan **ekspor CSV** (ringkasan dan data per bagian masalah, siap dibuka di Excel).
+Kasus Selesai bisa **diarsipkan** (Admin) supaya daftar harian tetap ringkas; arsip tetap bisa dicari dan ikut Laporan. Di daftar Kasus, centang beberapa kasus lalu **ubah urgensi** (Admin dan Staff) atau **arsipkan** (Admin) sekaligus. Halaman Laporan menyediakan **ekspor CSV** (ringkasan dan data per bagian masalah, siap dibuka di Excel). Kasus Selesai juga bisa dicetak sebagai **laporan kasus** (A4, untuk arsip internal tim): identitas kasus, rincian tiap bagian masalah beserta balasan vendor dan foto, komentar, dan riwayat. Pilih Simpan sebagai PDF di dialog cetak.
 
 ### 📝 Kronologi Lengkap & Tempel Tabel
 Setiap bagian masalah memuat **kronologi & detail** dan **tindakan sementara**, sehingga vendor paham apa yang terjadi sebelum membalas. Tabel dari Excel, Google Sheets, atau Word bisa **ditempel langsung** di kronologi, balasan vendor, dan artikel solusi.
@@ -74,6 +74,9 @@ Unggah foto bukti dan PDF laporan uji. Foto **otomatis dikompres** di perangkat 
 
 ### 💬 Komentar & Catatan Internal
 Komentar bertingkat (bisa balas-membalas) antara tim dan vendor. **Catatan internal** pada balasan vendor hanya terlihat oleh tim — nilai kualitas jawaban vendor tanpa mereka tahu.
+
+### 🔔 Notifikasi dalam Aplikasi
+Ikon lonceng per pengguna, seperti di media sosial: angka merah menandai yang belum dibaca. Isinya hanya yang menyangkut **Anda**: balasan atas komentar Anda, komentar atau balasan vendor, perubahan status, dan lampiran pada kasus yang Anda buat atau ikuti (Admin/Staff); tugas baru, permintaan revisi, komentar tim, dan artikel solusi baru (Vendor). Satu ketukan membuka kasus atau tugasnya. Kejadian beruntun digabung agar tidak banjir, dan notifikasi vendor tidak pernah memuat data pelanggan. Berbeda dengan *Aktivitas terbaru* di Beranda, yang adalah log seluruh tim.
 
 ### ⚡ Instan & Tahan Offline
 Perubahan **langsung terlihat** tanpa menunggu server (optimistic UI). Koneksi putus? Antrean menyimpan semua perubahan dan **mengirim otomatis** saat online kembali. Tidak ada data yang hilang.
@@ -188,9 +191,9 @@ Saat memesan Issue Tracker untuk perusahaan Anda, saya akan:
 
 | Aspek | Detail |
 |---|---|
-| **Backend** | Google Apps Script (Code.gs — 161 KB) |
-| **Frontend** | Single-page app (Index.html — 425 KB, vanilla JS, CSS variables) |
-| **Database** | Google Spreadsheet (16 sheet: Users, Vendors, Customers, Cases, Items, Comments, History, Replies, ReplyNotes, Solutions, Attachments, ItemTypes, Catalog, RootCauses, MailLog, Jobs) |
+| **Backend** | Google Apps Script (Code.gs — 173 KB) |
+| **Frontend** | Single-page app (Index.html — 503 KB, vanilla JS, CSS variables) |
+| **Database** | Google Spreadsheet (17 sheet: Users, Vendors, Customers, Cases, Items, Comments, History, Replies, ReplyNotes, Solutions, Attachments, ItemTypes, Catalog, RootCauses, MailLog, Jobs, Notifications) |
 | **Storage** | Google Drive (folder privat untuk lampiran) |
 | **PWA Shell** | Cloudflare Worker + Service Worker |
 | **Performa** | Server-side caching, pagination, SWR (stale-while-revalidate), optimistic UI |
@@ -198,7 +201,7 @@ Saat memesan Issue Tracker untuk perusahaan Anda, saya akan:
 | **Keamanan** | Hash + salt, token sesi, rate limiting, isolasi vendor, validasi server |
 | **Aksesibilitas** | Keyboard navigation, screen reader support, skip links, WCAG 2.1.4 |
 | **Bahasa** | Indonesia (dapat disesuaikan) |
-| **Skema DB** | Versi 12, migrasi otomatis saat upgrade |
+| **Skema DB** | Versi 14, migrasi otomatis saat upgrade |
 
 ---
 
@@ -225,6 +228,8 @@ Aktifkan sekali, lalu biarkan sistem bekerja:
 | Artikel solusi baru dibagikan | Vendor penerima |
 | Pengingat jatuh tempo (harian, ~07:00) | Vendor yang terlambat + rangkuman untuk Admin |
 
+> Lonceng di dalam aplikasi (lihat *Notifikasi dalam Aplikasi*) menyala otomatis dan tidak bergantung pada pengaturan email ini. Email tetap berguna saat aplikasi sedang tertutup.
+
 Isi email hanya kalimat singkat + tautan ke aplikasi. **Tidak ada data sensitif di email.**
 
 ---
@@ -235,18 +240,39 @@ Ingin melihat langsung? Saya bisa menyiapkan **environment demo** dengan data re
 - 8 customer, 6 vendor, 13 akun demo
 - 42 kasus dari 19 skenario berbeda
 - Balasan vendor lengkap, komentar bertingkat, catatan internal
-- ~150 lampiran (foto & PDF) yang dibuat otomatis
-- 12 artikel solusi (terbit & draft), dua kasus arsip, dan kotak "Akun demo" di halaman masuk (satu klik masuk per peran)
+- ~325 lampiran (foto & PDF) yang dibuat otomatis, sesuai isi tiap kasus
+- Kasus Selesai lengkap dengan bukti verifikasi, satu kasus yang dibuka kembali, kasus Selesai lama sudah diarsipkan
+- 12 artikel solusi (terbit & draft) dan kasus yang memakainya, serta kotak dan kotak "Akun demo" di halaman masuk (satu klik masuk per peran)
 - Data reset otomatis setiap hari
 
 ### Mode demo (untuk yang mengelola sendiri)
-`Demo.gs` hanya dijalankan dari editor Apps Script dan hanya saat data masih kosong: `seedDemo()` mengisi data contoh dan menyalakan `DEMO_MODE` (email dimatikan), `installDemoReset()` memasang reset harian, `clearDemo()` menghapus semua data dan mematikan mode demo. Untuk demo publik, pakai **proyek terpisah**. Untuk produksi atau pelanggan, **hapus `Demo.gs`** (atau jangan pernah menjalankan `seedDemo()`).
+`Demo.gs` hanya dijalankan dari editor Apps Script dan hanya saat data masih kosong: `seedDemo()` mengisi data contoh dan menyalakan `DEMO_MODE` (email dimatikan); lampiran dibuat bertahap otomatis oleh pemicu satu-kali (login demo tampil setelah selesai; pantau dengan `demoStatus()`, bila macet jalankan `demoContinue()`), `installDemoReset()` memasang reset harian, `clearDemo()` menghapus semua data dan mematikan mode demo. Untuk demo publik, pakai **proyek terpisah**. Untuk produksi atau pelanggan, **hapus `Demo.gs`** (atau jangan pernah menjalankan `seedDemo()`).
 
 **Hubungi saya untuk akses demo:**
 - 💬 WhatsApp: [**+62 823-1231-2734**](https://wa.me/6282312312734)
 - ✉️ Email: [**admin@arzhaning.my.id**](mailto:admin@arzhaning.my.id)
 
 ---
+
+## 💾 Cadangan, Arsip Otomatis, dan Pemulihan
+
+- **Otomatis:** tiap hari sekitar 02:00 spreadsheet disalin (14 salinan terakhir disimpan) dan lampiran baru disalin bertahap. Admin mengatur dan menjalankan manual di Pengaturan > Cadangan.
+- **Memulihkan:** dari editor Apps Script jalankan `useBackupSpreadsheet('ID_SALINAN')` untuk memakai salinan sebagai database, lalu `repairAttachmentLinks()` bila ada lampiran yang tautannya rusak.
+- **Arsip otomatis:** di Pengaturan > Arsip, Admin bisa memilih 1, 3, 6, atau 12 bulan; kasus Selesai yang lebih lama dari itu diarsipkan sendiri tiap hari (bawaan: mati). Kasus yang Anda keluarkan sendiri dari arsip tidak diarsipkan lagi.
+- **Email:** tiap pengguna bisa berhenti berlangganan atau memilih jenis email di Profil Saya; lonceng dalam aplikasi tetap menerima.
+- Mode demo tidak dicadangkan.
+
+## 📚 Impor, Tampilan Tersimpan, Ringkasan Mingguan, dan Tutorial
+
+- **Impor CSV:** Admin dapat mengimpor customer, vendor, dan katalog dari CSV, dengan pratinjau sebelum disimpan dan tombol unduh templat.
+- **Tampilan tersimpan:** simpan filter daftar kasus/tugas yang sering dipakai dan panggil lagi dengan satu ketukan.
+- **Ringkasan mingguan:** email ringkas tiap Senin untuk Admin (bisa dimatikan di Profil Saya).
+- **Terasa cepat:** setelah halaman pertama tampil, data halaman lain dimuat di latar belakang sehingga berpindah halaman langsung tampil tanpa kerangka (dilewati pada mode hemat data).
+- **Email sendiri dan catatan galat:** pengguna bisa mengganti email sendiri di Profil Saya (dengan password), dan Admin bisa mencari galat server lewat kode lima karakter di Pengaturan > Galat.
+- **Foto cepat dan aman:** kotak foto memakai gambar mini yang dibuat saat unggah (tanpa menyentuh Drive), foto kecil diunduh otomatis ke perangkat, dan penyimpanan di perangkat terikat pada akun serta dihapus saat keluar atau saat akun lain masuk.
+- **Performa:** tindakan massal menulis ke Sheet secara berkelompok, dan Admin punya tab Pengaturan > Performa untuk melihat waktu tiap panggilan. Panduan [performa GAS](docs/09-performa-gas.md) bisa dipakai di proyek Apps Script lain.
+- **Bantuan di dalam aplikasi:** tombol ? membuka Panduan tepat di bagian untuk layar yang sedang dibuka, ada pengantar singkat saat masuk pertama kali (sesuai peran), dan daftar kosong menunjukkan langkah berikutnya.
+- **Tutorial:** folder [`docs/`](docs/README.md) berisi panduan memasang, impor data, email, cadangan dan pemulihan, memperbarui, Worker/PWA, mode demo, dan masalah umum.
 
 ## 💰 Berapa Biayanya?
 
