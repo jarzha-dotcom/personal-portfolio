@@ -36,9 +36,9 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var d = function (i, u, w, v, t, x, s, l) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv')] }
+        function seed() { var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13')] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
-        function add(u, type, detail) { REQ.unshift({ id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }); save(); O.onChange() }
+        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
         function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
@@ -88,7 +88,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -508,6 +508,90 @@
       transform: translate(-50%, 0)
     }
 
+    .hm {
+      display: grid;
+      gap: 3px;
+      grid-template-columns: 130px repeat(var(--n), 20px) 42px;
+      align-items: center;
+      min-width: max-content
+    }
+
+    .hm-h,
+    .hm-r {
+      display: contents
+    }
+
+    .hm-h i {
+      font-style: normal;
+      font-size: 10px;
+      color: var(--mute);
+      text-align: center
+    }
+
+    .hm-n {
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .hm b {
+      font-size: 11px;
+      text-align: right
+    }
+
+    .hm-c {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      background: var(--chip)
+    }
+
+    .hm-c.p {
+      background: var(--ok)
+    }
+
+    .hm-c.l {
+      background: var(--late)
+    }
+
+    .hm-c.i {
+      background: var(--acc)
+    }
+
+    .hm-c.w {
+      background: transparent;
+      border: 1px solid var(--line);
+      cursor: default
+    }
+
+    .hm-c.f {
+      background: transparent;
+      border: 1px dashed var(--line);
+      cursor: default
+    }
+
+    .hm-lg {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      font-size: 12px;
+      color: var(--mute);
+      margin: 12px 0 6px
+    }
+
+    .hm-lg i {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      margin-right: 5px
+    }
+
     [hidden] {
       display: none !important
     }
@@ -685,6 +769,7 @@
       <div class="tg">Portal Admin · AbsenPro v2</div>
       <button class="nv on" data-v="sum">Ringkasan</button>
       <button class="nv" data-v="att">Kehadiran</button>
+      <button class="nv" data-v="rep">Laporan</button>
       <button class="nv" data-v="req">Persetujuan <span class="bdg" id="bd" hidden>0</span></button>
       <!--ANN--><button class="nv" data-v="ann">Pengumuman</button><!--/ANN-->
       <a class="nv" id="back" href="demo-absenpro-hris-v2.html" style="margin-top:8px">‹ Kembali ke aplikasi</a>
@@ -722,6 +807,16 @@
           </div>
           <p class="sm" id="em" hidden style="padding:16px 0;text-align:center">Tidak ada karyawan yang cocok.</p>
         </div>
+      </section>
+      <section class="view" id="v-rep">
+        <div class="hd">
+          <div>
+            <p>Rekap bulanan</p>
+            <h1>Laporan kehadiran</h1>
+          </div><button class="btn pri" id="repcsv">Ekspor CSV</button>
+        </div>
+        <div class="chips" id="repm"></div>
+        <div id="repbody"></div>
       </section>
       <section class="view" id="v-req"></section>
       <!--ANN-->
@@ -809,7 +904,7 @@
       const L = list(), ini = n => n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
       $('#tb').innerHTML = L.map(e => { const s = RL.status(e); return '<tr><td><div class="who"><span class="av">' + ini(e[1]) + '</span><div><b>' + RL.esc(e[1]) + '</b><br><span class="sm">' + RL.esc(e[2]) + '</span></div></div></td><td>' + RL.esc(e[3]) + '</td><td class="fh">' + s.t + '</td><td><span class="tag ' + s.st.split(' ')[0] + '">' + s.st + '</span></td></tr>' }).join(''); $('#em').hidden = L.length > 0
     }
-    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (window.renderAnnP) renderAnnP() }
+    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (VIEW === 'rep') renderRep(); else if (window.renderAnnP) renderAnnP() }
     $$('.nv[data-v]').forEach(b => b.onclick = () => { VIEW = b.dataset.v; $$('.nv[data-v]').forEach(x => x.classList.toggle('on', x === b)); $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + VIEW)); render() });
     const ST = ['Semua', 'Hadir', 'Terlambat', 'WFH', 'Dinas luar', 'Cuti', 'Belum absen'];
     $('#fl').innerHTML = ST.map(s => '<button class="' + (s === F ? 'on' : '') + '">' + s + '</button>').join('');
@@ -822,6 +917,22 @@
     };
     $('#th').onclick = () => { const r = document.documentElement, dk = getComputedStyle(r).getPropertyValue('--bg').trim() === getComputedStyle(r).getPropertyValue('--bgd').trim(); r.dataset.theme = dk ? 'light' : 'dark' };
     $('#lo').onclick = () => { setS(null); USER = null; toast('Anda telah keluar'); showLogin() };
+    const RM = [[5, 'Mei'], [6, 'Juni'], [7, 'Juli'], [8, 'Agustus'], [9, 'September'], [10, 'Oktober']], LBL = { p: 'Tepat waktu', l: 'Terlambat', i: 'Izin atau cuti', w: 'Akhir pekan', f: 'Belum terjadi' }; let REPM = 10;
+    function dayStat(ei, m, d) { const dt = new Date(2026, m - 1, d), w = dt.getDay(); if (w === 0 || w === 6) return 'w'; if (dt > new Date()) return 'f'; const h = (ei * 31 + m * 17 + d * 7) % 13; return h === 3 ? 'i' : (h === 6 || h === 9) ? 'l' : 'p' }
+    function repRows(m) { const nd = new Date(2026, m, 0).getDate(); return RL.emp.map((e, ei) => { const ds = [], c = { p: 0, l: 0, i: 0 }; for (let d = 1; d <= nd; d++) { const s = dayStat(ei, m, d); ds.push(s); if (c[s] !== undefined) c[s]++ } const wd = c.p + c.l + c.i; return { e, ds, c, wd, pct: wd ? Math.round((c.p + c.l) / wd * 100) : 0, ot: (ei * 5 + m * 3) % 9 } }) }
+    $('#repm').innerHTML = RM.map(x => '<button data-m="' + x[0] + '" class="' + (x[0] === REPM ? 'on' : '') + '">' + x[1] + '</button>').join('');
+    $('#repm').onclick = e => { const b = e.target.closest('button'); if (!b) return; REPM = +b.dataset.m; $$('#repm button').forEach(x => x.classList.toggle('on', x === b)); renderRep() };
+    $('#repcsv').onclick = () => {
+      const R = repRows(REPM), cell = c => { c = String(c); if (/^[=+\-@]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
+      const rows = [['Nama', 'Divisi', 'Hari kerja', 'Hadir tepat waktu', 'Terlambat', 'Izin atau cuti', 'Lembur (jam)', 'Kehadiran (%)']].concat(R.map(r => [r.e[1], r.e[3], r.wd, r.c.p, r.c.l, r.c.i, r.ot, r.pct]));
+      try { const b = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'laporan-' + RM.find(x => x[0] === REPM)[1].toLowerCase() + '-2026.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); toast('Mengunduh laporan ' + RM.find(x => x[0] === REPM)[1]) } catch (e) { toast('Ekspor tidak didukung di lingkungan ini') }
+    };
+
+    window.renderRep = function () {
+      const R = repRows(REPM), nd = R[0].ds.length, MN = RM.find(x => x[0] === REPM)[1];
+      $('#repbody').innerHTML = '<div class="card"><div class="tw"><div class="hm" style="--n:' + nd + '"><div class="hm-h"><span></span>' + Array.from({ length: nd }, (_, i) => '<i>' + (i + 1) + '</i>').join('') + '<b>%</b></div>' + R.map((r, ri) => '<div class="hm-r"><span class="hm-n">' + RL.esc(r.e[1]) + '</span>' + r.ds.map((s, i) => '<button class="hm-c ' + s + '" data-r="' + ri + '" data-d="' + (i + 1) + '" aria-label="' + RL.esc(r.e[1]) + ' tanggal ' + (i + 1) + ' ' + LBL[s] + '"></button>').join('') + '<b>' + r.pct + '%</b></div>').join('') + '</div></div><div class="hm-lg"><span><i style="background:var(--ok)"></i>Tepat waktu</span><span><i style="background:var(--late)"></i>Terlambat</span><span><i style="background:var(--acc)"></i>Izin atau cuti</span><span><i style="border:1px solid var(--line)"></i>Akhir pekan</span></div><p class="sm" id="hmi">Ketuk kotak untuk melihat detail. Data contoh untuk demo.</p></div>';
+      $('#repbody').onclick = e => { const b = e.target.closest('.hm-c'); if (!b) return; const r = R[+b.dataset.r]; $('#hmi').textContent = r.e[1] + ' \u00b7 ' + b.dataset.d + ' ' + MN + ' \u00b7 ' + LBL[r.ds[b.dataset.d - 1]] }
+    };
     /*ANN*/
     const AK = 'absenpro-v2-ann';
     function annLoad() { try { const r = JSON.parse(localStorage.getItem(AK)); if (r && r.ann) return r } catch (e) { } return { ann: [{ id: 1, title: 'Kebijakan WFH baru berlaku 1 Nov', tag: 'Penting' }, { id: 2, title: 'Town hall kuartal 4 \u00b7 Jumat 30 Okt, 15:00', tag: 'Acara' }, { id: 3, title: 'Survei kepuasan karyawan dibuka sampai 5 Nov', tag: 'Info' }], poll: { q: 'Hari WFH yang paling nyaman buat kamu?', opts: ['Senin', 'Rabu', 'Jumat'], votes: {} } } }

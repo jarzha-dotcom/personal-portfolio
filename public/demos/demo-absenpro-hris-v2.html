@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>AbsenPro v2 — Aplikasi Absensi & HRIS Mobile</title>
   <meta name="description"
-    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran, persetujuan berjenjang, kotak masuk notifikasi dengan aksi langsung, slip gaji visual dengan donut dan riwayat 6 bulan, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin.">
+    content="Versi kedua yang dirancang ulang: cincin shift, peta absen yang bisa digeser dengan penguncian geofence, login tiga peran, persetujuan berjenjang, deteksi bentrok cuti dengan saran tanggal, kotak masuk notifikasi dengan aksi langsung, slip gaji visual, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin dengan heatmap kehadiran.">
   <meta name="author" content="K. Arzhaning Jagad (Arzha)">
   <!--
   © 2026 K. Arzhaning Jagad (Arzha) — arzhaning.my.id
@@ -18,7 +18,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Absensi & HRIS Mobile v2 | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Versi kedua yang dirancang ulang: cincin shift, konfirmasi absen dengan peta dan verifikasi wajah, login tiga peran, persetujuan berjenjang, kotak masuk notifikasi dengan aksi langsung, slip gaji visual dengan donut dan riwayat 6 bulan, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin.">
+    content="Versi kedua yang dirancang ulang: cincin shift, peta absen yang bisa digeser dengan penguncian geofence, login tiga peran, persetujuan berjenjang, deteksi bentrok cuti dengan saran tanggal, kotak masuk notifikasi dengan aksi langsung, slip gaji visual, pengumuman dan jajak singkat, bahasa Indonesia/English, pratinjau empat ukuran layar, dan Portal Admin dengan heatmap kehadiran.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
@@ -1436,6 +1436,26 @@
       margin-bottom: 10px
     }
 
+    .hint {
+      font-weight: 600;
+      font-size: 13px;
+      margin: 10px 0 4px
+    }
+
+    .hint.warn {
+      color: var(--late)
+    }
+
+    .hint.ok {
+      color: var(--ok)
+    }
+
+    #lmap:focus-visible {
+      outline: 3px solid var(--sun);
+      outline-offset: 2px;
+      border-radius: 14px
+    }
+
     .nb2 {
       background: var(--late);
       color: #fff;
@@ -1658,9 +1678,9 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var d = function (i, u, w, v, t, x, s, l) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv')] }
+        function seed() { var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13')] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
-        function add(u, type, detail) { REQ.unshift({ id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }); save(); O.onChange() }
+        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
         function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
@@ -1710,7 +1730,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -1748,19 +1768,22 @@
       <div class="sb" role="dialog" aria-modal="true" aria-labelledby="shT">
         <h3 id="shT" style="font-size:18px;margin-bottom:6px"></h3>
         <div class="row"><span>Waktu</span><b id="shTime"></b></div>
-        <div class="row"><span>Lokasi</span><b>Kinerja Tower · 38 m</b></div>
+        <div class="row"><span>Lokasi</span><b id="shLoc">Kinerja Tower · 38 m</b></div>
         <div class="row"><span>Mode kerja</span><b id="shMode"></b></div>
-        <div class="mapb"><svg viewBox="0 0 300 120" role="img"
-            aria-label="Peta lokasi: Anda 38 meter dari titik absen kantor">
+        <div class="mapb"><svg id="lmap" viewBox="0 0 300 120" role="img" tabindex="0"
+            style="touch-action:none;cursor:crosshair"
+            aria-label="Peta lokasi. Seret titik kuning atau gunakan tombol panah untuk mengubah posisi simulasi.">
             <rect width="300" height="120" rx="14" fill="var(--chip)" />
             <path d="M0 85H300M0 38H300M80 0V120M215 0V120" stroke="var(--line)" stroke-width="6" />
             <circle cx="150" cy="60" r="46" fill="#1F9D7722" stroke="#1F9D77" stroke-dasharray="5 4" />
             <circle cx="150" cy="60" r="6" fill="var(--ink)" />
-            <circle cx="163" cy="70" r="7" fill="#F2B01E" stroke="#fff" stroke-width="2" /><text x="150" y="112"
-              text-anchor="middle" font-size="10" fill="var(--mute)" font-family="Figtree">Titik absen · radius 100
-              m</text>
+            <circle id="ume" cx="163" cy="70" r="9" fill="#F2B01E" stroke="#fff" stroke-width="2" style="cursor:grab" />
+            <text id="udist" x="150" y="14" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink)"
+              font-family="Figtree">38 m dari titik absen</text><text x="150" y="112" text-anchor="middle"
+              font-size="10" fill="var(--mute)" font-family="Figtree">Titik absen · radius 100 m</text>
           </svg></div>
         <button class="fv" id="fv"><span class="fvi"></span><span id="fvt">Verifikasi wajah</span></button>
+        <p class="sm" id="mapnote" style="margin-top:4px"></p>
         <p class="sm" style="margin-top:6px">Simulasi untuk demo, tanpa kamera</p>
         <button class="btn" id="shOk" disabled>Konfirmasi</button><button class="btn" id="shNo"
           style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
@@ -1893,6 +1916,7 @@
             <div><label>Mulai</label><input type="date" id="d1"></div>
             <div><label>Selesai</label><input type="date" id="d2"></div>
           </div>
+          <div id="lhint"></div>
           <label>Alasan</label><textarea id="why" rows="2" placeholder="Contoh: acara keluarga di Bandung"></textarea>
           <button class="btn" id="send">Kirim pengajuan</button>
         </div>
@@ -2109,7 +2133,7 @@
       }
       save(); tick()
     };
-    function openSheet() { const out = inAt && !outAt; $('#shT').textContent = out ? 'Konfirmasi absen pulang' : 'Konfirmasi absen masuk'; $('#shTime').textContent = stamp().s; $('#shMode').textContent = $('#mode .on').textContent; $('#sheet').hidden = false; resetFv(); $('#fv').focus() }
+    function openSheet() { const out = inAt && !outAt; $('#shT').textContent = out ? 'Konfirmasi absen pulang' : 'Konfirmasi absen masuk'; $('#shTime').textContent = stamp().s; $('#shMode').textContent = $('#mode .on').textContent; $('#sheet').hidden = false; resetFv(); mapState(); $('#fv').focus() }
     $('#go').onclick = openSheet;
     $('#shOk').onclick = () => { $('#sheet').hidden = true; doAbsen(); popDial() };
     $('#shNo').onclick = () => { $('#sheet').hidden = true };
@@ -2299,7 +2323,7 @@
     function setNav(r) { $('#nav').innerHTML = NV[r].map(x => `<button data-t="${x[0]}"><span><svg viewBox="0 0 24 24">${IC[x[2]]}</svg></span>${x[1]}${x[3] ? '<b class="nb" hidden></b>' : ''}</button>`).join(''); $$('#nav button').forEach(b => b.onclick = () => showTab(b.dataset.t)) }
     function showTab(id) {
       $$('.tab').forEach(t => t.classList.toggle('on', t.id === id)); $$('#nav button').forEach(b => { const on = b.dataset.t === id; b.classList.toggle('on', on); if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current') }); const inNav = !!$('#nav [data-t="' + id + '"]'); $$('.bk').forEach(b => { b.hidden = inNav }); if (!inNav) { const pb = $('#nav [data-t="t3"]'); if (pb) pb.classList.add('on') }
-      $('main').scrollTop = 0; if (id === 't1') renderHist(); if (id === 'tm') renderAnn(); if (/^(sp|ad)-/.test(id)) renderRole()
+      $('main').scrollTop = 0; if (id === 't1') { renderHist(); leaveHints() } if (id === 'tm') renderAnn(); if (/^(sp|ad)-/.test(id)) renderRole()
     }
     function badges() { const n = USER ? RL.pending(canAct).length : 0; $$('#nav .nb').forEach(b => { b.textContent = n; b.hidden = !n }) }
     function renderRole() { if (!USER) return; if (USER.r === 'spv') { RL.team($('#sp-team'), 'Digital', 'Divisi Digital'); RL.approvals($('#sp-appr'), r => r.div === 'Digital' && r.lvl === 'spv', 'Tim Digital') } else if (USER.r === 'admin') { RL.team($('#sp-team'), 'SDM', 'Divisi SDM'); RL.approvals($('#sp-appr'), r => r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital'), 'Admin') } }
@@ -2317,7 +2341,7 @@
     $('#mymenu').onclick = e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go) };
     RL.init({ prefix: 'v2', toast: toast, live: liveSt, can: canAct, onChange: rolesChanged });
     // pengajuan staf kini masuk antrean supervisor dan admin
-    $('#send').onclick = () => { const a = new Date(d1.value), b = new Date(d2.value); if (isNaN(a) || isNaN(b) || b < a) { toast('Tanggal selesai harus sama atau setelah tanggal mulai'); return } const days = Math.round((b - a) / 864e5) + 1, type = $('#type .on').textContent; if (type === 'Cuti tahunan') { if (days > left) { toast('Sisa cuti tinggal ' + left + ' hari'); return } left -= days; $('#left').textContent = left; $('#lb').style.width = left / 12 * 100 + '%' } const f = x => x.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); RL.add(USER, type, f(a) + ' \u2013 ' + f(b) + ' \u00b7 ' + days + ' hari'); $('#why').value = ''; toast('Pengajuan terkirim ke atasan'); addN('Pengajuan ' + type + ' dikirim', 'Menunggu persetujuan supervisor') };
+    $('#send').onclick = () => { const a = new Date(d1.value), b = new Date(d2.value); if (isNaN(a) || isNaN(b) || b < a) { toast('Tanggal selesai harus sama atau setelah tanggal mulai'); return } const days = Math.round((b - a) / 864e5) + 1, type = $('#type .on').textContent; if (type === 'Cuti tahunan') { if (days > left) { toast('Sisa cuti tinggal ' + left + ' hari'); return } left -= days; $('#left').textContent = left; $('#lb').style.width = left / 12 * 100 + '%' } const f = x => x.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); RL.add(USER, type, f(a) + ' \u2013 ' + f(b) + ' \u00b7 ' + days + ' hari', { ds: d1.value, de: d2.value }); leaveHints(); $('#why').value = ''; toast('Pengajuan terkirim ke atasan'); addN('Pengajuan ' + type + ' dikirim', 'Menunggu persetujuan supervisor') };
     $('#lk').onclick = () => { const d = $('#ld').value, a = $('#la').value, b = $('#lb2').value; if (!d || !a || !b || b <= a) { toast('Isi tanggal, dan jam selesai harus setelah jam mulai'); return } const [h1, m1] = a.split(':'), [h2, m2] = b.split(':'), mins = (h2 * 60 + +m2) - (h1 * 60 + +m1); RL.add(USER, 'Lembur', new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + Math.floor(mins / 60) + ' j ' + mins % 60 + ' m'); $('#lr').value = ''; toast('Pengajuan lembur terkirim'); addN('Lembur diajukan', 'Menunggu persetujuan supervisor') };
     $('#kk').onclick = () => { if (!$('#kd').value || !$('#kr').value.trim()) { toast('Isi tanggal dan alasan koreksi'); return } RL.add(USER, 'Koreksi absen', new Date($('#kd').value).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + $('#kr').value.trim().slice(0, 60)); $('#kr').value = ''; toast('Koreksi dikirim ke atasan'); addN('Koreksi absen dikirim', 'Menunggu persetujuan supervisor') };
     function applyUser(u) {
@@ -2366,6 +2390,38 @@
     renderAnn();
     Object.assign(EN, { 'Perlu tindakan': 'Needs action', 'Semua': 'All', 'Info': 'Info', 'Absen sekarang': 'Clock in/out now', 'Tidak ada yang perlu ditindaklanjuti.': 'Nothing needs your action.', 'Belum ada notifikasi.': 'No notifications yet.', 'Komposisi pendapatan': 'Earnings breakdown', 'Gaji bersih 6 bulan': 'Net pay, last 6 months', 'Transport': 'Transport', 'Makan': 'Meals', 'Bersih': 'Net', 'Jajak singkat': 'Quick poll', 'Belum ada pengumuman.': 'No announcements yet.' });
     TOK.push([/Terima kasih, suara Anda tercatat/, 'Thanks, your vote is recorded'], [/(\d+) suara/, '$1 votes'], [/\bJuni\b/, 'June'], [/\bJuli\b/, 'July'], [/Waktunya absen pulang/, 'Time to clock out']);
+    // ===== Putaran 2 (pilihan B): peta bisa digeser dan deteksi bentrok cuti
+    var UX = 163, UY = 70, DRAG = false;
+    function mapState() {
+      const m = Math.round(Math.hypot(UX - 150, UY - 60) / 0.46), modeIdx = [...$$('#mode button')].indexOf($('#mode .on')), out = m > 100, lock = out && modeIdx === 0;
+      $('#ume').setAttribute('cx', UX); $('#ume').setAttribute('cy', UY); $('#ume').setAttribute('fill', out ? '#E5584B' : '#F2B01E');
+      $('#udist').textContent = m + ' m dari titik absen'; $('#shLoc').textContent = 'Kinerja Tower \u00b7 ' + m + ' m';
+      const f = $('#fv'); if (lock) { f.className = 'fv'; f.disabled = true; $('#fvt').textContent = 'Di luar radius absen'; $('#shOk').disabled = true } else { if (f.disabled) { f.disabled = false; $('#fvt').textContent = 'Verifikasi wajah' } }
+      $('#mapnote').textContent = lock ? 'Di luar radius 100 m. Pilih mode Rumah atau Dinas luar di Beranda, atau mendekat ke kantor.' : out ? 'Mode ini tidak mewajibkan geofence, jadi absen tetap bisa dilanjutkan.' : 'Di dalam radius, siap verifikasi. Seret titik kuning untuk mencoba posisi lain.'
+    }
+    function mapPos(e) { const sv = $('#lmap'), r = sv.getBoundingClientRect(), k = 300 / (r.width || 300); UX = Math.max(8, Math.min(292, (e.clientX - r.left) * k)); UY = Math.max(8, Math.min(112, (e.clientY - r.top) * k)); mapState() }
+    $('#lmap').onpointerdown = e => { DRAG = true; try { $('#lmap').setPointerCapture(e.pointerId) } catch (x) { } mapPos(e) };
+    $('#lmap').onpointermove = e => { if (DRAG) mapPos(e) }; $('#lmap').onpointerup = $('#lmap').onpointercancel = () => { DRAG = false };
+    $('#lmap').onkeydown = e => { const d = { ArrowLeft: [-6, 0], ArrowRight: [6, 0], ArrowUp: [0, -6], ArrowDown: [0, 6] }[e.key]; if (!d) return; e.preventDefault(); UX = Math.max(8, Math.min(292, UX + d[0])); UY = Math.max(8, Math.min(112, UY + d[1])); mapState() };
+    $$('#mode button').forEach(b => b.addEventListener('click', () => { if (!$('#sheet').hidden) mapState() }));
+    function leaveHints() {
+      const a = $('#d1').value, b = $('#d2').value, el = $('#lhint'); if (!a || !b || b < a || !USER) { el.innerHTML = ''; return }
+      const div = String(USER.div).replace('Divisi ', ''), team = RL.emp.filter(e => e[3] === div), ov = RL.all().filter(r => r.ds && r.uid !== USER.id && r.div === div && r.st !== 'Ditolak' && r.ds <= b && r.de >= a), off = new Set(ov.map(r => r.uid));
+      const fm = s => new Date(s + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); let h = '';
+      if (ov.length) {
+        h += '<p class="hint warn">Bentrok dengan cuti rekan: ' + ov.map(r => RL.esc(r.who) + ' (' + fm(r.ds) + (r.de !== r.ds ? '\u2013' + fm(r.de) : '') + (r.st === 'Menunggu' ? ', menunggu' : '') + ')').join(', ') + '</p>';
+        const last = ov.reduce((m, r) => r.de > m ? r.de : m, ''), n = new Date(last + 'T00:00:00'); n.setDate(n.getDate() + 1); while (n.getDay() === 0 || n.getDay() === 6) n.setDate(n.getDate() + 1);
+        const len = Math.round((new Date(b) - new Date(a)) / 864e5), e2 = new Date(n); e2.setDate(e2.getDate() + len); const si = iso(n), ei = iso(e2);
+        h += '<button class="pl" id="lsug" data-a="' + si + '" data-b="' + ei + '">Saran: ' + fm(si) + (len ? ' \u2013 ' + fm(ei) : '') + ' tidak bentrok</button>'
+      }
+      else h += '<p class="hint ok">Tidak ada bentrok dengan rekan satu divisi.</p>';
+      h += '<p class="sm">Tim ' + div + ': ' + (team.length - off.size) + ' dari ' + team.length + ' orang masuk pada rentang ini.</p>'; el.innerHTML = h
+    }
+    $('#d1').addEventListener('change', leaveHints); $('#d2').addEventListener('change', leaveHints);
+    $('#lhint').onclick = e => { const b = e.target.closest('#lsug'); if (b) { $('#d1').value = b.dataset.a; $('#d2').value = b.dataset.b; leaveHints() } };
+    if (new Date('2026-11-03') > new Date()) { $('#d1').value = '2026-11-03'; $('#d2').value = '2026-11-04' }
+    Object.assign(EN, { 'Di luar radius absen': 'Outside check-in radius', 'Mode ini tidak mewajibkan geofence, jadi absen tetap bisa dilanjutkan.': 'This mode does not require a geofence, so you can still clock in.', 'Di dalam radius, siap verifikasi. Seret titik kuning untuk mencoba posisi lain.': 'Inside the radius, ready to verify. Drag the yellow dot to try another position.', 'Di luar radius 100 m. Pilih mode Rumah atau Dinas luar di Beranda, atau mendekat ke kantor.': 'Outside the 100 m radius. Choose Home or Field work mode on the home screen, or move closer to the office.' });
+    TOK.push([/(\d+) m dari titik absen/, '$1 m from check-in point'], [/Bentrok dengan cuti rekan:/, 'Clashes with teammates\u2019 leave:'], [/Tidak ada bentrok dengan rekan satu divisi\./, 'No clashes with teammates in your division.'], [/^Saran: /, 'Suggestion: '], [/ tidak bentrok$/, ' has no clash'], [/^Tim (\w+): (\d+) dari (\d+) orang masuk pada rentang ini\./, 'Team $1: $2 of $3 people available in this range.'], [/, menunggu/, ', pending']);
     lock(true);
     try { const u = ACC.find(a => a.id === localStorage.getItem('absenpro-v2-session')); if (u) { $('#login').hidden = true; lock(false); applyUser(u) } } catch (e) { }
     if (LANG === 'en') applyLang('en');

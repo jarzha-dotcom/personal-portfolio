@@ -31,7 +31,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Absensi & HRIS Mobile | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, cuti, lembur, dan klaim biaya dengan persetujuan berjenjang, notifikasi per hari, riwayat slip gaji, dan Portal Admin.">
+    content="Aplikasi absensi karyawan dalam tampilan smartphone dengan pratinjau ukuran layar, login tiga peran (staf, supervisor, admin) dengan akun demo, check-in geofence GPS dan verifikasi webcam, pilihan dinas luar saat di luar radius, cuti berbentuk kalender, lembur, klaim biaya, notifikasi per hari, riwayat slip gaji, dan Portal Admin dengan rekap bulanan.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris.webp">
@@ -3103,9 +3103,9 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var d = function (i, u, w, v, t, x, s, l) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv')] }
+        function seed() { var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13')] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
-        function add(u, type, detail) { REQ.unshift({ id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }); save(); O.onChange() }
+        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
         function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
@@ -3155,7 +3155,7 @@
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
       })(window);
 
   </script>
@@ -3304,6 +3304,38 @@
     .rlp[hidden],
     .rlportal[hidden] {
       display: none
+    }
+
+    #rcal .rc-s {
+      background: #0d9488 !important;
+      color: #fff !important
+    }
+
+    #rcal .rc-r {
+      background: #99f6e4 !important;
+      color: #0f172a !important
+    }
+
+    .dark #rcal .rc-r {
+      background: #134e4a !important;
+      color: #e2e8f0 !important
+    }
+
+    .rlf {
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin: 12px 0 6px
+    }
+
+    .ag-sheet #outWhy {
+      width: 100%;
+      font: 500 16px system-ui;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      color: #0f172a
     }
 
     .ag-gh {
@@ -5508,6 +5540,43 @@
         var a = Math.round(+$('#clmAmt').value), n = $('#clmNote').value.trim(); if (!(a >= 1000 && a <= 50000000)) { if (typeof showToast === 'function') showToast('Isi nominal antara Rp 1.000 dan Rp 50.000.000', 'error'); return } if (!USER) return;
         RL.add(USER, 'Klaim biaya', $('#clmCat').value + ' \u00b7 Rp ' + a.toLocaleString('id-ID') + (n ? ' \u00b7 ' + n : '')); $('#clmAmt').value = ''; $('#clmNote').value = ''; if (typeof showToast === 'function') showToast('Klaim diajukan ke atasan', 'success'); clmRender()
       };
+      // ===== Putaran 2 (pilihan A): dialog di luar radius dan kalender pemilih cuti
+      var _ha = window.handleAttendanceAction, OUT = document.createElement('div'); OUT.className = 'ag-ov'; OUT.hidden = true;
+      OUT.innerHTML = '<div class="ag-sheet" role="dialog" aria-modal="true" aria-labelledby="outT"><h3 id="outT">Anda di luar radius kantor</h3><p class="ag-sm">Jarak sekitar 2,4 km, batas absen kantor 50 m. Pilih cara melanjutkan:</p><button id="outWfh">Absen sebagai WFH</button><label class="rlf" for="outWhy">Atau ajukan absen dinas luar (butuh persetujuan supervisor)</label><input id="outWhy" type="text" maxlength="60" placeholder="Alasan, contoh: kunjungan klien di Bekasi"><button id="outOn" style="background:#0d9488;color:#fff">Ajukan dinas luar</button><button id="outNo" style="background:transparent;color:inherit;border:1px solid #cbd5e1">Batal</button></div>';
+      APP.appendChild(OUT);
+      OUT.onclick = function (e) { if (e.target === OUT) OUT.hidden = true }; $('#outNo').onclick = function () { OUT.hidden = true };
+      $('#outWfh').onclick = function () { OUT.hidden = true; setWorkStatus('WFH'); _ha() };
+      $('#outOn').onclick = function () {
+        var w = $('#outWhy').value.trim(); if (!w) { if (typeof showToast === 'function') showToast('Isi alasan dinas luar dulu', 'error'); return }
+        if (USER) RL.add(USER, 'Absen luar kantor', fmt(new Date()) + ' \u00b7 ' + w); OUT.hidden = true; $('#outWhy').value = ''; setWorkStatus('Onsite'); if (typeof showToast === 'function') showToast('Pengajuan dinas luar dikirim ke supervisor', 'success'); _ha()
+      };
+      window.handleAttendanceAction = function () { if (typeof appState !== 'undefined' && !appState.checkedIn && appState.workMode === 'WFO' && !appState.geofenceInside) { OUT.hidden = false; $('#outWfh').focus(); return } return _ha.apply(this, arguments) };
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') OUT.hidden = true });
+      var lf = document.getElementById('leaveStartDate'), le = document.getElementById('leaveEndDate'), fm0 = lf ? lf.closest('form') : null;
+      if (fm0) {
+        fm0.insertAdjacentHTML('beforebegin', '<div class="ag-card" id="rcal"><h3>Pilih tanggal cuti</h3><div class="ag-hd"><b id="rcM"></b><span><button type="button" id="rcP" aria-label="Bulan sebelumnya">\u2039</button><button type="button" id="rcN" aria-label="Bulan berikutnya">\u203a</button></span></div><div class="ag-cal" id="rcG"></div><p class="ag-sm" id="rcI" style="margin:10px 0 0"></p></div>');
+        var RS = null, RE = null, RO = 0;
+        function iso2(d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) }
+        function rcDraw() {
+          var n = new Date(), mo = n.getMonth() + RO, m0 = new Date(n.getFullYear(), mo, 1), first = (m0.getDay() + 6) % 7, len = new Date(n.getFullYear(), mo + 1, 0).getDate(), t = iso2(n);
+          var h = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map(function (x) { return '<small>' + x + '</small>' }).join('') + new Array(first + 1).join('<span></span>');
+          for (var d = 1; d <= len; d++) {
+            var dt = new Date(n.getFullYear(), mo, d), id = iso2(dt), w = dt.getDay(), c = '', dis = false; if (id < t) { c = 'f'; dis = true } else if (w === 0 || w === 6) c = 'w';
+            if (id === RS || id === RE) c = 'rc-s'; else if (RS && RE && id > RS && id < RE) c = 'rc-r';
+            h += '<button type="button" class="' + c + '" data-d="' + id + '"' + (dis ? ' disabled' : '') + '>' + d + '</button>'
+          }
+          $('#rcG').innerHTML = h; $('#rcM').textContent = m0.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+          var info = 'Ketuk tanggal mulai, lalu tanggal selesai.';
+          if (RS) { var e2 = RE || RS, c2 = 0, x = new Date(RS + 'T00:00:00'); while (iso2(x) <= e2) { if (x.getDay() % 6 !== 0) c2++; x.setDate(x.getDate() + 1) } info = fmt(RS) + (RE && RE !== RS ? ' \u2013 ' + fmt(RE) : '') + ' \u00b7 ' + c2 + ' hari kerja' }
+          $('#rcI').textContent = info
+        }
+        $('#rcG').onclick = function (e) {
+          var b = e.target.closest('button[data-d]'); if (!b || b.disabled) return; var d = b.dataset.d;
+          if (!RS || RE) (RS = d, RE = null); else if (d < RS) RS = d; else RE = d;
+          lf.value = RS; le.value = RE || RS; lf.dispatchEvent(new Event('change', { bubbles: true })); le.dispatchEvent(new Event('change', { bubbles: true })); rcDraw()
+        };
+        $('#rcP').onclick = function () { if (RO > 0) { RO--; rcDraw() } }; $('#rcN').onclick = function () { if (RO < 6) { RO++; rcDraw() } }; rcDraw()
+      }
       var rib = document.createElement('div'); rib.id = 'rlRib'; APP.appendChild(rib);
       function canAct(r) { return !!USER && r.uid !== USER.id && ((USER.r === 'spv' && r.lvl === 'spv' && r.div === 'Digital') || (USER.r === 'admin' && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')))) }
       function cur() { return typeof appState !== 'undefined' ? appState.activeTab : 'home' }

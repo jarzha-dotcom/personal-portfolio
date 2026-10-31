@@ -2213,6 +2213,8 @@
       </div>
     </div>
 
+
+
     <!-- Live Clock & Status -->
     <div class="hidden lg:flex items-center gap-3 text-xs text-slate-400">
       <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 rounded-lg border border-slate-700/60 font-num">
@@ -2281,6 +2283,16 @@
       </button>
     </div>
   </header>
+  <nav class="mxbar" aria-label="Modul">
+    <button class="mxn on" data-v="kasir" onclick="mxView('kasir')"><i
+        class="fa-solid fa-cash-register"></i><span>Kasir</span></button>
+    <button class="mxn" data-v="dash" onclick="mxView('dash')"><i
+        class="fa-solid fa-gauge"></i><span>Dashboard</span></button>
+    <button class="mxn" data-v="inv" onclick="mxView('inv')"><i
+        class="fa-solid fa-boxes-stacked"></i><span>Inventori</span></button>
+    <button class="mxn" data-v="lap" onclick="mxView('lap')"><i
+        class="fa-solid fa-chart-line"></i><span>Laporan</span></button>
+  </nav>
 
   <!-- MAIN DUAL-COLUMN WORKSPACE -->
   <main class="flex-1 flex overflow-hidden">
@@ -4555,6 +4567,434 @@
       window.addEventListener('resize', function () { if (window.innerWidth >= 1024) document.body.setAttribute('data-tab', 'produk'); });
     })();
   </script>
+  <!-- MX-EXT: Dashboard, Inventori, Laporan -->
+  <style>
+    .mxbar {
+      display: flex;
+      gap: 6px;
+      padding: 6px 12px;
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
+      overflow-x: auto;
+      flex: none;
+      z-index: 19
+    }
+
+    .mxn {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer
+    }
+
+    .mxn:hover {
+      background: #1e293b
+    }
+
+    .mxn.on {
+      background: #065f46;
+      color: #fff;
+      border-color: #10b981
+    }
+
+    @media(min-width:1280px) and (max-width:1699px) {
+      header kbd {
+        display: none !important
+      }
+    }
+
+    body.mxo #mx-mobtab {
+      display: none !important
+    }
+
+    #mx-view {
+      --bt: 46px
+    }
+
+    body.mxo #mx-view {
+      bottom: 46px
+    }
+
+    .mxc b.big {
+      font-size: clamp(12px, 3.4vw, 20px);
+      white-space: nowrap
+    }
+
+    @media(max-width:640px) {
+      .mxbar {
+        padding: 6px
+      }
+
+      .mxn {
+        flex: 1 1 0;
+        justify-content: center;
+        padding: 8px 4px;
+        font-size: 11px
+      }
+    }
+
+    #mx-view {
+      position: fixed;
+      top: 100px;
+      bottom: 46px;
+      left: 0;
+      right: 0;
+      z-index: 15;
+      overflow: auto;
+      padding: 16px;
+      background: var(--bg);
+      color: var(--tx);
+      --bg: #f1f5f9;
+      --cd: #fff;
+      --tx: #0f172a;
+      --mu: #64748b;
+      --bd: #e2e8f0;
+      font-size: 13px
+    }
+
+    body.mx-dark #mx-view {
+      --bg: #0b1220;
+      --cd: #111a2e;
+      --tx: #e2e8f0;
+      --mu: #94a3b8;
+      --bd: #1e293b
+    }
+
+    #mx-view h2 {
+      font-size: 16px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    #mx-view h3 {
+      font-size: 12px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: var(--mu);
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .mxg {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      margin-bottom: 12px
+    }
+
+    .mxg2 {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      margin-bottom: 12px
+    }
+
+    .mxc {
+      background: var(--cd);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 0
+    }
+
+    .mxc b.big {
+      display: block;
+      font-size: 20px;
+      font-weight: 800;
+      font-family: "JetBrains Mono", monospace;
+      margin: 2px 0
+    }
+
+    .mxc small {
+      color: var(--mu);
+      font-size: 11px
+    }
+
+    .up {
+      color: #059669
+    }
+
+    .dn {
+      color: #e11d48
+    }
+
+    .am {
+      color: #d97706
+    }
+
+    .mxnote {
+      background: #fef3c7;
+      color: #92400e;
+      border: 1px solid #fcd34d;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 11px;
+      margin-bottom: 12px
+    }
+
+    body.mx-dark .mxnote {
+      background: #3b2a0a;
+      color: #fcd34d;
+      border-color: #78560f
+    }
+
+    .mxt {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .mxt th {
+      text-align: left;
+      font-size: 11px;
+      color: var(--mu);
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--bd);
+      white-space: nowrap
+    }
+
+    .mxt td {
+      padding: 6px 8px;
+      border-bottom: 1px solid var(--bd);
+      white-space: nowrap
+    }
+
+    .mxt .r {
+      text-align: right;
+      font-family: "JetBrains Mono", monospace
+    }
+
+    .mxt tr.tot td {
+      font-weight: 800;
+      border-top: 2px solid var(--bd)
+    }
+
+    .mxt input {
+      width: 80px;
+      padding: 3px 6px;
+      border: 1px solid var(--bd);
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--tx);
+      font: inherit
+    }
+
+    .mxt input[type=date] {
+      width: 128px
+    }
+
+    .mxtag {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 700;
+      margin-right: 3px
+    }
+
+    .mxtag.g {
+      background: #d1fae5;
+      color: #065f46
+    }
+
+    .mxtag.a {
+      background: #fef3c7;
+      color: #92400e
+    }
+
+    .mxtag.r {
+      background: #ffe4e6;
+      color: #9f1239
+    }
+
+    .mxseg button {
+      padding: 5px 12px;
+      border: 1px solid var(--bd);
+      background: var(--cd);
+      color: var(--tx);
+      font-size: 12px;
+      cursor: pointer
+    }
+
+    .mxseg button.on {
+      background: #059669;
+      color: #fff;
+      border-color: #059669
+    }
+
+    .mxbtn {
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #059669;
+      color: #fff;
+      font-weight: 700;
+      font-size: 12px;
+      border: 0;
+      cursor: pointer
+    }
+
+    .mxsc {
+      overflow-x: auto
+    }
+  </style>
+  <div id="mx-view" hidden></div>
+  <script>
+    (function () {
+      var K = 'mx-ext-v1', X = { cost: {}, min: {}, exp: {} }, H = null, view = 'kasir', per = 7, OPEX = 300000;
+      var RC = { sembako: .86, snack: .78, minuman: .74, mandi: .76, rokok_pulsa: .93 };
+      var EXP = { p1: 400, p2: 200, p3: 180, p4: 240, p5: 18, p6: 6, p9: 150, p10: 330, p11: 25, p12: 300, p13: 9 };
+      var $ = function (i) { return document.getElementById(i); }, R = function (n) { return formatRupiah(Math.round(n)); };
+      function sh(n) { return n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' jt' : Math.round(n / 1e3) + ' rb'; }
+      function sv() { try { localStorage.setItem(K, JSON.stringify(X)); } catch (e) { } }
+      function rnd(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; var t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+      function ini() {
+        try { var r = JSON.parse(localStorage.getItem(K)); if (r && r.cost) X = r; } catch (e) { }
+        var t = new Date();
+        PRODUCTS.forEach(function (p, i) {
+          if (X.cost[p.id] == null) X.cost[p.id] = Math.round(p.price * (RC[p.category] || .8) * (.97 + (i % 4) * .02) / 100) * 100;
+          if (X.min[p.id] == null) X.min[p.id] = p.stock > 500 ? 0 : (p.price < 5000 ? 30 : 10);
+          if (X.exp[p.id] === undefined) { if (EXP[p.id]) { var d = new Date(t); d.setDate(d.getDate() + EXP[p.id]); X.exp[p.id] = d.toISOString().slice(0, 10); } else X.exp[p.id] = ''; }
+        }); sv();
+        var W = [0, 0, 0, 0, 0, 0, 1, 3, 4, 3, 3, 4, 5, 4, 3, 3, 4, 6, 8, 9, 6, 3, 1, 0], S = W.reduce(function (a, b) { return a + b; }), g = rnd(7), hr = t.getHours();
+        H = [];
+        for (var d = 13; d >= 0; d--) {
+          var dt = new Date(); dt.setDate(dt.getDate() - d);
+          var wk = dt.getDay() % 6 === 0 ? 1.3 : 1, f = 1;
+          if (d === 0) { var c = 0; W.forEach(function (w, h) { if (h <= hr) c += w; }); f = c / S; }
+          var q = {}, hrs = [], n = Math.round(90 * wk * (.8 + g() * .4) * f);
+          PRODUCTS.forEach(function (p) { var b = p.isPopular ? 14 : 6; if (p.price > 30000) b *= .5; q[p.id] = Math.round(b * wk * (.6 + g() * .8) * f); });
+          W.forEach(function (w, h) { hrs[h] = (d === 0 && h > hr) ? 0 : Math.round(n * w / S / f); });
+          H.push({ date: dt, q: q, hrs: hrs, tx: n });
+        }
+      }
+      function agg(d) {
+        var x = H[d], q = Object.assign({}, x.q), hrs = x.hrs.slice(), tx = x.tx, net = 0, man = 0, id;
+        for (id in q) { var p = productById(id); if (p) net += q[id] * p.price; }
+        if (d === H.length - 1) {
+          var ds = new Date().toDateString();
+          transactions.forEach(function (t) { if (t.voided || new Date(t.date).toDateString() !== ds) return; tx++; hrs[new Date(t.date).getHours()]++; t.items.forEach(function (i) { q[i.productId] = (q[i.productId] || 0) + i.quantity; net += i.subtotal; }); });
+          (shift.cashLog || []).forEach(function (e) { if (e.type === 'out') man += e.amount; });
+        }
+        var hpp = 0; for (id in q) hpp += q[id] * (X.cost[id] || 0);
+        return { date: x.date, q: q, hrs: hrs, tx: tx, net: net, hpp: hpp, gp: net - hpp, op: OPEX, man: man, np: net - hpp - OPEX - man };
+      }
+      function rng(n) { var a = []; for (var i = H.length - n; i < H.length; i++) a.push(agg(i)); return a; }
+      function sum(a, k) { return a.reduce(function (s, d) { return s + d[k]; }, 0); }
+      function card(l, v, s, c) { return '<div class="mxc"><small>' + l + '</small><b class="big ' + (c || '') + '">' + v + '</b><small>' + (s || '') + '</small></div>'; }
+      function daysLeft(p) { var e = X.exp[p.id]; return e ? Math.ceil((new Date(e + 'T23:59:59') - new Date()) / 864e5) : null; }
+      function lowList() { return PRODUCTS.filter(function (p) { return p.stock <= X.min[p.id]; }).sort(function (a, b) { return a.stock / (X.min[a.id] || 1) - b.stock / (X.min[b.id] || 1); }); }
+      function expList() { return PRODUCTS.filter(function (p) { var d = daysLeft(p); return d !== null && d <= 30; }).sort(function (a, b) { return daysLeft(a) - daysLeft(b); }); }
+      function chart(a) {
+        var W = 640, Hh = 190, m = 28, mx = Math.max.apply(null, a.map(function (d) { return d.net; })) || 1, bw = W / a.length, u = Hh - m - 14, s = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" style="width:100%;height:auto;color:var(--tx)">';
+        a.forEach(function (d, i) {
+          var h = u * d.net / mx, hh = u * Math.max(d.hpp, 0) / mx, x = i * bw + bw * .15, w = bw * .7, y = Hh - m - h, cx = x + w / 2;
+          s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + (h - hh) + '" rx="3" fill="#10b981"/><rect x="' + x + '" y="' + (y + h - hh) + '" width="' + w + '" height="' + hh + '" fill="#94a3b8"/>' +
+            '<text x="' + cx + '" y="' + (y - 4) + '" text-anchor="middle" font-size="9" fill="currentColor">' + sh(d.net) + '</text><text x="' + cx + '" y="' + (Hh - 10) + '" text-anchor="middle" font-size="10" fill="#64748b">' + d.date.getDate() + '/' + (d.date.getMonth() + 1) + '</text>';
+        });
+        return s + '</svg><small style="color:var(--mu)"><span style="color:#10b981">■</span> Laba kotor &nbsp; <span style="color:#94a3b8">■</span> HPP (tinggi total = penjualan)</small>';
+      }
+      var NOTE = '<div class="mxnote"><b>DATA DEMO</b> — riwayat 13 hari sebelumnya dibuat otomatis (bukan data nyata). Transaksi kasir hari ini tercatat nyata dan langsung masuk ke sini.</div>';
+      function dash() {
+        var a = rng(7), t = a[6], y = agg(H.length - 2), hr = new Date().getHours(), yc = 0, ys = 0, hs = Array(24).fill(0);
+        y.hrs.forEach(function (v, h) { ys += v; if (h <= hr) yc += v; });
+        var yn = ys ? y.net * yc / ys : y.net, dl = yn ? Math.round((t.net - yn) / yn * 100) : 0;
+        a.forEach(function (d) { d.hrs.forEach(function (v, h) { hs[h] += v; }); });
+        var pk = hs.indexOf(Math.max.apply(null, hs)), low = lowList(), ex = expList();
+        return NOTE + '<h2><i class="fa-solid fa-gauge"></i> Dashboard</h2><div class="mxg">' +
+          card('Penjualan hari ini', R(t.net), (dl >= 0 ? '▲ ' : '▼ ') + Math.abs(dl) + '% vs kemarin (jam yang sama)', dl >= 0 ? 'up' : 'dn') +
+          card('Laba kotor hari ini', R(t.gp), 'Margin ' + (t.net ? Math.round(t.gp / t.net * 100) : 0) + '%') +
+          card('Transaksi hari ini', t.tx, 'Rata-rata ' + R(t.tx ? t.net / t.tx : 0) + '/struk') +
+          card('Jam paling ramai', pk + ':00–' + (pk + 1) + ':00', 'berdasarkan 7 hari terakhir') + '</div>' +
+          '<div class="mxg2"><div class="mxc"><h3>Penjualan 7 hari terakhir</h3>' + chart(a) + '</div><div>' +
+          '<div class="mxc" style="margin-bottom:12px"><h3>Stok perlu diisi ulang (' + low.length + ')</h3>' + (low.slice(0, 6).map(function (p) { return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (p.stock <= 0 ? 'dn' : 'am') + '">' + p.stock + ' / min ' + X.min[p.id] + '</b></div>'; }).join('') || '<small>Semua stok aman.</small>') + '</div>' +
+          '<div class="mxc"><h3>Segera kadaluarsa (' + ex.length + ')</h3>' + (ex.slice(0, 5).map(function (p) { var d = daysLeft(p); return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (d < 0 ? 'dn' : 'am') + '">' + (d < 0 ? 'lewat ' + (-d) : d) + ' hari</b></div>'; }).join('') || '<small>Tidak ada.</small>') + '</div></div></div>';
+      }
+      function inv() {
+        var val = 0, low = lowList(), ex = expList();
+        PRODUCTS.forEach(function (p) { val += Math.max(p.stock, 0) * X.cost[p.id]; });
+        var rows = PRODUCTS.slice().sort(function (a, b) { return a.stock / (X.min[a.id] || 1) - b.stock / (X.min[b.id] || 1); }).map(function (p) {
+          var d = daysLeft(p), tg = p.stock <= 0 ? '<span class="mxtag r">Habis</span>' : p.stock <= X.min[p.id] ? '<span class="mxtag a">Menipis</span>' : '<span class="mxtag g">Aman</span>';
+          if (d !== null && d < 0) tg += '<span class="mxtag r">Kadaluarsa</span>'; else if (d !== null && d <= 30) tg += '<span class="mxtag a">ED ' + d + ' hr</span>';
+          return '<tr><td>' + esc(p.name) + '</td><td class="r">' + p.stock + '</td><td><input type="number" min="0" value="' + X.min[p.id] + '" onchange="mxSet(\'min\',\'' + p.id + '\',this.value)"></td>' +
+            '<td><input type="number" min="0" step="100" value="' + X.cost[p.id] + '" onchange="mxSet(\'cost\',\'' + p.id + '\',this.value)"></td><td class="r">' + R(p.price) + '</td><td class="r">' + R(Math.max(p.stock, 0) * X.cost[p.id]) + '</td>' +
+            '<td><input type="date" value="' + (X.exp[p.id] || '') + '" onchange="mxSet(\'exp\',\'' + p.id + '\',this.value)"></td><td>' + tg + '</td></tr>';
+        }).join('');
+        return NOTE.replace('riwayat 13 hari sebelumnya dibuat otomatis (bukan data nyata)', 'HPP, stok minimum, dan tanggal kadaluarsa awal adalah contoh; semuanya bisa Anda ubah di tabel') +
+          '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><div class="mxg">' +
+          card('Nilai persediaan (HPP)', R(val), 'stok × harga modal') + card('Perlu restock', low.length, 'stok ≤ minimum', low.length ? 'am' : 'up') +
+          card('Segera kadaluarsa', ex.length, '≤ 30 hari / lewat', ex.length ? 'dn' : 'up') + card('Jumlah produk', PRODUCTS.length, '') + '</div>' +
+          '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>HPP (Rp)</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + po();
+      }
+      var SUP = { sembako: 'PT Sembako Jaya', snack: 'CV Snack Nusantara', minuman: 'Distributor Minuman Prima', mandi: 'Agen Rumah Tangga Makmur', rokok_pulsa: 'Agen Rokok & Pulsa Cikarang' };
+      function po() {
+        X.po = X.po || [];
+        var low = lowList().map(function (p) { return p.id; }), opts = PRODUCTS.slice().sort(function (a, b) { return (low.indexOf(b.id) >= 0) - (low.indexOf(a.id) >= 0); }).map(function (p) { return '<option value="' + p.id + '">' + (low.indexOf(p.id) >= 0 ? '⚠ ' : '') + esc(p.name) + ' — ' + esc(SUP[p.category]) + '</option>'; }).join('');
+        var open = X.po.filter(function (o) { return o.st === 'Dipesan'; }).reduce(function (t, o) { return t + o.qty * o.cost; }, 0);
+        var rows = X.po.slice().reverse().map(function (o) {
+          var p = productById(o.pid);
+          return '<tr><td>' + o.id + '</td><td>' + esc(SUP[p.category]) + '</td><td>' + esc(p.name) + '</td><td class="r">' + o.qty + '</td><td class="r">' + R(o.qty * o.cost) + '</td><td>' + o.date + '</td><td>' +
+            (o.st === 'Dipesan' ? '<button class="mxbtn" onclick="mxRecv(\'' + o.id + '\')">Terima barang</button>' : '<span class="mxtag g">Diterima</span>') + '</td></tr>';
+        }).join('');
+        return '<div class="mxc" style="margin-top:12px"><h3>Pembelian ke supplier (pesanan masuk) · tertunda ' + R(open) + '</h3>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><select id="po-p" style="flex:1;min-width:220px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)">' + opts + '</select>' +
+          '<input id="po-q" type="number" min="1" placeholder="Qty" style="width:80px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"><button class="mxbtn" onclick="mxPO()">Buat PO</button></div>' +
+          '<div class="mxsc"><table class="mxt"><thead><tr><th>No. PO</th><th>Supplier</th><th>Produk</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th>Tanggal</th><th>Status</th></tr></thead><tbody>' +
+          (rows || '<tr><td colspan="7" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠ lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
+      }
+      function lap() {
+        var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), np = gp - op - man, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
+        a.forEach(function (d) { for (var id in d.q) q[id] = (q[id] || 0) + d.q[id]; });
+        var best = PRODUCTS.map(function (p) { return { p: p, qty: q[p.id] || 0, m: (p.price - X.cost[p.id]) / p.price, lb: (q[p.id] || 0) * (p.price - X.cost[p.id]) }; });
+        var top = best.slice().sort(function (x, y) { return y.qty - x.qty; }).slice(0, 5), mg = best.slice().sort(function (x, y) { return y.m - x.m; });
+        var li = function (r) { return '<tr><td>' + esc(r.p.name) + '</td><td class="r">' + r.qty + '</td><td class="r">' + R(r.qty * r.p.price) + '</td><td class="r">' + (r.m * 100).toFixed(1).replace('.', ',') + '%</td></tr>'; };
+        var head = '<thead><tr><th>Produk</th><th class="r">Terjual</th><th class="r">Omzet</th><th class="r">Margin</th></tr></thead>';
+        return NOTE + '<h2><i class="fa-solid fa-chart-line"></i> Laporan Laba Rugi <span class="mxseg" style="margin-left:auto"><button class="' + (per === 7 ? 'on' : '') + '" onclick="mxPer(7)">7 hari</button><button class="' + (per === 14 ? 'on' : '') + '" onclick="mxPer(14)">14 hari</button></span></h2>' +
+          '<div class="mxg2"><div class="mxc mxsc"><h3>Laba rugi · ' + per + ' hari terakhir</h3><table class="mxt"><tbody>' +
+          '<tr><td>Penjualan bersih</td><td class="r">' + R(net) + '</td><td class="r">100%</td></tr><tr><td>Harga pokok penjualan (HPP)</td><td class="r dn">− ' + R(hpp) + '</td><td class="r">' + pc(hpp) + '</td></tr>' +
+          '<tr class="tot"><td>Laba kotor</td><td class="r up">' + R(gp) + '</td><td class="r">' + pc(gp) + '</td></tr>' +
+          '<tr><td>Biaya operasional (demo: gaji, listrik, sewa)</td><td class="r dn">− ' + R(op) + '</td><td class="r">' + pc(op) + '</td></tr><tr><td>Kas keluar manual dari kasir</td><td class="r dn">− ' + R(man) + '</td><td class="r">' + pc(man) + '</td></tr>' +
+          '<tr class="tot"><td>Laba bersih</td><td class="r ' + (np >= 0 ? 'up' : 'dn') + '">' + R(np) + '</td><td class="r">' + pc(np) + '</td></tr></tbody></table></div>' +
+          '<div class="mxc"><h3>Penjualan harian</h3>' + chart(a) + '</div></div>' +
+          '<div class="mxg2"><div class="mxc mxsc"><h3>Produk terlaris</h3><table class="mxt">' + head + '<tbody>' + top.map(li).join('') + '</tbody></table></div>' +
+          '<div class="mxc mxsc"><h3>Margin tertinggi</h3><table class="mxt">' + head + '<tbody>' + mg.slice(0, 3).map(li).join('') + '</tbody></table><h3 style="margin-top:12px">Margin terendah</h3><table class="mxt">' + head + '<tbody>' + mg.slice(-3).reverse().map(li).join('') + '</tbody></table></div></div>';
+      }
+      function place() { var b = document.querySelector('.mxbar'); if (b) $('mx-view').style.top = b.getBoundingClientRect().bottom + 'px'; }
+      window.addEventListener('resize', place);
+      function draw() { $('mx-view').innerHTML = ({ dash: dash, inv: inv, lap: lap })[view](); }
+      window.mxView = function (v) {
+        if (!H) ini(); view = v; $('mx-view').hidden = v === 'kasir'; document.body.classList.toggle('mxo', v !== 'kasir'); place();
+        document.querySelectorAll('.mxn').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); });
+        if (v !== 'kasir') draw();
+      };
+      window.mxPer = function (n) { per = n; draw(); };
+      window.mxSet = function (k, id, v) { X[k][id] = k === 'exp' ? v : Math.max(0, Number(v) || 0); sv(); draw(); };
+      window.mxPO = function () {
+        var id = $('po-p').value, q = Math.floor(Number($('po-q').value) || 0), p = productById(id);
+        if (q <= 0) { showToast('Isi jumlah pesanan (lebih dari 0).', 'warn'); return; }
+        X.po = X.po || []; X.po.push({ id: 'PO-' + String(X.po.length + 1).padStart(3, '0'), pid: id, qty: q, cost: X.cost[id], st: 'Dipesan', date: new Date().toLocaleDateString('id-ID') });
+        sv(); draw(); showToast('PO ' + p.name + ' × ' + q + ' dibuat.', 'success');
+      };
+      window.mxRecv = function (id) {
+        var o = X.po.find(function (x) { return x.id === id; }), p = productById(o.pid); if (!o || o.st !== 'Dipesan') return;
+        o.st = 'Diterima'; p.stock += o.qty; mxStockLog.unshift({ name: p.name, kind: 'Barang masuk (' + o.id + ')', diff: o.qty, after: p.stock, time: new Date() });
+        sv(); renderProducts(); draw(); showToast(p.name + ': +' + o.qty + ' diterima. Stok sekarang ' + p.stock + '.', 'success');
+      };
+      setInterval(function () { if (view !== 'kasir' && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#mx-view'))) draw(); }, 3000);
+    })();
+  </script>
+
 </body>
 
 </html>
