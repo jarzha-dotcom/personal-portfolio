@@ -767,6 +767,162 @@
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/dari-scan-kamera-ke-data-aset-1-detik-cd718626.mp3",
     "storage": "blob"
   },
+  "depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7085,
+    "bytes": 1876608,
+    "duration": 469.152,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.904
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.904,
+        "end": 46.56
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 46.56,
+        "end": 92.376
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 92.376,
+        "end": 124.2
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 124.2,
+        "end": 175.248
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 175.248,
+        "end": 241.104
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 241.104,
+        "end": 278.64
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 278.64,
+        "end": 314.136
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 314.136,
+        "end": 360.192
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 360.192,
+        "end": 425.016
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 425.016,
+        "end": 469.152
+      }
+    ],
+    "hash": "787020c7fad262684dcbf170cee934adc8d9709a76d909e1f1dedd53d74954ef",
+    "generatedAt": "2026-11-01T10:17:49.032Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan-787020c7.mp3",
+    "storage": "blob"
+  },
+  "enkripsi-password-standar-militer-itu-apa": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7089,
+    "bytes": 1891200,
+    "duration": 472.8,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.736
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.736,
+        "end": 40.68
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 40.68,
+        "end": 98.808
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 98.808,
+        "end": 134.664
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 134.664,
+        "end": 178.272
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 178.272,
+        "end": 222.048
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 222.048,
+        "end": 281.904
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 281.904,
+        "end": 333.432
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 333.432,
+        "end": 372.168
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 372.168,
+        "end": 434.592
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 434.592,
+        "end": 472.8
+      }
+    ],
+    "hash": "f54dd2afd659a6627e115018a5e295cc5f3bdd4e85bc8b5b21683a7cf3011585",
+    "generatedAt": "2026-11-01T10:16:31.392Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/enkripsi-password-standar-militer-itu-apa-f54dd2af.mp3",
+    "storage": "blob"
+  },
   "kenapa-1-website-butuh-3-karakter-ai-berbeda": {
     "voice": "id-ID-Chirp3-HD-Aoede",
     "rate": 1,
@@ -1035,6 +1191,258 @@
     "hash": "a885b8d00d513422d5e7d3aa8b619847a09dc0088cf0017523124740e649a26f",
     "generatedAt": "2026-10-24T21:49:51.149Z",
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu-a885b8d0.mp3",
+    "storage": "blob"
+  },
+  "kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 10895,
+    "bytes": 2852064,
+    "duration": 713.016,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.488
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.488,
+        "end": 66.456
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 66.456,
+        "end": 129.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 129.792,
+        "end": 174.168
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 174.168,
+        "end": 239.496
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 239.496,
+        "end": 302.064
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 302.064,
+        "end": 346.008
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 346.008,
+        "end": 389.016
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 389.016,
+        "end": 426.384
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 426.384,
+        "end": 491.712
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 491.712,
+        "end": 537.84
+      },
+      {
+        "kind": "block",
+        "blockIndex": 10,
+        "start": 537.84,
+        "end": 612.816
+      },
+      {
+        "kind": "block",
+        "blockIndex": 11,
+        "start": 612.816,
+        "end": 671.64
+      },
+      {
+        "kind": "block",
+        "blockIndex": 12,
+        "start": 671.64,
+        "end": 713.016
+      }
+    ],
+    "hash": "181004fc82e41db37c7d4d62e633c065349e7e32189923e6c2a79dbdccfa5713",
+    "generatedAt": "2026-11-01T10:22:26.158Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah-181004fc.mp3",
+    "storage": "blob"
+  },
+  "membangun-aplikasi-100-persen-offline-rajendra-pintar": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7115,
+    "bytes": 1884864,
+    "duration": 471.216,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.304
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.304,
+        "end": 48.288
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 48.288,
+        "end": 87.024
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 87.024,
+        "end": 133.032
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 133.032,
+        "end": 204.12
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 204.12,
+        "end": 248.736
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 248.736,
+        "end": 304.2
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 304.2,
+        "end": 342.648
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 342.648,
+        "end": 379.992
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 379.992,
+        "end": 418.728
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 418.728,
+        "end": 471.216
+      }
+    ],
+    "hash": "c69293a81d9f1bc70e97be33e397cb59876a9fe66939a3ed24b36b7bb42bc4c6",
+    "generatedAt": "2026-11-01T10:20:06.197Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-c69293a8.mp3",
+    "storage": "blob"
+  },
+  "single-active-session-mencegah-akun-dibajak": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7019,
+    "bytes": 1812768,
+    "duration": 453.192,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.976
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.976,
+        "end": 45
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 45,
+        "end": 88.584
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 88.584,
+        "end": 135.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 135.792,
+        "end": 173.928
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 173.928,
+        "end": 215.976
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 215.976,
+        "end": 258.144
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 258.144,
+        "end": 304.992
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 304.992,
+        "end": 368.88
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 368.88,
+        "end": 410.688
+      },
+      {
+        "kind": "block",
+        "blockIndex": 9,
+        "start": 410.688,
+        "end": 453.192
+      }
+    ],
+    "hash": "1ff199c5f3626c64a5ea648909922d3f5340a1d4695f79ef173c3fb9c65839d5",
+    "generatedAt": "2026-11-01T10:18:56.290Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/single-active-session-mencegah-akun-dibajak-1ff199c5.mp3",
     "storage": "blob"
   },
   "studi-kasus-devrab-proposal-30-detik": {

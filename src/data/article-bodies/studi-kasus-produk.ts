@@ -194,4 +194,199 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah': [
+    {
+      paragraphs: [
+        'Bayangkan skenario ini (ilustrasi, tapi hampir semua perusahaan dengan banyak vendor pernah mengalaminya). Senin pagi, seorang pelanggan komplain: produk yang diterimanya bermasalah. Tim internal meneruskan keluhan itu ke grup WhatsApp vendor. Dua hari kemudian datang balasan singkat: \"Sudah kami perbaiki, mohon maaf atas ketidaknyamanannya.\" Kasus ditutup. Tiga minggu kemudian, pelanggan lain komplain tentang hal yang persis sama.',
+        'Tidak ada yang berbohong dalam cerita itu. Vendornya merespons, timnya meneruskan, kasusnya ditutup. Tapi tidak ada satu orang pun yang bisa menjawab tiga pertanyaan paling penting: apa penyebab sebenarnya, apa yang diubah supaya tidak terulang, dan apakah ini pernah terjadi sebelumnya.',
+        'Saya membangun Issue Tracker karena frustrasi pada pola seperti ini. Artikel ini membedah kenapa balasan seadanya itu hampir pasti terjadi kalau medianya salah, dan bagaimana desain aplikasi bisa mengubahnya tanpa harus memarahi siapa pun.',
+      ],
+    },
+    {
+      heading: 'Anatomi Balasan Seadanya: Apa yang Sebenarnya Hilang',
+      paragraphs: [
+        'Balasan \"sudah diperbaiki\" terlihat seperti jawaban, padahal ia melewatkan empat hal yang dibutuhkan perusahaan untuk benar-benar belajar dari sebuah keluhan:',
+        '1. Akar masalah: bukan gejalanya, tapi penyebab paling dasarnya. Barang rusak adalah gejala. Mesin yang tidak dikalibrasi, operator yang belum dilatih, atau bahan baku yang berganti pemasok adalah kemungkinan akarnya.',
+        '2. Tindakan perbaikan: apa yang dilakukan untuk memperbaiki kasus ini, dan apa yang diubah supaya kasus serupa tidak muncul lagi. Dua hal ini berbeda.',
+        '3. Bukti: foto, hasil uji, atau laporan yang bisa diperiksa, bukan sekadar pernyataan.',
+        '4. Konteks waktu: kapan masalah diketahui, kapan dibalas, dan apakah tepat waktu.',
+        'Tanpa keempatnya, perusahaan hanya memiliki catatan bahwa sesuatu terjadi, bukan pengetahuan tentang kenapa itu terjadi.',
+      ],
+    },
+    {
+      heading: 'Masalahnya Bukan di Vendor, Tapi di Medianya',
+      paragraphs: [
+        'Coba perhatikan alat yang biasa dipakai: grup WhatsApp, email berantai, dan spreadsheet yang dikirim bolak-balik. Ketiganya punya kelemahan yang sama: tidak ada yang memaksa balasan memuat hal yang dibutuhkan. Kolom kosong di chat tidak pernah ditandai merah. Tenggat tidak pernah menghitung mundur sendiri. Keluhan yang sama dari bulan lalu tenggelam di ribuan pesan di atasnya.',
+        'Akibatnya kualitas balasan bergantung pada niat baik dan ingatan masing-masing orang. Sebagai mantan orang audit internal, saya tidak percaya pada proses yang bergantung pada ingatan. Proses yang sehat adalah proses di mana cara yang salah memang sulit dilakukan.',
+      ],
+    },
+    {
+      heading: 'Satu Kasus, Banyak Bagian Masalah',
+      paragraphs: [
+        'Di Issue Tracker, setiap keluhan menjadi satu kasus dengan nomor urut otomatis (formatnya seperti CS-2026-0001), lengkap dengan kronologi dan tingkat urgensi dari Rendah sampai Mendesak. Yang membedakan: satu kasus bisa dipecah menjadi beberapa bagian masalah, dan masing-masing bisa ditangani vendor yang berbeda.',
+        'Ini penting karena keluhan di dunia nyata jarang punya satu penyebab. Satu produk bermasalah bisa melibatkan pemasok bahan, pihak perakitan, dan pihak pengiriman sekaligus. Dengan memecahnya, tiap vendor bertanggung jawab atas bagiannya sendiri dan tidak ada yang bisa bersembunyi di balik \"mungkin itu bagian pihak lain\".',
+        'Setiap bagian juga memuat kronologi dan detail serta tindakan sementara yang sudah diambil, sehingga vendor paham situasinya sebelum membalas. Tabel dari Excel, Google Sheets, atau Word bisa ditempel langsung di kronologi, balasan, dan artikel solusi.',
+      ],
+    },
+    {
+      heading: 'Form Balasan yang Tidak Bisa Dikirim Setengah Jadi',
+      paragraphs: [
+        'Vendor tidak membalas lewat chat bebas. Mereka login ke akunnya sendiri dan mengisi form balasan terstruktur yang mewajibkan akar masalah dan tindakan perbaikan. Akar masalah dikelompokkan dalam kategori standar seperti Manusia, Mesin, Material, dan Metode, lalu dijelaskan dengan kalimat sendiri.',
+        'Bandingkan dua balasan berikut (keduanya ilustrasi). Balasan pertama: \"Sudah kami perbaiki.\" Balasan kedua: \"Akar masalah (Mesin): sensor pada lini 2 tidak dikalibrasi sejak servis terakhir. Tindakan: sensor dikalibrasi ulang, jadwal kalibrasi diubah dari tahunan menjadi triwulanan.\" Balasan kedua bisa ditindaklanjuti, diaudit, dan dibandingkan dengan kasus lain. Balasan pertama tidak.',
+        'Form tidak bisa dikirim sebelum bagian wajibnya terisi. Kalau jawabannya belum memadai, tim bisa meminta revisi. Tidak ada lagi balasan setengah hati yang lolos hanya karena tidak ada yang sempat memeriksa.',
+      ],
+    },
+    {
+      heading: 'Menilai Vendor Tanpa Membuat Vendor Defensif',
+      paragraphs: [
+        'Tim bisa menulis catatan internal pada balasan vendor, dan catatan itu hanya terlihat oleh tim. Fungsinya sederhana: menilai kualitas jawaban tanpa vendor tahu. Kalau sebuah balasan lengkap tapi dangkal, tim bisa mencatatnya untuk bahan evaluasi tanpa memicu perdebatan di depan vendor.',
+        'Untuk komunikasi terbuka, tersedia komentar bertingkat antara tim dan vendor, yang bisa saling membalas. Notifikasi di dalam aplikasi, mirip lonceng di media sosial dengan angka merah untuk yang belum dibaca, memberi tahu pihak yang berkepentingan. Kejadian beruntun digabung supaya tidak banjir, dan isi notifikasi vendor tidak pernah memuat data pelanggan.',
+      ],
+    },
+    {
+      heading: 'Vendor Hanya Melihat Tugasnya Sendiri',
+      paragraphs: [
+        'Ada empat peran di sistem ini: Admin dengan akses penuh, Staff untuk operasional, Viewer yang hanya memantau, dan Vendor. Peran Vendor paling ketat: ia hanya melihat tugas miliknya, tanpa nama pelanggan dan tanpa data sensitif. Pemisahan dilakukan di sisi server, bukan sekadar disembunyikan di tampilan, jadi tidak bergantung pada tampilan semata.',
+        'Manfaatnya dua. Kerahasiaan pelanggan terjaga tanpa mengandalkan kehati-hatian staf saat menyalin pesan. Dan vendor fokus pada masalahnya sendiri alih-alih terseret perdebatan siapa yang salah. Lampiran juga tidak pernah dibagikan lewat link publik: setiap unduhan melewati pengecekan akses.',
+      ],
+    },
+    {
+      heading: 'Tenggat yang Menghitung Sendiri',
+      paragraphs: [
+        'Setiap bagian masalah punya batas waktu balas yang dihitung otomatis dari urgensinya. Begitu lewat, penanda Terlambat muncul. Pengingat email terkirim ke vendor sebelum dan sesudah jatuh tempo, jadi tim tidak perlu menjadi penagih yang menanyakan satu per satu.',
+        'Efek sampingnya sangat berharga: data. Karena waktu tercatat otomatis, laporan bisa menjawab pertanyaan yang sebelumnya hanya bisa dijawab dengan firasat. Berapa lama tim merespons pertama kali? Berapa lama sebuah kasus diselesaikan? Vendor mana yang paling cepat, dan vendor mana yang paling sering terlambat?',
+      ],
+    },
+    {
+      heading: 'Dari Kejadian Terpisah ke Pola',
+      paragraphs: [
+        'Laporan siap cetak (PDF) memuat metrik yang tadi disebut, ditambah grafik tren 6 bulan, masalah berulang, dan akar masalah menurut kategori. Masalah berulang dideteksi dari bagian masalah yang namanya muncul dua kali atau lebih. Di titik inilah keluhan berhenti terlihat sebagai kejadian terpisah dan mulai tampak sebagai pola.',
+        'Misalnya (ilustrasi), laporan menunjukkan bahwa sebagian besar akar masalah dalam enam bulan jatuh pada kategori Metode, bukan Mesin. Itu mengubah arah perbaikan: yang perlu dibenahi mungkin prosedur kerja, bukan peralatannya. Informasi seperti ini mustahil muncul dari tumpukan chat.',
+        'Kasus yang selesai juga bisa diubah menjadi artikel solusi di Knowledge Base, lalu diverifikasi dan dibagikan ke vendor. Saat tim membuat kasus baru, sistem otomatis menyarankan solusi serupa. Masalah yang sama tidak perlu diselidiki dari nol. Kasus selesai juga bisa dicetak sebagai laporan A4 untuk arsip internal, dan data bisa diekspor ke CSV untuk dibuka di Excel.',
+      ],
+    },
+    {
+      heading: 'Tahan Sinyal Putus-Nyambung, Tetap Bisa Diaudit',
+      paragraphs: [
+        'Perubahan langsung terlihat di layar tanpa menunggu server (optimistic UI), dan bila koneksi putus, perubahan disimpan di antrean offline lalu dikirim otomatis saat online kembali. Antrean ini bekerja selama halaman sudah terbuka, jadi pemuatan pertama tetap butuh internet. Aplikasi juga bisa dipasang di layar utama HP sebagai PWA.',
+        'Sementara itu, setiap tindakan tercatat di riwayat: siapa, kapan, dan apa yang berubah. Prinsipnya sama dengan yang saya bahas di artikel \"Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh Fitur Ini Lebih dari yang Kamu Kira\". Sistem yang baik harus siap ditanya kapan saja, bahkan oleh orang yang tidak ada di ruangan saat kejadian.',
+      ],
+    },
+    {
+      heading: 'Batas yang Perlu Diketahui: Pilihan Arsitektur yang Sengaja Sederhana',
+      paragraphs: [
+        'Backend-nya berjalan di Google Apps Script dengan Google Sheets sebagai database dan Google Drive untuk lampiran, jadi tidak ada biaya sewa server bulanan. Data tersimpan di akun Google milik pelanggan sendiri, bisa dibuka dan dicadangkan kapan saja.',
+        'Sebagai gantinya, ada batas yang saya sampaikan terus terang kepada calon pengguna:',
+        '• Satu eksekusi Apps Script maksimal 6 menit.',
+        '• Kuota email harian sekitar 100 untuk Gmail biasa, atau sekitar 1.500 untuk Google Workspace.',
+        '• Lampiran maksimal 10 MB per file (foto dikompres otomatis di perangkat).',
+        '• Kapasitas optimal sekitar 20.000 kasus. Di atas itu, migrasi ke database sungguhan sebaiknya dipertimbangkan.',
+        'Untuk perusahaan dengan banyak vendor yang belum butuh platform raksasa, batas-batas ini biasanya lebih dari cukup. Dan karena datanya ada di Google Sheets milik sendiri, kalau suatu hari perlu pindah, datanya tidak terkunci di tangan siapa pun. Tanda-tanda kapan batas itu mulai terasa saya rangkum di artikel \"5 Tanda Bisnismu Sudah Waktunya Migrasi dari Google Apps Script ke Server Sendiri\".',
+      ],
+    },
+    {
+      heading: 'Lima Pertanyaan untuk Menguji Sistem Pelacakan Keluhanmu',
+      paragraphs: [
+        'Entah kamu memakai Issue Tracker atau sistem lain, lima pertanyaan ini bisa dipakai untuk memeriksa kesehatan proses keluhanmu hari ini:',
+        '1. Kalau vendor membalas, apakah ada cara memastikan balasannya memuat akar masalah, bukan sekadar \"sudah beres\"?',
+        '2. Bisakah kamu melihat dalam satu layar keluhan mana yang sudah lewat tenggat?',
+        '3. Kalau masalah yang sama muncul lagi bulan depan, apakah ada yang bisa menunjukkan catatan kejadian sebelumnya dalam hitungan menit?',
+        '4. Apakah vendor bisa melihat data pelanggan yang sebenarnya tidak mereka perlukan?',
+        '5. Kalau besok auditor bertanya \"siapa memutuskan apa dan kapan\", dari mana kamu menjawabnya?',
+        'Kalau dua atau lebih jawabannya tidak yakin, kemungkinan besar keluhan di perusahaanmu masih mengalir lewat jalur yang membiarkan balasan seadanya.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Refleksi',
+      paragraphs: [
+        'Balasan vendor yang seadanya jarang soal sikap. Lebih sering itu cermin dari sistem yang tidak meminta lebih. Ketika form menuntut akar masalah, tenggat berjalan otomatis, vendor hanya melihat tugasnya, dan solusi lama tersimpan rapi, kualitas kerja ikut naik tanpa perlu teguran.',
+        'Kalau perusahaanmu masih mengelola keluhan lewat grup chat dan spreadsheet, coba tanyakan satu hal: kalau masalah yang sama muncul bulan depan, apakah ada yang bisa membuktikan bahwa akar masalahnya sudah pernah dicatat? Kalau belum yakin, kamu bisa mencoba demo Issue Tracker di itrack.arzhaning.my.id atau mengobrol dulu lewat WhatsApp untuk membahas kebutuhan perusahaanmu.',
+      ],
+    },
+  ],
+  'membangun-aplikasi-100-persen-offline-rajendra-pintar': [
+    {
+      paragraphs: [
+        'Bayangkan seorang anak berusia lima tahun duduk di kursi belakang mobil dalam perjalanan panjang. Sinyal naik turun, kuota orang tua tinggal sedikit, dan satu-satunya permintaan adalah \"Bun, main kartu belajar dong.\" Kalau aplikasinya baru bisa dipakai setelah loading dari internet, momen itu gagal. Anak bosan, orang tua repot, dan aplikasinya akhirnya dihapus.',
+        'Itulah alasan utama Rajendra Pintar, aplikasi belajar untuk anak usia 4 sampai 8 tahun yang saya bangun, dirancang agar bisa dimainkan tanpa internet. Artikel ini membedah bagaimana hal itu dicapai, apa saja keputusan teknis di baliknya, dan yang tidak kalah penting, apa yang jujur tetap butuh koneksi.',
+      ],
+    },
+    {
+      heading: 'Offline-First Berbeda dari Sekadar Ada Mode Offline',
+      paragraphs: [
+        'Banyak aplikasi menambahkan mode offline di belakang, seperti tambalan: fiturnya berjalan normal kalau ada internet, dan kalau tidak ada, sebagian halaman mendadak kosong. Pendekatan offline-first terbalik. Aplikasi dirancang dengan asumsi bahwa internet tidak ada, lalu koneksi diperlakukan sebagai bonus untuk hal-hal tertentu.',
+        'Untuk aplikasi anak, perbedaannya terasa langsung. Anak tidak tahu apa itu \"gagal memuat\". Ia hanya tahu layar yang tidak bergerak, dan ia akan berhenti memakainya. Karena itu keputusan offline saya ambil sejak awal, bukan ditambal di akhir.',
+      ],
+    },
+    {
+      heading: 'Apa yang Harus Selalu Tersedia',
+      paragraphs: [
+        'Langkah pertama adalah menentukan mana yang inti. Di Rajendra Pintar, inti pengalamannya adalah:',
+        '• Ratusan kartu belajar interaktif di 9 bidang, dari kosakata sampai angka dan transportasi, dengan materi yang menyesuaikan lima jenjang usia (4 sampai 8 tahun).',
+        '• Mode Kuis Ceria bergambar dengan umpan balik langsung dan efek konfeti.',
+        '• Game Memori untuk melatih daya ingat visual.',
+        '• Maskot, animasi, dan efek sentuhan layar yang membuat anak betah.',
+        'Semua itu harus berjalan dari perangkat itu sendiri. Seluruh kartu belajar juga gratis dan tidak dikunci di balik pembayaran, jadi tidak ada materi inti yang bergantung pada pengecekan status di server.',
+      ],
+    },
+    {
+      heading: 'Lapisan Pertama: Service Worker di Versi Web',
+      paragraphs: [
+        'Rajendra Pintar bisa dibuka lewat browser sebagai Progressive Web App. Di sinilah Service Worker bekerja. Bayangkan ia sebagai penjaga gudang yang berdiri di antara aplikasi dan internet. Saat aplikasi pertama kali dibuka, penjaga ini menyimpan berkas yang dibutuhkan ke penyimpanan lokal perangkat. Pada pembukaan berikutnya, setiap permintaan dijawab dari gudang lokal lebih dulu, tanpa perlu menghubungi server.',
+        'Hasilnya, setelah aplikasi dipasang ke layar utama lewat Add to Home Screen, materi belajar tetap tampil walaupun HP dalam mode pesawat. Tidak ada unduhan besar di awal seperti aplikasi toko, tapi pengalaman setelahnya terasa seperti aplikasi biasa. Perbandingan lengkap PWA dengan aplikasi mobile biasa ada di artikel \"Perbedaan Web App, Mobile App, dan PWA — Mana yang Kamu Butuhkan?\".',
+        'Satu konsekuensi yang perlu dipahami: karena aplikasi dijawab dari simpanan lokal, versi baru aplikasi baru sampai ke perangkat ketika ada koneksi. Ini kompromi yang wajar dan memang bagian dari cara kerja teknologi ini.',
+      ],
+    },
+    {
+      heading: 'Lapisan Kedua: Capacitor untuk Versi Android',
+      paragraphs: [
+        'Tidak semua orang tua nyaman memasang lewat browser, dan sebagian lebih percaya aplikasi dari Google Play. Untuk itu saya memakai Capacitor 8, yang membungkus aplikasi web yang sama menjadi aplikasi Android asli (APK).',
+        'Keuntungan terbesarnya bagi urusan offline: berkas aplikasi ikut terpaket di dalam aplikasi itu sendiri. Tidak ada tahap mengunduh materi setelah instalasi. Satu basis kode melayani dua jalur distribusi, jadi perbaikan di satu tempat terbawa ke yang lain dan saya tidak perlu memelihara dua aplikasi terpisah. Untuk developer tunggal seperti saya, itu bukan sekadar efisiensi, tapi syarat agar proyek bisa terus berjalan.',
+      ],
+    },
+    {
+      heading: 'Suara dan Efek Tanpa Berkas Berat',
+      paragraphs: [
+        'Aplikasi anak butuh banyak suara: pujian, klik ceria, tepuk tangan, nada kemenangan. Kalau semuanya berupa berkas audio, ukuran aplikasi membengkak dan semuanya harus ikut tersimpan di perangkat.',
+        'Jalan keluarnya ada dua. Pertama, efek suara pendek seperti pop, chime, dan fanfare dihasilkan langsung lewat Web Audio API, jadi tidak memakan ruang penyimpanan sama sekali. Kedua, pelafalan kosakata dalam bahasa Indonesia dan Inggris memakai mesin text-to-speech dwibahasa, sehingga ratusan kata tidak perlu direkam satu per satu.',
+        'Di sisi visual, animasi maskot dan kartu berjalan lewat pustaka animasi yang terpaket bersama aplikasi, begitu juga efek konfeti dan sentuhan layar. Karena dihasilkan di perangkat, semuanya tetap hidup tanpa koneksi.',
+      ],
+    },
+    {
+      heading: 'Apa yang Tetap Butuh Internet',
+      paragraphs: [
+        '\"100% offline\" paling jujur dimaknai pada materi belajarnya. Beberapa hal memang secara alami butuh koneksi:',
+        '• Masuk dengan akun Google dan sinkronisasi akun cloud.',
+        '• Pembayaran: Xendit di versi web, Google Play Billing di versi Android.',
+        '• Pemuatan pertama dan pembaruan versi aplikasi.',
+        'Prinsipnya, hal-hal ini tidak boleh menghalangi anak belajar. Koneksi hanya diperlukan untuk urusan orang tua, bukan urusan anak. Dan karena seluruh kartu belajar gratis, seorang anak tetap bisa belajar penuh walaupun orang tuanya belum login atau sedang tanpa sinyal.',
+      ],
+    },
+    {
+      heading: 'Cara Menguji Klaim Offline Sebuah Aplikasi',
+      paragraphs: [
+        'Kamu bisa memakai cara ini pada aplikasi apa pun, termasuk milikmu sendiri:',
+        '1. Buka aplikasi dan jalankan fitur utamanya sekali selagi online.',
+        '2. Aktifkan mode pesawat.',
+        '3. Tutup aplikasi sepenuhnya, lalu buka lagi.',
+        '4. Coba fitur inti. Kalau semuanya tetap jalan, klaim offline-nya nyata. Kalau muncul layar putih atau pesan gagal memuat, berarti offline-nya hanya setengah.',
+        'Uji sederhana ini sering jauh lebih jujur daripada brosur mana pun.',
+      ],
+    },
+    {
+      heading: 'Pelajaran untuk Bisnis yang Butuh Aplikasi Lapangan',
+      paragraphs: [
+        'Polanya sama dengan yang saya pakai di aplikasi bisnis: pisahkan apa yang harus selalu tersedia dari apa yang boleh menunggu koneksi. Staf gudang di ruang bawah tanah atau kasir di lokasi bersinyal lemah punya kebutuhan yang mirip dengan anak di dalam mobil, yaitu aplikasi yang tidak pernah berkata \"coba lagi nanti\".',
+        'Sebelum memesan aplikasi, ada satu pertanyaan yang layak diajukan ke developer: kalau internet putus di tengah pekerjaan, bagian mana yang tetap jalan dan bagian mana yang berhenti? Jawabannya menunjukkan seberapa serius sistem itu dirancang untuk kondisi lapangan yang nyata.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Refleksi',
+      paragraphs: [
+        'Membuat aplikasi yang bekerja saat sinyal bagus itu mudah. Yang membedakan adalah apa yang terjadi saat sinyalnya hilang. Rajendra Pintar saya rancang supaya jawabannya tetap sama: anak tetap bisa belajar.',
+        'Kalau kamu sedang menimbang aplikasi untuk anak, tim lapangan, atau pelanggan di daerah dengan sinyal terbatas, pikirkan skenario terburuknya lebih dulu. Sistem yang baik adalah yang tetap berguna justru pada kondisi paling tidak ideal.',
+        'Kalau penasaran dengan hasilnya, Rajendra Pintar bisa dicoba langsung di rapin.arzhaning.my.id. Coba uji sendiri dengan cara di atas: buka sekali, aktifkan mode pesawat, lalu lihat apa yang masih jalan. Untuk kebutuhan aplikasi lapangan di bisnismu, kamu juga bisa mengobrol dulu lewat WhatsApp.',
+      ],
+    },
+  ],
 };

@@ -59,6 +59,14 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-top-f41e899f.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-middle-9c23e955.jpeg',
   },
+  'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan-top-877bc8ca.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan-middle-bbd2835d.jpeg',
+  },
+  'enkripsi-password-standar-militer-itu-apa': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/enkripsi-password-standar-militer-itu-apa-top-fba378a0.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/enkripsi-password-standar-militer-itu-apa-middle-ea24ff5d.jpeg',
+  },
   'kenapa-1-website-butuh-3-karakter-ai-berbeda': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-top-f9c694b1.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-middle-8d0ce023.jpeg',
@@ -78,6 +86,18 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
   'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu-top-7881d5ec.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-riwayat-chat-ai-disimpan-di-browser-kamu-middle-957a2eee.jpeg',
+  },
+  'kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah-top-0c80c4c1.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah-middle-08ba1ee5.jpeg',
+  },
+  'membangun-aplikasi-100-persen-offline-rajendra-pintar': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-top-2116f1c6.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-middle-9d46c657.jpeg',
+  },
+  'single-active-session-mencegah-akun-dibajak': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/single-active-session-mencegah-akun-dibajak-top-e7f06097.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/single-active-session-mencegah-akun-dibajak-middle-e2704cef.jpeg',
   },
   'studi-kasus-devrab-proposal-30-detik': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/studi-kasus-devrab-proposal-30-detik-top-1615f26d.jpeg',

@@ -92,6 +92,61 @@ export interface Article {
 export const ARTICLES: Article[] = [
   // ===== Artikel published, diurutkan dari PALING BARU ke PALING LAMA =====
   {
+    slug: 'enkripsi-password-standar-militer-itu-apa',
+    title: 'Enkripsi Password Standar Militer Itu Apa, dan Kenapa Penting untuk Sistem Bisnis Kecil',
+    excerpt:
+      'Istilah \"PBKDF2 SHA-256\" terdengar rumit, tapi konsepnya sederhana untuk dipahami — dan kenapa ini bukan fitur yang boleh dilewatkan.',
+    category: 'Teknis',
+    readMinutes: 5,
+    pillar: 'keamanan-data',
+    published: true,
+    publishedAt: '2026-10-22',
+  },
+  {
+    slug: 'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan',
+    title: 'Depresiasi Aset Dihitung Otomatis: Penjelasan Straight-Line Method untuk Non-Akuntan',
+    excerpt:
+      'Metode garis lurus itu sebenarnya rumus yang cukup sederhana. Ini penjelasannya tanpa jargon akuntansi yang membingungkan.',
+    category: 'Panduan',
+    readMinutes: 5,
+    pillar: 'bedah-fitur-teknis',
+    published: true,
+    publishedAt: '2026-10-19',
+  },
+  {
+    slug: 'single-active-session-mencegah-akun-dibajak',
+    title: 'Single Active Session: Fitur Kecil yang Mencegah Akun Dibajak atau Dipakai Bersama',
+    excerpt:
+      'Login di perangkat baru otomatis mengeluarkan sesi lama — mekanisme sederhana yang sering luput padahal dampaknya besar untuk keamanan akun.',
+    category: 'Teknis',
+    readMinutes: 5,
+    pillar: 'keamanan-data',
+    published: true,
+    publishedAt: '2026-10-17',
+  },
+  {
+    slug: 'membangun-aplikasi-100-persen-offline-rajendra-pintar',
+    title: 'Membangun Aplikasi 100% Offline: Studi Teknis di Balik Rajendra Pintar',
+    excerpt:
+      'Bagaimana Capacitor dan Service Worker dipakai supaya ratusan materi belajar tetap bisa diakses tanpa kuota internet sama sekali.',
+    category: 'Teknis',
+    readMinutes: 5,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-10-14',
+  },
+  {
+    slug: 'kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah',
+    title: 'Kenapa Vendor Balas Seadanya, dan Cara Memaksa Akar Masalah',
+    excerpt:
+      'Balasan vendor yang seadanya biasanya cermin dari sistem yang tidak meminta lebih. Begini cara Issue Tracker memaksa akar masalah terisi dan keluhan tidak berulang.',
+    category: 'Studi Kasus',
+    readMinutes: 8,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-10-12',
+  },
+  {
     slug: 'kenapa-1-website-butuh-3-karakter-ai-berbeda',
     title: 'Kenapa 1 Website Butuh 3 Karakter AI Berbeda (Zannah, Rajendra, Radit)',
     excerpt:
@@ -378,16 +433,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
   {
-    slug: 'membangun-aplikasi-100-persen-offline-rajendra-pintar',
-    title: 'Membangun Aplikasi 100% Offline: Studi Teknis di Balik Rajendra Pintar',
-    excerpt:
-      'Bagaimana Capacitor dan Service Worker dipakai supaya ratusan materi belajar tetap bisa diakses tanpa kuota internet sama sekali.',
-    category: 'Teknis',
-    readMinutes: 5,
-    pillar: 'studi-kasus-produk',
-    published: false,
-  },
-  {
     slug: 'kenapa-b-games-pakai-postgresql-bukan-google-sheets',
     title: 'Kenapa B-Games Pakai PostgreSQL (Supabase), Bukan Google Sheets Seperti Assets DEMO',
     excerpt:
@@ -408,36 +453,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
 
-  {
-    slug: 'single-active-session-mencegah-akun-dibajak',
-    title: 'Single Active Session: Fitur Kecil yang Mencegah Akun Dibajak atau Dipakai Bersama',
-    excerpt:
-      'Login di perangkat baru otomatis mengeluarkan sesi lama — mekanisme sederhana yang sering luput padahal dampaknya besar untuk keamanan akun.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'keamanan-data',
-    published: false,
-  },
-  {
-    slug: 'enkripsi-password-standar-militer-itu-apa',
-    title: 'Enkripsi Password Standar Militer Itu Apa, dan Kenapa Penting untuk Sistem Bisnis Kecil',
-    excerpt:
-      'Istilah "PBKDF2 SHA-256" terdengar rumit, tapi konsepnya sederhana untuk dipahami — dan kenapa ini bukan fitur yang boleh dilewatkan.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'keamanan-data',
-    published: false,
-  },
-  {
-    slug: 'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan',
-    title: 'Depresiasi Aset Dihitung Otomatis: Penjelasan Straight-Line Method untuk Non-Akuntan',
-    excerpt:
-      'Metode garis lurus itu sebenarnya rumus yang cukup sederhana. Ini penjelasannya tanpa jargon akuntansi yang membingungkan.',
-    category: 'Panduan',
-    readMinutes: 3,
-    pillar: 'bedah-fitur-teknis',
-    published: false,
-  },
   {
     slug: 'offline-first-dua-aplikasi-saya-tetap-jalan-tanpa-internet',
     title: 'Offline-First: Bagaimana 2 Aplikasi Saya (Assets DEMO & Rajendra Pintar) Tetap Jalan Tanpa Internet',

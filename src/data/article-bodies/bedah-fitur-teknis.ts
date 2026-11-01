@@ -47,4 +47,92 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan': [
+    {
+      paragraphs: [
+        'Kalau kamu pernah melihat laporan aset perusahaan, ada satu kolom yang sering bikin dahi berkerut: nilai buku. Harga laptop di nota Rp15.000.000, tapi di laporan tertulis Rp9.000.000. Barangnya sama, belum rusak, kenapa nilainya turun? Jawabannya adalah depresiasi, atau penyusutan.',
+        'Banyak pemilik bisnis menganggap ini urusan akuntan dan tidak perlu dipahami. Padahal konsep dasarnya sederhana, dan memahaminya membantumu membaca laporan, menyusun anggaran pengadaan, dan menilai apakah sistem pencatatan asetmu bisa dipercaya. Artikel ini menjelaskan metode paling umum, garis lurus, tanpa jargon.',
+      ],
+    },
+    {
+      heading: 'Intinya: Membagi Biaya ke Seluruh Masa Pakai',
+      paragraphs: [
+        'Saat perusahaan membeli laptop seharga Rp15.000.000, uangnya keluar sekaligus. Tapi laptop itu dipakai bertahun-tahun. Secara akuntansi, lebih adil kalau biayanya dibagi ke seluruh masa pakai, bukan dibebankan semuanya di bulan pembelian. Pembagian biaya itulah depresiasi.',
+        'Analoginya seperti membayar langganan tahunan: kamu membayar setahun di muka, tapi manfaatnya dinikmati sedikit demi sedikit setiap bulan. Dengan metode garis lurus, pembagiannya rata: nilai aset berkurang dalam jumlah sama setiap bulan. Disebut garis lurus karena kalau digambar di grafik, nilai buku turun membentuk garis miring lurus dari nilai awal ke nilai akhir.',
+      ],
+    },
+    {
+      heading: 'Rumusnya Hanya Tiga Angka',
+      paragraphs: [
+        'Kamu butuh tiga angka:',
+        '1. Harga perolehan: berapa yang dibayar untuk memiliki aset itu dan membuatnya siap dipakai.',
+        '2. Nilai residu: perkiraan nilai aset di akhir masa pakainya.',
+        '3. Umur ekonomis: berapa lama aset diharapkan bermanfaat bagi perusahaan.',
+        'Rumusnya: (harga perolehan dikurangi nilai residu) dibagi umur ekonomis. Kalau umur dihitung dalam bulan, hasilnya adalah penyusutan per bulan.',
+      ],
+    },
+    {
+      heading: 'Contoh 1: Laptop Kantor (Angka Ilustrasi)',
+      paragraphs: [
+        'Sebuah laptop dibeli Rp15.000.000. Nilai residunya Rp3.000.000 dan umur ekonomisnya 4 tahun, atau 48 bulan. Selisihnya Rp12.000.000, dibagi 48 bulan, jadi penyusutannya Rp250.000 per bulan, atau Rp3.000.000 per tahun.',
+        'Nilai bukunya dari tahun ke tahun:',
+        '• Awal: Rp15.000.000',
+        '• Akhir tahun 1: Rp12.000.000',
+        '• Akhir tahun 2: Rp9.000.000',
+        '• Akhir tahun 3: Rp6.000.000',
+        '• Akhir tahun 4: Rp3.000.000 (sama dengan nilai residu, dan tidak turun lagi)',
+        'Itu sebabnya angka Rp9.000.000 di laporan tadi masuk akal: laptop itu sudah dipakai dua tahun.',
+      ],
+    },
+    {
+      heading: 'Contoh 2: Mesin Produksi dengan Residu Nol (Angka Ilustrasi)',
+      paragraphs: [
+        'Tidak semua aset punya nilai residu. Misalkan sebuah mesin dibeli Rp60.000.000, diperkirakan tidak bernilai lagi di akhir masa pakainya, dan umur ekonomisnya 5 tahun atau 60 bulan. Penyusutannya Rp60.000.000 dibagi 60, yaitu Rp1.000.000 per bulan.',
+        'Setelah 18 bulan, total penyusutannya Rp18.000.000, sehingga nilai bukunya Rp42.000.000. Dengan rumus yang sama dan hanya mengganti tiga angka, kamu bisa menghitung aset apa pun di kantormu.',
+        'Angka-angka di atas hanya contoh. Nilai residu, umur ekonomis, dan aturan kapan penyusutan mulai dihitung (penuh sejak bulan pembelian atau mulai bulan berikutnya) ditetapkan berdasarkan kebijakan akuntansi perusahaan, jadi konfirmasikan dengan akuntan atau konsultan pajakmu. Perlu diingat juga bahwa penyusutan untuk pembukuan dan untuk perpajakan bisa memakai aturan masa manfaat yang berbeda, sehingga angka di laporan keuangan belum tentu sama dengan angka di perhitungan pajak.',
+      ],
+    },
+    {
+      heading: 'Nilai Buku Bukan Harga Jual',
+      paragraphs: [
+        'Salah paham yang paling sering: mengira nilai buku sama dengan harga barang kalau dijual. Tidak sama. Nilai buku adalah angka pencatatan berdasarkan jadwal penyusutan, sedangkan harga jual ditentukan pasar.',
+        'Aset yang nilai bukunya sudah mencapai residu pun bisa tetap berfungsi dengan baik. Yang dikatakan angka itu hanyalah bahwa biayanya sudah selesai dibagi ke seluruh masa pakai. Sebaliknya, aset dengan nilai buku tinggi bisa saja sudah rusak. Karena itu pencatatan kondisi fisik tetap perlu berjalan berdampingan dengan pencatatan nilai.',
+      ],
+    },
+    {
+      heading: 'Kenapa Pemilik Bisnis Perlu Peduli',
+      paragraphs: [
+        'Ada tiga alasan praktis:',
+        '1. Membaca laporan keuangan. Nilai buku dan total aset memengaruhi gambaran kesehatan bisnismu di mata bank, investor, maupun auditor.',
+        '2. Merencanakan penggantian. Dengan mengetahui sisa umur ekonomis, kamu bisa memperkirakan kapan aset perlu diganti dan menyiapkan anggarannya, bukan kaget di saat mesin tiba-tiba berhenti.',
+        '3. Menjaga keteraturan data. Kalau penyusutan dihitung konsisten, laporan aset bisa dipertanggungjawabkan kapan saja diminta.',
+      ],
+    },
+    {
+      heading: 'Kenapa Hitungan Manual di Spreadsheet Rawan Salah',
+      paragraphs: [
+        'Rumusnya sederhana, tapi di lapangan hitungannya cepat berantakan. Satu spreadsheet menampung ratusan aset dengan tanggal beli, umur, dan residu yang berbeda-beda. Beberapa kesalahan yang paling sering saya temui:',
+        '• Rumus bergeser atau tertimpa saat baris disisipkan.',
+        '• Aset yang sudah afkir masih terus dihitung penyusutannya.',
+        '• Perhitungan lupa diperbarui di akhir bulan.',
+        '• Umur ekonomis kategori yang sama diisi berbeda-beda oleh orang berbeda.',
+        'Sebagai mantan orang audit internal, saya sering melihat selisih nilai aset yang muncul bukan karena kecurangan, tapi karena rumus yang tidak konsisten. Dan selisih semacam itu memakan waktu lama untuk ditelusuri.',
+      ],
+    },
+    {
+      heading: 'Bagaimana Assets DEMO Mengotomatisasinya',
+      paragraphs: [
+        'Di Assets DEMO, nilai aset menyusut otomatis setiap bulan memakai metode garis lurus, jadi tidak ada yang perlu menghitung ulang di akhir bulan. Saat sebuah aset dinyatakan afkir (disposed), nilai bukunya otomatis dikunci ke nilai residu tanpa penyesuaian manual. Admin juga bisa memperbarui nilai buku seluruh inventaris sekaligus lewat satu tombol sinkronisasi massal.',
+        'Hasilnya, pimpinan bisa melihat ringkasan total nilai perolehan berdampingan dengan total nilai buku saat ini dalam hitungan detik, plus estimasi sisa usia produktif aset untuk membantu menyusun anggaran pengadaan berikutnya. Laporan PDF dan nilai buku siap disajikan kapan pun auditor atau direksi memintanya. Aturan hitungnya tetap satu, sehingga semua aset diperlakukan sama. Cara pemindaian label QR di aplikasi yang sama saya bahas di artikel \"Dari Scan Kamera ke Data Aset dalam 1 Detik: Cara Kerja QR/Barcode di Assets DEMO\", dan konteks penerapannya di perusahaan nyata ada di \"Cara Kerja Sistem Manajemen Aset PT Global Multiparts\".',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Refleksi',
+      paragraphs: [
+        'Depresiasi garis lurus pada dasarnya hanya pembagian rata: biaya aset dibagi ke seluruh masa pakainya. Begitu kamu memegang tiga angka tadi, kamu bisa memeriksa sendiri apakah nilai buku di laporanmu masuk akal.',
+        'Coba ambil satu aset dari daftar asetmu, hitung manual dengan rumus di atas, lalu bandingkan dengan angka di laporan. Kalau hasilnya berbeda, itu pertanda bagus untuk mulai bertanya, dan mungkin saatnya mengganti rumus spreadsheet dengan sistem yang menghitungnya secara konsisten.',
+        'Untuk melihat bagaimana nilai buku berjalan otomatis, kamu bisa mencoba Assets DEMO di assets.arzhaning.my.id dengan salah satu akun uji coba.',
+      ],
+    },
+  ],
 };

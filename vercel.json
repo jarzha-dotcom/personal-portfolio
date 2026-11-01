@@ -128,7 +128,49 @@
     },
     {
       "source": "/artikel",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "4"
+        }
+      ],
+      "destination": "/artikel/page/4/index.html"
+    },
+    {
+      "source": "/artikel",
+      "has": [
+        {
+          "type": "query",
+          "key": "page",
+          "value": "5"
+        }
+      ],
+      "destination": "/artikel/page/5/index.html"
+    },
+    {
+      "source": "/artikel",
       "destination": "/artikel/index.html"
+    },
+    {
+      "source": "/artikel/enkripsi-password-standar-militer-itu-apa",
+      "destination": "/artikel/enkripsi-password-standar-militer-itu-apa/index.html"
+    },
+    {
+      "source": "/artikel/depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan",
+      "destination": "/artikel/depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan/index.html"
+    },
+    {
+      "source": "/artikel/single-active-session-mencegah-akun-dibajak",
+      "destination": "/artikel/single-active-session-mencegah-akun-dibajak/index.html"
+    },
+    {
+      "source": "/artikel/membangun-aplikasi-100-persen-offline-rajendra-pintar",
+      "destination": "/artikel/membangun-aplikasi-100-persen-offline-rajendra-pintar/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah",
+      "destination": "/artikel/kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah/index.html"
     },
     {
       "source": "/artikel/kenapa-1-website-butuh-3-karakter-ai-berbeda",

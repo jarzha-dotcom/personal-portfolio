@@ -108,7 +108,7 @@ Mencegah terjadinya perdebatan atau permintaan fitur tambahan di luar kesepakata
 
 ### 8. 🛡️ Keamanan & Perlindungan Tingkat Tinggi
 - **Pemisahan Akses Ketat**: Ruang kerja admin terlindungi penuh, sementara portal klien hanya menampilkan proposal yang bersangkutan.
-- **Enkripsi Sandi Standar Militer (PBKDF2 SHA-256)**: Mengamankan akun admin dari segala bentuk pencurian data.
+- **Penyimpanan Sandi Aman (PBKDF2 SHA-256 + salt)**: Sandi akun admin tidak disimpan apa adanya, melainkan diolah satu arah (hash) dengan salt, sehingga jauh lebih sulit disalahgunakan bila data bocor.
 - **Sistem Anti Brute-Force**: Memblokir otomatis percobaan masuk yang mencurigakan secara berulang.
 
 ---
