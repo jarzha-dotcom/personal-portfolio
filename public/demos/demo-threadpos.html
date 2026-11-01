@@ -1466,6 +1466,288 @@
       border-color: #fecdd3;
       color: #be123c
     }
+
+    /* ===== FIX: panel kanan scroll satu kesatuan (desktop) + header mobile tidak melebar ===== */
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    .tp-menu-btn,
+    #tp-menu-panel,
+    #tp-menu-scrim {
+      display: none;
+    }
+
+    .tp-menu-lbl {
+      display: none;
+    }
+
+    @media (min-width: 1024px) {
+
+      /* Seluruh kartu kanan (header invoice, daftar item, tagihan, pembayaran) ikut scroll */
+      #tp-sec-cart {
+        align-self: stretch !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        overscroll-behavior: contain;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e1 transparent;
+      }
+
+      #tp-sec-cart::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      #tp-sec-cart::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 9999px;
+      }
+
+      #tp-sec-cart>* {
+        flex: none !important;
+      }
+
+      /* daftar item tidak punya scroll sendiri lagi */
+      #tp-sec-cart #cart-list-container {
+        overflow: visible !important;
+        max-height: none !important;
+        min-height: 140px;
+      }
+    }
+
+    @media (max-width: 1023px) {
+
+      html,
+      body {
+        max-width: 100%;
+        overflow-x: hidden !important;
+      }
+
+      main,
+      main>section {
+        min-width: 0;
+        max-width: 100vw;
+      }
+
+      /* Header 1 baris: brand + Ditahan + Scan + tombol Menu (sisanya masuk dropdown) */
+      header {
+        flex-wrap: nowrap !important;
+        gap: 8px !important;
+      }
+
+      header>div:first-child {
+        flex: 1 1 auto;
+        min-width: 0;
+        width: auto;
+      }
+
+      header>div:first-child>div {
+        min-width: 0;
+      }
+
+      header>div:first-child .text-xs.text-slate-400 {
+        display: none !important;
+      }
+
+      header>div:last-child {
+        display: flex !important;
+        flex: none;
+        width: auto;
+        gap: 6px !important;
+      }
+
+      header>div:last-child>button:nth-child(n+3):not(.tp-menu-btn) {
+        display: none !important;
+      }
+
+      header>div:last-child>button {
+        position: relative;
+        width: 42px;
+        height: 42px;
+        min-height: 0 !important;
+        padding: 0 !important;
+        justify-content: center;
+        gap: 0 !important;
+      }
+
+      header>div:last-child>button .tp-hbadge {
+        position: absolute;
+        top: -5px;
+        right: -4px;
+        min-width: 16px;
+        height: 16px;
+        font-size: 9px;
+        padding: 0 4px;
+      }
+
+      header>div:last-child>.tp-menu-btn {
+        display: flex;
+      }
+
+      header>div:last-child>.tp-menu-btn[aria-expanded="true"] {
+        background: #e11d48;
+        border-color: #e11d48;
+      }
+
+      /* Panel keranjang: satu scroll saja, tanpa scroll bersarang */
+      #tp-sec-cart>* {
+        flex: none;
+      }
+
+      #tp-sec-cart #cart-list-container {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      /* Bar bawah demo & tab: jangan lebih lebar dari layar */
+      #tp-mobtab button {
+        min-width: 0;
+        padding: 0 4px;
+      }
+
+      #tp-mobtab .tp-tb-t {
+        white-space: nowrap;
+      }
+    }
+
+    /* ===== Dropdown Menu: aktif di <1440px (mobile, tablet, laptop kecil) ===== */
+    @media (max-width: 1439px) {
+
+      /* Dropdown menu */
+      #tp-menu-scrim.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 48;
+        background: rgba(2, 6, 23, .45);
+      }
+
+      #tp-menu-panel.open {
+        display: block;
+      }
+
+      #tp-menu-panel {
+        position: fixed;
+        left: 8px;
+        right: 8px;
+        max-width: 380px;
+        margin-left: auto;
+        z-index: 49;
+        max-height: calc(100dvh - 190px);
+        overflow-y: auto;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 16px;
+        box-shadow: 0 24px 48px -12px rgba(0, 0, 0, .6);
+        padding: 6px;
+        animation: tpPopIn .18s cubic-bezier(.2, .8, .2, 1);
+      }
+
+      #tp-menu-panel .tp-mn-user {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px 8px;
+        font-size: 12px;
+        color: #94a3b8;
+      }
+
+      #tp-menu-panel .tp-mn-user b {
+        color: #34d399;
+        font-weight: 600;
+      }
+
+      #tp-menu-panel .tp-mn-grp {
+        padding: 10px 12px 4px;
+        font: 700 10px 'Plus Jakarta Sans', sans-serif;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        color: #64748b;
+      }
+
+      #tp-menu-panel .tp-mn-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 11px 12px;
+        border: 0;
+        border-radius: 10px;
+        background: transparent;
+        color: #e2e8f0;
+        font: 600 14px 'Plus Jakarta Sans', sans-serif;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      #tp-menu-panel .tp-mn-item:hover,
+      #tp-menu-panel .tp-mn-item:active {
+        background: #1e293b;
+      }
+
+      #tp-menu-panel .tp-mn-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 15px;
+      }
+
+      #tp-menu-panel .tp-mn-item small {
+        margin-left: auto;
+        font: 500 11px 'JetBrains Mono', monospace;
+        color: #64748b;
+      }
+
+      #tp-menu-panel .tp-mn-item.danger {
+        color: #fda4af;
+      }
+
+
+      header>div:last-child>.tp-menu-btn {
+        display: flex;
+      }
+
+      header>div:last-child>.tp-menu-btn[aria-expanded="true"] {
+        background: #e11d48;
+        border-color: #e11d48;
+      }
+    }
+
+    @media (min-width: 1024px) and (max-width: 1439px) {
+
+      /* tampilkan hanya Ditahan + Scan + Menu; sisanya di dropdown */
+      header>div:last-child>button:nth-child(n+3):not(.tp-menu-btn) {
+        display: none !important;
+      }
+
+      header>div:last-child>button:nth-child(2) span {
+        display: inline !important;
+      }
+
+      .tp-menu-btn {
+        gap: 8px;
+      }
+
+      .tp-menu-lbl {
+        display: inline;
+      }
+
+      #tp-menu-panel {
+        left: auto;
+        right: 12px;
+        width: 340px;
+        max-width: calc(100vw - 24px);
+        margin-left: 0;
+        max-height: calc(100dvh - 140px);
+      }
+
+      #tp-menu-scrim.open {
+        background: transparent;
+      }
+    }
   </style>
 </head>
 
@@ -1759,8 +2041,39 @@
         <i class="fa-solid fa-chart-pie text-xs"></i>
         <span class="hidden md:inline">Riwayat Shift</span>
       </button>
+
+      <!-- Menu (dropdown) - hanya tampil di mobile/tablet -->
+      <button type="button" id="tp-menu-btn" class="tp-menu-btn rp-hbtn" aria-label="Menu lainnya" aria-haspopup="true"
+        aria-expanded="false" aria-controls="tp-menu-panel" onclick="tpMenu()"><i class="fa-solid fa-bars"
+          style="color:#f1f5f9"></i><span class="tp-menu-lbl">Menu</span></button>
     </div>
   </header>
+
+  <!-- Dropdown menu mobile -->
+  <div id="tp-menu-scrim" onclick="tpMenu(false)"></div>
+  <div id="tp-menu-panel" role="menu" aria-label="Menu kasir">
+    <div class="tp-mn-user"><i class="fa-solid fa-store"></i><span>Grand Indonesia &middot; <b>Kasir: Zannah
+          Jagad</b></span></div>
+
+    <div class="tp-mn-grp">Transaksi</div>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);openModal('return-modal');playAudio('click')"><i
+        class="fa-solid fa-rotate-left" style="color:#fbbf24"></i>Retur Barang</button>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);openCashDrawer()"><i
+        class="fa-solid fa-cash-register" style="color:#34d399"></i>Buka Laci Kasir</button>
+
+    <div class="tp-mn-grp">Manajemen</div>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);openModal('stock-modal');playAudio('click')"><i
+        class="fa-solid fa-boxes-stacked" style="color:#fbbf24"></i>Manajemen Stok<small>F3</small></button>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);openModal('report-modal');playAudio('click')"><i
+        class="fa-solid fa-chart-line" style="color:#38bdf8"></i>Laporan Penjualan<small>F4</small></button>
+    <button class="tp-mn-item danger" role="menuitem"
+      onclick="tpMenu(false);openModal('shift-modal');playAudio('click')"><i class="fa-solid fa-chart-pie"></i>Riwayat
+      Shift &amp; Tutup Kasir</button>
+
+    <div class="tp-mn-grp">Tampilan</div>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);tpToggleDark()"><i
+        class="fa-solid fa-circle-half-stroke" style="color:#cbd5e1"></i>Mode Gelap / Terang</button>
+  </div>
 
   <!-- ======================================================== -->
   <!-- 2. MAIN WORKSPACE (2-COLUMN POS LAYOUT)                   -->
@@ -1902,6 +2215,8 @@
             <span id="subtotal-val" class="font-mono font-semibold text-slate-800">Rp 0</span>
           </div>
 
+          <div id="promo-rows" class="space-y-1.5"></div>
+
           <div id="discount-row" class="flex justify-between text-emerald-600 font-medium">
             <span class="flex items-center gap-1">
               <i class="fa-solid fa-circle-check text-[10px]"></i>
@@ -1942,23 +2257,29 @@
           <label class="text-[11px] font-semibold text-slate-500 block mb-1.5">
             Metode Pembayaran:
           </label>
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-4 gap-1.5">
             <button type="button" onclick="setPaymentMethod('cash')" id="pay-btn-cash"
               class="pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-rose-50 border-rose-500 text-rose-700 shadow-xs">
               <i class="fa-solid fa-money-bill-wave text-sm"></i>
-              <span>Tunai (Cash)</span>
+              <span>Tunai</span>
             </button>
 
             <button type="button" onclick="setPaymentMethod('edc')" id="pay-btn-edc"
               class="pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600">
               <i class="fa-solid fa-credit-card text-sm"></i>
-              <span>EDC / Kartu</span>
+              <span>Kartu</span>
             </button>
 
             <button type="button" onclick="setPaymentMethod('qris')" id="pay-btn-qris"
               class="pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600">
               <i class="fa-solid fa-qrcode text-sm"></i>
-              <span>QRIS Instant</span>
+              <span>QRIS</span>
+            </button>
+
+            <button type="button" onclick="setPaymentMethod('split')" id="pay-btn-split"
+              class="pay-method-btn py-2 px-2 rounded-xl text-xs font-bold border transition-all flex flex-col items-center gap-1 cursor-pointer bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-600">
+              <i class="fa-solid fa-code-branch text-sm"></i>
+              <span>Split</span>
             </button>
           </div>
         </div>
@@ -2008,6 +2329,28 @@
             <span class="font-bold text-slate-900 block">Mesin EDC Siap</span>
             <span class="text-slate-500 text-[11px]">BCA / Mandiri / BRI / Contactless Tap didukung.</span>
           </div>
+        </div>
+
+        <!-- Split Payment Panel -->
+        <div id="split-panel" style="display:none" class="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-xs">
+          <div class="text-[11px] text-slate-500 mb-2">Bagi tagihan ke beberapa metode. Isi nominal tiap metode, atau
+            tekan <b>Sisa</b>.</div>
+          <div class="tp-srow"><span class="tp-slbl"><i class="fa-solid fa-money-bill-wave"
+                style="color:#10b981"></i>Tunai</span><span class="tp-srp">Rp</span><input id="split-in-cash"
+              class="tp-split-in" type="number" inputmode="numeric" min="0" placeholder="0"
+              oninput="tpSplitInput('cash',this.value)"><button type="button" class="tp-sfill"
+              onclick="tpSplitFill('cash')">Sisa</button></div>
+          <div class="tp-srow"><span class="tp-slbl"><i class="fa-solid fa-credit-card"
+                style="color:#3b82f6"></i>Kartu</span><span class="tp-srp">Rp</span><input id="split-in-edc"
+              class="tp-split-in" type="number" inputmode="numeric" min="0" placeholder="0"
+              oninput="tpSplitInput('edc',this.value)"><button type="button" class="tp-sfill"
+              onclick="tpSplitFill('edc')">Sisa</button></div>
+          <div class="tp-srow"><span class="tp-slbl"><i class="fa-solid fa-qrcode"
+                style="color:#a855f7"></i>QRIS</span><span class="tp-srp">Rp</span><input id="split-in-qris"
+              class="tp-split-in" type="number" inputmode="numeric" min="0" placeholder="0"
+              oninput="tpSplitInput('qris',this.value)"><button type="button" class="tp-sfill"
+              onclick="tpSplitFill('qris')">Sisa</button></div>
+          <div id="split-summary" class="tp-ssum"></div>
         </div>
 
         <!-- Giant Action Button: PROSES PEMBAYARAN & CETAK STRUK -->
@@ -2140,6 +2483,20 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Kirim struk digital -->
+      <div id="rcpt-wa" class="px-4 pt-3 pb-3 bg-white border-t border-slate-200 no-print">
+        <label for="wa-phone" class="text-[11px] font-semibold text-slate-500 block mb-1.5"><i
+            class="fa-brands fa-whatsapp" style="color:#22c55e"></i> Kirim struk digital</label>
+        <div class="flex gap-2">
+          <input id="wa-phone" type="tel" inputmode="tel" autocomplete="off" placeholder="No. WhatsApp (08xxxxxxxxxx)"
+            class="tp-wa-in" onkeydown="if(event.key==='Enter')tpSendWA()">
+          <button type="button" onclick="tpSendWA()" class="tp-wa-btn"><i
+              class="fa-brands fa-whatsapp"></i><span>Kirim</span></button>
+          <button type="button" onclick="tpCopyReceipt()" class="tp-wa-copy" title="Salin teks struk"
+            aria-label="Salin teks struk"><i class="fa-regular fa-copy"></i></button>
         </div>
       </div>
 
@@ -3276,6 +3633,23 @@
       renderCart();
       initScannerList();
     });
+  </script>
+  <script>
+    function tpMenu(open) {
+      var p = document.getElementById('tp-menu-panel'), sc = document.getElementById('tp-menu-scrim'),
+        b = document.getElementById('tp-menu-btn');
+      if (!p) return;
+      if (open === undefined) open = !p.classList.contains('open');
+      if (open) {
+        var h = document.querySelector('header');
+        p.style.top = (h.getBoundingClientRect().bottom + 6) + 'px';
+      }
+      p.classList.toggle('open', open);
+      sc.classList.toggle('open', open);
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+    }
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') tpMenu(false); });
+    window.matchMedia('(min-width:1440px)').addEventListener('change', function (e) { if (e.matches) tpMenu(false); });
   </script>
   <nav id="tp-mobtab" aria-label="Navigasi kasir">
     <button type="button" id="tp-tab-produk" class="on" onclick="tpTab('produk')"><i
@@ -4616,6 +4990,680 @@
       };
       try { if (localStorage.getItem(K) === 'dark') h.classList.add('tp-dark'); } catch (e) { }
     })();
+  </script>
+
+  <style>
+    /* ===== Fitur baru: split bayar, promo, struk WhatsApp, dashboard ===== */
+    .tp-srow {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .tp-slbl {
+      width: 74px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: #475569;
+      flex: none;
+    }
+
+    .tp-srp {
+      color: #94a3b8;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tp-split-in {
+      flex: 1;
+      min-width: 0;
+      text-align: right;
+      background: #fff;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font: 700 12px 'JetBrains Mono', monospace;
+      color: #0f172a;
+    }
+
+    .tp-split-in:focus {
+      outline: none;
+      border-color: #f43f5e;
+    }
+
+    .tp-sfill {
+      flex: none;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      border-radius: 6px;
+      padding: 5px 8px;
+      font: 700 10.5px 'Plus Jakarta Sans', sans-serif;
+      color: #be123c;
+      cursor: pointer;
+    }
+
+    .tp-sfill:hover {
+      background: #fff1f2;
+      border-color: #fda4af;
+    }
+
+    .tp-ssum {
+      margin-top: 4px;
+      padding-top: 8px;
+      border-top: 1px solid #e2e8f0;
+      display: grid;
+      gap: 4px;
+    }
+
+    .tp-ssum>div {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .tp-ssum .ok {
+      color: #059669;
+      font-weight: 700;
+    }
+
+    .tp-ssum .bad {
+      color: #e11d48;
+      font-weight: 700;
+    }
+
+    .tp-promo {
+      display: flex;
+      justify-content: space-between;
+      color: #b45309;
+      font-weight: 500;
+    }
+
+    .tp-hint {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #fffbeb;
+      border: 1px dashed #fcd34d;
+      color: #92400e;
+      font-size: 11px;
+      line-height: 1.35;
+    }
+
+    .tp-hint i {
+      margin-top: 2px;
+    }
+
+    .tp-wa-in {
+      flex: 1;
+      min-width: 0;
+      padding: 9px 11px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      font: 600 12.5px 'JetBrains Mono', monospace;
+      background: #f8fafc;
+    }
+
+    .tp-wa-in:focus {
+      outline: none;
+      border-color: #22c55e;
+      background: #fff;
+    }
+
+    .tp-wa-btn {
+      flex: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 14px;
+      border: 0;
+      border-radius: 10px;
+      background: #22c55e;
+      color: #fff;
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .tp-wa-btn:hover {
+      background: #16a34a;
+    }
+
+    .tp-wa-copy {
+      flex: none;
+      width: 40px;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: #fff;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .tp-wa-copy:hover {
+      background: #f1f5f9;
+    }
+
+    @media (max-width: 1023px) {
+
+      .tp-split-in,
+      .tp-wa-in {
+        font-size: 16px;
+      }
+    }
+
+    /* dashboard laporan */
+    #report-modal .tp-modal {
+      max-width: 880px;
+    }
+
+    .rp-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 680px) {
+      .rp-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .rp-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+      min-width: 0;
+    }
+
+    .rp-card .rp-h {
+      margin-top: 0;
+    }
+
+    .rp-card svg {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    .rp-note {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    .rp-note b {
+      color: #0f172a;
+    }
+
+    .rp-donut {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .rp-donut svg {
+      width: 128px;
+      flex: none;
+    }
+
+    .rp-leg {
+      flex: 1;
+      min-width: 130px;
+      display: grid;
+      gap: 6px;
+      font-size: 11.5px;
+    }
+
+    .rp-leg div {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .rp-leg i {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex: none;
+    }
+
+    .rp-leg span {
+      flex: 1;
+      color: #334155;
+    }
+
+    .rp-leg b {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: #0f172a;
+    }
+
+    .rp-leg em {
+      font-style: normal;
+      color: #94a3b8;
+      font-size: 10.5px;
+      min-width: 32px;
+      text-align: right;
+    }
+
+    .rp-stack {
+      display: flex;
+      height: 14px;
+      border-radius: 99px;
+      overflow: hidden;
+      background: #f1f5f9;
+      margin: 8px 0 10px;
+    }
+
+    html.tp-dark .rp-card {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    html.tp-dark .rp-leg span,
+    html.tp-dark .rp-note b,
+    html.tp-dark .rp-leg b {
+      color: #e2e8f0;
+    }
+
+    html.tp-dark .tp-split-in,
+    html.tp-dark .tp-wa-in {
+      background: #0f172a;
+      color: #e2e8f0;
+      border-color: #334155;
+    }
+  </style>
+
+  <script>
+    /* =====================================================================
+       FITUR BARU: PROMO OTOMATIS · SPLIT PAYMENT · STRUK WHATSAPP · DASHBOARD
+       ===================================================================== */
+    const tpSum = (a, f) => a.reduce((x, y) => x + f(y), 0);
+    const tpShort = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',').replace(',0', '') + ' jt' : v >= 1e3 ? Math.round(v / 1e3) + ' rb' : String(Math.round(v));
+    const tpPayMap = t => t.pay || { [t.method]: t.total };
+
+    /* ---------- 1. PROMO OTOMATIS ---------- */
+    const TP_LOOK_DISC = 50000;
+    function tpQtyBy(items, cat) { const l = items.filter(i => i.product.category === cat); return { qty: tpSum(l, i => i.qty), val: tpSum(l, i => i.qty * i.price), list: l }; }
+    function tpPromos(items) {
+      const sh = tpQtyBy(items, 'shirts'), pa = tpQtyBy(items, 'pants'), ac = tpQtyBy(items, 'accessories');
+      const out = [];
+      const bundles = Math.min(sh.qty, pa.qty);
+      if (bundles > 0) out.push({ id: 'LOOK', name: 'Paket Look ×' + bundles, amt: bundles * TP_LOOK_DISC });
+      const rem = sh.qty - bundles;
+      if (rem >= 2) out.push({ id: 'B2S', name: 'Promo 2 Atasan -10%', amt: Math.round(sh.val * (rem / sh.qty) * 0.10) });
+      if (ac.qty >= 2) {
+        const u = []; ac.list.forEach(i => { for (let k = 0; k < i.qty; k++) u.push(i.price); });
+        u.sort((a, b) => b - a);
+        let free = 0; for (let k = 1; k < u.length; k += 2) free += u[k];
+        out.push({ id: 'ACC', name: 'Promo Aksesori (1 Gratis)', amt: free });
+      }
+      return out;
+    }
+    function tpPromoHints(items) {
+      if (!items.length) return [];
+      const sh = tpQtyBy(items, 'shirts').qty, pa = tpQtyBy(items, 'pants').qty, ac = tpQtyBy(items, 'accessories').qty, h = [];
+      if (sh > pa) h.push('Tambah <b>1 celana / jeans</b> → <b>Paket Look</b> hemat ' + formatRupiah(TP_LOOK_DISC));
+      else if (pa > sh) h.push('Tambah <b>1 kaos / kemeja</b> → <b>Paket Look</b> hemat ' + formatRupiah(TP_LOOK_DISC));
+      if (sh - Math.min(sh, pa) === 1) h.push('Tambah <b>1 atasan lagi</b> → diskon <b>10%</b> untuk atasan');
+      if (ac === 1) h.push('Tambah <b>1 aksesori lagi</b> → yang termurah <b>GRATIS</b>');
+      return h.slice(0, 2);
+    }
+    tpCalc = function (items, rate, code) {
+      const subtotal = tpSum(items, i => i.price * i.qty);
+      const promos = tpPromos(items);
+      const promoDisc = Math.min(subtotal, tpSum(promos, p => p.amt));
+      const base = subtotal - promoDisc;
+      const memberDisc = Math.round(base * rate);
+      const after = base - memberDisc;
+      const v = TP_VOUCHERS[code];
+      let voucherDisc = 0, note = '';
+      if (v) {
+        if (after >= v.min) voucherDisc = v.type === 'pct' ? Math.min(Math.round(after * v.value / 100), v.max) : Math.min(v.value, after);
+        else note = 'Voucher belum berlaku: min. belanja ' + formatRupiah(v.min) + ' (setelah diskon).';
+      }
+      const taxable = after - voucherDisc;
+      const tax = Math.round(taxable * 0.11);
+      return { subtotal, promos, promoDisc, memberDisc, voucherDisc, voucherNote: note, tax, total: taxable + tax };
+    };
+
+    /* ---------- 2. SPLIT PAYMENT ---------- */
+    let tpSplit = { cash: 0, edc: 0, qris: 0 }, tpSplitCtx = null, tpSplitAdv = false, tpSplitPending = null, tpSplitLastTotal = -1;
+    function tpSplitCalc() {
+      const total = currentGrandTotal, nonCash = tpSplit.edc + tpSplit.qris, paid = tpSplit.cash + nonCash;
+      const n = [tpSplit.cash, tpSplit.edc, tpSplit.qris].filter(v => v > 0).length;
+      let err = '';
+      if (total <= 0) err = 'Keranjang masih kosong.';
+      else if (n < 2) err = 'Isi nominal minimal 2 metode.';
+      else if (nonCash > total) err = 'Kartu + QRIS melebihi total tagihan.';
+      else if (paid < total) err = 'Kurang ' + formatRupiah(total - paid);
+      return { total, paid, nonCash, change: Math.max(0, paid - total), cashNet: Math.max(0, total - nonCash), ok: !err, err };
+    }
+    function tpSplitRender() {
+      const box = tp$('split-summary'); if (!box) return;
+      const c = tpSplitCalc();
+      box.innerHTML = '<div><span>Total tagihan</span><b style="font-family:\'JetBrains Mono\',monospace">' + formatRupiah(c.total) + '</b></div>' +
+        '<div><span>Terbayar</span><b style="font-family:\'JetBrains Mono\',monospace">' + formatRupiah(c.paid) + '</b></div>' +
+        (c.ok ? '<div class="ok"><span>Kembalian</span><span style="font-family:\'JetBrains Mono\',monospace">' + formatRupiah(c.change) + '</span></div>'
+          : '<div class="bad"><span>' + (c.paid < c.total && c.paid > 0 && c.err.indexOf('Kurang') === 0 ? 'Kekurangan' : 'Perhatian') + '</span><span>' + (c.err.indexOf('Kurang ') === 0 ? c.err.slice(7) : c.err) + '</span></div>');
+    }
+    function tpSplitInput(k, v) { tpSplit[k] = Math.max(0, Math.round(Number(v) || 0)); tpSplitRender(); tpRefreshCheckout(); }
+    function tpSplitFill(k) {
+      playAudio('click');
+      const others = ['cash', 'edc', 'qris'].filter(x => x !== k).reduce((a, x) => a + tpSplit[x], 0);
+      tpSplit[k] = Math.max(0, currentGrandTotal - others);
+      const el = tp$('split-in-' + k); if (el) el.value = tpSplit[k] || '';
+      tpSplitRender(); tpRefreshCheckout();
+    }
+    function tpSplitReset() {
+      tpSplit = { cash: 0, edc: 0, qris: 0 };
+      ['cash', 'edc', 'qris'].forEach(k => { const el = tp$('split-in-' + k); if (el) el.value = ''; });
+      tpSplitRender();
+    }
+
+    const _tpSetPay = setPaymentMethod;
+    setPaymentMethod = function (m) {
+      _tpSetPay(m);
+      tp$('split-panel').style.display = m === 'split' ? 'block' : 'none';
+      if (m === 'split') tpSplitRender();
+      tpRefreshCheckout();
+    };
+
+    tpRefreshCheckout = function () {
+      const btn = tp$('checkout-btn'); if (!btn) return;
+      const payOk = paymentMethod === 'cash' ? cashTendered >= currentGrandTotal : paymentMethod === 'split' ? tpSplitCalc().ok : true;
+      const ok = cart.length > 0 && tpShift.open && payOk;
+      btn.disabled = !ok;
+      btn.className = ok
+        ? 'w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2.5 shadow-md cursor-pointer bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white shadow-rose-600/30 hover:shadow-lg'
+        : 'w-full py-3.5 px-4 rounded-xl font-bold text-sm transition-all duration-200 flex items-center justify-center gap-2.5 bg-slate-300 text-slate-500 cursor-not-allowed shadow-none';
+    };
+
+    const _tpProcess = processPayment;
+    processPayment = function () {
+      if (paymentMethod !== 'split') return _tpProcess();
+      if (!tpShiftGuard()) return;
+      if (cart.length === 0) { showToast('Keranjang belanja masih kosong.', 'warn'); return; }
+      const bad = cart.find(i => i.qty > tpStock(i.product.id, i.color.name, i.size));
+      if (bad) { showToast('Stok ' + bad.product.name + ' (' + bad.color.name + '/' + bad.size + ') tidak mencukupi.', 'error'); return; }
+      const c = tpSplitCalc();
+      if (!c.ok) { showToast(c.err, 'error'); return; }
+      tpSplitCtx = { parts: { cash: c.cashNet, edc: tpSplit.edc, qris: tpSplit.qris }, tendered: tpSplit.cash, refs: {}, labels: {}, queue: [] };
+      if (tpSplit.qris > 0) tpSplitCtx.queue.push('qris');
+      if (tpSplit.edc > 0) tpSplitCtx.queue.push('edc');
+      tpSplitNext();
+    };
+    function tpSplitNext() {
+      const ctx = tpSplitCtx; if (!ctx) return;
+      const k = ctx.queue.shift();
+      if (k === 'qris') tpOpenQris();
+      else if (k === 'edc') tpOpenEdc();
+      else { tpSplitCtx = null; tpCommit('split', { ctx }); }
+    }
+    function tpSplitLabel(modalId, text) { const sp = document.querySelector('#' + modalId + ' .tp-total span'); if (sp) sp.textContent = text; }
+
+    const _tpOQ = tpOpenQris;
+    tpOpenQris = function () {
+      _tpOQ();
+      if (tpSplitCtx) { tp$('qris-amount').textContent = formatRupiah(tpSplitCtx.parts.qris); tp$('qris-box').innerHTML = tpBuildQR(tpSplitCtx.parts.qris); tpSplitLabel('qris-modal', 'Bagian QRIS (split)'); }
+      else tpSplitLabel('qris-modal', 'Total Dibayar');
+    };
+    const _tpOE = tpOpenEdc;
+    tpOpenEdc = function () {
+      _tpOE();
+      if (tpSplitCtx) { tp$('edc-amount').textContent = formatRupiah(tpSplitCtx.parts.edc); tpSplitLabel('edc-modal', 'Bagian Kartu (split)'); }
+      else tpSplitLabel('edc-modal', 'Total Dibayar');
+    };
+    const _tpCQ = tpCloseQris;
+    tpCloseQris = function () { _tpCQ(); if (tpSplitCtx && !tpSplitAdv) { tpSplitCtx = null; showToast('Pembayaran split dibatalkan.', 'warn'); } };
+    const _tpCE = tpCloseEdc;
+    tpCloseEdc = function () { _tpCE(); if (tpSplitCtx && !tpSplitAdv) { tpSplitCtx = null; showToast('Pembayaran split dibatalkan.', 'warn'); } };
+    const _tpConfQ = tpConfirmQris;
+    tpConfirmQris = function () {
+      if (!tpSplitCtx) return _tpConfQ();
+      const ctx = tpSplitCtx; ctx.refs.qris = 'QR' + String(Date.now()).slice(-8);
+      tpSplitAdv = true; tpCloseQris(); tpSplitAdv = false; tpSplitNext();
+    };
+    const _tpConfE = tpConfirmEdc;
+    tpConfirmEdc = function () {
+      if (!tpSplitCtx) return _tpConfE();
+      const ctx = tpSplitCtx, bank = tp$('edc-bank').value;
+      ctx.refs.edc = String(Math.floor(100000 + Math.random() * 900000));
+      ctx.labels.edc = 'KARTU ' + (tpEdcType === 'debit' ? 'DEBIT ' : 'KREDIT ') + bank.toUpperCase();
+      tpSplitAdv = true; tpCloseEdc(); tpSplitAdv = false; tpSplitNext();
+    };
+
+    const _tpMake = tpMakeTrx;
+    tpMakeTrx = function (items, o) {
+      const t = _tpMake(items, o), c = tpCalc(items, o.rate, o.voucher);
+      t.promoDisc = c.promoDisc || 0; t.promos = c.promos || [];
+      if (o.method === 'split' && tpSplitPending) {
+        const x = tpSplitPending, nm = [];
+        if (x.parts.cash > 0) nm.push('TUNAI'); if (x.parts.edc > 0) nm.push('KARTU'); if (x.parts.qris > 0) nm.push('QRIS');
+        t.method = 'split'; t.methodLabel = 'SPLIT · ' + nm.join(' + ');
+        t.pay = { cash: x.parts.cash, edc: x.parts.edc, qris: x.parts.qris };
+        t.tendered = x.tendered; t.change = Math.max(0, x.tendered + x.parts.edc + x.parts.qris - t.total);
+        t.splitInfo = { edcRef: x.refs.edc || null, edcLabel: x.labels.edc || null, qrisRef: x.refs.qris || null };
+        t.ref = null;
+      } else t.pay = { [t.method]: t.total };
+      return t;
+    };
+    const _tpCommit = tpCommit;
+    tpCommit = function (method, extra) {
+      if (method !== 'split') return _tpCommit(method, extra);
+      const prev = cashTendered; cashTendered = extra.ctx.tendered; tpSplitPending = extra.ctx;
+      try { _tpCommit('split', { label: 'SPLIT', ref: null }); } finally { cashTendered = prev; tpSplitPending = null; }
+    };
+
+    /* refund pada transaksi split dibagi sesuai porsi metode asal */
+    function tpRefundParts(r) {
+      if (r.method !== 'split') return { [r.method]: r.amount };
+      const t = tpTrx.find(x => x.no === r.trxNo); if (!t || !t.pay) return { cash: r.amount };
+      const out = { cash: 0, edc: 0, qris: 0 }; let used = 0;
+      ['edc', 'qris'].forEach(k => { out[k] = Math.round(r.amount * (t.pay[k] || 0) / t.total); used += out[k]; });
+      out.cash = r.amount - used; return out;
+    }
+    tpShiftStats = function () {
+      const s = { count: 0, voided: 0, subtotal: 0, memberDisc: 0, voucherDisc: 0, promoDisc: 0, tax: 0, cash: 0, qris: 0, edc: 0, items: 0, refunds: 0, refundCash: 0, exchanges: 0 };
+      tpTrx.filter(t => t.shiftNo === tpShift.number).forEach(t => {
+        if (t.voided) { s.voided++; return; }
+        s.count++; s.subtotal += t.subtotal; s.memberDisc += t.memberDisc; s.voucherDisc += t.voucherDisc; s.promoDisc += (t.promoDisc || 0); s.tax += t.tax;
+        const pm = tpPayMap(t); Object.keys(pm).forEach(k => { s[k] = (s[k] || 0) + pm[k]; });
+        s.items += t.items.reduce((a, i) => a + i.qty, 0);
+      });
+      tpReturns.filter(r => r.shiftNo === tpShift.number).forEach(r => {
+        if (r.mode === 'refund') { const pr = tpRefundParts(r); Object.keys(pr).forEach(k => { s[k] -= pr[k]; }); s.refunds += r.amount; s.refundCash += (pr.cash || 0); }
+        else s.exchanges++;
+      });
+      s.sales = s.cash + s.qris + s.edc;
+      s.expectedCash = tpShift.openingCash + s.cash;
+      return s;
+    };
+
+    /* ---------- tampilan keranjang: baris promo + petunjuk ---------- */
+    const _tpRenderCart = renderCart;
+    renderCart = function () {
+      _tpRenderCart();
+      const c = tpCalc(cart, memberDiscountRate, tpVoucher);
+      const pr = tp$('promo-rows');
+      if (pr) pr.innerHTML = c.promos.map(p => '<div class="tp-promo"><span class="flex items-center gap-1"><i class="fa-solid fa-tags text-[10px]"></i><span>' + tpEsc(p.name) + '</span></span><span class="font-mono font-bold">- ' + formatRupiah(p.amt) + '</span></div>').join('');
+      const hints = tpPromoHints(cart), box = tp$('cart-list-container');
+      if (hints.length && box) box.insertAdjacentHTML('afterbegin', hints.map(h => '<div class="tp-hint"><i class="fa-solid fa-wand-magic-sparkles"></i><span>' + h + '</span></div>').join(''));
+      if (c.total !== tpSplitLastTotal) { tpSplitLastTotal = c.total; tpSplitReset(); }
+      else tpSplitRender();
+      tpRefreshCheckout();
+    };
+    const _tpResetOrder = tpResetOrder;
+    tpResetOrder = function () {
+      _tpResetOrder(); tpSplitCtx = null; tpSplitLastTotal = -1; tpSplitReset();
+      const w = tp$('wa-phone'); if (w) w.value = '';
+    };
+
+    /* ---------- struk: promo + rincian split ---------- */
+    let tpCurTrx = null;
+    const _tpRenderReceipt = tpRenderReceipt;
+    tpRenderReceipt = function (trx) {
+      _tpRenderReceipt(trx); tpCurTrx = trx;
+      let pr = tp$('rcpt-promo-rows');
+      if (!pr) { const ref = tp$('rcpt-discount-row'); pr = document.createElement('div'); pr.id = 'rcpt-promo-rows'; ref.parentNode.insertBefore(pr, ref); }
+      const pl = trx.promos || [];
+      pr.style.display = pl.length ? 'flex' : 'none'; pr.style.flexDirection = 'column'; pr.style.gap = '4px';
+      pr.innerHTML = pl.map(p => '<div class="flex justify-between gap-3"><span>' + tpEsc(p.name) + '</span><span class="whitespace-nowrap">- ' + formatRupiah(p.amt) + '</span></div>').join('');
+      const tl = tp$('rcpt-tendered-label').parentElement, chg = tp$('rcpt-change-row');
+      let sp = tp$('rcpt-split-rows');
+      if (!sp) { sp = document.createElement('div'); sp.id = 'rcpt-split-rows'; sp.className = 'space-y-1'; chg.parentNode.insertBefore(sp, chg.nextSibling); }
+      if (trx.method === 'split') {
+        const i = trx.splitInfo || {}, r = (a, b) => '<div class="flex justify-between"><span>' + a + '</span><span>' + b + '</span></div>';
+        tl.style.display = 'none'; chg.style.display = 'none'; sp.style.display = 'block';
+        sp.innerHTML = (trx.pay.cash > 0 ? r('Tunai', formatRupiah(trx.pay.cash)) : '') +
+          (trx.pay.edc > 0 ? r(tpEsc(i.edcLabel || 'Kartu'), formatRupiah(trx.pay.edc)) + '<div class="text-[10px] text-slate-500">Approval: ' + tpEsc(i.edcRef || '-') + '</div>' : '') +
+          (trx.pay.qris > 0 ? r('QRIS', formatRupiah(trx.pay.qris)) + '<div class="text-[10px] text-slate-500">Ref: ' + tpEsc(i.qrisRef || '-') + '</div>' : '') +
+          (trx.pay.cash > 0 ? r('Tunai Diterima', formatRupiah(trx.tendered)) + r('<b>Kembalian</b>', '<b>' + formatRupiah(trx.change) + '</b>') : '');
+        tp$('rcpt-payment-type').innerText = 'SPLIT';
+      } else { tl.style.display = ''; sp.style.display = 'none'; sp.innerHTML = ''; }
+    };
+
+    /* ---------- 3. STRUK WHATSAPP ---------- */
+    function tpWaText(t) {
+      const R = formatRupiah, L = [];
+      L.push('*THREADPOS · Grand Indonesia*', 'Struk ' + t.no, tpDMY(t.ts) + ' ' + tpHM(t.ts) + ' WIB', 'Kasir: Zannah Jagad', 'Pelanggan: ' + t.customer + ' (' + t.tierName + ')', '');
+      t.items.forEach(i => { L.push(i.name, '  ' + i.colorName + ' / ' + i.size + ' · ' + i.qty + ' x ' + R(i.price) + ' = ' + R(i.qty * i.price)); });
+      L.push('', 'Subtotal: ' + R(t.subtotal));
+      (t.promos || []).forEach(p => L.push('Promo ' + p.name + ': -' + R(p.amt)));
+      if (t.memberDisc > 0) L.push('Diskon Member (' + Math.round(t.rate * 100) + '%): -' + R(t.memberDisc));
+      if (t.voucherDisc > 0) L.push('Voucher ' + t.voucherCode + ': -' + R(t.voucherDisc));
+      L.push('PPN 11%: ' + R(t.tax), '*TOTAL: ' + R(t.total) + '*', '');
+      if (t.method === 'split') {
+        L.push('Bayar (split):');
+        if (t.pay.cash > 0) L.push('  • Tunai ' + R(t.pay.cash));
+        if (t.pay.edc > 0) L.push('  • ' + ((t.splitInfo && t.splitInfo.edcLabel) || 'Kartu') + ' ' + R(t.pay.edc));
+        if (t.pay.qris > 0) L.push('  • QRIS ' + R(t.pay.qris));
+        if (t.pay.cash > 0 && t.change > 0) L.push('Kembalian: ' + R(t.change));
+      } else {
+        L.push('Bayar: ' + t.methodLabel);
+        if (t.method === 'cash') L.push('Tunai diterima: ' + R(t.tendered), 'Kembalian: ' + R(t.change));
+      }
+      L.push('', 'Terima kasih sudah berbelanja! 🛍️', 'Tukar barang maks. 7 hari dengan struk & hangtag utuh.');
+      return L.join('\n');
+    }
+    function tpNormPhone(v) {
+      let d = String(v || '').replace(/\D/g, '');
+      if (!d) return '';
+      if (d.startsWith('0')) d = '62' + d.slice(1);
+      else if (d.startsWith('8')) d = '62' + d;
+      return d.length >= 10 && d.length <= 15 ? d : null;
+    }
+    function tpSendWA() {
+      if (!tpCurTrx) return;
+      const n = tpNormPhone(tp$('wa-phone').value);
+      if (n === null) { showToast('Nomor WhatsApp tidak valid. Contoh: 081234567890', 'error'); tp$('wa-phone').focus(); return; }
+      const url = 'https://wa.me/' + n + '?text=' + encodeURIComponent(tpWaText(tpCurTrx));
+      playAudio('click');
+      window.open(url, '_blank', 'noopener');
+      showToast(n ? 'Membuka WhatsApp ke +' + n + '…' : 'Membuka WhatsApp — pilih kontak penerima.', 'success');
+    }
+    function tpCopyReceipt() {
+      if (!tpCurTrx) return;
+      const txt = tpWaText(tpCurTrx).replace(/\*/g, '');
+      const ok = () => showToast('Teks struk disalin.', 'success');
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, () => showToast('Gagal menyalin teks.', 'error'));
+      else { const a = document.createElement('textarea'); a.value = txt; document.body.appendChild(a); a.select(); try { document.execCommand('copy'); ok(); } catch (e) { showToast('Gagal menyalin teks.', 'error'); } a.remove(); }
+    }
+
+    /* ---------- 4. DASHBOARD LAPORAN VISUAL ---------- */
+    function tpBarSvg(labels, vals) {
+      const W = window.innerWidth < 700 ? 340 : 640, H = window.innerWidth < 700 ? 190 : 200, pl = 6, pr = 6, pt = 22, pb = 26, n = labels.length, max = Math.max(1, ...vals), bw = (W - pl - pr) / n, ch = H - pt - pb;
+      let o = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Grafik penjualan"><defs><linearGradient id="rpg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fb7185"/><stop offset="1" stop-color="#e11d48"/></linearGradient></defs>';
+      [0, .5, 1].forEach(f => { const y = H - pb - ch * f; o += '<line x1="' + pl + '" x2="' + (W - pr) + '" y1="' + y + '" y2="' + y + '" stroke="#e2e8f0" stroke-dasharray="3 4"/>'; });
+      vals.forEach((v, i) => {
+        const h = v > 0 ? Math.max(3, v / max * ch) : 0, w = Math.min(46, bw * .66), x = pl + i * bw + (bw - w) / 2, y = H - pb - h;
+        if (h) o += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="5" fill="url(#rpg)"><title>' + tpEsc(labels[i]) + ' · ' + formatRupiah(v) + '</title></rect>';
+        if (v > 0 && (v === max || (n <= 8 && bw >= 40))) o += '<text x="' + (x + w / 2) + '" y="' + (y - 5) + '" text-anchor="middle" font-size="11" font-weight="700" fill="#475569">' + tpShort(v) + '</text>';
+        if (bw >= 34 || i % 2 === 0) o += '<text x="' + (pl + i * bw + bw / 2) + '" y="' + (H - 8) + '" text-anchor="middle" font-size="11" fill="#64748b">' + tpEsc(labels[i]) + '</text>';
+      });
+      return o + '</svg>';
+    }
+    function tpDonut(items, centerLabel) {
+      const tot = tpSum(items, x => x.v), r = 46, c = 2 * Math.PI * r;
+      if (!tot) return '<p style="color:#94a3b8">Belum ada data.</p>';
+      let off = 0, circ = '';
+      const act = items.filter(x => x.v > 0);
+      act.forEach((x, idx) => { const len = x.v / tot * c, draw = idx < act.length - 1 ? Math.min(c, len + 0.6) : len; circ += '<circle r="' + r + '" cx="64" cy="64" fill="none" stroke="' + x.c + '" stroke-width="20" stroke-dasharray="' + draw + ' ' + Math.max(0, c - draw) + '" stroke-dashoffset="' + (-off) + '" transform="rotate(-90 64 64)"><title>' + tpEsc(x.l) + ' · ' + formatRupiah(x.v) + '</title></circle>'; off += len; });
+      const svg = '<svg viewBox="0 0 128 128" role="img" aria-label="' + tpEsc(centerLabel) + '">' + circ + '<text x="64" y="61" text-anchor="middle" font-size="9" fill="#64748b">' + tpEsc(centerLabel) + '</text><text x="64" y="76" text-anchor="middle" font-size="14" font-weight="800" fill="#0f172a">' + tpShort(tot) + '</text></svg>';
+      const leg = items.map(x => '<div><i style="background:' + x.c + '"></i><span>' + tpEsc(x.l) + '</span><b>' + tpShort(x.v) + '</b><em>' + Math.round(x.v / tot * 100) + '%</em></div>').join('');
+      return '<div class="rp-donut">' + svg + '<div class="rp-leg">' + leg + '</div></div>';
+    }
+    tpRenderReport = function () {
+      const d0 = new Date(); d0.setHours(0, 0, 0, 0);
+      const from = tpRpRange === 'today' ? d0.getTime() : tpRpRange === '7d' ? Date.now() - 7 * 864e5 : 0;
+      const rows = tpTrx.filter(t => !t.voided && t.ts.getTime() >= from);
+      const rets = tpReturns.filter(r => r.mode === 'refund' && r.ts.getTime() >= from);
+      const refund = tpSum(rets, r => r.amount), gross = tpSum(rows, t => t.total), net = gross - refund;
+      const qty = tpSum(rows, t => tpSum(t.items, i => i.qty - i.returned));
+      const dMember = tpSum(rows, t => t.memberDisc), dVoucher = tpSum(rows, t => t.voucherDisc), dPromo = tpSum(rows, t => t.promoDisc || 0);
+
+      /* tren: per jam (hari ini) atau per hari */
+      let labels = [], vals = [], peak = '';
+      if (tpRpRange === 'today') {
+        const hrs = {}; rows.forEach(t => { const h = t.ts.getHours(); hrs[h] = (hrs[h] || 0) + t.total; });
+        const hk = Object.keys(hrs).map(Number);
+        if (hk.length) { const a = Math.min(...hk), b = Math.max(a + 3, Math.max(...hk)); for (let h = a; h <= Math.min(23, b); h++) { labels.push(tpPad(h) + ':00'); vals.push(hrs[h] || 0); } }
+        if (vals.length) { const m = Math.max(...vals); peak = 'Jam tersibuk: <b>' + labels[vals.indexOf(m)] + '</b> (' + formatRupiah(m) + ')'; }
+      } else {
+        const days = tpRpRange === '7d' ? 7 : 14, byDay = {};
+        rows.forEach(t => { const k = tpDMY(t.ts); byDay[k] = (byDay[k] || 0) + t.total; });
+        for (let k = days - 1; k >= 0; k--) { const d = new Date(Date.now() - k * 864e5); labels.push(tpPad(d.getDate()) + '/' + tpPad(d.getMonth() + 1)); vals.push(byDay[tpDMY(d)] || 0); }
+        const m = Math.max(...vals); if (m > 0) peak = 'Hari terbaik: <b>' + labels[vals.indexOf(m)] + '</b> (' + formatRupiah(m) + ')';
+      }
+      const trend = vals.some(v => v > 0) ? tpBarSvg(labels, vals) : '<p style="color:#94a3b8">Belum ada transaksi pada periode ini.</p>';
+
+      /* metode bayar (split dihitung per porsi) */
+      const pm = { cash: 0, edc: 0, qris: 0 }; let splitN = 0;
+      rows.forEach(t => { const m = tpPayMap(t); Object.keys(m).forEach(k => { pm[k] = (pm[k] || 0) + m[k]; }); if (t.method === 'split') splitN++; });
+      const payDonut = tpDonut([{ l: 'Tunai', v: pm.cash, c: '#10b981' }, { l: 'Kartu EDC', v: pm.edc, c: '#3b82f6' }, { l: 'QRIS', v: pm.qris, c: '#a855f7' }], 'Omzet');
+
+      /* kategori & produk terlaris */
+      const CAT = { shirts: ['Kaos & Kemeja', '#f43f5e'], pants: ['Celana & Jeans', '#3b82f6'], outerwear: ['Outerwear', '#f59e0b'], dress: ['Dress', '#a855f7'], accessories: ['Aksesori', '#10b981'] };
+      const cv = {}, top = {};
+      rows.forEach(t => t.items.forEach(i => { const n = i.qty - i.returned, p = tpProd(i.pid), k = p ? p.category : 'x'; cv[k] = (cv[k] || 0) + n * i.price; const o = top[i.name] || (top[i.name] = { q: 0, v: 0 }); o.q += n; o.v += n * i.price; }));
+      const catDonut = tpDonut(Object.keys(CAT).map(k => ({ l: CAT[k][0], v: cv[k] || 0, c: CAT[k][1] })), 'Penjualan');
+      const ta = Object.entries(top).sort((a, b) => b[1].v - a[1].v).slice(0, 5), tm = Math.max(1, ...ta.map(x => x[1].v));
+      const topHtml = ta.length ? ta.map(([k, o], i) => '<div class="rp-bar"><span><b style="color:#e11d48;margin-right:4px">' + (i + 1) + '</b>' + tpEsc(k) + '</span><div><span class="f" style="width:' + Math.round(o.v / tm * 100) + '%"></span></div><em>' + o.q + ' pcs · ' + formatRupiah(o.v) + '</em></div>').join('') : '<p style="color:#94a3b8">Belum ada data pada periode ini.</p>';
+
+      /* diskon yang diberikan */
+      const dTot = dMember + dVoucher + dPromo;
+      const dSeg = [['Promo', dPromo, '#f59e0b'], ['Member', dMember, '#10b981'], ['Voucher', dVoucher, '#6366f1']];
+      const discHtml = dTot > 0
+        ? '<div class="rp-stack">' + dSeg.filter(x => x[1] > 0).map(x => '<span style="width:' + (x[1] / dTot * 100) + '%;background:' + x[2] + '" title="' + x[0] + ' · ' + formatRupiah(x[1]) + '"></span>').join('') + '</div><div class="rp-leg">' + dSeg.map(x => '<div><i style="background:' + x[2] + '"></i><span>' + x[0] + '</span><b>' + formatRupiah(x[1]) + '</b></div>').join('') + '</div><div class="rp-note">Total diskon diberikan: <b>' + formatRupiah(dTot) + '</b> (' + (gross + dTot ? Math.round(dTot / (gross + dTot) * 100) : 0) + '% dari penjualan sebelum diskon)</div>'
+        : '<p style="color:#94a3b8">Belum ada diskon pada periode ini.</p>';
+
+      /* stok menipis */
+      const low = [];
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n <= 2) low.push([p.name, c.name, s, n]); })));
+      low.sort((a, b) => a[3] - b[3]);
+      const lowHtml = low.length ? low.slice(0, 14).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' (' + x[3] + ')</span>').join('') + (low.length > 14 ? '<span class="rp-chip">+' + (low.length - 14) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Semua stok aman.</p>';
+
+      const seg = [['today', 'Hari ini'], ['7d', '7 hari'], ['all', 'Semua']].map(x => '<button class="' + (tpRpRange === x[0] ? 'on' : '') + '" onclick="tpRpSet(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
+      const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
+      tp$('rp-body').innerHTML =
+        '<div class="rp-seg">' + seg + '</div>' +
+        '<div class="rp-kpis">' + kp('Omzet bersih', formatRupiah(net), 'hl') + kp('Transaksi', rows.length) + kp('Item terjual', qty) + kp('Rata-rata / trx', formatRupiah(rows.length ? Math.round(net / rows.length) : 0)) + kp('Refund', formatRupiah(refund)) + '</div>' +
+        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">' + (tpRpRange === 'today' ? 'Penjualan per jam' : 'Penjualan per hari') + '</div>' + trend + (peak ? '<div class="rp-note">' + peak + '</div>' : '') + '</div>' +
+        '<div class="rp-grid">' +
+        '<div class="rp-card"><div class="rp-h">Metode pembayaran</div>' + payDonut + (splitN ? '<div class="rp-note"><b>' + splitN + '</b> transaksi memakai split payment.</div>' : '') + '</div>' +
+        '<div class="rp-card"><div class="rp-h">Penjualan per kategori</div>' + catDonut + '</div>' +
+        '<div class="rp-card"><div class="rp-h">Produk terlaris</div>' + topHtml + '</div>' +
+        '<div class="rp-card"><div class="rp-h">Diskon & promo diberikan</div>' + discHtml + '</div>' +
+        '</div>' +
+        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">Stok menipis (≤ 2 pcs) · ' + low.length + ' varian</div>' + lowHtml + '</div>';
+    };
+    renderCart();
+    if (!tp$('report-modal').classList.contains('hidden')) tpRenderReport();
   </script>
 </body>
 

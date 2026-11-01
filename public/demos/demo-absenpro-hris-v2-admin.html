@@ -33,10 +33,20 @@
         var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
         var ini = function (n) { return String(n).split(' ').map(function (x) { return x[0] }).slice(0, 2).join('').toUpperCase() };
         var EMP = [['arzha', 'Arzha', 'Product Designer', 'Digital', 'Hadir', '07:52'], ['raka', 'Raka Mahendra', 'Engineer', 'Digital', 'WFH', '08:03'], ['salsa', 'Salsa Anindya', 'QA', 'Digital', 'Hadir', '07:58'], ['bima', 'Bima Satria', 'Engineer', 'Digital', 'Cuti', '\u2013'], ['laras', 'Laras Wulandari', 'Designer', 'Digital', 'Dinas luar', '08:10'], ['nadia', 'Nadia Putri', 'Akuntan', 'Keuangan', 'Hadir', '07:45'], ['fajar', 'Fajar Nugroho', 'Staf Keuangan', 'Keuangan', 'Terlambat', '08:41'], ['maya', 'Maya Lestari', 'Rekrutmen', 'SDM', 'Hadir', '07:55'], ['yoga', 'Yoga Pratama', 'Sales', 'Penjualan', 'Terlambat', '08:27'], ['intan', 'Intan Permata', 'Sales', 'Penjualan', 'Hadir', '08:02'], ['dimas', 'Dimas Aditya', 'Support', 'Layanan', 'WFH', '08:00'], ['rani', 'Rani Kusuma', 'Support', 'Layanan', 'Hadir', '07:49'], ['dina', 'Dina Prameswari', 'Supervisor Digital', 'Digital', 'Hadir', '07:40'], ['hendra', 'Hendra Wijaya', 'Admin HR', 'SDM', 'Hadir', '07:35']];
+        var CK = 'absenpro-v2-cfg';
+        function cfgDef() { return { dv: { Digital: 'reg', Keuangan: 'reg', SDM: 'reg', Penjualan: 'reg', Layanan: 'reg' }, w: { 'in': '08:00', late: '08:15', out: '17:00' }, g: { name: 'Kinerja Tower, SCBD', r: 100 }, l: { quota: 12, max: 5 }, c: { limit: 1500000, rcpt: 50000 }, log: [] } }
+        function cfg() { var d = cfgDef(); try { var r = JSON.parse(localStorage.getItem(CK)); if (r && typeof r === 'object') { ['w', 'g', 'l', 'c', 'dv'].forEach(function (k) { if (r[k] && typeof r[k] === 'object') for (var j in d[k]) if (typeof r[k][j] === typeof d[k][j]) d[k][j] = r[k][j] }); if (Array.isArray(r.log)) d.log = r.log } } catch (e) { } return d }
+        function cfgSave(c) { try { localStorage.setItem(CK, JSON.stringify(c)); return true } catch (e) { return false } }
+        var SHP = { pagi: { name: 'Pagi', 'in': '07:00', late: '07:15', out: '16:00' }, siang: { name: 'Siang', 'in': '13:00', late: '13:15', out: '22:00' } };
+        function shiftFor(div) { var c = cfg(), k = (c.dv || {})[String(div).replace('Divisi ', '')], s = SHP[k]; return s ? { 'in': s['in'], late: s.late, out: s.out, name: s.name } : { 'in': c.w['in'], late: c.w.late, out: c.w.out, name: 'Reguler' } }
+        function shiftOf(id) { var e = EMP.filter(function (x) { return x[0] === id })[0]; return shiftFor(e ? e[3] : 'Digital') }
+        function lateNote() { var s = {}; EMP.forEach(function (e) { s[shiftFor(e[3]).late] = 1 }); var k = Object.keys(s); return k.length === 1 ? 'setelah ' + k[0] : 'sesuai shift' }
+        function hm(s) { var p = String(s).split(':'); return (+p[0]) * 60 + (+p[1] || 0) }
+        function rcImg(r) { return r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<br><img class="rl-rc" alt="Foto struk" src="' + r.rc + '">' : '' }
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13')] }
+        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
@@ -54,14 +64,14 @@
         }
         function approvals(el, scope, label) {
           var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && (!scope || scope(r)) }).slice(0, 6);
-          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small></div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
+          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small>' + rcImg(r) + '</div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
             + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small></div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
           el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; decide(id, !!b.dataset.ok); O.toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) }
         }
         function summary(el) {
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
           EMP.forEach(function (e) { (dv[e[3]] = dv[e[3]] || []).push(e) });
-          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>setelah 08:15</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
+          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>' + lateNote() + '</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
             + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + ((d[1] - 70) * 3.6) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
             + '<div class="rl-card"><h3>Per divisi</h3>' + Object.keys(dv).map(function (k) { var p = Math.round(counts(dv[k]).h / dv[k].length * 100); return '<div class="rl-dv"><span>' + k + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>' }).join('') + '</div></div>'
         }
@@ -86,9 +96,10 @@
           + '.rl-dv{display:flex;align-items:center;gap:10px;margin:8px 0}.rl-dv span{width:80px;font-size:13px}.rl-dv i{flex:1;height:10px;border-radius:9px;background:var(--rl-chip);overflow:hidden}.rl-dv u{display:block;height:100%;background:var(--rl-acc);border-radius:9px}.rl-dv b{font-size:12px;width:38px;text-align:right}'
           + '.rl-q{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);margin-bottom:10px}'
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
+          + '.rl-rc{width:64px;height:64px;object-fit:cover;border-radius:10px;margin-top:6px;border:1px solid var(--rl-line)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, hm: hm, shiftFor: shiftFor, shiftOf: shiftOf };
       })(window);
 
   </script>
@@ -754,6 +765,110 @@
       }
     }
   </style>
+  <style>
+    .sgrid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px
+    }
+
+    .sgrid .card {
+      margin: 0
+    }
+
+    .sf {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-top: 12px
+    }
+
+    .sf label {
+      font: 600 12.5px var(--ff);
+      color: var(--mute)
+    }
+
+    .sf label b {
+      color: var(--ink)
+    }
+
+    input[type=time],
+    input[type=number] {
+      font: 500 14px var(--ff);
+      color: var(--ink);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      width: 100%
+    }
+
+    input[type=range] {
+      width: 100%;
+      accent-color: var(--acc)
+    }
+
+    .serr {
+      color: var(--late);
+      font-weight: 600;
+      min-height: 20px;
+      margin: 0 0 10px
+    }
+
+    .spv {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .spv ul {
+      margin: 0;
+      padding-left: 18px;
+      flex: 1;
+      min-width: 240px
+    }
+
+    .spv li {
+      margin: 6px 0;
+      line-height: 1.45
+    }
+
+    .rbk b {
+      font-size: 22px !important
+    }
+
+    .rbk {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)) !important
+    }
+
+    .rb-th {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      cursor: zoom-in;
+      transition: all .15s
+    }
+
+    .rb-th.big {
+      width: 150px;
+      height: 150px;
+      cursor: zoom-out;
+      position: relative;
+      z-index: 2
+    }
+
+    .slg {
+      padding: 9px 0;
+      border-top: 1px solid var(--line)
+    }
+
+    .slg:first-child {
+      border-top: 0
+    }
+  </style>
 </head>
 
 <body>
@@ -771,7 +886,9 @@
       <button class="nv" data-v="att">Kehadiran</button>
       <button class="nv" data-v="rep">Laporan</button>
       <button class="nv" data-v="req">Persetujuan <span class="bdg" id="bd" hidden>0</span></button>
+      <button class="nv" data-v="rb">Reimbursement</button>
       <!--ANN--><button class="nv" data-v="ann">Pengumuman</button><!--/ANN-->
+      <button class="nv" data-v="set">Pengaturan</button>
       <a class="nv" id="back" href="demo-absenpro-hris-v2.html" style="margin-top:8px">‹ Kembali ke aplikasi</a>
       <button class="nv" id="th">Ganti tema</button>
       <div class="me"><span class="av" id="mav"></span>
@@ -849,6 +966,97 @@
               aria-label="Pilihan jajak"><button class="btn pri" id="ppub">Terbitkan jajak</button></div>
         </div>
       </section><!--/ANN-->
+      <section class="view" id="v-rb">
+        <div class="hd">
+          <div>
+            <p>Klaim biaya karyawan</p>
+            <h1>Reimbursement</h1>
+          </div><button class="btn pri" id="rbcsv">Ekspor CSV</button>
+        </div>
+        <div class="rl-kp rbk" id="rbk"></div>
+        <div class="chips" id="rbm"></div>
+        <div class="chips" id="rbs"></div>
+        <div class="card">
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Tanggal</th>
+                  <th>Karyawan</th>
+                  <th>Kategori dan keterangan</th>
+                  <th>Nominal</th>
+                  <th>Status</th>
+                  <th>Struk</th>
+                </tr>
+              </thead>
+              <tbody id="rbt"></tbody>
+            </table>
+          </div>
+          <p class="sm" id="rbe" hidden style="padding:16px 0;text-align:center">Belum ada klaim untuk filter ini.</p>
+        </div>
+        <div class="card">
+          <h3>Per divisi</h3>
+          <p class="sm">Klaim menunggu dan disetujui, sesuai filter.</p>
+          <div id="rbd" style="margin-top:8px"></div>
+        </div>
+      </section>
+      <section class="view" id="v-set">
+        <div class="hd">
+          <div>
+            <p>Berlaku untuk seluruh karyawan</p>
+            <h1>Pengaturan</h1>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="sreset">Muat nilai
+              bawaan</button><button class="btn pri" id="ssave">Simpan perubahan</button></div>
+        </div>
+        <p class="serr" id="serr" role="alert"></p>
+        <div class="sgrid">
+          <div class="card">
+            <h3>Jam kerja</h3>
+            <p class="sm">Dipakai aplikasi untuk cincin shift, status terlambat, dan pengingat absen pulang.</p>
+            <div class="sf"><label for="sIn">Jam masuk</label><input type="time" id="sIn"></div>
+            <div class="sf"><label for="sLate">Batas terlambat</label><input type="time" id="sLate"></div>
+            <div class="sf"><label for="sOut">Jam pulang</label><input type="time" id="sOut"></div>
+          </div>
+          <div class="card">
+            <h3>Lokasi absen</h3>
+            <p class="sm">Titik dan radius geofence untuk karyawan dengan mode kerja Kantor.</p>
+            <div class="sf"><label for="sGn">Nama lokasi</label><input type="text" id="sGn" maxlength="60"></div>
+            <div class="sf"><label for="sGr">Radius absen: <b id="sGv"></b></label><input type="range" id="sGr" min="30"
+                max="300" step="10"></div>
+          </div>
+          <div class="card">
+            <h3>Kebijakan cuti</h3>
+            <p class="sm">Jatah dan batas pengajuan cuti tahunan.</p>
+            <div class="sf"><label for="sLq">Jatah cuti tahunan (hari)</label><input type="number" id="sLq" min="1"
+                max="30" step="1"></div>
+            <div class="sf"><label for="sLm">Maksimal hari sekali pengajuan</label><input type="number" id="sLm" min="1"
+                max="30" step="1"></div>
+          </div>
+          <div class="card">
+            <h3>Reimbursement</h3>
+            <p class="sm">Batas klaim per karyawan dan syarat lampiran struk.</p>
+            <div class="sf"><label for="sCl">Batas klaim per bulan (Rp)</label><input type="number" id="sCl"
+                min="100000" max="20000000" step="50000"></div>
+            <div class="sf"><label for="sCr">Struk wajib untuk klaim di atas (Rp)</label><input type="number" id="sCr"
+                min="0" step="10000"></div>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <h3>Shift per divisi</h3>
+            <p class="sm">Pilih jam kerja tiap divisi. Reguler memakai jam kerja di atas. Aplikasi mobile mengikuti
+              divisi karyawan yang login.</p>
+            <div class="sgrid" id="sdv" style="margin-top:4px"></div>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <h3>Pratinjau dampak</h3>
+            <div id="sprev"></div>
+          </div>
+          <div class="card" style="grid-column:1/-1">
+            <h3>Riwayat perubahan</h3>
+            <div id="slog"></div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 
@@ -883,7 +1091,7 @@
     const getS = () => { try { return localStorage.getItem(CFG.sess) } catch (e) { return MEM } };
     const setS = v => { MEM = v; try { if (v) localStorage.setItem(CFG.sess, v); else localStorage.removeItem(CFG.sess) } catch (e) { } };
     function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600) }
-    function liveSt(id) { if (!CFG.live || !['arzha', 'raka', 'salsa', 'dina', 'hendra'].includes(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > 495; return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
+    function liveSt(id) { if (!CFG.live || !['arzha', 'raka', 'salsa', 'dina', 'hendra'].includes(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > RL.hm(RL.shiftOf(id).late); return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
     function canAct(r) { return !!USER && USER.r === 'admin' && r.uid !== USER.id && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')) }
     RL.init({ prefix: CFG.prefix, toast: toast, live: liveSt, can: canAct, onChange: () => { if (USER) render() } });
     window.addEventListener('storage', e => { if (USER && e.key && e.key.indexOf('absenpro-') === 0) render() });
@@ -904,7 +1112,7 @@
       const L = list(), ini = n => n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
       $('#tb').innerHTML = L.map(e => { const s = RL.status(e); return '<tr><td><div class="who"><span class="av">' + ini(e[1]) + '</span><div><b>' + RL.esc(e[1]) + '</b><br><span class="sm">' + RL.esc(e[2]) + '</span></div></div></td><td>' + RL.esc(e[3]) + '</td><td class="fh">' + s.t + '</td><td><span class="tag ' + s.st.split(' ')[0] + '">' + s.st + '</span></td></tr>' }).join(''); $('#em').hidden = L.length > 0
     }
-    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (VIEW === 'rep') renderRep(); else if (window.renderAnnP) renderAnnP() }
+    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (VIEW === 'rep') renderRep(); else if (VIEW === 'rb') renderRb(); else if (VIEW === 'set') renderSet(); else if (window.renderAnnP) renderAnnP() }
     $$('.nv[data-v]').forEach(b => b.onclick = () => { VIEW = b.dataset.v; $$('.nv[data-v]').forEach(x => x.classList.toggle('on', x === b)); $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + VIEW)); render() });
     const ST = ['Semua', 'Hadir', 'Terlambat', 'WFH', 'Dinas luar', 'Cuti', 'Belum absen'];
     $('#fl').innerHTML = ST.map(s => '<button class="' + (s === F ? 'on' : '') + '">' + s + '</button>').join('');
@@ -947,6 +1155,81 @@
     $('#alist').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const d = annLoad(); d.ann = d.ann.filter(a => String(a.id) !== b.dataset.del); annSave(d); renderAnnP(); toast('Pengumuman dihapus') };
     $('#ppub').onclick = () => { const q = $('#pq').value.trim(), o = $('#po').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 5); if (!q || o.length < 2) { toast('Isi pertanyaan dan minimal dua pilihan'); return } const d = annLoad(); d.poll = { q: q.slice(0, 90), opts: o, votes: {} }; annSave(d); $('#pq').value = ''; $('#po').value = ''; renderAnnP(); toast('Jajak diterbitkan') };
     /*/ANN*/
+    /*RB*/
+    let RBM = 'all', RBS = 'Semua';
+    const rbAll = () => RL.all().filter(r => r.type === 'Reimbursement');
+    const rbFmt = r => r.cd ? new Date(r.cd + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (r.ym || '-');
+    const rbNote = r => String(r.detail).split(' \u00b7 ').slice(2).join(' \u00b7 ');
+    const rbRows = () => rbAll().filter(r => (RBM === 'all' || r.ym === RBM) && (RBS === 'Semua' || r.st === RBS));
+    const rbTag = { Disetujui: 'Hadir', Ditolak: 'Terlambat', Menunggu: 'Cuti' };
+    const rbImg = r => r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<img class="rb-th" alt="Struk ' + RL.esc(r.who) + '" src="' + r.rc + '">' : '<span class="sm">\u2013</span>';
+    function renderRb() {
+      const all = rbAll(), months = [...new Set(all.map(r => r.ym).filter(Boolean))].sort().reverse(); if (RBM !== 'all' && !months.includes(RBM)) RBM = 'all';
+      const L = rbRows(), sum = s => L.filter(r => r.st === s).reduce((x, r) => x + (r.amt || 0), 0), cnt = s => L.filter(r => r.st === s).length;
+      const card = (t, v, s, hl) => '<div class="rl-card' + (hl ? ' rl-hl' : '') + '"><small>' + t + '</small><b>' + v + '</b><span>' + s + '</span></div>';
+      $('#rbk').innerHTML = card('Menunggu', rpf(sum('Menunggu')), cnt('Menunggu') + ' klaim', 1) + card('Disetujui', rpf(sum('Disetujui')), cnt('Disetujui') + ' klaim') + card('Ditolak', rpf(sum('Ditolak')), cnt('Ditolak') + ' klaim') + card('Total klaim', String(L.length), 'sesuai filter');
+      const mn = ym => new Date(ym + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
+      $('#rbm').innerHTML = ['all'].concat(months).map(k => '<button data-m="' + k + '" class="' + (k === RBM ? 'on' : '') + '">' + (k === 'all' ? 'Semua bulan' : mn(k)) + '</button>').join('');
+      $('#rbs').innerHTML = ['Semua', 'Menunggu', 'Disetujui', 'Ditolak'].map(k => '<button data-s="' + k + '" class="' + (k === RBS ? 'on' : '') + '">' + k + '</button>').join('');
+      $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span></td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span></td><td>' + rbImg(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
+      const dv = {}; L.filter(r => r.st !== 'Ditolak').forEach(r => { dv[r.div] = (dv[r.div] || 0) + (r.amt || 0) }); const mx = Math.max(1, ...Object.values(dv));
+      $('#rbd').innerHTML = Object.keys(dv).length ? Object.keys(dv).sort((x, y) => dv[y] - dv[x]).map(k => '<div class="rl-dv"><span>' + RL.esc(k) + '</span><i><u style="width:' + Math.round(dv[k] / mx * 100) + '%"></u></i><b style="width:90px">' + rpf(dv[k]) + '</b></div>').join('') : '<p class="sm">Belum ada data.</p>'
+    }
+    $('#rbm').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBM = b.dataset.m; renderRb() };
+    $('#rbs').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBS = b.dataset.s; renderRb() };
+    $('#rbt').onclick = e => { const i = e.target.closest('.rb-th'); if (i) i.classList.toggle('big') };
+    $('#rbcsv').onclick = () => {
+      const L = rbRows(), cell = c => { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
+      const rows = [['Tanggal', 'Nama', 'Divisi', 'Kategori', 'Keterangan', 'Nominal (Rp)', 'Status', 'Struk']].concat(L.map(r => [r.cd || r.ym || '', r.who, r.div, r.cat || '', rbNote(r), r.amt || 0, r.st, r.rc ? 'Ya' : 'Tidak']));
+      try { const b = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'reimbursement-' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); toast('Mengunduh ' + L.length + ' klaim') } catch (e) { toast('Ekspor tidak didukung di lingkungan ini') }
+    };
+    /*/RB*/
+    /*SET*/
+    const CF = () => RL.cfg(), rpf = n => 'Rp ' + Number(n).toLocaleString('id-ID');
+    let SDIRTY = false;
+    const DVS = ['Digital', 'Keuangan', 'SDM', 'Penjualan', 'Layanan'], SHN = { reg: 'Reguler', pagi: 'Pagi 07:00 \u2013 16:00', siang: 'Siang 13:00 \u2013 22:00' };
+    $('#sdv').innerHTML = DVS.map(d => '<div class="sf"><label for="sdv-' + d + '">' + d + '</label><select id="sdv-' + d + '">' + Object.keys(SHN).map(k => '<option value="' + k + '">' + SHN[k] + '</option>').join('') + '</select></div>').join('');
+    const SF = [['sIn', 'w', 'in', 'Jam masuk', v => v], ['sLate', 'w', 'late', 'Batas terlambat', v => v], ['sOut', 'w', 'out', 'Jam pulang', v => v], ['sGn', 'g', 'name', 'Nama lokasi', v => v], ['sGr', 'g', 'r', 'Radius absen', v => v + ' m'], ['sLq', 'l', 'quota', 'Jatah cuti tahunan', v => v + ' hari'], ['sLm', 'l', 'max', 'Maks. hari sekali pengajuan', v => v + ' hari'], ['sCl', 'c', 'limit', 'Batas klaim bulanan', rpf], ['sCr', 'c', 'rcpt', 'Struk wajib di atas', rpf]];
+    DVS.forEach(d => SF.push(['sdv-' + d, 'dv', d, 'Shift ' + d, v => (SHN[v] || v).split(' ')[0]]));
+    function fillSet(c) { c = c || CF(); SF.forEach(f => { $('#' + f[0]).value = c[f[1]][f[2]] }); $('#sGv').textContent = c.g.r + ' m' }
+    function readSet() { const o = JSON.parse(JSON.stringify(CF())); SF.forEach(f => { const raw = $('#' + f[0]).value; o[f[1]][f[2]] = typeof o[f[1]][f[2]] === 'number' ? (raw === '' ? NaN : Math.round(+raw)) : raw.trim() }); return o }
+    function vSet(o) {
+      const T = /^\d{2}:\d{2}$/; if (![o.w.in, o.w.late, o.w.out].every(t => T.test(t))) return 'Isi jam masuk, batas terlambat, dan jam pulang';
+      const a = RL.hm(o.w.in), b = RL.hm(o.w.late), c = RL.hm(o.w.out); if (!(a < b && b < c)) return 'Urutan jam harus: masuk, lalu batas terlambat, lalu pulang';
+      if (o.g.name.length < 2) return 'Nama lokasi minimal 2 karakter';
+      const n = (v, lo, hi) => Number.isFinite(v) && v >= lo && v <= hi;
+      if (!n(o.g.r, 30, 300)) return 'Radius absen harus 30 sampai 300 m';
+      if (!n(o.l.quota, 1, 30)) return 'Jatah cuti harus 1 sampai 30 hari';
+      if (!n(o.l.max, 1, o.l.quota)) return 'Maksimal hari sekali pengajuan harus antara 1 dan jatah cuti';
+      if (!n(o.c.limit, 100000, 20000000)) return 'Batas klaim bulanan harus Rp 100.000 sampai Rp 20.000.000';
+      if (!n(o.c.rcpt, 0, o.c.limit)) return 'Batas wajib struk tidak boleh melebihi batas klaim bulanan';
+      return ''
+    }
+    function drawPrev() {
+      const o = readSet(), e = vSet(o), el = $('#sprev'); if (e) { el.innerHTML = '<p class="sm">' + RL.esc(e) + '</p>'; return }
+      const dur = ((RL.hm(o.w.out) - RL.hm(o.w.in)) / 60).toFixed(1).replace('.0', ''), px = 12 + o.g.r / 300 * 44;
+      el.innerHTML = '<div class="spv"><svg width="110" height="110" viewBox="0 0 110 110" role="img" aria-label="Skala radius absen"><rect width="110" height="110" rx="14" fill="var(--chip)"/><circle cx="55" cy="55" r="' + px + '" fill="#1F9D7722" stroke="#1F9D77" stroke-dasharray="5 4"/><circle cx="55" cy="55" r="4" fill="var(--ink)"/></svg><ul>'
+        + '<li>Absen setelah <b>' + o.w.late + '</b> ditandai Terlambat. Shift berjalan ' + o.w.in + ' sampai ' + o.w.out + ' (' + dur + ' jam).</li>'
+        + '<li>Titik absen <b>' + RL.esc(o.g.name) + '</b>, radius <b>' + o.g.r + ' m</b>. Mode Kantor di luar radius tidak bisa absen.</li>'
+        + '<li>Jatah cuti <b>' + o.l.quota + ' hari</b>, satu pengajuan maksimal <b>' + o.l.max + ' hari</b>.</li>'
+        + '<li>Shift divisi: ' + DVS.map(d => d + ' <b>' + (SHN[o.dv[d]] || 'Reguler').split(' ')[0] + '</b>').join(', ') + '.</li>'
+        + '<li>Klaim maksimal <b>' + rpf(o.c.limit) + '</b> per bulan. Struk wajib di atas <b>' + rpf(o.c.rcpt) + '</b>.</li></ul></div>'
+    }
+    function drawLog() {
+      const L = CF().log; $('#slog').innerHTML = L.length ? L.slice(0, 8).map(x => '<div class="slg"><b>' + RL.esc(x.by) + '</b> <span class="sm">' + new Date(x.t).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</span><br><span class="sm">' + (x.ch || []).map(RL.esc).join(' \u00b7 ') + '</span></div>').join('') : '<p class="sm">Belum ada perubahan. Nilai di atas adalah pengaturan bawaan.</p>'
+    }
+    function renderSet() { if (!SDIRTY) { fillSet(); $('#serr').textContent = '' } drawLog(); drawPrev() }
+    $$('#v-set input, #v-set select').forEach(i => i.oninput = () => { SDIRTY = true; if (i.id === 'sGr') $('#sGv').textContent = i.value + ' m'; $('#serr').textContent = ''; drawPrev() });
+    $('#sreset').onclick = () => { fillSet(RL.cfgDef()); SDIRTY = true; drawPrev(); toast('Nilai bawaan dimuat. Klik Simpan untuk menerapkan.') };
+    $('#ssave').onclick = () => {
+      const o = readSet(), e = vSet(o); if (e) { $('#serr').textContent = e; return }
+      const c = CF(), ch = []; SF.forEach(f => { const x = c[f[1]][f[2]], y = o[f[1]][f[2]]; if (x !== y) ch.push(f[3] + ': ' + f[4](x) + ' \u2192 ' + f[4](y)) });
+      if (!ch.length) { toast('Tidak ada perubahan'); return }
+      o.log = [{ t: Date.now(), by: USER.name, ch: ch }].concat(c.log || []).slice(0, 20);
+      if (!RL.cfgSave(o)) { toast('Gagal menyimpan. Penyimpanan peramban penuh atau diblokir'); return }
+      SDIRTY = false; render(); toast('Pengaturan disimpan. Aplikasi mobile ikut berubah.')
+    };
+    /*/SET*/
     boot();
   </script>
 </body>
