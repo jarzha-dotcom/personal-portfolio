@@ -2215,6 +2215,27 @@
 
 
 
+    <div class="mxdd"><button type="button" class="mxddb" id="mx-ddb" onclick="mxDD()" aria-haspopup="true"><i
+          class="fa-solid fa-bars"></i>
+        <div style="text-align:left;line-height:1.15"><em id="mx-ddl" style="font-style:normal">Kasir</em><small
+            id="mx-ddr" style="display:block;font-size:10px;font-weight:600;opacity:.8">-</small></div><i
+          class="fa-solid fa-chevron-down" style="font-size:10px"></i>
+      </button>
+      <div class="mxddm" id="mx-ddm" hidden>
+        <button type="button" class="mxi on" data-v="kasir" onclick="mxView('kasir');mxDD(false)"><i
+            class="fa-solid fa-cash-register"></i>Kasir</button>
+        <button type="button" class="mxi" data-v="dash" onclick="mxView('dash');mxDD(false)"><i
+            class="fa-solid fa-gauge"></i>Dashboard</button>
+        <button type="button" class="mxi" data-v="inv" onclick="mxView('inv');mxDD(false)"><i
+            class="fa-solid fa-boxes-stacked"></i>Inventori<b class="mxbg" id="mx-badge2" hidden
+            style="margin-left:auto"></b></button>
+        <button type="button" class="mxi" data-v="lap" onclick="mxView('lap');mxDD(false)"><i
+            class="fa-solid fa-chart-line"></i>Laporan</button>
+        <button type="button" class="mxi" style="border-top:1px solid #334155;border-radius:0 0 8px 8px;margin-top:4px"
+          onclick="mxRolePick();mxDD(false)"><i class="fa-solid fa-user-shield"></i>Ganti peran <b class="mxrl2"
+            style="margin-left:auto;color:#34d399;font-size:12px">Pemilik</b></button>
+      </div>
+    </div>
     <!-- Live Clock & Status -->
     <div class="hidden lg:flex items-center gap-3 text-xs text-slate-400">
       <div class="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800/80 rounded-lg border border-slate-700/60 font-num">
@@ -2289,9 +2310,11 @@
     <button class="mxn" data-v="dash" onclick="mxView('dash')"><i
         class="fa-solid fa-gauge"></i><span>Dashboard</span></button>
     <button class="mxn" data-v="inv" onclick="mxView('inv')"><i
-        class="fa-solid fa-boxes-stacked"></i><span>Inventori</span></button>
+        class="fa-solid fa-boxes-stacked"></i><span>Inventori</span><b class="mxbg" id="mx-badge" hidden></b></button>
     <button class="mxn" data-v="lap" onclick="mxView('lap')"><i
         class="fa-solid fa-chart-line"></i><span>Laporan</span></button>
+    <button type="button" class="mxrole" onclick="mxRolePick()" title="Ganti peran"><span>Peran:</span> <b
+        id="mx-role-l">Pemilik</b></button>
   </nav>
 
   <!-- MAIN DUAL-COLUMN WORKSPACE -->
@@ -3199,7 +3222,7 @@
       }
       grid.innerHTML = '<div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5">' +
         filtered.map(function (p) {
-          var out = p.stock <= 0, low = !out && p.stock <= 10;
+          var out = p.stock <= 0, low = !out && p.stock <= mxMin(p);
           return '<div onclick="addToCart(\x27' + p.id + '\x27)" class="bg-white rounded-xl border border-slate-200 hover:border-emerald-500 transition-all cursor-pointer flex flex-col overflow-hidden hover:shadow-md hover:-translate-y-0.5 group' + (out ? ' mx-soldout' : '') + '">' +
             '<div class="relative aspect-4/3 w-full bg-slate-100 overflow-hidden">' +
             '<img src="' + p.imageUrl + '" alt="' + esc(p.name) + '" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />' +
@@ -3862,6 +3885,7 @@
         '<div class="r"><span>Kas masuk / keluar (manual)</span><span>+' + formatRupiah(st.cashIn) + ' / -' + formatRupiah(st.cashOut) + '</span></div>' +
         '<div class="r"><span>Kas seharusnya (awal + tunai + masuk - keluar)</span><span>' + formatRupiah(st.expectedCash) + '</span></div>' +
         '<div class="r"><span>Laci dibuka tanpa transaksi</span><span>' + shift.kicks + 'x</span></div>' +
+        (window.mxShiftProfit ? mxShiftProfit() : '') +
         '<div class="r sec"><span>Produk Terlaris Shift Ini</span><span></span></div>' + mxTopRows(st) +
         '</div>';
     }
@@ -4150,7 +4174,7 @@
       info.classList.remove('hidden');
       info.innerHTML = '<div class="nm">' + esc(p.name) + '</div>' +
         '<div class="pr">' + formatRupiah(p.price) + ' <small style="font-size:11px;color:#64748b">/ ' + esc(p.unit) + '</small>' + (p.originalPrice ? '<s>' + formatRupiah(p.originalPrice) + '</s>' : '') + '</div>' +
-        '<div class="mt">Barcode ' + p.barcode + ' · Stok: <b style="color:' + (p.stock <= 10 ? '#e11d48' : '#047857') + '">' + p.stock + '</b>' + (p.originalPrice ? ' · <b style="color:#e11d48">PROMO</b>' : '') + '</div>' +
+        '<div class="mt">Barcode ' + p.barcode + ' · Stok: <b style="color:' + (p.stock <= mxMin(p) ? '#e11d48' : '#047857') + '">' + p.stock + '</b>' + (p.originalPrice ? ' · <b style="color:#e11d48">PROMO</b>' : '') + '</div>' +
         '<div style="margin-top:8px"><button type="button" class="mx-btn green xs" onclick="addToCart(\x27' + p.id + '\x27); showToast(\x27' + p.name.replace(/'/g, '') + ' ditambahkan.\x27, \x27success\x27)"><i class="fa-solid fa-plus"></i>Tambah ke keranjang</button></div>';
     }
     function mxScanPick(id) {
@@ -4193,7 +4217,7 @@
     function mxSetStockFilter(f) { mxStockFilter = f; mxRenderStock(); }
     function mxRenderStock() {
       var q = ($('stk-search').value || '').toLowerCase().trim();
-      var low = PRODUCTS.filter(function (p) { return p.stock > 0 && p.stock <= 10; }).length;
+      var low = PRODUCTS.filter(function (p) { return p.stock > 0 && p.stock <= mxMin(p); }).length;
       var out = PRODUCTS.filter(function (p) { return p.stock <= 0; }).length;
       var value = PRODUCTS.reduce(function (a, p) { return a + p.stock * p.price; }, 0);
       $('stk-summary').innerHTML = '<div>Produk<b>' + PRODUCTS.length + '</b></div><div class="warn">Menipis<b>' + low + '</b></div><div class="bad">Habis<b>' + out + '</b></div><div>Nilai Stok<b>' + formatRupiah(value) + '</b></div>';
@@ -4202,14 +4226,14 @@
       }).join('');
       var list = PRODUCTS.filter(function (p) {
         var mq = !q || p.name.toLowerCase().indexOf(q) !== -1 || p.barcode.indexOf(q) !== -1;
-        var mf = mxStockFilter === 'all' || (mxStockFilter === 'low' && p.stock > 0 && p.stock <= 10) || (mxStockFilter === 'out' && p.stock <= 0);
+        var mf = mxStockFilter === 'all' || (mxStockFilter === 'low' && p.stock > 0 && p.stock <= mxMin(p)) || (mxStockFilter === 'out' && p.stock <= 0);
         return mq && mf;
       }).sort(function (a, b) { return a.stock - b.stock; });
       $('stk-list').innerHTML = list.length ? list.map(function (p) {
-        var tag = p.stock <= 0 ? '<span class="mx-tag red">Habis</span>' : p.stock <= 10 ? '<span class="mx-tag amber">Menipis</span>' : '<span class="mx-tag green">Aman</span>';
+        var tag = p.stock <= 0 ? '<span class="mx-tag red">Habis</span>' : p.stock <= mxMin(p) ? '<span class="mx-tag amber">Menipis</span>' : '<span class="mx-tag green">Aman</span>';
         return '<div class="mx-card"><div class="main"><div class="top">' + esc(p.name) + ' ' + tag + '</div>' +
           '<div class="sub">' + p.barcode + ' · ' + esc(p.unit) + ' · ' + formatRupiah(p.price) + '</div></div>' +
-          '<div class="side"><div class="mx-bigstock ' + (p.stock <= 10 ? 'low' : '') + '">' + p.stock + '<small>stok sistem</small></div>' +
+          '<div class="side"><div class="mx-bigstock ' + (p.stock <= mxMin(p) ? 'low' : '') + '">' + p.stock + '<small>stok sistem</small></div>' +
           '<div class="mx-stockqty"><input id="stk-q-' + p.id + '" type="number" min="0" placeholder="Qty" onkeydown="if(event.key===\x27Enter\x27)mxStockIn(\x27' + p.id + '\x27)">' +
           '<button type="button" class="mx-btn green xs" onclick="mxStockIn(\x27' + p.id + '\x27)">+ Masuk</button>' +
           '<button type="button" class="mx-btn ghost xs" onclick="mxStockSet(\x27' + p.id + '\x27)">Opname</button></div></div></div>';
@@ -4242,6 +4266,7 @@
 
     /* ---------- Penyimpanan data (localStorage, aman bila diblokir) ---------- */
     var MX_KEY = 'martexpress-pos-v2';
+    function mxMin(p) { return window.mxMinMap && window.mxMinMap[p.id] != null ? window.mxMinMap[p.id] : 10; }
     function mxSave() {
       try {
         localStorage.setItem(MX_KEY, JSON.stringify({
@@ -4272,7 +4297,7 @@
     }
     function mxResetDemo() {
       askConfirm('Reset data demo?', 'Semua transaksi, stok, dan shift kembali ke data awal.', 'Ya, reset', function () {
-        try { localStorage.removeItem(MX_KEY); } catch (e) { }
+        try { localStorage.removeItem(MX_KEY); localStorage.removeItem('mx-ext-v1'); } catch (e) { }
         window.removeEventListener('beforeunload', mxSave);
         location.reload();
       }, true);
@@ -4512,7 +4537,7 @@
     /* ---------- Ringkasan live (strip KPI) ---------- */
     function mxUpdateKpi() {
       try {
-        var st = shiftStats(), low = PRODUCTS.filter(function (p) { return p.stock <= 10; }).length;
+        var st = shiftStats(), low = PRODUCTS.filter(function (p) { return p.stock <= mxMin(p); }).length;
         $('kpi-sales').textContent = formatRupiah(st.sales);
         $('kpi-count').textContent = st.count;
         $('kpi-items').textContent = st.items;
@@ -4614,6 +4639,31 @@
 
     body.mxo #mx-mobtab {
       display: none !important
+    }
+
+    @media(max-width:1023px) {
+      body.mxo header>div:last-child {
+        display: none !important
+      }
+    }
+
+    @media(max-width:640px) {
+      #mx-view {
+        padding: 12px
+      }
+
+      .mxg,
+      .mxg2 {
+        gap: 8px
+      }
+
+      .mxc {
+        padding: 10px 12px
+      }
+
+      .mxbar {
+        padding: 4px 6px
+      }
     }
 
     #mx-view {
@@ -4845,52 +4895,385 @@
       cursor: pointer
     }
 
+    @media print {
+      body.mxo {
+        display: block !important;
+        height: auto !important;
+        overflow: visible !important
+      }
+
+      body.mxo>*:not(#mx-view) {
+        display: none !important
+      }
+
+      body.mxo #mx-view {
+        position: static !important;
+        overflow: visible !important;
+        background: #fff !important;
+        color: #000 !important;
+        padding: 0
+      }
+
+      .mxbtn,
+      .mxseg,
+      .mxnote input {
+        display: none !important
+      }
+
+      .mxc {
+        break-inside: avoid
+      }
+    }
+
     .mxsc {
       overflow-x: auto
     }
+
+    .mxrc {
+      display: block;
+      width: 100%;
+      text-align: left;
+      padding: 12px 14px;
+      margin-top: 8px;
+      border-radius: 12px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #e2e8f0;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700
+    }
+
+    .mxrc:hover {
+      border-color: #10b981
+    }
+
+    .mxrc small {
+      display: block;
+      color: #94a3b8;
+      margin-top: 2px;
+      font-weight: 400;
+      font-size: 12px
+    }
+
+    .mxrole {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      background: #1e293b;
+      border: 1px solid #334155;
+      cursor: pointer;
+      flex: 0 0 auto
+    }
+
+    .mxc>div[style*="space-between"]>b {
+      white-space: nowrap;
+      margin-left: 12px;
+      flex: none
+    }
+
+    .mxpin {
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: rgba(2, 6, 23, .7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px
+    }
+
+    .mxpin[hidden] {
+      display: none
+    }
+
+    .mxpin>div {
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      width: min(340px, 100%)
+    }
+
+    .mxpin input {
+      width: 100%;
+      margin: 10px 0 4px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background: #1e293b;
+      color: #fff;
+      font-size: 22px;
+      letter-spacing: .4em;
+      text-align: center
+    }
+
+    .mxfile {
+      position: relative;
+      overflow: hidden;
+      display: inline-block
+    }
+
+    .mxfile input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer
+    }
+
+    .mxrow {
+      position: sticky;
+      left: 0;
+      width: calc(100vw - 72px);
+      max-width: 760px;
+      white-space: normal;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center
+    }
+
+    .mxt td[colspan] {
+      white-space: normal
+    }
+
+    .mxdd {
+      display: none;
+      position: relative
+    }
+
+    @media(max-width:1023px) {
+      .mxbar {
+        display: none !important
+      }
+
+      .mxdd {
+        display: block
+      }
+    }
+
+    .mxddb {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      background: #065f46;
+      color: #fff;
+      border: 1px solid #10b981;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .mxddm {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 6px);
+      min-width: 210px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, .45);
+      z-index: 60
+    }
+
+    .mxddm[hidden] {
+      display: none
+    }
+
+    .mxi {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 14px;
+      font-weight: 600;
+      text-align: left;
+      background: none;
+      border: 0;
+      cursor: pointer
+    }
+
+    .mxi i {
+      width: 18px;
+      text-align: center;
+      color: #34d399
+    }
+
+    .mxi.on {
+      background: #065f46;
+      color: #fff
+    }
+
+    .mxdemo {
+      font-size: 11px;
+      color: var(--mu);
+      margin: -2px 0 12px
+    }
+
+    .mxsub {
+      margin: -4px 0 12px;
+      color: var(--mu);
+      font-size: 12px
+    }
+
+    .mxlink {
+      color: #059669;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: underline
+    }
+
+    .mxseg {
+      display: inline-flex
+    }
+
+    .mxdet>summary {
+      cursor: pointer;
+      font-weight: 700;
+      padding: 10px 14px;
+      background: var(--cd);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      list-style: none
+    }
+
+    .mxdet>summary::before {
+      content: '▸ ';
+      color: #059669
+    }
+
+    .mxdet[open]>summary::before {
+      content: '▾ '
+    }
+
+    .mxbg {
+      background: #e11d48;
+      color: #fff;
+      border-radius: 99px;
+      font-size: 10px;
+      padding: 0 6px;
+      line-height: 16px
+    }
   </style>
+  <div id="mx-role" class="mxpin" hidden>
+    <div style="width:min(460px,100%)">
+      <div id="mx-role-s1"><b style="font-size:17px">Masuk sebagai</b>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Pilih peran, lalu masukkan PIN-nya.<br>PIN demo: Kasir
+          1111 · Supervisor 2222 · Pemilik 3333</div>
+        <button class="mxrc" onclick="mxRoleChoose('kasir')">Kasir<small>Hanya layar Kasir. Void, retur, dan kas keluar
+            butuh PIN supervisor.</small></button>
+        <button class="mxrc" onclick="mxRoleChoose('spv')">Supervisor<small>Kasir, Dashboard, dan Inventori. Tidak
+            melihat laba.</small></button>
+        <button class="mxrc" onclick="mxRoleChoose('owner')">Pemilik<small>Semua menu, termasuk Laporan laba, keamanan,
+            dan cadangan data.</small></button>
+        <div style="display:flex;gap:8px;margin-top:12px"><button id="mx-role-x" class="mxbtn"
+            style="background:#475569;flex:1"
+            onclick="document.getElementById('mx-role').hidden=true">Batal</button><button id="mx-role-out"
+            class="mxbtn" style="background:#be123c;flex:1" onclick="mxLogout()">Keluar</button></div>
+      </div>
+      <div id="mx-role-s2" hidden><b id="mx-role-t2" style="font-size:17px">Masuk</b>
+        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Masukkan PIN untuk peran ini.</div>
+        <input id="mx-role-i" type="password" inputmode="numeric" maxlength="6" autocomplete="off"
+          onkeydown="if(event.key==='Enter')mxRoleOk()">
+        <div id="mx-role-e" style="color:#fb7185;font-size:12px;min-height:16px"></div>
+        <div style="display:flex;gap:8px;margin-top:8px"><button class="mxbtn" style="flex:1"
+            onclick="mxRoleOk()">Masuk</button><button class="mxbtn" style="flex:1;background:#475569"
+            onclick="mxRoleBack()">Kembali</button></div>
+      </div>
+    </div>
+  </div>
+  <div id="mx-pin" class="mxpin" hidden>
+    <div><b id="mx-pin-t">Otorisasi supervisor</b>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Masukkan PIN Supervisor atau Pemilik. PIN demo: 2222 /
+        3333</div>
+      <input id="mx-pin-i" type="password" inputmode="numeric" maxlength="6" autocomplete="off"
+        onkeydown="if(event.key==='Enter')mxPinOk()">
+      <div id="mx-pin-e" style="color:#fb7185;font-size:12px;min-height:16px"></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="mxbtn" style="flex:1"
+          onclick="mxPinOk()">Otorisasi</button><button class="mxbtn" style="flex:1;background:#475569"
+          onclick="mxPinCancel()">Batal</button></div>
+    </div>
+  </div>
   <div id="mx-view" hidden></div>
   <script>
     (function () {
-      var K = 'mx-ext-v1', X = { cost: {}, min: {}, exp: {} }, H = null, view = 'kasir', per = 7, OPEX = 300000;
+      var K = 'mx-ext-v1', X = { cost: {}, min: {}, exp: {} }, H = null, view = 'kasir', per = 7, invTab = 'stock', invEdit = false, detOpen = false, addOpen = false, recvId = null, editId = null, editImg = null, payId = null, adOpen = false, secOpen = false, devOpen = false, cardId = null, poDraft = [], lastRec = [], OPEX = 300000;
       var RC = { sembako: .86, snack: .78, minuman: .74, mandi: .76, rokok_pulsa: .93 };
       var EXP = { p1: 400, p2: 200, p3: 180, p4: 240, p5: 18, p6: 6, p9: 150, p10: 330, p11: 25, p12: 300, p13: 9 };
       var $ = function (i) { return document.getElementById(i); }, R = function (n) { return formatRupiah(Math.round(n)); };
       function sh(n) { return n >= 1e6 ? (n / 1e6).toFixed(1).replace('.', ',') + ' jt' : Math.round(n / 1e3) + ' rb'; }
-      function sv() { try { localStorage.setItem(K, JSON.stringify(X)); } catch (e) { } }
+      function sv() { try { var c = Object.assign({}, X); delete c.role; localStorage.setItem(K, JSON.stringify(c)); return true; } catch (e) { return false; } }
       function rnd(s) { return function () { s |= 0; s = s + 0x6D2B79F5 | 0; var t = Math.imul(s ^ s >>> 15, 1 | s); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+      function ph(p) {
+        var C = { sembako: '#b45309', snack: '#be123c', minuman: '#0369a1', mandi: '#7c3aed', rokok_pulsa: '#475569' }, t = (p.name || '?').split(/\s+/).slice(0, 2).map(function (w) { return w.replace(/[^A-Za-z0-9]/g, '').charAt(0); }).join('').toUpperCase() || '?';
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 270"><rect width="360" height="270" fill="' + (C[p.category] || '#475569') + '"/><text x="180" y="160" text-anchor="middle" font-size="96" font-family="sans-serif" font-weight="700" fill="#fff">' + t + '</text></svg>');
+      }
+      try {
+        var sx = JSON.parse(localStorage.getItem(K)) || {}, ms = JSON.parse(localStorage.getItem('martexpress-pos-v2')) || {};
+        (sx.np || []).forEach(function (q) { if (!PRODUCTS.some(function (p) { return p.id === q.id; })) { q.imageUrl = ph(q); PRODUCTS.push(q); } });
+        Object.keys(sx.ov || {}).forEach(function (id) { var p = productById(id), o = sx.ov[id]; if (!p) return;['name', 'category', 'unit', 'price', 'imageUrl'].forEach(function (k) { if (o[k] != null) p[k] = o[k]; }); if (o.noOrig) delete p.originalPrice; });
+        (ms.stock || []).forEach(function (x) { var p = productById(x[0]); if (p && String(x[0]).charAt(0) === 'n') p.stock = x[1]; });
+      } catch (e) { }
       function ini() {
         try { var r = JSON.parse(localStorage.getItem(K)); if (r && r.cost) X = r; } catch (e) { }
+        delete X.role;
         var t = new Date();
         PRODUCTS.forEach(function (p, i) {
           if (X.cost[p.id] == null) X.cost[p.id] = Math.round(p.price * (RC[p.category] || .8) * (.97 + (i % 4) * .02) / 100) * 100;
           if (X.min[p.id] == null) X.min[p.id] = p.stock > 500 ? 0 : (p.price < 5000 ? 30 : 10);
           if (X.exp[p.id] === undefined) { if (EXP[p.id]) { var d = new Date(t); d.setDate(d.getDate() + EXP[p.id]); X.exp[p.id] = d.toISOString().slice(0, 10); } else X.exp[p.id] = ''; }
-        }); sv();
+        }); X.po = X.po || []; X.adj = X.adj || []; X.audit = X.audit || []; X.pins = X.pins || { kasir: '1111', spv: '2222', owner: '3333' }; if (X.pin) { X.pins.spv = X.pin; delete X.pin; } sv(); window.mxMinMap = X.min;
         var W = [0, 0, 0, 0, 0, 0, 1, 3, 4, 3, 3, 4, 5, 4, 3, 3, 4, 6, 8, 9, 6, 3, 1, 0], S = W.reduce(function (a, b) { return a + b; }), g = rnd(7), hr = t.getHours();
         H = [];
         for (var d = 13; d >= 0; d--) {
-          var dt = new Date(); dt.setDate(dt.getDate() - d);
+          g = rnd(100 + d); var dt = new Date(); dt.setDate(dt.getDate() - d);
           var wk = dt.getDay() % 6 === 0 ? 1.3 : 1, f = 1;
           if (d === 0) { var c = 0; W.forEach(function (w, h) { if (h <= hr) c += w; }); f = c / S; }
           var q = {}, hrs = [], n = Math.round(90 * wk * (.8 + g() * .4) * f);
-          PRODUCTS.forEach(function (p) { var b = p.isPopular ? 14 : 6; if (p.price > 30000) b *= .5; q[p.id] = Math.round(b * wk * (.6 + g() * .8) * f); });
-          W.forEach(function (w, h) { hrs[h] = (d === 0 && h > hr) ? 0 : Math.round(n * w / S / f); });
+          PRODUCTS.forEach(function (p) { if (p.id[0] === 'n') { q[p.id] = 0; return; } var b = p.isPopular ? 14 : 6; if (p.price > 30000) b *= .5; q[p.id] = Math.round(b * wk * (.6 + g() * .8) * f); });
+          W.forEach(function (w, h) { hrs[h] = (d === 0 && (h > hr || !f)) ? 0 : Math.round(n * w / S / f); });
           H.push({ date: dt, q: q, hrs: hrs, tx: n });
         }
       }
       function agg(d) {
-        var x = H[d], q = Object.assign({}, x.q), hrs = x.hrs.slice(), tx = x.tx, net = 0, man = 0, id;
-        for (id in q) { var p = productById(id); if (p) net += q[id] * p.price; }
-        if (d === H.length - 1) {
-          var ds = new Date().toDateString();
-          transactions.forEach(function (t) { if (t.voided || new Date(t.date).toDateString() !== ds) return; tx++; hrs[new Date(t.date).getHours()]++; t.items.forEach(function (i) { q[i.productId] = (q[i.productId] || 0) + i.quantity; net += i.subtotal; }); });
-          (shift.cashLog || []).forEach(function (e) { if (e.type === 'out') man += e.amount; });
-        }
-        var hpp = 0; for (id in q) hpp += q[id] * (X.cost[id] || 0);
-        return { date: x.date, q: q, hrs: hrs, tx: tx, net: net, hpp: hpp, gp: net - hpp, op: OPEX, man: man, np: net - hpp - OPEX - man };
+        var x = H[d], q = Object.assign({}, x.q), hrs = x.hrs.slice(), tx = x.tx, net = 0, man = 0, pay = { cash: 0, qris: 0, card: 0 }, id, ds = x.date.toDateString(), last = d === H.length - 1;
+        for (id in q) { var p = productById(id); if (p) net += q[id] * p.price * .97; }
+        pay.cash = net * .55; pay.qris = net * .35; pay.card = net * .10;
+        var pk = function (m) { return m === 'cash' ? 'cash' : m === 'qris' ? 'qris' : 'card'; };
+        transactions.forEach(function (t) {
+          if (t.voided) return;
+          var nt = t.total - t.tax - (t.rounding || 0), r = t.total ? nt / t.total : 1;
+          if (new Date(t.date).toDateString() === ds) {
+            tx++; hrs[new Date(t.date).getHours()]++; net += nt; pay[pk(t.method)] += nt;
+            t.items.forEach(function (i) { q[i.productId] = (q[i.productId] || 0) + i.quantity; });
+          }
+          (t.refunds || []).forEach(function (f) {
+            if (new Date(f.time).toDateString() !== ds) return;
+            net -= f.amount * r; pay[pk(t.method)] -= f.amount * r;
+            if (f.reason === 'salah') f.lines.forEach(function (l) { q[l.productId] = (q[l.productId] || 0) - l.qty; });
+          });
+        });
+        if (last) (shift.cashLog || []).forEach(function (e) { if (e.type === 'out' && !e.supplier) man += e.amount; });
+        var hpp = 0, et = new Date(x.date); et.setHours(23, 59, 59, 999);
+        for (id in q) hpp += q[id] * costAt(id, et.getTime());
+        var op = X.opex != null ? X.opex : OPEX;
+        return { date: x.date, pay: pay, q: q, hrs: hrs, tx: tx, net: net, hpp: hpp, gp: net - hpp, op: op, man: man, np: net - hpp - op - man };
       }
-      function rng(n) { var a = []; for (var i = H.length - n; i < H.length; i++) a.push(agg(i)); return a; }
+      function rng(n, o) { o = o || 0; var a = []; for (var i = H.length - n - o; i < H.length - o; i++) a.push(agg(i)); return a; }
       function sum(a, k) { return a.reduce(function (s, d) { return s + d[k]; }, 0); }
       function card(l, v, s, c) { return '<div class="mxc"><small>' + l + '</small><b class="big ' + (c || '') + '">' + v + '</b><small>' + (s || '') + '</small></div>'; }
       function daysLeft(p) { var e = X.exp[p.id]; return e ? Math.ceil((new Date(e + 'T23:59:59') - new Date()) / 864e5) : null; }
@@ -4899,27 +5282,27 @@
       function chart(a) {
         var W = 640, Hh = 190, m = 28, mx = Math.max.apply(null, a.map(function (d) { return d.net; })) || 1, bw = W / a.length, u = Hh - m - 14, s = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" style="width:100%;height:auto;color:var(--tx)">';
         a.forEach(function (d, i) {
-          var h = u * d.net / mx, hh = u * Math.max(d.hpp, 0) / mx, x = i * bw + bw * .15, w = bw * .7, y = Hh - m - h, cx = x + w / 2;
+          var h = u * d.net / mx, hh = X.role === 'owner' ? u * Math.max(d.hpp, 0) / mx : 0, w = Math.min(bw * .7, 64), x = i * bw + (bw - w) / 2, y = Hh - m - h, cx = x + w / 2;
           s += '<rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + (h - hh) + '" rx="3" fill="#10b981"/><rect x="' + x + '" y="' + (y + h - hh) + '" width="' + w + '" height="' + hh + '" fill="#94a3b8"/>' +
             '<text x="' + cx + '" y="' + (y - 4) + '" text-anchor="middle" font-size="9" fill="currentColor">' + sh(d.net) + '</text><text x="' + cx + '" y="' + (Hh - 10) + '" text-anchor="middle" font-size="10" fill="#64748b">' + d.date.getDate() + '/' + (d.date.getMonth() + 1) + '</text>';
         });
-        return s + '</svg><small style="color:var(--mu)"><span style="color:#10b981">■</span> Laba kotor &nbsp; <span style="color:#94a3b8">■</span> HPP (tinggi total = penjualan)</small>';
+        return s + '</svg><small style="color:var(--mu)">' + (X.role === 'owner' ? '<span style="color:#10b981">■</span> Laba kotor &nbsp; <span style="color:#94a3b8">■</span> HPP (tinggi total = penjualan)' : 'Penjualan bersih per hari') + '</small>';
       }
-      var NOTE = '<div class="mxnote"><b>DATA DEMO</b> — riwayat 13 hari sebelumnya dibuat otomatis (bukan data nyata). Transaksi kasir hari ini tercatat nyata dan langsung masuk ke sini.</div>';
+      var NOTE = '<div class="mxdemo"><span class="mxtag a">DATA DEMO</span> Riwayat 13 hari sebelumnya adalah contoh. Transaksi kasir hari ini nyata.</div>';
       function dash() {
         var a = rng(7), t = a[6], y = agg(H.length - 2), hr = new Date().getHours(), yc = 0, ys = 0, hs = Array(24).fill(0);
         y.hrs.forEach(function (v, h) { ys += v; if (h <= hr) yc += v; });
         var yn = ys ? y.net * yc / ys : y.net, dl = yn ? Math.round((t.net - yn) / yn * 100) : 0;
         a.forEach(function (d) { d.hrs.forEach(function (v, h) { hs[h] += v; }); });
         var pk = hs.indexOf(Math.max.apply(null, hs)), low = lowList(), ex = expList();
-        return NOTE + '<h2><i class="fa-solid fa-gauge"></i> Dashboard</h2><div class="mxg">' +
+        return NOTE + '<h2><i class="fa-solid fa-gauge"></i> Dashboard</h2><p class="mxsub" style="color:var(--tx);font-size:14px">Hari ini toko menjual <b>' + R(t.net) + '</b> (' + (dl >= 0 ? 'naik ' : 'turun ') + Math.abs(dl) + '% dibanding kemarin jam yang sama). ' + (low.length ? '<b class="am">' + low.length + ' barang</b> perlu diisi ulang.' : 'Semua stok aman.') + '</p>' + guide() + '<div class="mxg">' +
           card('Penjualan hari ini', R(t.net), (dl >= 0 ? '▲ ' : '▼ ') + Math.abs(dl) + '% vs kemarin (jam yang sama)', dl >= 0 ? 'up' : 'dn') +
-          card('Laba kotor hari ini', R(t.gp), 'Margin ' + (t.net ? Math.round(t.gp / t.net * 100) : 0) + '%') +
+          (X.role === 'owner' ? card('Laba kotor hari ini', R(t.gp), 'Margin ' + (t.net ? Math.round(t.gp / t.net * 100) : 0) + '%') : card('Barang terjual hari ini', Object.keys(t.q).reduce(function (n, k) { return n + Math.max(0, t.q[k]); }, 0), 'pcs')) +
           card('Transaksi hari ini', t.tx, 'Rata-rata ' + R(t.tx ? t.net / t.tx : 0) + '/struk') +
           card('Jam paling ramai', pk + ':00–' + (pk + 1) + ':00', 'berdasarkan 7 hari terakhir') + '</div>' +
-          '<div class="mxg2"><div class="mxc"><h3>Penjualan 7 hari terakhir</h3>' + chart(a) + '</div><div>' +
-          '<div class="mxc" style="margin-bottom:12px"><h3>Stok perlu diisi ulang (' + low.length + ')</h3>' + (low.slice(0, 6).map(function (p) { return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (p.stock <= 0 ? 'dn' : 'am') + '">' + p.stock + ' / min ' + X.min[p.id] + '</b></div>'; }).join('') || '<small>Semua stok aman.</small>') + '</div>' +
-          '<div class="mxc"><h3>Segera kadaluarsa (' + ex.length + ')</h3>' + (ex.slice(0, 5).map(function (p) { var d = daysLeft(p); return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (d < 0 ? 'dn' : 'am') + '">' + (d < 0 ? 'lewat ' + (-d) : d) + ' hari</b></div>'; }).join('') || '<small>Tidak ada.</small>') + '</div></div></div>';
+          '<div class="mxg2"><div class="mxc"><h3>Penjualan 7 hari terakhir</h3>' + chart(a) + '<h3 style="margin-top:14px">Jam ramai (rata-rata 7 hari)</h3>' + hourChart(hs) + '</div><div>' +
+          '<div class="mxc" style="margin-bottom:12px"><h3>Stok perlu diisi ulang (' + low.length + ')</h3>' + (low.slice(0, 4).map(function (p) { return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (p.stock <= 0 ? 'dn' : 'am') + '">' + p.stock + ' / min ' + X.min[p.id] + '</b></div>'; }).join('') || '<small>Semua stok aman.</small>') + '</div>' +
+          '<div class="mxc"><h3>Segera kadaluarsa (' + ex.length + ')</h3>' + (ex.slice(0, 3).map(function (p) { var d = daysLeft(p); return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (d < 0 ? 'dn' : 'am') + '">' + (d < 0 ? 'lewat ' + (-d) : d) + ' hari</b></div>'; }).join('') || '<small>Tidak ada.</small>') + '<a class="mxlink" onclick="mxView(\'inv\')">Buka Inventori →</a></div></div></div>' + (X.role === 'owner' ? sec() + dev() : '');
       }
       function inv() {
         var val = 0, low = lowList(), ex = expList();
@@ -4927,71 +5310,489 @@
         var rows = PRODUCTS.slice().sort(function (a, b) { return a.stock / (X.min[a.id] || 1) - b.stock / (X.min[b.id] || 1); }).map(function (p) {
           var d = daysLeft(p), tg = p.stock <= 0 ? '<span class="mxtag r">Habis</span>' : p.stock <= X.min[p.id] ? '<span class="mxtag a">Menipis</span>' : '<span class="mxtag g">Aman</span>';
           if (d !== null && d < 0) tg += '<span class="mxtag r">Kadaluarsa</span>'; else if (d !== null && d <= 30) tg += '<span class="mxtag a">ED ' + d + ' hr</span>';
-          return '<tr><td>' + esc(p.name) + '</td><td class="r">' + p.stock + '</td><td><input type="number" min="0" value="' + X.min[p.id] + '" onchange="mxSet(\'min\',\'' + p.id + '\',this.value)"></td>' +
-            '<td><input type="number" min="0" step="100" value="' + X.cost[p.id] + '" onchange="mxSet(\'cost\',\'' + p.id + '\',this.value)"></td><td class="r">' + R(p.price) + '</td><td class="r">' + R(Math.max(p.stock, 0) * X.cost[p.id]) + '</td>' +
-            '<td><input type="date" value="' + (X.exp[p.id] || '') + '" onchange="mxSet(\'exp\',\'' + p.id + '\',this.value)"></td><td>' + tg + '</td></tr>';
+          return '<tr><td><a class="mxlink" style="text-decoration:none" onclick="mxCard(\'' + p.id + '\')">' + esc(p.name) + '</a></td><td class="r">' + p.stock + '</td><td>' + inp('min', p) + '</td>' +
+            '<td>' + inp('cost', p) + '</td><td class="r">' + R(p.price) + '</td><td class="r">' + R(Math.max(p.stock, 0) * X.cost[p.id]) + '</td>' +
+            '<td>' + inp('exp', p) + '</td><td>' + tg + '</td>' + (invEdit ? '<td><button class="mxbtn" onclick="mxEditP(\'' + p.id + '\')">Ubah</button></td>' : '') + '</tr>';
         }).join('');
-        return NOTE.replace('riwayat 13 hari sebelumnya dibuat otomatis (bukan data nyata)', 'HPP, stok minimum, dan tanggal kadaluarsa awal adalah contoh; semuanya bisa Anda ubah di tabel') +
-          '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><div class="mxg">' +
+        return NOTE +
+          '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><p class="mxsub">Menjawab: stok saya aman nggak?</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div class="mxseg"><button class="' + (invTab !== 'buy' ? 'on' : '') + '" onclick="mxTab(\'stock\')">Stok barang</button><button class="' + (invTab === 'buy' ? 'on' : '') + '" onclick="mxTab(\'buy\')">Pembelian &amp; supplier</button></div>' + (invTab !== 'buy' ? '<button class="mxbtn" onclick="mxAdd()">' + (addOpen ? 'Batal tambah' : '+ Produk baru') + '</button><button class="mxbtn" style="background:' + (invEdit ? '#d97706' : '#64748b') + '" onclick="mxEdit()">' + (invEdit ? 'Selesai mengubah' : 'Ubah harga modal / stok minimum / kadaluarsa') + '</button>' : '') + '</div><div class="mxg">' +
           card('Nilai persediaan (HPP)', R(val), 'stok × harga modal') + card('Perlu restock', low.length, 'stok ≤ minimum', low.length ? 'am' : 'up') +
           card('Segera kadaluarsa', ex.length, '≤ 30 hari / lewat', ex.length ? 'dn' : 'up') + card('Jumlah produk', PRODUCTS.length, '') + '</div>' +
-          '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>HPP (Rp)</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + po();
+          (invTab === 'buy' ? '' : (addOpen ? addForm() : '') + (editId ? editForm() : '') + (cardId ? stockCard() : '') + '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>Harga modal</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th>' + (invEdit ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>') + (invTab === 'buy' ? po() + adj() + sup() + opn() : '');
       }
       var SUP = { sembako: 'PT Sembako Jaya', snack: 'CV Snack Nusantara', minuman: 'Distributor Minuman Prima', mandi: 'Agen Rumah Tangga Makmur', rokok_pulsa: 'Agen Rokok & Pulsa Cikarang' };
+      var SUPD = { sembako: { c: '0812-3456-7001', lt: 2, tm: 14 }, snack: { c: '0813-5555-0102', lt: 1, tm: 7 }, minuman: { c: '0811-2233-4455', lt: 1, tm: 7 }, mandi: { c: '0857-9000-1200', lt: 3, tm: 30 }, rokok_pulsa: { c: '021-5550-0199', lt: 1, tm: 0 } };
+      function due(o) {
+        if (!o.ts) return '-'; var d = new Date(o.ts + SUPD[productById(o.pid).category].tm * 864e5), late = !o.paid && o.st === 'Diterima' && d < new Date();
+        return '<span class="' + (late ? 'dn' : '') + '">' + d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + '</span>';
+      }
+      function sup() {
+        return '<div class="mxc mxsc" style="margin-top:12px"><h3>Daftar supplier (data contoh)</h3><table class="mxt"><thead><tr><th>Supplier</th><th>Kontak</th><th class="r">Lead time</th><th class="r">Termin bayar</th></tr></thead><tbody>' +
+          Object.keys(SUP).map(function (k) { var d = SUPD[k]; return '<tr><td>' + esc(SUP[k]) + '</td><td>' + d.c + '</td><td class="r">' + d.lt + ' hari</td><td class="r">' + (d.tm ? d.tm + ' hari' : 'Tunai') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+      }
       function po() {
         X.po = X.po || [];
         var low = lowList().map(function (p) { return p.id; }), opts = PRODUCTS.slice().sort(function (a, b) { return (low.indexOf(b.id) >= 0) - (low.indexOf(a.id) >= 0); }).map(function (p) { return '<option value="' + p.id + '">' + (low.indexOf(p.id) >= 0 ? '⚠ ' : '') + esc(p.name) + ' — ' + esc(SUP[p.category]) + '</option>'; }).join('');
-        var open = X.po.filter(function (o) { return o.st === 'Dipesan'; }).reduce(function (t, o) { return t + o.qty * o.cost; }, 0);
-        var rows = X.po.slice().reverse().map(function (o) {
+        var open = X.po.filter(function (o) { return o.st !== 'Diterima'; }).reduce(function (t, o) { return t + (o.qty - rc(o)) * o.cost; }, 0);
+        var hut = X.po.filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+        hut = Math.max(0, hut - (X.adj || []).filter(function (r) { return r.reason === 'retur'; }).reduce(function (t, r) { return t + r.val; }, 0));
+        var lineRow = function (o) {
           var p = productById(o.pid);
-          return '<tr><td>' + o.id + '</td><td>' + esc(SUP[p.category]) + '</td><td>' + esc(p.name) + '</td><td class="r">' + o.qty + '</td><td class="r">' + R(o.qty * o.cost) + '</td><td>' + o.date + '</td><td>' +
-            (o.st === 'Dipesan' ? '<button class="mxbtn" onclick="mxRecv(\'' + o.id + '\')">Terima barang</button>' : '<span class="mxtag g">Diterima</span>') + '</td></tr>';
+          var tr = '<tr><td>' + o.id + '</td><td>' + esc(SUP[p.category]) + '</td><td>' + esc(p.name) + '</td><td class="r">' + o.qty + '</td><td class="r">' + R(o.qty * o.cost) + '</td><td>' + o.date + '</td><td>' + due(o) + '</td><td>' +
+            (o.st !== 'Diterima' ? (o.st === 'Sebagian' ? '<span class="mxtag a">Sebagian ' + rc(o) + '/' + o.qty + '</span> ' : '') + '<button class="mxbtn" onclick="mxRecv(\'' + o.id + '\')">Terima barang</button>' : '<span class="mxtag g">Diterima</span>' + (o.paid ? '<span class="mxtag g">Lunas</span>' : '<button class="mxbtn" onclick="mxPay(\'' + o.id + '\')">Bayar</button>')) + '</td></tr>';
+          return tr + (recvId === o.id ? rvRow(o) : '') + (payId === o.id ? pyRow(o) : '');
+        };
+        var gs = {}, ord = []; X.po.forEach(function (o) { var g = o.grp || o.id; if (!gs[g]) { gs[g] = []; ord.push(g); } gs[g].push(o); }); ord.reverse();
+        var rows = ord.map(function (g) {
+          var L = gs[g], head = '';
+          if (L.length > 1) {
+            var tot = L.reduce(function (t, o) { return t + o.qty * o.cost; }, 0), openN = L.filter(function (o) { return o.st !== 'Diterima'; }).length, unp = L.filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+            head = '<tr style="background:var(--bg)"><td colspan="8"><div class="mxrow"><b>' + g + '</b> · ' + esc(SUP[productById(L[0].pid).category]) + ' · ' + L.length + ' barang · ' + R(tot) + (openN ? '<button class="mxbtn" onclick="mxRecvAll(\'' + g + '\')">Terima semua sisa</button>' : '') + (unp ? '<button class="mxbtn" style="background:#d97706" onclick="mxPayAll(\'' + g + '\')">Bayar semua (' + R(unp) + ')</button>' : '') + '</div></td></tr>' + (payId === g ? pyRowG(g, unp) : '');
+          }
+          return head + L.map(lineRow).join('');
         }).join('');
-        return '<div class="mxc" style="margin-top:12px"><h3>Pembelian ke supplier (pesanan masuk) · tertunda ' + R(open) + '</h3>' +
+        return rec() + '<div class="mxc" style="margin-top:12px"><h3>Pembelian ke supplier (pesanan masuk) · tertunda ' + R(open) + ' · belum dibayar ' + R(hut) + '</h3>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><select id="po-p" style="flex:1;min-width:220px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)">' + opts + '</select>' +
-          '<input id="po-q" type="number" min="1" placeholder="Qty" style="width:80px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"><button class="mxbtn" onclick="mxPO()">Buat PO</button></div>' +
-          '<div class="mxsc"><table class="mxt"><thead><tr><th>No. PO</th><th>Supplier</th><th>Produk</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th>Tanggal</th><th>Status</th></tr></thead><tbody>' +
-          (rows || '<tr><td colspan="7" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠ lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
+          '<input id="po-q" type="number" min="1" placeholder="Qty" style="width:80px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"><button class="mxbtn" onclick="mxPOAdd()">Tambah barang</button></div>' + poDraftHtml() +
+          '<div class="mxsc"><table class="mxt"><thead><tr><th>No. PO</th><th>Supplier</th><th>Produk</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th>Tanggal</th><th>Jatuh tempo</th><th>Status</th></tr></thead><tbody>' +
+          (rows || '<tr><td colspan="8" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠, tambahkan beberapa barang dari supplier yang sama, lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
       }
       function lap() {
-        var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), np = gp - op - man, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
+        var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), sel = selisih(per), wr = writeoff(per), np = gp - op - man + sel - wr, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
         a.forEach(function (d) { for (var id in d.q) q[id] = (q[id] || 0) + d.q[id]; });
         var best = PRODUCTS.map(function (p) { return { p: p, qty: q[p.id] || 0, m: (p.price - X.cost[p.id]) / p.price, lb: (q[p.id] || 0) * (p.price - X.cost[p.id]) }; });
         var top = best.slice().sort(function (x, y) { return y.qty - x.qty; }).slice(0, 5), mg = best.slice().sort(function (x, y) { return y.m - x.m; });
         var li = function (r) { return '<tr><td>' + esc(r.p.name) + '</td><td class="r">' + r.qty + '</td><td class="r">' + R(r.qty * r.p.price) + '</td><td class="r">' + (r.m * 100).toFixed(1).replace('.', ',') + '%</td></tr>'; };
         var head = '<thead><tr><th>Produk</th><th class="r">Terjual</th><th class="r">Omzet</th><th class="r">Margin</th></tr></thead>';
-        return NOTE + '<h2><i class="fa-solid fa-chart-line"></i> Laporan Laba Rugi <span class="mxseg" style="margin-left:auto"><button class="' + (per === 7 ? 'on' : '') + '" onclick="mxPer(7)">7 hari</button><button class="' + (per === 14 ? 'on' : '') + '" onclick="mxPer(14)">14 hari</button></span></h2>' +
-          '<div class="mxg2"><div class="mxc mxsc"><h3>Laba rugi · ' + per + ' hari terakhir</h3><table class="mxt"><tbody>' +
-          '<tr><td>Penjualan bersih</td><td class="r">' + R(net) + '</td><td class="r">100%</td></tr><tr><td>Harga pokok penjualan (HPP)</td><td class="r dn">− ' + R(hpp) + '</td><td class="r">' + pc(hpp) + '</td></tr>' +
-          '<tr class="tot"><td>Laba kotor</td><td class="r up">' + R(gp) + '</td><td class="r">' + pc(gp) + '</td></tr>' +
+        var pv = per * 2 <= H.length ? rng(per, per) : null, dl = function (x, y) { if (!y) return ''; var p = Math.round((x - y) / Math.abs(y) * 100); return (p >= 0 ? '▲ ' : '▼ ') + Math.abs(p) + '% vs ' + per + ' hari sebelumnya'; };
+        var cmp = pv ? '<div class="mxg">' + card('Penjualan bersih', R(net), dl(net, sum(pv, 'net'))) + card('Laba kotor', R(gp), dl(gp, sum(pv, 'gp'))) + card('Laba bersih', R(np), dl(np, sum(pv, 'np')), np >= 0 ? 'up' : 'dn') + card('Transaksi', sum(a, 'tx'), dl(sum(a, 'tx'), sum(pv, 'tx'))) + '</div><small style="color:var(--mu);display:block;margin:-4px 0 12px">Hari ini masih berjalan, jadi angka periode ini bisa tampak lebih rendah sampai toko tutup.</small>' : '<div class="mxnote" style="background:var(--cd);color:var(--tx);border-color:var(--bd)">Perbandingan dengan periode sebelumnya tersedia untuk Hari ini, 3 hari, dan 7 hari (data demo hanya 14 hari).</div>';
+        return NOTE + '<h2><i class="fa-solid fa-chart-line"></i> Laporan Laba Rugi <span class="mxseg" style="margin-left:auto"><button class="' + (per === 1 ? 'on' : '') + '" onclick="mxPer(1)">Hari ini</button><button class="' + (per === 3 ? 'on' : '') + '" onclick="mxPer(3)">3 hari</button><button class="' + (per === 7 ? 'on' : '') + '" onclick="mxPer(7)">7 hari</button><button class="' + (per === 14 ? 'on' : '') + '" onclick="mxPer(14)">14 hari</button></span><button class="mxbtn" onclick="mxCSV()">Ekspor CSV</button><button class="mxbtn" onclick="window.print()">Cetak</button></h2><p class="mxsub">Menjawab: untung toko berapa? &nbsp;Biaya operasional per hari (contoh): Rp <input type="number" min="0" step="10000" value="' + (X.opex != null ? X.opex : OPEX) + '" onchange="mxOpex(this.value)" style="width:110px;padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"> &nbsp;gaji, listrik, sewa — ubah sesuai toko Anda. Penjualan bersih sudah dikurangi diskon &amp; PPN.</p>' +
+          '<p class="mxsub" style="color:var(--tx);font-size:14px">Dari penjualan <b>' + R(net) + '</b>, setelah modal barang dan biaya, ' + (np >= 0 ? 'tersisa laba <b class="up">' : 'rugi <b class="dn">') + R(Math.abs(np)) + '</b> (' + pc(np) + ' dari penjualan).</p>' + cmp + '<div class="mxg2"><div class="mxc mxsc"><h3>Laba rugi · ' + per + ' hari terakhir</h3><table class="mxt"><tbody>' +
+          '<tr><td>Penjualan bersih</td><td class="r">' + R(net) + '</td><td class="r">100%</td></tr><tr><td>Modal barang terjual (HPP)</td><td class="r dn">− ' + R(hpp) + '</td><td class="r">' + pc(hpp) + '</td></tr>' +
+          '<tr class="tot"><td>Laba kotor <small style="font-weight:400;color:var(--mu)">(penjualan − modal)</small></td><td class="r up">' + R(gp) + '</td><td class="r">' + pc(gp) + '</td></tr>' +
           '<tr><td>Biaya operasional (demo: gaji, listrik, sewa)</td><td class="r dn">− ' + R(op) + '</td><td class="r">' + pc(op) + '</td></tr><tr><td>Kas keluar manual dari kasir</td><td class="r dn">− ' + R(man) + '</td><td class="r">' + pc(man) + '</td></tr>' +
-          '<tr class="tot"><td>Laba bersih</td><td class="r ' + (np >= 0 ? 'up' : 'dn') + '">' + R(np) + '</td><td class="r">' + pc(np) + '</td></tr></tbody></table></div>' +
+          '<tr><td>Selisih stok (opname)</td><td class="r ' + (sel < 0 ? 'dn' : '') + '">' + (sel < 0 ? '− ' : '') + R(Math.abs(sel)) + '</td><td class="r">' + pc(Math.abs(sel)) + '</td></tr>' +
+          '<tr><td>Barang rusak / kadaluarsa</td><td class="r ' + (wr > 0 ? 'dn' : '') + '">' + (wr > 0 ? '− ' : '') + R(wr) + '</td><td class="r">' + pc(wr) + '</td></tr>' +
+          '<tr class="tot"><td>Laba bersih <small style="font-weight:400;color:var(--mu)">(setelah semua biaya)</small></td><td class="r ' + (np >= 0 ? 'up' : 'dn') + '">' + R(np) + '</td><td class="r">' + pc(np) + '</td></tr></tbody></table><small style="color:var(--mu);display:block;margin-top:8px">Pembayaran ke supplier bukan biaya: modal barang sudah dihitung di HPP saat barang terjual. Pembayaran tunai tetap mengurangi kas laci.</small></div>' +
           '<div class="mxc"><h3>Penjualan harian</h3>' + chart(a) + '</div></div>' +
-          '<div class="mxg2"><div class="mxc mxsc"><h3>Produk terlaris</h3><table class="mxt">' + head + '<tbody>' + top.map(li).join('') + '</tbody></table></div>' +
-          '<div class="mxc mxsc"><h3>Margin tertinggi</h3><table class="mxt">' + head + '<tbody>' + mg.slice(0, 3).map(li).join('') + '</tbody></table><h3 style="margin-top:12px">Margin terendah</h3><table class="mxt">' + head + '<tbody>' + mg.slice(-3).reverse().map(li).join('') + '</tbody></table></div></div>';
+          '<details class="mxdet" ' + (detOpen ? 'open' : '') + ' ontoggle="mxDet(this.open)"><summary>Lihat rincian: produk terlaris, margin, kategori, pembayaran, arus kas</summary><div class="mxg2"><div class="mxc mxsc"><h3>Produk terlaris</h3><table class="mxt">' + head + '<tbody>' + top.map(li).join('') + '</tbody></table></div>' +
+          '<div class="mxc mxsc"><h3>Margin tertinggi</h3><table class="mxt">' + head + '<tbody>' + mg.slice(0, 3).map(li).join('') + '</tbody></table><h3 style="margin-top:12px">Margin terendah</h3><table class="mxt">' + head + '<tbody>' + mg.slice(-3).reverse().map(li).join('') + '</tbody></table></div></div>' + '<div class="mxg2">' + cat(q) + payCard(a) + '</div><div class="mxg2">' + cashCard(net, op, man) + '</div></details>';
       }
-      function place() { var b = document.querySelector('.mxbar'); if (b) $('mx-view').style.top = b.getBoundingClientRect().bottom + 'px'; }
+      var CATS = { sembako: 'Sembako & Beras', snack: 'Makanan Ringan', minuman: 'Minuman & Susu', mandi: 'Kebutuhan Mandi', rokok_pulsa: 'Rokok & Pulsa' };
+      function selisih(n) {
+        var lim = new Date(); lim.setDate(lim.getDate() - n);
+        return (mxStockLog || []).reduce(function (t, e) {
+          if (e.kind !== 'Stok opname' || new Date(e.time) < lim) return t;
+          var p = PRODUCTS.find(function (x) { return x.name === e.name; }); return p ? t + e.diff * X.cost[p.id] : t;
+        }, 0);
+      }
+      function cat(q) {
+        var c = {}; PRODUCTS.forEach(function (p) { var k = c[p.category] = c[p.category] || { o: 0, l: 0 }, n = q[p.id] || 0; k.o += n * p.price; k.l += n * (p.price - X.cost[p.id]); });
+        return '<div class="mxc mxsc"><h3>Penjualan per kategori</h3><table class="mxt"><thead><tr><th>Kategori</th><th class="r">Omzet</th><th class="r">Laba kotor</th><th class="r">Margin</th></tr></thead><tbody>' +
+          Object.keys(c).sort(function (a, b) { return c[b].o - c[a].o; }).map(function (k) { return '<tr><td>' + (CATS[k] || k) + '</td><td class="r">' + R(c[k].o) + '</td><td class="r">' + R(c[k].l) + '</td><td class="r">' + (c[k].o ? (c[k].l / c[k].o * 100).toFixed(1).replace('.', ',') : 0) + '%</td></tr>'; }).join('') + '</tbody></table></div>';
+      }
+      function payCard(a) {
+        var t = { cash: 0, qris: 0, card: 0 }, T = 0; a.forEach(function (d) { for (var k in t) t[k] += d.pay[k]; }); T = t.cash + t.qris + t.card;
+        var L = { cash: 'Tunai', qris: 'QRIS', card: 'Kartu / lainnya' };
+        return '<div class="mxc mxsc"><h3>Metode pembayaran</h3><table class="mxt"><thead><tr><th>Metode</th><th class="r">Penjualan</th><th class="r">Porsi</th></tr></thead><tbody>' + Object.keys(t).map(function (k) { return '<tr><td>' + L[k] + '</td><td class="r">' + R(t[k]) + '</td><td class="r">' + (T ? (t[k] / T * 100).toFixed(1).replace('.', ',') : 0) + '%</td></tr>'; }).join('') + '</tbody></table><small style="color:var(--mu)">Porsi hari sebelumnya adalah contoh; transaksi kasir hari ini tercatat sesuai metode sebenarnya.</small></div>';
+      }
+      function hourChart(hs) {
+        var m = Math.max.apply(null, hs.slice(6, 23)) || 1, s = '<svg viewBox="0 0 340 90" style="width:100%;height:auto">';
+        for (var h = 6; h <= 22; h++) { var bh = 60 * hs[h] / m, x = (h - 6) * 20 + 2; s += '<rect x="' + x + '" y="' + (70 - bh) + '" width="16" height="' + bh + '" rx="2" fill="' + (hs[h] === m ? '#f59e0b' : '#10b981') + '"/><text x="' + (x + 8) + '" y="84" text-anchor="middle" font-size="8" fill="#64748b">' + h + '</text>'; }
+        return s + '</svg><small style="color:var(--mu)">Jam tersibuk berwarna oranye.</small>';
+      }
+      function rec() {
+        var a = H.slice(-8, -1), r = [];
+        PRODUCTS.forEach(function (p) {
+          var d = a.reduce(function (t, x) { return t + (x.q[p.id] || 0); }, 0) / 7; if (d <= 0) return;
+          var open = (X.po || []).some(function (o) { return o.pid === p.id && o.st !== 'Diterima'; }), days = p.stock / d;
+          var lt = SUPD[p.category].lt; if (days <= lt + 3 && !open) r.push({ p: p, d: d, days: days, q: Math.max(1, Math.ceil(d * (lt + 14) - p.stock)) });
+        });
+        r.sort(function (x, y) { return x.days - y.days; }); lastRec = r;
+        return '<div class="mxc" style="margin-top:12px"><h3>Rekomendasi pesan ulang (memperhitungkan lead time supplier)' + (r.length ? ' <button class="mxbtn" style="float:right;text-transform:none" onclick="mxPORecAll()">Buat PO semua (per supplier)</button>' : '') + '</h3>' + (r.length ? '<div class="mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Terjual/hari</th><th class="r">Stok cukup</th><th class="r">Saran qty</th><th></th></tr></thead><tbody>' +
+          r.map(function (x) { return '<tr><td>' + esc(x.p.name) + '</td><td class="r">' + x.d.toFixed(1).replace('.', ',') + '</td><td class="r ' + (x.days < 2 ? 'dn' : 'am') + '">' + (x.days < 1 ? '< 1' : x.days.toFixed(1).replace('.', ',')) + ' hari</td><td class="r">' + x.q + '</td><td><button class="mxbtn" onclick="mxPOq(\'' + x.p.id + '\',' + x.q + ')">Buat PO</button></td></tr>'; }).join('') + '</tbody></table></div>' : '<small>Tidak ada barang yang diperkirakan habis dalam beberapa hari ke depan.</small>') + '</div>';
+      }
+      function opn() {
+        var l = (mxStockLog || []).filter(function (e) { return e.kind === 'Stok opname'; }).slice(0, 8);
+        return '<div class="mxc mxsc" style="margin-top:12px"><h3>Riwayat stok opname (selisih fisik vs sistem)</h3>' + (l.length ? '<table class="mxt"><thead><tr><th>Waktu</th><th>Produk</th><th class="r">Selisih</th><th class="r">Nilai</th></tr></thead><tbody>' +
+          l.map(function (e) { var p = PRODUCTS.find(function (x) { return x.name === e.name; }), v = p ? e.diff * X.cost[p.id] : 0; return '<tr><td>' + new Date(e.time).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td><td>' + esc(e.name) + '</td><td class="r ' + (e.diff < 0 ? 'dn' : '') + '">' + (e.diff > 0 ? '+' : '') + e.diff + '</td><td class="r ' + (v < 0 ? 'dn' : '') + '">' + (v < 0 ? '− ' : '') + R(Math.abs(v)) + '</td></tr>'; }).join('') + '</tbody></table>' : '<small>Belum ada opname. Gunakan tombol "Barang masuk & stok opname"; selisih akan tercatat di sini dan masuk ke laporan laba rugi.</small>') + '</div>';
+      }
+      function badge() { var n = lowList().length;['mx-badge', 'mx-badge2'].forEach(function (i) { var b = $(i); if (b) { b.textContent = n; b.hidden = !n; } }); }
+      window.mxOpex = function (v) { X.opex = Math.max(0, Number(v) || 0); sv(); draw(); };
+      window.mxCSV = function () {
+        var c = 'tanggal,penjualan_bersih,hpp,laba_kotor,biaya_operasional,kas_keluar,laba_bersih\n';
+        rng(per).forEach(function (d) { c += d.date.toISOString().slice(0, 10) + ',' + [d.net, d.hpp, d.gp, d.op, d.man, d.np].map(Math.round).join(',') + '\n'; });
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv' })); a.download = 'laporan-martexpress.csv'; a.click();
+      };
+      function pyRow(o) {
+        var p = productById(o.pid), amt = rc(o) * o.cost, c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
+        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>Bayar ' + o.id + '</b> · ' + esc(SUP[p.category]) + ' · <b>' + R(amt) + '</b> &nbsp; Dibayar dari <select id="py-m" style="' + c + '"><option value="cash">Tunai dari laci kasir</option><option value="tf">Transfer / lainnya</option></select> &nbsp;<button class="mxbtn" onclick="mxPaySave(\'' + o.id + '\')">Catat pembayaran</button> <button class="mxbtn" style="background:#64748b" onclick="mxPay(null)">Batal</button></div></td></tr>';
+      }
+      window.mxPay = function (id) { payId = id; recvId = null; draw(); };
+      window.mxPaySave = function (id) {
+        var o = X.po.find(function (x) { return x.id === id; }), amt = rc(o) * o.cost, m = $('py-m').value;
+        if (m === 'cash') {
+          if (!shiftGuard()) return;
+          var kas = shiftStats().expectedCash;
+          if (amt > kas) { showToast('Kas laci tidak cukup (' + formatRupiah(kas) + '). Pilih transfer atau tambah kas masuk dulu.', 'error'); return; }
+          shift.cashLog = shift.cashLog || [];
+          shift.cashLog.push({ type: 'out', amount: amt, note: 'Bayar supplier ' + o.id + ' – ' + SUP[productById(o.pid).category], time: new Date(), supplier: true });
+          if (typeof renderShift === 'function') renderShift();
+        }
+        o.paid = true; o.payVia = m; o.payTs = Date.now(); aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), id + ' · ' + R(amt)); payId = null; sv(); draw();
+        showToast(id + ' lunas' + (m === 'cash' ? ' — ' + R(amt) + ' dicatat sebagai kas keluar laci.' : ' (transfer).'), 'success');
+      };
+      function hutang() {
+        var h = (X.po || []).filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+        return Math.max(0, h - (X.adj || []).filter(function (r) { return r.reason === 'retur'; }).reduce(function (t, r) { return t + r.val; }, 0));
+      }
+      function cashCard(net, op, man) {
+        var lim = Date.now() - per * 864e5, sp = (X.po || []).reduce(function (t, o) { var ts = o.payTs || o.ts || 0; return o.paid && ts >= lim ? t + rc(o) * o.cost : t; }, 0), k = net - sp - op - man;
+        var r = function (l, v, neg, c) { return '<tr' + (c ? ' class="tot"' : '') + '><td>' + l + '</td><td class="r ' + (neg ? 'dn' : (c ? (v >= 0 ? 'up' : 'dn') : '')) + '">' + (neg ? '− ' : '') + R(Math.abs(v)) + '</td></tr>'; };
+        return '<div class="mxc mxsc"><h3>Arus kas · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('Uang masuk dari penjualan', net) + r('Bayar supplier', sp, 1) + r('Biaya operasional', op, 1) + r('Kas keluar manual', man, 1) + r('Kas bersih periode', k, 0, 1) + '</tbody></table>' +
+          '<small style="color:var(--mu);display:block;margin-top:8px">Belum termasuk PPN dan kas masuk tambahan. Hutang ke supplier saat ini: <b>' + R(hutang()) + '</b>.</small></div>';
+      }
+      var ADL = { retur: 'Retur ke supplier', rusak: 'Barang rusak', exp: 'Barang kadaluarsa' };
+      function writeoff(n) {
+        var lim = Date.now() - n * 864e5; return (X.adj || []).reduce(function (t, r) { return r.reason !== 'retur' && r.ts >= lim ? t + r.val : t; }, 0);
+      }
+      function adj() {
+        var c = 'padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit', l = (X.adj || []).slice(-6).reverse();
+        var form = adOpen ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><select id="ad-p" style="flex:1;min-width:200px;' + c + '">' + PRODUCTS.filter(function (p) { return p.stock > 0; }).map(function (p) { return '<option value="' + p.id + '">' + esc(p.name) + ' (stok ' + p.stock + ')</option>'; }).join('') + '</select><input id="ad-q" type="number" min="1" placeholder="Qty" style="width:80px;' + c + '"><select id="ad-r" style="' + c + '"><option value="retur">Retur ke supplier (kredit hutang)</option><option value="rusak">Barang rusak (kerugian)</option><option value="exp">Barang kadaluarsa (kerugian)</option></select><button class="mxbtn" onclick="mxSaveAdj()">Catat</button></div>' : '';
+        return '<div class="mxc" style="margin-top:12px"><h3>Retur &amp; barang rusak / kadaluarsa <button class="mxbtn" style="float:right;text-transform:none" onclick="mxAdj()">' + (adOpen ? 'Batal' : '+ Catat') + '</button></h3>' + form +
+          (l.length ? '<div class="mxsc"><table class="mxt"><thead><tr><th>Tanggal</th><th>Produk</th><th class="r">Qty</th><th>Alasan</th><th class="r">Nilai (modal)</th></tr></thead><tbody>' + l.map(function (r) { return '<tr><td>' + new Date(r.ts).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + '</td><td>' + esc(productById(r.pid) ? productById(r.pid).name : r.pid) + '</td><td class="r">' + r.qty + '</td><td>' + ADL[r.reason] + '</td><td class="r ' + (r.reason === 'retur' ? '' : 'dn') + '">' + (r.reason === 'retur' ? '' : '− ') + R(r.val) + '</td></tr>'; }).join('') + '</tbody></table></div>' : '<small style="color:var(--mu)">Belum ada. Retur mengurangi stok dan hutang ke supplier; rusak/kadaluarsa mengurangi stok dan dihitung sebagai kerugian di laporan.</small>') + '</div>';
+      }
+      window.mxAdj = function () { adOpen = !adOpen; draw(); };
+      window.mxSaveAdj = function () {
+        var id = $('ad-p').value, q = Math.floor(Number($('ad-q').value) || 0), r = $('ad-r').value, p = productById(id);
+        if (!p || q < 1 || q > p.stock) { showToast('Jumlah harus 1 sampai ' + (p ? p.stock : 0) + ' (stok saat ini).', 'warn'); return; }
+        var v = q * X.cost[id]; p.stock -= q; X.adj = X.adj || [];
+        X.adj.push({ id: 'AD-' + String(X.adj.length + 1).padStart(3, '0'), pid: id, qty: q, reason: r, val: v, ts: Date.now() });
+        mxStockLog.unshift({ name: p.name, kind: ADL[r], diff: -q, after: p.stock, time: new Date() });
+        aud(ADL[r], p.name + ' ×' + q + ' (' + R(v) + ')'); adOpen = false; sv(); renderProducts(); draw(); showToast(ADL[r] + ': ' + p.name + ' −' + q + ' (' + R(v) + ').', r === 'retur' ? 'success' : 'warn');
+      };
+      window.mxShiftProfit = function () {
+        if (X.role === 'kasir') return ''; if (!H) ini(); var n = 0, h = 0, t0 = new Date(shift.openedAt), cs = function (id) { return X.cost[id] || 0; };
+        transactions.forEach(function (t) {
+          if (t.voided) return; var nt = t.total - t.tax - (t.rounding || 0), r = t.total ? nt / t.total : 1;
+          if (new Date(t.date) >= t0) { n += nt; t.items.forEach(function (i) { h += i.quantity * cs(i.productId); }); }
+          (t.refunds || []).forEach(function (f) { if (new Date(f.time) < t0) return; n -= f.amount * r; if (f.reason === 'salah') f.lines.forEach(function (l) { h -= l.qty * cs(l.productId); }); });
+        });
+        var g = n - h, F = function (v) { return formatRupiah(Math.round(v)); };
+        return '<div class="r sec"><span>Laba Kotor Shift Ini</span><span></span></div><div class="r"><span>Penjualan bersih (tanpa PPN, setelah retur)</span><span>' + F(n) + '</span></div><div class="r"><span>Harga pokok (HPP)</span><span>-' + F(h) + '</span></div><div class="r strong"><span>Laba kotor' + (n ? ' (' + (g / n * 100).toFixed(1).replace('.', ',') + '%)' : '') + '</span><span>' + F(g) + '</span></div>';
+      };
+      window.mxPOq = function (id, q) { var g = mkPO([{ pid: id, qty: q }]); sv(); draw(); showToast('PO dibuat: ' + productById(id).name + ' × ' + q + ' (' + g + ').', 'success'); };
+      function inp(k, p) {
+        if (!invEdit) return k === 'cost' ? R(X.cost[p.id]) : k === 'exp' ? (X.exp[p.id] ? new Date(X.exp[p.id]).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: '2-digit' }) : '-') : X.min[p.id];
+        if (k === 'exp') return '<input type="date" value="' + (X.exp[p.id] || '') + '" onchange="mxSet(\'exp\',\'' + p.id + '\',this.value)">';
+        return '<input type="number" min="0"' + (k === 'cost' ? ' step="100"' : '') + ' value="' + X[k][p.id] + '" onchange="mxSet(\'' + k + '\',\'' + p.id + '\',this.value)">';
+      }
+      function guide() {
+        if (X.hideGuide) return '';
+        return '<div class="mxc" style="margin-bottom:12px;display:flex;gap:10px;align-items:flex-start"><div style="flex:1;min-width:0"><b>Coba alur demo (1 menit)</b><br><small>① Jual 1–2 barang di <a class="mxlink" onclick="mxView(\'kasir\')">Kasir</a> → ② kembali ke sini: penjualan dan stok langsung berubah → ' + (X.role === 'owner' ? '③ buka <a class="mxlink" onclick="mxView(\'lap\')">Laporan</a> untuk melihat untungnya.' : '③ buka <a class="mxlink" onclick="mxView(\'inv\')">Inventori</a> untuk melihat stok berkurang.') + '</small></div><button class="mxbtn" style="background:#64748b;padding:4px 9px" onclick="mxHide()" aria-label="Sembunyikan panduan">✕</button></div>';
+      }
+      window.mxDD = function (o) { var m = $('mx-ddm'); m.hidden = o === undefined ? !m.hidden : !o; };
+      document.addEventListener('click', function (e) { if (!e.target.closest('.mxdd')) $('mx-ddm').hidden = true; });
+      function addForm() {
+        var c = 'width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit', F = function (l, id, t, v, x) { return '<label style="display:block"><small>' + l + '</small><input id="' + id + '" type="' + t + '" ' + (x || '') + ' value="' + (v || '') + '" style="' + c + '"></label>'; };
+        return '<div class="mxc" style="margin-bottom:12px"><h3>Tambah produk baru</h3><div class="mxg" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">' +
+          F('Nama produk *', 'np-n', 'text') + '<label style="display:block"><small>Kategori</small><select id="np-c" style="' + c + '">' + Object.keys(CATS).map(function (k) { return '<option value="' + k + '">' + CATS[k] + '</option>'; }).join('') + '</select></label>' +
+          F('Satuan', 'np-u', 'text', 'Pcs') + F('Harga jual (Rp) *', 'np-p', 'number', '', 'min="1"') + F('Harga modal (Rp) *', 'np-m', 'number', '', 'min="0"') + F('Stok awal', 'np-s', 'number', '0', 'min="0"') + F('Stok minimum', 'np-k', 'number', '10', 'min="0"') + F('Kadaluarsa (opsional)', 'np-e', 'date') + F('Barcode (kosong = otomatis)', 'np-b', 'text') + photoField('') +
+          '</div><button class="mxbtn" onclick="mxSaveProd()">Simpan produk</button> <small style="color:var(--mu)">Produk langsung muncul di Kasir. * wajib diisi.</small></div>';
+      }
+      window.mxAdd = function () { addOpen = !addOpen; recvId = null; editId = null; editImg = null; draw(); };
+      window.mxSaveProd = function () {
+        var g = function (i) { return $(i).value.trim(); }, n = g('np-n'), pr = Number(g('np-p')), co = Number(g('np-m')), st = Math.max(0, Math.floor(Number(g('np-s')) || 0)), mn = Math.max(0, Math.floor(Number(g('np-k')) || 0));
+        if (!n) { showToast('Isi nama produk.', 'warn'); return; }
+        if (!(pr > 0)) { showToast('Harga jual harus lebih dari 0.', 'warn'); return; }
+        if (g('np-m') === '' || !(co >= 0)) { showToast('Isi harga modal (boleh 0).', 'warn'); return; }
+        var bc = g('np-b') || ('899' + String(Date.now()).slice(-10));
+        if (PRODUCTS.some(function (p) { return p.barcode === bc; })) { showToast('Barcode sudah dipakai produk lain.', 'error'); return; }
+        var p = { id: 'n' + Date.now().toString(36), barcode: bc, name: n, category: g('np-c'), price: pr, unit: g('np-u') || 'Pcs', stock: st };
+        (X.np = X.np || []).push(JSON.parse(JSON.stringify(p))); p.imageUrl = editImg || ph(p); if (editImg) (X.ov = X.ov || {})[p.id] = { imageUrl: editImg }; editImg = null; PRODUCTS.push(p);
+        setCost(p.id, co); aud('Tambah produk', n + ' · jual ' + R(pr) + ' · modal ' + R(co)); X.min[p.id] = mn; X.exp[p.id] = g('np-e'); addOpen = false; sv(); renderProducts(); draw();
+        showToast(n + ' ditambahkan' + (co > pr ? ' (peringatan: harga modal di atas harga jual).' : '. Sudah muncul di Kasir.'), co > pr ? 'warn' : 'success');
+      };
+      function photoField(src) {
+        return '<label style="display:block"><small>Foto produk (opsional)</small><input type="file" accept="image/*" onchange="mxPhoto(this)" style="width:100%;font-size:12px"><img id="ep-img" src="' + src + '" alt="" style="margin-top:6px;width:96px;height:72px;object-fit:cover;border-radius:8px;' + (src ? '' : 'display:none') + '"></label>';
+      }
+      function editForm() {
+        var p = productById(editId); if (!p) return '';
+        var c = 'width:100%;padding:6px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx);font:inherit', F = function (l, id, t, v, x) { return '<label style="display:block"><small>' + l + '</small><input id="' + id + '" type="' + t + '" ' + (x || '') + ' value="' + String(v).replace(/"/g, '&quot;') + '" style="' + c + '"></label>'; };
+        return '<div class="mxc" style="margin-bottom:12px;border-color:#d97706"><h3>Ubah produk</h3><div class="mxg" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">' + F('Nama produk', 'ep-n', 'text', p.name) +
+          '<label style="display:block"><small>Kategori</small><select id="ep-c" style="' + c + '">' + Object.keys(CATS).map(function (k) { return '<option value="' + k + '"' + (k === p.category ? ' selected' : '') + '>' + CATS[k] + '</option>'; }).join('') + '</select></label>' +
+          F('Satuan', 'ep-u', 'text', p.unit || 'Pcs') + F('Harga jual (Rp)', 'ep-p', 'number', p.price, 'min="1"') + photoField(p.imageUrl) + '</div>' +
+          '<button class="mxbtn" onclick="mxSaveEdit()">Simpan perubahan</button> <button class="mxbtn" style="background:#64748b" onclick="mxEditP(null)">Batal</button> ' +
+          (p.id.charAt(0) === 'n' ? '<button class="mxbtn" style="background:#e11d48;float:right" onclick="mxDelProd()">Hapus produk</button>' : '<small style="color:var(--mu)">Produk bawaan demo tidak bisa dihapus.</small>') + '</div>';
+      }
+      window.mxEditP = function (id) { editId = id; editImg = null; addOpen = false; draw(); if (id) $('mx-view').scrollTop = 0; };
+      window.mxPhoto = function (inp) {
+        var f = inp.files && inp.files[0]; if (!f) return;
+        if (f.size > 8e6) { showToast('Foto terlalu besar (maks. 8 MB).', 'warn'); return; }
+        var r = new FileReader();
+        r.onload = function () {
+          var im = new Image();
+          im.onload = function () {
+            var W = 360, H = 270, c = document.createElement('canvas'); c.width = W; c.height = H;
+            var sc = Math.max(W / im.width, H / im.height), w = im.width * sc, h = im.height * sc;
+            c.getContext('2d').drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+            editImg = c.toDataURL('image/jpeg', .82); var e = $('ep-img'); e.src = editImg; e.style.display = 'block';
+          };
+          im.onerror = function () { showToast('File gambar tidak bisa dibaca.', 'error'); };
+          im.src = r.result;
+        };
+        r.readAsDataURL(f);
+      };
+      window.mxSaveEdit = function () {
+        var p = productById(editId), n = $('ep-n').value.trim(), pr = Number($('ep-p').value);
+        if (!n) { showToast('Nama produk tidak boleh kosong.', 'warn'); return; }
+        if (!(pr > 0)) { showToast('Harga jual harus lebih dari 0.', 'warn'); return; }
+        var o = (X.ov = X.ov || {})[p.id] = X.ov[p.id] || {};
+        p.name = o.name = n; p.category = o.category = $('ep-c').value; p.unit = o.unit = $('ep-u').value.trim() || 'Pcs'; p.price = o.price = pr;
+        if (p.originalPrice && pr >= p.originalPrice) { delete p.originalPrice; o.noOrig = true; }
+        if (editImg) p.imageUrl = o.imageUrl = editImg;
+        var ok = sv(); editId = null; editImg = null; renderProducts(); draw();
+        showToast(ok ? n + ' diperbarui.' : 'Perubahan aktif, tetapi penyimpanan browser penuh (foto tidak tersimpan permanen).', ok ? (pr < X.cost[p.id] ? 'warn' : 'success') : 'warn');
+      };
+      window.mxDelProd = function () {
+        var p = productById(editId); if (!p || p.id.charAt(0) !== 'n') return;
+        if (transactions.some(function (t) { return t.items.some(function (i) { return i.productId === p.id; }); }) || (X.po || []).some(function (o) { return o.pid === p.id; })) { showToast('Produk sudah punya transaksi atau PO, tidak bisa dihapus.', 'warn'); return; }
+        askConfirm('Hapus ' + p.name + '?', 'Produk dihapus dari Kasir dan Inventori.', 'Ya, hapus', function () {
+          PRODUCTS.splice(PRODUCTS.indexOf(p), 1); X.np = (X.np || []).filter(function (q) { return q.id !== p.id; });
+          [X.cost, X.min, X.exp, X.ov || {}].forEach(function (m) { delete m[p.id]; });
+          aud('Hapus produk', p.name); editId = null; sv(); renderProducts(); draw(); showToast('Produk dihapus.', 'success');
+        });
+      };
+      window.mxHide = function () { X.hideGuide = true; sv(); draw(); };
+      window.mxTab = function (t) { invTab = t; payId = null; adOpen = false; invEdit = false; addOpen = false; recvId = null; editId = null; editImg = null; draw(); };
+      window.mxEdit = function () { invEdit = !invEdit; draw(); };
+      window.mxDet = function (o) { detOpen = o; };
+      function setCost(id, v) {
+        X.ch = X.ch || {}; var h = X.ch[id] = X.ch[id] || [[0, X.cost[id] != null ? X.cost[id] : v]];
+        if (X.cost[id] != null && X.cost[id] !== v) h.push([Date.now(), v]); X.cost[id] = v;
+      }
+      function costAt(id, t) {
+        var h = X.ch && X.ch[id]; if (!h) return X.cost[id] || 0;
+        var c = h[0][1]; for (var i = 1; i < h.length; i++) if (h[i][0] <= t) c = h[i][1]; return c;
+      }
+      function aud(a, d) { X.audit = X.audit || []; X.audit.push({ ts: Date.now(), a: a, d: String(d || ''), r: ROLEL[X.role] || '' }); if (X.audit.length > 200) X.audit.shift(); sv(); }
+      var PINCB = null, rolePick = null, fails = 0, lockUntil = 0;
+      function authBy(v) { return v === X.pins.spv ? 'Supervisor' : v === X.pins.owner ? 'Pemilik' : null; }
+      function pinGate(title, cb) {
+        if (X.pinOn === false || X.role === 'spv' || X.role === 'owner') { cb(); return; }
+        PINCB = cb; $('mx-pin-t').textContent = 'Otorisasi supervisor: ' + title; $('mx-pin-i').value = ''; $('mx-pin-e').textContent = ''; $('mx-pin').hidden = false;
+        setTimeout(function () { $('mx-pin-i').focus(); }, 50);
+      }
+      window.mxPinOk = function () {
+        var t = $('mx-pin-t').textContent.replace('Otorisasi supervisor: ', '');
+        var who = authBy($('mx-pin-i').value); if (who) { var cb = PINCB; PINCB = null; $('mx-pin').hidden = true; $('mx-pin-i').value = ''; $('mx-pin-i').blur(); aud('PIN diterima (' + who + ')', t); if (cb) setTimeout(function () { try { cb(); } catch (e) { console.error(e); showToast('Aksi gagal diproses.', 'error'); } }, 0); }
+        else { $('mx-pin-e').textContent = 'PIN salah. Coba lagi.'; $('mx-pin-i').value = ''; aud('PIN salah', t); }
+      };
+      window.mxPinCancel = function () { PINCB = null; $('mx-pin').hidden = true; };
+      window.mxPinToggle = function () { X.pinOn = X.pinOn === false; aud('PIN supervisor ' + (X.pinOn === false ? 'dimatikan' : 'diaktifkan'), ''); draw(); };
+      window.mxPinSet = function (r) {
+        var v = prompt('PIN baru untuk ' + ROLEL[r] + ' (4–6 angka):'); if (v === null) return;
+        if (!/^\d{4,6}$/.test(v)) { showToast('PIN harus 4–6 angka.', 'warn'); return; }
+        if (Object.keys(X.pins).some(function (k) { return k !== r && X.pins[k] === v; })) { showToast('PIN itu sudah dipakai peran lain. Pilih yang berbeda.', 'warn'); return; }
+        X.pins[r] = v; aud('PIN ' + ROLEL[r] + ' diubah', ''); draw(); showToast('PIN ' + ROLEL[r] + ' diperbarui.', 'success');
+      };
+      window.mxSecT = function (o) { secOpen = o; }; window.mxDevT = function (o) { devOpen = o; };
+      window.mxBackup = function () {
+        try { mxSave(); } catch (e) { } sv();
+        var d = { app: 'martexpress-demo', v: 1, at: new Date().toISOString(), main: localStorage.getItem('martexpress-pos-v2'), ext: localStorage.getItem(K) };
+        var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(d)], { type: 'application/json' })); a.download = 'cadangan-martexpress-' + d.at.slice(0, 10) + '.json'; a.click(); aud('Unduh cadangan', '');
+      };
+      window.mxRestore = function (inp) {
+        var f = inp.files && inp.files[0]; if (!f) return; var r = new FileReader();
+        r.onload = function () {
+          var d; try { d = JSON.parse(r.result); } catch (e) { }
+          if (!d || d.app !== 'martexpress-demo') { showToast('File ini bukan cadangan MartExpress.', 'error'); return; }
+          askConfirm('Pulihkan data dari cadangan?', 'Data di perangkat ini akan diganti dengan isi file (' + String(d.at || '').slice(0, 10) + '). Halaman akan dimuat ulang.', 'Ya, pulihkan', function () {
+            try { window.removeEventListener('beforeunload', mxSave); if (d.main) localStorage.setItem('martexpress-pos-v2', d.main); else localStorage.removeItem('martexpress-pos-v2'); if (d.ext) localStorage.setItem(K, d.ext); else localStorage.removeItem(K); }
+            catch (e) { showToast('Gagal menulis penyimpanan browser.', 'error'); return; }
+            location.reload();
+          }, true);
+        };
+        r.readAsText(f);
+      };
+      function sec() {
+        var a = (X.audit || []).slice(-10).reverse(), on = X.pinOn !== false;
+        return '<details class="mxdet" ' + (secOpen ? 'open' : '') + ' ontoggle="mxSecT(this.open)"><summary>Keamanan &amp; data: PIN supervisor, cadangan, log aktivitas</summary><div class="mxg2">' +
+          '<div class="mxc"><h3>PIN akses &amp; otorisasi</h3><p style="margin:0 0 8px">Otorisasi aksi sensitif: <span class="mxtag ' + (on ? 'g' : 'a') + '">' + (on ? 'Aktif' : 'Nonaktif') + '</span></p><small style="color:var(--mu);display:block;margin-bottom:8px">Tiap peran masuk dengan PIN-nya sendiri. Kasir yang melakukan void, retur, kas keluar, stok opname, atau ubah harga perlu PIN Supervisor atau Pemilik.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mxbtn" onclick="mxPinToggle()">' + (on ? 'Matikan otorisasi' : 'Aktifkan otorisasi') + '</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'kasir\')">PIN Kasir</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'spv\')">PIN Supervisor</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'owner\')">PIN Pemilik</button><button class="mxbtn" style="background:#64748b" onclick="mxIdleCycle()">Kunci otomatis: ' + ((X.idle != null ? X.idle : 10) ? (X.idle != null ? X.idle : 10) + ' menit' : 'mati') + '</button></div></div>' +
+          '<div class="mxc"><h3>Cadangan data</h3><small style="color:var(--mu);display:block;margin-bottom:8px">Unduh cadangan agar data bisa dipulihkan atau dipindah ke perangkat lain.</small><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="mxbtn" onclick="mxBackup()">Unduh cadangan</button><span class="mxfile"><button class="mxbtn" style="background:#64748b">Pulihkan dari file</button><input type="file" accept=".json,application/json" onchange="mxRestore(this)"></span></div></div>' + simCard() + '</div>' +
+          '<div class="mxc mxsc"><h3>Log aktivitas (10 terakhir)</h3>' + (a.length ? '<table class="mxt"><thead><tr><th>Waktu</th><th>Peran</th><th>Aktivitas</th><th>Keterangan</th></tr></thead><tbody>' + a.map(function (e) { return '<tr><td>' + new Date(e.ts).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td><td>' + esc(e.r || '-') + '</td><td>' + esc(e.a) + '</td><td>' + esc(e.d) + '</td></tr>'; }).join('') + '</tbody></table>' : '<small style="color:var(--mu)">Belum ada aktivitas tercatat.</small>') + '</div></details>';
+      }
+      function dev() {
+        var L = [['Server &amp; multi-perangkat', 'Database terpusat, sinkron antar kasir dan cabang, pemilik memantau dari jauh, cadangan otomatis.'], ['Pengguna &amp; keamanan', 'Akun terpisah per kasir dengan kata sandi atau PIN yang tersimpan terenkripsi, serta masuk dengan kartu atau sidik jari.'], ['Pembelian', 'Satuan beli (dus ke pcs), harga grosir bertingkat, cicilan ke supplier, retur per faktur.'], ['Stok', 'Kadaluarsa per batch (yang paling dekat dijual lebih dulu), stok per rak atau gudang, cetak label barcode, terima barang dengan scan.'], ['Pembayaran &amp; pajak', 'QRIS dinamis dan mesin EDC terintegrasi, e-faktur dan pelaporan pajak, struk digital lewat WhatsApp.'], ['Laporan', 'Perbandingan bulanan dan antar cabang, prediksi stok dari riwayat penjualan nyata yang lebih panjang.']];
+        return '<details class="mxdet" ' + (devOpen ? 'open' : '') + ' ontoggle="mxDevT(this.open)"><summary>Pengembangan yang bisa dilakukan</summary><div class="mxc" style="margin-bottom:12px"><h3>Fitur yang saat ini versi demo</h3><p class="mxsub" style="margin:0 0 8px">Berjalan penuh di demo ini. Untuk toko nyata, bagian berikut perlu server demi keamanan dan keandalan:</p><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Login, PIN, dan peran</b><br><small style="color:var(--mu)">Saat ini tersimpan di browser sehingga bisa dilihat atau diubah pengguna. Versi nyata: verifikasi, enkripsi, dan hak akses dijalankan di server.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Log aktivitas</b><br><small style="color:var(--mu)">Saat ini bisa diubah lewat browser. Versi nyata: dicatat di server dan tidak bisa diubah.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Penyimpanan data</b><br><small style="color:var(--mu)">Saat ini hanya di browser satu perangkat. Versi nyata: database terpusat yang sinkron antar kasir dan cabang, dengan cadangan otomatis terjadwal.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Cadangan dan pemulihan</b><br><small style="color:var(--mu)">Saat ini manual lewat file. Versi nyata: otomatis dan tersimpan aman di luar perangkat toko.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Kunci layar otomatis</b><br><small style="color:var(--mu)">Saat ini hanya pengaman tampilan. Versi nyata: sesi kedaluwarsa diatur server.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Simulasi penjualan dan riwayat 13 hari</b><br><small style="color:var(--mu)">Data contoh untuk presentasi, tidak ada di versi nyata.</small></div></div><div class="mxc"><p class="mxsub" style="margin:0 0 8px">Pengembangan lanjutan yang belum ada di demo ini:</p>' + L.map(function (x) { return '<div style="padding:6px 0;border-top:1px solid var(--bd)"><b>' + x[0] + '</b><br><small style="color:var(--mu)">' + x[1] + '</small></div>'; }).join('') + '</div></details>';
+      }
+      var ROLES = { kasir: ['kasir'], spv: ['kasir', 'dash', 'inv'], owner: ['kasir', 'dash', 'inv', 'lap'] }, ROLEL = { kasir: 'Kasir', spv: 'Supervisor', owner: 'Pemilik' };
+      function allowed(v) { return ROLES[X.role || 'kasir'].indexOf(v) >= 0; }
+      function applyRole() {
+        document.querySelectorAll('.mxn,.mxi[data-v]').forEach(function (b) { b.style.display = allowed(b.dataset.v) ? '' : 'none'; });
+        var l = X.role ? ROLEL[X.role] : '-'; $('mx-role-l').textContent = l; $('mx-ddr').textContent = X.role ? 'Peran: ' + l : 'Pilih peran'; document.querySelectorAll('.mxrl2').forEach(function (e) { e.textContent = l; });
+      }
+      function resetUI() { poDraft = []; cardId = null; PINCB = null; $('mx-pin').hidden = true; $('mx-ddm').hidden = true; addOpen = false; editId = null; editImg = null; recvId = null; payId = null; adOpen = false; invEdit = false; invTab = 'stock'; }
+      window.mxRoleBack = function () { rolePick = null; $('mx-role-s2').hidden = true; $('mx-role-s1').hidden = false; };
+      window.mxRolePick = function () { resetUI(); mxRoleBack(); $('mx-role-x').hidden = !X.role; $('mx-role-out').hidden = !X.role; $('mx-role').hidden = false; };
+      window.mxRoleChoose = function (r) { rolePick = r; $('mx-role-s1').hidden = true; $('mx-role-s2').hidden = false; $('mx-role-t2').textContent = 'Masuk sebagai ' + ROLEL[r]; $('mx-role-i').value = ''; $('mx-role-e').textContent = ''; setTimeout(function () { $('mx-role-i').focus(); }, 50); };
+      window.mxRoleOk = function () {
+        var now = Date.now(), e = $('mx-role-e');
+        if (now < lockUntil) { e.textContent = 'Terlalu banyak percobaan. Coba lagi ' + Math.ceil((lockUntil - now) / 1000) + ' detik.'; return; }
+        if ($('mx-role-i').value === X.pins[rolePick]) { fails = 0; mxSetRole(rolePick); return; }
+        fails++; aud('Login gagal', ROLEL[rolePick]); $('mx-role-i').value = '';
+        if (fails >= 5) { fails = 0; lockUntil = now + 30000; e.textContent = 'Terlalu banyak percobaan. Coba lagi 30 detik.'; } else e.textContent = 'PIN salah (' + fails + '/5).';
+      };
+      window.mxSetRole = function (r) {
+        resetUI(); X.role = r; $('mx-role').hidden = true; mxRoleBack(); try { sessionStorage.setItem('mx-sess', r); } catch (e) { }
+        sv(); aud('Masuk sebagai ' + ROLEL[r], ''); applyRole(); mxView('kasir'); showToast('Masuk sebagai ' + ROLEL[r] + '.', 'success');
+      };
+      window.mxLogout = function () {
+        aud('Keluar', ''); try { sessionStorage.removeItem('mx-sess'); } catch (e) { } resetUI(); X.role = undefined; applyRole(); mxView('kasir');
+        mxRoleBack(); $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false;
+      };
+      function stockCard() {
+        var p = productById(cardId); if (!p) return ''; var ev = [];
+        transactions.forEach(function (t) {
+          if (t.voided) return;
+          t.items.forEach(function (i) { if (i.productId === p.id) ev.push({ t: new Date(t.date), d: -i.quantity, k: 'Penjualan ' + t.number + (t.sim ? ' (simulasi)' : '') }); });
+          (t.refunds || []).forEach(function (f) { if (f.reason === 'salah') f.lines.forEach(function (l) { if (l.productId === p.id) ev.push({ t: new Date(f.time), d: l.qty, k: 'Retur penjualan ' + t.number }); }); });
+        });
+        (mxStockLog || []).forEach(function (e) { if (e.name === p.name) ev.push({ t: new Date(e.time), d: e.diff, k: e.kind }); });
+        ev.sort(function (a, b) { return b.t - a.t; }); var bal = p.stock;
+        var rows = ev.slice(0, 30).map(function (e) { var r = '<tr><td>' + e.t.toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td><td>' + esc(e.k) + '</td><td class="r ' + (e.d < 0 ? 'dn' : 'up') + '">' + (e.d > 0 ? '+' : '') + e.d + '</td><td class="r">' + bal + '</td></tr>'; bal -= e.d; return r; }).join('');
+        return '<div class="mxc mxsc" style="margin-bottom:12px;border-color:#059669"><h3>Kartu stok · ' + esc(p.name) + ' <button class="mxbtn" style="float:right;text-transform:none;background:#64748b" onclick="mxCard(null)">Tutup</button></h3>' +
+          (rows ? '<table class="mxt"><thead><tr><th>Waktu</th><th>Keterangan</th><th class="r">Jumlah</th><th class="r">Saldo</th></tr></thead><tbody>' + rows + '</tbody></table>' : '<small style="color:var(--mu)">Belum ada pergerakan stok tercatat.</small>') + '</div>';
+      }
+      window.mxCard = function (id) { cardId = id; draw(); if (id) $('mx-view').scrollTop = 0; };
+      /* Simulasi penjualan untuk presentasi */
+      function simCard() {
+        var n = transactions.filter(function (t) { return t.sim; }).length;
+        return '<div class="mxc"><h3>Simulasi penjualan</h3><small style="color:var(--mu);display:block;margin-bottom:8px">Menambah transaksi contoh hari ini. Stok, Dashboard, dan laporan ikut bergerak.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mxbtn" onclick="mxSim(5)">+5 transaksi</button><button class="mxbtn" onclick="mxSim(20)">+20 transaksi</button><button class="mxbtn" style="background:#64748b" onclick="mxSimClear()">Hapus simulasi (' + n + ')</button></div></div>';
+      }
+      function simRefresh() { transactions.sort(function (a, b) { return new Date(b.date) - new Date(a.date); }); try { updateShiftUI(); renderProducts(); updateBadges(); if (typeof mxUpdateKpi === 'function') mxUpdateKpi(); } catch (e) { } draw(); }
+      window.mxSim = function (n) {
+        var mins = Math.min(240, Math.max(5, (Date.now() - new Date().setHours(0, 0, 0, 0)) / 60000)), made = 0, ML = ['cash', 'cash', 'qris', 'edc'];
+        for (var k = 0; k < n; k++) {
+          var pool = PRODUCTS.filter(function (p) { return p.stock > 0; }), lines = [], c = 1 + Math.floor(Math.random() * 3);
+          for (var j = 0; j < c && pool.length; j++) { var p = pool.splice(Math.floor(Math.random() * pool.length), 1)[0]; lines.push({ productId: p.id, quantity: Math.min(p.stock, 1 + Math.floor(Math.random() * 3)) }); }
+          if (!lines.length) break;
+          var m = ML[Math.floor(Math.random() * ML.length)], d = new Date(Date.now() - Math.random() * mins * 60000), tot = calcBill(lines, null, m).total;
+          var r = makeReceipt(lines, null, m, m === 'cash' ? Math.ceil(tot / 5000) * 5000 : 0, d, m === 'cash' ? {} : { label: m === 'qris' ? 'QRIS' : 'KARTU DEBIT', ref: String(1000000 + Math.floor(Math.random() * 9e6)) });
+          r.sim = true; lines.forEach(function (l) { productById(l.productId).stock -= l.quantity; }); transactions.unshift(r); made++;
+        }
+        simRefresh(); aud('Simulasi penjualan', made + ' transaksi'); showToast(made + ' transaksi simulasi ditambahkan.', 'success');
+      };
+      window.mxSimClear = function () {
+        var del = transactions.filter(function (t) { return t.sim; }); if (!del.length) { showToast('Tidak ada transaksi simulasi.', 'warn'); return; }
+        del.forEach(function (t) { t.items.forEach(function (i) { var p = productById(i.productId); if (p) p.stock += i.quantity - (i.returned || 0); }); });
+        for (var i = transactions.length - 1; i >= 0; i--) if (transactions[i].sim) transactions.splice(i, 1);
+        simRefresh(); aud('Hapus simulasi', del.length + ' transaksi'); showToast(del.length + ' transaksi simulasi dihapus, stok dikembalikan.', 'success');
+      };
+      /* Kunci layar otomatis */
+      var lastAct = Date.now();
+      ['mousemove', 'keydown', 'click', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { lastAct = Date.now(); }, true); });
+      function mxLock() { var r = X.role; resetUI(); $('mx-role-x').hidden = true; $('mx-role-out').hidden = false; mxRoleBack(); $('mx-role').hidden = false; mxRoleChoose(r); $('mx-role-t2').textContent = 'Layar terkunci · PIN ' + ROLEL[r]; }
+      setInterval(function () { var m = X.idle != null ? X.idle : 10; if (!m || !X.role || !$('mx-role').hidden) return; if (Date.now() - lastAct > m * 60000) { aud('Layar terkunci', ''); mxLock(); } }, 5000);
+      window.mxIdleSet = function (m) { X.idle = m; sv(); draw(); };
+      window.mxIdleCycle = function () { var o = [0, 2, 5, 10], c = X.idle != null ? X.idle : 10; mxIdleSet(o[(o.indexOf(c) + 1) % o.length]); };
+      function place() { var h = document.querySelector('header').getBoundingClientRect().bottom, b = document.querySelector('.mxbar'); $('mx-view').style.top = Math.max(h, b && b.offsetParent ? b.getBoundingClientRect().bottom : 0) + 'px'; }
       window.addEventListener('resize', place);
-      function draw() { $('mx-view').innerHTML = ({ dash: dash, inv: inv, lap: lap })[view](); }
+      function draw() { var fn = ({ dash: dash, inv: inv, lap: lap })[view]; if (fn) $('mx-view').innerHTML = fn(); }
       window.mxView = function (v) {
-        if (!H) ini(); view = v; $('mx-view').hidden = v === 'kasir'; document.body.classList.toggle('mxo', v !== 'kasir'); place();
-        document.querySelectorAll('.mxn').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); });
+        if (!H) ini(); if (!allowed(v)) { showToast('Menu ini tidak tersedia untuk peran ' + ROLEL[X.role] + '.', 'warn'); return; } view = v; $('mx-view').hidden = v === 'kasir'; document.body.classList.toggle('mxo', v !== 'kasir'); place();
+        document.querySelectorAll('.mxn,.mxi').forEach(function (b) { b.classList.toggle('on', b.dataset.v === v); }); $('mx-ddl').textContent = { kasir: 'Kasir', dash: 'Dashboard', inv: 'Inventori', lap: 'Laporan' }[v];
         if (v !== 'kasir') draw();
       };
       window.mxPer = function (n) { per = n; draw(); };
-      window.mxSet = function (k, id, v) { X[k][id] = k === 'exp' ? v : Math.max(0, Number(v) || 0); sv(); draw(); };
-      window.mxPO = function () {
+      window.mxSet = function (k, id, v) { if (k === 'cost') { var nv = Math.max(0, Number(v) || 0); aud('Ubah harga modal', productById(id).name + ': ' + R(X.cost[id]) + ' → ' + R(nv)); setCost(id, nv); } else X[k][id] = k === 'exp' ? v : Math.max(0, Number(v) || 0); sv(); if (k === 'min') renderProducts(); draw(); };
+      function nextPO() { var m = 0; (X.po || []).forEach(function (o) { var n = parseInt(String(o.grp || o.id).replace('PO-', ''), 10); if (n > m) m = n; }); return 'PO-' + String(m + 1).padStart(3, '0'); }
+      function mkPO(lines) {
+        X.po = X.po || []; var g = nextPO(), dt = new Date().toLocaleDateString('id-ID');
+        lines.forEach(function (l, i) { X.po.push({ id: lines.length > 1 ? g + '.' + (i + 1) : g, grp: g, pid: l.pid, qty: l.qty, cost: X.cost[l.pid], st: 'Dipesan', ts: Date.now(), date: dt }); });
+        aud('Buat PO', g + ' · ' + lines.length + ' barang · ' + SUP[productById(lines[0].pid).category]); return g;
+      }
+      function poDraftHtml() {
+        if (!poDraft.length) return '';
+        var tot = 0, sp = SUP[productById(poDraft[0].pid).category];
+        var rows = poDraft.map(function (l, i) { var p = productById(l.pid), v = l.qty * X.cost[l.pid]; tot += v; return '<tr><td>' + esc(p.name) + '</td><td class="r">' + l.qty + '</td><td class="r">' + R(v) + '</td><td><a class="mxlink" style="text-decoration:none" onclick="mxPODel(' + i + ')">✕</a></td></tr>'; }).join('');
+        return '<div class="mxsc" style="margin-bottom:10px"><table class="mxt"><thead><tr><th>Barang dalam PO ini</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><b>' + esc(sp) + '</b> · total ' + R(tot) + '<button class="mxbtn" onclick="mxPOGo()">Buat PO (' + poDraft.length + ' barang)</button><button class="mxbtn" style="background:#64748b" onclick="mxPOClear()">Kosongkan</button></div>';
+      }
+      window.mxPOAdd = function () {
         var id = $('po-p').value, q = Math.floor(Number($('po-q').value) || 0), p = productById(id);
         if (q <= 0) { showToast('Isi jumlah pesanan (lebih dari 0).', 'warn'); return; }
-        X.po = X.po || []; X.po.push({ id: 'PO-' + String(X.po.length + 1).padStart(3, '0'), pid: id, qty: q, cost: X.cost[id], st: 'Dipesan', date: new Date().toLocaleDateString('id-ID') });
-        sv(); draw(); showToast('PO ' + p.name + ' × ' + q + ' dibuat.', 'success');
+        if (poDraft.length && SUP[productById(poDraft[0].pid).category] !== SUP[p.category]) { showToast('Satu PO untuk satu supplier (' + SUP[productById(poDraft[0].pid).category] + '). Buat PO ini dulu.', 'warn'); return; }
+        var ex = poDraft.find(function (l) { return l.pid === id; }); if (ex) ex.qty += q; else poDraft.push({ pid: id, qty: q }); draw();
       };
-      window.mxRecv = function (id) {
-        var o = X.po.find(function (x) { return x.id === id; }), p = productById(o.pid); if (!o || o.st !== 'Dipesan') return;
-        o.st = 'Diterima'; p.stock += o.qty; mxStockLog.unshift({ name: p.name, kind: 'Barang masuk (' + o.id + ')', diff: o.qty, after: p.stock, time: new Date() });
-        sv(); renderProducts(); draw(); showToast(p.name + ': +' + o.qty + ' diterima. Stok sekarang ' + p.stock + '.', 'success');
+      window.mxPODel = function (i) { poDraft.splice(i, 1); draw(); };
+      window.mxPOClear = function () { poDraft = []; draw(); };
+      window.mxPOGo = function () { var n = poDraft.length, g = mkPO(poDraft); poDraft = []; sv(); draw(); showToast(g + ' dibuat (' + n + ' barang).', 'success'); };
+      window.mxPORecAll = function () {
+        var by = {}; lastRec.forEach(function (x) { (by[SUP[x.p.category]] = by[SUP[x.p.category]] || []).push({ pid: x.p.id, qty: x.q }); });
+        var ks = Object.keys(by); ks.forEach(function (k) { mkPO(by[k]); }); sv(); draw(); showToast(ks.length + ' PO dibuat dari rekomendasi.', 'success');
       };
-      setInterval(function () { if (view !== 'kasir' && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#mx-view'))) draw(); }, 3000);
+      window.mxRecvAll = function (g) {
+        var n = 0; (X.po || []).forEach(function (o) {
+          if ((o.grp || o.id) !== g || o.st === 'Diterima') return; var p = productById(o.pid), rem = o.qty - rc(o), before = Math.max(p.stock, 0), oc = X.cost[p.id], avg = Math.round((before * oc + rem * o.cost) / (before + rem));
+          if (avg !== oc) setCost(p.id, avg); o.recv = o.qty; o.st = 'Diterima'; p.stock += rem; n++;
+          mxStockLog.unshift({ name: p.name, kind: 'Barang masuk (' + o.id + ')', diff: rem, after: p.stock, time: new Date() });
+        });
+        aud('Terima PO (semua sisa)', g + ' · ' + n + ' barang'); sv(); renderProducts(); draw(); showToast(g + ': ' + n + ' barang diterima.', 'success');
+      };
+      window.mxPayAll = function (g) { payId = g; recvId = null; draw(); };
+      function pyRowG(g, amt) {
+        var c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
+        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>Bayar ' + g + '</b> · <b>' + R(amt) + '</b> <select id="py-m" style="' + c + '"><option value="cash">Tunai dari laci kasir</option><option value="tf">Transfer / lainnya</option></select><button class="mxbtn" onclick="mxPayGSave(\'' + g + '\')">Catat pembayaran</button><button class="mxbtn" style="background:#64748b" onclick="mxPay(null)">Batal</button></div></td></tr>';
+      }
+      window.mxPayGSave = function (g) {
+        var L = (X.po || []).filter(function (o) { return (o.grp || o.id) === g && rc(o) > 0 && !o.paid; }), amt = L.reduce(function (t, o) { return t + rc(o) * o.cost; }, 0), m = $('py-m').value;
+        if (m === 'cash') {
+          if (!shiftGuard()) return; var kas = shiftStats().expectedCash;
+          if (amt > kas) { showToast('Kas laci tidak cukup (' + formatRupiah(kas) + '). Pilih transfer atau tambah kas masuk dulu.', 'error'); return; }
+          shift.cashLog = shift.cashLog || []; shift.cashLog.push({ type: 'out', amount: amt, note: 'Bayar supplier ' + g + ' – ' + SUP[productById(L[0].pid).category], time: new Date(), supplier: true }); if (typeof renderShift === 'function') renderShift();
+        }
+        L.forEach(function (o) { o.paid = true; o.payVia = m; o.payTs = Date.now(); }); aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), g + ' · ' + R(amt)); payId = null; sv(); draw();
+        showToast(g + ' lunas' + (m === 'cash' ? ' — ' + R(amt) + ' dicatat sebagai kas keluar laci.' : ' (transfer).'), 'success');
+      };
+      function rc(o) { return o.recv != null ? o.recv : (o.st === 'Diterima' ? o.qty : 0); }
+      function rvRow(o) {
+        var p = productById(o.pid), rem = o.qty - rc(o), c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
+        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>Terima ' + esc(p.name) + '</b> · sisa pesanan ' + rem + ' &nbsp; Jumlah diterima <input id="rv-q" type="number" min="1" max="' + rem + '" value="' + rem + '" style="width:70px;' + c + '"> &nbsp;Harga beli/unit <input id="rv-c" type="number" min="0" value="' + o.cost + '"' + (rc(o) > 0 ? ' disabled' : '') + ' style="width:90px;' + c + '"> &nbsp;Kadaluarsa (opsional) <input id="rv-e" type="date" style="width:130px;' + c + '"> &nbsp;<button class="mxbtn" onclick="mxRecvSave(\'' + o.id + '\')">Simpan penerimaan</button> <button class="mxbtn" style="background:#64748b" onclick="mxRecv(null)">Batal</button></div></td></tr>';
+      }
+      window.mxRecv = function (id) { recvId = id; draw(); };
+      window.mxRecvSave = function (id) {
+        var o = X.po.find(function (x) { return x.id === id; }), p = productById(o.pid), rem = o.qty - rc(o), q = Math.floor(Number($('rv-q').value) || 0), e = $('rv-e').value;
+        if (q < 1 || q > rem) { showToast('Jumlah diterima harus 1 sampai ' + rem + '.', 'warn'); return; }
+        if (e) { var old = X.exp[p.id]; X.exp[p.id] = (p.stock > 0 && old && old < e) ? old : e; }
+        var lock = $('rv-c').disabled, bp = lock ? o.cost : Math.max(0, Number($('rv-c').value) || 0), before = Math.max(p.stock, 0), oc = X.cost[p.id];
+        if (!lock) o.cost = bp;
+        var avg = Math.round((before * oc + q * bp) / (before + q)); if (avg !== oc) setCost(p.id, avg);
+        o.recv = rc(o) + q; o.st = o.recv >= o.qty ? 'Diterima' : 'Sebagian'; p.stock += q; recvId = null; aud('Terima PO', id + ' · ' + p.name + ' +' + q + ' @ ' + R(bp));
+        mxStockLog.unshift({ name: p.name, kind: 'Barang masuk (' + o.id + ')', diff: q, after: p.stock, time: new Date() });
+        sv(); renderProducts(); draw(); showToast(p.name + ': +' + q + ' diterima' + (o.st === 'Sebagian' ? ' (sebagian, sisa ' + (o.qty - o.recv) + ')' : '') + '. Stok sekarang ' + p.stock + '.' + (avg !== oc ? ' HPP rata-rata jadi ' + R(avg) + '.' : ''), 'success');
+      };
+      setTimeout(function () { if (!H) ini(); badge(); renderProducts(); applyRole(); }, 900);
+      setInterval(function () { if (H) badge(); }, 3000);
+      setInterval(function () { if (view !== 'kasir' && !addOpen && !recvId && !editId && !payId && !adOpen && !(document.activeElement && document.activeElement.closest && document.activeElement.closest('#mx-view'))) draw(); }, 3000);
+      /* Gerbang PIN supervisor + log aktivitas pada aksi sensitif kasir */
+      var _void = window.voidTransaction; window.voidTransaction = function (n) { pinGate('void ' + n, function () { aud('Void diotorisasi', n); _void(n); }); };
+      var _ret = window.confirmReturn; window.confirmReturn = function () { var t = returnTrx, a = t ? returnSelection().amount : 0; pinGate('retur ' + (t ? t.number : ''), function () { aud('Retur penjualan', (t ? t.number : '') + ' · refund ' + R(a)); _ret(); }); };
+      var _cash = window.mxAddCashLog; window.mxAddCashLog = function () {
+        if (document.getElementById('mx-cash-type').value !== 'out') { _cash(); return; }
+        pinGate('kas keluar laci', function () { aud('Kas keluar laci', document.getElementById('mx-cash-amt').value + ' · ' + document.getElementById('mx-cash-note').value); _cash(); });
+      };
+      var _stk = window.mxStockSet; window.mxStockSet = function (id) {
+        var p = productById(id), inp = document.getElementById('stk-q-' + id); if (!inp || inp.value === '') { _stk(id); return; }
+        pinGate('stok opname ' + p.name, function () { var b = p.stock; _stk(id); aud('Stok opname', p.name + ': ' + b + ' → ' + p.stock); });
+      };
+      var _edit = window.mxSaveEdit; window.mxSaveEdit = function () {
+        var p = productById(editId), pr = Number($('ep-p').value);
+        if (p && pr > 0 && pr !== p.price) { var old = p.price; pinGate('ubah harga ' + p.name, function () { aud('Ubah harga jual', p.name + ': ' + R(old) + ' → ' + R(pr)); _edit(); }); } else _edit();
+      };
+      ini(); delete X.role;
+      var ss = null; try { ss = sessionStorage.getItem('mx-sess'); } catch (e) { }
+      if (ss && ROLES[ss]) X.role = ss; else { $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false; }
+      applyRole();
     })();
   </script>
 

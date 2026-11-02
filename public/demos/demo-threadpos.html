@@ -1549,6 +1549,17 @@
       }
 
       header>div:first-child .text-xs.text-slate-400 {
+        display: flex !important;
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      header>div:first-child .text-xs.text-slate-400> :not(#tp-userline) {
+        display: none !important;
+      }
+
+      #tp-logout-btn {
         display: none !important;
       }
 
@@ -1967,9 +1978,12 @@
             <i class="fa-solid fa-store text-[10px] text-slate-400"></i>
             <span>Store: Grand Indonesia</span>
             <span class="text-slate-600">·</span>
-            <span class="text-emerald-400 font-medium flex items-center gap-1">
+            <span id="tp-userline" class="text-emerald-400 font-medium flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              Kasir: Zannah Jagad
+              <span id="tp-user-name">Zannah Jagad</span>
+              <span id="tp-user-badge" class="tp-rolebadge staff">Staff</span>
+              <button type="button" id="tp-logout-btn" onclick="tpLogout()" title="Keluar / ganti peran"><i
+                  class="fa-solid fa-right-from-bracket"></i><span>Keluar</span></button>
             </span>
           </div>
         </div>
@@ -1985,8 +1999,8 @@
       </div>
       <span class="text-slate-600">|</span>
       <div class="flex items-center gap-1.5 text-slate-400">
-        <i class="fa-solid fa-server text-[10px] text-emerald-400"></i>
-        <span>Offline-Ready Synced</span>
+        <i class="fa-solid fa-flask text-[10px] text-amber-400"></i>
+        <span>Mode Demo</span>
       </div>
     </div>
 
@@ -2073,6 +2087,18 @@
     <div class="tp-mn-grp">Tampilan</div>
     <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);tpToggleDark()"><i
         class="fa-solid fa-circle-half-stroke" style="color:#cbd5e1"></i>Mode Gelap / Terang</button>
+
+    <div class="tp-mn-grp">Demo</div>
+    <button class="tp-mn-item" role="menuitem" onclick="tpMenu(false);tpDemoOpen()"><i class="fa-solid fa-clapperboard"
+        style="color:#fb7185"></i>Skenario &amp; tur demo</button>
+    <button class="tp-mn-item danger" role="menuitem" onclick="tpMenu(false);tpResetDemo()"><i
+        class="fa-solid fa-rotate-right"></i>Reset data demo</button>
+
+    <div class="tp-mn-grp">Akun</div>
+    <button class="tp-mn-item tp-owner-only" role="menuitem" onclick="tpMenu(false);openModal('log-modal')"><i
+        class="fa-solid fa-clipboard-list" style="color:#a78bfa"></i>Log aktivitas</button>
+    <button class="tp-mn-item danger" role="menuitem" onclick="tpMenu(false);tpLogout()"><i
+        class="fa-solid fa-right-from-bracket"></i>Keluar / ganti peran</button>
   </div>
 
   <!-- ======================================================== -->
@@ -2181,11 +2207,14 @@
 
         <!-- Customer & Loyalty Tier Strip -->
         <div class="mt-3 pt-3 border-t border-slate-800 grid grid-cols-2 gap-2 text-xs">
-          <div>
+          <div style="position:relative">
             <label class="text-[10px] text-slate-400 block mb-1">Pelanggan / Member:</label>
             <input id="cust-name-input" type="text" value="Zannah Tan"
               class="w-full bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 font-medium"
-              placeholder="Nama Pembeli..." />
+              placeholder="Cari nama / no. HP member..." autocomplete="off" oninput="tpCustInput(this.value)"
+              onfocus="this.select();tpCustSuggest(true)" onblur="setTimeout(function(){tpCustSuggest(false)},160)"
+              onkeydown="tpCustKey(event)" />
+            <div id="cust-suggest" class="tp-cs" style="display:none"></div>
           </div>
 
           <div>
@@ -2199,6 +2228,7 @@
             </select>
           </div>
         </div>
+        <div id="member-card"></div>
       </div>
 
       <!-- Cart Items List (Scrollable) -->
@@ -2238,6 +2268,8 @@
                 id="voucher-label">Voucher</span></span>
             <span id="voucher-val" class="font-mono font-bold">- Rp 0</span>
           </div>
+
+          <div id="pts-rows" class="space-y-1.5"></div>
 
           <div class="flex justify-between text-slate-600">
             <span>Pajak Restitusi / PPN (11%)</span>
@@ -4346,7 +4378,7 @@
           '<span class="tp-label">Uang Fisik di Laci (hasil hitung, untuk tutup shift)</span>' +
           '<input id="sh-counted" type="text" inputmode="numeric" class="tp-input num" placeholder="Rp 0" oninput="tpOnCount(this)">' +
           '<div id="sh-diff" class="tp-diff"><span>Selisih</span><b>-</b></div>';
-        foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="playAudio(\'click\'); window.print();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
+        foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="tpShiftPrint();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
           '<button type="button" id="sh-close-btn" class="tp-btn rose" disabled onclick="tpRequestCloseShift()"><i class="fa-solid fa-lock"></i>Tutup Shift &amp; Handover</button>';
       } else {
         tp$('sh-title').textContent = 'Laporan Shift #' + tpShift.number + ' (Ditutup)';
@@ -4354,7 +4386,7 @@
         body.innerHTML = '<div class="tp-done closed"><div class="ic"><i class="fa-solid fa-lock"></i></div><h4>Shift Telah Ditutup</h4><p>Laporan di bawah sudah final dan siap diserahterimakan.</p></div>' + tpShiftRows(s) +
           `<div class="tp-rows" style="margin-top:10px"><div class="r"><span>Uang fisik dihitung</span><span>${formatRupiah(tpShift.counted)}</span></div></div>
        <div class="tp-diff ${diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus'}"><span>${diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih'}</span><b>${diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))}</b></div>`;
-        foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="playAudio(\'click\'); window.print();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
+        foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="tpShiftPrint();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
           '<button type="button" class="tp-btn green" onclick="tpStartNewShift()"><i class="fa-solid fa-play"></i>Mulai Shift Baru</button>';
       }
     }
@@ -4393,6 +4425,7 @@
       if (!t || t.voided) return;
       tpAsk('Void transaksi ' + no + '?', `Stok pakaian dikembalikan dan nilai ${formatRupiah(t.total)} dikeluarkan dari laporan shift${t.method === 'cash' ? ' (uang dikembalikan dari laci)' : ''}.`, 'Ya, Void Transaksi', () => {
         t.voided = true;
+        tpLog('void', 'Void ' + no + ' \u00b7 ' + formatRupiah(t.total), { approver: tpVoidApprover });
         t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
         renderProducts(); tpRenderShift();
         showToast(no + ' di-void. Stok dikembalikan.', 'warn');
@@ -4637,7 +4670,8 @@
           onclick="tpRpCsv()"><i class="fa-solid fa-file-csv"></i> CSV</button><button class="tp-btn ghost"
           onclick="tpRpPrint()"><i class="fa-solid fa-print"></i> Cetak</button><button class="tp-btn rosesoft"
           onclick="tpResetDemo()"><i class="fa-solid fa-trash-arrow-up"></i> Reset data</button><button
-          class="tp-btn ghost" onclick="closeModal('report-modal')">Tutup</button></div>
+          class="tp-btn ghost tp-owner-only" onclick="openModal('log-modal')"><i class="fa-solid fa-clipboard-list"></i>
+          Log aktivitas</button><button class="tp-btn ghost" onclick="closeModal('report-modal')">Tutup</button></div>
     </div>
   </div>
   <script>
@@ -5286,6 +5320,15 @@
     const tpSum = (a, f) => a.reduce((x, y) => x + f(y), 0);
     const tpShort = v => v >= 1e6 ? (v / 1e6).toFixed(1).replace('.', ',').replace(',0', '') + ' jt' : v >= 1e3 ? Math.round(v / 1e3) + ' rb' : String(Math.round(v));
     const tpPayMap = t => t.pay || { [t.method]: t.total };
+    let tpCust = null, tpRedeemPts = 0, tpCommitting = false;
+    /* peran pengguna (simulasi): staff / spv / owner */
+    let tpRole = null;
+    const TP_USERS = {
+      staff: { name: 'Zannah Jagad', label: 'Staff', title: 'Kasir', pin: '1111' },
+      spv: { name: 'Maria Gunawan', label: 'SPV', title: 'Supervisor', pin: '2222' },
+      owner: { name: 'Bambang Sutanto', label: 'Owner', title: 'Pemilik', pin: '3333' }
+    };
+    const tpCashierName = () => (TP_USERS[tpRole] || TP_USERS.staff).name;   /* member terpilih, poin yang ingin ditukar, penanda sedang commit */
 
     /* ---------- 1. PROMO OTOMATIS ---------- */
     const TP_LOOK_DISC = 50000;
@@ -5327,9 +5370,14 @@
         if (after >= v.min) voucherDisc = v.type === 'pct' ? Math.min(Math.round(after * v.value / 100), v.max) : Math.min(v.value, after);
         else note = 'Voucher belum berlaku: min. belanja ' + formatRupiah(v.min) + ' (setelah diskon).';
       }
-      const taxable = after - voucherDisc;
+      const afterV = after - voucherDisc;
+      /* tukar poin: 1 poin = Rp 100, maks. 50% dari tagihan (sebelum PPN) */
+      let pointsUsed = 0;
+      if (tpCust && tpRedeemPts > 0) pointsUsed = Math.max(0, Math.min(tpRedeemPts, tpCust.points, Math.floor(afterV * 0.5 / 100)));
+      const pointsDisc = pointsUsed * 100;
+      const taxable = afterV - pointsDisc;
       const tax = Math.round(taxable * 0.11);
-      return { subtotal, promos, promoDisc, memberDisc, voucherDisc, voucherNote: note, tax, total: taxable + tax };
+      return { subtotal, promos, promoDisc, memberDisc, voucherDisc, voucherNote: note, pointsUsed, pointsDisc, tax, total: taxable + tax };
     };
 
     /* ---------- 2. SPLIT PAYMENT ---------- */
@@ -5442,6 +5490,14 @@
     tpMakeTrx = function (items, o) {
       const t = _tpMake(items, o), c = tpCalc(items, o.rate, o.voucher);
       t.promoDisc = c.promoDisc || 0; t.promos = c.promos || [];
+      t.pointsUsed = c.pointsUsed || 0; t.pointsDisc = c.pointsDisc || 0;
+      if (tpCommitting) t.cashier = tpCashierName();
+      if (tpCommitting && tpCust) {            /* transaksi nyata dari member: poin ditukar & diperoleh */
+        const earn = Math.floor(t.total / 10000);
+        t.custId = tpCust.id; t.ptsEarned = earn;
+        tpCust.points = Math.max(0, tpCust.points - t.pointsUsed + earn); tpCust.visits += 1;
+        t.ptsBalance = tpCust.points; tpCustSave();
+      }
       if (o.method === 'split' && tpSplitPending) {
         const x = tpSplitPending, nm = [];
         if (x.parts.cash > 0) nm.push('TUNAI'); if (x.parts.edc > 0) nm.push('KARTU'); if (x.parts.qris > 0) nm.push('QRIS');
@@ -5455,9 +5511,12 @@
     };
     const _tpCommit = tpCommit;
     tpCommit = function (method, extra) {
-      if (method !== 'split') return _tpCommit(method, extra);
-      const prev = cashTendered; cashTendered = extra.ctx.tendered; tpSplitPending = extra.ctx;
-      try { _tpCommit('split', { label: 'SPLIT', ref: null }); } finally { cashTendered = prev; tpSplitPending = null; }
+      tpCommitting = true;
+      try {
+        if (method !== 'split') return _tpCommit(method, extra);
+        const prev = cashTendered; cashTendered = extra.ctx.tendered; tpSplitPending = extra.ctx;
+        try { _tpCommit('split', { label: 'SPLIT', ref: null }); } finally { cashTendered = prev; tpSplitPending = null; }
+      } finally { tpCommitting = false; }
     };
 
     /* refund pada transaksi split dibagi sesuai porsi metode asal */
@@ -5494,6 +5553,10 @@
       if (pr) pr.innerHTML = c.promos.map(p => '<div class="tp-promo"><span class="flex items-center gap-1"><i class="fa-solid fa-tags text-[10px]"></i><span>' + tpEsc(p.name) + '</span></span><span class="font-mono font-bold">- ' + formatRupiah(p.amt) + '</span></div>').join('');
       const hints = tpPromoHints(cart), box = tp$('cart-list-container');
       if (hints.length && box) box.insertAdjacentHTML('afterbegin', hints.map(h => '<div class="tp-hint"><i class="fa-solid fa-wand-magic-sparkles"></i><span>' + h + '</span></div>').join(''));
+      const pw = tp$('pts-rows');
+      if (pw) pw.innerHTML = c.pointsDisc > 0 ? '<div class="tp-promo" style="color:#be185d"><span class="flex items-center gap-1"><i class="fa-solid fa-star text-[10px]"></i><span>Tukar poin (' + c.pointsUsed.toLocaleString('id-ID') + ')</span></span><span class="font-mono font-bold">- ' + formatRupiah(c.pointsDisc) + '</span></div>' : '';
+      if (typeof tpAutoLink === 'function') tpAutoLink();
+      if (typeof renderMemberCard === 'function') renderMemberCard();
       if (c.total !== tpSplitLastTotal) { tpSplitLastTotal = c.total; tpSplitReset(); }
       else tpSplitRender();
       tpRefreshCheckout();
@@ -5501,6 +5564,7 @@
     const _tpResetOrder = tpResetOrder;
     tpResetOrder = function () {
       _tpResetOrder(); tpSplitCtx = null; tpSplitLastTotal = -1; tpSplitReset();
+      tpCust = null; tpRedeemPts = 0;
       const w = tp$('wa-phone'); if (w) w.value = '';
     };
 
@@ -5509,11 +5573,16 @@
     const _tpRenderReceipt = tpRenderReceipt;
     tpRenderReceipt = function (trx) {
       _tpRenderReceipt(trx); tpCurTrx = trx;
+      tp$('rcpt-cashier').innerText = (trx.cashier || 'Zannah Jagad') + ' (' + tpPad(trx.shiftNo) + ')';
       let pr = tp$('rcpt-promo-rows');
       if (!pr) { const ref = tp$('rcpt-discount-row'); pr = document.createElement('div'); pr.id = 'rcpt-promo-rows'; ref.parentNode.insertBefore(pr, ref); }
       const pl = trx.promos || [];
       pr.style.display = pl.length ? 'flex' : 'none'; pr.style.flexDirection = 'column'; pr.style.gap = '4px';
       pr.innerHTML = pl.map(p => '<div class="flex justify-between gap-3"><span>' + tpEsc(p.name) + '</span><span class="whitespace-nowrap">- ' + formatRupiah(p.amt) + '</span></div>').join('');
+      let pw = tp$('rcpt-pts-rows');
+      if (!pw) { const ref = tp$('rcpt-tax').parentElement; pw = document.createElement('div'); pw.id = 'rcpt-pts-rows'; ref.parentNode.insertBefore(pw, ref); }
+      pw.style.display = trx.pointsDisc > 0 ? 'flex' : 'none'; pw.style.justifyContent = 'space-between'; pw.style.gap = '12px';
+      pw.innerHTML = trx.pointsDisc > 0 ? '<span>Tukar Poin (' + trx.pointsUsed.toLocaleString('id-ID') + ')</span><span style="white-space:nowrap">- ' + formatRupiah(trx.pointsDisc) + '</span>' : '';
       const tl = tp$('rcpt-tendered-label').parentElement, chg = tp$('rcpt-change-row');
       let sp = tp$('rcpt-split-rows');
       if (!sp) { sp = document.createElement('div'); sp.id = 'rcpt-split-rows'; sp.className = 'space-y-1'; chg.parentNode.insertBefore(sp, chg.nextSibling); }
@@ -5526,17 +5595,24 @@
           (trx.pay.cash > 0 ? r('Tunai Diterima', formatRupiah(trx.tendered)) + r('<b>Kembalian</b>', '<b>' + formatRupiah(trx.change) + '</b>') : '');
         tp$('rcpt-payment-type').innerText = 'SPLIT';
       } else { tl.style.display = ''; sp.style.display = 'none'; sp.innerHTML = ''; }
+      let pf = tp$('rcpt-pts-foot');
+      if (!pf) { pf = document.createElement('div'); pf.id = 'rcpt-pts-foot'; sp.parentNode.insertBefore(pf, sp.nextSibling); }
+      if (trx.custId) {
+        pf.style.cssText = 'display:block;margin-top:6px;padding:6px 8px;border:1px dashed #cbd5e1;border-radius:6px;font-size:11px;text-align:center';
+        pf.innerHTML = 'Poin: ' + (trx.pointsUsed ? '-' + trx.pointsUsed.toLocaleString('id-ID') + ' ditukar · ' : '') + '<b>+' + (trx.ptsEarned || 0).toLocaleString('id-ID') + ' diperoleh</b> · Saldo <b>' + (trx.ptsBalance || 0).toLocaleString('id-ID') + '</b>';
+      } else pf.style.display = 'none';
     };
 
     /* ---------- 3. STRUK WHATSAPP ---------- */
     function tpWaText(t) {
       const R = formatRupiah, L = [];
-      L.push('*THREADPOS · Grand Indonesia*', 'Struk ' + t.no, tpDMY(t.ts) + ' ' + tpHM(t.ts) + ' WIB', 'Kasir: Zannah Jagad', 'Pelanggan: ' + t.customer + ' (' + t.tierName + ')', '');
+      L.push('*THREADPOS · Grand Indonesia*', 'Struk ' + t.no, tpDMY(t.ts) + ' ' + tpHM(t.ts) + ' WIB', 'Kasir: ' + (t.cashier || 'Zannah Jagad'), 'Pelanggan: ' + t.customer + ' (' + t.tierName + ')', '');
       t.items.forEach(i => { L.push(i.name, '  ' + i.colorName + ' / ' + i.size + ' · ' + i.qty + ' x ' + R(i.price) + ' = ' + R(i.qty * i.price)); });
       L.push('', 'Subtotal: ' + R(t.subtotal));
       (t.promos || []).forEach(p => L.push('Promo ' + p.name + ': -' + R(p.amt)));
       if (t.memberDisc > 0) L.push('Diskon Member (' + Math.round(t.rate * 100) + '%): -' + R(t.memberDisc));
       if (t.voucherDisc > 0) L.push('Voucher ' + t.voucherCode + ': -' + R(t.voucherDisc));
+      if (t.pointsDisc > 0) L.push('Tukar Poin (' + t.pointsUsed + '): -' + R(t.pointsDisc));
       L.push('PPN 11%: ' + R(t.tax), '*TOTAL: ' + R(t.total) + '*', '');
       if (t.method === 'split') {
         L.push('Bayar (split):');
@@ -5548,6 +5624,7 @@
         L.push('Bayar: ' + t.methodLabel);
         if (t.method === 'cash') L.push('Tunai diterima: ' + R(t.tendered), 'Kembalian: ' + R(t.change));
       }
+      if (t.custId) L.push('', '⭐ Poin: +' + (t.ptsEarned || 0) + ' diperoleh' + (t.pointsUsed ? ', ' + t.pointsUsed + ' ditukar' : '') + ' · Saldo ' + (t.ptsBalance || 0) + ' poin');
       L.push('', 'Terima kasih sudah berbelanja! 🛍️', 'Tukar barang maks. 7 hari dengan struk & hangtag utuh.');
       return L.join('\n');
     }
@@ -5599,13 +5676,15 @@
       return '<div class="rp-donut">' + svg + '<div class="rp-leg">' + leg + '</div></div>';
     }
     tpRenderReport = function () {
+      if (tpRole === 'staff') tpRpRange = 'today';
+      const rf = x => tpRole !== 'staff' || x.shiftNo === tpShift.number;
       const d0 = new Date(); d0.setHours(0, 0, 0, 0);
       const from = tpRpRange === 'today' ? d0.getTime() : tpRpRange === '7d' ? Date.now() - 7 * 864e5 : 0;
-      const rows = tpTrx.filter(t => !t.voided && t.ts.getTime() >= from);
-      const rets = tpReturns.filter(r => r.mode === 'refund' && r.ts.getTime() >= from);
+      const rows = tpTrx.filter(t => !t.voided && t.ts.getTime() >= from && rf(t));
+      const rets = tpReturns.filter(r => r.mode === 'refund' && r.ts.getTime() >= from && rf(r));
       const refund = tpSum(rets, r => r.amount), gross = tpSum(rows, t => t.total), net = gross - refund;
       const qty = tpSum(rows, t => tpSum(t.items, i => i.qty - i.returned));
-      const dMember = tpSum(rows, t => t.memberDisc), dVoucher = tpSum(rows, t => t.voucherDisc), dPromo = tpSum(rows, t => t.promoDisc || 0);
+      const dMember = tpSum(rows, t => t.memberDisc), dVoucher = tpSum(rows, t => t.voucherDisc), dPromo = tpSum(rows, t => t.promoDisc || 0), dPts = tpSum(rows, t => t.pointsDisc || 0);
 
       /* tren: per jam (hari ini) atau per hari */
       let labels = [], vals = [], peak = '';
@@ -5636,8 +5715,8 @@
       const topHtml = ta.length ? ta.map(([k, o], i) => '<div class="rp-bar"><span><b style="color:#e11d48;margin-right:4px">' + (i + 1) + '</b>' + tpEsc(k) + '</span><div><span class="f" style="width:' + Math.round(o.v / tm * 100) + '%"></span></div><em>' + o.q + ' pcs · ' + formatRupiah(o.v) + '</em></div>').join('') : '<p style="color:#94a3b8">Belum ada data pada periode ini.</p>';
 
       /* diskon yang diberikan */
-      const dTot = dMember + dVoucher + dPromo;
-      const dSeg = [['Promo', dPromo, '#f59e0b'], ['Member', dMember, '#10b981'], ['Voucher', dVoucher, '#6366f1']];
+      const dTot = dMember + dVoucher + dPromo + dPts;
+      const dSeg = [['Promo', dPromo, '#f59e0b'], ['Member', dMember, '#10b981'], ['Voucher', dVoucher, '#6366f1'], ['Tukar poin', dPts, '#ec4899']];
       const discHtml = dTot > 0
         ? '<div class="rp-stack">' + dSeg.filter(x => x[1] > 0).map(x => '<span style="width:' + (x[1] / dTot * 100) + '%;background:' + x[2] + '" title="' + x[0] + ' · ' + formatRupiah(x[1]) + '"></span>').join('') + '</div><div class="rp-leg">' + dSeg.map(x => '<div><i style="background:' + x[2] + '"></i><span>' + x[0] + '</span><b>' + formatRupiah(x[1]) + '</b></div>').join('') + '</div><div class="rp-note">Total diskon diberikan: <b>' + formatRupiah(dTot) + '</b> (' + (gross + dTot ? Math.round(dTot / (gross + dTot) * 100) : 0) + '% dari penjualan sebelum diskon)</div>'
         : '<p style="color:#94a3b8">Belum ada diskon pada periode ini.</p>';
@@ -5650,9 +5729,14 @@
 
       const seg = [['today', 'Hari ini'], ['7d', '7 hari'], ['all', 'Semua']].map(x => '<button class="' + (tpRpRange === x[0] ? 'on' : '') + '" onclick="tpRpSet(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
       const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
+      let profitHtml = '';
+      if (tpRole === 'owner') {
+        const revEx = Math.round(net / 1.11), hpp = Math.round(0.55 * tpSum(rows, t => tpSum(t.items, i => (i.qty - i.returned) * i.price))), prof = revEx - hpp, mg = revEx ? Math.round(prof / revEx * 100) : 0;
+        profitHtml = '<div class="rp-card" style="margin-top:12px"><div class="rp-h" style="display:flex;justify-content:space-between;align-items:center">Estimasi laba kotor <span class="tp-rolebadge owner" style="text-transform:none">khusus Owner</span></div><div class="rp-kpis" style="margin-top:8px">' + kp('Penjualan (ex-PPN)', formatRupiah(revEx)) + kp('Estimasi HPP (55%)', formatRupiah(hpp)) + kp('Estimasi laba kotor', formatRupiah(prof), 'hl') + kp('Margin', mg + '%') + '</div><div class="rp-note">Perkiraan: HPP diasumsikan 55% dari harga jual karena data modal produk belum diinput.</div></div>';
+      }
       tp$('rp-body').innerHTML =
-        '<div class="rp-seg">' + seg + '</div>' +
-        '<div class="rp-kpis">' + kp('Omzet bersih', formatRupiah(net), 'hl') + kp('Transaksi', rows.length) + kp('Item terjual', qty) + kp('Rata-rata / trx', formatRupiah(rows.length ? Math.round(net / rows.length) : 0)) + kp('Refund', formatRupiah(refund)) + '</div>' +
+        (tpRole === 'staff' ? '<div class="rp-note" style="margin:0 0 10px"><i class="fa-solid fa-lock"></i> Staff hanya melihat penjualan <b>shift sendiri</b> (#' + tpShift.number + '). Laporan semua hari: SPV / Owner.</div>' : '<div class="rp-seg">' + seg + '</div>') +
+        '<div class="rp-kpis">' + kp('Omzet bersih', formatRupiah(net), 'hl') + kp('Transaksi', rows.length) + kp('Item terjual', qty) + kp('Rata-rata / trx', formatRupiah(rows.length ? Math.round(net / rows.length) : 0)) + kp('Refund', formatRupiah(refund)) + '</div>' + profitHtml +
         '<div class="rp-card" style="margin-top:12px"><div class="rp-h">' + (tpRpRange === 'today' ? 'Penjualan per jam' : 'Penjualan per hari') + '</div>' + trend + (peak ? '<div class="rp-note">' + peak + '</div>' : '') + '</div>' +
         '<div class="rp-grid">' +
         '<div class="rp-card"><div class="rp-h">Metode pembayaran</div>' + payDonut + (splitN ? '<div class="rp-note"><b>' + splitN + '</b> transaksi memakai split payment.</div>' : '') + '</div>' +
@@ -5664,6 +5748,2115 @@
     };
     renderCart();
     if (!tp$('report-modal').classList.contains('hidden')) tpRenderReport();
+  </script>
+
+  <style>
+    /* ===== Pencarian member & poin; hitung uang fisik ===== */
+    .tp-cs {
+      position: absolute;
+      left: 0;
+      width: min(300px, calc(100vw - 40px));
+      top: 100%;
+      margin-top: 4px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      box-shadow: 0 18px 40px -10px rgba(0, 0, 0, .65);
+      z-index: 40;
+      max-height: 260px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .tp-cs-h {
+      padding: 6px 8px 4px;
+      font: 700 9.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .tp-cs-empty {
+      padding: 12px 10px;
+      font-size: 11.5px;
+      color: #94a3b8;
+      line-height: 1.4;
+    }
+
+    .tp-cs-i {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 8px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .tp-cs-i:hover,
+    .tp-cs-i.on {
+      background: #1e293b;
+    }
+
+    .tp-cs-i .av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 12px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+      background: linear-gradient(135deg, #fb7185, #e11d48);
+    }
+
+    .tp-cs-i .m {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+    }
+
+    .tp-cs-i .m b {
+      color: #f1f5f9;
+      font-size: 12.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tp-cs-i small {
+      color: #94a3b8;
+      font: 500 10.5px 'JetBrains Mono', monospace;
+    }
+
+    .tp-cs-i .r {
+      display: grid;
+      justify-items: end;
+      gap: 2px;
+      flex: none;
+    }
+
+    .tp-tier {
+      padding: 1px 7px;
+      border-radius: 99px;
+      font: 800 9.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .tp-tier.silver {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .tp-tier.gold {
+      background: #fde68a;
+      color: #92400e;
+    }
+
+    .tp-tier.platinum {
+      background: #c7d2fe;
+      color: #3730a3;
+    }
+
+    #member-card {
+      margin-top: 8px;
+    }
+
+    .tp-mc {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(251, 191, 36, .09);
+      border: 1px solid rgba(251, 191, 36, .28);
+      color: #fde68a;
+      font-size: 11.5px;
+    }
+
+    .tp-mc b {
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tp-mc .dim {
+      color: #a8a29e;
+    }
+
+    .tp-mc-btn {
+      margin-left: auto;
+      padding: 5px 10px;
+      border-radius: 8px;
+      border: 1px solid #f59e0b;
+      background: rgba(245, 158, 11, .14);
+      color: #fcd34d;
+      font: 700 11px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .tp-mc-btn:hover {
+      background: rgba(245, 158, 11, .28);
+    }
+
+    .tp-mc-btn.on {
+      background: #ec4899;
+      border-color: #ec4899;
+      color: #fff;
+    }
+
+    .tp-mc-sub {
+      margin-top: 5px;
+      font-size: 11px;
+      color: #fcd34d;
+      opacity: .9;
+    }
+
+    .tp-mc-hint {
+      font-size: 10.5px;
+      color: #64748b;
+      padding: 0 2px;
+    }
+
+    .tp-den {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      background: #f8fafc;
+    }
+
+    .tp-den-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11.5px;
+      color: #64748b;
+      margin-bottom: 6px;
+      gap: 8px;
+    }
+
+    .tp-den-head b {
+      color: #0f172a;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tp-den-row {
+      display: grid;
+      grid-template-columns: 92px 1fr 104px;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+    }
+
+    .tp-den-l {
+      font: 700 12px 'JetBrains Mono', monospace;
+      color: #334155;
+    }
+
+    .tp-den-q {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tp-den-q button {
+      width: 30px;
+      height: 30px;
+      flex: none;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      font: 700 15px sans-serif;
+      color: #475569;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .tp-den-q button:active {
+      background: #f1f5f9;
+    }
+
+    .tp-den-q input {
+      width: 100%;
+      min-width: 0;
+      max-width: 64px;
+      height: 30px;
+      text-align: center;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: 700 13px 'JetBrains Mono', monospace;
+      background: #fff;
+    }
+
+    .tp-den-q input:focus {
+      outline: none;
+      border-color: #f43f5e;
+    }
+
+    .tp-den-q input.coin {
+      max-width: none;
+      text-align: right;
+      padding: 0 8px;
+    }
+
+    .tp-den-s {
+      text-align: right;
+      font: 600 11.5px 'JetBrains Mono', monospace;
+      color: #64748b;
+    }
+
+    .tp-den-act {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tp-den-act button {
+      flex: 1;
+      min-width: 120px;
+      padding: 8px 10px;
+      border-radius: 9px;
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      font: 700 11.5px 'Plus Jakarta Sans', sans-serif;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .tp-den-act button:hover {
+      background: #f1f5f9;
+    }
+
+    @media (max-width: 1023px) {
+      .tp-den-q input {
+        font-size: 16px;
+      }
+
+      .tp-den-row {
+        grid-template-columns: 80px 1fr 88px;
+      }
+    }
+
+    html.tp-dark .tp-den {
+      background: #0f172a;
+      border-color: #334155;
+    }
+
+    html.tp-dark .tp-den-l,
+    html.tp-dark .tp-den-head b {
+      color: #e2e8f0;
+    }
+  </style>
+
+  <script>
+    /* =====================================================================
+       MEMBER: PENCARIAN PELANGGAN + POIN LOYALITAS   |   TUTUP SHIFT: HITUNG PECAHAN
+       ===================================================================== */
+    const TP_CKEY = 'threadpos-cust-v1';
+    const TP_TIER_INFO = { silver: { n: 'Silver', v: '0.05' }, gold: { n: 'Gold', v: '0.10' }, platinum: { n: 'Platinum', v: '0.15' } };
+    let TP_CUSTS = [
+      { id: 'c1', name: 'Zannah Tan', phone: '081234567890', tier: 'silver', points: 840, visits: 9 },
+      { id: 'c2', name: 'Rina Kusuma', phone: '085711223344', tier: 'gold', points: 2150, visits: 24 },
+      { id: 'c3', name: 'Bagas Pratama', phone: '081399887766', tier: 'platinum', points: 5320, visits: 51 },
+      { id: 'c4', name: 'Dewi Anggraini', phone: '082144556677', tier: 'silver', points: 310, visits: 4 },
+      { id: 'c5', name: 'Kevin Wijaya', phone: '087822334455', tier: 'gold', points: 1480, visits: 17 },
+      { id: 'c6', name: 'Maya Lestari', phone: '089677889900', tier: 'platinum', points: 4060, visits: 38 },
+      { id: 'c7', name: 'Arief Hidayat', phone: '081120203030', tier: 'silver', points: 120, visits: 2 },
+      { id: 'c8', name: 'Nadia Putri', phone: '085266778899', tier: 'gold', points: 960, visits: 11 }
+    ];
+    let tpCustOff = false, tpCsList = [], tpCsIdx = -1;
+    try { const raw = localStorage.getItem(TP_CKEY); if (raw) { const d = JSON.parse(raw); if (Array.isArray(d) && d.length) TP_CUSTS = d; } } catch (e) { }
+    function tpCustSave() { if (tpCustOff) return; try { localStorage.setItem(TP_CKEY, JSON.stringify(TP_CUSTS)); } catch (e) { } }
+    window.addEventListener('pagehide', tpCustSave);
+    const _tpResetDemoC = window.tpResetDemo;
+    if (_tpResetDemoC) window.tpResetDemo = function () {
+      const _a = tpAsk;
+      tpAsk = function (t, m, l, cb, d) { tpAsk = _a; _a(t, m, l, function () { tpCustOff = true; try { localStorage.removeItem(TP_CKEY); localStorage.removeItem('threadpos-tour-v1'); localStorage.removeItem('threadpos-log-v1'); sessionStorage.removeItem('threadpos-session-v1'); } catch (e) { } cb(); }, d); };
+      _tpResetDemoC();
+    };
+
+    const tpPhone = d => String(d).replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3');
+    const tpIni = n => (n.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('') || '?').toUpperCase();
+    function tpCustFind(q) {
+      q = q.trim().toLowerCase();
+      const d = q.replace(/\D/g, ''), dn = d.startsWith('62') ? '0' + d.slice(2) : d;
+      let r = TP_CUSTS.filter(c => !q || c.name.toLowerCase().includes(q) || (d.length >= 3 && c.phone.includes(dn)));
+      if (!q) r = r.slice().sort((a, b) => b.points - a.points);
+      return r.slice(0, 5);
+    }
+    function tpCustSuggest(show) {
+      const box = tp$('cust-suggest'); if (!box) return;
+      if (!show) { box.style.display = 'none'; return; }
+      const q = tp$('cust-name-input').value, walk = /walk-in/i.test(q) || !q.trim() || !!(tpCust && q.trim() === tpCust.name);
+      const list = tpCustFind(walk ? '' : q); tpCsList = list; tpCsIdx = list.length ? 0 : -1;
+      box.innerHTML = list.length
+        ? '<div class="tp-cs-h">' + (walk ? 'Member teratas' : 'Hasil pencarian') + '</div>' + list.map((c, i) =>
+          '<div class="tp-cs-i' + (i === 0 ? ' on' : '') + '" onmousedown="event.preventDefault();tpCustPick(\'' + c.id + '\')"><div class="av">' + tpEsc(tpIni(c.name)) + '</div><div class="m"><b>' + tpEsc(c.name) + '</b><small>' + tpPhone(c.phone) + '</small></div><div class="r"><span class="tp-tier ' + c.tier + '">' + TP_TIER_INFO[c.tier].n + '</span><small>' + c.points.toLocaleString('id-ID') + ' poin</small></div></div>').join('')
+        : '<div class="tp-cs-empty">Tidak ada member dengan nama / no. HP itu.<br>Transaksi dilanjutkan sebagai pelanggan umum.</div>';
+      box.style.display = 'block';
+    }
+    function tpCustInput(v) {
+      if (tpCust && v.trim() !== tpCust.name) { tpCust = null; tpRedeemPts = 0; renderCart(); }
+      tpCustSuggest(true);
+    }
+    function tpCustKey(e) {
+      const box = tp$('cust-suggest'), open = box && box.style.display !== 'none';
+      if (e.key === 'Escape') { tpCustSuggest(false); return; }
+      if (!open || !tpCsList.length) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); tpCsIdx = (tpCsIdx + (e.key === 'ArrowDown' ? 1 : -1) + tpCsList.length) % tpCsList.length;
+        box.querySelectorAll('.tp-cs-i').forEach((el, i) => el.classList.toggle('on', i === tpCsIdx));
+      } else if (e.key === 'Enter') { e.preventDefault(); tpCustPick(tpCsList[tpCsIdx].id); }
+    }
+    function tpCustPick(id) {
+      const c = TP_CUSTS.find(x => x.id === id); if (!c) return;
+      tpCust = c; tpRedeemPts = 0;
+      tp$('cust-name-input').value = c.name;
+      const sel = tp$('member-tier-select'); sel.value = TP_TIER_INFO[c.tier].v;
+      tpCustSuggest(false);
+      handleTierChange(sel.value);
+      showToast('Member: ' + c.name + ' · ' + TP_TIER_INFO[c.tier].n + ' · ' + c.points.toLocaleString('id-ID') + ' poin', 'success');
+    }
+    function tpAutoLink() {
+      if (tpCust) return;
+      const n = (tp$('cust-name-input').value || '').trim().toLowerCase();
+      const c = n && TP_CUSTS.find(x => x.name.toLowerCase() === n);
+      if (c) tpCust = c;
+    }
+    function tpToggleRedeem() {
+      if (!tpCust) return; playAudio('click');
+      if (tpRedeemPts > 0) tpRedeemPts = 0;
+      else if (tpCust.points < 100) { showToast('Minimal 100 poin untuk bisa ditukar.', 'warn'); return; }
+      else if (!cart.length) { showToast('Tambahkan pakaian ke keranjang dulu.', 'warn'); return; }
+      else tpRedeemPts = tpCust.points;
+      renderCart();
+    }
+    function renderMemberCard() {
+      const box = tp$('member-card'); if (!box) return;
+      if (!tpCust) { box.innerHTML = '<div class="tp-mc-hint"><i class="fa-solid fa-magnifying-glass"></i> Ketik nama atau no. HP untuk mencari member &amp; poinnya</div>'; return; }
+      const c = tpCust, calc = tpCalc(cart, memberDiscountRate, tpVoucher), earn = cart.length ? Math.floor(calc.total / 10000) : 0, on = calc.pointsUsed > 0;
+      box.innerHTML = '<div class="tp-mc"><span class="tp-tier ' + c.tier + '">' + TP_TIER_INFO[c.tier].n + '</span><span><b>' + c.points.toLocaleString('id-ID') + '</b> poin</span><span class="dim">· ' + c.visits + 'x kunjungan</span>' +
+        '<button type="button" class="tp-mc-btn' + (tpRedeemPts > 0 ? ' on' : '') + '" onclick="tpToggleRedeem()">' + (tpRedeemPts > 0 ? 'Batal tukar' : 'Tukar poin') + '</button></div>' +
+        '<div class="tp-mc-sub">' + (on ? 'Memakai <b>' + calc.pointsUsed.toLocaleString('id-ID') + '</b> poin = hemat ' + formatRupiah(calc.pointsDisc) + ' (maks. 50% tagihan) · ' : '') + (earn ? '+' + earn.toLocaleString('id-ID') + ' poin dari transaksi ini' : '1 poin tiap belanja Rp 10.000 · 1 poin = Rp 100') + '</div>';
+    }
+    /* void: poin dikembalikan seperti semula */
+    tpVoid = function (no) {
+      const t = tpTrx.find(x => x.no === no);
+      if (!t || t.voided) return;
+      tpAsk('Void transaksi ' + no + '?', 'Stok pakaian dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari laporan shift' + (t.method === 'cash' ? ' (uang dikembalikan dari laci)' : '') + (t.custId ? '. Poin member ikut dikembalikan.' : '.'), 'Ya, Void Transaksi', () => {
+        t.voided = true;
+        t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
+        if (t.custId) { const c = TP_CUSTS.find(x => x.id === t.custId); if (c) { c.points = Math.max(0, c.points - (t.ptsEarned || 0) + (t.pointsUsed || 0)); c.visits = Math.max(0, c.visits - 1); tpCustSave(); } }
+        renderProducts(); tpRenderShift(); renderMemberCard();
+        showToast(no + ' di-void. Stok' + (t.custId ? ' & poin' : '') + ' dikembalikan.', 'warn');
+      }, true);
+    };
+
+    /* ---------- hitung uang fisik per pecahan ---------- */
+    const TP_DENOMS = [100000, 50000, 20000, 10000, 5000, 2000, 1000];
+    let tpCount = {}, tpCoin = 0;
+    const tpCountTotal = () => TP_DENOMS.reduce((a, d) => a + d * (tpCount[d] || 0), 0) + tpCoin;
+    function tpDenSync() {
+      TP_DENOMS.forEach(d => { const e = tp$('dens-' + d); if (e) e.textContent = formatRupiah(d * (tpCount[d] || 0)); });
+      const tot = tpCountTotal(), inp = tp$('sh-counted'), th = tp$('den-total');
+      if (th) th.textContent = formatRupiah(tot);
+      if (inp) { inp.value = tot ? String(tot) : ''; tpOnCount(inp); }
+    }
+    function tpDenSet(d, v) { tpCount[d] = Math.max(0, Math.floor(Number(v) || 0)); tpDenSync(); }
+    function tpDenStep(d, n) { tpCount[d] = Math.max(0, (tpCount[d] || 0) + n); const e = tp$('den-' + d); if (e) e.value = tpCount[d]; tpDenSync(); }
+    function tpCoinSet(v) { tpCoin = Math.max(0, Math.floor(Number(String(v).replace(/\D/g, '')) || 0)); tpDenSync(); }
+    function tpDenFill() {
+      playAudio('click'); let rem = tpShiftStats().expectedCash; tpCount = {};
+      TP_DENOMS.forEach(d => { tpCount[d] = Math.floor(rem / d); rem -= tpCount[d] * d; }); tpCoin = rem;
+      TP_DENOMS.forEach(d => { const e = tp$('den-' + d); if (e) e.value = tpCount[d]; }); const c = tp$('den-coin'); if (c) c.value = tpCoin || '';
+      tpDenSync();
+    }
+    function tpDenClear() {
+      playAudio('click'); tpCount = {}; tpCoin = 0;
+      TP_DENOMS.forEach(d => { const e = tp$('den-' + d); if (e) e.value = 0; }); const c = tp$('den-coin'); if (c) c.value = '';
+      tpDenSync();
+    }
+    const _tpRenderShift = tpRenderShift;
+    tpRenderShift = function () {
+      _tpRenderShift();
+      const body = tp$('sh-body'); if (!body) return;
+      if (tpShift.open) {
+        const inp = tp$('sh-counted'); if (!inp) return;
+        const lbl = inp.previousElementSibling; if (lbl) lbl.textContent = 'Hitung Uang Fisik di Laci (per pecahan)';
+        const exp = tpShiftStats().expectedCash;
+        const rows = TP_DENOMS.map(d => '<div class="tp-den-row"><span class="tp-den-l">' + formatRupiah(d) + '</span><div class="tp-den-q"><button type="button" aria-label="Kurangi" onclick="tpDenStep(' + d + ',-1)">−</button><input id="den-' + d + '" type="number" inputmode="numeric" min="0" value="' + (tpCount[d] || 0) + '" oninput="tpDenSet(' + d + ',this.value)" onfocus="this.select()"><button type="button" aria-label="Tambah" onclick="tpDenStep(' + d + ',1)">+</button></div><span class="tp-den-s" id="dens-' + d + '">' + formatRupiah(d * (tpCount[d] || 0)) + '</span></div>').join('');
+        const box = document.createElement('div'); box.className = 'tp-den'; box.id = 'sh-den';
+        box.innerHTML = '<div class="tp-den-head"><span>Kas seharusnya (sistem): <b>' + formatRupiah(exp) + '</b></span><span>Terhitung: <b id="den-total">' + formatRupiah(tpCountTotal()) + '</b></span></div>' + rows +
+          '<div class="tp-den-row"><span class="tp-den-l">Koin &amp; receh</span><div class="tp-den-q"><input id="den-coin" class="coin" type="text" inputmode="numeric" placeholder="Rp 0" value="' + (tpCoin || '') + '" oninput="tpCoinSet(this.value)" onfocus="this.select()"></div><span class="tp-den-s"></span></div>' +
+          '<div class="tp-den-act"><button type="button" onclick="tpDenFill()"><i class="fa-solid fa-wand-magic-sparkles"></i> Isi otomatis (demo)</button><button type="button" onclick="tpDenClear()"><i class="fa-solid fa-eraser"></i> Kosongkan</button></div>';
+        inp.parentNode.insertBefore(box, inp);
+        inp.readOnly = true; inp.placeholder = 'Total otomatis dari pecahan';
+        /* pindahkan blok hitung uang ke atas daftar transaksi (lebih dekat dengan rekap kas) */
+        const tl = [...body.querySelectorAll('.tp-label')].find(x => /Transaksi Shift Ini/i.test(x.textContent));
+        if (tl) [lbl, box, inp, tp$('sh-diff')].forEach(n => { if (n) body.insertBefore(n, tl); });
+        tpDenSync();
+      } else if (tpShift.countDetail) {
+        const cd = tpShift.countDetail, r = [];
+        TP_DENOMS.forEach(d => { const q = (cd.den && cd.den[d]) || 0; if (q) r.push('<div class="r"><span>' + formatRupiah(d) + ' × ' + q + '</span><span>' + formatRupiah(d * q) + '</span></div>'); });
+        if (cd.coin) r.push('<div class="r"><span>Koin &amp; receh</span><span>' + formatRupiah(cd.coin) + '</span></div>');
+        if (r.length) body.insertAdjacentHTML('beforeend', '<span class="tp-label">Rincian uang fisik per pecahan</span><div class="tp-rows">' + r.join('') + '</div>');
+      }
+    };
+    const _tpReqClose = tpRequestCloseShift;
+    tpRequestCloseShift = function () { tpShift.countDetail = { den: Object.assign({}, tpCount), coin: tpCoin }; _tpReqClose(); };
+    const _tpNewShift = tpStartNewShift;
+    tpStartNewShift = function () { tpCount = {}; tpCoin = 0; _tpNewShift(); };
+
+    /* init: pelanggan bawaan = Zannah Tan (member Silver) */
+    tpCust = TP_CUSTS.find(c => c.name === (tp$('cust-name-input').value || '').trim()) || null;
+    renderCart();
+  </script>
+
+  <style>
+    /* ===== Kontrol demo + tur ===== */
+    #tp-demo {
+      position: fixed;
+      left: 12px;
+      bottom: 58px;
+      z-index: 45;
+      display: flex;
+      gap: 8px;
+    }
+
+    #tp-demo button {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, .14);
+      cursor: pointer;
+      font: 700 12.5px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+      box-shadow: 0 8px 24px -6px rgba(2, 6, 23, .55);
+    }
+
+    #tp-demo-btn {
+      background: linear-gradient(135deg, #f43f5e, #be123c);
+      border-color: rgba(255, 255, 255, .25) !important;
+    }
+
+    #tp-demo-btn:hover {
+      filter: brightness(1.08);
+    }
+
+    #tp-demo-reset {
+      background: #0f172a;
+      color: #fda4af !important;
+    }
+
+    #tp-demo-reset:hover {
+      background: #1e293b;
+    }
+
+    #tp-demo-scrim {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 44;
+    }
+
+    #tp-demo-scrim.open {
+      display: block;
+    }
+
+    #tp-demo-panel {
+      display: none;
+      position: fixed;
+      left: 12px;
+      bottom: 108px;
+      z-index: 46;
+      width: min(350px, calc(100vw - 24px));
+      max-height: calc(100dvh - 190px);
+      overflow-y: auto;
+      background: #0f172a;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 24px 56px -12px rgba(0, 0, 0, .7);
+    }
+
+    #tp-demo-panel.open {
+      display: block;
+      animation: tpPopIn .18s cubic-bezier(.2, .8, .2, 1);
+    }
+
+    .tpd-h {
+      padding: 8px 10px 4px;
+      display: grid;
+      gap: 2px;
+    }
+
+    .tpd-h b {
+      font: 800 14px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+    }
+
+    .tpd-h span {
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .tpd-grp {
+      padding: 10px 10px 4px;
+      font: 700 10px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #64748b;
+    }
+
+    .tpd-s,
+    .tpd-l,
+    .tpd-rst {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      padding: 9px 10px;
+      border: 0;
+      border-radius: 11px;
+      background: transparent;
+      color: #e2e8f0;
+      text-align: left;
+      cursor: pointer;
+      font: 600 13px 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .tpd-s:hover,
+    .tpd-l:hover {
+      background: #1e293b;
+    }
+
+    .tpd-s .ic {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(244, 63, 94, .14);
+      color: #fb7185;
+      font-size: 14px;
+    }
+
+    .tpd-s .tx {
+      display: grid;
+      gap: 1px;
+      min-width: 0;
+    }
+
+    .tpd-s b {
+      font-size: 13px;
+      color: #f1f5f9;
+    }
+
+    .tpd-s small {
+      font: 500 11px 'Plus Jakarta Sans', sans-serif;
+      color: #94a3b8;
+      line-height: 1.3;
+    }
+
+    .tpd-l i {
+      width: 20px;
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .tpd-rst {
+      margin-top: 6px;
+      border-top: 1px solid #1e293b;
+      border-radius: 0 0 11px 11px;
+      color: #fda4af;
+      font-size: 12.5px;
+    }
+
+    .tpd-rst:hover {
+      background: rgba(244, 63, 94, .12);
+    }
+
+    .tpd-rst i {
+      width: 20px;
+      text-align: center;
+    }
+
+    @media (max-width: 1023px) {
+      #tp-demo {
+        bottom: 112px;
+      }
+
+      #tp-demo #tp-demo-reset {
+        display: none;
+      }
+
+      body[data-tab="cart"] #tp-demo {
+        display: none;
+      }
+
+      #tp-demo-btn {
+        height: 38px;
+        padding: 0 13px;
+      }
+
+      #tp-demo-panel {
+        bottom: 160px;
+        max-height: calc(100dvh - 240px);
+      }
+    }
+
+    @media print {
+
+      #tp-demo,
+      #tp-demo-panel,
+      #tp-tour {
+        display: none !important;
+      }
+    }
+
+    #tp-tour {
+      position: fixed;
+      inset: 0;
+      z-index: 2147483000;
+    }
+
+    #tp-tour .tt-block {
+      position: absolute;
+      inset: 0;
+    }
+
+    #tp-tour .tt-spot {
+      position: fixed;
+      border-radius: 14px;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(2, 6, 23, .74);
+      outline: 2.5px solid #fb7185;
+      outline-offset: 0;
+      transition: left .28s ease, top .28s ease, width .28s ease, height .28s ease;
+    }
+
+    #tp-tour .tt-card {
+      position: fixed;
+      width: min(340px, calc(100vw - 24px));
+      background: #fff;
+      color: #0f172a;
+      border-radius: 16px;
+      padding: 14px 16px 12px;
+      box-shadow: 0 24px 60px -10px rgba(0, 0, 0, .6);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: left .28s ease, top .28s ease;
+    }
+
+    #tp-tour .tt-step {
+      font: 700 10.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #e11d48;
+    }
+
+    #tp-tour .tt-title {
+      font: 800 15.5px/1.25 'Plus Jakarta Sans', sans-serif;
+      margin: 3px 0 5px;
+    }
+
+    #tp-tour .tt-text {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: #475569;
+      margin: 0;
+    }
+
+    #tp-tour .tt-text b {
+      color: #0f172a;
+    }
+
+    #tp-tour .tt-dots {
+      display: flex;
+      gap: 5px;
+      margin: 11px 0 10px;
+    }
+
+    #tp-tour .tt-dots i {
+      width: 7px;
+      height: 7px;
+      border-radius: 99px;
+      background: #e2e8f0;
+      transition: all .2s;
+    }
+
+    #tp-tour .tt-dots i.on {
+      width: 20px;
+      background: #e11d48;
+    }
+
+    #tp-tour .tt-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #tp-tour .tt-btns span {
+      flex: 1;
+    }
+
+    #tp-tour .tt-btns button {
+      border: 0;
+      border-radius: 10px;
+      padding: 9px 13px;
+      font: 700 12.5px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    #tp-tour .tt-skip {
+      background: transparent;
+      color: #94a3b8;
+      padding-left: 0 !important;
+    }
+
+    #tp-tour .tt-skip:hover {
+      color: #475569;
+    }
+
+    #tp-tour .tt-prev {
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    #tp-tour .tt-prev:hover {
+      background: #e2e8f0;
+    }
+
+    #tp-tour .tt-next {
+      background: #e11d48;
+      color: #fff;
+    }
+
+    #tp-tour .tt-next:hover {
+      background: #be123c;
+    }
+
+    #tp-tour .tt-alt {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    #tp-tour .tt-card.compact {
+      padding: 10px 13px 9px;
+    }
+
+    #tp-tour .tt-card.compact .tt-step {
+      display: none;
+    }
+
+    #tp-tour .tt-card.compact .tt-title {
+      font-size: 14px;
+      margin: 0 0 3px;
+    }
+
+    #tp-tour .tt-card.compact .tt-text {
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    #tp-tour .tt-card.compact .tt-dots {
+      margin: 8px 0;
+    }
+
+    #tp-tour .tt-card.compact .tt-btns button {
+      padding: 7px 11px;
+      font-size: 12px;
+    }
+  </style>
+
+  <!-- ===== KONTROL DEMO: skenario siap pakai, tur, reset ===== -->
+  <div id="tp-demo-scrim" onclick="tpDemoClose()"></div>
+  <div id="tp-demo">
+    <button type="button" id="tp-demo-btn" onclick="tpDemoToggle()" aria-haspopup="dialog" aria-expanded="false"><i
+        class="fa-solid fa-clapperboard"></i><span>Demo</span></button>
+    <button type="button" id="tp-demo-reset" onclick="tpResetDemo()" title="Reset semua data demo"
+      aria-label="Reset data demo"><i class="fa-solid fa-rotate-right"></i><span>Reset</span></button>
+  </div>
+  <div id="tp-demo-panel" role="dialog" aria-label="Menu demo">
+    <div class="tpd-h"><b>Demo ThreadPOS</b><span>Pilih skenario — keranjang langsung terisi, tinggal dicoba.</span>
+    </div>
+    <div class="tpd-grp">Skenario cepat</div>
+    <button type="button" class="tpd-s" onclick="tpDemoRun('look')"><span class="ic"><i
+          class="fa-solid fa-shirt"></i></span><span class="tx"><b>Paket Look + member Gold</b><small>Kemeja + jeans →
+          promo otomatis &amp; diskon member</small></span></button>
+    <button type="button" class="tpd-s" onclick="tpDemoRun('two')"><span class="ic"><i
+          class="fa-solid fa-tags"></i></span><span class="tx"><b>Beli 2 atasan, diskon 10%</b><small>Dua kaos → promo
+          atasan, pelanggan umum</small></span></button>
+    <button type="button" class="tpd-s" onclick="tpDemoRun('acc')"><span class="ic"><i
+          class="fa-solid fa-hat-cowboy"></i></span><span class="tx"><b>Aksesori: yang termurah gratis</b><small>Beli 2
+          aksesori → satu gratis</small></span></button>
+    <button type="button" class="tpd-s" onclick="tpDemoRun('split')"><span class="ic"><i
+          class="fa-solid fa-code-branch"></i></span><span class="tx"><b>Bayar split Kartu + QRIS</b><small>Nominal
+          sudah terisi, tinggal tekan Bayar</small></span></button>
+    <button type="button" class="tpd-s" onclick="tpDemoRun('pts')"><span class="ic"><i
+          class="fa-solid fa-star"></i></span><span class="tx"><b>Tukar poin member Platinum</b><small>Bagas menukar
+          poin → hemat hingga 50%</small></span></button>
+    <div class="tpd-grp">Jelajah fitur</div>
+    <button type="button" class="tpd-l" onclick="tpDemoClose();tpTourStart()"><i class="fa-solid fa-route"></i>Mulai tur
+      singkat (5 langkah)</button>
+    <button type="button" class="tpd-l" onclick="tpDemoClose();openModal('report-modal');playAudio('click')"><i
+        class="fa-solid fa-chart-line"></i>Dashboard laporan</button>
+    <button type="button" class="tpd-l" onclick="tpDemoClose();openModal('shift-modal');playAudio('click')"><i
+        class="fa-solid fa-lock"></i>Simulasi tutup shift &amp; hitung uang</button>
+    <button type="button" class="tpd-l tp-owner-only" onclick="tpDemoClose();openModal('log-modal')"><i
+        class="fa-solid fa-clipboard-list"></i>Log aktivitas (Owner)</button>
+    <button type="button" class="tpd-l" onclick="tpDemoClose();tpLogout()"><i
+        class="fa-solid fa-right-from-bracket"></i>Keluar / ganti peran</button>
+    <button type="button" class="tpd-rst" onclick="tpDemoClose();tpResetDemo()"><i
+        class="fa-solid fa-rotate-right"></i>Reset semua data demo</button>
+  </div>
+
+  <!-- ===== TUR SINGKAT ===== -->
+  <div id="tp-tour" style="display:none" role="dialog" aria-modal="true" aria-label="Tur singkat">
+    <div class="tt-block"></div>
+    <div class="tt-spot"></div>
+    <div class="tt-card">
+      <div class="tt-step"></div>
+      <h5 class="tt-title"></h5>
+      <p class="tt-text"></p>
+      <div class="tt-dots"></div>
+      <div class="tt-btns">
+        <button type="button" class="tt-skip" onclick="tpTourEnd()">Lewati</button>
+        <span></span>
+        <button type="button" class="tt-prev" onclick="tpTourGo(-1)">Kembali</button>
+        <button type="button" class="tt-next" onclick="tpTourGo(1)">Lanjut</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       DEMO: SKENARIO SIAP PAKAI · TUR SINGKAT · RESET
+       ===================================================================== */
+    const TP_SCEN = {
+      look: { t: 'Paket Look + member Gold', lines: [['prod-1', 1], ['prod-3', 1]], member: 'c2' },
+      two: { t: 'Beli 2 atasan diskon 10%', lines: [['prod-2', 2]], member: null },
+      acc: { t: 'Aksesori: yang termurah gratis', lines: [['prod-9', 1], ['prod-10', 1]], member: null },
+      split: { t: 'Bayar split Kartu + QRIS', lines: [['prod-1', 1], ['prod-3', 1], ['prod-5', 1]], member: 'c5', pay: 'split' },
+      pts: { t: 'Tukar poin member Platinum', lines: [['prod-5', 1], ['prod-6', 1]], member: 'c3', redeem: true }
+    };
+    function tpDemoLine(pid, qty) {
+      const p = tpProd(pid); if (!p) return null;
+      for (const c of p.colors) for (const sz of p.sizes) {
+        const st = tpStock(pid, c.name, sz);
+        if (st > 0) return { cartId: pid + '-' + c.name + '-' + sz, product: p, color: c, size: sz, qty: Math.min(qty, st), price: p.price };
+      }
+      return null;
+    }
+    function tpDemoMember(id) {
+      const c = TP_CUSTS.find(x => x.id === id); if (!c) return;
+      tpCust = c; tpRedeemPts = 0;
+      tp$('cust-name-input').value = c.name;
+      const sel = tp$('member-tier-select'); sel.value = TP_TIER_INFO[c.tier].v; memberDiscountRate = parseFloat(sel.value);
+    }
+    function tpDemoLoad(id, silent) {
+      const sc = TP_SCEN[id]; if (!sc) return false;
+      if (!tpShift.open) tpStartNewShift();
+      ['receipt-modal', 'held-modal', 'return-modal', 'shift-modal', 'report-modal', 'scanner-modal'].forEach(m => { const e = tp$(m); if (e) { e.classList.add('hidden'); e.classList.remove('flex'); } });
+      tpPendingFinish = false; tpReprint = false;
+      tpResetOrder();
+      cart = sc.lines.map(l => tpDemoLine(l[0], l[1])).filter(Boolean);
+      if (sc.member) tpDemoMember(sc.member);
+      renderCart();
+      if (sc.redeem && tpCust) { tpRedeemPts = tpCust.points; renderCart(); }
+      if (sc.pay === 'split') {
+        setPaymentMethod('split');
+        const total = currentGrandTotal, edc = Math.min(Math.round(total * 0.4 / 1000) * 1000, 400000);
+        tpSplit = { cash: 0, edc: edc, qris: total - edc };
+        tp$('split-in-cash').value = ''; tp$('split-in-edc').value = tpSplit.edc; tp$('split-in-qris').value = tpSplit.qris;
+        tpSplitRender(); tpRefreshCheckout();
+      }
+      if (!silent) {
+        if (window.innerWidth < 1024) tpTab('cart');
+        showToast('Skenario dimuat: ' + sc.t, 'success');
+      }
+      return cart.length > 0;
+    }
+    function tpDemoRun(id) { tpDemoClose(); playAudio('click'); tpDemoLoad(id, false); }
+
+    function tpDemoOpen() { tp$('tp-demo-panel').classList.add('open'); tp$('tp-demo-scrim').classList.add('open'); tp$('tp-demo-btn').setAttribute('aria-expanded', 'true'); }
+    function tpDemoClose() { tp$('tp-demo-panel').classList.remove('open'); tp$('tp-demo-scrim').classList.remove('open'); tp$('tp-demo-btn').setAttribute('aria-expanded', 'false'); }
+    function tpDemoToggle() { playAudio('click'); tp$('tp-demo-panel').classList.contains('open') ? tpDemoClose() : tpDemoOpen(); }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !tp$('tp-tour').style.display.includes('block')) tpDemoClose(); });
+
+    /* ---------- tur ---------- */
+    const TP_TOUR_KEY = 'threadpos-tour-v1';
+    const tpWide = () => window.innerWidth >= 1440;
+    const TP_TOUR = [
+      {
+        tab: 'produk', els: () => [tp$('search-input').parentElement, tp$('category-tabs')],
+        title: 'Cari & tambah produk', text: () => 'Cari lewat <b>nama atau kode SKU</b> (contoh: SHR-001) atau saring per kategori. Pilih <b>warna &amp; ukuran</b>, lalu tekan <b>Tambah ke Keranjang</b>. Stok tiap varian dicek otomatis.'
+      },
+      {
+        tab: 'cart', before: () => { if (!tpCalc(cart, memberDiscountRate, tpVoucher).promos.length) tpDemoLoad('look', true); }, els: () => innerHeight < 700 ? [tp$('promo-rows'), tp$('discount-row')] : [tp$('promo-rows').parentElement],
+        title: 'Promo otomatis', text: () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Kotak kuning di keranjang mengingatkan promo berikutnya. Tagihan &amp; PPN terhitung real-time.'
+      },
+      {
+        tab: 'cart', before: () => { if (!tpCust) { tpDemoMember('c2'); renderCart(); } }, els: () => [tp$('cust-name-input').closest('.grid'), tp$('member-card')],
+        title: 'Member & poin loyalitas', text: () => 'Ketik <b>nama atau no. HP</b> untuk mencari member. Tier otomatis memberi diskon, dan poin bisa <b>ditukar</b> jadi potongan (1 poin = Rp 100). Tiap Rp 10.000 belanja dapat 1 poin.'
+      },
+      {
+        tab: 'cart', before: () => { if (paymentMethod !== 'split') { setPaymentMethod('split'); const t = currentGrandTotal, e = Math.round(t * 0.4 / 1000) * 1000; tpSplit = { cash: 0, edc: e, qris: t - e }; tp$('split-in-edc').value = e; tp$('split-in-qris').value = t - e; tpSplitRender(); tpRefreshCheckout(); } },
+        els: () => [tp$('pay-btn-cash').parentElement, tp$('split-panel')],
+        title: 'Bayar split', text: () => 'Satu transaksi bisa dibayar <b>tunai + kartu + QRIS</b> sekaligus. Isi nominal tiap metode atau tekan <b>Sisa</b>. Setelah bayar, struk bisa dikirim lewat <b>WhatsApp</b>.'
+      },
+      {
+        tab: 'produk', els: () => [tpWide() ? document.querySelector('header button[onclick*="report-modal"]') : tp$('tp-menu-btn')],
+        title: 'Laporan & tutup shift',
+        text: () => (tpWide() ? 'Tombol <b>Laporan</b> membuka dashboard: grafik jam tersibuk, metode bayar, produk terlaris, dan diskon. ' : 'Buka <b>Menu</b> untuk <b>Laporan Penjualan</b>, Retur, Stok, dan Tutup Shift. ') + (tpRole === 'staff' ? 'Staff hanya melihat shift sendiri; SPV dan Owner melihat semua hari. ' : '') + 'Saat tutup shift, kasir <b>menghitung uang per pecahan</b> dan selisih kas langsung terlihat.'
+      },
+      {
+        tab: 'produk', els: () => [innerWidth >= 1024 ? tp$('tp-userline') : tp$('tp-menu-btn')],
+        title: 'Peran & persetujuan', cta: 'Keluar & coba Owner', ctaFn: () => tpLogout(),
+        text: () => 'Kamu masuk sebagai <b>' + TP_USERS[tpRole].label + '</b>. Void, retur, dan buka laci kasir butuh <b>PIN SPV</b>; Owner melihat dashboard lengkap, estimasi laba, dan <b>log aktivitas</b>. ' + (innerWidth >= 1024 ? 'Tombol <b>Keluar</b> di sini untuk ganti peran.' : 'Ganti peran lewat <b>Menu → Keluar</b>.')
+      }
+    ];
+    let tpTourIdx = -1;
+    function tpTourStart() {
+      if (!tpRole) return;
+      tpDemoClose();
+      ['receipt-modal', 'held-modal', 'return-modal', 'shift-modal', 'report-modal', 'scanner-modal'].forEach(m => { const e = tp$(m); if (e) { e.classList.add('hidden'); e.classList.remove('flex'); } });
+      tp$('tp-tour').style.display = 'block'; tpTourIdx = -1; tpTourGo(1);
+      if (!tpTourRaf) tpTourRaf = requestAnimationFrame(tpTourLoop);
+    }
+    function tpTourEnd(openReport) {
+      tp$('tp-tour').style.display = 'none'; tpTourIdx = -1;
+      try { localStorage.setItem(TP_TOUR_KEY, '1'); } catch (e) { }
+      if (window.innerWidth < 1024) tpTab('produk');
+      if (openReport) { openModal('report-modal'); playAudio('click'); }
+    }
+    function tpTourGo(d) {
+      const n = tpTourIdx + d;
+      if (n >= TP_TOUR.length) { tpTourEnd(false); return; }
+      if (n < 0) return;
+      tpTourIdx = n; playAudio('click');
+      const st = TP_TOUR[n];
+      if (window.innerWidth < 1024) tpTab(st.tab);
+      if (st.before) { try { st.before(); } catch (e) { } }
+      const card = document.querySelector('#tp-tour .tt-card'), last = n === TP_TOUR.length - 1;
+      card.querySelector('.tt-step').textContent = 'Langkah ' + (n + 1) + ' dari ' + TP_TOUR.length;
+      card.querySelector('.tt-title').textContent = st.title;
+      card.querySelector('.tt-text').innerHTML = st.text();
+      card.querySelector('.tt-dots').innerHTML = TP_TOUR.map((_, i) => '<i class="' + (i === n ? 'on' : '') + '"></i>').join('');
+      card.querySelector('.tt-prev').style.display = n === 0 ? 'none' : '';
+      card.querySelector('.tt-skip').style.display = last ? 'none' : '';
+      const nx = card.querySelector('.tt-next');
+      nx.textContent = last ? 'Selesai' : 'Lanjut';
+      let alt = card.querySelector('.tt-alt'); if (alt) alt.remove();
+      if (last && st.cta) { alt = document.createElement('button'); alt.type = 'button'; alt.className = 'tt-alt'; alt.textContent = st.cta; alt.onclick = () => { tpTourEnd(false); if (st.ctaFn) st.ctaFn(); }; nx.before(alt); }
+      const first = st.els().find(e => e && e.getClientRects().length);
+      tpTourSig = '';
+      if (first) first.scrollIntoView({ block: first.getBoundingClientRect().height > innerHeight * .45 ? 'start' : 'center', inline: 'nearest' });
+      setTimeout(tpTourPlace, 140); setTimeout(tpTourPlace, 420);
+    }
+    function tpTourEls() { return TP_TOUR[tpTourIdx].els().filter(e => e && e.getClientRects().length && e.getBoundingClientRect().width > 0); }
+    function tpTourPlace() {
+      if (tpTourIdx < 0) return;
+      const vw = innerWidth, vh = innerHeight, bottomLimit = vh - 54, M = 12, TOP = 8;
+      const els = tpTourEls();
+      const spot = document.querySelector('#tp-tour .tt-spot'), card = document.querySelector('#tp-tour .tt-card');
+      card.classList.toggle('compact', vh < 700);
+      let cw = card.offsetWidth, ch = card.offsetHeight;
+      if (!els.length) { spot.style.cssText = 'left:50%;top:40%;width:0;height:0'; card.style.left = Math.max(M, (vw - cw) / 2) + 'px'; card.style.top = Math.max(TOP, (bottomLimit - ch) / 2) + 'px'; return; }
+      let l = 1e9, t = 1e9, r = -1, b = -1;
+      els.forEach(e => { const q = e.getBoundingClientRect(); l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom); });
+      const P = 6; l = Math.max(4, l - P); t = Math.max(4, t - P); r = Math.min(vw - 4, r + P); b = Math.min(vh - 4, b + P);
+      const cx = (l + r) / 2;
+      const attempt = () => {
+        const clampX = x => Math.min(Math.max(M, x), vw - cw - M), clampY = y => Math.min(Math.max(TOP, y), bottomLimit - ch - 4);
+        const tries = {
+          below: () => (b + M + ch <= bottomLimit) && { x: clampX(l), y: b + M },
+          above: () => (t - M - ch >= TOP) && { x: clampX(l), y: t - M - ch },
+          left: () => (vw >= 600 && l - M - cw >= M) && { x: l - M - cw, y: clampY(t) },
+          right: () => (vw >= 600 && r + M + cw <= vw - M) && { x: r + M, y: clampY(t) }
+        };
+        const order = (vw >= 600 && cx > vw * 0.62) ? ['left', 'below', 'above', 'right'] : ['below', 'above', 'right', 'left'];
+        for (const k of order) { const pos = tries[k](); if (pos) return pos; }
+        return null;
+      };
+      let pos = attempt();
+      if (!pos && !card.classList.contains('compact')) { card.classList.add('compact'); cw = card.offsetWidth; ch = card.offsetHeight; pos = attempt(); }
+      if (!pos) {
+        /* tidak ada ruang: kartu di sisi yang lebih lega, area sorotan dipotong agar tidak tertimpa */
+        const below = bottomLimit - b, above = t - TOP;
+        if (below >= above) { const y = bottomLimit - ch - 4; pos = { x: Math.min(Math.max(M, l), vw - cw - M), y }; b = Math.max(t + 28, Math.min(b, y - M)); }
+        else { const y = TOP; pos = { x: Math.min(Math.max(M, l), vw - cw - M), y }; t = Math.min(b - 28, Math.max(t, y + ch + M)); }
+      }
+      spot.style.left = l + 'px'; spot.style.top = t + 'px'; spot.style.width = (r - l) + 'px'; spot.style.height = (b - t) + 'px';
+      card.style.left = pos.x + 'px'; card.style.top = pos.y + 'px';
+    }
+    /* pantau terus: scroll, gambar selesai dimuat, atau tata letak bergeser → posisi ikut menyesuaikan */
+    let tpTourRaf = 0, tpTourSig = '';
+    function tpTourLoop() {
+      if (tpTourIdx < 0) { tpTourRaf = 0; return; }
+      const sig = tpTourEls().map(e => { const q = e.getBoundingClientRect(); return Math.round(q.left) + ',' + Math.round(q.top) + ',' + Math.round(q.width) + ',' + Math.round(q.height); }).join('|') + '#' + innerWidth + 'x' + innerHeight + '#' + tpTourIdx;
+      if (sig !== tpTourSig) { tpTourSig = sig; tpTourPlace(); }
+      tpTourRaf = requestAnimationFrame(tpTourLoop);
+    }
+    window.addEventListener('resize', () => { if (tpTourIdx >= 0) tpTourPlace(); });
+    window.addEventListener('keydown', e => {
+      if (tpTourIdx < 0) return;
+      if (e.key === 'Escape') { e.preventDefault(); tpTourEnd(false); }
+      else if (e.key === 'ArrowRight' || e.key === 'Enter') { e.preventDefault(); tpTourGo(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); tpTourGo(-1); }
+    }, true);
+
+    /* tur otomatis di kunjungan pertama (setelah masuk) */
+    let tpTourAutoDone = false;
+    function tpTourAuto() {
+      if (tpTourAutoDone) return;
+      let seen = false; try { seen = !!localStorage.getItem(TP_TOUR_KEY); } catch (e) { }
+      if (seen || document.hidden || !tpRole || /[?&]notour\b/.test(location.search)) return;
+      if (document.querySelector('.tp-overlay:not(.hidden)')) return;
+      tpTourAutoDone = true; tpTourStart();
+    }
+    setTimeout(tpTourAuto, 1400);
+  </script>
+
+  <script>
+    /* =====================================================================
+       DATA CONTOH: riwayat ±2 minggu supaya dashboard & laporan terlihat hidup
+       (deterministik; dibuat sekali, ikut tersimpan, hilang saat Reset demo)
+       ===================================================================== */
+    (function () {
+      if (tpTrx.some(t => t.hist)) return;
+      function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+      const R = rng(20261102);
+      const pick = a => a[Math.floor(R() * a.length)];
+      const wpick = pairs => { let x = R() * pairs.reduce((a, p) => a + p[1], 0); for (const p of pairs) { x -= p[1]; if (x <= 0) return p[0]; } return pairs[pairs.length - 1][0]; };
+      const PW = [['prod-2', 10], ['prod-1', 8], ['prod-11', 5], ['prod-3', 9], ['prod-4', 6], ['prod-5', 5], ['prod-6', 6], ['prod-12', 4], ['prod-7', 5], ['prod-8', 5], ['prod-9', 4], ['prod-10', 6]];
+      const HW = [[10, 2], [11, 3], [12, 6], [13, 7], [14, 4], [15, 3], [16, 4], [17, 5], [18, 8], [19, 9], [20, 6], [21, 2]];
+      const PERDAY = [12, 6, 6, 7, 7, 10, 14];             /* Min..Sab: akhir pekan paling ramai */
+      const TIERRATE = { silver: 0.05, gold: 0.10, platinum: 0.15 };
+      const MEMBERS = TP_CUSTS.map(c => ({ name: c.name, rate: TIERRATE[c.tier] }));
+      const BANKS = ['BCA', 'Mandiri', 'BNI', 'BRI'];
+      const digits = n => { let o = ''; for (let i = 0; i < n; i++) o += Math.floor(R() * 10); return o; };
+      const line = (pid, qty) => { const p = tpProd(pid), ci = Math.floor(R() * p.colors.length), size = pick(p.sizes); return { cartId: pid + '-' + p.colors[ci].name + '-' + size, product: p, color: p.colors[ci], size, qty, price: p.price }; };
+      function basket() {
+        let items = [];
+        if (R() < 0.18) items = [line(pick(['prod-1', 'prod-2', 'prod-11']), 1), line(pick(['prod-3', 'prod-4']), 1)];
+        else { items = [line(wpick(PW), R() < 0.15 ? 2 : 1)]; if (R() < 0.33) items.push(line(wpick(PW), 1)); if (R() < 0.10) items.push(line(wpick(PW), 1)); }
+        const m = {}; items.forEach(i => { if (m[i.cartId]) m[i.cartId].qty += i.qty; else m[i.cartId] = i; });
+        return Object.values(m);
+      }
+      function make(ts, shiftNo, no, allowVoid) {
+        const items = basket(), mem = R() < 0.38 ? pick(MEMBERS) : null, rate = mem ? mem.rate : 0, cust = mem ? mem.name : 'Pelanggan Walk-In';
+        const voucher = R() < 0.07 ? 'THREAD10' : null, mr = R();
+        const method = mr < 0.40 ? 'cash' : mr < 0.75 ? 'qris' : mr < 0.93 ? 'edc' : 'split';
+        const total = tpCalc(items, rate, voucher).total, bank = pick(BANKS), kind = R() < 0.7 ? 'DEBIT ' : 'KREDIT ';
+        const base = method === 'split' ? 'cash' : method, o = { no, ts, shiftNo, customer: cust, rate, voucher, method: base, tendered: 0 };
+        if (base === 'cash') o.tendered = R() < 0.3 ? total : Math.ceil(total / 50000) * 50000;
+        if (base === 'qris') { o.label = 'QRIS'; o.ref = 'QR' + digits(8); }
+        if (base === 'edc') { o.label = 'KARTU ' + kind + bank.toUpperCase(); o.ref = digits(6); }
+        const t = tpMakeTrx(items, o);
+        if (method === 'split') {
+          const a = Math.round(total * (0.35 + R() * 0.3) / 1000) * 1000, cashq = R() < 0.6;
+          const pay = cashq ? { cash: a, edc: 0, qris: total - a } : { cash: 0, edc: a, qris: total - a };
+          t.method = 'split'; t.pay = pay; t.ref = null;
+          t.methodLabel = 'SPLIT · ' + (cashq ? 'TUNAI' : 'KARTU') + ' + QRIS';
+          t.tendered = pay.cash ? Math.ceil(pay.cash / 50000) * 50000 : total; t.change = pay.cash ? t.tendered - pay.cash : 0;
+          t.splitInfo = { edcRef: pay.edc ? digits(6) : null, edcLabel: pay.edc ? 'KARTU ' + kind + bank.toUpperCase() : null, qrisRef: 'QR' + digits(8) };
+        }
+        t.hist = true;
+        if (allowVoid && R() < 0.02) t.voided = true;
+        return t;
+      }
+      /* jadwal waktu transaksi */
+      const slots = [], now = Date.now(), d0 = new Date(); d0.setHours(0, 0, 0, 0);
+      for (let k = 13; k >= 1; k--) {
+        const day = new Date(d0.getTime() - k * 864e5), n = Math.max(3, PERDAY[day.getDay()] + Math.round((R() - 0.5) * 4));
+        for (let i = 0; i < n; i++) { const ts = new Date(day.getTime()); ts.setHours(wpick(HW), Math.floor(R() * 60), Math.floor(R() * 60)); slots.push({ ts, shift: 0, v: true }); }
+      }
+      const cutoff = now - 195 * 60000, open = d0.getTime() + 10 * 3600000;   /* hari ini: dari jam 10:00 sampai sebelum transaksi contoh lama */
+      if (cutoff - open > 40 * 60000) { const n = 4 + Math.floor(R() * 4); for (let i = 0; i < n; i++) slots.push({ ts: new Date(open + R() * (cutoff - open)), shift: tpShift.number, v: false }); }
+      slots.sort((a, b) => a.ts - b.ts);
+      let no = 8831 - slots.length + 1;
+      const made = slots.map(sl => { const t = make(sl.ts, sl.shift, 'TRX-' + sl.ts.getFullYear() + tpPad(sl.ts.getMonth() + 1) + '-' + (no++), sl.v); return t; });
+      made.forEach(t => tpTrx.push(t));
+      tpTrx.sort((a, b) => b.ts - a.ts);
+      /* jam buka shift mengikuti transaksi pertamanya */
+      if (tpShift.open && !tpShift.closedAt && tpShift.number === 1) {
+        const first = tpTrx.filter(t => t.shiftNo === tpShift.number).reduce((m, t) => Math.min(m, t.ts.getTime()), Infinity);
+        if (isFinite(first)) tpShift.openedAt = tpHM(new Date(first - 8 * 60000)) + ' WIB';
+      }
+    })();
+  </script>
+
+  <style>
+    /* ===== Cetak rekap shift (sebelumnya mencetak halaman kosong) + pastikan laporan ikut terlihat ===== */
+    @media print {
+
+      body.sh-printing,
+      body.rp-printing {
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        background: #fff !important;
+        display: block !important;
+      }
+
+      body.sh-printing *,
+      body.rp-printing * {
+        visibility: visible !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      body.sh-printing>*:not(#shift-modal) {
+        display: none !important;
+      }
+
+      body.sh-printing #shift-modal {
+        position: static !important;
+        display: block !important;
+        background: none !important;
+        padding: 0 !important;
+        animation: none !important;
+        backdrop-filter: none !important;
+      }
+
+      body.sh-printing #shift-modal .tp-modal {
+        max-width: none !important;
+        max-height: none !important;
+        box-shadow: none !important;
+        border: 0 !important;
+        animation: none !important;
+      }
+
+      body.sh-printing #shift-modal .tp-mfoot,
+      body.sh-printing #shift-modal .tp-mhead,
+      body.sh-printing #sh-den,
+      body.sh-printing #sh-body button {
+        display: none !important;
+      }
+
+      body.sh-printing #sh-body {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      body.sh-printing #sh-body::before {
+        content: attr(data-title);
+        display: block;
+        font: 800 15px 'Plus Jakarta Sans', sans-serif;
+        margin-bottom: 12px;
+      }
+    }
+  </style>
+
+  <script>
+    function tpShiftPrint() {
+      const n = new Date();
+      tp$('sh-body').setAttribute('data-title', 'ThreadPOS \u00b7 Grand Indonesia \u2014 Rekap Shift #' + tpShift.number + ' \u00b7 dicetak ' + tpDMY(n) + ' ' + tpHM(n));
+      document.body.classList.add('sh-printing');
+      window.addEventListener('afterprint', () => document.body.classList.remove('sh-printing'), { once: true });
+      window.print();
+    }
+  </script>
+
+  <style>
+    /* ===== Peran, PIN, persetujuan, log ===== */
+    .tp-rolebadge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 99px;
+      font: 800 9.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    .tp-rolebadge.staff {
+      background: rgba(148, 163, 184, .22);
+      color: #cbd5e1;
+    }
+
+    .tp-rolebadge.spv {
+      background: rgba(245, 158, 11, .22);
+      color: #fcd34d;
+    }
+
+    .tp-rolebadge.owner {
+      background: rgba(244, 63, 94, .24);
+      color: #fda4af;
+    }
+
+    .rp-card .tp-rolebadge.owner,
+    .lgm-row .tp-rolebadge.owner {
+      background: #ffe4e6;
+      color: #be123c;
+    }
+
+    .lgm-row .tp-rolebadge.spv {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .lgm-row .tp-rolebadge.staff {
+      background: #e2e8f0;
+      color: #475569;
+    }
+
+    #tp-logout-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 1px 8px !important;
+      min-height: 0 !important;
+      height: auto !important;
+      border-radius: 99px;
+      border: 1px solid #334155;
+      background: transparent;
+      color: #94a3b8;
+      font: 600 10.5px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      margin-left: 2px;
+    }
+
+    #tp-logout-btn:hover {
+      background: #1e293b;
+      color: #fda4af;
+      border-color: #fb7185;
+    }
+
+    .tp-owner-only {
+      display: none !important;
+    }
+
+    body[data-role="owner"] .tp-owner-only {
+      display: inline-flex !important;
+    }
+
+    body[data-role="owner"] .tp-mn-item.tp-owner-only,
+    body[data-role="owner"] .tpd-l.tp-owner-only {
+      display: flex !important;
+    }
+
+    body:not([data-role="owner"]) #report-modal .tp-mfoot [onclick*="tpRpCsv"],
+    body:not([data-role="owner"]) #report-modal .tp-mfoot [onclick*="tpResetDemo"] {
+      display: none !important;
+    }
+
+    .tp-lock::after {
+      content: "\f023";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 9px;
+      color: #fbbf24;
+      opacity: .85;
+      margin-left: 6px;
+    }
+
+    .tp-mn-item.tp-lock::after {
+      margin-left: auto;
+    }
+
+    #tp-login,
+    #tp-appr {
+      position: fixed;
+      inset: 0;
+      z-index: 2147482000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 12px 58px;
+      overflow-y: auto;
+    }
+
+    #tp-login {
+      background: radial-gradient(900px 520px at 15% -10%, rgba(244, 63, 94, .22), transparent), radial-gradient(700px 480px at 100% 110%, rgba(99, 102, 241, .18), transparent), #070b14;
+    }
+
+    #tp-appr {
+      background: rgba(2, 6, 23, .78);
+      backdrop-filter: blur(3px);
+    }
+
+    #tp-login.open,
+    #tp-appr.open {
+      display: flex;
+    }
+
+    .lg-card {
+      width: min(420px, 100%);
+      max-height: calc(100dvh - 70px);
+      overflow-y: auto;
+      background: #0f172a;
+      border: 1px solid #243049;
+      border-radius: 22px;
+      padding: 22px 20px 18px;
+      color: #e2e8f0;
+      box-shadow: 0 30px 80px -20px rgba(0, 0, 0, .8);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      margin: auto;
+    }
+
+    .lg-brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      margin-bottom: 14px;
+    }
+
+    .lg-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fb7185, #e11d48);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .lg-brand b {
+      display: block;
+      font-size: 18px;
+      color: #fff;
+      letter-spacing: -.01em;
+    }
+
+    .lg-brand b span {
+      color: #fb7185;
+    }
+
+    .lg-brand small {
+      color: #94a3b8;
+      font-size: 11px;
+    }
+
+    .lg-card h2 {
+      font: 800 21px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+      margin: 4px 0 2px;
+    }
+
+    .lg-sub {
+      font-size: 12.5px;
+      color: #94a3b8;
+      margin: 0 0 14px;
+      line-height: 1.45;
+    }
+
+    .lg-roles {
+      display: grid;
+      gap: 9px;
+    }
+
+    .lg-role {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      text-align: left;
+      padding: 12px;
+      border-radius: 15px;
+      background: #111c33;
+      border: 1px solid #243049;
+      color: #e2e8f0;
+      cursor: pointer;
+      transition: border-color .15s, transform .15s, background .15s;
+      font-family: inherit;
+    }
+
+    .lg-role:hover {
+      border-color: #fb7185;
+      background: #14223d;
+      transform: translateY(-1px);
+    }
+
+    .lg-role .av,
+    .lg-who .av {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 15px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+    }
+
+    .staff .av,
+    .av.staff {
+      background: linear-gradient(135deg, #38bdf8, #2563eb);
+    }
+
+    .spv .av,
+    .av.spv {
+      background: linear-gradient(135deg, #fbbf24, #d97706);
+    }
+
+    .owner .av,
+    .av.owner {
+      background: linear-gradient(135deg, #fb7185, #be123c);
+    }
+
+    .lg-role .tx {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      gap: 1px;
+    }
+
+    .lg-role .tx b {
+      font-size: 14.5px;
+      color: #fff;
+    }
+
+    .lg-role .tx b em {
+      font-style: normal;
+      font-weight: 600;
+      font-size: 11px;
+      color: #94a3b8;
+      margin-left: 5px;
+    }
+
+    .lg-role .tx>span {
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+
+    .lg-role .tx small {
+      font-size: 11px;
+      color: #94a3b8;
+      line-height: 1.4;
+      margin-top: 2px;
+    }
+
+    .lg-role>i {
+      color: #475569;
+      font-size: 12px;
+    }
+
+    .lg-note {
+      display: flex;
+      gap: 9px;
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(251, 191, 36, .08);
+      border: 1px dashed rgba(251, 191, 36, .35);
+      color: #fcd34d;
+      font-size: 11.5px;
+      line-height: 1.45;
+    }
+
+    .lg-note b {
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .lg-back {
+      background: none;
+      border: 0;
+      color: #94a3b8;
+      font: 600 12px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      padding: 4px 0;
+      margin-bottom: 6px;
+    }
+
+    .lg-back:hover {
+      color: #fff;
+    }
+
+    .lg-who {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      margin: 4px 0 12px;
+    }
+
+    .lg-who b {
+      display: block;
+      color: #fff;
+      font-size: 16px;
+    }
+
+    .lg-who small {
+      color: #94a3b8;
+      font-size: 12px;
+    }
+
+    .pn-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 8px 0 6px;
+    }
+
+    .pn-dots i {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2px solid #475569;
+      transition: all .12s;
+    }
+
+    .pn-dots i.on {
+      background: #fb7185;
+      border-color: #fb7185;
+      transform: scale(1.1);
+    }
+
+    .pn-dots.shake {
+      animation: pnShake .4s;
+    }
+
+    @keyframes pnShake {
+      20% {
+        transform: translateX(-8px);
+      }
+
+      40% {
+        transform: translateX(8px);
+      }
+
+      60% {
+        transform: translateX(-6px);
+      }
+
+      80% {
+        transform: translateX(6px);
+      }
+    }
+
+    .pn-msg {
+      min-height: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #fda4af;
+      margin-bottom: 8px;
+    }
+
+    .pn-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      max-width: 290px;
+      margin: 0 auto;
+    }
+
+    .pn-pad button {
+      height: 58px;
+      border-radius: 15px;
+      border: 1px solid #243049;
+      background: #162036;
+      color: #fff;
+      font: 700 22px 'JetBrains Mono', monospace;
+      cursor: pointer;
+      transition: transform .08s, background .12s;
+    }
+
+    .pn-pad button:hover {
+      background: #1e2d4d;
+    }
+
+    .pn-pad button:active {
+      transform: scale(.94);
+      background: #e11d48;
+    }
+
+    .pn-pad button.alt {
+      font-size: 15px;
+      color: #94a3b8;
+    }
+
+    @media (max-height: 700px) {
+      .pn-pad button {
+        height: 46px;
+        font-size: 19px;
+      }
+
+      .lg-card {
+        padding: 16px 16px 14px;
+      }
+
+      .lg-role .tx small {
+        display: none;
+      }
+    }
+
+    .lg-hint {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 8px;
+      border-radius: 10px;
+      border: 1px dashed #334155;
+      background: transparent;
+      color: #94a3b8;
+      font: 500 11.5px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .lg-hint b {
+      color: #fcd34d;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .lg-hint:hover {
+      border-color: #fcd34d;
+    }
+
+    .lg-card.ap {
+      width: min(360px, 100%);
+      text-align: center;
+    }
+
+    .ap-ic {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 8px;
+      border-radius: 50%;
+      background: rgba(245, 158, 11, .16);
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .lg-card.ap h3 {
+      font: 800 17px 'Plus Jakarta Sans', sans-serif;
+      color: #fff;
+      margin: 0 0 6px;
+    }
+
+    .ap-desc {
+      margin: 0 0 4px;
+      font-size: 13px;
+      color: #e2e8f0;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .ap-by {
+      display: block;
+      color: #94a3b8;
+      font-size: 11.5px;
+      margin-bottom: 8px;
+    }
+
+    .ap-cancel {
+      margin-top: 8px;
+      width: 100%;
+      padding: 10px;
+      border-radius: 11px;
+      border: 0;
+      background: #1e293b;
+      color: #cbd5e1;
+      font: 700 13px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .ap-cancel:hover {
+      background: #334155;
+    }
+
+    .lgm-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .lgm-chips button {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      color: #475569;
+      border-radius: 99px;
+      padding: 5px 12px;
+      font: 700 11.5px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+    }
+
+    .lgm-chips button.on {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a;
+    }
+
+    .lgm-sum {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 16px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .lgm-sum b {
+      color: #0f172a;
+    }
+
+    .lgm-row {
+      display: flex;
+      gap: 11px;
+      padding: 10px 2px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .lgm-row .ic {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      flex: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+    }
+
+    .lgm-row .tx {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lgm-row .tx>b {
+      display: block;
+      font-size: 13px;
+      color: #0f172a;
+      font-weight: 700;
+    }
+
+    .lgm-row .meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 4px 8px;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .lgm-row .ok {
+      background: #d1fae5;
+      color: #065f46;
+      border-radius: 99px;
+      padding: 1px 8px;
+      font-weight: 700;
+    }
+
+    .lgm-row .time {
+      margin-left: auto;
+      font: 500 10.5px 'JetBrains Mono', monospace;
+      color: #94a3b8;
+      white-space: nowrap;
+      align-self: flex-start;
+    }
+
+    @media (max-width: 560px) {
+      .lgm-row .time {
+        display: none;
+      }
+    }
+
+    .st-lock {
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      border-radius: 12px;
+      background: #fffbeb;
+      border: 1px dashed #fcd34d;
+      color: #92400e;
+      font-size: 12px;
+    }
+  </style>
+
+  <!-- ===== MASUK: PILIH PERAN + PIN ===== -->
+  <div id="tp-login" role="dialog" aria-modal="true" aria-label="Masuk ke kasir">
+    <div class="lg-card">
+      <div class="lg-brand"><span class="lg-logo"><i class="fa-solid fa-tags"></i></span>
+        <div><b>Thread<span>POS</span></b><small>Fashion Retail · Grand Indonesia</small></div>
+      </div>
+      <div id="lg-s1">
+        <h2>Masuk ke kasir</h2>
+        <p class="lg-sub">Pilih peran, lalu masukkan PIN. Peran menentukan apa saja yang boleh dilakukan.</p>
+        <div class="lg-roles">
+          <button type="button" class="lg-role staff" onclick="tpLoginPick('staff')"><span class="av">ZJ</span><span
+              class="tx"><b>Staff <em>Kasir</em></b><span>Zannah Jagad</span><small>Menjual, menahan transaksi, kirim
+                struk. Void, retur &amp; buka laci perlu PIN SPV.</small></span><i
+              class="fa-solid fa-chevron-right"></i></button>
+          <button type="button" class="lg-role spv" onclick="tpLoginPick('spv')"><span class="av">MG</span><span
+              class="tx"><b>SPV <em>Supervisor</em></b><span>Maria Gunawan</span><small>Menyetujui void, retur &amp;
+                selisih kas. Laporan semua hari, penyesuaian stok.</small></span><i
+              class="fa-solid fa-chevron-right"></i></button>
+          <button type="button" class="lg-role owner" onclick="tpLoginPick('owner')"><span class="av">BS</span><span
+              class="tx"><b>Owner <em>Pemilik</em></b><span>Bambang Sutanto</span><small>Akses penuh: dashboard lengkap,
+                estimasi laba, log aktivitas, ekspor data.</small></span><i
+              class="fa-solid fa-chevron-right"></i></button>
+        </div>
+        <div class="lg-note"><i class="fa-solid fa-circle-info"></i><span><b>Simulasi untuk demo.</b> PIN demo: Staff
+            <b>1111</b> · SPV <b>2222</b> · Owner <b>3333</b>. Di produk sungguhan, tiap orang punya akun dan PIN
+            sendiri.</span></div>
+      </div>
+      <div id="lg-s2" style="display:none">
+        <button type="button" class="lg-back" onclick="tpLoginBack()"><i class="fa-solid fa-arrow-left"></i> Ganti
+          peran</button>
+        <div class="lg-who"><span class="av" id="lg-av"></span>
+          <div><b id="lg-name"></b><small id="lg-rolename"></small></div>
+        </div>
+        <p class="lg-sub" style="text-align:center;margin-bottom:6px">Masukkan PIN 4 digit</p>
+        <div id="lg-pad"></div>
+        <button type="button" class="lg-hint" onclick="tpPinFill('lg')">PIN demo: <b id="lg-hintpin"></b> · ketuk untuk
+          mengisi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PERSETUJUAN SPV ===== -->
+  <div id="tp-appr" role="dialog" aria-modal="true" aria-label="Persetujuan supervisor">
+    <div class="lg-card ap">
+      <div class="ap-ic"><i class="fa-solid fa-user-shield"></i></div>
+      <h3>Perlu persetujuan Supervisor</h3>
+      <p class="ap-desc" id="ap-desc"></p>
+      <small class="ap-by" id="ap-by"></small>
+      <div id="ap-pad"></div>
+      <button type="button" class="lg-hint" onclick="tpPinFill('ap')">PIN demo SPV: <b>2222</b> (Owner: 3333) · ketuk
+        untuk mengisi</button>
+      <button type="button" class="ap-cancel" onclick="tpApprovalCancel()">Batal</button>
+    </div>
+  </div>
+
+  <!-- ===== LOG AKTIVITAS (Owner) ===== -->
+  <div id="log-modal" class="tp-overlay hidden">
+    <div class="tp-modal" style="max-width:720px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-clipboard-list" style="color:#a78bfa"></i> Log Aktivitas</h4><button
+          onclick="closeModal('log-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody" id="lgm-body"></div>
+      <div class="tp-mfoot"><span style="margin-right:auto;font-size:10.5px;color:#64748b;align-self:center"><i
+            class="fa-solid fa-lock"></i> Hanya terlihat oleh Owner</span><button class="tp-btn ghost"
+          onclick="closeModal('log-modal')">Tutup</button></div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       PERAN (Staff / SPV / Owner) — MASUK DENGAN PIN, PERSETUJUAN, LOG AKTIVITAS
+       Catatan: ini simulasi di browser untuk demo, bukan keamanan sungguhan.
+       ===================================================================== */
+    const TP_SESS = 'threadpos-session-v1', TP_LOGKEY = 'threadpos-log-v1';
+    let tpVoidApprover = null, tpRetApprover = null;
+
+    /* ---------- log aktivitas ---------- */
+    let TP_LOG = [];
+    try { TP_LOG = JSON.parse(localStorage.getItem(TP_LOGKEY) || '[]').map(e => Object.assign(e, { ts: new Date(e.ts) })); } catch (e) { TP_LOG = []; }
+    function tpLogSave() { try { localStorage.setItem(TP_LOGKEY, JSON.stringify(TP_LOG)); } catch (e) { } }
+    function tpLog(type, text, o) {
+      o = o || {};
+      TP_LOG.unshift({ ts: new Date(), type: type, text: text, actor: tpRole ? TP_USERS[tpRole].name : '-', role: tpRole, approver: o.approver ? o.approver.name : null, approverRole: o.approver ? o.approver.role : null });
+      if (TP_LOG.length > 300) TP_LOG.length = 300;
+      tpLogSave();
+    }
+    (function seedLog() {
+      if (localStorage.getItem(TP_LOGKEY) !== null) return;
+      const L = [], now = Date.now(), staff = TP_USERS.staff.name, spv = { name: TP_USERS.spv.name, role: 'spv' }, own = { name: TP_USERS.owner.name, role: 'owner' };
+      const add = (ts, type, text, actor, role, ap) => L.push({ ts: ts, type: type, text: text, actor: actor, role: role, approver: ap ? ap.name : null, approverRole: ap ? ap.role : null });
+      tpTrx.filter(t => t.voided && t.hist).forEach((t, i) => add(new Date(t.ts.getTime() + 25 * 60000), 'void', 'Void ' + t.no + ' \u00b7 ' + formatRupiah(t.total), staff, 'staff', i % 4 === 3 ? own : spv));
+      const d0 = new Date(); d0.setHours(0, 0, 0, 0);
+      for (let k = 13; k >= 1; k--) {
+        const ts = new Date(d0.getTime() - k * 864e5 + 21.7 * 3600000), diff = (k % 5 === 2) ? -20000 : (k % 7 === 3 ? 50000 : 0);
+        add(ts, 'close', 'Tutup shift harian \u00b7 ' + (diff === 0 ? 'kas sesuai' : 'selisih ' + (diff > 0 ? '+' : '\u2212') + formatRupiah(Math.abs(diff))), staff, 'staff', diff ? spv : null);
+      }
+      [[11, 14.2], [8, 16.8], [6, 12.4], [3, 19.1], [1, 13.6]].forEach(a => add(new Date(d0.getTime() - a[0] * 864e5 + a[1] * 3600000), 'drawer', 'Buka laci kasir tanpa transaksi', staff, 'staff', spv));
+      const hist = tpTrx.filter(t => t.hist && !t.voided).slice(8, 40);
+      [[9, 0], [5, 6], [2, 14]].forEach((a, i) => { const t = hist[a[1]] || hist[0]; if (t) add(new Date(t.ts.getTime() + 3 * 3600000), 'return', 'RET-' + String(i + 1).padStart(4, '0') + ' \u00b7 refund ' + formatRupiah(Math.round(t.total * 0.45)) + ' \u00b7 ' + t.no, staff, 'staff', spv); });
+      [[10, 10.3, 'Terima barang \u00b7 Heavyweight Cotton Basic T-Shirt Off White/M \u00b7 12 \u2192 36', 'spv'], [4, 10.6, 'Opname \u00b7 Slim Straight Selvedge Denim Deep Indigo/32 \u00b7 5 \u2192 4', 'spv'], [2, 9.9, 'Terima barang \u00b7 Full-Grain Leather Everyday Tote \u00b7 3 \u2192 9', 'owner']].forEach(a => add(new Date(d0.getTime() - a[0] * 864e5 + a[1] * 3600000), 'stock', a[2], TP_USERS[a[3]].name, a[3], null));
+      [[12, 9.6, 'staff'], [9, 9.4, 'spv'], [5, 9.5, 'staff'], [2, 9.7, 'owner'], [1, 9.5, 'staff']].forEach(a => add(new Date(d0.getTime() - a[0] * 864e5 + a[1] * 3600000), 'login', 'Masuk sebagai ' + TP_USERS[a[2]].label, TP_USERS[a[2]].name, a[2], null));
+      TP_LOG = L.filter(e => e.ts.getTime() < now).sort((a, b) => b.ts - a.ts); tpLogSave();
+    })();
+
+    const LOG_META = { void: ['fa-ban', '#e11d48', '#ffe4e6'], return: ['fa-rotate-left', '#d97706', '#fef3c7'], drawer: ['fa-cash-register', '#059669', '#d1fae5'], close: ['fa-lock', '#475569', '#e2e8f0'], stock: ['fa-boxes-stacked', '#b45309', '#ffedd5'], login: ['fa-right-to-bracket', '#4f46e5', '#e0e7ff'], logout: ['fa-right-from-bracket', '#4f46e5', '#e0e7ff'] };
+    let tpLogFilter = 'all';
+    function tpRenderLog() {
+      const body = tp$('lgm-body'); if (!body) return;
+      const F = [['all', 'Semua'], ['void', 'Void'], ['return', 'Retur'], ['drawer', 'Laci'], ['close', 'Shift'], ['stock', 'Stok'], ['akses', 'Akses']];
+      const list = TP_LOG.filter(e => tpLogFilter === 'all' || (tpLogFilter === 'akses' ? (e.type === 'login' || e.type === 'logout') : e.type === tpLogFilter));
+      const wk = Date.now() - 7 * 864e5, sens = TP_LOG.filter(e => e.ts.getTime() >= wk && (e.type === 'void' || e.type === 'return' || e.type === 'drawer' || (e.type === 'close' && /selisih/.test(e.text)))), appr = sens.filter(e => e.approver).length;
+      body.innerHTML = '<div class="lgm-sum"><span>Aksi sensitif 7 hari: <b>' + sens.length + '</b></span><span>Disetujui SPV/Owner: <b>' + appr + '</b>' + (sens.length ? ' (' + Math.round(appr / sens.length * 100) + '%)' : '') + '</span><span>Total catatan: <b>' + TP_LOG.length + '</b></span></div>' +
+        '<div class="lgm-chips">' + F.map(f => '<button class="' + (tpLogFilter === f[0] ? 'on' : '') + '" onclick="tpLogSet(\'' + f[0] + '\')">' + f[1] + '</button>').join('') + '</div>' +
+        (list.length ? list.slice(0, 120).map(e => {
+          const m = LOG_META[e.type] || LOG_META.login, rb = e.role ? '<span class="tp-rolebadge ' + e.role + '">' + TP_USERS[e.role].label + '</span>' : '';
+          return '<div class="lgm-row"><div class="ic" style="background:' + m[2] + ';color:' + m[1] + '"><i class="fa-solid ' + m[0] + '"></i></div><div class="tx"><b>' + tpEsc(e.text) + '</b><div class="meta"><span>oleh <b style="color:#334155">' + tpEsc(e.actor) + '</b></span>' + rb + (e.approver ? '<span class="ok"><i class="fa-solid fa-check"></i> disetujui ' + tpEsc(e.approver) + '</span>' : '') + '</div></div><div class="time">' + tpDMY(e.ts) + ' ' + tpHM(e.ts) + '</div></div>';
+        }).join('') : '<p style="color:#94a3b8">Belum ada catatan.</p>');
+    }
+    function tpLogSet(f) { tpLogFilter = f; tpRenderLog(); }
+
+    /* ---------- papan PIN ---------- */
+    const tpPins = { lg: '', ap: '' };
+    function tpPadHTML(p) {
+      return '<div class="pn-dots" id="' + p + '-dots"><i></i><i></i><i></i><i></i></div><div class="pn-msg" id="' + p + '-msg"></div><div class="pn-pad">' +
+        [1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => '<button type="button" onclick="tpPinKey(\'' + p + '\',\'' + n + '\')">' + n + '</button>').join('') +
+        '<button type="button" class="alt" onclick="tpPinKey(\'' + p + '\',\'C\')">C</button><button type="button" onclick="tpPinKey(\'' + p + '\',\'0\')">0</button><button type="button" class="alt" aria-label="Hapus" onclick="tpPinKey(\'' + p + '\',\'B\')"><i class="fa-solid fa-delete-left"></i></button></div>';
+    }
+    tp$('lg-pad').innerHTML = tpPadHTML('lg'); tp$('ap-pad').innerHTML = tpPadHTML('ap');
+    function tpPinRender(p) { tp$(p + '-dots').querySelectorAll('i').forEach((d, i) => d.classList.toggle('on', i < tpPins[p].length)); }
+    function tpPinKey(p, k) {
+      tp$(p + '-msg').textContent = '';
+      if (k === 'C') tpPins[p] = ''; else if (k === 'B') tpPins[p] = tpPins[p].slice(0, -1); else if (tpPins[p].length < 4) tpPins[p] += k;
+      tpPinRender(p);
+      if (tpPins[p].length === 4) setTimeout(() => tpPinSubmit(p), 140);
+    }
+    function tpPinFill(p) {
+      playAudio('click'); tpPins[p] = p === 'lg' ? TP_USERS[tpLoginRole].pin : TP_USERS.spv.pin; tpPinRender(p);
+      setTimeout(() => tpPinSubmit(p), 220);
+    }
+    function tpPinErr(p, msg) {
+      const d = tp$(p + '-dots'); d.classList.remove('shake'); void d.offsetWidth; d.classList.add('shake');
+      tp$(p + '-msg').textContent = msg; tpPins[p] = ''; setTimeout(() => tpPinRender(p), 380);
+    }
+    function tpPinSubmit(p) {
+      const pin = tpPins[p];
+      if (pin.length < 4) return;
+      if (p === 'lg') {
+        if (pin === TP_USERS[tpLoginRole].pin) { tpPins.lg = ''; tpLogin(tpLoginRole); } else tpPinErr('lg', 'PIN salah. Coba lagi.');
+      } else {
+        const who = ['spv', 'owner'].find(r => TP_USERS[r].pin === pin);
+        if (who) { const cb = tpApCb; tpApCb = null; tpApClose(); playAudio('success'); if (cb) cb({ name: TP_USERS[who].name, role: who }); }
+        else tpPinErr('ap', pin === TP_USERS.staff.pin ? 'PIN Staff tidak bisa menyetujui.' : 'PIN SPV / Owner salah.');
+      }
+    }
+
+    /* ---------- masuk / keluar ---------- */
+    let tpLoginRole = null;
+    function tpLoginShow() {
+      tp$('tp-login').classList.add('open'); tp$('lg-s1').style.display = 'block'; tp$('lg-s2').style.display = 'none'; tpPins.lg = ''; tpPinRender('lg');
+    }
+    function tpLoginPick(r) {
+      playAudio('click'); tpLoginRole = r; const u = TP_USERS[r];
+      tp$('lg-av').className = 'av ' + r; tp$('lg-av').textContent = u.name.split(' ').map(w => w[0]).join('');
+      tp$('lg-name').textContent = u.name; tp$('lg-rolename').textContent = u.label + ' · ' + u.title; tp$('lg-hintpin').textContent = u.pin;
+      tpPins.lg = ''; tpPinRender('lg'); tp$('lg-msg').textContent = '';
+      tp$('lg-s1').style.display = 'none'; tp$('lg-s2').style.display = 'block';
+    }
+    function tpLoginBack() { playAudio('click'); tpLoginShow(); }
+    function tpLogin(r, silent) {
+      tpRole = r; try { sessionStorage.setItem(TP_SESS, r); } catch (e) { }
+      tp$('tp-login').classList.remove('open'); tpApplyRole();
+      if (!silent) { tpLog('login', 'Masuk sebagai ' + TP_USERS[r].label); playAudio('success'); showToast('Masuk sebagai ' + TP_USERS[r].name + ' (' + TP_USERS[r].label + ')', 'success'); setTimeout(tpTourAuto, 700); }
+    }
+    function tpLogout() {
+      if (tpRole) tpLog('logout', 'Keluar dari kasir');
+      if (typeof tpTourIdx !== 'undefined' && tpTourIdx >= 0) tpTourEnd(false);
+      tpRole = null; try { sessionStorage.removeItem(TP_SESS); } catch (e) { }
+      ['report-modal', 'log-modal', 'stock-modal', 'shift-modal', 'return-modal', 'held-modal', 'scanner-modal'].forEach(m => { const e = tp$(m); if (e) { e.classList.add('hidden'); e.classList.remove('flex'); } });
+      tpMenu(false); tpDemoClose(); tpApClose(); tpApCb = null; tpApplyRole(); tpLoginShow();
+    }
+    function tpApplyRole() {
+      const u = tpRole ? TP_USERS[tpRole] : null;
+      document.body.setAttribute('data-role', tpRole || '');
+      const nm = tp$('tp-user-name'); if (nm) nm.textContent = u ? u.name : '\u2014';
+      const bd = tp$('tp-user-badge'); if (bd) { bd.textContent = u ? u.label : ''; bd.className = 'tp-rolebadge ' + (tpRole || 'staff'); }
+      const mu = document.querySelector('#tp-menu-panel .tp-mn-user');
+      if (mu) mu.innerHTML = '<i class="fa-solid fa-store"></i><span>Grand Indonesia &middot; <b>' + (u ? u.name : '') + '</b> <em class="tp-rolebadge ' + (tpRole || 'staff') + '" style="font-style:normal">' + (u ? u.label : '') + '</em></span>';
+      document.querySelectorAll('header [onclick*="return-modal"], header [onclick*="openCashDrawer"], #tp-menu-panel [onclick*="return-modal"], #tp-menu-panel [onclick*="openCashDrawer"]').forEach(e => e.classList.toggle('tp-lock', tpRole === 'staff'));
+      if (typeof tpStockLock === 'function') tpStockLock();
+    }
+
+    /* ---------- persetujuan SPV ---------- */
+    let tpApCb = null;
+    function tpApClose() { tp$('tp-appr').classList.remove('open'); tpPins.ap = ''; tpPinRender('ap'); tp$('ap-msg').textContent = ''; }
+    function tpApprovalAsk(kind, desc, cb) {
+      tpApCb = cb; tp$('ap-desc').textContent = desc;
+      tp$('ap-by').textContent = 'Diminta oleh ' + TP_USERS[tpRole].name + ' (' + TP_USERS[tpRole].label + ')';
+      tpPins.ap = ''; tpPinRender('ap'); tp$('ap-msg').textContent = ''; tp$('tp-appr').classList.add('open');
+    }
+    function tpApprovalCancel() { tpApCb = null; tpApClose(); playAudio('click'); showToast('Persetujuan dibatalkan.', 'warn'); }
+    function tpGuard(kind, desc, fn) { if (tpRole === 'staff') tpApprovalAsk(kind, desc, fn); else fn(null); }
+
+    document.addEventListener('keydown', function (e) {
+      const lg = tp$('tp-login').classList.contains('open'), ap = tp$('tp-appr').classList.contains('open');
+      if (!lg && !ap) { if (e.key === 'Escape' && !tp$('log-modal').classList.contains('hidden')) closeModal('log-modal'); return; }
+      const p = ap ? 'ap' : 'lg';
+      if (p === 'lg' && tp$('lg-s2').style.display === 'none') { e.stopImmediatePropagation(); if (e.key !== 'F5' && e.key !== 'F12') e.preventDefault(); return; }
+      if (/^[0-9]$/.test(e.key)) tpPinKey(p, e.key);
+      else if (e.key === 'Backspace') tpPinKey(p, 'B');
+      else if (e.key === 'Escape') { if (ap) tpApprovalCancel(); else tpLoginBack(); }
+      else if (e.key === 'F5' || e.key === 'F12') return;
+      e.stopImmediatePropagation(); e.preventDefault();
+    }, true);
+    document.addEventListener('mousedown', e => { if (e.target.id === 'log-modal') closeModal('log-modal'); });
+
+    /* ---------- penjagaan aksi ---------- */
+    const _tpOpenM = openModal;
+    openModal = function (id) {
+      if (!tpRole) return;
+      if (id === 'log-modal' && tpRole !== 'owner') { showToast('Log aktivitas khusus Owner.', 'warn'); return; }
+      if (id === 'return-modal' && tpRole === 'staff') { tpApprovalAsk('return', 'Proses retur / penukaran barang', ap => { tpRetApprover = ap; _tpOpenM(id); }); return; }
+      if (id === 'return-modal') tpRetApprover = null;
+      _tpOpenM(id);
+      if (id === 'log-modal') tpRenderLog();
+      if (id === 'stock-modal') tpStockLock();
+    };
+    const _tpDrawer = openCashDrawer;
+    openCashDrawer = function () { tpGuard('drawer', 'Buka laci kasir tanpa transaksi', ap => { _tpDrawer(); tpLog('drawer', 'Buka laci kasir tanpa transaksi', { approver: ap }); }); };
+    const _tpVoidG = tpVoid;
+    tpVoid = function (no) {
+      const t = tpTrx.find(x => x.no === no); if (!t || t.voided) return;
+      tpGuard('void', 'Void ' + no + ' \u00b7 ' + formatRupiah(t.total), ap => { tpVoidApprover = ap; _tpVoidG(no); });
+    };
+    const _tpConfRet = tpConfirmReturn;
+    tpConfirmReturn = function () {
+      const n = tpReturns.length; _tpConfRet();
+      if (tpReturns.length > n) { const r = tpReturns[tpReturns.length - 1]; tpLog('return', r.no + ' \u00b7 ' + (r.mode === 'refund' ? 'refund ' + formatRupiah(r.amount) : 'penukaran') + ' \u00b7 ' + r.trxNo, { approver: tpRetApprover }); }
+    };
+    const _tpReqClose2 = tpRequestCloseShift;
+    tpRequestCloseShift = function () {
+      const counted = Number(String(tp$('sh-counted').value).replace(/\D/g, '')) || 0, diff = counted - tpShiftStats().expectedCash;
+      const go = ap => { tpShift.closeMeta = { by: TP_USERS[tpRole].name, role: tpRole, approver: ap ? ap.name : null, approverRole: ap ? ap.role : null, diff: diff }; _tpReqClose2(); };
+      if (diff !== 0 && tpRole === 'staff') tpApprovalAsk('closeDiff', 'Tutup shift dengan selisih kas ' + (diff > 0 ? '+' : '\u2212') + formatRupiah(Math.abs(diff)), go); else go(null);
+    };
+    const _tpRenderShift2 = tpRenderShift;
+    tpRenderShift = function () {
+      _tpRenderShift2();
+      if (!tpShift.open && tpShift.closeMeta && !tpShift.closeLogged) {
+        tpShift.closeLogged = true; const m = tpShift.closeMeta;
+        tpLog('close', 'Tutup shift #' + tpShift.number + ' \u00b7 ' + (m.diff === 0 ? 'kas sesuai' : 'selisih ' + (m.diff > 0 ? '+' : '\u2212') + formatRupiah(Math.abs(m.diff))), { approver: m.approver ? { name: m.approver, role: m.approverRole } : null });
+      }
+    };
+
+    /* stok: Staff hanya melihat */
+    function tpStockLock() {
+      const staff = tpRole === 'staff', recv = tp$('st-recv'); if (!recv) return;
+      recv.style.display = staff ? 'none' : '';
+      let note = tp$('st-lock');
+      if (!note) { note = document.createElement('div'); note.id = 'st-lock'; note.className = 'st-lock'; note.innerHTML = '<i class="fa-solid fa-lock"></i> <b>Mode lihat saja.</b> Penerimaan barang &amp; penyesuaian stok (opname) hanya untuk SPV / Owner.'; recv.parentNode.insertBefore(note, recv); }
+      note.style.display = staff ? 'block' : 'none';
+      document.querySelectorAll('#st-grid input').forEach(i => { i.readOnly = staff; });
+    }
+    const _tpStGrid = tpRenderStGrid; tpRenderStGrid = function () { _tpStGrid(); tpStockLock(); };
+    const _tpStSetG = tpStSet; tpStSet = function () { if (tpRole === 'staff') { showToast('Penyesuaian stok khusus SPV / Owner.', 'warn'); tpRenderStGrid(); return; } _tpStSetG.apply(null, arguments); };
+    const _tpStRecvG = tpStRecv; tpStRecv = function () { if (tpRole === 'staff') { showToast('Penerimaan barang khusus SPV / Owner.', 'warn'); return; } _tpStRecvG(); };
+    const _tpMoveG = tpMove; tpMove = function (p, c, s, from, to, type, note) { _tpMoveG(p, c, s, from, to, type, note); tpLog('stock', (type === 'masuk' ? 'Terima barang' : 'Opname') + ' \u00b7 ' + p.name + ' ' + c + '/' + s + ' \u00b7 ' + from + ' \u2192 ' + to); };
+
+    /* ---------- init: ?role=… atau sesi tab ini melewati layar masuk ---------- */
+    (function () {
+      let r = null; const m = location.search.match(/[?&]role=(staff|spv|owner)\b/);
+      if (m) r = m[1]; else { try { r = sessionStorage.getItem(TP_SESS); } catch (e) { } }
+      if (r && TP_USERS[r]) tpLogin(r, true); else { tpApplyRole(); tpLoginShow(); }
+    })();
   </script>
 </body>
 
