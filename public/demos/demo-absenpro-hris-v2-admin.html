@@ -41,13 +41,23 @@
         function shiftFor(div) { var c = cfg(), k = (c.dv || {})[String(div).replace('Divisi ', '')], s = SHP[k]; return s ? { 'in': s['in'], late: s.late, out: s.out, name: s.name } : { 'in': c.w['in'], late: c.w.late, out: c.w.out, name: 'Reguler' } }
         function shiftOf(id) { var e = EMP.filter(function (x) { return x[0] === id })[0]; return shiftFor(e ? e[3] : 'Digital') }
         function lateNote() { var s = {}; EMP.forEach(function (e) { s[shiftFor(e[3]).late] = 1 }); var k = Object.keys(s); return k.length === 1 ? 'setelah ' + k[0] : 'sesuai shift' }
+        var EK = 'absenpro-v2-emp', EMP0 = EMP.map(function (r) { return r.slice() }), LOCK = { dina: 1, hendra: 1 }, DIVS = ['Digital', 'Keuangan', 'SDM', 'Penjualan', 'Layanan'];
+        function empStore() { var s = { add: [], off: [], div: {}, log: [] }; try { var r = JSON.parse(localStorage.getItem(EK)); if (r && typeof r === 'object') { if (Array.isArray(r.add)) s.add = r.add.filter(function (a) { return a && /^[a-z][a-z0-9]{1,15}$/.test(a.id) && typeof a.name === 'string' && a.name.length <= 60 && typeof a.pos === 'string' && a.pos.length <= 40 && DIVS.indexOf(a.div) > -1 && !EMP0.some(function (e) { return e[0] === a.id }) }); var ids = EMP0.map(function (e) { return e[0] }).concat(s.add.map(function (a) { return a.id })); if (Array.isArray(r.off)) s.off = r.off.filter(function (i) { return ids.indexOf(i) > -1 && !LOCK[i] }); if (r.div && typeof r.div === 'object') for (var i in r.div) if (ids.indexOf(i) > -1 && !LOCK[i] && DIVS.indexOf(r.div[i]) > -1) s.div[i] = r.div[i]; if (Array.isArray(r.log)) s.log = r.log.filter(function (x) { return x && typeof x.t === 'number' && typeof x.by === 'string' && typeof x.txt === 'string' }).slice(0, 20) } } catch (e) { } return s }
+        function empSave(s) { try { localStorage.setItem(EK, JSON.stringify(s)); return true } catch (e) { return false } }
+        function empApply() { var s = empStore(); EMP.length = 0; EMP0.concat(s.add.map(function (a) { return [a.id, a.name, a.pos, a.div, 'Belum absen', '\u2013'] })).forEach(function (e) { if (s.off.indexOf(e[0]) > -1) return; var r = e.slice(); if (s.div[r[0]]) r[3] = s.div[r[0]]; EMP.push(r) }) }
+        function empAll() { var s = empStore(); return EMP0.map(function (e) { return { id: e[0], name: e[1], pos: e[2], div: s.div[e[0]] || e[3], div0: e[3], off: s.off.indexOf(e[0]) > -1, lock: !!LOCK[e[0]], added: false } }).concat(s.add.map(function (a) { return { id: a.id, name: a.name, pos: a.pos, div: s.div[a.id] || a.div, div0: a.div, off: s.off.indexOf(a.id) > -1, lock: false, added: true } })) }
+        function isLive(id) { return ['arzha', 'raka', 'salsa', 'dina', 'hendra'].indexOf(id) > -1 || empStore().add.some(function (a) { return a.id === id }) }
+        empApply();
+        function selfie(id) { var z = { i: '', o: '' }; try { var r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())), ok = function (p) { return typeof p === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p) ? p : '' }; return r ? { i: r.inAt ? ok(r.inAt.p) : '', o: r.outAt ? ok(r.outAt.p) : '' } : z } catch (e) { return z } }
+        function resetAll() { var ks = [], i; for (i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i)); var n = 0; ks.forEach(function (k) { if (k && k.indexOf('absenpro-') === 0 && !/lang|theme|session/.test(k)) { localStorage.removeItem(k); n++ } }); try { sessionStorage.setItem('ap-reset', '1') } catch (e) { } try { localStorage.setItem('absenpro-v2-reset', String(Date.now())) } catch (e) { } return n }
+        window.addEventListener('storage', function (e) { if (e.key === 'absenpro-v2-reset' && e.newValue) location.reload() });
         function hm(s) { var p = String(s).split(':'); return (+p[0]) * 60 + (+p[1] || 0) }
         function rcImg(r) { return r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<br><img class="rl-rc" alt="Foto struk" src="' + r.rc + '">' : '' }
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
         function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
-        function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
+        function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
@@ -99,7 +109,7 @@
           + '.rl-rc{width:64px;height:64px;object-fit:cover;border-radius:10px;margin-top:6px;border:1px solid var(--rl-line)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, hm: hm, shiftFor: shiftFor, shiftOf: shiftOf };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, selfie: selfie, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
       })(window);
 
   </script>
@@ -886,6 +896,7 @@
       <button class="nv" data-v="att">Kehadiran</button>
       <button class="nv" data-v="rep">Laporan</button>
       <button class="nv" data-v="req">Persetujuan <span class="bdg" id="bd" hidden>0</span></button>
+      <button class="nv" data-v="emp">Karyawan</button>
       <button class="nv" data-v="rb">Reimbursement</button>
       <!--ANN--><button class="nv" data-v="ann">Pengumuman</button><!--/ANN-->
       <button class="nv" data-v="set">Pengaturan</button>
@@ -917,6 +928,7 @@
                   <th>Divisi</th>
                   <th>Masuk</th>
                   <th>Status</th>
+                  <th>Selfie</th>
                 </tr>
               </thead>
               <tbody id="tb"></tbody>
@@ -966,6 +978,81 @@
               aria-label="Pilihan jajak"><button class="btn pri" id="ppub">Terbitkan jajak</button></div>
         </div>
       </section><!--/ANN-->
+      <section class="view" id="v-emp">
+        <div class="hd">
+          <div>
+            <p id="ecnt"></p>
+            <h1>Karyawan</h1>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ecsv">Ekspor CSV</button><button
+              class="btn" id="eimp">Impor CSV</button><button class="btn pri" id="eadd">Tambah karyawan</button></div>
+        </div>
+        <input type="file" id="eimf" accept=".csv,text/csv,text/plain" hidden>
+        <div class="card" id="eipv" style="display:none">
+          <h3>Pratinjau impor</h3>
+          <p class="sm" id="eisum"></p>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Baris</th>
+                  <th>Nama</th>
+                  <th>Jabatan</th>
+                  <th>Divisi</th>
+                  <th>Hasil</th>
+                </tr>
+              </thead>
+              <tbody id="eit"></tbody>
+            </table>
+          </div>
+          <p class="sm" style="margin:10px 0">Kolom: Nama, Jabatan, Divisi (Digital, Keuangan, SDM, Penjualan, Layanan).
+            Pemisah koma atau titik koma. Maksimal 200 baris. <button class="btn" id="etpl"
+              style="padding:4px 10px;font-size:12.5px">Unduh templat</button></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="eigo">Impor</button><button
+              class="btn" id="eicx">Batal</button></div>
+        </div>
+        <div class="card" id="eform" style="display:none">
+          <h3>Karyawan baru</h3>
+          <p class="sm">Akun login dibuat otomatis dengan kata sandi demo.</p>
+          <div class="sgrid">
+            <div class="sf"><label for="eN">Nama lengkap</label><input type="text" id="eN" maxlength="60"
+                autocomplete="off"></div>
+            <div class="sf"><label for="eP">Jabatan</label><input type="text" id="eP" maxlength="40" autocomplete="off">
+            </div>
+            <div class="sf"><label for="eD">Divisi</label><select id="eD"></select></div>
+          </div>
+          <p class="serr" id="eerr" role="alert" style="margin-top:10px"></p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="esave">Simpan
+              karyawan</button><button class="btn" id="ecancel">Batal</button></div>
+        </div>
+        <div class="card">
+          <div class="tools"><input type="search" id="eq" placeholder="Cari nama, jabatan, atau divisi"
+              aria-label="Cari karyawan"></div>
+          <div class="chips" id="es"></div>
+          <div class="tw">
+            <table>
+              <thead>
+                <tr>
+                  <th>Karyawan</th>
+                  <th>Divisi</th>
+                  <th>Shift</th>
+                  <th>Akun</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="et"></tbody>
+            </table>
+          </div>
+          <p class="sm" id="eem" style="display:none;padding:16px 0;text-align:center">Tidak ada karyawan yang cocok.
+          </p>
+          <p class="sm" style="margin-top:10px">Akun Supervisor dan Admin tidak bisa diubah di demo, agar alur
+            persetujuan tetap utuh.</p>
+        </div>
+        <div class="card">
+          <h3>Riwayat perubahan</h3>
+          <div id="elog"></div>
+        </div>
+      </section>
       <section class="view" id="v-rb">
         <div class="hd">
           <div>
@@ -1055,6 +1142,16 @@
             <h3>Riwayat perubahan</h3>
             <div id="slog"></div>
           </div>
+          <div class="card" style="grid-column:1/-1">
+            <h3>Data demo</h3>
+            <p class="sm">Hapus semua absen dan selfie, ajuan, klaim, pengaturan, serta karyawan tambahan, lalu kembali
+              ke data awal. Tema dan bahasa tetap. Tidak bisa dibatalkan.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px"><button class="btn"
+                id="rst1">Reset data demo</button><span id="rst2"
+                style="display:none;gap:8px;align-items:center;flex-wrap:wrap"><b class="sm">Yakin?</b><button
+                  class="btn" id="rstY" style="background:var(--late);color:#fff">Ya, hapus semua data</button><button
+                  class="btn" id="rstN">Batal</button></span></div>
+          </div>
         </div>
       </section>
     </main>
@@ -1091,7 +1188,7 @@
     const getS = () => { try { return localStorage.getItem(CFG.sess) } catch (e) { return MEM } };
     const setS = v => { MEM = v; try { if (v) localStorage.setItem(CFG.sess, v); else localStorage.removeItem(CFG.sess) } catch (e) { } };
     function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 2600) }
-    function liveSt(id) { if (!CFG.live || !['arzha', 'raka', 'salsa', 'dina', 'hendra'].includes(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > RL.hm(RL.shiftOf(id).late); return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
+    function liveSt(id) { if (!CFG.live || !RL.isLive(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > RL.hm(RL.shiftOf(id).late); return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
     function canAct(r) { return !!USER && USER.r === 'admin' && r.uid !== USER.id && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')) }
     RL.init({ prefix: CFG.prefix, toast: toast, live: liveSt, can: canAct, onChange: () => { if (USER) render() } });
     window.addEventListener('storage', e => { if (USER && e.key && e.key.indexOf('absenpro-') === 0) render() });
@@ -1110,9 +1207,9 @@
     function list() { return RL.emp.filter(e => { const s = RL.status(e).st; return (F === 'Semua' || s === F) && (!Q || (e[1] + ' ' + e[2] + ' ' + e[3]).toLowerCase().indexOf(Q) > -1) }) }
     function drawTable() {
       const L = list(), ini = n => n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
-      $('#tb').innerHTML = L.map(e => { const s = RL.status(e); return '<tr><td><div class="who"><span class="av">' + ini(e[1]) + '</span><div><b>' + RL.esc(e[1]) + '</b><br><span class="sm">' + RL.esc(e[2]) + '</span></div></div></td><td>' + RL.esc(e[3]) + '</td><td class="fh">' + s.t + '</td><td><span class="tag ' + s.st.split(' ')[0] + '">' + s.st + '</span></td></tr>' }).join(''); $('#em').hidden = L.length > 0
+      $('#tb').innerHTML = L.map(e => { const s = RL.status(e); return '<tr><td><div class="who"><span class="av">' + ini(e[1]) + '</span><div><b>' + RL.esc(e[1]) + '</b><br><span class="sm">' + RL.esc(e[2]) + '</span></div></div></td><td>' + RL.esc(e[3]) + '</td><td class="fh">' + s.t + '</td><td><span class="tag ' + s.st.split(' ')[0] + '">' + s.st + '</span></td><td>' + selfCell(e[0]) + '</td></tr>' }).join(''); $('#em').hidden = L.length > 0
     }
-    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (VIEW === 'rep') renderRep(); else if (VIEW === 'rb') renderRb(); else if (VIEW === 'set') renderSet(); else if (window.renderAnnP) renderAnnP() }
+    function render() { badge(); if (VIEW === 'sum') RL.summary($('#v-sum')); else if (VIEW === 'req') { RL.approvals($('#v-req'), null, 'Semua divisi') } else if (VIEW === 'att') drawTable(); else if (VIEW === 'rep') renderRep(); else if (VIEW === 'emp') renderEmp(); else if (VIEW === 'rb') renderRb(); else if (VIEW === 'set') renderSet(); else if (window.renderAnnP) renderAnnP() }
     $$('.nv[data-v]').forEach(b => b.onclick = () => { VIEW = b.dataset.v; $$('.nv[data-v]').forEach(x => x.classList.toggle('on', x === b)); $$('.view').forEach(v => v.classList.toggle('on', v.id === 'v-' + VIEW)); render() });
     const ST = ['Semua', 'Hadir', 'Terlambat', 'WFH', 'Dinas luar', 'Cuti', 'Belum absen'];
     $('#fl').innerHTML = ST.map(s => '<button class="' + (s === F ? 'on' : '') + '">' + s + '</button>').join('');
@@ -1155,6 +1252,98 @@
     $('#alist').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const d = annLoad(); d.ann = d.ann.filter(a => String(a.id) !== b.dataset.del); annSave(d); renderAnnP(); toast('Pengumuman dihapus') };
     $('#ppub').onclick = () => { const q = $('#pq').value.trim(), o = $('#po').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 5); if (!q || o.length < 2) { toast('Isi pertanyaan dan minimal dua pilihan'); return } const d = annLoad(); d.poll = { q: q.slice(0, 90), opts: o, votes: {} }; annSave(d); $('#pq').value = ''; $('#po').value = ''; renderAnnP(); toast('Jajak diterbitkan') };
     /*/ANN*/
+    const selfCell = id => { const p = RL.selfie(id); return [p.i && '<img class="rb-th" alt="Selfie masuk" title="Masuk" src="' + p.i + '">', p.o && '<img class="rb-th" alt="Selfie pulang" title="Pulang" src="' + p.o + '">'].filter(Boolean).join(' ') || '<span class="sm">\u2013</span>' };
+    $('#tb').onclick = e => { const i = e.target.closest('.rb-th'); if (i) i.classList.toggle('big') };
+    $('#rst1').onclick = () => { $('#rst1').style.display = 'none'; $('#rst2').style.display = 'flex'; $('#rstN').focus() };
+    $('#rstN').onclick = () => { $('#rst2').style.display = 'none'; $('#rst1').style.display = ''; $('#rst1').focus() };
+    $('#rstY').onclick = () => { RL.resetAll(); location.reload() };
+    try { if (sessionStorage.getItem('ap-reset')) { sessionStorage.removeItem('ap-reset'); setTimeout(() => toast('Data demo direset ke kondisi awal'), 500) } } catch (e) { }
+    /*EMP*/
+    let EF = 'Semua', EQ = '';
+    function newId(name, all, s, pos, div) {
+      let base = name.split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 12); if (!/^[a-z]/.test(base) || base.length < 2) base = 'staf';
+      let id = base, n = 1; while (all.some(e => e.id === id)) id = base + (++n);
+      all.push({ id: id }); s.add.push({ id: id, name: name, pos: pos || '', div: div || '', eid: 'EMP-' + (3000 + s.add.length + 1) }); return id
+    }
+    function empLog(s, txt) { s.log = [{ t: Date.now(), by: USER.name, txt: txt }].concat(s.log || []).slice(0, 20) }
+    function renderEmp() {
+      const all = RL.empAll(), act = all.filter(e => !e.off).length;
+      $('#ecnt').textContent = act + ' aktif \u00b7 ' + (all.length - act) + ' nonaktif';
+      $('#es').innerHTML = ['Semua', 'Aktif', 'Nonaktif'].map(k => '<button data-f="' + k + '" class="' + (k === EF ? 'on' : '') + '">' + k + '</button>').join('');
+      const L = all.filter(e => (EF === 'Semua' || (EF === 'Aktif') === !e.off) && (!EQ || (e.name + ' ' + e.pos + ' ' + e.div).toLowerCase().indexOf(EQ) > -1));
+      $('#et').innerHTML = L.map(e => { const sh = RL.shiftFor(e.div), me = USER && USER.id === e.id, fix = e.lock || me; return '<tr><td><div class="who"><span class="av">' + RL.esc(e.name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase()) + '</span><div><b>' + RL.esc(e.name) + '</b><br><span class="sm">' + RL.esc(e.pos) + (e.added ? ' \u00b7 baru' : '') + '</span></div></div></td><td>' + (fix ? RL.esc(e.div) : '<select class="edv" data-id="' + RL.esc(e.id) + '" aria-label="Divisi ' + RL.esc(e.name) + '">' + RL.DIVS.map(d => '<option' + (d === e.div ? ' selected' : '') + '>' + d + '</option>').join('') + '</select>') + '</td><td>' + sh.name + '<br><span class="sm">' + sh.in + ' \u2013 ' + sh.out + '</span></td><td><span class="tag ' + (e.off ? 'Terlambat' : 'Hadir') + '">' + (e.off ? 'Nonaktif' : 'Aktif') + '</span></td><td>' + (fix ? '<span class="sm">\u2013</span>' : '<button class="btn" data-id="' + RL.esc(e.id) + '" data-act="' + (e.off ? 'on' : 'off') + '">' + (e.off ? 'Aktifkan' : 'Nonaktifkan') + '</button>') + '</td></tr>' }).join('');
+      $('#eem').style.display = L.length ? 'none' : '';
+      const lg = RL.empStore().log; $('#elog').innerHTML = lg.length ? lg.slice(0, 8).map(x => '<div class="slg"><b>' + RL.esc(x.by) + '</b> <span class="sm">' + new Date(x.t).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</span><br><span class="sm">' + RL.esc(x.txt) + '</span></div>').join('') : '<p class="sm">Belum ada perubahan data karyawan.</p>'
+    }
+    $('#eD').innerHTML = RL.DIVS.map(d => '<option>' + d + '</option>').join('');
+    $('#eq').oninput = e => { EQ = e.target.value.trim().toLowerCase(); renderEmp() };
+    $('#es').onclick = e => { const b = e.target.closest('button'); if (!b) return; EF = b.dataset.f; renderEmp() };
+    $('#eadd').onclick = () => { $('#eform').style.display = ''; $('#eerr').textContent = ''; $('#eN').focus() };
+    $('#ecancel').onclick = () => { $('#eform').style.display = 'none' };
+    $('#esave').onclick = () => {
+      const name = $('#eN').value.trim().replace(/\s+/g, ' '), pos = $('#eP').value.trim(), div = $('#eD').value, er = t => { $('#eerr').textContent = t };
+      if (name.length < 2 || !/[A-Za-z]{2}/.test(name) || /^[=+\-@]/.test(name) || /[<>]/.test(name)) { er('Isi nama lengkap yang valid, tanpa tanda < > dan tidak diawali = + - @'); return }
+      if (!pos) { er('Isi jabatan'); return }
+      const all = RL.empAll(); if (all.some(e => e.name.toLowerCase() === name.toLowerCase())) { er('Nama sudah terdaftar'); return }
+      const s = RL.empStore(), id = newId(name, all, s, pos, div); empLog(s, 'Menambah ' + name + ' (' + pos + ', ' + div + ')');
+      if (!RL.empSave(s)) { er('Gagal menyimpan. Penyimpanan peramban penuh atau diblokir'); return }
+      RL.empApply(); $('#eN').value = ''; $('#eP').value = ''; $('#eform').style.display = 'none'; render(); toast('Ditambahkan. Login: ' + id + '@absenpro.demo, kata sandi demo123')
+    };
+    $('#et').onchange = e => {
+      const sel = e.target.closest('.edv'); if (!sel) return; const s = RL.empStore(), it = RL.empAll().find(x => x.id === sel.dataset.id); if (!it) return;
+      if (sel.value === it.div0) delete s.div[it.id]; else s.div[it.id] = sel.value; empLog(s, it.name + ': divisi ' + it.div + ' \u2192 ' + sel.value);
+      if (!RL.empSave(s)) { toast('Gagal menyimpan'); return } RL.empApply(); render(); toast('Divisi ' + it.name + ' diperbarui')
+    };
+    $('#et').onclick = e => {
+      const b = e.target.closest('button[data-act]'); if (!b) return; const s = RL.empStore(), it = RL.empAll().find(x => x.id === b.dataset.id); if (!it || it.lock) return;
+      if (b.dataset.act === 'off') { if (s.off.indexOf(it.id) < 0) s.off.push(it.id) } else s.off = s.off.filter(i => i !== it.id);
+      empLog(s, (b.dataset.act === 'off' ? 'Menonaktifkan ' : 'Mengaktifkan ') + it.name); if (!RL.empSave(s)) { toast('Gagal menyimpan'); return }
+      RL.empApply(); render(); toast(it.name + (b.dataset.act === 'off' ? ' dinonaktifkan' : ' diaktifkan'))
+    };
+    // ---- ekspor / impor CSV
+    const csvCell = c => { c = String(c == null ? '' : c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
+    function dl(name, text) { try { const b = new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); return true } catch (e) { toast('Unduhan tidak didukung di lingkungan ini'); return false } }
+    function parseCsv(t) {
+      t = t.replace(/^\ufeff/, ''); const f = t.split(/\r?\n/)[0] || '', d = f.split(';').length > f.split(',').length ? ';' : ',', rows = []; let r = [], c = '', q = false;
+      for (let i = 0; i < t.length; i++) { const ch = t[i]; if (q) { if (ch === '"') { if (t[i + 1] === '"') { c += '"'; i++ } else q = false } else c += ch } else if (ch === '"') q = true; else if (ch === d) { r.push(c); c = '' } else if (ch === '\n' || ch === '\r') { if (ch === '\r' && t[i + 1] === '\n') i++; r.push(c); c = ''; if (r.some(x => x.trim() !== '')) rows.push(r); r = [] } else c += ch }
+      r.push(c); if (r.some(x => x.trim() !== '')) rows.push(r); return rows
+    }
+    let IMP = [];
+    const clean = v => String(v || '').replace(/^'(?=[=+\-@\t\r])/, '').replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim();
+    function buildImp(text) {
+      let rows = parseCsv(text); if (!rows.length) return null; if (/^(nama|name)/i.test(clean(rows[0][0]))) rows = rows.slice(1);
+      const seen = new Set(RL.empAll().map(e => e.name.toLowerCase())); const over = rows.length > 200; rows = rows.slice(0, 200);
+      IMP = rows.map((r, i) => {
+        const name = clean(r[0]), pos = clean(r[1]), dv = clean(r[2]).replace(/^divisi\s+/i, ''), div = RL.DIVS.find(x => x.toLowerCase() === dv.toLowerCase()); let err = '';
+        if (name.length < 2 || !/[A-Za-z]{2}/.test(name) || /^[=+\-@]/.test(name) || /[<>]/.test(name)) err = 'Nama tidak valid'; else if (name.length > 60) err = 'Nama terlalu panjang'; else if (!pos) err = 'Jabatan kosong'; else if (pos.length > 40) err = 'Jabatan terlalu panjang'; else if (!div) err = 'Divisi tidak dikenal'; else if (seen.has(name.toLowerCase())) err = 'Nama sudah terdaftar'; else seen.add(name.toLowerCase());
+        return { n: i + 1, name: name, pos: pos, div: div || dv, err: err }
+      }); return { over: over }
+    }
+    function drawImp(over) {
+      const ok = IMP.filter(x => !x.err).length, bad = IMP.length - ok;
+      $('#eisum').textContent = ok + ' siap diimpor' + (bad ? ', ' + bad + ' dilewati karena bermasalah' : '') + (over ? '. Hanya 200 baris pertama yang dibaca' : '') + '.';
+      $('#eit').innerHTML = IMP.slice(0, 50).map(x => '<tr><td>' + x.n + '</td><td>' + RL.esc(x.name) + '</td><td>' + RL.esc(x.pos) + '</td><td>' + RL.esc(x.div) + '</td><td><span class="tag ' + (x.err ? 'Terlambat' : 'Hadir') + '">' + (x.err ? RL.esc(x.err) : 'Siap') + '</span></td></tr>').join('') + (IMP.length > 50 ? '<tr><td colspan="5" class="sm">dan ' + (IMP.length - 50) + ' baris lainnya</td></tr>' : '');
+      $('#eigo').textContent = 'Impor ' + ok + ' karyawan'; $('#eigo').disabled = !ok; $('#eipv').style.display = ''
+    }
+    $('#eimp').onclick = () => $('#eimf').click();
+    $('#eimf').onchange = e => {
+      const f = e.target.files[0]; e.target.value = ''; if (!f) return; if (f.size > 200 * 1024) { toast('Berkas terlalu besar (maksimal 200 KB)'); return }
+      const rd = new FileReader(); rd.onerror = () => toast('Berkas tidak bisa dibaca'); rd.onload = () => { const r = buildImp(String(rd.result)); if (!r || !IMP.length) { $('#eipv').style.display = 'none'; toast('Tidak ada baris data di berkas ini'); return } drawImp(r.over) }; rd.readAsText(f)
+    };
+    $('#eicx').onclick = () => { IMP = []; $('#eipv').style.display = 'none' };
+    $('#etpl').onclick = () => { if (dl('templat-karyawan.csv', 'Nama,Jabatan,Divisi\r\nContoh Satu,Staf Keuangan,Keuangan\r\nContoh Dua,Sales,Penjualan\r\n')) toast('Templat diunduh') };
+    $('#eigo').onclick = () => {
+      const ok = IMP.filter(x => !x.err); if (!ok.length) return; const s = RL.empStore(); if (s.add.length + ok.length > 300) { toast('Batas 300 karyawan tambahan di demo terlampaui'); return }
+      const all = RL.empAll(); ok.forEach(x => newId(x.name, all, s, x.pos, x.div)); empLog(s, 'Impor ' + ok.length + ' karyawan dari CSV');
+      if (!RL.empSave(s)) { toast('Gagal menyimpan. Penyimpanan peramban penuh atau diblokir'); return }
+      RL.empApply(); IMP = []; $('#eipv').style.display = 'none'; render(); toast(ok.length + ' karyawan diimpor. Kata sandi login: demo123')
+    };
+    $('#ecsv').onclick = () => {
+      const L = RL.empAll().filter(e => (EF === 'Semua' || (EF === 'Aktif') === !e.off) && (!EQ || (e.name + ' ' + e.pos + ' ' + e.div).toLowerCase().indexOf(EQ) > -1));
+      const rows = [['ID', 'Nama', 'Jabatan', 'Divisi', 'Shift', 'Akun']].concat(L.map(e => [e.id, e.name, e.pos, e.div, RL.shiftFor(e.div).name, e.off ? 'Nonaktif' : 'Aktif']));
+      if (dl('karyawan-' + new Date().toISOString().slice(0, 10) + '.csv', rows.map(r => r.map(csvCell).join(',')).join('\r\n'))) toast('Mengunduh ' + L.length + ' karyawan')
+    };
+    /*/EMP*/
     /*RB*/
     let RBM = 'all', RBS = 'Semua';
     const rbAll = () => RL.all().filter(r => r.type === 'Reimbursement');
@@ -1211,6 +1400,7 @@
       el.innerHTML = '<div class="spv"><svg width="110" height="110" viewBox="0 0 110 110" role="img" aria-label="Skala radius absen"><rect width="110" height="110" rx="14" fill="var(--chip)"/><circle cx="55" cy="55" r="' + px + '" fill="#1F9D7722" stroke="#1F9D77" stroke-dasharray="5 4"/><circle cx="55" cy="55" r="4" fill="var(--ink)"/></svg><ul>'
         + '<li>Absen setelah <b>' + o.w.late + '</b> ditandai Terlambat. Shift berjalan ' + o.w.in + ' sampai ' + o.w.out + ' (' + dur + ' jam).</li>'
         + '<li>Titik absen <b>' + RL.esc(o.g.name) + '</b>, radius <b>' + o.g.r + ' m</b>. Mode Kantor di luar radius tidak bisa absen.</li>'
+        + '<li>Selfie dari kamera depan <b>wajib</b> setiap absen masuk dan pulang.</li>'
         + '<li>Jatah cuti <b>' + o.l.quota + ' hari</b>, satu pengajuan maksimal <b>' + o.l.max + ' hari</b>.</li>'
         + '<li>Shift divisi: ' + DVS.map(d => d + ' <b>' + (SHN[o.dv[d]] || 'Reguler').split(' ')[0] + '</b>').join(', ') + '.</li>'
         + '<li>Klaim maksimal <b>' + rpf(o.c.limit) + '</b> per bulan. Struk wajib di atas <b>' + rpf(o.c.rcpt) + '</b>.</li></ul></div>'

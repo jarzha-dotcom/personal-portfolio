@@ -2446,7 +2446,7 @@
                 id="bill-redeem-label">Tukar Poin</span></span>
             <span class="font-bold font-num" id="bill-redeem">-Rp 0</span>
           </div>
-          <div class="flex justify-between text-slate-600">
+          <div class="flex justify-between text-slate-600" id="bill-ppn-row">
             <span>PPN (11%)</span>
             <span class="font-bold text-slate-800 font-num" id="bill-ppn">Rp 0</span>
           </div>
@@ -2457,7 +2457,7 @@
           <div class="pt-1.5 border-t border-slate-200 flex justify-between items-baseline">
             <div>
               <span class="text-xs font-bold text-slate-900 block">Total Tagihan</span>
-              <span class="text-[10px] text-slate-400">Termasuk pajak & pembulatan</span>
+              <span class="text-[10px] text-slate-400" id="bill-note">Termasuk pajak & pembulatan</span>
             </div>
             <span class="text-xl font-extrabold text-emerald-700 font-num" id="bill-grand-total">Rp 0</span>
           </div>
@@ -3058,7 +3058,7 @@
         redeemAmt = pointsUsed * POINT_VALUE;
       }
       var taxable = Math.max(0, afterVoucher - redeemAmt);
-      var ppn = Math.round(taxable * 0.11);
+      var ppn = Math.round(taxable * mxTaxRate());
       var exact = taxable + ppn;
       // Pembulatan ke Rp100 terdekat khusus pembayaran tunai
       var rounding = (method === 'cash' && exact > 0) ? Math.round(exact / 100) * 100 - exact : 0;
@@ -3358,7 +3358,7 @@
 
       mxUpdateDiscUI(b);
       mxUpdateRedeemUI(b);
-      $('bill-ppn').innerText = formatRupiah(b.ppn);
+      $('bill-ppn').innerText = formatRupiah(b.ppn); $('bill-ppn-row').classList.toggle('hidden', mxTaxMode === 'non'); $('bill-note').textContent = mxTaxMode === 'non' ? 'Termasuk pembulatan' : 'Termasuk pajak & pembulatan';
 
       var rRow = $('bill-rounding-row');
       if (b.rounding !== 0) { rRow.classList.remove('hidden'); $('bill-rounding').innerText = (b.rounding > 0 ? '+' : '-') + formatRupiah(Math.abs(b.rounding)); }
@@ -3614,7 +3614,7 @@
         (r.voucherAmount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Voucher ' + esc(r.voucherCode) + ':</span><span>-' + formatRupiah(r.voucherAmount) + '</span></div>' : '') +
         (r.discount > 0 ? '<div class="flex justify-between text-emerald-700"><span>Diskon Member:</span><span>-' + formatRupiah(r.discount) + '</span></div>' : '') +
         (r.pointsUsed > 0 ? '<div class="flex justify-between text-emerald-700"><span>Tukar Poin (' + r.pointsUsed + ' poin):</span><span>-' + formatRupiah(r.redeemAmount) + '</span></div>' : '') +
-        '<div class="flex justify-between text-slate-600"><span>PPN 11%:</span><span>' + formatRupiah(r.tax) + '</span></div>' +
+        (r.tax > 0 ? '<div class="flex justify-between text-slate-600"><span>PPN 11%:</span><span>' + formatRupiah(r.tax) + '</span></div>' : '') +
         (r.rounding !== 0 ? '<div class="flex justify-between text-slate-600"><span>Pembulatan:</span><span>' + (r.rounding > 0 ? '+' : '-') + formatRupiah(Math.abs(r.rounding)) + '</span></div>' : '') +
         '<div class="flex justify-between text-xs font-black pt-1 border-t border-slate-300">' +
         '<span>TOTAL:</span><span class="text-sm">' + formatRupiah(r.total) + '</span>' +
@@ -3873,7 +3873,7 @@
         '<div class="r"><span>Penjualan kotor</span><span>' + formatRupiah(st.subtotal) + '</span></div>' +
         '<div class="r"><span>Diskon member</span><span>-' + formatRupiah(st.discount) + '</span></div>' +
         '<div class="r"><span>Tukar poin member</span><span>-' + formatRupiah(st.redeem) + '</span></div>' +
-        '<div class="r"><span>PPN 11%</span><span>' + formatRupiah(st.tax) + '</span></div>' +
+        (st.tax > 0 ? '<div class="r"><span>PPN 11%</span><span>' + formatRupiah(st.tax) + '</span></div>' : '') +
         '<div class="r"><span>Retur barang (sudah dikurangkan)</span><span>-' + formatRupiah(st.refunded) + '</span></div>' +
         '<div class="r sec"><span>Per Metode Bayar</span><span></span></div>' +
         '<div class="r"><span>Tunai</span><span>' + formatRupiah(st.cash) + '</span></div>' +
@@ -4266,6 +4266,8 @@
 
     /* ---------- Penyimpanan data (localStorage, aman bila diblokir) ---------- */
     var MX_KEY = 'martexpress-pos-v2';
+    var mxTaxMode = 'pkp';
+    function mxTaxRate() { return mxTaxMode === 'non' ? 0 : 0.11; }
     function mxMin(p) { return window.mxMinMap && window.mxMinMap[p.id] != null ? window.mxMinMap[p.id] : 10; }
     function mxSave() {
       try {
@@ -4929,6 +4931,254 @@
       overflow-x: auto
     }
 
+    .mxlogin {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: radial-gradient(1200px 600px at 15% 0%, #064e3b 0%, transparent 60%), radial-gradient(900px 500px at 100% 100%, #0c4a6e 0%, transparent 55%), #020617;
+      color: #e2e8f0;
+      overflow: auto
+    }
+
+    .mxlogin[hidden] {
+      display: none
+    }
+
+    .mxlg {
+      width: min(380px, 100%);
+      text-align: center
+    }
+
+    .mxlg-logo {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 10px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, .35)
+    }
+
+    .mxlg h1 {
+      font-size: 20px;
+      font-weight: 800;
+      margin: 0;
+      color: #fff
+    }
+
+    .mxlg-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 2px 0 16px
+    }
+
+    .mxlg-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 4px
+    }
+
+    .mxlg-tab {
+      padding: 9px 4px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      background: transparent;
+      border: 0;
+      cursor: pointer
+    }
+
+    .mxlg-tab.on {
+      background: #059669;
+      color: #fff
+    }
+
+    #mx-lg-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      margin: 10px 4px 14px;
+      min-height: 32px
+    }
+
+    #mx-lg-dots {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 6px;
+      min-height: 14px
+    }
+
+    #mx-lg-dots i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #475569;
+      display: block
+    }
+
+    #mx-lg-dots i.f {
+      background: #34d399;
+      border-color: #34d399
+    }
+
+    #mx-lg-dots.sh {
+      animation: mxsh .35s
+    }
+
+    @keyframes mxsh {
+
+      20%,
+      60% {
+        transform: translateX(-8px)
+      }
+
+      40%,
+      80% {
+        transform: translateX(8px)
+      }
+    }
+
+    #mx-role-e {
+      color: #fb7185;
+      font-size: 12px;
+      min-height: 18px;
+      margin-bottom: 6px
+    }
+
+    .mxlg-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .mxlg-pad button {
+      height: 54px;
+      border-radius: 14px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      color: #f1f5f9;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .mxlg-pad button:active {
+      background: #1e293b
+    }
+
+    .mxlg-pad .ok {
+      background: #059669;
+      border-color: #059669;
+      font-size: 14px
+    }
+
+    .mxlg-pad .dl {
+      font-size: 16px;
+      color: #94a3b8
+    }
+
+    #mx-lg-hint {
+      display: inline-block;
+      margin: -6px auto 14px;
+      padding: 5px 14px;
+      border-radius: 99px;
+      background: rgba(16, 185, 129, .12);
+      border: 1px solid rgba(16, 185, 129, .35);
+      color: #6ee7b7;
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    #mx-lg-hint.x {
+      color: #94a3b8;
+      border-color: #334155;
+      background: transparent;
+      font-weight: 600
+    }
+
+    .mxlg-foot {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px
+    }
+
+    .mxlg-foot button {
+      flex: 1
+    }
+
+    .mxlg-hint {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 12px
+    }
+
+    @media print {
+
+      body.mxo #mx-view,
+      body.mxo #mx-view *,
+      body.mxlb #mx-label,
+      body.mxlb #mx-label * {
+        visibility: visible !important
+      }
+
+      body.mxlb>*:not(#mx-label) {
+        display: none !important
+      }
+
+      body.mxlb.mxo>#mx-label {
+        display: block !important
+      }
+
+      body.mxlb.mxo>#mx-view {
+        display: none !important
+      }
+
+      body.mxlb #mx-label {
+        position: static !important;
+        background: #fff !important;
+        padding: 0 !important;
+        display: block !important
+      }
+
+      .mxlb-box {
+        background: #fff !important;
+        border: 0 !important;
+        color: #000 !important;
+        padding: 0 !important;
+        width: auto !important;
+        max-height: none !important;
+        overflow: visible !important
+      }
+
+      .mxlb-ctl,
+      .mxlb-box>b {
+        display: none !important
+      }
+
+      .mxlb-grid {
+        grid-template-columns: repeat(auto-fill, 52mm) !important;
+        gap: 3mm !important
+      }
+
+      .mxlb-lb {
+        break-inside: avoid
+      }
+    }
+
     .mxrc {
       display: block;
       width: 100%;
@@ -5169,31 +5419,60 @@
       line-height: 16px
     }
   </style>
-  <div id="mx-role" class="mxpin" hidden>
-    <div style="width:min(460px,100%)">
-      <div id="mx-role-s1"><b style="font-size:17px">Masuk sebagai</b>
-        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Pilih peran, lalu masukkan PIN-nya.<br>PIN demo: Kasir
-          1111 · Supervisor 2222 · Pemilik 3333</div>
-        <button class="mxrc" onclick="mxRoleChoose('kasir')">Kasir<small>Hanya layar Kasir. Void, retur, dan kas keluar
-            butuh PIN supervisor.</small></button>
-        <button class="mxrc" onclick="mxRoleChoose('spv')">Supervisor<small>Kasir, Dashboard, dan Inventori. Tidak
-            melihat laba.</small></button>
-        <button class="mxrc" onclick="mxRoleChoose('owner')">Pemilik<small>Semua menu, termasuk Laporan laba, keamanan,
-            dan cadangan data.</small></button>
-        <div style="display:flex;gap:8px;margin-top:12px"><button id="mx-role-x" class="mxbtn"
-            style="background:#475569;flex:1"
-            onclick="document.getElementById('mx-role').hidden=true">Batal</button><button id="mx-role-out"
-            class="mxbtn" style="background:#be123c;flex:1" onclick="mxLogout()">Keluar</button></div>
-      </div>
-      <div id="mx-role-s2" hidden><b id="mx-role-t2" style="font-size:17px">Masuk</b>
-        <div style="font-size:12px;color:#94a3b8;margin-top:2px">Masukkan PIN untuk peran ini.</div>
-        <input id="mx-role-i" type="password" inputmode="numeric" maxlength="6" autocomplete="off"
-          onkeydown="if(event.key==='Enter')mxRoleOk()">
-        <div id="mx-role-e" style="color:#fb7185;font-size:12px;min-height:16px"></div>
-        <div style="display:flex;gap:8px;margin-top:8px"><button class="mxbtn" style="flex:1"
-            onclick="mxRoleOk()">Masuk</button><button class="mxbtn" style="flex:1;background:#475569"
-            onclick="mxRoleBack()">Kembali</button></div>
-      </div>
+  <div id="mx-role" class="mxlogin" hidden>
+    <div class="mxlg">
+      <div class="mxlg-logo">M</div>
+      <h1 id="mx-lg-title">Masuk</h1>
+      <div class="mxlg-sub">MartExpress POS · Cabang Cikarang Utama<br><span id="mx-lg-date"></span></div>
+      <div class="mxlg-tabs"><button type="button" class="mxlg-tab" data-r="kasir"
+          onclick="mxRoleChoose('kasir')">Kasir</button><button type="button" class="mxlg-tab" data-r="spv"
+          onclick="mxRoleChoose('spv')">Supervisor</button><button type="button" class="mxlg-tab" data-r="owner"
+          onclick="mxRoleChoose('owner')">Pemilik</button></div>
+      <div id="mx-lg-desc"></div>
+      <div id="mx-lg-hint"></div>
+      <div id="mx-lg-dots"></div>
+      <div id="mx-role-e"></div>
+      <div class="mxlg-pad"><button type="button" onclick="mxKey('1')">1</button><button type="button"
+          onclick="mxKey('2')">2</button><button type="button" onclick="mxKey('3')">3</button><button type="button"
+          onclick="mxKey('4')">4</button><button type="button" onclick="mxKey('5')">5</button><button type="button"
+          onclick="mxKey('6')">6</button><button type="button" onclick="mxKey('7')">7</button><button type="button"
+          onclick="mxKey('8')">8</button><button type="button" onclick="mxKey('9')">9</button><button type="button"
+          class="dl" onclick="mxKey('del')" aria-label="Hapus">⌫</button><button type="button"
+          onclick="mxKey('0')">0</button><button type="button" class="ok" onclick="mxKey('ok')">Masuk</button></div>
+      <div class="mxlg-foot"><button id="mx-role-x" class="mxbtn" style="background:#475569"
+          onclick="document.getElementById('mx-role').hidden=true">Batal</button><button id="mx-role-out" class="mxbtn"
+          style="background:#be123c" onclick="mxLogout()">Keluar</button></div>
+    </div>
+  </div>
+  <div id="mx-label" class="mxpin" hidden>
+    <div class="mxlb-box" style="width:min(640px,100%);max-height:92vh;overflow:auto"><b style="font-size:17px">Cetak
+        label barcode</b>
+      <div class="mxlb-ctl" style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0;align-items:center"><select
+          id="lb-p" onchange="mxLabelUpd()"
+          style="flex:1;min-width:200px;padding:8px;border-radius:8px;background:#1e293b;color:#e2e8f0;border:1px solid #334155"></select><input
+          id="lb-n" type="number" min="1" max="60" value="6" oninput="mxLabelUpd()"
+          style="width:80px;margin:0;font-size:14px;letter-spacing:0;padding:8px"><small style="color:#94a3b8">jumlah
+          label</small></div>
+      <div id="lb-prev" class="mxlb-grid"
+        style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px"></div>
+      <div class="mxlb-ctl" style="display:flex;gap:8px;margin-top:12px"><button class="mxbtn" style="flex:1"
+          onclick="mxLabelPrint()">Cetak</button><button class="mxbtn" style="flex:1;background:#475569"
+          onclick="mxLabelClose()">Tutup</button></div>
+    </div>
+  </div>
+  <div id="mx-wa" class="mxpin" hidden>
+    <div style="width:min(460px,100%)"><b style="font-size:17px">Kirim struk lewat WhatsApp</b>
+      <div style="font-size:12px;color:#94a3b8;margin-top:2px">Isi nomor pelanggan, atau kosongkan untuk memilih kontak
+        di WhatsApp.</div>
+      <input id="wa-no" type="tel" inputmode="tel" placeholder="08xx atau 628xx" autocomplete="off"
+        style="font-size:16px;letter-spacing:0;text-align:left" onkeydown="if(event.key==='Enter')mxWAGo()">
+      <div id="wa-e" style="color:#fb7185;font-size:12px;min-height:16px"></div>
+      <textarea id="wa-t" readonly rows="9"
+        style="width:100%;margin-top:6px;padding:8px;border-radius:10px;border:1px solid #334155;background:#1e293b;color:#cbd5e1;font:12px/1.4 monospace;resize:none"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="mxbtn"
+          style="flex:2;background:#16a34a" onclick="mxWAGo()">Buka WhatsApp</button><button class="mxbtn"
+          style="flex:1;background:#475569" onclick="mxWACopy()">Salin teks</button><button class="mxbtn"
+          style="flex:1;background:#475569" onclick="document.getElementById('mx-wa').hidden=true">Tutup</button></div>
     </div>
   </div>
   <div id="mx-pin" class="mxpin" hidden>
@@ -5222,6 +5501,7 @@
         var C = { sembako: '#b45309', snack: '#be123c', minuman: '#0369a1', mandi: '#7c3aed', rokok_pulsa: '#475569' }, t = (p.name || '?').split(/\s+/).slice(0, 2).map(function (w) { return w.replace(/[^A-Za-z0-9]/g, '').charAt(0); }).join('').toUpperCase() || '?';
         return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 270"><rect width="360" height="270" fill="' + (C[p.category] || '#475569') + '"/><text x="180" y="160" text-anchor="middle" font-size="96" font-family="sans-serif" font-weight="700" fill="#fff">' + t + '</text></svg>');
       }
+      PRODUCTS.forEach(function (p) { if (/^\d{13}$/.test(p.barcode) && String(eanChk(p.barcode)) !== p.barcode.charAt(12)) p.barcode = eanFix(p.barcode.slice(0, 12)); });
       try {
         var sx = JSON.parse(localStorage.getItem(K)) || {}, ms = JSON.parse(localStorage.getItem('martexpress-pos-v2')) || {};
         (sx.np || []).forEach(function (q) { if (!PRODUCTS.some(function (p) { return p.id === q.id; })) { q.imageUrl = ph(q); PRODUCTS.push(q); } });
@@ -5236,7 +5516,7 @@
           if (X.cost[p.id] == null) X.cost[p.id] = Math.round(p.price * (RC[p.category] || .8) * (.97 + (i % 4) * .02) / 100) * 100;
           if (X.min[p.id] == null) X.min[p.id] = p.stock > 500 ? 0 : (p.price < 5000 ? 30 : 10);
           if (X.exp[p.id] === undefined) { if (EXP[p.id]) { var d = new Date(t); d.setDate(d.getDate() + EXP[p.id]); X.exp[p.id] = d.toISOString().slice(0, 10); } else X.exp[p.id] = ''; }
-        }); X.po = X.po || []; X.adj = X.adj || []; X.audit = X.audit || []; X.pins = X.pins || { kasir: '1111', spv: '2222', owner: '3333' }; if (X.pin) { X.pins.spv = X.pin; delete X.pin; } sv(); window.mxMinMap = X.min;
+        }); X.po = X.po || []; X.adj = X.adj || []; X.audit = X.audit || []; X.pins = X.pins || { kasir: '1111', spv: '2222', owner: '3333' }; if (X.pin) { X.pins.spv = X.pin; delete X.pin; } sv(); window.mxMinMap = X.min; window.mxTaxMode = X.taxMode || 'pkp';
         var W = [0, 0, 0, 0, 0, 0, 1, 3, 4, 3, 3, 4, 5, 4, 3, 3, 4, 6, 8, 9, 6, 3, 1, 0], S = W.reduce(function (a, b) { return a + b; }), g = rnd(7), hr = t.getHours();
         H = [];
         for (var d = 13; d >= 0; d--) {
@@ -5252,18 +5532,18 @@
       function agg(d) {
         var x = H[d], q = Object.assign({}, x.q), hrs = x.hrs.slice(), tx = x.tx, net = 0, man = 0, pay = { cash: 0, qris: 0, card: 0 }, id, ds = x.date.toDateString(), last = d === H.length - 1;
         for (id in q) { var p = productById(id); if (p) net += q[id] * p.price * .97; }
-        pay.cash = net * .55; pay.qris = net * .35; pay.card = net * .10;
+        pay.cash = net * .55; pay.qris = net * .35; pay.card = net * .10; var tax = net * .11;
         var pk = function (m) { return m === 'cash' ? 'cash' : m === 'qris' ? 'qris' : 'card'; };
         transactions.forEach(function (t) {
           if (t.voided) return;
           var nt = t.total - t.tax - (t.rounding || 0), r = t.total ? nt / t.total : 1;
           if (new Date(t.date).toDateString() === ds) {
-            tx++; hrs[new Date(t.date).getHours()]++; net += nt; pay[pk(t.method)] += nt;
+            tx++; hrs[new Date(t.date).getHours()]++; net += nt; tax += t.tax; pay[pk(t.method)] += nt;
             t.items.forEach(function (i) { q[i.productId] = (q[i.productId] || 0) + i.quantity; });
           }
           (t.refunds || []).forEach(function (f) {
             if (new Date(f.time).toDateString() !== ds) return;
-            net -= f.amount * r; pay[pk(t.method)] -= f.amount * r;
+            net -= f.amount * r; tax -= f.amount * (1 - r); pay[pk(t.method)] -= f.amount * r;
             if (f.reason === 'salah') f.lines.forEach(function (l) { q[l.productId] = (q[l.productId] || 0) - l.qty; });
           });
         });
@@ -5271,7 +5551,7 @@
         var hpp = 0, et = new Date(x.date); et.setHours(23, 59, 59, 999);
         for (id in q) hpp += q[id] * costAt(id, et.getTime());
         var op = X.opex != null ? X.opex : OPEX;
-        return { date: x.date, pay: pay, q: q, hrs: hrs, tx: tx, net: net, hpp: hpp, gp: net - hpp, op: op, man: man, np: net - hpp - op - man };
+        return { date: x.date, tax: tax, pay: pay, q: q, hrs: hrs, tx: tx, net: net, hpp: hpp, gp: net - hpp, op: op, man: man, np: net - hpp - op - man };
       }
       function rng(n, o) { o = o || 0; var a = []; for (var i = H.length - n - o; i < H.length - o; i++) a.push(agg(i)); return a; }
       function sum(a, k) { return a.reduce(function (s, d) { return s + d[k]; }, 0); }
@@ -5315,7 +5595,7 @@
             '<td>' + inp('exp', p) + '</td><td>' + tg + '</td>' + (invEdit ? '<td><button class="mxbtn" onclick="mxEditP(\'' + p.id + '\')">Ubah</button></td>' : '') + '</tr>';
         }).join('');
         return NOTE +
-          '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><p class="mxsub">Menjawab: stok saya aman nggak?</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div class="mxseg"><button class="' + (invTab !== 'buy' ? 'on' : '') + '" onclick="mxTab(\'stock\')">Stok barang</button><button class="' + (invTab === 'buy' ? 'on' : '') + '" onclick="mxTab(\'buy\')">Pembelian &amp; supplier</button></div>' + (invTab !== 'buy' ? '<button class="mxbtn" onclick="mxAdd()">' + (addOpen ? 'Batal tambah' : '+ Produk baru') + '</button><button class="mxbtn" style="background:' + (invEdit ? '#d97706' : '#64748b') + '" onclick="mxEdit()">' + (invEdit ? 'Selesai mengubah' : 'Ubah harga modal / stok minimum / kadaluarsa') + '</button>' : '') + '</div><div class="mxg">' +
+          '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><p class="mxsub">Menjawab: stok saya aman nggak?</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div class="mxseg"><button class="' + (invTab !== 'buy' ? 'on' : '') + '" onclick="mxTab(\'stock\')">Stok barang</button><button class="' + (invTab === 'buy' ? 'on' : '') + '" onclick="mxTab(\'buy\')">Pembelian &amp; supplier</button></div>' + (invTab !== 'buy' ? '<button class="mxbtn" onclick="mxAdd()">' + (addOpen ? 'Batal tambah' : '+ Produk baru') + '</button><button class="mxbtn" style="background:#475569" onclick="mxLabel()">Cetak label</button><button class="mxbtn" style="background:' + (invEdit ? '#d97706' : '#64748b') + '" onclick="mxEdit()">' + (invEdit ? 'Selesai mengubah' : 'Ubah harga modal / stok minimum / kadaluarsa') + '</button>' : '') + '</div><div class="mxg">' +
           card('Nilai persediaan (HPP)', R(val), 'stok × harga modal') + card('Perlu restock', low.length, 'stok ≤ minimum', low.length ? 'am' : 'up') +
           card('Segera kadaluarsa', ex.length, '≤ 30 hari / lewat', ex.length ? 'dn' : 'up') + card('Jumlah produk', PRODUCTS.length, '') + '</div>' +
           (invTab === 'buy' ? '' : (addOpen ? addForm() : '') + (editId ? editForm() : '') + (cardId ? stockCard() : '') + '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>Harga modal</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th>' + (invEdit ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>') + (invTab === 'buy' ? po() + adj() + sup() + opn() : '');
@@ -5327,26 +5607,26 @@
         return '<span class="' + (late ? 'dn' : '') + '">' + d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + '</span>';
       }
       function sup() {
-        return '<div class="mxc mxsc" style="margin-top:12px"><h3>Daftar supplier (data contoh)</h3><table class="mxt"><thead><tr><th>Supplier</th><th>Kontak</th><th class="r">Lead time</th><th class="r">Termin bayar</th></tr></thead><tbody>' +
-          Object.keys(SUP).map(function (k) { var d = SUPD[k]; return '<tr><td>' + esc(SUP[k]) + '</td><td>' + d.c + '</td><td class="r">' + d.lt + ' hari</td><td class="r">' + (d.tm ? d.tm + ' hari' : 'Tunai') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+        return '<div class="mxc mxsc" style="margin-top:12px"><h3>Daftar supplier (data contoh)</h3><table class="mxt"><thead><tr><th>Supplier</th><th>Kontak</th><th class="r">Lead time</th><th class="r">Termin bayar</th><th class="r">Hutang</th></tr></thead><tbody>' +
+          Object.keys(SUP).map(function (k) { var d = SUPD[k]; return '<tr><td>' + esc(SUP[k]) + '</td><td>' + d.c + '</td><td class="r">' + d.lt + ' hari</td><td class="r">' + (d.tm ? d.tm + ' hari' : 'Tunai') + '</td><td class="r ' + (hutBy(SUP[k]) ? 'dn' : '') + '">' + R(hutBy(SUP[k])) + '</td></tr>'; }).join('') + '</tbody></table></div>';
       }
       function po() {
         X.po = X.po || [];
         var low = lowList().map(function (p) { return p.id; }), opts = PRODUCTS.slice().sort(function (a, b) { return (low.indexOf(b.id) >= 0) - (low.indexOf(a.id) >= 0); }).map(function (p) { return '<option value="' + p.id + '">' + (low.indexOf(p.id) >= 0 ? '⚠ ' : '') + esc(p.name) + ' — ' + esc(SUP[p.category]) + '</option>'; }).join('');
         var open = X.po.filter(function (o) { return o.st !== 'Diterima'; }).reduce(function (t, o) { return t + (o.qty - rc(o)) * o.cost; }, 0);
-        var hut = X.po.filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+        var hut = X.po.reduce(function (t, o) { return t + owed(o); }, 0);
         hut = Math.max(0, hut - (X.adj || []).filter(function (r) { return r.reason === 'retur'; }).reduce(function (t, r) { return t + r.val; }, 0));
         var lineRow = function (o) {
           var p = productById(o.pid);
           var tr = '<tr><td>' + o.id + '</td><td>' + esc(SUP[p.category]) + '</td><td>' + esc(p.name) + '</td><td class="r">' + o.qty + '</td><td class="r">' + R(o.qty * o.cost) + '</td><td>' + o.date + '</td><td>' + due(o) + '</td><td>' +
-            (o.st !== 'Diterima' ? (o.st === 'Sebagian' ? '<span class="mxtag a">Sebagian ' + rc(o) + '/' + o.qty + '</span> ' : '') + '<button class="mxbtn" onclick="mxRecv(\'' + o.id + '\')">Terima barang</button>' : '<span class="mxtag g">Diterima</span>' + (o.paid ? '<span class="mxtag g">Lunas</span>' : '<button class="mxbtn" onclick="mxPay(\'' + o.id + '\')">Bayar</button>')) + '</td></tr>';
+            (o.st !== 'Diterima' ? (o.st === 'Sebagian' ? '<span class="mxtag a">Sebagian ' + rc(o) + '/' + o.qty + '</span> ' : '') + '<button class="mxbtn" onclick="mxRecv(\'' + o.id + '\')">Terima barang</button>' : '<span class="mxtag g">Diterima</span>' + (o.paid ? '<span class="mxtag g">Lunas</span>' : (o.pd ? '<span class="mxtag a">Cicilan ' + R(o.pd) + '</span>' : '') + '<button class="mxbtn" onclick="mxPay(\'' + o.id + '\')">Bayar</button>')) + '</td></tr>';
           return tr + (recvId === o.id ? rvRow(o) : '') + (payId === o.id ? pyRow(o) : '');
         };
         var gs = {}, ord = []; X.po.forEach(function (o) { var g = o.grp || o.id; if (!gs[g]) { gs[g] = []; ord.push(g); } gs[g].push(o); }); ord.reverse();
         var rows = ord.map(function (g) {
           var L = gs[g], head = '';
           if (L.length > 1) {
-            var tot = L.reduce(function (t, o) { return t + o.qty * o.cost; }, 0), openN = L.filter(function (o) { return o.st !== 'Diterima'; }).length, unp = L.filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+            var tot = L.reduce(function (t, o) { return t + o.qty * o.cost; }, 0), openN = L.filter(function (o) { return o.st !== 'Diterima'; }).length, unp = L.reduce(function (t, o) { return t + owed(o); }, 0);
             head = '<tr style="background:var(--bg)"><td colspan="8"><div class="mxrow"><b>' + g + '</b> · ' + esc(SUP[productById(L[0].pid).category]) + ' · ' + L.length + ' barang · ' + R(tot) + (openN ? '<button class="mxbtn" onclick="mxRecvAll(\'' + g + '\')">Terima semua sisa</button>' : '') + (unp ? '<button class="mxbtn" style="background:#d97706" onclick="mxPayAll(\'' + g + '\')">Bayar semua (' + R(unp) + ')</button>' : '') + '</div></td></tr>' + (payId === g ? pyRowG(g, unp) : '');
           }
           return head + L.map(lineRow).join('');
@@ -5358,7 +5638,7 @@
           (rows || '<tr><td colspan="8" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠, tambahkan beberapa barang dari supplier yang sama, lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
       }
       function lap() {
-        var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), sel = selisih(per), wr = writeoff(per), np = gp - op - man + sel - wr, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
+        var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), sel = selisih(per), wr = writeoff(per), pphv = X.taxMode === 'non' ? pphOf(a).pph : 0, np = gp - op - man + sel - wr - pphv, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
         a.forEach(function (d) { for (var id in d.q) q[id] = (q[id] || 0) + d.q[id]; });
         var best = PRODUCTS.map(function (p) { return { p: p, qty: q[p.id] || 0, m: (p.price - X.cost[p.id]) / p.price, lb: (q[p.id] || 0) * (p.price - X.cost[p.id]) }; });
         var top = best.slice().sort(function (x, y) { return y.qty - x.qty; }).slice(0, 5), mg = best.slice().sort(function (x, y) { return y.m - x.m; });
@@ -5372,11 +5652,11 @@
           '<tr class="tot"><td>Laba kotor <small style="font-weight:400;color:var(--mu)">(penjualan − modal)</small></td><td class="r up">' + R(gp) + '</td><td class="r">' + pc(gp) + '</td></tr>' +
           '<tr><td>Biaya operasional (demo: gaji, listrik, sewa)</td><td class="r dn">− ' + R(op) + '</td><td class="r">' + pc(op) + '</td></tr><tr><td>Kas keluar manual dari kasir</td><td class="r dn">− ' + R(man) + '</td><td class="r">' + pc(man) + '</td></tr>' +
           '<tr><td>Selisih stok (opname)</td><td class="r ' + (sel < 0 ? 'dn' : '') + '">' + (sel < 0 ? '− ' : '') + R(Math.abs(sel)) + '</td><td class="r">' + pc(Math.abs(sel)) + '</td></tr>' +
-          '<tr><td>Barang rusak / kadaluarsa</td><td class="r ' + (wr > 0 ? 'dn' : '') + '">' + (wr > 0 ? '− ' : '') + R(wr) + '</td><td class="r">' + pc(wr) + '</td></tr>' +
+          '<tr><td>Barang rusak / kadaluarsa</td><td class="r ' + (wr > 0 ? 'dn' : '') + '">' + (wr > 0 ? '− ' : '') + R(wr) + '</td><td class="r">' + pc(wr) + '</td></tr>' + (X.taxMode === 'non' ? '<tr><td>Estimasi PPh final UMKM (0,5%)</td><td class="r ' + (pphv > 0 ? 'dn' : '') + '">' + (pphv > 0 ? '− ' : '') + R(pphv) + '</td><td class="r">' + pc(pphv) + '</td></tr>' : '') +
           '<tr class="tot"><td>Laba bersih <small style="font-weight:400;color:var(--mu)">(setelah semua biaya)</small></td><td class="r ' + (np >= 0 ? 'up' : 'dn') + '">' + R(np) + '</td><td class="r">' + pc(np) + '</td></tr></tbody></table><small style="color:var(--mu);display:block;margin-top:8px">Pembayaran ke supplier bukan biaya: modal barang sudah dihitung di HPP saat barang terjual. Pembayaran tunai tetap mengurangi kas laci.</small></div>' +
           '<div class="mxc"><h3>Penjualan harian</h3>' + chart(a) + '</div></div>' +
           '<details class="mxdet" ' + (detOpen ? 'open' : '') + ' ontoggle="mxDet(this.open)"><summary>Lihat rincian: produk terlaris, margin, kategori, pembayaran, arus kas</summary><div class="mxg2"><div class="mxc mxsc"><h3>Produk terlaris</h3><table class="mxt">' + head + '<tbody>' + top.map(li).join('') + '</tbody></table></div>' +
-          '<div class="mxc mxsc"><h3>Margin tertinggi</h3><table class="mxt">' + head + '<tbody>' + mg.slice(0, 3).map(li).join('') + '</tbody></table><h3 style="margin-top:12px">Margin terendah</h3><table class="mxt">' + head + '<tbody>' + mg.slice(-3).reverse().map(li).join('') + '</tbody></table></div></div>' + '<div class="mxg2">' + cat(q) + payCard(a) + '</div><div class="mxg2">' + cashCard(net, op, man) + '</div></details>';
+          '<div class="mxc mxsc"><h3>Margin tertinggi</h3><table class="mxt">' + head + '<tbody>' + mg.slice(0, 3).map(li).join('') + '</tbody></table><h3 style="margin-top:12px">Margin terendah</h3><table class="mxt">' + head + '<tbody>' + mg.slice(-3).reverse().map(li).join('') + '</tbody></table></div></div>' + '<div class="mxg2">' + cat(q) + payCard(a) + '</div><div class="mxg2">' + cashCard(net, op, man) + taxCard(a) + '</div></details>';
       }
       var CATS = { sembako: 'Sembako & Beras', snack: 'Makanan Ringan', minuman: 'Minuman & Susu', mandi: 'Kebutuhan Mandi', rokok_pulsa: 'Rokok & Pulsa' };
       function selisih(n) {
@@ -5424,30 +5704,48 @@
         rng(per).forEach(function (d) { c += d.date.toISOString().slice(0, 10) + ',' + [d.net, d.hpp, d.gp, d.op, d.man, d.np].map(Math.round).join(',') + '\n'; });
         var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([c], { type: 'text/csv' })); a.download = 'laporan-martexpress.csv'; a.click();
       };
-      function pyRow(o) {
-        var p = productById(o.pid), amt = rc(o) * o.cost, c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
-        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>Bayar ' + o.id + '</b> · ' + esc(SUP[p.category]) + ' · <b>' + R(amt) + '</b> &nbsp; Dibayar dari <select id="py-m" style="' + c + '"><option value="cash">Tunai dari laci kasir</option><option value="tf">Transfer / lainnya</option></select> &nbsp;<button class="mxbtn" onclick="mxPaySave(\'' + o.id + '\')">Catat pembayaran</button> <button class="mxbtn" style="background:#64748b" onclick="mxPay(null)">Batal</button></div></td></tr>';
+      function owed(o) { return o.paid ? 0 : Math.max(0, rc(o) * o.cost - (o.pd || 0)); }
+      function payRec(o, a, m) { o.pays = o.pays || []; o.pays.push({ ts: Date.now(), amt: a, via: m }); o.pd = (o.pd || 0) + a; if (owed(o) <= 0) { o.paid = true; o.payVia = m; o.payTs = Date.now(); } }
+      function cashOut(a, note) {
+        if (!shiftGuard()) return false; var kas = shiftStats().expectedCash;
+        if (a > kas) { showToast('Kas laci tidak cukup (' + formatRupiah(kas) + '). Pilih transfer atau tambah kas masuk dulu.', 'error'); return false; }
+        shift.cashLog = shift.cashLog || []; shift.cashLog.push({ type: 'out', amount: a, note: note, time: new Date(), supplier: true }); if (typeof renderShift === 'function') renderShift(); return true;
       }
+      function payForm(title, amt, fn, id) {
+        var c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
+        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>' + title + '</b> · sisa hutang <b>' + R(amt) + '</b> Dibayar Rp <input id="py-a" type="number" min="1" max="' + amt + '" value="' + amt + '" style="width:110px;' + c + '"> <select id="py-m" style="' + c + '"><option value="cash">Tunai dari laci kasir</option><option value="tf">Transfer / lainnya</option></select><button class="mxbtn" onclick="' + fn + '(\'' + id + '\')">Catat pembayaran</button><button class="mxbtn" style="background:#64748b" onclick="mxPay(null)">Batal</button></div></td></tr>';
+      }
+      function pyRow(o) { return payForm('Bayar ' + o.id + ' · ' + esc(SUP[productById(o.pid).category]), owed(o), 'mxPaySave', o.id); }
+      function hutBy(k) { return (X.po || []).reduce(function (t, o) { return SUP[productById(o.pid).category] === k ? t + owed(o) : t; }, 0); }
       window.mxPay = function (id) { payId = id; recvId = null; draw(); };
       window.mxPaySave = function (id) {
-        var o = X.po.find(function (x) { return x.id === id; }), amt = rc(o) * o.cost, m = $('py-m').value;
-        if (m === 'cash') {
-          if (!shiftGuard()) return;
-          var kas = shiftStats().expectedCash;
-          if (amt > kas) { showToast('Kas laci tidak cukup (' + formatRupiah(kas) + '). Pilih transfer atau tambah kas masuk dulu.', 'error'); return; }
-          shift.cashLog = shift.cashLog || [];
-          shift.cashLog.push({ type: 'out', amount: amt, note: 'Bayar supplier ' + o.id + ' – ' + SUP[productById(o.pid).category], time: new Date(), supplier: true });
-          if (typeof renderShift === 'function') renderShift();
-        }
-        o.paid = true; o.payVia = m; o.payTs = Date.now(); aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), id + ' · ' + R(amt)); payId = null; sv(); draw();
-        showToast(id + ' lunas' + (m === 'cash' ? ' — ' + R(amt) + ' dicatat sebagai kas keluar laci.' : ' (transfer).'), 'success');
+        var o = X.po.find(function (x) { return x.id === id; }), due = owed(o), a = Math.round(Number($('py-a').value) || 0), m = $('py-m').value;
+        if (a < 1 || a > due) { showToast('Jumlah dibayar harus 1 sampai ' + R(due) + '.', 'warn'); return; }
+        if (m === 'cash' && !cashOut(a, 'Bayar supplier ' + id + ' – ' + SUP[productById(o.pid).category])) return;
+        payRec(o, a, m); aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), id + ' · ' + R(a) + (owed(o) > 0 ? ' (cicilan, sisa ' + R(owed(o)) + ')' : ' (lunas)')); payId = null; sv(); draw();
+        showToast(id + (owed(o) > 0 ? ': cicilan ' + R(a) + ' dicatat, sisa ' + R(owed(o)) + '.' : ' lunas.') + (m === 'cash' ? ' Kas laci berkurang.' : ''), 'success');
       };
       function hutang() {
-        var h = (X.po || []).filter(function (o) { return rc(o) > 0 && !o.paid; }).reduce(function (t, o) { return t + rc(o) * o.cost; }, 0);
+        var h = (X.po || []).reduce(function (t, o) { return t + owed(o); }, 0);
         return Math.max(0, h - (X.adj || []).filter(function (r) { return r.reason === 'retur'; }).reduce(function (t, r) { return t + r.val; }, 0));
       }
+      var TAX_FREE = 500e6, PKP_LIMIT = 4.8e9, PPH = 0.005;
+      function pphOf(a) {
+        var before = X.ytd || 0, omzet = sum(a, 'net'), taxable = Math.max(0, before + omzet - TAX_FREE) - Math.max(0, before - TAX_FREE);
+        return { before: before, omzet: omzet, taxable: taxable, pph: Math.round(taxable * PPH) };
+      }
+      window.mxYtd = function (v) { X.ytd = Math.max(0, Number(v) || 0); sv(); draw(); };
+      function taxCard(a) {
+        var r = function (l, v, c) { return '<tr' + (c ? ' class="tot"' : '') + '><td>' + l + '</td><td class="r">' + v + '</td></tr>'; }, cap = '<small style="color:var(--mu);display:block;margin-top:8px">Estimasi untuk perencanaan, bukan perhitungan resmi. Pastikan angka dan aturan terbaru ke KPP atau konsultan pajak.</small>';
+        if (X.taxMode === 'non') {
+          var p = pphOf(a), proj = sum(rng(H.length), 'net') / H.length * 365, st = proj <= TAX_FREE ? 'Di bawah Rp500 juta: tidak kena PPh final.' : proj <= PKP_LIMIT ? 'Antara Rp500 juta dan Rp4,8 miliar: PPh final 0,5% dan tidak wajib PKP.' : 'Di atas Rp4,8 miliar: wajib dikukuhkan sebagai PKP.';
+          return '<div class="mxc mxsc"><h3>Pajak · Non-PKP (PPh final UMKM) · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('Omzet periode', R(p.omzet)) + r('Omzet kumulatif tahun ini sebelum periode <input type="number" min="0" step="1000000" value="' + p.before + '" onchange="mxYtd(this.value)" style="width:130px">', R(p.before)) + r('Bagian omzet kena PPh final (di atas Rp500 juta)', R(p.taxable)) + r('Estimasi PPh final 0,5%', R(p.pph), 1) + r('Proyeksi omzet setahun (rata-rata ' + H.length + ' hari)', R(proj)) + '</tbody></table><small style="display:block;margin-top:6px"><b>' + st + '</b></small>' + cap + '</div>';
+        }
+        var lim = Date.now() - per * 864e5, buy = (X.po || []).reduce(function (t, o) { return (o.ts || 0) >= lim ? t + rc(o) * o.cost : t; }, 0), out = sum(a, 'tax'), inn = buy * 0.11;
+        return '<div class="mxc mxsc"><h3>Pajak · PKP (PPN) · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('PPN keluaran (dari penjualan)', R(out)) + r('PPN masukan (estimasi 11% dari pembelian)', R(inn)) + r('PPN kurang bayar (estimasi)', R(Math.max(0, out - inn)), 1) + '</tbody></table><small style="color:var(--mu);display:block;margin-top:8px">PPN masukan hanya dapat dikreditkan bila supplier PKP dan ada faktur pajak.</small>' + cap + '</div>';
+      }
       function cashCard(net, op, man) {
-        var lim = Date.now() - per * 864e5, sp = (X.po || []).reduce(function (t, o) { var ts = o.payTs || o.ts || 0; return o.paid && ts >= lim ? t + rc(o) * o.cost : t; }, 0), k = net - sp - op - man;
+        var lim = Date.now() - per * 864e5, sp = (X.po || []).reduce(function (t, o) { if (o.pays) return t + o.pays.reduce(function (u, p) { return p.ts >= lim ? u + p.amt : u; }, 0); var ts = o.payTs || o.ts || 0; return o.paid && ts >= lim ? t + rc(o) * o.cost : t; }, 0), k = net - sp - op - man;
         var r = function (l, v, neg, c) { return '<tr' + (c ? ' class="tot"' : '') + '><td>' + l + '</td><td class="r ' + (neg ? 'dn' : (c ? (v >= 0 ? 'up' : 'dn') : '')) + '">' + (neg ? '− ' : '') + R(Math.abs(v)) + '</td></tr>'; };
         return '<div class="mxc mxsc"><h3>Arus kas · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('Uang masuk dari penjualan', net) + r('Bayar supplier', sp, 1) + r('Biaya operasional', op, 1) + r('Kas keluar manual', man, 1) + r('Kas bersih periode', k, 0, 1) + '</tbody></table>' +
           '<small style="color:var(--mu);display:block;margin-top:8px">Belum termasuk PPN dan kas masuk tambahan. Hutang ke supplier saat ini: <b>' + R(hutang()) + '</b>.</small></div>';
@@ -5506,7 +5804,7 @@
         if (!n) { showToast('Isi nama produk.', 'warn'); return; }
         if (!(pr > 0)) { showToast('Harga jual harus lebih dari 0.', 'warn'); return; }
         if (g('np-m') === '' || !(co >= 0)) { showToast('Isi harga modal (boleh 0).', 'warn'); return; }
-        var bc = g('np-b') || ('899' + String(Date.now()).slice(-10));
+        var bc = g('np-b') || eanFix('899' + String(Date.now()).slice(-9));
         if (PRODUCTS.some(function (p) { return p.barcode === bc; })) { showToast('Barcode sudah dipakai produk lain.', 'error'); return; }
         var p = { id: 'n' + Date.now().toString(36), barcode: bc, name: n, category: g('np-c'), price: pr, unit: g('np-u') || 'Pcs', stock: st };
         (X.np = X.np || []).push(JSON.parse(JSON.stringify(p))); p.imageUrl = editImg || ph(p); if (editImg) (X.ov = X.ov || {})[p.id] = { imageUrl: editImg }; editImg = null; PRODUCTS.push(p);
@@ -5522,7 +5820,7 @@
         return '<div class="mxc" style="margin-bottom:12px;border-color:#d97706"><h3>Ubah produk</h3><div class="mxg" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">' + F('Nama produk', 'ep-n', 'text', p.name) +
           '<label style="display:block"><small>Kategori</small><select id="ep-c" style="' + c + '">' + Object.keys(CATS).map(function (k) { return '<option value="' + k + '"' + (k === p.category ? ' selected' : '') + '>' + CATS[k] + '</option>'; }).join('') + '</select></label>' +
           F('Satuan', 'ep-u', 'text', p.unit || 'Pcs') + F('Harga jual (Rp)', 'ep-p', 'number', p.price, 'min="1"') + photoField(p.imageUrl) + '</div>' +
-          '<button class="mxbtn" onclick="mxSaveEdit()">Simpan perubahan</button> <button class="mxbtn" style="background:#64748b" onclick="mxEditP(null)">Batal</button> ' +
+          '<button class="mxbtn" onclick="mxSaveEdit()">Simpan perubahan</button> <button class="mxbtn" style="background:#64748b" onclick="mxEditP(null)">Batal</button> <button class="mxbtn" style="background:#475569" onclick="mxLabel(\'' + p.id + '\')">Cetak label</button> ' +
           (p.id.charAt(0) === 'n' ? '<button class="mxbtn" style="background:#e11d48;float:right" onclick="mxDelProd()">Hapus produk</button>' : '<small style="color:var(--mu)">Produk bawaan demo tidak bisa dihapus.</small>') + '</div>';
       }
       window.mxEditP = function (id) { editId = id; editImg = null; addOpen = false; draw(); if (id) $('mx-view').scrollTop = 0; };
@@ -5576,7 +5874,7 @@
         var c = h[0][1]; for (var i = 1; i < h.length; i++) if (h[i][0] <= t) c = h[i][1]; return c;
       }
       function aud(a, d) { X.audit = X.audit || []; X.audit.push({ ts: Date.now(), a: a, d: String(d || ''), r: ROLEL[X.role] || '' }); if (X.audit.length > 200) X.audit.shift(); sv(); }
-      var PINCB = null, rolePick = null, fails = 0, lockUntil = 0;
+      var PINCB = null, rolePick = 'kasir', fails = 0, lockUntil = 0, pinBuf = '', lockMode = false, RDESC = { kasir: 'Layar Kasir. Void, retur, dan kas keluar butuh PIN supervisor.', spv: 'Kasir, Dashboard, dan Inventori. Tidak melihat laba.', owner: 'Semua menu, termasuk Laporan laba, keamanan, dan cadangan data.' };
       function authBy(v) { return v === X.pins.spv ? 'Supervisor' : v === X.pins.owner ? 'Pemilik' : null; }
       function pinGate(title, cb) {
         if (X.pinOn === false || X.role === 'spv' || X.role === 'owner') { cb(); return; }
@@ -5617,13 +5915,13 @@
       };
       function sec() {
         var a = (X.audit || []).slice(-10).reverse(), on = X.pinOn !== false;
-        return '<details class="mxdet" ' + (secOpen ? 'open' : '') + ' ontoggle="mxSecT(this.open)"><summary>Keamanan &amp; data: PIN supervisor, cadangan, log aktivitas</summary><div class="mxg2">' +
-          '<div class="mxc"><h3>PIN akses &amp; otorisasi</h3><p style="margin:0 0 8px">Otorisasi aksi sensitif: <span class="mxtag ' + (on ? 'g' : 'a') + '">' + (on ? 'Aktif' : 'Nonaktif') + '</span></p><small style="color:var(--mu);display:block;margin-bottom:8px">Tiap peran masuk dengan PIN-nya sendiri. Kasir yang melakukan void, retur, kas keluar, stok opname, atau ubah harga perlu PIN Supervisor atau Pemilik.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mxbtn" onclick="mxPinToggle()">' + (on ? 'Matikan otorisasi' : 'Aktifkan otorisasi') + '</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'kasir\')">PIN Kasir</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'spv\')">PIN Supervisor</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'owner\')">PIN Pemilik</button><button class="mxbtn" style="background:#64748b" onclick="mxIdleCycle()">Kunci otomatis: ' + ((X.idle != null ? X.idle : 10) ? (X.idle != null ? X.idle : 10) + ' menit' : 'mati') + '</button></div></div>' +
+        return '<details class="mxdet" ' + (secOpen ? 'open' : '') + ' ontoggle="mxSecT(this.open)"><summary>Pengaturan &amp; keamanan: pajak, PIN, cadangan, log aktivitas</summary><div class="mxg2">' +
+          taxSet() + '<div class="mxc"><h3>PIN akses &amp; otorisasi</h3><p style="margin:0 0 8px">Otorisasi aksi sensitif: <span class="mxtag ' + (on ? 'g' : 'a') + '">' + (on ? 'Aktif' : 'Nonaktif') + '</span></p><small style="color:var(--mu);display:block;margin-bottom:8px">Tiap peran masuk dengan PIN-nya sendiri. Kasir yang melakukan void, retur, kas keluar, stok opname, atau ubah harga perlu PIN Supervisor atau Pemilik.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mxbtn" onclick="mxPinToggle()">' + (on ? 'Matikan otorisasi' : 'Aktifkan otorisasi') + '</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'kasir\')">PIN Kasir</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'spv\')">PIN Supervisor</button><button class="mxbtn" style="background:#64748b" onclick="mxPinSet(\'owner\')">PIN Pemilik</button><button class="mxbtn" style="background:#64748b" onclick="mxIdleCycle()">Kunci otomatis: ' + ((X.idle != null ? X.idle : 10) ? (X.idle != null ? X.idle : 10) + ' menit' : 'mati') + '</button></div></div>' +
           '<div class="mxc"><h3>Cadangan data</h3><small style="color:var(--mu);display:block;margin-bottom:8px">Unduh cadangan agar data bisa dipulihkan atau dipindah ke perangkat lain.</small><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="mxbtn" onclick="mxBackup()">Unduh cadangan</button><span class="mxfile"><button class="mxbtn" style="background:#64748b">Pulihkan dari file</button><input type="file" accept=".json,application/json" onchange="mxRestore(this)"></span></div></div>' + simCard() + '</div>' +
           '<div class="mxc mxsc"><h3>Log aktivitas (10 terakhir)</h3>' + (a.length ? '<table class="mxt"><thead><tr><th>Waktu</th><th>Peran</th><th>Aktivitas</th><th>Keterangan</th></tr></thead><tbody>' + a.map(function (e) { return '<tr><td>' + new Date(e.ts).toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td><td>' + esc(e.r || '-') + '</td><td>' + esc(e.a) + '</td><td>' + esc(e.d) + '</td></tr>'; }).join('') + '</tbody></table>' : '<small style="color:var(--mu)">Belum ada aktivitas tercatat.</small>') + '</div></details>';
       }
       function dev() {
-        var L = [['Server &amp; multi-perangkat', 'Database terpusat, sinkron antar kasir dan cabang, pemilik memantau dari jauh, cadangan otomatis.'], ['Pengguna &amp; keamanan', 'Akun terpisah per kasir dengan kata sandi atau PIN yang tersimpan terenkripsi, serta masuk dengan kartu atau sidik jari.'], ['Pembelian', 'Satuan beli (dus ke pcs), harga grosir bertingkat, cicilan ke supplier, retur per faktur.'], ['Stok', 'Kadaluarsa per batch (yang paling dekat dijual lebih dulu), stok per rak atau gudang, cetak label barcode, terima barang dengan scan.'], ['Pembayaran &amp; pajak', 'QRIS dinamis dan mesin EDC terintegrasi, e-faktur dan pelaporan pajak, struk digital lewat WhatsApp.'], ['Laporan', 'Perbandingan bulanan dan antar cabang, prediksi stok dari riwayat penjualan nyata yang lebih panjang.']];
+        var L = [['Server &amp; multi-perangkat', 'Database terpusat, sinkron antar kasir dan cabang, pemilik memantau dari jauh, cadangan otomatis.'], ['Pengguna &amp; keamanan', 'Akun terpisah per kasir dengan kata sandi atau PIN yang tersimpan terenkripsi, serta masuk dengan kartu atau sidik jari.'], ['Pembelian', 'Satuan beli (dus ke pcs), harga grosir bertingkat, cicilan ke supplier, retur per faktur.'], ['Stok', 'Kadaluarsa per batch (yang paling dekat dijual lebih dulu), stok per rak atau gudang, terima barang dengan scan.'], ['Pembayaran &amp; pajak', 'QRIS dinamis dan mesin EDC terintegrasi, e-faktur dan pelaporan pajak, struk digital lewat WhatsApp.'], ['Laporan', 'Perbandingan bulanan dan antar cabang, prediksi stok dari riwayat penjualan nyata yang lebih panjang.']];
         return '<details class="mxdet" ' + (devOpen ? 'open' : '') + ' ontoggle="mxDevT(this.open)"><summary>Pengembangan yang bisa dilakukan</summary><div class="mxc" style="margin-bottom:12px"><h3>Fitur yang saat ini versi demo</h3><p class="mxsub" style="margin:0 0 8px">Berjalan penuh di demo ini. Untuk toko nyata, bagian berikut perlu server demi keamanan dan keandalan:</p><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Login, PIN, dan peran</b><br><small style="color:var(--mu)">Saat ini tersimpan di browser sehingga bisa dilihat atau diubah pengguna. Versi nyata: verifikasi, enkripsi, dan hak akses dijalankan di server.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Log aktivitas</b><br><small style="color:var(--mu)">Saat ini bisa diubah lewat browser. Versi nyata: dicatat di server dan tidak bisa diubah.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Penyimpanan data</b><br><small style="color:var(--mu)">Saat ini hanya di browser satu perangkat. Versi nyata: database terpusat yang sinkron antar kasir dan cabang, dengan cadangan otomatis terjadwal.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Cadangan dan pemulihan</b><br><small style="color:var(--mu)">Saat ini manual lewat file. Versi nyata: otomatis dan tersimpan aman di luar perangkat toko.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Kunci layar otomatis</b><br><small style="color:var(--mu)">Saat ini hanya pengaman tampilan. Versi nyata: sesi kedaluwarsa diatur server.</small></div><div style="padding:6px 0;border-top:1px solid var(--bd)"><b>Simulasi penjualan dan riwayat 13 hari</b><br><small style="color:var(--mu)">Data contoh untuk presentasi, tidak ada di versi nyata.</small></div></div><div class="mxc"><p class="mxsub" style="margin:0 0 8px">Pengembangan lanjutan yang belum ada di demo ini:</p>' + L.map(function (x) { return '<div style="padding:6px 0;border-top:1px solid var(--bd)"><b>' + x[0] + '</b><br><small style="color:var(--mu)">' + x[1] + '</small></div>'; }).join('') + '</div></details>';
       }
       var ROLES = { kasir: ['kasir'], spv: ['kasir', 'dash', 'inv'], owner: ['kasir', 'dash', 'inv', 'lap'] }, ROLEL = { kasir: 'Kasir', spv: 'Supervisor', owner: 'Pemilik' };
@@ -5633,24 +5931,43 @@
         var l = X.role ? ROLEL[X.role] : '-'; $('mx-role-l').textContent = l; $('mx-ddr').textContent = X.role ? 'Peran: ' + l : 'Pilih peran'; document.querySelectorAll('.mxrl2').forEach(function (e) { e.textContent = l; });
       }
       function resetUI() { poDraft = []; cardId = null; PINCB = null; $('mx-pin').hidden = true; $('mx-ddm').hidden = true; addOpen = false; editId = null; editImg = null; recvId = null; payId = null; adOpen = false; invEdit = false; invTab = 'stock'; }
-      window.mxRoleBack = function () { rolePick = null; $('mx-role-s2').hidden = true; $('mx-role-s1').hidden = false; };
-      window.mxRolePick = function () { resetUI(); mxRoleBack(); $('mx-role-x').hidden = !X.role; $('mx-role-out').hidden = !X.role; $('mx-role').hidden = false; };
-      window.mxRoleChoose = function (r) { rolePick = r; $('mx-role-s1').hidden = true; $('mx-role-s2').hidden = false; $('mx-role-t2').textContent = 'Masuk sebagai ' + ROLEL[r]; $('mx-role-i').value = ''; $('mx-role-e').textContent = ''; setTimeout(function () { $('mx-role-i').focus(); }, 50); };
+      function loginDraw() {
+        var r = rolePick || 'kasir', n = X.pins ? X.pins[r].length : 4;
+        document.querySelectorAll('.mxlg-tab').forEach(function (t) { t.classList.toggle('on', t.dataset.r === r); });
+        $('mx-lg-desc').textContent = RDESC[r]; var DEF = { kasir: '1111', spv: '2222', owner: '3333' }, hh = $('mx-lg-hint'), isDef = X.pins && X.pins[r] === DEF[r]; hh.className = isDef ? '' : 'x'; hh.textContent = isDef ? 'PIN demo ' + ROLEL[r] + ': ' + DEF[r] : 'PIN sudah diubah oleh Pemilik'; $('mx-lg-title').textContent = lockMode ? 'Layar terkunci' : 'Masuk';
+        $('mx-lg-dots').innerHTML = new Array(n + 1).join('<i></i>').replace(/<i><\/i>/g, function () { return '<i></i>'; });[].forEach.call($('mx-lg-dots').children, function (d, i) { if (i < pinBuf.length) d.className = 'f'; });
+        $('mx-lg-date').textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      }
+      window.mxRoleBack = function () { rolePick = rolePick || 'kasir'; pinBuf = ''; $('mx-role-e').textContent = ''; loginDraw(); };
+      window.mxRolePick = function () { resetUI(); lockMode = false; rolePick = X.role || 'kasir'; $('mx-role-x').hidden = !X.role; $('mx-role-out').hidden = !X.role; mxRoleBack(); $('mx-role').hidden = false; };
+      window.mxRoleChoose = function (r) { rolePick = r; pinBuf = ''; $('mx-role-e').textContent = ''; loginDraw(); };
+      window.mxKey = function (k) {
+        if (k === 'ok') { mxRoleOk(); return; }
+        if (k === 'del') pinBuf = pinBuf.slice(0, -1); else if (pinBuf.length < 6) pinBuf += k;
+        $('mx-role-e').textContent = ''; loginDraw(); if (k !== 'del' && pinBuf.length === X.pins[rolePick].length) mxRoleOk();
+      };
       window.mxRoleOk = function () {
         var now = Date.now(), e = $('mx-role-e');
-        if (now < lockUntil) { e.textContent = 'Terlalu banyak percobaan. Coba lagi ' + Math.ceil((lockUntil - now) / 1000) + ' detik.'; return; }
-        if ($('mx-role-i').value === X.pins[rolePick]) { fails = 0; mxSetRole(rolePick); return; }
-        fails++; aud('Login gagal', ROLEL[rolePick]); $('mx-role-i').value = '';
+        if (now < lockUntil) { e.textContent = 'Terlalu banyak percobaan. Coba lagi ' + Math.ceil((lockUntil - now) / 1000) + ' detik.'; pinBuf = ''; loginDraw(); return; }
+        if (!pinBuf) { e.textContent = 'Masukkan PIN dulu.'; return; }
+        if (pinBuf === X.pins[rolePick]) { fails = 0; mxSetRole(rolePick); return; }
+        fails++; aud('Login gagal', ROLEL[rolePick]); pinBuf = ''; loginDraw();
+        var d = $('mx-lg-dots'); d.classList.remove('sh'); void d.offsetWidth; d.classList.add('sh');
         if (fails >= 5) { fails = 0; lockUntil = now + 30000; e.textContent = 'Terlalu banyak percobaan. Coba lagi 30 detik.'; } else e.textContent = 'PIN salah (' + fails + '/5).';
       };
       window.mxSetRole = function (r) {
-        resetUI(); X.role = r; $('mx-role').hidden = true; mxRoleBack(); try { sessionStorage.setItem('mx-sess', r); } catch (e) { }
+        resetUI(); lockMode = false; X.role = r; $('mx-role').hidden = true; mxRoleBack(); try { sessionStorage.setItem('mx-sess', r); } catch (e) { }
         sv(); aud('Masuk sebagai ' + ROLEL[r], ''); applyRole(); mxView('kasir'); showToast('Masuk sebagai ' + ROLEL[r] + '.', 'success');
       };
       window.mxLogout = function () {
-        aud('Keluar', ''); try { sessionStorage.removeItem('mx-sess'); } catch (e) { } resetUI(); X.role = undefined; applyRole(); mxView('kasir');
-        mxRoleBack(); $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false;
+        aud('Keluar', ''); try { sessionStorage.removeItem('mx-sess'); } catch (e) { } resetUI(); X.role = undefined; lockMode = false; applyRole(); mxView('kasir');
+        rolePick = 'kasir'; mxRoleBack(); $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false;
       };
+      document.addEventListener('keydown', function (e) {
+        if ($('mx-role').hidden) return;
+        if (/^\d$/.test(e.key)) mxKey(e.key); else if (e.key === 'Backspace') mxKey('del'); else if (e.key === 'Enter') mxKey('ok'); else return;
+        e.preventDefault(); e.stopPropagation();
+      }, true);
       function stockCard() {
         var p = productById(cardId); if (!p) return ''; var ev = [];
         transactions.forEach(function (t) {
@@ -5661,11 +5978,19 @@
         (mxStockLog || []).forEach(function (e) { if (e.name === p.name) ev.push({ t: new Date(e.time), d: e.diff, k: e.kind }); });
         ev.sort(function (a, b) { return b.t - a.t; }); var bal = p.stock;
         var rows = ev.slice(0, 30).map(function (e) { var r = '<tr><td>' + e.t.toLocaleString('id-ID', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</td><td>' + esc(e.k) + '</td><td class="r ' + (e.d < 0 ? 'dn' : 'up') + '">' + (e.d > 0 ? '+' : '') + e.d + '</td><td class="r">' + bal + '</td></tr>'; bal -= e.d; return r; }).join('');
-        return '<div class="mxc mxsc" style="margin-bottom:12px;border-color:#059669"><h3>Kartu stok · ' + esc(p.name) + ' <button class="mxbtn" style="float:right;text-transform:none;background:#64748b" onclick="mxCard(null)">Tutup</button></h3>' +
+        return '<div class="mxc mxsc" style="margin-bottom:12px;border-color:#059669"><h3>Kartu stok · ' + esc(p.name) + ' <button class="mxbtn" style="float:right;text-transform:none;background:#64748b" onclick="mxCard(null)">Tutup</button><button class="mxbtn" style="float:right;text-transform:none;background:#475569;margin-right:6px" onclick="mxLabel(\'' + p.id + '\')">Cetak label</button></h3>' +
           (rows ? '<table class="mxt"><thead><tr><th>Waktu</th><th>Keterangan</th><th class="r">Jumlah</th><th class="r">Saldo</th></tr></thead><tbody>' + rows + '</tbody></table>' : '<small style="color:var(--mu)">Belum ada pergerakan stok tercatat.</small>') + '</div>';
       }
       window.mxCard = function (id) { cardId = id; draw(); if (id) $('mx-view').scrollTop = 0; };
       /* Simulasi penjualan untuk presentasi */
+      function taxSet() {
+        var non = X.taxMode === 'non';
+        return '<div class="mxc"><h3>Status pajak toko</h3><div class="mxseg" style="margin-bottom:8px"><button class="' + (non ? '' : 'on') + '" onclick="mxTaxSet(\'pkp\')">PKP</button><button class="' + (non ? 'on' : '') + '" onclick="mxTaxSet(\'non\')">Non-PKP</button></div><small style="color:var(--mu);display:block">' + (non ? 'Non-PKP: kasir dan struk tanpa PPN. Laporan memuat estimasi PPh final UMKM 0,5%.' : 'PKP: harga ditambah PPN 11% di kasir dan struk. Laporan memuat PPN keluaran dan masukan.') + ' Berlaku untuk transaksi berikutnya; struk lama tidak berubah.</small></div>';
+      }
+      window.mxTaxSet = function (m) {
+        if (X.taxMode === m || (m === 'pkp' && !X.taxMode)) return; X.taxMode = m; window.mxTaxMode = m; aud('Ubah status pajak', m === 'non' ? 'Non-PKP' : 'PKP'); sv();
+        try { renderCart(); } catch (e) { } draw(); showToast('Status pajak: ' + (m === 'non' ? 'Non-PKP (tanpa PPN).' : 'PKP (PPN 11%).'), 'success');
+      };
       function simCard() {
         var n = transactions.filter(function (t) { return t.sim; }).length;
         return '<div class="mxc"><h3>Simulasi penjualan</h3><small style="color:var(--mu);display:block;margin-bottom:8px">Menambah transaksi contoh hari ini. Stok, Dashboard, dan laporan ikut bergerak.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mxbtn" onclick="mxSim(5)">+5 transaksi</button><button class="mxbtn" onclick="mxSim(20)">+20 transaksi</button><button class="mxbtn" style="background:#64748b" onclick="mxSimClear()">Hapus simulasi (' + n + ')</button></div></div>';
@@ -5692,10 +6017,63 @@
       /* Kunci layar otomatis */
       var lastAct = Date.now();
       ['mousemove', 'keydown', 'click', 'touchstart'].forEach(function (ev) { document.addEventListener(ev, function () { lastAct = Date.now(); }, true); });
-      function mxLock() { var r = X.role; resetUI(); $('mx-role-x').hidden = true; $('mx-role-out').hidden = false; mxRoleBack(); $('mx-role').hidden = false; mxRoleChoose(r); $('mx-role-t2').textContent = 'Layar terkunci · PIN ' + ROLEL[r]; }
+      function mxLock() { var r = X.role; resetUI(); lockMode = true; rolePick = r; pinBuf = ''; $('mx-role-e').textContent = ''; $('mx-role-x').hidden = true; $('mx-role-out').hidden = false; loginDraw(); $('mx-role').hidden = false; }
       setInterval(function () { var m = X.idle != null ? X.idle : 10; if (!m || !X.role || !$('mx-role').hidden) return; if (Date.now() - lastAct > m * 60000) { aud('Layar terkunci', ''); mxLock(); } }, 5000);
       window.mxIdleSet = function (m) { X.idle = m; sv(); draw(); };
       window.mxIdleCycle = function () { var o = [0, 2, 5, 10], c = X.idle != null ? X.idle : 10; mxIdleSet(o[(o.indexOf(c) + 1) % o.length]); };
+      function eanChk(d) { var t = 0; for (var i = 0; i < 12; i++) t += (+d[i]) * (i % 2 ? 3 : 1); return (10 - t % 10) % 10; }
+      function eanFix(d12) { return d12 + eanChk(d12); }
+      function ean13(code) {
+        if (!/^\d{13}$/.test(code)) return '';
+        var L = ['0001101', '0011001', '0010011', '0111101', '0100011', '0110001', '0101111', '0111011', '0110111', '0001011'], G = ['0100111', '0110011', '0011011', '0100001', '0011101', '0111001', '0000101', '0010001', '0001001', '0010111'],
+          R = ['1110010', '1100110', '1101100', '1000010', '1011100', '1001110', '1010000', '1000100', '1001000', '1110100'], P = ['LLLLLL', 'LLGLGG', 'LLGGLG', 'LLGGGL', 'LGLLGG', 'LGGLLG', 'LGGGLL', 'LGLGLG', 'LGLGGL', 'LGGLGL'];
+        var d = code.split('').map(Number), b = '101', i;
+        for (i = 1; i <= 6; i++) b += (P[d[0]].charAt(i - 1) === 'L' ? L : G)[d[i]];
+        b += '01010'; for (i = 7; i <= 12; i++) b += R[d[i]]; b += '101';
+        var svg = '<svg viewBox="0 0 113 64" style="width:100%;height:auto;display:block" xmlns="http://www.w3.org/2000/svg"><rect width="113" height="64" fill="#fff"/>', st = -1;
+        for (i = 0; i <= b.length; i++) {
+          if (b.charAt(i) === '1' && st < 0) st = i;
+          if ((b.charAt(i) !== '1') && st >= 0) { var g = st < 3 || (st >= 45 && st < 50) || st >= 92; svg += '<rect x="' + (9 + st) + '" y="2" width="' + (i - st) + '" height="' + (g ? 54 : 48) + '" fill="#000"/>'; st = -1; }
+        }
+        return svg + '<text x="2" y="62" font-size="8" font-family="monospace">' + code.charAt(0) + '</text><text x="12" y="62" font-size="8" font-family="monospace" textLength="39" lengthAdjust="spacing">' + code.slice(1, 7) + '</text><text x="59" y="62" font-size="8" font-family="monospace" textLength="39" lengthAdjust="spacing">' + code.slice(7) + '</text></svg>';
+      }
+      window.mxLabel = function (id) {
+        $('lb-p').innerHTML = PRODUCTS.map(function (p) { return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join(''); if (id) $('lb-p').value = id;
+        $('lb-n').value = 6; mxLabelUpd(); document.body.classList.add('mxlb'); $('mx-label').hidden = false;
+      };
+      window.mxLabelUpd = function () {
+        var p = productById($('lb-p').value), n = Math.max(1, Math.min(60, Math.floor(Number($('lb-n').value) || 1)));
+        var one = '<div class="mxlb-lb" style="background:#fff;color:#000;border:1px dashed #999;border-radius:4px;padding:6px 8px;text-align:center"><div style="font:700 11px/1.2 sans-serif;height:26px;overflow:hidden">' + esc(p.name) + '</div><div style="font:800 17px/1.3 monospace">' + R(p.price) + '</div>' + (ean13(p.barcode) || '<div style="font:12px monospace;padding:14px 0">' + esc(p.barcode) + '</div>') + '</div>';
+        $('lb-prev').innerHTML = new Array(n + 1).join(one);
+      };
+      window.mxLabelPrint = function () { var p = productById($('lb-p').value); aud('Cetak label barcode', p.name + ' ×' + $('lb-n').value); window.print(); };
+      window.mxLabelClose = function () { $('mx-label').hidden = true; document.body.classList.remove('mxlb'); };
+      function waText(r) {
+        var F = function (v) { return formatRupiah(Math.round(v)); }, L = [], d = new Date(r.date), line = '------------------------';
+        L.push('*MARTEXPRESS MINIMARKET*', 'Cabang Cikarang Utama', line, 'No: ' + r.number, 'Tanggal: ' + d.toLocaleString('id-ID'), 'Kasir: ' + r.cashier + (r.member ? ' · Member: ' + r.member.name : ''));
+        if (r.voided) L.push('*** VOID / DIBATALKAN ***');
+        L.push(line);
+        r.items.forEach(function (i) { L.push(i.name, '  ' + i.quantity + ' ' + i.unit + ' x ' + F(i.price) + ' = ' + F(i.price * i.quantity)); if (i.disc > 0) L.push('  Diskon item: -' + F(i.disc)); });
+        L.push(line, 'Subtotal: ' + F(r.subtotal));
+        if (r.itemDiscount > 0) L.push('Diskon item: -' + F(r.itemDiscount));
+        if (r.voucherAmount > 0) L.push('Voucher ' + r.voucherCode + ': -' + F(r.voucherAmount));
+        if (r.discount > 0) L.push('Diskon member: -' + F(r.discount));
+        if (r.pointsUsed > 0) L.push('Tukar poin (' + r.pointsUsed + '): -' + F(r.redeemAmount));
+        if (r.tax > 0) L.push('PPN 11%: ' + F(r.tax));
+        if (r.rounding) L.push('Pembulatan: ' + (r.rounding > 0 ? '+' : '-') + F(Math.abs(r.rounding)));
+        L.push('*TOTAL: ' + F(r.total) + '*', 'Bayar: ' + r.methodLabel + (r.method === 'cash' ? ' ' + F(r.cashPaid) + ' (kembali ' + F(r.change) + ')' : '') + (r.ref ? ' · Ref ' + r.ref : ''));
+        if (mxSaving(r) > 0) L.push('Anda hemat ' + F(mxSaving(r)) + '!');
+        if (r.member) L.push('Poin didapat: +' + r.earnedPoints);
+        L.push('Terima kasih sudah berbelanja!'); return L.join('\n');
+      }
+      function waNo(v) { var d = String(v || '').replace(/\D/g, ''); if (!d) return ''; if (d.charAt(0) === '0') d = '62' + d.slice(1); else if (d.charAt(0) === '8') d = '62' + d; return /^62\d{8,13}$/.test(d) ? d : null; }
+      window.mxShareWA = function () { var r = mxCurrentReceipt; if (!r) return; $('wa-t').value = waText(r); $('wa-e').textContent = ''; $('mx-wa').hidden = false; setTimeout(function () { $('wa-no').focus(); }, 50); };
+      window.mxWAGo = function () {
+        var n = waNo($('wa-no').value); if (n === null) { $('wa-e').textContent = 'Nomor tidak valid. Contoh: 081234567890.'; return; }
+        window.open('https://wa.me/' + n + '?text=' + encodeURIComponent($('wa-t').value), '_blank');
+        aud('Kirim struk WhatsApp', mxCurrentReceipt.number + (n ? ' · ' + n.slice(0, 5) + '…' : '')); $('mx-wa').hidden = true; showToast('Struk dibuka di WhatsApp.', 'success');
+      };
+      window.mxWACopy = function () { var t = $('wa-t'); t.select(); try { if (navigator.clipboard) navigator.clipboard.writeText(t.value); else document.execCommand('copy'); } catch (e) { document.execCommand('copy'); } showToast('Teks struk disalin.', 'success'); };
       function place() { var h = document.querySelector('header').getBoundingClientRect().bottom, b = document.querySelector('.mxbar'); $('mx-view').style.top = Math.max(h, b && b.offsetParent ? b.getBoundingClientRect().bottom : 0) + 'px'; }
       window.addEventListener('resize', place);
       function draw() { var fn = ({ dash: dash, inv: inv, lap: lap })[view]; if (fn) $('mx-view').innerHTML = fn(); }
@@ -5740,19 +6118,14 @@
         aud('Terima PO (semua sisa)', g + ' · ' + n + ' barang'); sv(); renderProducts(); draw(); showToast(g + ': ' + n + ' barang diterima.', 'success');
       };
       window.mxPayAll = function (g) { payId = g; recvId = null; draw(); };
-      function pyRowG(g, amt) {
-        var c = 'padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--cd);color:var(--tx)';
-        return '<tr><td colspan="8" style="background:var(--bg)"><div class="mxrow"><b>Bayar ' + g + '</b> · <b>' + R(amt) + '</b> <select id="py-m" style="' + c + '"><option value="cash">Tunai dari laci kasir</option><option value="tf">Transfer / lainnya</option></select><button class="mxbtn" onclick="mxPayGSave(\'' + g + '\')">Catat pembayaran</button><button class="mxbtn" style="background:#64748b" onclick="mxPay(null)">Batal</button></div></td></tr>';
-      }
+      function pyRowG(g, amt) { return payForm('Bayar ' + g, amt, 'mxPayGSave', g); }
       window.mxPayGSave = function (g) {
-        var L = (X.po || []).filter(function (o) { return (o.grp || o.id) === g && rc(o) > 0 && !o.paid; }), amt = L.reduce(function (t, o) { return t + rc(o) * o.cost; }, 0), m = $('py-m').value;
-        if (m === 'cash') {
-          if (!shiftGuard()) return; var kas = shiftStats().expectedCash;
-          if (amt > kas) { showToast('Kas laci tidak cukup (' + formatRupiah(kas) + '). Pilih transfer atau tambah kas masuk dulu.', 'error'); return; }
-          shift.cashLog = shift.cashLog || []; shift.cashLog.push({ type: 'out', amount: amt, note: 'Bayar supplier ' + g + ' – ' + SUP[productById(L[0].pid).category], time: new Date(), supplier: true }); if (typeof renderShift === 'function') renderShift();
-        }
-        L.forEach(function (o) { o.paid = true; o.payVia = m; o.payTs = Date.now(); }); aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), g + ' · ' + R(amt)); payId = null; sv(); draw();
-        showToast(g + ' lunas' + (m === 'cash' ? ' — ' + R(amt) + ' dicatat sebagai kas keluar laci.' : ' (transfer).'), 'success');
+        var L = (X.po || []).filter(function (o) { return (o.grp || o.id) === g && owed(o) > 0; }), due = L.reduce(function (t, o) { return t + owed(o); }, 0), a = Math.round(Number($('py-a').value) || 0), m = $('py-m').value;
+        if (a < 1 || a > due) { showToast('Jumlah dibayar harus 1 sampai ' + R(due) + '.', 'warn'); return; }
+        if (m === 'cash' && !cashOut(a, 'Bayar supplier ' + g + ' – ' + SUP[productById(L[0].pid).category])) return;
+        var rest = a; L.forEach(function (o) { var x = Math.min(rest, owed(o)); if (x > 0) { payRec(o, x, m); rest -= x; } });
+        var left = due - a; aud('Bayar supplier ' + (m === 'cash' ? 'tunai' : 'transfer'), g + ' · ' + R(a) + (left > 0 ? ' (cicilan, sisa ' + R(left) + ')' : ' (lunas)')); payId = null; sv(); draw();
+        showToast(g + (left > 0 ? ': cicilan ' + R(a) + ' dicatat, sisa ' + R(left) + '.' : ' lunas.') + (m === 'cash' ? ' Kas laci berkurang.' : ''), 'success');
       };
       function rc(o) { return o.recv != null ? o.recv : (o.st === 'Diterima' ? o.qty : 0); }
       function rvRow(o) {
@@ -5791,7 +6164,7 @@
       };
       ini(); delete X.role;
       var ss = null; try { ss = sessionStorage.getItem('mx-sess'); } catch (e) { }
-      if (ss && ROLES[ss]) X.role = ss; else { $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false; }
+      if (ss && ROLES[ss]) X.role = ss; else { rolePick = 'kasir'; $('mx-role-x').hidden = true; $('mx-role-out').hidden = true; $('mx-role').hidden = false; loginDraw(); }
       applyRole();
     })();
   </script>

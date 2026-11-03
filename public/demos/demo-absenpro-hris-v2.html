@@ -1683,13 +1683,22 @@
         function shiftFor(div) { var c = cfg(), k = (c.dv || {})[String(div).replace('Divisi ', '')], s = SHP[k]; return s ? { 'in': s['in'], late: s.late, out: s.out, name: s.name } : { 'in': c.w['in'], late: c.w.late, out: c.w.out, name: 'Reguler' } }
         function shiftOf(id) { var e = EMP.filter(function (x) { return x[0] === id })[0]; return shiftFor(e ? e[3] : 'Digital') }
         function lateNote() { var s = {}; EMP.forEach(function (e) { s[shiftFor(e[3]).late] = 1 }); var k = Object.keys(s); return k.length === 1 ? 'setelah ' + k[0] : 'sesuai shift' }
+        var EK = 'absenpro-v2-emp', EMP0 = EMP.map(function (r) { return r.slice() }), LOCK = { dina: 1, hendra: 1 }, DIVS = ['Digital', 'Keuangan', 'SDM', 'Penjualan', 'Layanan'];
+        function empStore() { var s = { add: [], off: [], div: {}, log: [] }; try { var r = JSON.parse(localStorage.getItem(EK)); if (r && typeof r === 'object') { if (Array.isArray(r.add)) s.add = r.add.filter(function (a) { return a && /^[a-z][a-z0-9]{1,15}$/.test(a.id) && typeof a.name === 'string' && a.name.length <= 60 && typeof a.pos === 'string' && a.pos.length <= 40 && DIVS.indexOf(a.div) > -1 && !EMP0.some(function (e) { return e[0] === a.id }) }); var ids = EMP0.map(function (e) { return e[0] }).concat(s.add.map(function (a) { return a.id })); if (Array.isArray(r.off)) s.off = r.off.filter(function (i) { return ids.indexOf(i) > -1 && !LOCK[i] }); if (r.div && typeof r.div === 'object') for (var i in r.div) if (ids.indexOf(i) > -1 && !LOCK[i] && DIVS.indexOf(r.div[i]) > -1) s.div[i] = r.div[i]; if (Array.isArray(r.log)) s.log = r.log.filter(function (x) { return x && typeof x.t === 'number' && typeof x.by === 'string' && typeof x.txt === 'string' }).slice(0, 20) } } catch (e) { } return s }
+        function empSave(s) { try { localStorage.setItem(EK, JSON.stringify(s)); return true } catch (e) { return false } }
+        function empApply() { var s = empStore(); EMP.length = 0; EMP0.concat(s.add.map(function (a) { return [a.id, a.name, a.pos, a.div, 'Belum absen', '\u2013'] })).forEach(function (e) { if (s.off.indexOf(e[0]) > -1) return; var r = e.slice(); if (s.div[r[0]]) r[3] = s.div[r[0]]; EMP.push(r) }) }
+        function empAll() { var s = empStore(); return EMP0.map(function (e) { return { id: e[0], name: e[1], pos: e[2], div: s.div[e[0]] || e[3], div0: e[3], off: s.off.indexOf(e[0]) > -1, lock: !!LOCK[e[0]], added: false } }).concat(s.add.map(function (a) { return { id: a.id, name: a.name, pos: a.pos, div: s.div[a.id] || a.div, div0: a.div, off: s.off.indexOf(a.id) > -1, lock: false, added: true } })) }
+        function isLive(id) { return ['arzha', 'raka', 'salsa', 'dina', 'hendra'].indexOf(id) > -1 || empStore().add.some(function (a) { return a.id === id }) }
+        empApply();
+        function resetAll() { var ks = [], i; for (i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i)); var n = 0; ks.forEach(function (k) { if (k && k.indexOf('absenpro-') === 0 && !/lang|theme|session/.test(k)) { localStorage.removeItem(k); n++ } }); try { sessionStorage.setItem('ap-reset', '1') } catch (e) { } try { localStorage.setItem('absenpro-v2-reset', String(Date.now())) } catch (e) { } return n }
+        window.addEventListener('storage', function (e) { if (e.key === 'absenpro-v2-reset' && e.newValue) location.reload() });
         function hm(s) { var p = String(s).split(':'); return (+p[0]) * 60 + (+p[1] || 0) }
         function rcImg(r) { return r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<br><img class="rl-rc" alt="Foto struk" src="' + r.rc + '">' : '' }
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
         function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
-        function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } }) }
+        function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
@@ -1741,7 +1750,7 @@
           + '.rl-rc{width:64px;height:64px;object-fit:cover;border-radius:10px;margin-top:6px;border:1px solid var(--rl-line)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, hm: hm, shiftFor: shiftFor, shiftOf: shiftOf };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
       })(window);
 
   </script>
@@ -1764,6 +1773,80 @@
 
     #rbPv[hidden] {
       display: none
+    }
+  </style>
+  <style>
+    .camv {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 1/1;
+      width: min(100%, 230px);
+      margin: 8px auto
+    }
+
+    .camv video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(-1);
+      display: block
+    }
+
+    .camg {
+      position: absolute;
+      inset: 12% 20%;
+      border: 2px dashed rgba(255, 255, 255, .7);
+      border-radius: 50%;
+      pointer-events: none
+    }
+
+    .camb {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .camb .btn {
+      flex: 1;
+      margin: 0
+    }
+
+    #selfT {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--line);
+      display: block;
+      margin: 6px auto
+    }
+
+    #selfT[hidden] {
+      display: none
+    }
+
+    .sth {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-left: 8px;
+      border: 1px solid var(--line)
+    }
+
+    .sth[hidden] {
+      display: none
+    }
+
+    #sheet .sb {
+      max-height: 94vh;
+      overflow: auto
+    }
+
+    #fv[hidden] {
+      display: none !important
     }
   </style>
 </head>
@@ -1814,9 +1897,22 @@
               font-family="Figtree">38 m dari titik absen</text><text id="mapR" x="150" y="112" text-anchor="middle"
               font-size="10" fill="var(--mute)" font-family="Figtree">Titik absen · radius 100 m</text>
           </svg></div>
-        <button class="fv" id="fv"><span class="fvi"></span><span id="fvt">Verifikasi wajah</span></button>
+        <button class="fv" id="fv"><span class="fvi"></span><span id="fvt">Ambil selfie</span></button>
+        <div id="cam" hidden>
+          <div class="camv"><video id="camV" playsinline muted autoplay
+              aria-label="Pratinjau kamera depan"></video><span class="camg" aria-hidden="true"></span></div>
+          <div class="camb"><button class="btn" id="camSnap" type="button">Ambil foto</button><button class="btn"
+              id="camX" type="button" style="background:var(--chip);color:var(--ink)">Batal</button></div>
+        </div>
+        <div id="camFb" hidden>
+          <p class="sm" id="camMsg" role="alert"></p>
+          <div class="camb"><button class="btn" id="camRetry" type="button"
+              style="background:var(--chip);color:var(--ink)">Coba lagi</button></div>
+        </div>
+        <img id="selfT" alt="Selfie absen" hidden>
         <p class="sm" id="mapnote" style="margin-top:4px"></p>
-        <p class="sm" style="margin-top:6px">Simulasi untuk demo, tanpa kamera</p>
+        <p class="sm" id="camNote" style="margin-top:6px">Selfie lewat kamera depan. Foto disimpan di perangkat ini
+          sebagai bukti absen.</p>
         <button class="btn" id="shOk" disabled>Konfirmasi</button><button class="btn" id="shNo"
           style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
       </div>
@@ -1826,6 +1922,15 @@
         <h3 id="lst" style="font-size:18px;margin-bottom:6px">Keluar dari AbsenPro?</h3>
         <p class="sm">Status absen hari ini tetap tersimpan untuk akun ini.</p><button class="btn dg"
           id="lyes">Keluar</button><button class="btn" id="lno"
+          style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
+      </div>
+    </div>
+    <div class="sheet" id="rsheet" hidden>
+      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="rst">
+        <h3 id="rst" style="font-size:18px;margin-bottom:6px">Reset data demo?</h3>
+        <p class="sm">Semua absen dan selfie, ajuan dan klaim, pengaturan dari admin, serta karyawan tambahan akan
+          dihapus. Tema dan bahasa tetap. Tindakan ini tidak bisa dibatalkan.</p><button class="btn dg" id="ryes">Ya,
+          reset data</button><button class="btn" id="rno"
           style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
       </div>
     </div>
@@ -1876,11 +1981,11 @@
           <ul class="tl">
             <li id="li-in"><i></i>
               <div><b>Masuk</b><span id="in-s">Belum absen</span></div>
-              <div class="t" id="in-t">--:--</div>
+              <div class="t" id="in-t">--:--</div><img class="sth" id="in-p" alt="Selfie absen masuk" hidden>
             </li>
             <li id="li-out"><i></i>
               <div><b>Pulang</b><span id="out-s">Setelah 17:00</span></div>
-              <div class="t" id="out-t">--:--</div>
+              <div class="t" id="out-t">--:--</div><img class="sth" id="out-p" alt="Selfie absen pulang" hidden>
             </li>
           </ul>
         </div>
@@ -2131,6 +2236,12 @@
             class="mm" data-go="tr"><span>Riwayat kehadiran</span><span>›</span></button><button class="mm"
             data-go="t1"><span>Ajuan cuti, lembur, dan klaim</span><span>›</span></button>
         </div>
+        <div class="card">
+          <div class="row">
+            <div><b>Data demo</b><br><span style="color:var(--mute);font-size:12px">Hapus absen, klaim, dan pengaturan,
+                kembali ke data awal</span></div><button class="eye" id="rsb">Reset</button>
+          </div>
+        </div>
         <div class="card"><button class="btn dg" id="lo" style="margin-top:0">Keluar</button></div>
         <p style="text-align:center;color:var(--mute);font-size:12px;margin-top:18px">AbsenPro v2 · Desain oleh K.
           Arzhaning Jagad</p>
@@ -2185,12 +2296,12 @@
     function stamp() { const d = new Date(); return { h: d.getHours(), m: d.getMinutes(), s: pad(d.getHours()) + ':' + pad(d.getMinutes()) } }
     function doAbsen() {
       if (!inAt) {
-        inAt = stamp(); const late = inAt.h * 60 + inAt.m > LT();
+        inAt = stamp(); if (SELFIE) inAt.p = SELFIE; const late = inAt.h * 60 + inAt.m > LT();
         $('#in-t').textContent = inAt.s; $('#in-s').textContent = late ? 'Terlambat dari batas ' + SW().late : 'Tepat waktu';
         $('#li-in').className = late ? 'l' : 'd'; toast('Absen masuk tercatat pukul ' + inAt.s)
       }
       else if (!outAt) {
-        outAt = stamp(); $('#out-t').textContent = outAt.s; $('#out-s').textContent = 'Selesai bekerja'; $('#li-out').className = 'd';
+        outAt = stamp(); if (SELFIE) outAt.p = SELFIE; $('#out-t').textContent = outAt.s; $('#out-s').textContent = 'Selesai bekerja'; $('#li-out').className = 'd';
         $('#dial').classList.add('done'); $('#go').textContent = 'Sampai besok'; $('#go').disabled = true; $('#sub').textContent = 'Terima kasih untuk hari ini'; toast('Absen pulang tercatat pukul ' + outAt.s)
       }
       save(); tick()
@@ -2203,7 +2314,7 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#sheet').hidden = true });
     $('#kk').onclick = () => { if (!$('#kd').value || !$('#kr').value.trim()) { toast('Isi tanggal dan alasan koreksi'); return } toast('Koreksi dikirim ke atasan'); addN('Koreksi absen dikirim', 'Menunggu persetujuan atasan'); $('#kr').value = '' };
     let USER = null; let K = 'absenpro-demo-' + new Date().toDateString();
-    function save() { try { localStorage.setItem(K, JSON.stringify({ inAt, outAt })) } catch (e) { } }
+    function save() { try { localStorage.setItem(K, JSON.stringify({ inAt, outAt })) } catch (e) { } thumbs() }
     try {
       const r = JSON.parse(localStorage.getItem(K)); if (r && r.inAt) {
         inAt = r.inAt; const late = inAt.h * 60 + inAt.m > LT(); $('#in-t').textContent = inAt.s; $('#in-s').textContent = late ? 'Terlambat dari batas ' + SW().late : 'Tepat waktu'; $('#li-in').className = late ? 'l' : 'd';
@@ -2329,7 +2440,7 @@
     $$('#mchips button').forEach((b, i) => b.onclick = () => { $$('#mchips button').forEach(x => x.classList.toggle('on', x === b)); const cs = $$('#t2 .card'); cs.forEach(c => c.classList.add('ld')); setTimeout(() => { setSlip(['05', '06', '07', '08', '09', '10'][i]); cs.forEach(c => c.classList.remove('ld')) }, 350) });
     TOK.push([/Dibayar/, 'Paid'], [/ke rekening/, 'to account'], [/Agustus/, 'August'], [/Oktober/, 'October']);
     // verifikasi wajah (simulasi) dan animasi
-    function resetFv() { const f = $('#fv'); f.className = 'fv'; $('#fvt').textContent = 'Verifikasi wajah'; $('#shOk').disabled = true }
+    function resetFv() { const f = $('#fv'); f.className = 'fv'; $('#fvt').textContent = 'Ambil selfie'; $('#shOk').disabled = true; camReset() }
     $('#fv').onclick = () => { const f = $('#fv'); if (f.classList.contains('sc') || f.classList.contains('ok')) return; f.classList.add('sc'); $('#fvt').textContent = 'Memindai…'; setTimeout(() => { f.classList.remove('sc'); f.classList.add('ok'); $('#fvt').textContent = 'Wajah terverifikasi'; $('#shOk').disabled = false; $('#shOk').focus() }, 1600) };
     function popDial() { const d = $('#dial'); d.classList.remove('pop'); void d.offsetWidth; d.classList.add('pop') }
     // terjemahan tab Tim dan verifikasi
@@ -2359,7 +2470,7 @@
     }
     function doLogin(u) { try { localStorage.setItem('absenpro-v2-session', u.id) } catch (e) { } $('#login').hidden = true; lock(false); applyUser(u); toast('Selamat datang, ' + u.short) }
     function doLogout() { try { localStorage.removeItem('absenpro-v2-session') } catch (e) { } USER = null; resetDay(); $('#le').value = ''; $('#lp').value = ''; $('#lp').type = 'password'; $('#lv').textContent = 'Lihat'; $('#lerr').textContent = ''; $$('.acc').forEach(x => x.classList.remove('on')); $('#login').hidden = false; lock(true); toast('Anda telah keluar'); $('#le').focus() }
-    function trySubmit() { const e = $('#le').value.trim().toLowerCase(), p = $('#lp').value, er = $('#lerr'); if (!e || !p) { er.textContent = 'Isi email dan kata sandi'; return } const u = ACC.find(a => a.email === e); if (!u || p !== PW) { er.textContent = 'Email atau kata sandi salah'; return } er.textContent = ''; doLogin(u) }
+    function trySubmit() { const e = $('#le').value.trim().toLowerCase(), p = $('#lp').value, er = $('#lerr'); if (!e || !p) { er.textContent = 'Isi email dan kata sandi'; return } const u = ACC.find(a => a.email === e); if (!u || p !== PW) { er.textContent = 'Email atau kata sandi salah'; return } if (u.off) { er.textContent = 'Akun dinonaktifkan. Hubungi HR.'; return } er.textContent = ''; doLogin(u) }
     $('#lgo').onclick = trySubmit;[$('#le'), $('#lp')].forEach(i => i.onkeydown = e => { if (e.key === 'Enter') trySubmit() });
     $('#lacc').onclick = e => { const b = e.target.closest('.acc'); if (!b) return; const u = ACC.find(a => a.id === b.dataset.id); $('#le').value = u.email; $('#lp').value = PW; $('#lerr').textContent = ''; $$('.acc').forEach(x => x.classList.toggle('on', x === b)); $('#lgo').focus() };
     $('#lv').onclick = () => { const p = $('#lp'), s = p.type === 'password'; p.type = s ? 'text' : 'password'; $('#lv').textContent = s ? 'Sembunyi' : 'Lihat' };
@@ -2375,7 +2486,7 @@
     ACC.push({ id: 'hendra', email: 'hendra@absenpro.demo', short: 'Hendra', name: 'Hendra Wijaya', ini: 'HW', role: 'Admin HR', div: 'Divisi SDM', eid: 'EMP-1001', boss: 'Direksi', r: 'admin' });
     const RLB = { staff: 'Staf', spv: 'Supervisor', admin: 'Admin' };
     $('#lacc').innerHTML = ACC.map(a => `<button class="acc" data-id="${a.id}"><span class="pa">${a.ini}</span><span style="flex:1"><b>${a.name}</b><br><span class="sm">${a.role} \u00b7 ${a.email}</span></span><span class="tag ${a.r === 'staff' ? 'ok' : a.r === 'spv' ? '' : 'mu'}">${RLB[a.r]}</span></button>`).join('');
-    function liveSt(id) { if (!['arzha', 'raka', 'salsa', 'dina', 'hendra'].includes(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > RL.hm(RL.shiftOf(id).late); return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
+    function liveSt(id) { if (!RL.isLive(id)) return null; try { const r = JSON.parse(localStorage.getItem('absenpro-' + id + '-' + new Date().toDateString())); if (r && r.inAt) { const late = r.inAt.h * 60 + r.inAt.m > RL.hm(RL.shiftOf(id).late); return { st: late ? 'Terlambat' : 'Hadir', t: r.inAt.s } } } catch (e) { } return { st: 'Belum absen', t: '\u2013' } }
     const IC = { home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>', hist: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>', req: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/>', team: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c.6-3.5 3.5-5 7-5s6.4 1.5 7 5M16 5a3.5 3.5 0 0 1 0 7M18 15c2.2.5 3.6 2 4 5"/>', pay: '<rect x="2" y="6" width="20" height="13" rx="3"/><circle cx="12" cy="12.5" r="3"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/>', ok: '<path d="M4 12l5 5L20 6"/>', chart: '<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>' };
     const NV = {
       staff: [['t0', 'Beranda', 'home'], ['tr', 'Riwayat', 'hist'], ['t1', 'Ajuan', 'req'], ['tm', 'Tim', 'team'], ['t2', 'Gaji', 'pay'], ['t3', 'Profil', 'user']],
@@ -2394,7 +2505,7 @@
       if (!USER) return; const key = 'absenpro-seen-' + USER.id; let seen = []; try { seen = JSON.parse(localStorage.getItem(key)) || [] } catch (e) { }
       const fresh = RL.mine(USER.id).filter(r => r.st !== 'Menunggu' && r.id > 1e9 && !seen.includes(r.id)); if (!fresh.length) return;
       fresh.forEach(r => { addN(r.type + (r.st === 'Disetujui' ? ' disetujui' : ' ditolak'), RL.esc(r.detail) + ' \u00b7 oleh ' + ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[r.lvl || 'spv']) });
-      setTimeout(() => toast(fresh.length === 1 ? fresh[0].type + (fresh[0].st === 'Disetujui' ? ' disetujui' : ' ditolak') : fresh.length + ' pengajuan sudah diputuskan'), 2600);
+      setTimeout(() => USER && USER.id === fresh[0].uid && toast(fresh.length === 1 ? fresh[0].type + (fresh[0].st === 'Disetujui' ? ' disetujui' : ' ditolak') : fresh.length + ' pengajuan sudah diputuskan'), 2600);
       try { localStorage.setItem(key, JSON.stringify(seen.concat(fresh.map(r => r.id)))) } catch (e) { }
     }
     function rolesChanged() { badges(); renderRole(); renderHist(); checkDecisions(); drawN(); rbRender() }
@@ -2458,7 +2569,7 @@
       const R = CF().g.r, m = Math.round(Math.hypot(UX - 150, UY - 60) * R / 46), modeIdx = [...$$('#mode button')].indexOf($('#mode .on')), out = m > R, lock = out && modeIdx === 0;
       $('#ume').setAttribute('cx', UX); $('#ume').setAttribute('cy', UY); $('#ume').setAttribute('fill', out ? '#E5584B' : '#F2B01E');
       $('#udist').textContent = m + ' m dari titik absen'; $('#shLoc').textContent = CF().g.name.split(',')[0] + ' \u00b7 ' + m + ' m'; $('#geoS').textContent = CF().g.name + ' \u00b7 ' + m + ' m dari titik absen'; $('#mapR').textContent = 'Titik absen \u00b7 radius ' + R + ' m'; $('.geo b').textContent = out ? 'Di luar area kantor' : 'Di dalam area kantor';
-      const f = $('#fv'); if (lock) { f.className = 'fv'; f.disabled = true; $('#fvt').textContent = 'Di luar radius absen'; $('#shOk').disabled = true } else { if (f.disabled) { f.disabled = false; $('#fvt').textContent = 'Verifikasi wajah' } }
+      const f = $('#fv'); if (lock) { f.className = 'fv'; f.disabled = true; $('#fvt').textContent = 'Di luar radius absen'; $('#shOk').disabled = true } else { if (f.disabled) { f.disabled = false; $('#fvt').textContent = 'Ambil selfie' } }
       $('#mapnote').textContent = lock ? 'Di luar radius ' + R + ' m. Pilih mode Rumah atau Dinas luar di Beranda, atau mendekat ke kantor.' : out ? 'Mode ini tidak mewajibkan geofence, jadi absen tetap bisa dilanjutkan.' : 'Di dalam radius, siap verifikasi. Seret titik kuning untuk mencoba posisi lain.'
     }
     function mapPos(e) { const sv = $('#lmap'), r = sv.getBoundingClientRect(), k = 300 / (r.width || 300); UX = Math.max(8, Math.min(292, (e.clientX - r.left) * k)); UY = Math.max(8, Math.min(112, (e.clientY - r.top) * k)); mapState() }
@@ -2489,7 +2600,7 @@
     const ldt = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) };
     function syncLeave() { const q = CF().l.quota; left = Math.max(0, q - usedL); $('#left').textContent = left; $('#lb').style.width = Math.min(100, left / q * 100) + '%'; $('#lq').textContent = 'dari ' + q + ' hari' }
     function applyCfg() {
-      const c = CF(), s = SW(); syncLeave();
+      const c = CF(), s = SW(); syncLeave(); thumbs(); camNote();
       if (!inAt) $('#sub').textContent = 'Shift ' + s.in + ' \u2013 ' + s.out;
       if (!outAt) $('#out-s').textContent = 'Setelah ' + s.out;
       if (inAt) { const late = inAt.h * 60 + inAt.m > LT(); $('#in-s').textContent = late ? 'Terlambat dari batas ' + s.late : 'Tepat waktu'; $('#li-in').className = late ? 'l' : 'd' }
@@ -2543,8 +2654,51 @@
     }
     Object.assign(EN, { 'Reimbursement menunggu dibayar': 'Reimbursement awaiting payout', 'Dibayar bersama gaji bulan berikutnya setelah disetujui.': 'Paid with the following month\u2019s salary once approved.' });
     TOK.unshift([/^Gaji ([A-Za-z]+ \d{4})$/, '$1 salary']); TOK.push([/\bJanuari\b/, 'January'], [/\bFebruari\b/, 'February'], [/\bMaret\b/, 'March'], [/\bDesember\b/, 'December']);
+    // ---- selfie absen lewat kamera depan
+    let SELFIE = null, CAMS = null;
+    function stopCam() { if (CAMS) { CAMS.getTracks().forEach(t => t.stop()); CAMS = null } $('#camV').srcObject = null; $('#cam').hidden = true }
+    function camNote() { $('#camNote').textContent = 'Selfie wajib dari kamera depan. Foto disimpan di perangkat ini sebagai bukti absen.' }
+    function camReset() { stopCam(); SELFIE = null; $('#camFb').hidden = true; $('#selfT').hidden = true; $('#fv').hidden = false; camNote() }
+    function showFb(msg) { stopCam(); $('#fv').hidden = true; $('#camMsg').textContent = msg; $('#camFb').hidden = false; $('#camRetry').focus() }
+    function toSelfie(src, w, h, mirror) { const s = Math.min(w, h), c = document.createElement('canvas'), x = c.getContext('2d'); c.width = c.height = 160; if (mirror) { x.translate(160, 0); x.scale(-1, 1) } x.drawImage(src, (w - s) / 2, (h - s) / 2, s, s, 0, 0, 160, 160); return c.toDataURL('image/jpeg', .6) }
+    function setSelfie(p) { SELFIE = p; $('#selfT').src = p; $('#selfT').hidden = false; $('#camFb').hidden = true; const f = $('#fv'); f.hidden = false; f.className = 'fv ok'; $('#fvt').textContent = 'Selfie terambil, ketuk untuk ulangi'; $('#shOk').disabled = false; $('#shOk').focus() }
+    async function startCam() {
+      $('#camFb').hidden = true; const md = navigator.mediaDevices;
+      if (!md || !md.getUserMedia) { showFb(window.isSecureContext === false ? 'Kamera hanya bisa dipakai lewat koneksi aman (HTTPS). Buka aplikasi lewat alamat HTTPS.' : 'Peramban ini tidak mendukung kamera. Buka di Chrome atau Safari.'); return }
+      try { CAMS = await md.getUserMedia({ video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }, audio: false }) }
+      catch (e) { showFb(e && e.name === 'NotAllowedError' ? 'Izin kamera ditolak. Izinkan kamera di pengaturan peramban, lalu ketuk Coba lagi.' : e && e.name === 'NotFoundError' ? 'Kamera tidak ditemukan di perangkat ini. Absen butuh kamera depan.' : 'Kamera tidak bisa dibuka. Tutup aplikasi lain yang memakai kamera, atau buka di Chrome atau Safari, lalu ketuk Coba lagi.'); return }
+      if ($('#sheet').hidden) { stopCam(); return }
+      const v = $('#camV'); v.srcObject = CAMS; try { await v.play() } catch (e) { }
+      $('#fv').hidden = true; $('#cam').hidden = false; $('#shOk').disabled = true; $('#camSnap').focus()
+    }
+    $('#fv').onclick = () => { const f = $('#fv'); if (f.disabled || f.classList.contains('sc')) return; startCam() };
+    $('#camSnap').onclick = () => { const v = $('#camV'); if (!v.videoWidth) { toast('Kamera belum siap'); return } const p = toSelfie(v, v.videoWidth, v.videoHeight, true); stopCam(); setSelfie(p) };
+    $('#camX').onclick = () => { stopCam(); const f = $('#fv'); f.hidden = false; $('#shOk').disabled = !f.classList.contains('ok'); f.focus() };
+    $('#camRetry').onclick = () => startCam();
+    new MutationObserver(() => { if ($('#sheet').hidden) stopCam() }).observe($('#sheet'), { attributes: true, attributeFilter: ['hidden'] });
+    function thumbs() { [['in', inAt], ['out', outAt]].forEach(([k, o]) => { const im = $('#' + k + '-p'); if (!im) return; if (o && typeof o.p === 'string' && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(o.p)) { im.src = o.p; im.hidden = false } else { im.hidden = true; im.removeAttribute('src') } }) }
+    Object.assign(EN, { 'Ambil foto': 'Take photo', 'Coba lagi': 'Try again', 'Ambil selfie': 'Take selfie', 'Selfie terambil, ketuk untuk ulangi': 'Selfie taken, tap to retake', 'Kamera belum siap': 'Camera not ready yet', 'Kamera hanya bisa dipakai lewat koneksi aman (HTTPS). Buka aplikasi lewat alamat HTTPS.': 'The camera only works over a secure connection (HTTPS). Open the app through an HTTPS address.', 'Peramban ini tidak mendukung kamera. Buka di Chrome atau Safari.': 'This browser does not support the camera. Open it in Chrome or Safari.', 'Izin kamera ditolak. Izinkan kamera di pengaturan peramban, lalu ketuk Coba lagi.': 'Camera permission denied. Allow it in your browser settings, then tap Try again.', 'Kamera tidak ditemukan di perangkat ini. Absen butuh kamera depan.': 'No camera found on this device. Check-in needs a front camera.', 'Kamera tidak bisa dibuka. Tutup aplikasi lain yang memakai kamera, atau buka di Chrome atau Safari, lalu ketuk Coba lagi.': 'The camera could not be opened. Close other apps using the camera, or open this in Chrome or Safari, then tap Try again.', 'Selfie wajib dari kamera depan. Foto disimpan di perangkat ini sebagai bukti absen.': 'A selfie from the front camera is required. The photo is stored on this device as check-in proof.', 'Reset data demo?': 'Reset demo data?', 'Ya, reset data': 'Yes, reset data', 'Data demo': 'Demo data', 'Reset': 'Reset', 'Hapus absen, klaim, dan pengaturan, kembali ke data awal': 'Clear check-ins, claims, and settings, back to the initial data', 'Semua absen dan selfie, ajuan dan klaim, pengaturan dari admin, serta karyawan tambahan akan dihapus. Tema dan bahasa tetap. Tindakan ini tidak bisa dibatalkan.': 'All check-ins and selfies, requests and claims, admin settings, and added employees will be deleted. Theme and language stay. This cannot be undone.', 'Data demo direset ke kondisi awal': 'Demo data was reset to its initial state' });
+    // ---- reset data demo
+    $('#rsb').onclick = () => { $('#rsheet').hidden = false; $('#rno').focus() };
+    $('#rno').onclick = () => { $('#rsheet').hidden = true; $('#rsb').focus() };
+    $('#ryes').onclick = () => { RL.resetAll(); location.reload() };
+    try { if (sessionStorage.getItem('ap-reset')) { sessionStorage.removeItem('ap-reset'); setTimeout(() => toast('Data demo direset ke kondisi awal'), 500) } } catch (e) { }
+    // ---- akun dari halaman Karyawan (HR)
+    const ini2 = n => n.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase();
+    function accSync() {
+      const s = RL.empStore();
+      s.add.forEach(a => { if (!ACC.find(x => x.id === a.id)) ACC.push({ id: a.id, email: a.id + '@absenpro.demo', short: a.name.split(' ')[0], name: a.name, ini: ini2(a.name), role: a.pos, div: 'Divisi ' + a.div, eid: a.eid, r: 'staff' }) });
+      ACC.forEach(u => { if (u.r !== 'staff') return; if (!u.d0) u.d0 = u.div; const d = s.div[u.id] || u.d0.replace('Divisi ', ''); u.div = 'Divisi ' + d; u.boss = d === 'Digital' ? 'Dina Prameswari' : 'Hendra Wijaya'; u.off = s.off.includes(u.id) })
+    }
+    function renderAcc() { $('#lacc').innerHTML = ACC.map(a => `<button class="acc" data-id="${a.id}"><span class="pa">${a.ini}</span><span style="flex:1"><b>${RL.esc(a.name)}</b><br><span class="sm">${RL.esc(a.role)} \u00b7 ${a.email}</span></span><span class="tag ${a.off ? 'mu' : a.r === 'staff' ? 'ok' : a.r === 'spv' ? '' : 'mu'}">${a.off ? 'Nonaktif' : RLB[a.r]}</span></button>`).join('') }
+    window.addEventListener('storage', e => {
+      if (e.key !== 'absenpro-v2-emp') return; const d0 = USER && USER.div; accSync(); renderAcc();
+      if (USER) { if (USER.off) { doLogout(); toast('Akun dinonaktifkan oleh HR') } else if (USER.div !== d0) { applyUser(USER); toast('Divisi diperbarui oleh HR') } }
+    });
+    accSync(); renderAcc();
+    Object.assign(EN, { 'Akun dinonaktifkan. Hubungi HR.': 'Account deactivated. Please contact HR.', 'Akun dinonaktifkan oleh HR': 'Account deactivated by HR', 'Divisi diperbarui oleh HR': 'Division updated by HR', 'Nonaktif': 'Inactive' });
     lock(true);
-    try { const u = ACC.find(a => a.id === localStorage.getItem('absenpro-v2-session')); if (u) { $('#login').hidden = true; lock(false); applyUser(u) } } catch (e) { }
+    try { const u = ACC.find(a => a.id === localStorage.getItem('absenpro-v2-session')); if (u && !u.off) { $('#login').hidden = true; lock(false); applyUser(u) } } catch (e) { }
     if (LANG === 'en') applyLang('en');
   </script>
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">

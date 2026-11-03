@@ -1760,6 +1760,30 @@
       }
     }
   </style>
+  <script>
+      /* Tentukan sejak awal apakah layar masuk perlu tampil, supaya antarmuka kasir tidak sempat berkilas. */
+      (function () {
+        var need = true;
+        try {
+          if (/[?&]role=(staff|spv|owner)\b/.test(location.search)) need = false;
+          else if (/^(staff|spv|owner)$/.test(sessionStorage.getItem('threadpos-session-v1') || '')) need = false;
+        } catch (e) { }
+        if (need) document.documentElement.classList.add('tp-needlogin');
+      })();
+  </script>
+  <style>
+    html.tp-needlogin {
+      background: #070b14;
+    }
+
+    html.tp-needlogin body>*:not(#tp-login):not(#__jz-bar):not(script):not(style) {
+      visibility: hidden !important;
+    }
+
+    html.tp-needlogin #tp-login {
+      display: flex;
+    }
+  </style>
 </head>
 
 <body data-tab="produk"
@@ -3830,8 +3854,8 @@
         const soldOut = left <= 0;
         return `
     <div class="bg-white rounded-2xl border border-slate-200/90 hover:border-slate-300 hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden group">
-      <div class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden">
-        <img src="${p.image}" alt="${tpEsc(p.name)}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" loading="lazy" />
+      <div class="relative aspect-[4/3] w-full bg-slate-100 overflow-hidden tp-skel">
+        <img src="${p.image}" alt="${tpEsc(p.name)}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" loading="lazy" onload="this.classList.add('ok')" onerror="this.parentNode.classList.add('tp-noimg')" />
         <div class="absolute top-2.5 left-2.5 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-xs text-white text-[10px] font-mono font-medium px-2 py-0.5 rounded-md">
           <i class="fa-solid fa-tag text-[9px] text-rose-400"></i><span>${p.sku}</span>
         </div>
@@ -4309,7 +4333,7 @@
         cart = h.cart.map(i => ({ ...i, qty: Math.min(i.qty, tpStock(i.product.id, i.color.name, i.size)) })).filter(i => i.qty > 0);
         tpHeld = tpHeld.filter(x => x.id !== id);
         tp$('cust-name-input').value = h.customer;
-        tp$('member-tier-select').value = String(h.rate); memberDiscountRate = h.rate;
+        { const sel = tp$('member-tier-select'), op = [...sel.options].find(o => parseFloat(o.value) === h.rate); sel.value = op ? op.value : String(h.rate); } memberDiscountRate = h.rate;
         tpVoucher = h.voucher; tp$('voucher-input').value = h.voucher || '';
         tpLastTotal = -1; cashTendered = 0; tp$('cash-tendered-input').value = '';
         renderCart(); renderProducts(); tpUpdateBadges(); tpCloseHeld();
@@ -4425,7 +4449,6 @@
       if (!t || t.voided) return;
       tpAsk('Void transaksi ' + no + '?', `Stok pakaian dikembalikan dan nilai ${formatRupiah(t.total)} dikeluarkan dari laporan shift${t.method === 'cash' ? ' (uang dikembalikan dari laci)' : ''}.`, 'Ya, Void Transaksi', () => {
         t.voided = true;
-        tpLog('void', 'Void ' + no + ' \u00b7 ' + formatRupiah(t.total), { approver: tpVoidApprover });
         t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
         renderProducts(); tpRenderShift();
         showToast(no + ' di-void. Stok dikembalikan.', 'warn');
@@ -5722,10 +5745,15 @@
         : '<p style="color:#94a3b8">Belum ada diskon pada periode ini.</p>';
 
       /* stok menipis */
-      const low = [];
-      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n <= 2) low.push([p.name, c.name, s, n]); })));
+      const low = [], zero = [];
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n === 0) zero.push([p.name, c.name, s, n]); else if (n <= 2) low.push([p.name, c.name, s, n]); })));
       low.sort((a, b) => a[3] - b[3]);
-      const lowHtml = low.length ? low.slice(0, 14).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' (' + x[3] + ')</span>').join('') + (low.length > 14 ? '<span class="rp-chip">+' + (low.length - 14) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Semua stok aman.</p>';
+      const sold = {};
+      rows.forEach(t => t.items.forEach(i => { const k = i.pid + '|' + i.colorName + '|' + i.size; sold[k] = (sold[k] || 0) + (i.qty - i.returned); }));
+      const need = [];
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(sz => { const n = tpStock(p.id, c.name, sz), q = sold[p.id + '|' + c.name + '|' + sz] || 0; if (n <= 2 && q >= 2) need.push([p.name, c.name, sz, n, q]); })));
+      need.sort((x, y) => y[4] - x[4] || x[3] - y[3]);
+      const lowHtml = need.length ? need.slice(0, 10).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' — stok ' + x[3] + ' · terjual ' + x[4] + '</span>').join('') + (need.length > 10 ? '<span class="rp-chip">+' + (need.length - 10) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Tidak ada varian laris yang stoknya menipis pada periode ini.</p>';
 
       const seg = [['today', 'Hari ini'], ['7d', '7 hari'], ['all', 'Semua']].map(x => '<button class="' + (tpRpRange === x[0] ? 'on' : '') + '" onclick="tpRpSet(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
       const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
@@ -5744,7 +5772,7 @@
         '<div class="rp-card"><div class="rp-h">Produk terlaris</div>' + topHtml + '</div>' +
         '<div class="rp-card"><div class="rp-h">Diskon & promo diberikan</div>' + discHtml + '</div>' +
         '</div>' +
-        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">Stok menipis (≤ 2 pcs) · ' + low.length + ' varian</div>' + lowHtml + '</div>';
+        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">Perlu restok (laris &amp; stok ≤ 2) · ' + need.length + ' varian</div>' + lowHtml + '<div class="rp-note" style="margin-top:8px">Diurutkan dari yang paling laku pada periode ini. Selain itu, <b>' + zero.length + '</b> varian sedang habis (0 pcs) dan tampil dicoret di katalog.</div></div>';
     };
     renderCart();
     if (!tp$('report-modal').classList.contains('hidden')) tpRenderReport();
@@ -6147,6 +6175,7 @@
       if (!t || t.voided) return;
       tpAsk('Void transaksi ' + no + '?', 'Stok pakaian dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari laporan shift' + (t.method === 'cash' ? ' (uang dikembalikan dari laci)' : '') + (t.custId ? '. Poin member ikut dikembalikan.' : '.'), 'Ya, Void Transaksi', () => {
         t.voided = true;
+        tpLog('void', 'Void ' + no + ' \u00b7 ' + formatRupiah(t.total), { approver: tpVoidApprover });
         t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
         if (t.custId) { const c = TP_CUSTS.find(x => x.id === t.custId); if (c) { c.points = Math.max(0, c.points - (t.ptsEarned || 0) + (t.pointsUsed || 0)); c.visits = Math.max(0, c.visits - 1); tpCustSave(); } }
         renderProducts(); tpRenderShift(); renderMemberCard();
@@ -7258,7 +7287,11 @@
 
     .lg-note b {
       color: #fff;
-      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .lg-note code {
+      color: #fff;
+      font: 700 11.5px 'JetBrains Mono', monospace;
     }
 
     .lg-back {
@@ -7585,6 +7618,22 @@
 
   <!-- ===== MASUK: PILIH PERAN + PIN ===== -->
   <div id="tp-login" role="dialog" aria-modal="true" aria-label="Masuk ke kasir">
+    <aside class="lg-hero" aria-hidden="true">
+      <span class="eyebrow"><i class="fa-solid fa-flask"></i> Mode demo · POS toko fashion</span>
+      <h1>Kasir toko fashion yang <em>cepat, rapi,</em> dan terkontrol.</h1>
+      <p class="lead">Coba alur kasir sungguhan dari penjualan sampai tutup shift. Semua data contoh tersimpan di
+        browser ini.</p>
+      <ul>
+        <li><i class="fa-solid fa-tags"></i><span><b>Promo otomatis &amp; bayar split</b>Tunai, kartu, dan QRIS dalam
+            satu transaksi.</span></li>
+        <li><i class="fa-solid fa-star"></i><span><b>Member &amp; poin loyalitas</b>Cari lewat nama atau no. HP, poin
+            bisa ditukar.</span></li>
+        <li><i class="fa-solid fa-user-shield"></i><span><b>Peran &amp; persetujuan</b>Void dan retur oleh staff butuh
+            PIN supervisor.</span></li>
+        <li><i class="fa-solid fa-chart-line"></i><span><b>Laporan &amp; tutup shift</b>Dashboard, estimasi laba, hitung
+            uang per pecahan.</span></li>
+      </ul>
+    </aside>
     <div class="lg-card">
       <div class="lg-brand"><span class="lg-logo"><i class="fa-solid fa-tags"></i></span>
         <div><b>Thread<span>POS</span></b><small>Fashion Retail · Grand Indonesia</small></div>
@@ -7607,8 +7656,8 @@
               class="fa-solid fa-chevron-right"></i></button>
         </div>
         <div class="lg-note"><i class="fa-solid fa-circle-info"></i><span><b>Simulasi untuk demo.</b> PIN demo: Staff
-            <b>1111</b> · SPV <b>2222</b> · Owner <b>3333</b>. Di produk sungguhan, tiap orang punya akun dan PIN
-            sendiri.</span></div>
+            <code>1111</code> · SPV <code>2222</code> · Owner <code>3333</code>. Di produk sungguhan, tiap orang punya
+            akun dan PIN sendiri.</span></div>
       </div>
       <div id="lg-s2" style="display:none">
         <button type="button" class="lg-back" onclick="tpLoginBack()"><i class="fa-solid fa-arrow-left"></i> Ganti
@@ -7621,6 +7670,8 @@
         <button type="button" class="lg-hint" onclick="tpPinFill('lg')">PIN demo: <b id="lg-hintpin"></b> · ketuk untuk
           mengisi</button>
       </div>
+      <div class="lg-prep" id="lg-prep"><i class="dot"></i><span id="lg-prep-txt">Menyiapkan data toko…</span><span
+          class="bar"><i id="lg-prep-bar" style="width:0%"></i></span></div>
     </div>
   </div>
 
@@ -7753,6 +7804,7 @@
     }
     function tpLoginBack() { playAudio('click'); tpLoginShow(); }
     function tpLogin(r, silent) {
+      document.documentElement.classList.remove('tp-needlogin');
       tpRole = r; try { sessionStorage.setItem(TP_SESS, r); } catch (e) { }
       tp$('tp-login').classList.remove('open'); tpApplyRole();
       if (!silent) { tpLog('login', 'Masuk sebagai ' + TP_USERS[r].label); playAudio('success'); showToast('Masuk sebagai ' + TP_USERS[r].name + ' (' + TP_USERS[r].label + ')', 'success'); setTimeout(tpTourAuto, 700); }
@@ -7856,6 +7908,257 @@
       let r = null; const m = location.search.match(/[?&]role=(staff|spv|owner)\b/);
       if (m) r = m[1]; else { try { r = sessionStorage.getItem(TP_SESS); } catch (e) { } }
       if (r && TP_USERS[r]) tpLogin(r, true); else { tpApplyRole(); tpLoginShow(); }
+    })();
+  </script>
+
+  <style>
+    /* ===== latar berkilau saat gambar produk memuat ===== */
+    .tp-skel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(100deg, #f1f5f9 30%, #e2e8f0 50%, #f1f5f9 70%);
+      background-size: 200% 100%;
+      animation: tpShimmer 1.3s linear infinite;
+    }
+
+    .tp-skel.tp-noimg::before {
+      animation: none;
+      background: #eef2f7;
+    }
+
+    .tp-skel>img {
+      position: relative;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity .3s ease, transform .3s ease;
+    }
+
+    .tp-skel>img.ok {
+      opacity: 1;
+    }
+
+    @keyframes tpShimmer {
+      to {
+        background-position: -200% 0;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .tp-skel::before {
+        animation: none;
+      }
+    }
+  </style>
+
+  <script>
+    /* gambar yang sudah ada di cache tidak memicu onload setelah render ulang → tandai langsung */
+    function tpSkelFix() { document.querySelectorAll('.tp-skel > img').forEach(i => { if (i.complete && i.naturalWidth > 0) i.classList.add('ok'); }); }
+    const _tpRenderProducts = renderProducts;
+    renderProducts = function () { _tpRenderProducts.apply(this, arguments); tpSkelFix(); };
+    tpSkelFix();
+  </script>
+
+  <style>
+    /* header lebar penuh (>=1440px) tetap muat setelah ada baris pengguna: ringkas di 1440–1679px */
+    @media (min-width: 1440px) and (max-width: 1679px) {
+      header>div:first-child .text-xs.text-slate-400> :not(#tp-userline) {
+        display: none !important;
+      }
+
+      #tp-logout-btn span {
+        display: none;
+      }
+
+      #tp-logout-btn {
+        padding: 1px 7px !important;
+      }
+    }
+  </style>
+
+  <style>
+    /* ===== Halaman login: hero + status kesiapan data ===== */
+    .lg-hero {
+      display: none;
+    }
+
+    @media (min-width: 980px) and (min-height: 640px) {
+
+      #tp-login.open,
+      html.tp-needlogin #tp-login {
+        gap: clamp(40px, 6vw, 96px);
+      }
+
+      .lg-hero {
+        display: block;
+        width: min(470px, 42vw);
+        color: #e2e8f0;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: auto 0 auto auto;
+      }
+
+      #tp-login>.lg-card {
+        margin: auto auto auto 0;
+      }
+
+      .lg-hero .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 5px 12px;
+        border-radius: 99px;
+        background: rgba(251, 191, 36, .1);
+        border: 1px solid rgba(251, 191, 36, .3);
+        color: #fcd34d;
+        font: 700 11px 'Plus Jakarta Sans', sans-serif;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+      }
+
+      .lg-hero h1 {
+        margin: 16px 0 12px;
+        font: 800 clamp(30px, 3.2vw, 42px)/1.12 'Plus Jakarta Sans', sans-serif;
+        color: #fff;
+        letter-spacing: -.02em;
+      }
+
+      .lg-hero h1 em {
+        font-style: normal;
+        background: linear-gradient(135deg, #fb7185, #f43f5e);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+
+      .lg-hero .lead {
+        margin: 0 0 22px;
+        font-size: 14.5px;
+        line-height: 1.6;
+        color: #94a3b8;
+        max-width: 420px;
+      }
+
+      .lg-hero ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .lg-hero li {
+        display: flex;
+        gap: 13px;
+        align-items: flex-start;
+      }
+
+      .lg-hero li>i {
+        flex: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(244, 63, 94, .13);
+        color: #fb7185;
+        font-size: 14px;
+      }
+
+      .lg-hero li span {
+        display: grid;
+        gap: 2px;
+        font-size: 12.5px;
+        color: #94a3b8;
+        line-height: 1.45;
+      }
+
+      .lg-hero li b {
+        color: #f1f5f9;
+        font-size: 13.5px;
+      }
+    }
+
+    .lg-prep {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid #1e293b;
+      font-size: 11.5px;
+      color: #94a3b8;
+    }
+
+    .lg-prep .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      flex: none;
+      animation: lgPulse 1.2s ease-in-out infinite;
+    }
+
+    .lg-prep.ok .dot {
+      background: #10b981;
+      animation: none;
+    }
+
+    .lg-prep>span:nth-child(2) {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lg-prep em {
+      font-style: normal;
+      color: #fcd34d;
+    }
+
+    .lg-prep .bar {
+      flex: none;
+      width: 54px;
+      height: 4px;
+      border-radius: 99px;
+      background: #1e293b;
+      overflow: hidden;
+    }
+
+    .lg-prep .bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #fb7185, #f43f5e);
+      transition: width .25s ease;
+    }
+
+    .lg-prep.ok .bar i {
+      background: #10b981;
+    }
+
+    @keyframes lgPulse {
+      50% {
+        opacity: .35;
+      }
+    }
+  </style>
+
+  <script>
+    /* Muat gambar produk & font di belakang layar saat pengguna masih di halaman login,
+       supaya setelah masuk katalog langsung tampil dari cache browser. Indikatornya nyata, bukan animasi palsu. */
+    (function () {
+      const urls = [...new Set(PRODUCTS.map(p => p.image).filter(Boolean))], total = urls.length;
+      let done = 0, ok = 0, fontsOk = false;
+      function render() {
+        const el = tp$('lg-prep'); if (!el) return;
+        const ready = done >= total && fontsOk;
+        el.classList.toggle('ok', ready);
+        tp$('lg-prep-bar').style.width = Math.round((total ? (done / total) : 1) * 100) + '%';
+        tp$('lg-prep-txt').innerHTML = ready
+          ? 'Data toko siap · ' + PRODUCTS.length + ' produk · ' + tpTrx.length + ' transaksi · ' + TP_CUSTS.length + ' member' + (ok < total ? ' <em>(' + (total - ok) + ' gambar tidak termuat)</em>' : '')
+          : 'Menyiapkan data toko… gambar ' + done + '/' + total;
+      }
+      urls.forEach(u => { const im = new Image(); im.decoding = 'async'; im.onload = () => { done++; ok++; render(); }; im.onerror = () => { done++; render(); }; im.src = u; });
+      (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => { fontsOk = true; render(); });
+      render();
     })();
   </script>
 </body>

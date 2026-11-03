@@ -5613,6 +5613,7 @@
           l.innerHTML = grp('Hari ini', today) + grp('Kemarin', yest) + grp('Minggu ini', week)
         }
       }
+      window.__RL = RL;
       window.RoleUI = {
         apply: function (u) {
           USER = u; $('#rlMenu').hidden = u.r === 'staff';[].forEach.call(document.querySelectorAll('.rlportal'), function (e) { e.hidden = u.r !== 'admin' }); document.body.dataset.role = u.r;
@@ -5655,7 +5656,7 @@
       function submit() {
         var em = $('#lgE').value.trim().toLowerCase(), pw = $('#lgP').value, er = $('#lgR');
         if (!em || !pw) { er.textContent = 'Isi email dan kata sandi'; return }
-        var u = ACC.filter(function (a) { return a.email === em })[0]; if (!u || pw !== PW) { er.textContent = 'Email atau kata sandi salah'; return }
+        var u = ACC.filter(function (a) { return a.email === em })[0]; if (!u || !window.__okpw(u.id, pw)) { er.textContent = 'Email atau kata sandi salah'; return }
         er.textContent = ''; try { localStorage.setItem(KEY, u.id); location.reload() } catch (e) { enter(u) }
       }
       $('#lgG').onclick = submit;
@@ -5674,6 +5675,242 @@
       var id = null; try { id = localStorage.getItem(KEY) } catch (e) { }
       var cur = ACC.filter(function (a) { return a.id === id })[0];
       if (cur) enter(cur); else { lock(true) }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v7: kata sandi per akun (demo, hash ringan di browser, bukan keamanan sungguhan) */
+    (function () {
+      function cy(s) { var a = 0xdeadbeef, b = 0x41c6ce57, c, i; for (i = 0; i < s.length; i++) { c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677) } a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909); return String(4294967296 * (2097151 & b) + (a >>> 0)) }
+      window.__HS = [{ d: '2026-05-01', n: 'Hari Buruh Internasional', t: 'Wajib' }, { d: '2026-06-01', n: 'Hari Lahir Pancasila', t: 'Wajib' }, { d: '2026-08-17', n: 'Hari Kemerdekaan RI', t: 'Wajib' }, { d: '2026-12-24', n: 'Cuti bersama Natal', t: 'Opsional' }, { d: '2026-12-25', n: 'Hari Raya Natal', t: 'Wajib' }, { d: '2027-01-01', n: 'Tahun Baru 2027', t: 'Wajib' }]; window.__cy = cy; window.__okpw = function (id, p) { var h = null; try { h = localStorage.getItem('absenpro-pw-' + id) } catch (e) { } return h ? h === cy(p) : p === 'demo123' }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v3 (app): skor, jam kerja, koreksi absen, layanan HR, data diri */
+    (function () {
+      var $ = function (s) { return document.querySelector(s) }, sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var P = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[sid];
+      if (!P || !window.__RL) return;
+      var me = { id: sid, name: P[0], div: P[1], r: P[2] };
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } }, wr = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
+      var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+      var toast = function (m, t) { if (typeof showToast === 'function') showToast(m, t || 'success') };
+      var CF = rd('absenpro-cfg-v1', { in: '08:00', out: '17:00', tol: 10, rad: 100, quota: 12 });
+      var css = document.createElement('style');
+      css.textContent = '.x2-ring{display:flex;align-items:center;gap:14px}.x2-big{font-size:26px;font-weight:800;line-height:1}.x2-bars{display:flex;align-items:flex-end;gap:8px;height:92px;margin-top:10px}.x2-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;font-weight:600}.x2-bars i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:#10b981;min-height:4px}.x2-bars i.t{background:#0d9488}.x2-bars i.tw{background:#cbd5e1}.dark .x2-bars i.tw{background:#334155}.x2-bars small{font-size:9.5px;opacity:.7;margin-top:3px}.x2-pill{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}.x2-pill button{border:1px solid #cbd5e1;border-radius:99px;padding:5px 11px;font-size:11.5px;font-weight:600;background:transparent;color:inherit}.x2-pill button[aria-pressed=true]{background:#0d9488;border-color:#0d9488;color:#fff}.x2-in{width:100%;margin:4px 0 8px;padding:9px 11px;border-radius:10px;border:1px solid #cbd5e1;background:transparent;color:inherit;font:inherit;font-size:13px;user-select:auto}.x2-l{font-size:11px;font-weight:700;opacity:.7;display:block;margin-top:4px}.x2-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.x2-go{width:100%;margin-top:6px;padding:11px;border:0;border-radius:12px;background:#0d9488;color:#fff;font-weight:700;font-size:13px}.x2-st{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}.x2-st.a,.x2-st.Menunggu{background:#fef3c7;color:#92400e}.x2-st.b{background:#dbeafe;color:#1e40af}.x2-st.c,.x2-st.Disetujui{background:#d1fae5;color:#065f46}.x2-st.Ditolak{background:#fee2e2;color:#991b1b}';
+      document.head.appendChild(css);
+      function card(h) { var d = document.createElement('div'); d.className = 'ag-card'; d.innerHTML = h; return d }
+      function fld(l, id, t, ph, v) { return '<label class="x2-l" for="' + id + '">' + l + '</label><input class="x2-in" id="' + id + '" type="' + (t || 'text') + '" placeholder="' + (ph || '') + '" value="' + esc(v || '') + '">' }
+      var dfmt = function (d) { return new Date(d + 'T00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }, iso = function (o) { var d = new Date(Date.now() - o * 864e5); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2) };
+
+      // Skor kedisiplinan (Agenda)
+      var M = [['Mei', 92], ['Jun', 88], ['Jul', 95], ['Agu', 90], ['Sep', 94], ['Okt', 97]], avg = Math.round(M.reduce(function (a, b) { return a + b[1] }, 0) / M.length), last = 97, R = 30, C = 2 * Math.PI * R, ag = $('#tabContent-agenda');
+      if (ag) ag.appendChild(card('<h3>Skor kedisiplinan</h3><div class="x2-ring"><svg width="76" height="76" viewBox="0 0 76 76" role="img" aria-label="Skor ' + last + ' persen"><circle cx="38" cy="38" r="' + R + '" fill="none" stroke="#e2e8f0" stroke-width="8"/><circle cx="38" cy="38" r="' + R + '" fill="none" stroke="#0d9488" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C * (1 - last / 100) + '" transform="rotate(-90 38 38)"/><text x="38" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="currentColor">' + last + '</text></svg><div><div class="x2-big">' + last + '% <span style="font-size:12px;color:#0d9488">tepat waktu</span></div><p class="ag-sm">Rata-rata 6 bulan ' + avg + '%. Toleransi terlambat ' + CF.tol + ' menit.</p></div></div><div class="x2-bars">' + M.map(function (m, i) { return '<div title="' + m[0] + ': ' + m[1] + '%"><span>' + m[1] + '</span><i class="' + (i === 5 ? 't' : '') + '" style="height:' + (m[1] - 70) * 2.6 + 'px"></i><small>' + m[0] + '</small></div>' }).join('') + '</div>'));
+
+      // Jam kerja minggu ini (Beranda)
+      var hm = $('#tabContent-home'), dow = (new Date().getDay() + 6) % 7, H = [8.5, 9, 8.2, 8.8, 8.4], N = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum'], tot = 0; H.forEach(function (h, i) { if (i < dow) tot += h });
+      if (hm) hm.appendChild(card('<h3>Jam kerja minggu ini</h3><p class="ag-sm"><b>' + tot.toFixed(1) + ' jam</b> dari target 40 jam \u00b7 Shift ' + CF.in + '\u2013' + CF.out + '</p><div class="x2-bars" style="height:80px">' + N.map(function (n, i) { var v = i < dow ? H[i] : 0; return '<div><span>' + (v || '') + '</span><i class="' + (i === dow ? 't' : v ? '' : 'tw') + '" style="height:' + (v ? v * 6.5 : 4) + 'px"></i><small>' + n + '</small></div>' }).join('') + '</div><div style="height:6px;border-radius:9px;background:#e2e8f0;margin-top:12px;overflow:hidden"><div style="width:' + Math.min(100, tot / .4) + '%;height:100%;background:#0d9488"></div></div>'));
+
+      var lv = $('#tabContent-leave');
+      if (lv) {
+        // Koreksi absen -> antrean persetujuan atasan
+        var RS = ['Lupa absen masuk', 'Lupa absen pulang', 'Perangkat bermasalah', 'GPS tidak akurat'];
+        lv.appendChild(card('<h3>Koreksi absen</h3><p class="ag-sm">Lupa absen? Ajukan koreksi, atasan akan menyetujui.</p>' + fld('Tanggal', 'cxD', 'date', '', iso(1)) + '<div class="x2-2"><div>' + fld('Jam masuk', 'cxI', 'time', '', CF.in) + '</div><div>' + fld('Jam pulang', 'cxO', 'time', '', CF.out) + '</div></div><label class="x2-l" for="cxR">Alasan</label><select class="x2-in" id="cxR">' + RS.map(function (r) { return '<option>' + r + '</option>' }).join('') + '</select><button class="x2-go" id="cxGo">Ajukan koreksi</button><h3 style="margin-top:16px">Pengajuan koreksi saya</h3><div id="cxL"></div>'));
+        $('#cxD').max = iso(0);
+        var cxl = function () { var L = __RL.mine(sid).filter(function (r) { return r.type === 'Koreksi absen' }).slice(0, 4); $('#cxL').innerHTML = L.length ? L.map(function (r) { return '<div class="ag-row"><div><b>' + esc(r.detail.split(' \u00b7 ')[0]) + '</b><br><span class="ag-sm">' + esc(r.detail.split(' \u00b7 ').slice(1).join(' \u00b7 ')) + '</span></div><span class="x2-st ' + r.st + '">' + r.st + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada pengajuan koreksi.</p>' };
+        $('#cxGo').onclick = function () { var d = $('#cxD').value, i = $('#cxI').value, o = $('#cxO').value; if (!d || !i || !o) return toast('Lengkapi tanggal dan jam', 'error'); if (d > iso(0)) return toast('Tanggal tidak boleh di masa depan', 'error'); if (o <= i) return toast('Jam pulang harus setelah jam masuk', 'error'); __RL.add(me, 'Koreksi absen', dfmt(d) + ' \u00b7 ' + i + '\u2013' + o + ' \u00b7 ' + $('#cxR').value); cxl(); toast('Koreksi absen diajukan ke atasan') };
+        cxl(); setInterval(cxl, 3000);
+
+        // Layanan HR -> tiket dibaca portal admin
+        var CAT = ['Surat keterangan kerja', 'Ubah data pribadi', 'Kendala absensi', 'Pertanyaan payroll'], pick = CAT[0], TS = { Diterima: 'a', Diproses: 'b', Selesai: 'c' };
+        lv.appendChild(card('<h3>Layanan HR</h3><div class="x2-pill" id="x2Cat">' + CAT.map(function (c, i) { return '<button type="button" aria-pressed="' + (i === 0) + '">' + c + '</button>' }).join('') + '</div><input class="x2-in" id="x2Note" maxlength="80" placeholder="Catatan singkat (opsional)"><button class="x2-go" id="x2Go">Kirim tiket</button><h3 style="margin-top:16px">Tiket saya</h3><div id="x2List"></div>'));
+        var tx = function () { var L = rd('absenpro-tix-all', []).filter(function (t) { return t.uid === sid }).slice(0, 5); $('#x2List').innerHTML = L.length ? L.map(function (t) { return '<div class="ag-row"><div><b>' + esc(t.cat) + '</b><br><span class="ag-sm">#' + t.no + ' \u00b7 ' + esc(t.note || 'Tanpa catatan') + '</span></div><span class="x2-st ' + TS[t.st] + '">' + (t.st === 'Diproses' ? 'Diproses HR' : t.st) + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada tiket. HR memperbarui status dari Portal Admin.</p>' };
+        $('#x2Cat').onclick = function (e) { var b = e.target.closest('button'); if (!b) return; pick = b.textContent;[].forEach.call(this.children, function (x) { x.setAttribute('aria-pressed', x === b) }) };
+        $('#x2Go').onclick = function () { var n = $('#x2Note'), T = rd('absenpro-tix-all', []); T.unshift({ no: 1001 + T.length, uid: sid, who: me.name, div: me.div, cat: pick, note: n.value.trim(), at: Date.now(), st: 'Diterima' }); wr('absenpro-tix-all', T); n.value = ''; tx(); toast('Tiket "' + pick + '" terkirim ke HR') };
+        tx(); setInterval(tx, 3000);
+      }
+
+      // Data diri (Profil)
+      var pf = $('#tabContent-profile'), PK = 'absenpro-prof-' + sid, D = rd(PK, {});
+      if (pf) {
+        pf.appendChild(card('<h3>Data diri</h3><p class="ag-sm">Kontak ini dipakai HR untuk keperluan darurat.</p>' + fld('Nomor telepon', 'pfT', 'tel', '081234567890', D.t) + fld('Alamat domisili', 'pfA', 'text', 'Jl. ..., Jakarta', D.a) + fld('Kontak darurat (nama dan nomor)', 'pfE', 'text', 'Ibu \u00b7 0812...', D.e) + '<button class="x2-go" id="pfGo">Simpan data diri</button>'));
+        $('#pfGo').onclick = function () { var t = $('#pfT').value.trim(); if (t && !/^(\+62|0)8\d{7,12}$/.test(t.replace(/[\s-]/g, ''))) return toast('Format nomor telepon tidak valid', 'error'); wr(PK, { t: t, a: $('#pfA').value.trim(), e: $('#pfE').value.trim() }); toast('Data diri tersimpan') };
+      }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v4 (app): foto presensi, status terlambat dari pengaturan, wajib kamera, radius geofence */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      if (!sid || typeof appState === 'undefined') return;
+      var $ = function (s) { return document.querySelector(s) }, AK = 'absenpro-att-' + sid;
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
+      var cf = function () { return Object.assign({ in: '08:00', tol: 10, rad: 100, cam: 'Tidak' }, rd('absenpro-cfg-v1', {})) };
+      var nm = { arzha: 'K. Arzhaning Jagad', raka: 'Raka Mahendra', salsa: 'Salsa Anindya', dina: 'Dina Prameswari', hendra: 'Hendra Wijaya' }[sid] || sid;
+      var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+      // radius geofence mengikuti pengaturan admin
+      var _t = window.showToast; if (_t) window.showToast = function (m, t) { return _t(typeof m === 'string' ? m.replace('maks 50m', 'maks ' + cf().rad + 'm') : m, t) };
+      function snap() { var v = $('#webcamVideo'); if (!appState.webcamStream || !v || !v.videoWidth) return null; var c = document.createElement('canvas'), s = Math.min(v.videoWidth, v.videoHeight); c.width = c.height = 160; c.getContext('2d').drawImage(v, (v.videoWidth - s) / 2, (v.videoHeight - s) / 2, s, s, 0, 0, 160, 160); try { var d = c.getContext('2d').getImageData(0, 0, 160, 160).data, t = 0; for (var i = 0; i < d.length; i += 16) t += d[i] + d[i + 1] + d[i + 2]; if (t / (d.length / 16 * 3) < 12) return null; return c.toDataURL('image/jpeg', .6) } catch (e) { return null } }
+      function card() { var a = $('#tabContent-agenda'), d = document.createElement('div'); d.className = 'ag-card'; d.id = 'phCard'; if (a) a.appendChild(d); return d }
+      function draw() {
+        var d = $('#phCard') || card(), L = rd(AK, []).slice(0, 6);
+        d.innerHTML = '<h3>Foto presensi saya</h3>' + (L.length ? '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' + L.map(function (r) { return '<div style="text-align:center;font-size:10.5px">' + (r.img ? '<img src="' + r.img + '" alt="Foto ' + r.t + '" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px">' : '<div style="aspect-ratio:1;border-radius:12px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#64748b;font-weight:700">Tanpa foto</div>') + '<b style="display:block;margin-top:4px">' + r.t + ' ' + r.tm + '</b><span style="opacity:.7">' + esc(r.st) + '</span></div>' }).join('') + '</div>' : '<p class="ag-sm">Belum ada foto. Setiap absen wajib memakai foto wajah dari kamera.</p>')
+      }
+      // kamera menyala otomatis saat modal verifikasi dibuka
+      var _h = window.handleAttendanceAction; window.handleAttendanceAction = function () { _h.apply(this, arguments); var m = $('#modalVerifyAttendance'); if (m && !m.classList.contains('hidden') && !appState.webcamStream && typeof toggleWebcamFeed === 'function') setTimeout(toggleWebcamFeed, 250) };
+      // reset data
+      var KEEP = ['absenpro-v1-session', 'absenpro_theme', 'absenpro_dev'];
+      function wipe(all) { try { var ks = []; for (var i = 0; i < localStorage.length; i++) ks.push(localStorage.key(i)); ks.forEach(function (k) { if (k.indexOf('absenpro') === 0 && KEEP.indexOf(k) < 0 && (all || k === AK || k === 'absenpro-prof-' + sid || k === 'absenpro-pw-' + sid)) localStorage.removeItem(k) }); if (!all) { var T = rd('absenpro-tix-all', []).filter(function (t) { return t.uid !== sid }), Q = rd('absenpro-req2-v1', null); localStorage.setItem('absenpro-tix-all', JSON.stringify(T)); if (Q) localStorage.setItem('absenpro-req2-v1', JSON.stringify(Q.filter(function (r) { return r.uid !== sid }))) } } catch (e) { } if (_t) _t(all ? 'Semua data demo dihapus' : 'Data Anda dihapus', 'info'); setTimeout(function () { location.reload() }, 700) }
+      function two(b, label, fn) { b.onclick = function () { if (b.dataset.arm) return fn(); b.dataset.arm = 1; b.textContent = 'Yakin? Ketuk lagi untuk menghapus'; clearTimeout(b.t); b.t = setTimeout(function () { b.dataset.arm = ''; b.textContent = label }, 4000) } }
+      var pf = $('#tabContent-profile'); if (pf) { var rc = document.createElement('div'); rc.className = 'ag-card'; rc.innerHTML = '<h3>Reset data</h3><p class="ag-sm">Hapus data demo yang tersimpan di perangkat ini. Anda tetap masuk sebagai akun yang sama.</p><button class="x2-go" id="rsM" style="background:#d97706">Reset data saya</button><button class="x2-go" id="rsA" style="background:#dc2626">Reset semua data demo</button><p class="ag-sm" style="margin-top:8px">Data saya: foto presensi, data diri, tiket HR, dan pengajuan Anda. Semua data: seluruh akun, antrean persetujuan, karyawan, dan pengaturan.</p>'; pf.appendChild(rc); two($('#rsM'), 'Reset data saya', function () { wipe(false) }); two($('#rsA'), 'Reset semua data demo', function () { wipe(true) }) }
+      var _c = window.confirmAttendanceAction;
+      window.confirmAttendanceAction = async function () {
+        var C = cf(), isIn = !appState.checkedIn;
+        if (!appState.webcamStream) return _t && _t('Foto wajah wajib untuk absen. Aktifkan kamera lalu hadapkan wajah Anda.', 'error');
+        if (appState.webcamStream && window.FaceDetector) { try { var f = await new FaceDetector().detect($('#webcamVideo')); if (!f.length) return _t && _t('Wajah tidak terdeteksi. Hadapkan wajah ke kamera.', 'error') } catch (e) { } }
+        var img = snap(), n = new Date(), mins = n.getHours() * 60 + n.getMinutes(), p = C.in.split(':'), lim = +p[0] * 60 + +p[1] + C.tol, late = isIn && mins > lim, tm = ('0' + n.getHours()).slice(-2) + ':' + ('0' + n.getMinutes()).slice(-2);
+        if (!img) return _t && _t('Foto gagal diambil atau terlalu gelap. Pastikan wajah terlihat jelas di kamera.', 'error');
+        _c();
+        if (late) { var b = $('#metricCheckInBadge'), s = $('#statusTimeSub'); if (b) { b.textContent = 'Terlambat'; b.className = 'text-[9px] text-amber-600 font-semibold' } if (s) s.textContent = 'Status: Terlambat ' + (mins - lim + C.tol) + ' menit dari jam masuk ' + C.in + '.' }
+        var L = rd(AK, []); L.unshift({ uid: sid, who: nm, t: isIn ? 'Masuk' : 'Pulang', tm: tm, at: Date.now(), mode: appState.workMode, st: isIn ? (late ? 'Terlambat' : 'Tepat waktu') : 'Pulang', img: img, loc: window.__loc ? { d: Math.round(__loc.dist), a: Math.round(__loc.acc), la: +__loc.lat.toFixed(5), ln: +__loc.lng.toFixed(5) } : null }); try { localStorage.setItem(AK, JSON.stringify(L.slice(0, 20))) } catch (e) { }
+        draw()
+      };
+      draw();
+    })();
+  </script>
+  <script>
+    /* AbsenPro v5 (app): geofence GPS asli */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      if (!sid || typeof appState === 'undefined' || !navigator.geolocation) return;
+      var $ = function (s) { return document.getElementById(s) }, W = null;
+      var cf = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } return Object.assign({ rad: 100, lat: -6.2263, lng: 106.8097 }, c) };
+      var toast = function (m, t) { if (typeof showToast === 'function') showToast(m, t || 'info') };
+      function hav(a, b, c, d) { var r = Math.PI / 180, x = Math.sin((c - a) * r / 2), y = Math.sin((d - b) * r / 2), h = x * x + Math.cos(a * r) * Math.cos(c * r) * y * y; return 12742000 * Math.asin(Math.sqrt(h)) }
+      var km = function (m) { return m >= 1000 ? (m / 1000).toFixed(1) + ' km' : Math.round(m) + ' m' };
+      function paint(p) {
+        var C = cf(), d = hav(p.coords.latitude, p.coords.longitude, C.lat, C.lng), ok = d <= C.rad;
+        window.__loc = { lat: p.coords.latitude, lng: p.coords.longitude, dist: d, acc: p.coords.accuracy, at: Date.now() }; appState.geofenceInside = ok;
+        var b = $('geofenceBadgeBtn'), dt = $('geofenceDistText'), dot = $('geofenceDot'), lc = $('geofenceLocationText'), st = $('geofenceStatusText');
+        if (b) b.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold text-white shadow-md active:scale-95 transition ' + (ok ? 'bg-emerald-500' : 'bg-rose-500');
+        if (dt) dt.textContent = 'Jarak ' + km(d) + (ok ? ' (Dalam kantor)' : ' (Di luar)');
+        if (dot) dot.className = 'w-1.5 h-1.5 rounded-full bg-white' + (ok ? ' animate-pulse' : '');
+        if (lc) lc.textContent = 'GPS asli \u00b7 akurasi \u00b1' + Math.round(p.coords.accuracy) + ' m \u00b7 radius ' + C.rad + ' m';
+        if (st) { st.textContent = ok ? 'GPS Valid (' + km(d) + ')' : 'Di Luar Radius (' + km(d) + ')'; st.className = (ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400') + ' font-bold shrink-0' }
+        if (window.__mapDraw) __mapDraw()
+      }
+      function err(e) { toast(e && e.code === 1 ? 'Izin lokasi ditolak. Izinkan lokasi di browser, atau ganti status ke WFH di tab Profil.' : 'Lokasi tidak tersedia. Coba lagi atau gunakan WFH.', 'error') }
+      function fix() { return new Promise(function (res) { navigator.geolocation.getCurrentPosition(function (p) { paint(p); if (W === null) W = navigator.geolocation.watchPosition(paint, function () { }, { enableHighAccuracy: true, maximumAge: 5000 }); res(true) }, function (e) { err(e); res(false) }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 15000 }) }) }
+      window.toggleGeofenceSimulation = function () { toast('Memperbarui lokasi GPS...'); fix().then(function (ok) { if (ok) { var c = cf(); toast(appState.geofenceInside ? 'Lokasi valid: ' + km(__loc.dist) + ' dari kantor' : 'Di luar radius: ' + km(__loc.dist) + ' dari kantor (maks ' + c.rad + ' m)', appState.geofenceInside ? 'success' : 'error') } }) };
+      var _h = window.handleAttendanceAction;
+      window.handleAttendanceAction = async function () {
+        if (appState.workMode === 'WFO' && !appState.checkedIn) { toast('Memeriksa lokasi GPS...'); if (!(await fix())) return }
+        return _h.apply(this, arguments)
+      };
+      if (navigator.permissions) navigator.permissions.query({ name: 'geolocation' }).then(function (r) { if (r.state === 'granted') fix() }).catch(function () { });
+    })();
+  </script>
+  <script>
+    /* AbsenPro v6 (app): peta mini lokasi */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var hm = document.getElementById('tabContent-home'); if (!sid || !hm) return;
+      function absMap(C, pts) {
+        var k = Math.cos(C.lat * Math.PI / 180) * 111320, M = pts.map(function (p) { return { x: (p.ln - C.lng) * k, y: (p.la - C.lat) * 110540, ok: p.ok, t: p.t, a: p.a || 0 } }), R = Math.max(C.rad * 1.6, 40), g = '', i;
+        M.forEach(function (p) { R = Math.max(R, Math.hypot(p.x, p.y) * 1.25) });
+        var s = 80 / R, N = [10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, 100000], nb = 10; N.forEach(function (n) { if (n <= R * .6) nb = n });
+        for (i = 1; i < 6; i++) g += '<line x1="' + i * 50 + '" y1="0" x2="' + i * 50 + '" y2="180" stroke="currentColor" opacity=".08"/>';
+        for (i = 1; i < 4; i++) g += '<line x1="0" y1="' + i * 45 + '" x2="300" y2="' + i * 45 + '" stroke="currentColor" opacity=".08"/>';
+        g += '<circle cx="150" cy="90" r="' + C.rad * s + '" fill="rgba(13,148,136,.16)" stroke="#0d9488" stroke-width="1.5" stroke-dasharray="4 3"/><rect x="146" y="86" width="8" height="8" rx="2" fill="#0d9488"/><text x="150" y="80" text-anchor="middle" font-size="9" font-weight="700" fill="#0d9488">Kantor</text>';
+        M.forEach(function (p) { var x = 150 + p.x * s, y = 90 - p.y * s, c = p.ok ? '#10b981' : '#ef4444'; if (p.a) g += '<circle cx="' + x + '" cy="' + y + '" r="' + Math.min(p.a * s, 40) + '" fill="' + c + '" opacity=".15"/>'; g += '<circle cx="' + x + '" cy="' + y + '" r="5" fill="' + c + '" stroke="#fff" stroke-width="2"><title>' + String(p.t).replace(/[&<>"]/g, '') + '</title></circle>' });
+        g += '<line x1="12" y1="168" x2="' + (12 + nb * s) + '" y2="168" stroke="currentColor" stroke-width="2"/><text x="12" y="162" font-size="9" fill="currentColor">' + (nb >= 1000 ? nb / 1000 + ' km' : nb + ' m') + '</text><text x="286" y="18" text-anchor="middle" font-size="10" font-weight="800" fill="currentColor">U</text><path d="M286 22l-4 8h8z" fill="currentColor"/>';
+        return '<svg viewBox="0 0 300 180" width="100%" role="img" aria-label="Peta lokasi kantor dan posisi staf" style="border-radius:14px;background:rgba(148,163,184,.12);display:block">' + g + '</svg>'
+      }
+
+      var cf = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } return Object.assign({ rad: 100, lat: -6.2263, lng: 106.8097 }, c) };
+      var d = document.createElement('div'); d.className = 'ag-card'; d.id = 'mapCard'; hm.appendChild(d);
+      window.__mapDraw = function () {
+        var C = cf(), L = window.__loc, ok = typeof appState !== 'undefined' && appState.geofenceInside;
+        d.innerHTML = '<h3>Peta lokasi</h3>' + absMap(C, L ? [{ la: L.lat, ln: L.lng, ok: ok, t: 'Posisi Anda', a: L.acc }] : []) + '<p class="ag-sm" style="margin-top:8px">' + (L ? '<b>' + (ok ? 'Dalam' : 'Di luar') + ' radius ' + C.rad + ' m</b> \u00b7 jarak ' + (L.dist >= 1000 ? (L.dist / 1000).toFixed(1) + ' km' : Math.round(L.dist) + ' m') + ' \u00b7 <a href="https://www.google.com/maps?q=' + C.lat + ',' + C.lng + '" target="_blank" rel="noopener" style="color:#0d9488;font-weight:700">Buka kantor di Google Maps</a>' : 'Ketuk lencana lokasi di atas untuk menampilkan posisi Anda di peta.') + '</p>'
+      };
+      __mapDraw();
+    })();
+  </script>
+  <script>
+    /* AbsenPro v7 (app): ganti kata sandi, libur dari admin */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var $ = function (s) { return document.querySelector(s) }, pf = $('#tabContent-profile'); if (!sid || !pf) return;
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } }, toast = function (m, t) { if (typeof showToast === 'function') showToast(m, t || 'success') };
+      var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+      var f = function (l, id, ac) { return '<label class="x2-l" for="' + id + '">' + l + '</label><input class="x2-in" id="' + id + '" type="password" autocomplete="' + ac + '">' };
+      var c = document.createElement('div'); c.className = 'ag-card'; c.innerHTML = '<h3>Ganti kata sandi</h3><p class="ag-sm">Minimal 8 karakter, berisi huruf dan angka.</p>' + f('Kata sandi lama', 'pwO', 'current-password') + f('Kata sandi baru', 'pwN', 'new-password') + f('Ulangi kata sandi baru', 'pwC', 'new-password') + '<button class="x2-go" id="pwGo">Simpan kata sandi</button>'; pf.appendChild(c);
+      $('#pwGo').onclick = function () {
+        var o = $('#pwO').value, n = $('#pwN').value, k = $('#pwC').value;
+        if (!window.__okpw(sid, o)) return toast('Kata sandi lama salah', 'error');
+        if (n.length < 8 || !/[A-Za-z]/.test(n) || !/\d/.test(n)) return toast('Kata sandi baru minimal 8 karakter dengan huruf dan angka', 'error');
+        if (n === o) return toast('Kata sandi baru harus berbeda dari yang lama', 'error');
+        if (n !== k) return toast('Konfirmasi kata sandi tidak cocok', 'error');
+        try { localStorage.setItem('absenpro-pw-' + sid, __cy(n)) } catch (e) { return toast('Gagal menyimpan', 'error') }
+        $('#pwO').value = $('#pwN').value = $('#pwC').value = ''; toast('Kata sandi diperbarui. Pakai yang baru saat masuk berikutnya.')
+      };
+      // libur mendatang dari portal admin
+      var SEED = window.__HS;
+      var h3 = [].filter.call(document.querySelectorAll('#tabContent-agenda .ag-card h3'), function (h) { return h.textContent.trim() === 'Libur mendatang' })[0];
+      if (h3) {
+        var box = h3.parentNode, draw = function () {
+          var n = new Date(), td = n.getFullYear() + '-' + ('0' + (n.getMonth() + 1)).slice(-2) + '-' + ('0' + n.getDate()).slice(-2);
+          var L = rd('absenpro-hol-v1', SEED).filter(function (h) { return h.d >= td }).sort(function (a, b) { return a.d < b.d ? -1 : 1 }).slice(0, 5);
+          box.innerHTML = '<h3>Libur mendatang</h3>' + (L.length ? L.map(function (h) { return '<div class="ag-row"><div><b>' + esc(h.n) + '</b><br><span class="ag-sm">' + new Date(h.d + 'T00:00').toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '</span></div><span class="ag-tag ' + (h.t === 'Wajib' ? '' : 'mu') + '">' + esc(h.t) + '</span></div>' }).join('') : '<p class="ag-sm">Tidak ada libur dalam waktu dekat.</p>')
+        }; draw(); setInterval(draw, 4000)
+      }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v8 (app): hari kerja tanpa libur, kuota cuti dari persetujuan, libur di kalender */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var P = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[sid];
+      var $ = function (s) { return document.querySelector(s) }; if (!P || !window.__RL || !$('#leaveForm')) return;
+      var me = { id: sid, name: P[0], div: P[1], r: P[2] }, pad = function (n) { return ('0' + n).slice(-2) }, toast = function (m, t) { showToast(m, t || 'success') };
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
+      var hol = function () { var m = {}; rd('absenpro-hol-v1', window.__HS).forEach(function (h) { if (h.t === 'Wajib') m[h.d] = h.n }); return m };
+      var iso = function (d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) };
+      function wd(s, e) { var H = hol(), n = 0, d = new Date(s + 'T00:00'), z = new Date(e + 'T00:00'); for (; d <= z; d.setDate(d.getDate() + 1)) { var w = d.getDay(); if (w && w < 6 && !H[iso(d)]) n++ } return n }
+      var fmt = function (s) { return new Date(s + 'T00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) };
+      var KIND = function (t) { return /tahunan/i.test(t) ? 'a' : /sakit/i.test(t) ? 's' : /khusus/i.test(t) ? 'p' : '' };
+      function quota() {
+        var u = { a: 0, s: 0, p: 0 }, q = Object.assign({ quota: 12 }, rd('absenpro-cfg-v1', {})), tot = { a: +q.quota, s: 10, p: 3 };
+        __RL.mine(sid).forEach(function (r) { var k = KIND(r.type), m = /(\d+) hari/.exec(r.detail || ''); if (k && m && r.st !== 'Ditolak') u[k] += +m[1] });
+        return { a: Math.max(0, tot.a - u.a), s: Math.max(0, tot.s - u.s), p: Math.max(0, tot.p - u.p) }
+      }
+      function show() { var q = quota(); appState.leaveBalance = { annual: q.a, sick: q.s, special: q.p }; $('#quotaAnnual').textContent = q.a; $('#quotaSick').textContent = q.s; $('#quotaSpecial').textContent = q.p; hint() }
+      var en = $('#leaveEndDate'); en.parentNode.insertAdjacentHTML('afterend', '<p id="lvHint" class="text-[11px] text-slate-500 dark:text-slate-400" aria-live="polite"></p>');
+      function hint() { var s = $('#leaveStartDate').value, e = en.value, h = $('#lvHint'); if (!h) return; if (!s || !e) { h.textContent = 'Hari kerja dihitung tanpa Sabtu, Minggu, dan libur wajib. Kuota yang menunggu persetujuan sudah dikurangi.'; return } if (e < s) { h.textContent = 'Tanggal selesai harus setelah tanggal mulai.'; return } var n = wd(s, e), k = KIND($('#leaveType').value), q = quota(); h.textContent = n + ' hari kerja' + (k ? ' \u00b7 sisa kuota ' + q[k] + ' hari' + (n > q[k] ? ' (tidak cukup)' : '') : '') }
+      ['leaveStartDate', 'leaveEndDate', 'leaveType'].forEach(function (id) { $('#' + id).addEventListener('change', hint) });
+      window.handleLeaveSubmit = function (ev) {
+        ev.preventDefault(); var t = $('#leaveType').value, s = $('#leaveStartDate').value, e = en.value, r = $('#leaveReason').value.trim();
+        if (!s || !e) return toast('Mohon lengkapi tanggal mulai dan selesai.', 'error');
+        if (e < s) return toast('Tanggal selesai harus setelah tanggal mulai.', 'error');
+        var n = wd(s, e); if (!n) return toast('Rentang tanggal hanya berisi akhir pekan atau libur.', 'error');
+        var k = KIND(t), q = quota(); if (k && n > q[k]) return toast('Sisa kuota ' + q[k] + ' hari tidak cukup untuk ' + n + ' hari kerja.', 'error');
+        if (__RL.mine(sid).some(function (x) { return x.st !== 'Ditolak' && x.ds && x.de && s <= x.de && e >= x.ds })) return toast('Tanggal bertabrakan dengan pengajuan Anda yang lain.', 'error');
+        __RL.add(me, t, fmt(s) + ' \u2013 ' + fmt(e) + ' \u00b7 ' + n + ' hari' + (r ? ' \u00b7 ' + r.slice(0, 40) : ''), { ds: s, de: e });
+        var L = $('#leaveHistoryList'), c = document.createElement('div'); c.className = 'p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 space-y-1 pop-in';
+        c.innerHTML = '<div class="flex items-center justify-between"><span class="font-bold text-xs text-slate-800 dark:text-slate-100"></span><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Menunggu atasan</span></div><div class="text-[11px] text-slate-500 dark:text-slate-400"></div>';
+        c.querySelectorAll('span,div')[1].textContent = t + (r ? ' (' + r.slice(0, 20) + ')' : ''); c.lastChild.textContent = s + ' s/d ' + e + ' (' + n + ' hari kerja)'; L.insertBefore(c, L.firstChild);
+        $('#leaveForm').reset(); $('#uploadedFileName').textContent = 'Pilih Dokumen PDF / Foto'; $('#leaveHistoryCount').textContent = L.children.length + ' Pengajuan'; show();
+        toast('Pengajuan cuti (' + n + ' hari kerja) dikirim ke atasan.')
+      };
+      show(); setInterval(show, 2500);
+      // libur tampil di kalender kehadiran
+      var cal = $('#agCal'), MN = ['januari', 'februari', 'maret', 'april', 'mei', 'juni', 'juli', 'agustus', 'september', 'oktober', 'november', 'desember'];
+      function mark() {
+        var t = ($('#agMon').textContent || '').toLowerCase().split(' '), mo = MN.indexOf(t[0]), y = +t[1], H = hol(); if (mo < 0) return;
+        var h = +$('#agH').textContent, l = +$('#agL').textContent, i = +$('#agI').textContent;
+        [].forEach.call(cal.querySelectorAll('button[data-d]'), function (b) { var k = y + '-' + pad(mo + 1) + '-' + pad(+b.dataset.d), c = b.className; if (!H[k] || c === 't') return; if (c === 'p') h--; else if (c === 'l') { l--; h-- } else if (c === 'i') i--; b.className = 'w'; b.dataset.i = 'Libur: ' + H[k] });
+        $('#agH').textContent = Math.max(0, h); $('#agL').textContent = Math.max(0, l); $('#agI').textContent = Math.max(0, i)
+      }
+      if (cal && $('#agMon')) { new MutationObserver(mark).observe(cal, { childList: true }); mark() }
     })();
   </script>
 </body>
