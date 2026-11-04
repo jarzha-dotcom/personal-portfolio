@@ -4931,6 +4931,14 @@
       overflow-x: auto
     }
 
+    .mxwrap td {
+      white-space: normal
+    }
+
+    .mxwrap td.r {
+      white-space: nowrap
+    }
+
     .mxlogin {
       position: fixed;
       inset: 0;
@@ -5739,15 +5747,15 @@
         var r = function (l, v, c) { return '<tr' + (c ? ' class="tot"' : '') + '><td>' + l + '</td><td class="r">' + v + '</td></tr>'; }, cap = '<small style="color:var(--mu);display:block;margin-top:8px">Estimasi untuk perencanaan, bukan perhitungan resmi. Pastikan angka dan aturan terbaru ke KPP atau konsultan pajak.</small>';
         if (X.taxMode === 'non') {
           var p = pphOf(a), proj = sum(rng(H.length), 'net') / H.length * 365, st = proj <= TAX_FREE ? 'Di bawah Rp500 juta: tidak kena PPh final.' : proj <= PKP_LIMIT ? 'Antara Rp500 juta dan Rp4,8 miliar: PPh final 0,5% dan tidak wajib PKP.' : 'Di atas Rp4,8 miliar: wajib dikukuhkan sebagai PKP.';
-          return '<div class="mxc mxsc"><h3>Pajak · Non-PKP (PPh final UMKM) · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('Omzet periode', R(p.omzet)) + r('Omzet kumulatif tahun ini sebelum periode <input type="number" min="0" step="1000000" value="' + p.before + '" onchange="mxYtd(this.value)" style="width:130px">', R(p.before)) + r('Bagian omzet kena PPh final (di atas Rp500 juta)', R(p.taxable)) + r('Estimasi PPh final 0,5%', R(p.pph), 1) + r('Proyeksi omzet setahun (rata-rata ' + H.length + ' hari)', R(proj)) + '</tbody></table><small style="display:block;margin-top:6px"><b>' + st + '</b></small>' + cap + '</div>';
+          return '<div class="mxc mxsc"><h3>Pajak · Non-PKP (PPh final UMKM) · ' + per + ' hari</h3><table class="mxt mxwrap"><tbody>' + r('Omzet periode', R(p.omzet)) + r('Omzet kumulatif tahun ini sebelum periode', R(p.before)) + r('Bagian omzet kena PPh final (di atas Rp500 juta)', R(p.taxable)) + r('Estimasi PPh final 0,5%', R(p.pph), 1) + r('Proyeksi omzet setahun (rata-rata ' + H.length + ' hari)', R(proj)) + '</tbody></table><div style="margin-top:8px;font-size:12px">Ubah omzet kumulatif sebelum periode: Rp <input type="number" min="0" step="1000000" value="' + p.before + '" onchange="mxYtd(this.value)" style="width:140px;padding:3px 6px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"></div><small style="display:block;margin-top:6px"><b>' + st + '</b></small>' + cap + '</div>';
         }
         var lim = Date.now() - per * 864e5, buy = (X.po || []).reduce(function (t, o) { return (o.ts || 0) >= lim ? t + rc(o) * o.cost : t; }, 0), out = sum(a, 'tax'), inn = buy * 0.11;
-        return '<div class="mxc mxsc"><h3>Pajak · PKP (PPN) · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('PPN keluaran (dari penjualan)', R(out)) + r('PPN masukan (estimasi 11% dari pembelian)', R(inn)) + r('PPN kurang bayar (estimasi)', R(Math.max(0, out - inn)), 1) + '</tbody></table><small style="color:var(--mu);display:block;margin-top:8px">PPN masukan hanya dapat dikreditkan bila supplier PKP dan ada faktur pajak.</small>' + cap + '</div>';
+        return '<div class="mxc mxsc"><h3>Pajak · PKP (PPN) · ' + per + ' hari</h3><table class="mxt mxwrap"><tbody>' + r('PPN keluaran (dari penjualan)', R(out)) + r('PPN masukan (estimasi 11% dari pembelian)', R(inn)) + r('PPN kurang bayar (estimasi)', R(Math.max(0, out - inn)), 1) + '</tbody></table><small style="color:var(--mu);display:block;margin-top:8px">PPN masukan hanya dapat dikreditkan bila supplier PKP dan ada faktur pajak.</small>' + cap + '</div>';
       }
       function cashCard(net, op, man) {
         var lim = Date.now() - per * 864e5, sp = (X.po || []).reduce(function (t, o) { if (o.pays) return t + o.pays.reduce(function (u, p) { return p.ts >= lim ? u + p.amt : u; }, 0); var ts = o.payTs || o.ts || 0; return o.paid && ts >= lim ? t + rc(o) * o.cost : t; }, 0), k = net - sp - op - man;
         var r = function (l, v, neg, c) { return '<tr' + (c ? ' class="tot"' : '') + '><td>' + l + '</td><td class="r ' + (neg ? 'dn' : (c ? (v >= 0 ? 'up' : 'dn') : '')) + '">' + (neg ? '− ' : '') + R(Math.abs(v)) + '</td></tr>'; };
-        return '<div class="mxc mxsc"><h3>Arus kas · ' + per + ' hari</h3><table class="mxt"><tbody>' + r('Uang masuk dari penjualan', net) + r('Bayar supplier', sp, 1) + r('Biaya operasional', op, 1) + r('Kas keluar manual', man, 1) + r('Kas bersih periode', k, 0, 1) + '</tbody></table>' +
+        return '<div class="mxc mxsc"><h3>Arus kas · ' + per + ' hari</h3><table class="mxt mxwrap"><tbody>' + r('Uang masuk dari penjualan', net) + r('Bayar supplier', sp, 1) + r('Biaya operasional', op, 1) + r('Kas keluar manual', man, 1) + r('Kas bersih periode', k, 0, 1) + '</tbody></table>' +
           '<small style="color:var(--mu);display:block;margin-top:8px">Belum termasuk PPN dan kas masuk tambahan. Hutang ke supplier saat ini: <b>' + R(hutang()) + '</b>.</small></div>';
       }
       var ADL = { retur: 'Retur ke supplier', rusak: 'Barang rusak', exp: 'Barang kadaluarsa' };
