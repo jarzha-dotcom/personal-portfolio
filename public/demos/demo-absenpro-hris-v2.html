@@ -43,12 +43,12 @@
       --bg: #EDF1F5;
       --card: #fff;
       --ink: #12263F;
-      --mute: #6A7B90;
+      --mute: #586A80;
       --line: #DCE3EB;
       --sun: #F2B01E;
       --sunink: #3A2A00;
-      --ok: #1F9D77;
-      --late: #E5584B;
+      --ok: #157055;
+      --late: #BE3629;
       --chip: #E4EAF1;
       --frame: #12263F
     }
@@ -59,6 +59,8 @@
         --card: #13243A;
         --ink: #EAF0F7;
         --mute: #8FA3BA;
+        --ok: #3FCB9E;
+        --late: #FF7B6E;
         --line: #233750;
         --chip: #1B3049;
         --frame: #050B13
@@ -70,6 +72,8 @@
       --card: #13243A;
       --ink: #EAF0F7;
       --mute: #8FA3BA;
+      --ok: #3FCB9E;
+      --late: #FF7B6E;
       --line: #233750;
       --chip: #1B3049;
       --frame: #050B13
@@ -1849,6 +1853,22 @@
       display: none !important
     }
   </style>
+  <style>
+    @media(prefers-color-scheme:dark) {
+
+      :root:not([data-theme="light"]) .btn.dg,
+      :root:not([data-theme="light"]) .wk .p,
+      :root:not([data-theme="light"]) .wk .p b {
+        color: #0B1624
+      }
+    }
+
+    :root[data-theme="dark"] .btn.dg,
+    :root[data-theme="dark"] .wk .p,
+    :root[data-theme="dark"] .wk .p b {
+      color: #0B1624
+    }
+  </style>
 </head>
 
 <body>
@@ -2050,20 +2070,22 @@
           <div class="chips" id="type"><button class="on">Cuti
               tahunan</button><button>Sakit</button><button>Izin</button></div>
           <div class="two">
-            <div><label>Mulai</label><input type="date" id="d1"></div>
-            <div><label>Selesai</label><input type="date" id="d2"></div>
+            <div><label for="d1">Mulai</label><input type="date" id="d1"></div>
+            <div><label for="d2">Selesai</label><input type="date" id="d2"></div>
           </div>
           <div id="lhint"></div>
-          <label>Alasan</label><textarea id="why" rows="2" placeholder="Contoh: acara keluarga di Bandung"></textarea>
+          <label for="why">Alasan</label><textarea id="why" rows="2"
+            placeholder="Contoh: acara keluarga di Bandung"></textarea>
           <button class="btn" id="send">Kirim pengajuan</button>
         </div>
         <div class="card">
           <h3>Ajukan lembur</h3>
           <div class="two">
-            <div><label>Tanggal</label><input type="date" id="ld"></div>
-            <div><label>Mulai</label><input type="time" id="la" value="17:00"></div>
-          </div><label>Selesai</label><input type="time" id="lb2" value="19:00"><label>Pekerjaan</label><textarea
-            id="lr" rows="2" placeholder="Contoh: rilis fitur absensi"></textarea><button class="btn" id="lk">Kirim
+            <div><label for="ld">Tanggal</label><input type="date" id="ld"></div>
+            <div><label for="la">Mulai</label><input type="time" id="la" value="17:00"></div>
+          </div><label for="lb2">Selesai</label><input type="time" id="lb2" value="19:00"><label
+            for="lr">Pekerjaan</label><textarea id="lr" rows="2"
+            placeholder="Contoh: rilis fitur absensi"></textarea><button class="btn" id="lk">Kirim
             lembur</button>
         </div>
         <div class="card" id="rbCard">
@@ -2536,17 +2558,17 @@
       const acts = rem.map(n => `<div class="row"><div><b>${n.t}</b><br><span class="sm">${n.s}</span></div><div class="rl-acts"><button class="y" data-go="abs">Absen sekarang</button></div></div>`).concat(act.map(r => `<div class="row"><div><b>${RL.esc(r.who)} \u00b7 ${RL.esc(r.type)}</b><br><span class="sm">${RL.esc(r.detail)}</span></div><div class="rl-acts"><button class="y" data-id="${r.id}" data-ok="1">Setujui</button><button class="n" data-id="${r.id}">Tolak</button></div></div>`));
       const rows = NT === 'act' ? acts : NT === 'info' ? info : acts.concat(info);
       $('#nl').innerHTML = rows.length ? rows.join('') : '<p class="sm" style="padding:18px 0;text-align:center">' + (NT === 'act' ? 'Tidak ada yang perlu ditindaklanjuti.' : 'Belum ada notifikasi.') + '</p>';
-      const c = N.filter(n => n.u).length + act.length; $('#bd').textContent = c; $('#bd').hidden = !c; $('#nbAct').textContent = acts.length; $('#nbAct').hidden = !acts.length;
+      const c = N.filter(n => n.u).length + act.length; $('#bd').textContent = c; $('#bd').hidden = !c; $('#bell').setAttribute('aria-label', c ? 'Notifikasi ' + c : 'Notifikasi'); $('#nbAct').textContent = acts.length; $('#nbAct').hidden = !acts.length;
       $$('#ntabs button').forEach(b => b.classList.toggle('on', b.dataset.t === NT))
     }
-    $('#bell').onclick = () => { NT = 'all'; drawN(); $('#nsheet').hidden = false; N.forEach(n => n.u = 0); const c = actItems().length; $('#bd').textContent = c; $('#bd').hidden = !c };
+    $('#bell').onclick = () => { NT = 'all'; drawN(); $('#nsheet').hidden = false; N.forEach(n => n.u = 0); const c = actItems().length; $('#bd').textContent = c; $('#bd').hidden = !c; $('#bell').setAttribute('aria-label', c ? 'Notifikasi ' + c : 'Notifikasi') };
     $('#ntabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; NT = b.dataset.t; drawN() };
     $('#nl').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.go === 'abs') { $('#nsheet').hidden = true; showTab('t0'); return } if (b.dataset.id) { const r = RL.decide(+b.dataset.id, !!b.dataset.ok); if (r) toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) } };
     Object.assign(SL, { '05': { n: 'Mei', a: 'Mei', v: [12000000, 1200000, 800000, -140000, -260000, -400000] }, '06': { n: 'Juni', a: 'Jun', v: [12000000, 1200000, 840000, -140000, -260000, -405000] }, '07': { n: 'Juli', a: 'Jul', v: [12000000, 1200000, 860000, -140000, -260000, -410000] } });
     function drawPay() {
       if (!SL['05']) return; const MK = ['05', '06', '07', '08', '09', '10'], nets = k => SL[k].v.reduce((a, b) => a + b, 0) + rbPaid(k), v = SL[SM].v, e = v.slice(0, 3), tot = e.reduce((a, b) => a + b, 0), C = ['var(--sun)', 'var(--ink)', 'var(--ok)'], NM = ['Gaji pokok', 'Transport', 'Makan'], R = 48, L = 2 * Math.PI * R; let off = 0;
       $('#dn').innerHTML = `<svg viewBox="0 0 120 120" role="img" aria-label="Komposisi pendapatan"><circle cx="60" cy="60" r="${R}" fill="none" stroke="var(--chip)" stroke-width="16"/>${e.map((x, i) => { const d = x / tot * L, c = `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${C[i]}" stroke-width="16" stroke-dasharray="${d} ${L - d}" stroke-dashoffset="${-off}" transform="rotate(-90 60 60)"/>`; off += d; return c }).join('')}<text x="60" y="57" text-anchor="middle" font-size="9" fill="var(--mute)">Bersih</text><text x="60" y="72" text-anchor="middle" font-size="12" font-weight="800" fill="var(--ink)">${hide ? '\u2022\u2022\u2022' : (slipNet() / 1e6).toFixed(1) + ' jt'}</text></svg><ul class="lgd">${e.map((x, i) => `<li><i style="background:${C[i]}"></i>${NM[i]} <b>${Math.round(x / tot * 100)}%</b></li>`).join('')}</ul>`;
-      const mx = Math.max(...MK.map(nets)); $('#b6').innerHTML = MK.map(k => `<button data-k="${k}" class="${k === SM ? 't' : ''}" aria-label="${SL[k].n}"><b>${hide ? '\u2022' : (nets(k) / 1e6).toFixed(1)}</b><i style="height:${40 + nets(k) / mx * 70}px"></i><small>${SL[k].a}</small></button>`).join('')
+      const mx = Math.max(...MK.map(nets)); $('#b6').innerHTML = MK.map(k => `<button data-k="${k}" class="${k === SM ? 't' : ''}" title="${SL[k].n}"><b>${hide ? '\u2022' : (nets(k) / 1e6).toFixed(1)}</b><i style="height:${40 + nets(k) / mx * 70}px"></i><small>${SL[k].a}</small></button>`).join('')
     }
     $('#b6').onclick = e => { const b = e.target.closest('button'); if (!b) return; $('#mchips').children[['05', '06', '07', '08', '09', '10'].indexOf(b.dataset.k)].click() };
     drawPay();

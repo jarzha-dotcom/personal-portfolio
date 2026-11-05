@@ -2997,7 +2997,7 @@
        STATE & HELPER
     ================================================================ */
     var cart = [];
-    var activeCategory = 'all';
+    var activeCategory = 'all', gridLimit = 48, GRID_STEP = 48, srchT = null, KH = {};
     var searchQuery = '';
     var selectedMember = null;
     var paymentMethod = 'cash';
@@ -3183,19 +3183,24 @@
       }).join('');
     }
 
-    function setCategory(id) { activeCategory = id; renderCategories(); renderProducts(); }
+    function setCategory(id) { activeCategory = id; gridLimit = GRID_STEP; renderCategories(); renderProducts(); }
 
-    function handleSearch(val) { searchQuery = val.trim().toLowerCase(); renderProducts(); }
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase(); gridLimit = GRID_STEP; clearTimeout(srchT);
+      if (PRODUCTS.length > 300) srchT = setTimeout(renderProducts, 120); else renderProducts();
+    }
+    function mxMoreProducts() { gridLimit += GRID_STEP; renderProducts(); }
 
     function handleSearchKeydown(e) {
       if (e.key !== 'Enter') return;
       if (!searchQuery) return;
+      clearTimeout(srchT);
       var exact = PRODUCTS.find(function (p) { return p.barcode === searchQuery; });
       var target = exact || getFilteredProducts()[0];
       if (target) {
         addToCart(target.id);
         $('search-input').value = '';
-        searchQuery = '';
+        searchQuery = ''; gridLimit = GRID_STEP;
         renderProducts();
       } else {
         showToast('Barang "' + searchQuery + '" tidak ditemukan.', 'warn');
@@ -3203,17 +3208,26 @@
     }
 
     function getFilteredProducts() {
-      return PRODUCTS.filter(function (p) {
-        var matchCat = activeCategory === 'all' || p.category === activeCategory;
-        var matchQ = !searchQuery || p.name.toLowerCase().indexOf(searchQuery) !== -1 || p.barcode.indexOf(searchQuery) !== -1;
-        return matchCat && matchQ;
+      var ts = searchQuery ? searchQuery.split(/\s+/).filter(Boolean) : [];
+      var a = PRODUCTS.filter(function (p) {
+        if (activeCategory !== 'all' && p.category !== activeCategory) return false;
+        if (!ts.length) return true;
+        var k = p.id + '|' + p.name, h = KH[k] || (KH[k] = (p.name + ' ' + p.barcode + ' ' + p.id).toLowerCase());
+        for (var i = 0; i < ts.length; i++) if (h.indexOf(ts[i]) < 0) return false;
+        return true;
       });
+      if (searchQuery) {   /* hasil paling relevan di atas: barcode persis, lalu nama diawali kata kunci */
+        var r = function (p) { return p.barcode === searchQuery ? 0 : p.name.toLowerCase().indexOf(searchQuery) === 0 ? 1 : p.barcode.slice(-6) === searchQuery ? 2 : 3; };
+        a = a.map(function (p, i) { return [r(p), i, p]; }).sort(function (x, y) { return x[0] - y[0] || x[1] - y[1]; }).map(function (x) { return x[2]; });
+      }
+      return a;
     }
 
     function renderProducts() {
       var filtered = getFilteredProducts();
       var countEl = $('product-count-label');
-      if (countEl) countEl.innerHTML = 'Menampilkan <strong class="text-slate-700">' + filtered.length + '</strong> produk';
+      var shown = Math.min(filtered.length, gridLimit);
+      if (countEl) countEl.innerHTML = 'Menampilkan <strong class="text-slate-700">' + shown.toLocaleString('id-ID') + '</strong>' + (shown < filtered.length ? ' dari <strong class="text-slate-700">' + filtered.length.toLocaleString('id-ID') + '</strong>' : '') + ' produk';
       var grid = $('products-grid');
       if (!grid) return;
       if (filtered.length === 0) {
@@ -3221,7 +3235,7 @@
         return;
       }
       grid.innerHTML = '<div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5">' +
-        filtered.map(function (p) {
+        filtered.slice(0, gridLimit).map(function (p) {
           var out = p.stock <= 0, low = !out && p.stock <= mxMin(p);
           return '<div onclick="addToCart(\x27' + p.id + '\x27)" class="bg-white rounded-xl border border-slate-200 hover:border-emerald-500 transition-all cursor-pointer flex flex-col overflow-hidden hover:shadow-md hover:-translate-y-0.5 group' + (out ? ' mx-soldout' : '') + '">' +
             '<div class="relative aspect-4/3 w-full bg-slate-100 overflow-hidden">' +
@@ -3249,7 +3263,8 @@
             '</div>' +
             '</div>';
         }).join('') +
-        '</div>';
+        '</div>' +
+        (filtered.length > shown ? '<div style="text-align:center;padding:16px 0 8px"><button type="button" onclick="mxMoreProducts()" class="mxbtn" style="background:#059669;padding:9px 18px;font-size:13px">Tampilkan ' + Math.min(GRID_STEP, filtered.length - shown) + ' lagi <span style="opacity:.8">(sisa ' + (filtered.length - shown).toLocaleString('id-ID') + ')</span></button><div style="font-size:12px;color:#64748b;margin-top:8px">Atau ketik nama, kode, atau scan barcode untuk mempersempit.</div></div>' : '');
     }
 
     /* ================================================================
@@ -5427,7 +5442,308 @@
       line-height: 16px
     }
   </style>
+  <style id="mx-inv-v2">
+    .mxib {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 8px
+    }
+
+    .mxiq {
+      flex: 1 1 280px;
+      min-width: 0;
+      padding: 9px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--bd, #cbd5e1);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 14px
+    }
+
+    .mxib select {
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--bd, #cbd5e1);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 13px;
+      max-width: 100%
+    }
+
+    .mxiq:focus-visible,
+    .mxib select:focus-visible,
+    .mxif select:focus-visible {
+      outline: 2px solid #10b981;
+      outline-offset: 1px
+    }
+
+    .mxic {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .mxchip {
+      border: 1px solid var(--bd, #cbd5e1);
+      background: transparent;
+      color: inherit;
+      border-radius: 99px;
+      padding: 5px 12px;
+      font: inherit;
+      font-size: 12.5px;
+      cursor: pointer
+    }
+
+    .mxchip b {
+      margin-left: 4px;
+      opacity: .7
+    }
+
+    .mxchip.on {
+      background: #059669;
+      border-color: #059669;
+      color: #fff
+    }
+
+    .mxchip.on b {
+      opacity: 1
+    }
+
+    .mxif {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 13px;
+      color: var(--mu, #64748b)
+    }
+
+    .mxifr {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .mxifr select {
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--bd, #cbd5e1);
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 12.5px
+    }
+
+    .mxif button[disabled] {
+      opacity: .4;
+      cursor: default
+    }
+  </style>
+  <style id="mx-login-v2">
+    /* Login v2: muat di layar pendek, tidak terpotong, panel kiri di layar lebar */
+    #mx-role.mxlogin {
+      align-items: flex-start;
+      justify-content: center;
+      gap: clamp(32px, 7vw, 110px);
+      padding: 16px 16px 62px
+    }
+
+    #mx-role .mxlg {
+      margin: auto 0;
+      width: min(392px, 100%);
+      padding: 22px 22px 18px;
+      background: rgba(2, 6, 23, .62);
+      border: 1px solid #1e3a34;
+      border-radius: 24px;
+      box-shadow: 0 30px 80px -28px #000;
+      backdrop-filter: blur(8px)
+    }
+
+    #mx-role .mxlg-logo {
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+      border-radius: 13px;
+      margin-bottom: 8px
+    }
+
+    #mx-role .mxlg h1 {
+      font-size: 19px;
+      letter-spacing: -.01em
+    }
+
+    #mx-role .mxlg-sub {
+      margin-bottom: 12px
+    }
+
+    #mx-role .mxlg-tab {
+      transition: background .15s, color .15s
+    }
+
+    #mx-role .mxlg-tab:not(.on):hover {
+      color: #e2e8f0
+    }
+
+    #mx-lg-desc {
+      min-height: 0;
+      margin: 10px 4px;
+      line-height: 1.4
+    }
+
+    #mx-lg-hint {
+      margin: 0 auto 12px
+    }
+
+    #mx-lg-dots i {
+      width: 13px;
+      height: 13px;
+      transition: background .12s, transform .12s, box-shadow .12s
+    }
+
+    #mx-lg-dots i.f {
+      transform: scale(1.15);
+      box-shadow: 0 0 12px rgba(52, 211, 153, .55)
+    }
+
+    #mx-role-e {
+      min-height: 16px;
+      margin-bottom: 8px
+    }
+
+    #mx-role .mxlg-pad {
+      gap: 7px
+    }
+
+    #mx-role .mxlg-pad button {
+      height: clamp(40px, 7.4vh, 56px);
+      transition: transform .08s, background .12s
+    }
+
+    #mx-role .mxlg-pad button:hover {
+      background: #13213a
+    }
+
+    #mx-role .mxlg-pad button:active {
+      transform: scale(.95);
+      background: #065f46
+    }
+
+    #mx-role .mxlg-pad .ok:hover {
+      background: #10b981
+    }
+
+    #mx-role button:focus-visible {
+      outline: 2px solid #6ee7b7;
+      outline-offset: 2px
+    }
+
+    #mx-role .mxlg-foot button[hidden] {
+      display: none
+    }
+
+    #mx-role .mxlg-foot:not(:has(button:not([hidden]))) {
+      display: none
+    }
+
+    .mxhero {
+      display: none
+    }
+
+    @media (min-width:900px) {
+      .mxhero {
+        display: block;
+        width: min(430px, 44vw);
+        margin: auto 0;
+        color: #cbd5e1;
+        text-align: left;
+        font-family: inherit
+      }
+
+      .mxh-clock {
+        font-size: clamp(56px, 7vw, 92px);
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -.04em;
+        color: #ecfdf5;
+        font-variant-numeric: tabular-nums
+      }
+
+      .mxh-date {
+        margin: 6px 0 22px;
+        font-size: 14px;
+        color: #6ee7b7
+      }
+
+      .mxhero h2 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -.01em
+      }
+
+      .mxhero p {
+        margin: 0 0 16px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: #94a3b8;
+        max-width: 380px
+      }
+
+      .mxhero ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 9px;
+        font-size: 13px;
+        color: #94a3b8
+      }
+
+      .mxhero li {
+        padding-left: 14px;
+        border-left: 2px solid #059669
+      }
+
+      #mx-role .mxlg-sub br,
+      #mx-role .mxlg-sub #mx-lg-date {
+        display: none
+      }
+    }
+
+    @media (max-height:600px) {
+      #mx-role .mxlg-logo {
+        display: none
+      }
+
+      #mx-role .mxlg {
+        padding: 16px 18px 14px
+      }
+
+      #mx-lg-desc {
+        font-size: 11.5px
+      }
+    }
+  </style>
   <div id="mx-role" class="mxlogin" hidden>
+    <aside class="mxhero" aria-hidden="true">
+      <div class="mxh-clock" id="mxh-time">--.--</div>
+      <div class="mxh-date" id="mxh-date"></div>
+      <h2>Kasir siap, antrean aman.</h2>
+      <p>Scan, bayar, cetak struk. Void dan retur tetap lewat persetujuan supervisor.</p>
+      <ul>
+        <li>Stok berkurang otomatis di setiap penjualan</li>
+        <li>Barang yang segera kadaluarsa langsung terlihat</li>
+        <li>Laba hanya bisa dilihat Pemilik</li>
+      </ul>
+    </aside>
     <div class="mxlg">
       <div class="mxlg-logo">M</div>
       <h1 id="mx-lg-title">Masuk</h1>
@@ -5439,7 +5755,7 @@
       <div id="mx-lg-desc"></div>
       <div id="mx-lg-hint"></div>
       <div id="mx-lg-dots"></div>
-      <div id="mx-role-e"></div>
+      <div id="mx-role-e" role="alert"></div>
       <div class="mxlg-pad"><button type="button" onclick="mxKey('1')">1</button><button type="button"
           onclick="mxKey('2')">2</button><button type="button" onclick="mxKey('3')">3</button><button type="button"
           onclick="mxKey('4')">4</button><button type="button" onclick="mxKey('5')">5</button><button type="button"
@@ -5452,6 +5768,7 @@
           style="background:#be123c" onclick="mxLogout()">Keluar</button></div>
     </div>
   </div>
+  <script>(function () { var t = document.getElementById('mxh-time'), d = document.getElementById('mxh-date'); function u() { var n = new Date(); t.textContent = n.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace(':', '.'); d.textContent = n.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) } u(); setInterval(u, 20000) })();</script>
   <div id="mx-label" class="mxpin" hidden>
     <div class="mxlb-box" style="width:min(640px,100%);max-height:92vh;overflow:auto"><b style="font-size:17px">Cetak
         label barcode</b>
@@ -5498,7 +5815,7 @@
   <div id="mx-view" hidden></div>
   <script>
     (function () {
-      var K = 'mx-ext-v1', X = { cost: {}, min: {}, exp: {} }, H = null, view = 'kasir', per = 7, invTab = 'stock', invEdit = false, detOpen = false, addOpen = false, recvId = null, editId = null, editImg = null, payId = null, adOpen = false, secOpen = false, devOpen = false, cardId = null, poDraft = [], lastRec = [], OPEX = 300000;
+      var K = 'mx-ext-v1', X = { cost: {}, min: {}, exp: {} }, H = null, view = 'kasir', per = 7, invTab = 'stock', invQ = '', invF = 'all', invC = '', invS = 'urgent', invPg = 0, invPer = 50, invT = null, HAY = {}, invEdit = false, detOpen = false, addOpen = false, recvId = null, editId = null, editImg = null, payId = null, adOpen = false, secOpen = false, devOpen = false, cardId = null, poDraft = [], lastRec = [], OPEX = 300000;
       var RC = { sembako: .86, snack: .78, minuman: .74, mandi: .76, rokok_pulsa: .93 };
       var EXP = { p1: 400, p2: 200, p3: 180, p4: 240, p5: 18, p6: 6, p9: 150, p10: 330, p11: 25, p12: 300, p13: 9 };
       var $ = function (i) { return document.getElementById(i); }, R = function (n) { return formatRupiah(Math.round(n)); };
@@ -5592,21 +5909,87 @@
           '<div class="mxc" style="margin-bottom:12px"><h3>Stok perlu diisi ulang (' + low.length + ')</h3>' + (low.slice(0, 4).map(function (p) { return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (p.stock <= 0 ? 'dn' : 'am') + '">' + p.stock + ' / min ' + X.min[p.id] + '</b></div>'; }).join('') || '<small>Semua stok aman.</small>') + '</div>' +
           '<div class="mxc"><h3>Segera kadaluarsa (' + ex.length + ')</h3>' + (ex.slice(0, 3).map(function (p) { var d = daysLeft(p); return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>' + esc(p.name) + '</span><b class="' + (d < 0 ? 'dn' : 'am') + '">' + (d < 0 ? 'lewat ' + (-d) : d) + ' hari</b></div>'; }).join('') || '<small>Tidak ada.</small>') + '<a class="mxlink" onclick="mxView(\'inv\')">Buka Inventori →</a></div></div></div>' + (X.role === 'owner' ? sec() + dev() : '');
       }
-      function inv() {
-        var val = 0, low = lowList(), ex = expList();
-        PRODUCTS.forEach(function (p) { val += Math.max(p.stock, 0) * X.cost[p.id]; });
-        var rows = PRODUCTS.slice().sort(function (a, b) { return a.stock / (X.min[a.id] || 1) - b.stock / (X.min[b.id] || 1); }).map(function (p) {
+
+      function invHay(p) { var k = p.id + '|' + p.name; return HAY[k] || (HAY[k] = (p.name + ' ' + (p.barcode || '') + ' ' + p.id + ' ' + (CATS[p.category] || '')).toLowerCase()); }
+      function invList() {
+        var ts = invQ.toLowerCase().split(/\s+/).filter(Boolean);
+        var a = PRODUCTS.filter(function (p) {
+          if (invC && p.category !== invC) return false;
+          if (invF === 'low' && !(p.stock <= X.min[p.id])) return false;
+          if (invF === 'out' && !(p.stock <= 0)) return false;
+          if (invF === 'exp') { var d = daysLeft(p); if (!(d !== null && d <= 30)) return false; }
+          if (ts.length) { var h = invHay(p); for (var i = 0; i < ts.length; i++) if (h.indexOf(ts[i]) < 0) return false; }
+          return true;
+        });
+        var v = function (p) { return Math.max(p.stock, 0) * (X.cost[p.id] || 0); };
+        var S = {
+          urgent: function (a, b) { return a.stock / (X.min[a.id] || 1) - b.stock / (X.min[b.id] || 1); },
+          name: function (a, b) { return a.name.localeCompare(b.name, 'id'); },
+          lo: function (a, b) { return a.stock - b.stock; },
+          hi: function (a, b) { return b.stock - a.stock; },
+          val: function (a, b) { return v(b) - v(a); }
+        };
+        return a.sort(S[invS] || S.urgent);
+      }
+      function invRows(list) {
+        if (!list.length) return '<tr><td colspan="9" style="text-align:center;padding:28px 12px;color:var(--mu)">' + (invQ || invF !== 'all' || invC ? 'Tidak ada produk yang cocok' + (invQ ? ' dengan “' + esc(invQ) + '”' : '') + '. Coba kata lain, atau <a class="mxlink" onclick="mxIclr()">hapus semua filter</a>.' : 'Belum ada produk.') + '</td></tr>';
+        return list.map(function (p) {
           var d = daysLeft(p), tg = p.stock <= 0 ? '<span class="mxtag r">Habis</span>' : p.stock <= X.min[p.id] ? '<span class="mxtag a">Menipis</span>' : '<span class="mxtag g">Aman</span>';
           if (d !== null && d < 0) tg += '<span class="mxtag r">Kadaluarsa</span>'; else if (d !== null && d <= 30) tg += '<span class="mxtag a">ED ' + d + ' hr</span>';
           return '<tr><td><a class="mxlink" style="text-decoration:none" onclick="mxCard(\'' + p.id + '\')">' + esc(p.name) + '</a></td><td class="r">' + p.stock + '</td><td>' + inp('min', p) + '</td>' +
             '<td>' + inp('cost', p) + '</td><td class="r">' + R(p.price) + '</td><td class="r">' + R(Math.max(p.stock, 0) * X.cost[p.id]) + '</td>' +
             '<td>' + inp('exp', p) + '</td><td>' + tg + '</td>' + (invEdit ? '<td><button class="mxbtn" onclick="mxEditP(\'' + p.id + '\')">Ubah</button></td>' : '') + '</tr>';
         }).join('');
+      }
+      function invChips() {
+        var n = { all: PRODUCTS.length, low: lowList().length, out: PRODUCTS.filter(function (p) { return p.stock <= 0; }).length, exp: expList().length };
+        return [['all', 'Semua'], ['low', 'Perlu restock'], ['out', 'Habis'], ['exp', 'Segera kadaluarsa']].map(function (c) {
+          return '<button type="button" class="mxchip' + (invF === c[0] ? ' on' : '') + '" onclick="mxIf(\'' + c[0] + '\')">' + c[1] + ' <b>' + n[c[0]].toLocaleString('id-ID') + '</b></button>';
+        }).join('');
+      }
+      function invBar() {
+        if (invTab === 'buy') return '';
+        var cats = '<option value="">Semua kategori</option>' + Object.keys(CATS).map(function (k) { return '<option value="' + k + '"' + (invC === k ? ' selected' : '') + '>' + CATS[k] + '</option>'; }).join('');
+        var so = [['urgent', 'Paling mendesak'], ['name', 'Nama A–Z'], ['lo', 'Stok terendah'], ['hi', 'Stok tertinggi'], ['val', 'Nilai stok terbesar']].map(function (o) { return '<option value="' + o[0] + '"' + (invS === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+        return '<div class="mxib"><input id="mx-iq" type="search" class="mxiq" value="' + esc(invQ) + '" placeholder="Cari nama, barcode, atau kode produk…  (tekan /)" autocomplete="off" aria-label="Cari produk" oninput="mxIq(this.value)" onkeydown="mxIk(event)"><select aria-label="Kategori" onchange="mxIc(this.value)">' + cats + '</select><select aria-label="Urutkan" onchange="mxIs(this.value)">' + so + '</select></div><div id="mx-ic" class="mxic">' + invChips() + '</div>';
+      }
+      function invFoot(L) {
+        var t = L.length, pg = Math.max(1, Math.ceil(t / invPer)); invPg = Math.min(invPg, pg - 1);
+        var a = t ? invPg * invPer + 1 : 0, b = Math.min(t, (invPg + 1) * invPer);
+        return '<span>Menampilkan <b>' + a.toLocaleString('id-ID') + '–' + b.toLocaleString('id-ID') + '</b> dari <b>' + t.toLocaleString('id-ID') + '</b> produk</span><span class="mxifr"><select aria-label="Baris per halaman" onchange="mxIper(this.value)">' + [25, 50, 100, 200].map(function (n) { return '<option value="' + n + '"' + (invPer === n ? ' selected' : '') + '>' + n + ' per halaman</option>'; }).join('') + '</select><button type="button" class="mxbtn" style="background:#64748b" ' + (invPg <= 0 ? 'disabled' : '') + ' onclick="mxIpg(-1)">‹ Sebelumnya</button><span>' + (invPg + 1) + ' / ' + pg + '</span><button type="button" class="mxbtn" style="background:#64748b" ' + (invPg >= pg - 1 ? 'disabled' : '') + ' onclick="mxIpg(1)">Berikutnya ›</button></span>';
+      }
+      function invUpd() {
+        var b = $('mx-ib'); if (!b) return; var L = invList();
+        invPg = Math.min(invPg, Math.max(0, Math.ceil(L.length / invPer) - 1));
+        b.innerHTML = invRows(L.slice(invPg * invPer, (invPg + 1) * invPer)); $('mx-ic').innerHTML = invChips(); $('mx-if').innerHTML = invFoot(L);
+      }
+      window.mxIq = function (v) { invQ = v; invPg = 0; clearTimeout(invT); invT = setTimeout(invUpd, 120); };
+      window.mxIk = function (e) {
+        if (e.key === 'Escape') { e.target.value = ''; mxIq(''); return; }
+        if (e.key !== 'Enter') return; clearTimeout(invT); invUpd(); var L = invList(), q = invQ.trim();
+        var ex = L.filter(function (p) { return p.barcode === q || p.id === q; })[0] || (L.length === 1 ? L[0] : null);
+        if (ex) mxCard(ex.id);
+      };
+      window.mxIf = function (f) { invF = f; invPg = 0; invUpd(); };
+      window.mxIc = function (c) { invC = c; invPg = 0; invUpd(); };
+      window.mxIs = function (v) { invS = v; invPg = 0; invUpd(); };
+      window.mxIper = function (n) { invPer = +n || 50; invPg = 0; invUpd(); };
+      window.mxIpg = function (d) { invPg = Math.max(0, invPg + d); invUpd(); var t = $('mx-ib'); if (t && t.closest) { var r = t.closest('.mxsc'); if (r && r.scrollIntoView) r.scrollIntoView({ block: 'nearest' }); } };
+      window.mxIclr = function () { invQ = ''; invF = 'all'; invC = ''; invPg = 0; draw(); };
+      document.addEventListener('keydown', function (e) {
+        if (e.key !== '/' || view !== 'inv' || invTab === 'buy' || e.ctrlKey || e.metaKey) return;
+        var t = e.target; if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
+        var q = $('mx-iq'); if (q) { e.preventDefault(); q.focus(); q.select(); }
+      });
+      function inv() {
+        var val = 0, low = lowList(), ex = expList();
+        PRODUCTS.forEach(function (p) { val += Math.max(p.stock, 0) * X.cost[p.id]; });
+        var L = invList(), rows = invRows(L.slice(invPg * invPer, (invPg + 1) * invPer));
         return NOTE +
           '<h2><i class="fa-solid fa-boxes-stacked"></i> Inventori <button class="mxbtn" onclick="mxOpenStock()" style="margin-left:auto"><i class="fa-solid fa-truck-ramp-box"></i> Barang masuk &amp; stok opname</button></h2><p class="mxsub">Menjawab: stok saya aman nggak?</p><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px"><div class="mxseg"><button class="' + (invTab !== 'buy' ? 'on' : '') + '" onclick="mxTab(\'stock\')">Stok barang</button><button class="' + (invTab === 'buy' ? 'on' : '') + '" onclick="mxTab(\'buy\')">Pembelian &amp; supplier</button></div>' + (invTab !== 'buy' ? '<button class="mxbtn" onclick="mxAdd()">' + (addOpen ? 'Batal tambah' : '+ Produk baru') + '</button><button class="mxbtn" style="background:#475569" onclick="mxLabel()">Cetak label</button><button class="mxbtn" style="background:' + (invEdit ? '#d97706' : '#64748b') + '" onclick="mxEdit()">' + (invEdit ? 'Selesai mengubah' : 'Ubah harga modal / stok minimum / kadaluarsa') + '</button>' : '') + '</div><div class="mxg">' +
           card('Nilai persediaan (HPP)', R(val), 'stok × harga modal') + card('Perlu restock', low.length, 'stok ≤ minimum', low.length ? 'am' : 'up') +
           card('Segera kadaluarsa', ex.length, '≤ 30 hari / lewat', ex.length ? 'dn' : 'up') + card('Jumlah produk', PRODUCTS.length, '') + '</div>' +
-          (invTab === 'buy' ? '' : (addOpen ? addForm() : '') + (editId ? editForm() : '') + (cardId ? stockCard() : '') + '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>Harga modal</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th>' + (invEdit ? '<th></th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table></div>') + (invTab === 'buy' ? po() + adj() + sup() + opn() : '');
+          (invTab === 'buy' ? '' : (addOpen ? addForm() : '') + (editId ? editForm() : '') + (cardId ? stockCard() : '') + invBar() + '<div class="mxc mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Stok</th><th>Stok min</th><th>Harga modal</th><th class="r">Harga jual</th><th class="r">Nilai stok</th><th>Kadaluarsa</th><th>Status</th>' + (invEdit ? '<th></th>' : '') + '</tr></thead><tbody id="mx-ib">' + rows + '</tbody></table></div><div id="mx-if" class="mxif">' + invFoot(L) + '</div>') + (invTab === 'buy' ? po() + adj() + sup() + opn() : '');
       }
       var SUP = { sembako: 'PT Sembako Jaya', snack: 'CV Snack Nusantara', minuman: 'Distributor Minuman Prima', mandi: 'Agen Rumah Tangga Makmur', rokok_pulsa: 'Agen Rokok & Pulsa Cikarang' };
       var SUPD = { sembako: { c: '0812-3456-7001', lt: 2, tm: 14 }, snack: { c: '0813-5555-0102', lt: 1, tm: 7 }, minuman: { c: '0811-2233-4455', lt: 1, tm: 7 }, mandi: { c: '0857-9000-1200', lt: 3, tm: 30 }, rokok_pulsa: { c: '021-5550-0199', lt: 1, tm: 0 } };

@@ -3809,6 +3809,7 @@
        STOK PER VARIAN (WARNA x UKURAN)
     ================================================================ */
     const tpVS = {};
+    const tpMin = p => (p && Number.isFinite(p.min) ? p.min : 2);
     function tpInitStock() {
       PRODUCTS.forEach((p, pi) => {
         const cells = [];
@@ -3860,7 +3861,7 @@
           <i class="fa-solid fa-tag text-[9px] text-rose-400"></i><span>${p.sku}</span>
         </div>
         <div class="absolute top-2.5 right-2.5 bg-white/90 backdrop-blur-xs text-slate-700 text-[10px] font-medium px-2 py-0.5 rounded-md shadow-xs" title="Stok varian terpilih (total semua varian: ${p.stock})">
-          Stok: <span class="font-bold ${left <= 2 ? 'tp-low' : 'text-slate-900'}">${left}</span><span class="text-slate-400"> / ${p.stock}</span>
+          Stok: <span class="font-bold ${left <= tpMin(p) ? 'tp-low' : 'text-slate-900'}">${left}</span><span class="text-slate-400"> / ${p.stock}</span>
         </div>
       </div>
       <div class="p-3.5 flex-1 flex flex-col justify-between">
@@ -4722,7 +4723,7 @@
       let hh = '';
       if (hk.length) for (let h = Math.min(...hk); h <= Math.max(...hk); h++) hh += '<div title="' + tpPad(h) + ':00 · ' + formatRupiah(hrs[h] || 0) + '"><span class="f" style="height:' + (Math.round((hrs[h] || 0) / hm * 72) + 2) + 'px"></span>' + tpPad(h) + '</div>';
       const low = [];
-      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n <= 2) low.push([p.name, c.name, s, n]); })));
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n <= tpMin(p)) low.push([p.name, c.name, s, n]); })));
       low.sort((a, b) => a[3] - b[3]);
       const seg = [['today', 'Hari ini'], ['7d', '7 hari'], ['all', 'Semua']].map(x => '<button class="' + (tpRpRange === x[0] ? 'on' : '') + '" onclick="tpRpSet(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
       const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
@@ -4732,7 +4733,7 @@
         '<div class="rp-h">Penjualan per jam</div>' + (hh ? '<div class="rp-hours">' + hh + '</div>' : '<p style="color:#94a3b8">Belum ada transaksi.</p>') +
         '<div class="rp-h">Metode pembayaran</div>' + bars(pay, ' trx') +
         '<div class="rp-h">Produk terlaris</div>' + bars(top, ' pcs') +
-        '<div class="rp-h">Stok menipis (≤ 2 pcs) · ' + low.length + ' varian</div>' +
+        '<div class="rp-h">Stok menipis (≤ batas minimum) · ' + low.length + ' varian</div>' +
         (low.length ? low.slice(0, 14).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' (' + x[3] + ')</span>').join('') + (low.length > 14 ? '<span class="rp-chip">+' + (low.length - 14) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Semua stok aman.</p>');
     }
     const _tpOpen = openModal;
@@ -4859,22 +4860,69 @@
     }
   </style>
   <div id="stock-modal" class="tp-overlay hidden">
-    <div class="tp-modal" style="max-width:760px">
+    <div class="tp-modal">
       <div class="tp-mhead">
-        <h4><i class="fa-solid fa-boxes-stacked" style="color:#fbbf24"></i> Manajemen Stok</h4><button
-          onclick="closeModal('stock-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+        <h4><i class="fa-solid fa-boxes-stacked" style="color:#fbbf24"></i> Manajemen Stok</h4>
+        <div style="display:flex;gap:6px">
+          <button id="st-fs" onclick="tpStFull()" title="Layar penuh browser" aria-label="Layar penuh"><i
+              class="fa-solid fa-expand"></i></button>
+          <button onclick="closeModal('stock-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+        </div>
       </div>
       <div class="tp-mbody">
-        <div class="rp-h" style="margin-top:0">Terima barang masuk</div>
-        <div id="st-recv"></div>
-        <div class="rp-h">Stok opname <span style="font-weight:500;text-transform:none;color:#64748b">· ubah angka, lalu
-            Enter atau pindah kolom</span></div>
-        <input id="st-q" class="st-in" placeholder="Cari produk atau SKU…" oninput="tpStQ=this.value;tpRenderStGrid()">
-        <div id="st-grid"></div>
-        <div class="rp-h">Riwayat mutasi stok</div>
-        <div id="st-log"></div>
+        <div class="st-main">
+          <div id="st-stats" class="st-stats"></div>
+          <div class="st-tools">
+            <input id="st-q" class="st-in" placeholder="Cari produk atau SKU…"
+              oninput="tpStQ=this.value;tpRenderStGrid()">
+            <select id="st-cat" class="st-sel" onchange="tpStCat=this.value;tpRenderStGrid()"></select>
+            <div id="st-chips" class="st-chips"></div>
+            <button class="tp-btn ghost" onclick="tpStCsv()" title="Unduh tabel sesuai filter saat ini"><i
+                class="fa-solid fa-file-csv"></i> Ekspor CSV</button>
+            <button id="st-addbtn" class="tp-btn green" onclick="tpNpOpen()"><i class="fa-solid fa-plus"></i> Tambah
+              Produk</button>
+          </div>
+          <div id="st-grid" class="st-tbl"></div>
+        </div>
+        <aside class="st-side">
+          <div class="rp-h" style="margin-top:0">Terima barang masuk</div>
+          <div id="st-recv"></div>
+          <div class="rp-h">Riwayat mutasi stok</div>
+          <div id="st-log"></div>
+        </aside>
       </div>
-      <div class="tp-mfoot"><button class="tp-btn ghost" onclick="closeModal('stock-modal')">Tutup</button></div>
+    </div>
+  </div>
+  <div id="np-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal" style="max-width:520px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-shirt" style="color:#34d399"></i> <span id="np-title">Tambah Produk Baru</span></h4>
+        <button onclick="closeModal('np-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody np-form">
+        <label>Nama produk<input id="np-name" class="st-in" placeholder="mis. Kaos Polo Pique"></label>
+        <div class="np-2"><label>Kategori<select id="np-cat" class="st-sel" onchange="tpNpSku()"></select></label>
+          <label>SKU<input id="np-sku" class="st-in"></label>
+        </div>
+        <div class="np-2"><label>Harga (Rp)<input id="np-price" class="st-in" type="number" min="1"
+              placeholder="199000"></label>
+          <label id="np-qtyl">Stok awal per varian<input id="np-qty" class="st-in" type="number" min="0"
+              value="5"></label>
+        </div>
+        <label>Batas stok menipis <small>pcs; varian dengan stok ≤ angka ini ditandai menipis</small><input id="np-min"
+            class="st-in" type="number" min="0" value="2"></label>
+        <label id="np-colorsl">Warna <small>pisahkan koma, hex opsional</small><input id="np-colors" class="st-in"
+            placeholder="Hitam #111827, Putih #f8fafc, Navy"></label>
+        <label id="np-sizesl">Ukuran <small>pisahkan koma</small><input id="np-sizes" class="st-in"
+            value="S, M, L, XL"></label>
+        <label>Foto produk <small>unggah dari perangkat (otomatis diperkecil)</small><input id="np-file" class="st-in"
+            type="file" accept="image/*" onchange="tpNpFile(this)"><img id="np-prev" alt="Pratinjau"></label>
+        <label>atau URL gambar <small>opsional</small><input id="np-img" class="st-in" placeholder="https://…"></label>
+      </div>
+      <div class="tp-mfoot"><button class="tp-btn ghost" onclick="closeModal('np-modal')">Batal</button>
+        <button class="tp-btn green" onclick="tpNpSave()"><i class="fa-solid fa-check"></i> <span id="np-savel">Simpan
+            Produk</span></button>
+      </div>
     </div>
   </div>
   <script>
@@ -4921,7 +4969,7 @@
           p.sizes.map((s, si) => { const n = tpStock(p.id, c.name, s); return '<label class="st-cell ' + (n === 0 ? 'z' : n <= 2 ? 'l' : '') + '">' + tpEsc(s) + '<input type="number" min="0" value="' + n + '" onchange="tpStSet(\'' + p.id + '\',' + ci + ',' + si + ',this.value)"></label>'; }).join('') + '</div>').join('') + '</div>').join('') : '<p style="color:#94a3b8;margin-top:8px">Produk tidak ditemukan.</p>';
     }
     function tpRenderStLog() {
-      tp$('st-log').innerHTML = tpMoves.length ? tpMoves.slice(0, 8).map(m => '<div class="st-log"><em>' + tpDMY(m.ts) + ' ' + tpHM(m.ts) + '</em><span style="font-weight:700;color:' + (m.type === 'masuk' ? '#059669' : '#d97706') + '">' + (m.type === 'masuk' ? 'MASUK' : 'OPNAME') + '</span><span style="flex:1">' + tpEsc(m.name) + ' · ' + tpEsc(m.color) + ' · ' + tpEsc(m.size) + (m.note ? ' · <i>' + tpEsc(m.note) + '</i>' : '') + '</span><em>' + m.from + ' → ' + m.to + '</em></div>').join('') : '<p style="color:#94a3b8">Belum ada mutasi stok.</p>';
+      tp$('st-log').innerHTML = tpMoves.length ? tpMoves.slice(0, 40).map(m => '<div class="st-log"><em>' + tpDMY(m.ts) + ' ' + tpHM(m.ts) + '</em><span style="font-weight:700;color:' + (m.type === 'masuk' ? '#059669' : '#d97706') + '">' + (m.type === 'masuk' ? 'MASUK' : 'OPNAME') + '</span><span style="flex:1">' + tpEsc(m.name) + ' · ' + tpEsc(m.color) + ' · ' + tpEsc(m.size) + (m.note ? ' · <i>' + tpEsc(m.note) + '</i>' : '') + '</span><em>' + m.from + ' → ' + m.to + '</em></div>').join('') : '<p style="color:#94a3b8">Belum ada mutasi stok.</p>';
     }
     function tpRenderStock() { tpRenderRecv(); tpRenderStGrid(); tpRenderStLog(); }
     const _tpOpen2 = openModal;
@@ -4933,6 +4981,454 @@
     });
     document.addEventListener('mousedown', e => { if (e.target.id === 'stock-modal') closeModal('stock-modal'); });
   </script>
+  <style>
+    #stock-modal.tp-overlay {
+      padding: 0;
+      z-index: 60
+    }
+
+    #stock-modal .tp-modal {
+      max-width: none;
+      width: 100%;
+      height: 100%;
+      max-height: none;
+      border-radius: 0;
+      border: 0
+    }
+
+    #stock-modal .tp-mbody {
+      display: flex;
+      padding: 0;
+      overflow: hidden;
+      flex: 1;
+      min-height: 0
+    }
+
+    .st-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 16px
+    }
+
+    .st-side {
+      width: 340px;
+      flex: none;
+      border-left: 1px solid #e2e8f0;
+      background: #f8fafc;
+      padding: 14px 16px;
+      overflow: auto
+    }
+
+    .st-side .st-form {
+      flex-direction: column
+    }
+
+    .st-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px
+    }
+
+    .st-stat {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 8px 12px;
+      background: #fff
+    }
+
+    .st-stat b {
+      display: block;
+      font: 800 19px 'JetBrains Mono', monospace;
+      color: #0f172a
+    }
+
+    .st-stat span {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: #64748b
+    }
+
+    .st-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px
+    }
+
+    .st-tools .st-in {
+      flex: 1 1 200px;
+      width: auto
+    }
+
+    .st-tools .st-sel {
+      width: auto
+    }
+
+    .st-chips {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap
+    }
+
+    .st-chip {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 99px;
+      padding: 6px 12px;
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      color: #475569
+    }
+
+    .st-chip i {
+      font-style: normal;
+      font-family: 'JetBrains Mono', monospace;
+      opacity: .7;
+      margin-left: 4px
+    }
+
+    .st-chip.on {
+      background: #0f172a;
+      color: #fff;
+      border-color: #0f172a
+    }
+
+    .st-tbl {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      background: #fff
+    }
+
+    .st-tbl table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px
+    }
+
+    .st-tbl th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: #0f172a;
+      color: #fff;
+      text-align: left;
+      padding: 9px 12px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em
+    }
+
+    .st-tbl td {
+      padding: 6px 12px;
+      border-bottom: 1px solid #f1f5f9
+    }
+
+    .st-tbl .r {
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .st-ph td {
+      background: #f1f5f9;
+      padding: 8px 12px;
+      border-top: 2px solid #e2e8f0
+    }
+
+    .st-ph img {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      object-fit: cover;
+      vertical-align: middle;
+      margin-right: 10px
+    }
+
+    .st-ph small {
+      color: #64748b;
+      margin-left: 8px
+    }
+
+    .st-ph .t {
+      float: right;
+      font: 700 12px 'JetBrains Mono', monospace;
+      color: #475569;
+      line-height: 32px
+    }
+
+    .st-r.zr td {
+      background: #fff1f2
+    }
+
+    .st-r.lo td {
+      background: #fffbeb
+    }
+
+    .st-qty {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px
+    }
+
+    .st-qty input {
+      width: 62px;
+      text-align: center;
+      padding: 5px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font: 700 13px 'JetBrains Mono', monospace
+    }
+
+    .st-qty button {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer
+    }
+
+    .st-badge {
+      padding: 2px 10px;
+      border-radius: 99px;
+      font: 700 11px 'Plus Jakarta Sans', sans-serif
+    }
+
+    .st-badge.ok {
+      background: #d1fae5;
+      color: #047857
+    }
+
+    .st-badge.lo {
+      background: #fef3c7;
+      color: #b45309
+    }
+
+    .st-badge.zr {
+      background: #ffe4e6;
+      color: #be123c
+    }
+
+    .np-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto
+    }
+
+    .np-form label {
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      color: #334155;
+      display: block
+    }
+
+    .np-form label small {
+      font-weight: 500;
+      color: #94a3b8
+    }
+
+    .np-form .st-in,
+    .np-form .st-sel {
+      margin-top: 4px
+    }
+
+    .st-ib {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      margin-right: 6px;
+      cursor: pointer;
+      color: #475569
+    }
+
+    .st-ib.d {
+      color: #be123c
+    }
+
+    #np-prev {
+      display: none;
+      width: 72px;
+      height: 72px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 1px solid #e2e8f0;
+      margin-top: 6px
+    }
+
+    .np-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    @media (max-width: 900px) {
+      #stock-modal .tp-mbody {
+        flex-direction: column;
+        overflow: auto
+      }
+
+      .st-side {
+        width: auto;
+        border-left: 0;
+        border-top: 1px solid #e2e8f0;
+        overflow: visible
+      }
+
+      .st-tbl {
+        flex: none;
+        min-height: 380px
+      }
+    }
+  </style>
+  <script>
+    let tpStCat = 'all', tpStStat = 'all';
+    const TP_CATL = { shirts: 'Atasan', pants: 'Celana', outerwear: 'Outerwear', dress: 'Dress', accessories: 'Aksesoris' };
+    const TP_CATP = { shirts: 'SHR', pants: 'PNT', outerwear: 'OUT', dress: 'DRS', accessories: 'ACC' };
+    const TP_PAL = ['#111827', '#f8fafc', '#1e3a8a', '#14532d', '#881337', '#b45309', '#64748b', '#84a98c'];
+    const tpStS = (n, p) => n === 0 ? 'zr' : n <= tpMin(p) ? 'lo' : 'ok';
+    const tpImgFallback = n => 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600"><rect width="600" height="600" fill="#e2e8f0"/><text x="300" y="320" font-size="180" text-anchor="middle" fill="#94a3b8" font-family="sans-serif">' + (n || '?').charAt(0).toUpperCase() + '</text></svg>');
+
+    function tpRegisterProduct(p, q) {
+      if (tpProd(p.id)) return;
+      PRODUCTS.push(p);
+      if (!tpVS[p.id]) { const m = {}; p.colors.forEach(c => { m[c.name] = {}; p.sizes.forEach(s => m[c.name][s] = q || 0); }); tpVS[p.id] = m; }
+      activeVariants[p.id] = { color: p.colors[0], size: p.sizes[0] };
+      tpSyncStock(p);
+    }
+
+    tpRenderStGrid = function () {
+      const q = tpStQ.toLowerCase(), staff = tpRole === 'staff';
+      const sel = tp$('st-cat');
+      if (!sel.options.length) sel.innerHTML = '<option value="all">Semua kategori</option>' + Object.keys(TP_CATL).map(k => '<option value="' + k + '">' + TP_CATL[k] + '</option>').join('');
+      sel.value = tpStCat;
+      tp$('st-addbtn').style.display = staff ? 'none' : '';
+      const ps = PRODUCTS.filter(p => (tpStCat === 'all' || p.category === tpStCat) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
+      const cnt = { all: 0, ok: 0, lo: 0, zr: 0 }; let pcs = 0, val = 0, rows = '';
+      ps.forEach(p => {
+        let body = '', tot = 0, v = 0;
+        p.colors.forEach((c, ci) => p.sizes.forEach((s, si) => {
+          const n = tpStock(p.id, c.name, s), k = tpStS(n, p); cnt.all++; cnt[k]++; tot += n; v += n * p.price;
+          if (tpStStat !== 'all' && tpStStat !== k) return;
+          const call = d => "tpStSet('" + p.id + "'," + ci + ',' + si + ',' + d + ')';
+          body += '<tr class="st-r ' + k + '"><td><span class="st-sw" style="background:' + c.hex + '"></span>' + tpEsc(c.name) + '</td><td><b>' + tpEsc(s) + '</b></td>' +
+            '<td><span class="st-qty"><button onclick="' + call(n - 1) + '" aria-label="Kurangi">−</button><input type="number" min="0" value="' + n + '" onchange="' + call('this.value') + '"><button onclick="' + call(n + 1) + '" aria-label="Tambah">+</button></span></td>' +
+            '<td><span class="st-badge ' + k + '">' + (k === 'zr' ? 'Habis' : k === 'lo' ? 'Menipis' : 'Aman') + '</span></td><td class="r">' + formatRupiah(n * p.price) + '</td></tr>';
+        }));
+        pcs += tot; val += v;
+        if (body) rows += '<tr class="st-ph"><td colspan="5"><img src="' + tpEsc(p.image) + '" alt=""><b>' + tpEsc(p.name) + '</b><small>' + tpEsc(p.sku) + ' · ' + (TP_CATL[p.category] || p.category) + ' · ' + formatRupiah(p.price) + ' · min ' + tpMin(p) + '</small><span class="t">' + (staff ? '' : '<button class="st-ib" title="Edit produk" onclick="tpNpOpen(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button>' + (p.custom ? '<button class="st-ib d" title="Hapus produk" onclick="tpNpDel(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '')) + tot + ' pcs</span></td></tr>' + body;
+      });
+      tp$('st-stats').innerHTML = [['Produk', ps.length], ['Total stok (pcs)', pcs], ['Nilai persediaan', formatRupiah(val)], ['Varian menipis (≤ min)', cnt.lo], ['Varian habis', cnt.zr]].map(x => '<div class="st-stat"><span>' + x[0] + '</span><b>' + x[1] + '</b></div>').join('');
+      tp$('st-chips').innerHTML = [['all', 'Semua'], ['ok', 'Aman'], ['lo', 'Menipis'], ['zr', 'Habis']].map(x => '<button class="st-chip' + (tpStStat === x[0] ? ' on' : '') + '" onclick="tpStStat=\'' + x[0] + '\';tpRenderStGrid()">' + x[1] + '<i>' + cnt[x[0]] + '</i></button>').join('');
+      tp$('st-grid').innerHTML = rows ? '<table><thead><tr><th>Warna</th><th>Ukuran</th><th>Stok</th><th>Status</th><th style="text-align:right">Nilai</th></tr></thead><tbody>' + rows + '</tbody></table>' : '<p style="color:#94a3b8;padding:24px;text-align:center">Tidak ada varian yang cocok dengan filter.</p>';
+    };
+
+    function tpStCsv() {
+      const q = tpStQ.toLowerCase(), qt = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"', lab = { zr: 'Habis', lo: 'Menipis', ok: 'Aman' }, rows = [];
+      PRODUCTS.filter(p => (tpStCat === 'all' || p.category === tpStCat) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))).forEach(p =>
+        p.colors.forEach(c => p.sizes.forEach(s => {
+          const n = tpStock(p.id, c.name, s), k = tpStS(n, p);
+          if (tpStStat !== 'all' && tpStStat !== k) return;
+          rows.push([p.sku, p.name, TP_CATL[p.category] || p.category, c.name, s, n, tpMin(p), lab[k], p.price, n * p.price, ''].map(qt).join(';'));
+        })));
+      if (!rows.length) { showToast('Tidak ada data untuk diekspor.', 'warn'); return; }
+      const head = ['SKU', 'Produk', 'Kategori', 'Warna', 'Ukuran', 'Stok Sistem', 'Batas Min', 'Status', 'Harga', 'Nilai Stok', 'Stok Fisik (isi manual)'].map(qt).join(';');
+      const n = new Date(), url = URL.createObjectURL(new Blob(['\ufeff' + [head].concat(rows).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'stok-threadpos-' + n.getFullYear() + tpPad(n.getMonth() + 1) + tpPad(n.getDate()) + '.csv';
+      document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+      showToast('CSV stok diekspor: ' + rows.length + ' varian.', 'success');
+    }
+    function tpStFull() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => { }); }
+    document.addEventListener('fullscreenchange', () => { const i = document.querySelector('#st-fs i'); if (i) i.className = 'fa-solid ' + (document.fullscreenElement ? 'fa-compress' : 'fa-expand'); });
+    window.addEventListener('keydown', e => { const m = tp$('np-modal'); if (e.key === 'Escape' && !m.classList.contains('hidden')) { e.stopImmediatePropagation(); closeModal('np-modal'); } }, true);
+
+    function tpNpSku() {
+      const cat = tp$('np-cat').value, pre = TP_CATP[cat] || 'PRD'; let n = PRODUCTS.length + 1;
+      while (PRODUCTS.some(p => p.sku.toLowerCase() === pre.toLowerCase() + '-' + String(n).padStart(3, '0'))) n++;
+      tp$('np-sku').value = pre + '-' + String(n).padStart(3, '0');
+    }
+    let tpNpEdit = null, tpNpImgData = null;
+    function tpNpOpen(id) {
+      if (tpRole === 'staff') { showToast('Tambah/edit produk khusus SPV / Owner.', 'warn'); return; }
+      const p = id ? tpProd(id) : null; tpNpEdit = p ? p.id : null;
+      tp$('np-cat').innerHTML = Object.keys(TP_CATL).map(k => '<option value="' + k + '">' + TP_CATL[k] + '</option>').join('');
+      tp$('np-title').textContent = p ? 'Edit Produk' : 'Tambah Produk Baru'; tp$('np-savel').textContent = p ? 'Simpan Perubahan' : 'Simpan Produk';
+      tpNpImgData = null; tp$('np-file').value = ''; tp$('np-prev').src = p ? p.image : ''; tp$('np-prev').style.display = p ? 'block' : 'none';
+      ['np-qtyl', 'np-colorsl', 'np-sizesl'].forEach(i => tp$(i).style.display = p ? 'none' : '');
+      if (p) { tp$('np-name').value = p.name; tp$('np-cat').value = p.category; tp$('np-sku').value = p.sku; tp$('np-price').value = p.price; tp$('np-min').value = tpMin(p); tp$('np-img').value = p.image.startsWith('data:') ? '' : p.image; }
+      else { ['np-name', 'np-price', 'np-colors', 'np-img'].forEach(i => tp$(i).value = ''); tp$('np-qty').value = 5; tp$('np-min').value = 2; tp$('np-sizes').value = 'S, M, L, XL'; tpNpSku(); }
+      openModal('np-modal'); setTimeout(() => tp$('np-name').focus(), 60);
+    }
+    function tpNpFile(inp) {
+      const f = inp.files && inp.files[0]; if (!f) return;
+      if (!f.type.startsWith('image/')) { showToast('File harus berupa gambar.', 'warn'); inp.value = ''; return; }
+      const r = new FileReader();
+      r.onload = () => {
+        const im = new Image();
+        im.onload = () => {
+          const enc = (max, ql) => { const k = Math.min(1, max / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', ql); };
+          let d = enc(600, .82); if (d.length > 250000) d = enc(400, .7);
+          tpNpImgData = d; const pv = tp$('np-prev'); pv.src = d; pv.style.display = 'block';
+          showToast('Foto siap (' + Math.round(d.length / 1024) + ' KB).', 'success');
+        };
+        im.onerror = () => showToast('Gambar tidak bisa dibaca.', 'warn');
+        im.src = r.result;
+      };
+      r.readAsDataURL(f);
+    }
+    function tpNpUpdate() {
+      if (tpRole === 'staff') { showToast('Edit produk khusus SPV / Owner.', 'warn'); return; }
+      const p = tpProd(tpNpEdit); if (!p) return;
+      const g = id => tp$(id).value.trim(), name = g('np-name'), sku = g('np-sku'), price = Math.floor(Number(g('np-price'))), img = tpNpImgData || g('np-img');
+      const err = !name ? 'Nama produk wajib diisi.' : !sku ? 'SKU wajib diisi.' : PRODUCTS.some(x => x !== p && x.sku.toLowerCase() === sku.toLowerCase()) ? 'SKU sudah dipakai produk lain.' : !(price > 0) ? 'Harga harus lebih dari 0.' : '';
+      if (err) { showToast(err, 'warn'); return; }
+      const old = p.name + ' · ' + formatRupiah(p.price);
+      Object.assign(p, { name, sku, price, category: tp$('np-cat').value, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0), edited: true }); if (img) p.image = img;
+      closeModal('np-modal'); renderProducts(); renderCart(); tpRenderStock(); playAudio('success');
+      showToast('Produk "' + name + '" diperbarui.', 'success');
+      if (typeof tpLog === 'function') tpLog('stock', 'Edit produk \u00b7 ' + old + ' \u2192 ' + name + ' \u00b7 ' + formatRupiah(price));
+    }
+    function tpNpDel(pid) {
+      if (tpRole === 'staff') { showToast('Hapus produk khusus SPV / Owner.', 'warn'); return; }
+      const p = tpProd(pid); if (!p) return;
+      const why = p.stock > 0 ? 'Stok masih ' + p.stock + ' pcs. Kosongkan stok (opname ke 0) dulu.' :
+        tpTrx.some(t => t.items.some(i => i.pid === pid)) ? 'Produk sudah pernah terjual, jadi tidak bisa dihapus agar laporan tetap utuh.' :
+          (cart.concat(...tpHeld.map(h => h.cart))).some(i => i.product.id === pid) ? 'Produk masih ada di keranjang / transaksi tertahan.' : '';
+      if (why) { showToast(why, 'warn'); return; }
+      tpAsk('Hapus produk?', p.name + ' (' + p.sku + ') akan dihapus dari katalog dan stok.', 'Ya, Hapus', function () {
+        PRODUCTS.splice(PRODUCTS.indexOf(p), 1); delete tpVS[pid]; delete activeVariants[pid];
+        if (tpStSel.p === pid) tpStSel = { p: PRODUCTS[0].id, c: 0, s: 0 };
+        renderProducts(); tpRenderStock(); showToast('Produk dihapus.', 'warn');
+        if (typeof tpLog === 'function') tpLog('stock', 'Hapus produk \u00b7 ' + p.name);
+      }, true);
+    }
+    function tpNpSave() {
+      if (tpNpEdit) return tpNpUpdate();
+      if (tpRole === 'staff') { showToast('Tambah produk khusus SPV / Owner.', 'warn'); return; }
+      const g = id => tp$(id).value.trim(), name = g('np-name'), sku = g('np-sku'), price = Math.floor(Number(g('np-price'))), q = Math.max(0, Math.floor(Number(g('np-qty')) || 0));
+      const colors = g('np-colors').split(',').map(x => x.trim()).filter(Boolean).map((x, i) => { const m = x.match(/^(.*?)\s*(#[0-9a-f]{6}|#[0-9a-f]{3})$/i); return { name: (m ? m[1] : x) || 'Warna ' + (i + 1), hex: m ? m[2] : TP_PAL[i % TP_PAL.length] }; });
+      const sizes = [...new Set(g('np-sizes').split(/[,\s]+/).filter(Boolean).map(s => s.toUpperCase()))];
+      const err = !name ? 'Nama produk wajib diisi.' : !sku ? 'SKU wajib diisi.' : PRODUCTS.some(p => p.sku.toLowerCase() === sku.toLowerCase()) ? 'SKU sudah dipakai produk lain.' :
+        !(price > 0) ? 'Harga harus lebih dari 0.' : !colors.length ? 'Isi minimal satu warna.' : new Set(colors.map(c => c.name.toLowerCase())).size !== colors.length ? 'Nama warna tidak boleh kembar.' : !sizes.length ? 'Isi minimal satu ukuran.' : '';
+      if (err) { showToast(err, 'warn'); return; }
+      const p = { id: 'prod-' + Date.now().toString(36), sku, name, category: tp$('np-cat').value, price, image: tpNpImgData || g('np-img') || tpImgFallback(name), colors, sizes, stock: 0, custom: true, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0) };
+      tpRegisterProduct(p, 0);
+      colors.forEach(c => sizes.forEach(s => { if (q > 0) { tpVS[p.id][c.name][s] = q; tpMove(p, c.name, s, 0, q, 'masuk', 'Stok awal produk baru'); } }));
+      tpSyncStock(p); tpStSel = { p: p.id, c: 0, s: 0 };
+      closeModal('np-modal'); renderProducts(); tpRenderStock(); playAudio('success');
+      showToast('Produk "' + name + '" ditambahkan (' + colors.length * sizes.length + ' varian).', 'success');
+    }
+  </script>
   <script>
     /* ===== Penyimpanan otomatis (localStorage) ===== */
     (function () {
@@ -4940,7 +5436,7 @@
       let last = '', off = false;
       function snap() {
         return JSON.stringify({
-          v: 1, mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
+          v: 1, np: PRODUCTS.filter(p => p.custom), pe: PRODUCTS.filter(p => p.edited && !p.custom).map(p => ({ id: p.id, name: p.name, category: p.category, sku: p.sku, price: p.price, image: p.image, min: p.min })), mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
           held: tpHeld.map(h => ({ ...h, cart: h.cart.map(i => ({ pid: i.product.id, color: i.color.name, size: i.size, qty: i.qty, price: i.price })) }))
         });
       }
@@ -4950,6 +5446,8 @@
           if (!raw) return false;
           const d = JSON.parse(raw);
           if (d.v !== 1) return false;
+          (d.np || []).forEach(p => tpRegisterProduct(p));
+          (d.pe || []).forEach(e => { const p = tpProd(e.id); if (p) Object.assign(p, e, { edited: true }); });
           const held = d.held.map(h => ({
             ...h, time: new Date(h.time),
             cart: h.cart.map(i => {
@@ -5746,12 +6244,12 @@
 
       /* stok menipis */
       const low = [], zero = [];
-      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n === 0) zero.push([p.name, c.name, s, n]); else if (n <= 2) low.push([p.name, c.name, s, n]); })));
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(s => { const n = tpStock(p.id, c.name, s); if (n === 0) zero.push([p.name, c.name, s, n]); else if (n <= tpMin(p)) low.push([p.name, c.name, s, n]); })));
       low.sort((a, b) => a[3] - b[3]);
       const sold = {};
       rows.forEach(t => t.items.forEach(i => { const k = i.pid + '|' + i.colorName + '|' + i.size; sold[k] = (sold[k] || 0) + (i.qty - i.returned); }));
       const need = [];
-      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(sz => { const n = tpStock(p.id, c.name, sz), q = sold[p.id + '|' + c.name + '|' + sz] || 0; if (n <= 2 && q >= 2) need.push([p.name, c.name, sz, n, q]); })));
+      PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(sz => { const n = tpStock(p.id, c.name, sz), q = sold[p.id + '|' + c.name + '|' + sz] || 0; if (n <= tpMin(p) && q >= 2) need.push([p.name, c.name, sz, n, q]); })));
       need.sort((x, y) => y[4] - x[4] || x[3] - y[3]);
       const lowHtml = need.length ? need.slice(0, 10).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' — stok ' + x[3] + ' · terjual ' + x[4] + '</span>').join('') + (need.length > 10 ? '<span class="rp-chip">+' + (need.length - 10) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Tidak ada varian laris yang stoknya menipis pada periode ini.</p>';
 
@@ -5772,7 +6270,7 @@
         '<div class="rp-card"><div class="rp-h">Produk terlaris</div>' + topHtml + '</div>' +
         '<div class="rp-card"><div class="rp-h">Diskon & promo diberikan</div>' + discHtml + '</div>' +
         '</div>' +
-        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">Perlu restok (laris &amp; stok ≤ 2) · ' + need.length + ' varian</div>' + lowHtml + '<div class="rp-note" style="margin-top:8px">Diurutkan dari yang paling laku pada periode ini. Selain itu, <b>' + zero.length + '</b> varian sedang habis (0 pcs) dan tampil dicoret di katalog.</div></div>';
+        '<div class="rp-card" style="margin-top:12px"><div class="rp-h">Perlu restok (laris &amp; stok ≤ batas minimum) · ' + need.length + ' varian</div>' + lowHtml + '<div class="rp-note" style="margin-top:8px">Diurutkan dari yang paling laku pada periode ini. Selain itu, <b>' + zero.length + '</b> varian sedang habis (0 pcs) dan tampil dicoret di katalog.</div></div>';
     };
     renderCart();
     if (!tp$('report-modal').classList.contains('hidden')) tpRenderReport();
@@ -7982,7 +8480,7 @@
       display: none;
     }
 
-    @media (min-width: 980px) and (min-height: 640px) {
+    @media (min-width: 980px) {
 
       #tp-login.open,
       html.tp-needlogin #tp-login {
@@ -8160,6 +8658,189 @@
       (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(() => { fontsOk = true; render(); });
       render();
     })();
+  </script>
+  <style id="tp-login-v2">
+    /* Login v2: kartu tidak lagi punya scrollbar putih, panel hero ikut tampil di laptop pendek */
+    #tp-login .lg-card,
+    #tp-login {
+      scrollbar-width: thin;
+      scrollbar-color: #334155 transparent
+    }
+
+    #tp-login .lg-card::-webkit-scrollbar,
+    #tp-login::-webkit-scrollbar {
+      width: 6px
+    }
+
+    #tp-login .lg-card::-webkit-scrollbar-thumb,
+    #tp-login::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 9px
+    }
+
+    #tp-login .lg-card::-webkit-scrollbar-track,
+    #tp-login::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    .lg-role {
+      position: relative;
+      overflow: hidden
+    }
+
+    .lg-role::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 10px;
+      bottom: 10px;
+      width: 3px;
+      border-radius: 0 3px 3px 0;
+      background: var(--rc, #475569);
+      opacity: 0;
+      transition: opacity .15s
+    }
+
+    .lg-role.staff {
+      --rc: #38bdf8
+    }
+
+    .lg-role.spv {
+      --rc: #fbbf24
+    }
+
+    .lg-role.owner {
+      --rc: #fb7185
+    }
+
+    .lg-role:hover::before,
+    .lg-role:focus-visible::before {
+      opacity: 1
+    }
+
+    .lg-role>i {
+      transition: transform .15s, color .15s
+    }
+
+    .lg-role:hover>i {
+      transform: translateX(3px);
+      color: #fb7185
+    }
+
+    .lg-role:focus-visible,
+    .pn-pad button:focus-visible,
+    .lg-hint:focus-visible,
+    .lg-back:focus-visible {
+      outline: 2px solid #fb7185;
+      outline-offset: 2px
+    }
+
+    .pn-dots i.on {
+      box-shadow: 0 0 12px rgba(251, 113, 133, .55)
+    }
+
+    @media (max-height:760px) {
+      .lg-card {
+        padding: 14px 16px 12px
+      }
+
+      .lg-brand {
+        margin-bottom: 8px
+      }
+
+      .lg-logo {
+        width: 34px;
+        height: 34px;
+        font-size: 14px
+      }
+
+      .lg-brand b {
+        font-size: 16px
+      }
+
+      .lg-card h2 {
+        font-size: 18px;
+        margin: 0
+      }
+
+      .lg-sub {
+        margin-bottom: 10px;
+        font-size: 12px
+      }
+
+      .lg-roles {
+        gap: 7px
+      }
+
+      .lg-role {
+        padding: 8px 10px
+      }
+
+      .lg-role .av,
+      .lg-who .av {
+        width: 38px;
+        height: 38px;
+        border-radius: 11px;
+        font-size: 13px
+      }
+
+      .lg-role .tx small {
+        display: none
+      }
+
+      .lg-note {
+        margin-top: 10px;
+        padding: 8px 10px;
+        font-size: 11px
+      }
+
+      .lg-prep {
+        margin-top: 10px;
+        padding-top: 8px
+      }
+
+      .lg-who {
+        margin: 0 0 6px
+      }
+
+      .pn-pad button {
+        height: 44px;
+        font-size: 19px
+      }
+    }
+
+    @media (min-width:980px) and (max-height:760px) {
+      .lg-hero .lead {
+        display: none
+      }
+
+      .lg-hero li:nth-child(n+3) {
+        display: none
+      }
+
+      .lg-hero h1 {
+        font-size: clamp(26px, 2.8vw, 34px);
+        margin-bottom: 20px
+      }
+
+      .lg-hero ul {
+        gap: 10px
+      }
+    }
+  </style>
+  <script>
+    /* Login: ketik PIN dari keyboard, Esc untuk ganti peran, 1/2/3 untuk pilih peran */
+    document.addEventListener('keydown', function (e) {
+      var L = document.getElementById('tp-login'), s2 = document.getElementById('lg-s2');
+      if (!L || getComputedStyle(L).display === 'none') return;
+      var pin = s2 && s2.style.display !== 'none';
+      if (pin && /^\d$/.test(e.key)) tpPinKey('lg', e.key);
+      else if (pin && e.key === 'Backspace') tpPinKey('lg', 'B');
+      else if (pin && e.key === 'Escape') tpLoginBack();
+      else if (!pin && /^[123]$/.test(e.key)) tpLoginPick(['staff', 'spv', 'owner'][e.key - 1]);
+      else return;
+      e.preventDefault(); e.stopPropagation();
+    }, true);
   </script>
 </body>
 

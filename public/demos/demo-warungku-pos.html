@@ -1520,6 +1520,212 @@
         margin: 0;
       }
     }
+
+    /* ===== Member, poin & voucher (referensi ThreadPOS) ===== */
+    .wk-mc-wrap {
+      position: relative
+    }
+
+    .wk-cs {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 3px;
+      z-index: 40;
+      background: #fff;
+      border: 1px solid #e5e5e5;
+      border-radius: 10px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .14);
+      padding: 4px;
+      max-height: 220px;
+      overflow: auto
+    }
+
+    .wk-cs-h {
+      font: 700 9.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: #a3a3a3;
+      padding: 4px 7px
+    }
+
+    .wk-cs-i {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 7px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 12px
+    }
+
+    .wk-cs-i.on,
+    .wk-cs-i:hover {
+      background: #fef3c7
+    }
+
+    .wk-cs-i .av {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #f59e0b;
+      color: #fff;
+      font: 700 10px sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none
+    }
+
+    .wk-cs-i small {
+      display: block;
+      color: #737373;
+      font: 500 10px 'JetBrains Mono', monospace
+    }
+
+    .wk-cs-empty {
+      padding: 8px;
+      font-size: 11px;
+      color: #737373;
+      line-height: 1.5
+    }
+
+    .wk-cs-empty button {
+      margin-top: 5px;
+      font-weight: 700;
+      color: #b45309;
+      cursor: pointer
+    }
+
+    .wk-mc {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+      padding: 6px 8px;
+      border-radius: 9px;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #404040
+    }
+
+    .wk-mc .dim {
+      color: #a3a3a3
+    }
+
+    .wk-mc-sub {
+      font-size: 10.5px;
+      color: #737373;
+      padding: 3px 2px 0
+    }
+
+    .wk-mc-hint {
+      font-size: 10.5px;
+      color: #a3a3a3;
+      padding: 2px 2px 0
+    }
+
+    .wk-tier {
+      font: 800 9.5px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: #e5e5e5;
+      color: #525252
+    }
+
+    .wk-tier.silver {
+      background: #e2e8f0;
+      color: #475569
+    }
+
+    .wk-tier.gold {
+      background: #fde68a;
+      color: #92400e
+    }
+
+    .wk-tier.platinum {
+      background: #ddd6fe;
+      color: #5b21b6
+    }
+
+    .wk-mc-btn {
+      margin-left: auto;
+      font: 700 10.5px 'Plus Jakarta Sans', sans-serif;
+      padding: 3px 9px;
+      border-radius: 7px;
+      border: 1px solid #f59e0b;
+      color: #b45309;
+      background: #fff;
+      cursor: pointer
+    }
+
+    .wk-mc-btn.on {
+      background: #f59e0b;
+      color: #fff
+    }
+
+    .wk-vrow {
+      display: flex;
+      gap: 6px;
+      align-items: center
+    }
+
+    .wk-vrow input {
+      flex: 1;
+      min-width: 0;
+      text-transform: uppercase;
+      background: #fff;
+      border: 1px dashed #d4d4d4;
+      border-radius: 8px;
+      padding: 5px 9px;
+      font: 600 11px 'JetBrains Mono', monospace
+    }
+
+    .wk-vrow input:focus {
+      outline: 1px solid #f59e0b
+    }
+
+    .wk-vchips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px
+    }
+
+    .wk-vchips button {
+      font: 700 9.5px 'JetBrains Mono', monospace;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: #f5f5f5;
+      border: 1px solid #e5e5e5;
+      color: #525252;
+      cursor: pointer
+    }
+
+    .wk-vchips button:hover {
+      border-color: #f59e0b;
+      color: #b45309
+    }
+
+    .wk-xrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #525252
+    }
+
+    .wk-xrow b {
+      font: 600 12px 'JetBrains Mono', monospace;
+      color: #059669
+    }
+
+    .wk-xnote {
+      font-size: 10px;
+      color: #d97706;
+      line-height: 1.4
+    }
   </style>
 </head>
 
@@ -1909,8 +2115,18 @@
             class="hidden px-2.5 py-1.5 bg-neutral-100 border border-neutral-200 rounded-lg text-xs font-semibold text-neutral-600 items-center">
             Bawa Pulang (Takeaway)
           </div>
-          <input type="text" id="customer-name" placeholder="Nama Pelanggan (opsional)"
+          <input type="text" id="customer-name" autocomplete="off" oninput="wkCustInput(this.value)"
+            onfocus="wkCustSuggest(true)" onblur="setTimeout(function(){wkCustSuggest(false)},160)"
+            onkeydown="wkCustKey(event)" placeholder="Nama / No. HP member (opsional)"
             class="w-full bg-white border border-neutral-200 rounded-lg px-2.5 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-amber-500" />
+          <div class="wk-mc-wrap">
+            <div id="wk-cust-suggest" class="wk-cs" style="display:none"></div>
+          </div>
+          <div id="wk-member-card"></div>
+          <div class="wk-vrow"><input id="wk-voucher-input" placeholder="Kode voucher" maxlength="16" autocomplete="off"
+              onkeydown="if(event.key==='Enter'){event.preventDefault();wkApplyVoucher()}"><button type="button"
+              class="wk-chip" onclick="wkApplyVoucher()">Pakai</button></div>
+          <div class="wk-vchips" id="wk-vchips"></div>
         </div>
       </div>
 
@@ -1932,6 +2148,7 @@
                 onclick="wkOpenDiscount()" class="wk-link">Atur</button></span>
             <span id="bill-discount" class="font-mono tabular-nums font-semibold">Rp 0</span>
           </div>
+          <div id="wk-extra-rows" class="flex flex-col gap-1.5"></div>
           <div id="tax-row" class="flex justify-between text-neutral-600">
             <span id="tax-label">PB1 (10%)</span>
             <span id="bill-tax" class="font-mono tabular-nums font-semibold">Rp 0</span>
@@ -3241,6 +3458,23 @@
     const wkHM = d => wkPad(d.getHours()) + ':' + wkPad(d.getMinutes());
     const wkProduct = id => PRODUCTS.find(p => p.id === id);
 
+    /* ---- Member, poin & voucher ---- */
+    var WK_PT_VAL = 100, WK_EARN = 5000, WK_MIN_REDEEM = 50;
+    var WK_TIERS = { reguler: { n: 'Reguler', r: 0 }, silver: { n: 'Silver', r: 0.03 }, gold: { n: 'Gold', r: 0.05 }, platinum: { n: 'Platinum', r: 0.08 } };
+    var WK_VOUCHERS = {
+      WARUNG10: { type: 'pct', value: 10, max: 15000, min: 30000, d: '10% maks. 15rb · min 30rb' },
+      HEMAT5K: { type: 'nom', value: 5000, max: 5000, min: 25000, d: 'Rp5.000 · min 25rb' },
+      MAKANBERDUA: { type: 'nom', value: 15000, max: 15000, min: 80000, d: 'Rp15.000 · min 80rb' }
+    };
+    var WK_CUSTS = [
+      { id: 'm1', name: 'Budi Santoso', phone: '081234567890', tier: 'gold', points: 640, visits: 22 },
+      { id: 'm2', name: 'Siti Rahayu', phone: '085712345678', tier: 'silver', points: 215, visits: 9 },
+      { id: 'm3', name: 'Agus Prasetyo', phone: '081398765432', tier: 'reguler', points: 40, visits: 3 },
+      { id: 'm4', name: 'Dewi Anggraini', phone: '087811223344', tier: 'platinum', points: 1520, visits: 41 },
+      { id: 'm5', name: 'Rizky Maulana', phone: '082155667788', tier: 'reguler', points: 85, visits: 4 },
+      { id: 'm6', name: 'Lestari Wulandari', phone: '089644556677', tier: 'silver', points: 330, visits: 12 }
+    ];
+    var wkMem = null, wkVoucher = null, wkRedeemPts = 0, wkCsList = [], wkCsIdx = -1;
     let wkDiscount = { type: 'pct', value: 0 };
     let wkDiscType = 'pct';
     let wkHeld = [];
@@ -3289,15 +3523,29 @@
     /* ================================================================
        PERHITUNGAN TAGIHAN (DISKON + PAJAK)
     ================================================================ */
-    function wkCalc(items, disc, taxOn, taxRate) {
+    function wkCalc(items, disc, taxOn, taxRate, x) {
       const subtotal = items.reduce((a, it) => a + it.price * it.quantity, 0);
       let discount = disc.type === 'pct' ? Math.round(subtotal * Math.min(100, disc.value) / 100) : Math.min(disc.value, subtotal);
       discount = Math.max(0, discount);
-      const taxable = subtotal - discount;
+      x = x || {};
+      const a0 = subtotal - discount;
+      const memberDisc = Math.round(a0 * (x.rate || 0));
+      const a1 = a0 - memberDisc;
+      const v = x.voucher ? WK_VOUCHERS[x.voucher] : null;
+      let voucherDisc = 0, voucherNote = '';
+      if (v) {
+        if (a1 >= v.min) voucherDisc = Math.max(0, v.type === 'pct' ? Math.min(Math.round(a1 * v.value / 100), v.max) : Math.min(v.value, a1));
+        else voucherNote = 'Voucher belum berlaku: min. belanja ' + formatRupiah(v.min) + ' (setelah diskon).';
+      }
+      const a2 = a1 - voucherDisc;
+      const pointsUsed = x.pts ? Math.max(0, Math.min(x.pts, Math.floor(a2 * 0.5 / WK_PT_VAL))) : 0;
+      const pointsDisc = pointsUsed * WK_PT_VAL;
+      const taxable = a2 - pointsDisc;
       const tax = taxOn ? Math.round(taxable * taxRate) : 0;
-      return { subtotal, discount, tax, total: taxable + tax };
+      return { subtotal, discount, memberDisc, voucherDisc, voucherNote, pointsUsed, pointsDisc, tax, total: taxable + tax };
     }
-    const wkCurrent = () => wkCalc(cart, wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate);
+    function wkXtra() { return { voucher: wkVoucher, pts: wkRedeemPts, rate: wkMem ? (WK_TIERS[wkMem.tier] || WK_TIERS.reguler).r : 0 }; }
+    const wkCurrent = () => wkCalc(cart, wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate, wkXtra());
 
     function calculateTotals() {
       const t = wkCurrent();
@@ -3323,6 +3571,7 @@
       } else taxRow.classList.add('hidden');
 
       wk$('bill-total').innerText = formatRupiah(t.total);
+      wkRenderExtra(t);
 
       if (paymentMethod === 'cash') {
         wkRenderQuick(t.total);
@@ -3525,6 +3774,7 @@
       return wkTables.find(t => !wkHeld.some(h => h.orderType === 'dine_in' && h.table === t)) || wkTables[0];
     }
     function wkResetOrder() {
+      wkMem = null; wkVoucher = null; wkRedeemPts = 0; { const vi = document.getElementById('wk-voucher-input'); if (vi) vi.value = ''; }
       wkTab('menu');
       cart = [];
       cashTendered = 0;
@@ -3603,7 +3853,7 @@
       }
       wkHeldSeq++;
       const id = 'HLD-' + wkPad(wkHeldSeq);
-      wkHeld.push({ id, orderType, table: tbl, customer: wk$('customer-name').value.trim(), cart: JSON.parse(JSON.stringify(cart)), discount: { ...wkDiscount }, time: new Date() });
+      wkHeld.push({ id, custId: wkMem ? wkMem.id : null, voucher: wkVoucher, orderType, table: tbl, customer: wk$('customer-name').value.trim(), cart: JSON.parse(JSON.stringify(cart)), discount: { ...wkDiscount }, time: new Date() });
       wkResetOrder(); renderCart(); renderProducts(); wkUpdateBadges();
       wkToast('Pesanan disimpan sebagai ' + id + '. Silakan layani pelanggan berikutnya.', 'success');
       return true;
@@ -3645,6 +3895,7 @@
         wkRenderTableOptions();
         if (h.orderType === 'dine_in') wk$('table-number').value = h.table;
         wk$('customer-name').value = h.customer || '';
+        wkMem = (h.custId && WK_CUSTS.find(c => c.id === h.custId)) || null; wkVoucher = h.voucher || null; wkRedeemPts = 0; { const vi = document.getElementById('wk-voucher-input'); if (vi) vi.value = wkVoucher || ''; }
         setPaymentMethod('cash');
         renderCart(); renderProducts(); wkUpdateBadges(); wkCloseHeld(); wkTab('cart');
         wkToast(id + ' dipanggil ke kasir.', 'success');
@@ -3744,7 +3995,8 @@
     /* ---------- Commit transaksi ---------- */
     function wkMakeTrx(items, method, tendered, date, opts) {
       opts = opts || {};
-      const t = wkCalc(items, opts.discount || wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate);
+      const xt = opts.discount ? null : wkXtra();
+      const t = wkCalc(items, opts.discount || wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate, xt);
       const type = opts.orderType || orderType;
       return {
         orderNumber: 'TRX-' + (240500 + (++wkTrxSeq)),
@@ -3752,6 +4004,8 @@
         timeStr: wkHM(date),
         items: JSON.parse(JSON.stringify(items)),
         subtotal: t.subtotal, discount: t.discount, tax: t.tax, total: t.total,
+        memberDisc: t.memberDisc, voucher: t.voucherDisc > 0 ? wkVoucher : null, voucherDisc: t.voucherDisc, pointsUsed: t.pointsUsed, pointsDisc: t.pointsDisc,
+        custId: (xt && wkMem) ? wkMem.id : null, tier: (xt && wkMem) ? wkMem.tier : null, ptsEarned: (xt && wkMem) ? Math.floor(t.total / WK_EARN) : 0,
         taxPct: Math.round(storeSettings.taxRate * 100),
         orderType: type,
         tableNumber: type === 'dine_in' ? (opts.table != null ? opts.table : wk$('table-number').value) : 'Takeaway',
@@ -3771,6 +4025,7 @@
       const trx = wkMakeTrx(cart, method, tendered, new Date(), extra);
       cart.forEach(c => { const p = wkProduct(c.id); if (p) p.stock = Math.max(0, p.stock - c.quantity); });
       transactions.unshift(trx);
+      wkAward(trx);
       if (method === 'cash') {
         drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'penjualan', amount: trx.total, note: 'Penjualan Tunai #' + trx.orderNumber, timestamp: trx.timeStr + ' WIB' });
       }
@@ -3798,6 +4053,7 @@
     <div class="flex justify-between"><span>Kasir</span><span>${wkEsc(trx.cashierName)}</span></div>
     <div class="flex justify-between"><span>Jenis</span><span class="font-bold">${trx.orderType === 'dine_in' ? 'DINE IN (' + wkEsc(trx.tableNumber) + ')' : 'TAKEAWAY (Bungkus)'}</span></div>
     ${trx.customerName ? `<div class="flex justify-between"><span>Pelanggan</span><span>${wkEsc(trx.customerName)}</span></div>` : ''}
+    ${trx.custId ? `<div class="flex justify-between"><span>Member</span><span>${wkEsc((WK_TIERS[trx.tier] || WK_TIERS.reguler).n)} · +${trx.ptsEarned} poin${trx.pointsUsed ? ' / -' + trx.pointsUsed : ''}</span></div>` : ''}
     ${trx.voided ? '<div class="text-center font-extrabold" style="color:#e11d48;letter-spacing:.15em;padding-top:4px">*** VOID / DIBATALKAN ***</div>' : ''}
     ${wkReceiptReprint && !trx.voided ? '<div class="text-center font-bold text-neutral-500" style="padding-top:4px">** SALINAN STRUK **</div>' : ''}`;
 
@@ -3811,6 +4067,9 @@
       wk$('receipt-totals').innerHTML = `
     <div class="flex justify-between"><span>Subtotal</span><span>${formatRupiah(trx.subtotal)}</span></div>
     ${trx.discount > 0 ? `<div class="flex justify-between"><span>Diskon</span><span>-${formatRupiah(trx.discount)}</span></div>` : ''}
+    ${trx.memberDisc > 0 ? `<div class="flex justify-between"><span>Diskon Member</span><span>-${formatRupiah(trx.memberDisc)}</span></div>` : ''}
+    ${trx.voucherDisc > 0 ? `<div class="flex justify-between"><span>Voucher ${wkEsc(trx.voucher || '')}</span><span>-${formatRupiah(trx.voucherDisc)}</span></div>` : ''}
+    ${trx.pointsDisc > 0 ? `<div class="flex justify-between"><span>Tukar ${trx.pointsUsed} poin</span><span>-${formatRupiah(trx.pointsDisc)}</span></div>` : ''}
     ${trx.tax > 0 ? `<div class="flex justify-between"><span>PB1 (${trx.taxPct}%)</span><span>${formatRupiah(trx.tax)}</span></div>` : ''}
     <div class="flex justify-between font-bold text-xs pt-1 border-t border-neutral-300 text-neutral-900"><span>TOTAL</span><span>${formatRupiah(trx.total)}</span></div>`;
 
@@ -3892,6 +4151,7 @@
       if (!t || t.voided) return;
       wkAsk('Void transaksi ' + no + '?', 'Stok menu dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari omset serta laporan shift' + (t.paymentMethod === 'cash' ? ' (uang dikembalikan dari laci).' : '.'), 'Ya, Void Transaksi', () => {
         t.voided = true;
+        wkRevoke(t);
         t.items.forEach(i => { const p = wkProduct(i.id); if (p) p.stock += i.quantity; });
         wkConsume(t.items, 1, true);
         if (t.paymentMethod === 'cash') drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'void', amount: t.total, note: 'Void #' + no + ' (uang dikembalikan)', timestamp: wkHM(new Date()) + ' WIB' });
@@ -4871,9 +5131,110 @@
     }
     function wkResetDemo() {
       wkAsk('Reset demo?', 'Transaksi, stok, laci kas, dan pengaturan akan kembali ke data contoh awal.', 'Ya, Reset', () => {
-        wkNoSave = true; try { db.del(WK_KEY); db.del('warungku-tour'); } catch (e) { }
+        wkNoSave = true; try { db.del(WK_KEY); db.del('warungku-tour'); db.del('warungku-members-v1'); } catch (e) { }
         location.reload();
       }, true);
+    }
+
+
+    /* ================================================================
+       MEMBER, POIN & VOUCHER (diadaptasi dari ThreadPOS)
+       Urutan hitung: subtotal → diskon manual → member → voucher → poin → PB1
+    ================================================================ */
+    try { const d = db.get('warungku-members-v1'); if (Array.isArray(d) && d.length) WK_CUSTS = d; } catch (e) { }
+    function wkMSave() { try { db.set('warungku-members-v1', WK_CUSTS); } catch (e) { } }
+    const wkIni = n => (n.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('') || '?').toUpperCase();
+    const wkPhone = d => String(d).replace(/(\d{4})(\d{4})(\d+)/, '$1-$2-$3');
+    function wkCustFind(q) {
+      q = q.trim().toLowerCase();
+      const d = q.replace(/\D/g, ''), dn = d.startsWith('62') ? '0' + d.slice(2) : d;
+      let r = WK_CUSTS.filter(c => !q || c.name.toLowerCase().includes(q) || (d.length >= 3 && c.phone.includes(dn)));
+      if (!q) r = r.slice().sort((a, b) => b.points - a.points);
+      return r.slice(0, 5);
+    }
+    function wkCustSuggest(show) {
+      const box = wk$('wk-cust-suggest'); if (!box) return;
+      if (!show) { box.style.display = 'none'; return; }
+      const q = wk$('customer-name').value, top = !q.trim() || !!(wkMem && q.trim() === wkMem.name);
+      const list = wkCustFind(top ? '' : q); wkCsList = list; wkCsIdx = list.length ? 0 : -1;
+      box.innerHTML = list.length
+        ? '<div class="wk-cs-h">' + (top ? 'Member teratas' : 'Hasil pencarian') + '</div>' + list.map((c, i) =>
+          '<div class="wk-cs-i' + (i === 0 ? ' on' : '') + '" onmousedown="event.preventDefault();wkCustPick(\'' + c.id + '\')"><div class="av">' + wkEsc(wkIni(c.name)) + '</div><div><b>' + wkEsc(c.name) + '</b><small>' + wkPhone(c.phone) + ' · ' + c.points.toLocaleString('id-ID') + ' poin</small></div><span class="wk-tier ' + c.tier + '" style="margin-left:auto">' + WK_TIERS[c.tier].n + '</span></div>').join('')
+        : '<div class="wk-cs-empty">Belum ada member dengan nama / no. HP itu.' + (q.trim() ? '<br><button type="button" onmousedown="event.preventDefault();wkRegister()">+ Daftarkan “' + wkEsc(q.trim()) + '” sebagai member</button>' : '') + '</div>';
+      box.style.display = 'block';
+    }
+    function wkCustInput(v) {
+      if (wkMem && v.trim() !== wkMem.name) { wkMem = null; wkRedeemPts = 0; renderCart(); }
+      wkCustSuggest(true);
+    }
+    function wkCustKey(e) {
+      const box = wk$('wk-cust-suggest'), open = box && box.style.display !== 'none';
+      if (e.key === 'Escape') { wkCustSuggest(false); return; }
+      if (!open || !wkCsList.length) return;
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault(); wkCsIdx = (wkCsIdx + (e.key === 'ArrowDown' ? 1 : -1) + wkCsList.length) % wkCsList.length;
+        box.querySelectorAll('.wk-cs-i').forEach((el, i) => el.classList.toggle('on', i === wkCsIdx));
+      } else if (e.key === 'Enter') { e.preventDefault(); wkCustPick(wkCsList[wkCsIdx].id); }
+    }
+    function wkCustPick(id) {
+      const c = WK_CUSTS.find(x => x.id === id); if (!c) return;
+      wkMem = c; wkRedeemPts = 0; wk$('customer-name').value = c.name; wkCustSuggest(false); renderCart();
+      wkToast('Member: ' + c.name + ' · ' + WK_TIERS[c.tier].n + ' · ' + c.points.toLocaleString('id-ID') + ' poin', 'success');
+    }
+    function wkRegister() {
+      const name = wk$('customer-name').value.trim(); if (!name) return;
+      const ph = (window.prompt('No. HP ' + name + ' (untuk member baru):', '08') || '').replace(/\D/g, '');
+      if (ph.length < 9) { wkToast('No. HP tidak valid, pendaftaran dibatalkan.', 'warn'); return; }
+      const c = { id: 'm' + Date.now(), name, phone: ph, tier: 'reguler', points: 0, visits: 0 };
+      WK_CUSTS.push(c); wkMSave(); wkCustPick(c.id);
+    }
+    function wkToggleRedeem() {
+      if (!wkMem) return;
+      if (wkRedeemPts > 0) wkRedeemPts = 0;
+      else if (wkMem.points < WK_MIN_REDEEM) { wkToast('Minimal ' + WK_MIN_REDEEM + ' poin untuk bisa ditukar.', 'warn'); return; }
+      else if (!cart.length) { wkToast('Tambahkan menu ke keranjang dulu.', 'warn'); return; }
+      else wkRedeemPts = wkMem.points;
+      renderCart();
+    }
+    function wkApplyVoucher(code) {
+      code = (code || wk$('wk-voucher-input').value).trim().toUpperCase();
+      if (!code) { wkToast('Masukkan kode voucher dulu.', 'warn'); return; }
+      if (!WK_VOUCHERS[code]) { wkToast('Kode voucher “' + code + '” tidak valid.', 'error'); return; }
+      if (!cart.length) { wkToast('Tambahkan menu ke keranjang sebelum memakai voucher.', 'warn'); return; }
+      wkVoucher = code; wk$('wk-voucher-input').value = code; renderCart();
+      const c = wkCurrent();
+      wkToast(c.voucherDisc > 0 ? 'Voucher ' + code + ' dipakai: hemat ' + formatRupiah(c.voucherDisc) : c.voucherNote, c.voucherDisc > 0 ? 'success' : 'warn');
+    }
+    function wkRemoveVoucher() { wkVoucher = null; wk$('wk-voucher-input').value = ''; renderCart(); wkToast('Voucher dilepas.', 'info'); }
+    function wkRenderExtra(t) {
+      const rows = [];
+      if (t.memberDisc > 0) rows.push('<div class="wk-xrow"><span>Diskon Member (' + WK_TIERS[wkMem.tier].n + ' ' + Math.round(WK_TIERS[wkMem.tier].r * 100) + '%)</span><b>-' + formatRupiah(t.memberDisc) + '</b></div>');
+      if (wkVoucher) rows.push('<div class="wk-xrow"><span class="flex items-center gap-1.5">Voucher ' + wkEsc(wkVoucher) + '<button type="button" class="wk-link" onclick="wkRemoveVoucher()">Lepas</button></span><b>' + (t.voucherDisc > 0 ? '-' + formatRupiah(t.voucherDisc) : 'Rp 0') + '</b></div>' + (t.voucherNote ? '<div class="wk-xnote">' + wkEsc(t.voucherNote) + '</div>' : ''));
+      if (t.pointsDisc > 0) rows.push('<div class="wk-xrow"><span>Tukar ' + t.pointsUsed.toLocaleString('id-ID') + ' poin</span><b>-' + formatRupiah(t.pointsDisc) + '</b></div>');
+      wk$('wk-extra-rows').innerHTML = rows.join('');
+      const box = wk$('wk-member-card');
+      if (!wkMem) { box.innerHTML = '<div class="wk-mc-hint"><i class="fa-solid fa-magnifying-glass"></i> Ketik nama / no. HP untuk mencari member &amp; poinnya</div>'; }
+      else {
+        const c = wkMem, earn = cart.length ? Math.floor(t.total / WK_EARN) : 0;
+        box.innerHTML = '<div class="wk-mc"><span class="wk-tier ' + c.tier + '">' + WK_TIERS[c.tier].n + '</span><span><b>' + c.points.toLocaleString('id-ID') + '</b> poin</span><span class="dim">· ' + c.visits + 'x kunjungan</span>' +
+          '<button type="button" class="wk-mc-btn' + (wkRedeemPts > 0 ? ' on' : '') + '" onclick="wkToggleRedeem()">' + (wkRedeemPts > 0 ? 'Batal tukar' : 'Tukar poin') + '</button></div>' +
+          '<div class="wk-mc-sub">' + (t.pointsUsed > 0 ? 'Memakai <b>' + t.pointsUsed.toLocaleString('id-ID') + '</b> poin = hemat ' + formatRupiah(t.pointsDisc) + ' (maks. 50% tagihan) · ' : '') + (earn ? '+' + earn.toLocaleString('id-ID') + ' poin dari transaksi ini' : '1 poin tiap belanja ' + formatRupiah(WK_EARN)) + '</div>';
+      }
+      const vc = wk$('wk-vchips');
+      if (vc && !vc.dataset.ok) { vc.innerHTML = Object.keys(WK_VOUCHERS).map(k => '<button type="button" title="' + WK_VOUCHERS[k].d + '" onclick="wkApplyVoucher(\'' + k + '\')">' + k + '</button>').join(''); vc.dataset.ok = '1'; }
+    }
+    function wkTierFor(v) { return v >= 30 ? 'platinum' : v >= 15 ? 'gold' : v >= 6 ? 'silver' : 'reguler'; }
+    function wkAward(trx) {
+      if (!trx.custId) return;
+      const c = WK_CUSTS.find(x => x.id === trx.custId); if (!c) return;
+      c.points = Math.max(0, c.points - (trx.pointsUsed || 0) + (trx.ptsEarned || 0)); c.visits++;
+      const nt = wkTierFor(c.visits); if (WK_TIERS[nt].r > WK_TIERS[c.tier].r) { c.tier = nt; wkToast(c.name + ' naik ke tier ' + WK_TIERS[nt].n + '!', 'success'); }
+      wkMSave();
+    }
+    function wkRevoke(t) {
+      if (!t.custId) return;
+      const c = WK_CUSTS.find(x => x.id === t.custId); if (!c) return;
+      c.points = Math.max(0, c.points - (t.ptsEarned || 0) + (t.pointsUsed || 0)); c.visits = Math.max(0, c.visits - 1); wkMSave();
     }
 
     wkRestored = wkLoadState();

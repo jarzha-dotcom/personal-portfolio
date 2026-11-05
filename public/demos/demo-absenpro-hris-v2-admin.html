@@ -118,13 +118,13 @@
       --bg: #EDF1F5;
       --card: #fff;
       --ink: #12263F;
-      --mute: #66778C;
+      --mute: #566779;
       --line: #DCE3EB;
       --chip: #E4EAF1;
       --acc: #F2B01E;
       --accink: #3A2A00;
-      --ok: #1F9D77;
-      --late: #E5584B;
+      --ok: #157055;
+      --late: #BE3629;
       --ff: Figtree, system-ui, sans-serif;
       --fh: "Bricolage Grotesque", Figtree, sans-serif
     }
@@ -135,6 +135,8 @@
         --card: #13243A;
         --ink: #EAF0F7;
         --mute: #8FA3BA;
+        --ok: #3FCB9E;
+        --late: #FF7B6E;
         --line: #233750;
         --chip: #1B3049
       }
@@ -145,6 +147,8 @@
       --card: #13243A;
       --ink: #EAF0F7;
       --mute: #8FA3BA;
+      --ok: #3FCB9E;
+      --late: #FF7B6E;
       --line: #233750;
       --chip: #1B3049
     }
@@ -879,6 +883,22 @@
       border-top: 0
     }
   </style>
+  <style>
+    @media(prefers-color-scheme:dark) {
+
+      :root:not([data-theme="light"]) .btn.dg,
+      :root:not([data-theme="light"]) .wk .p,
+      :root:not([data-theme="light"]) .wk .p b {
+        color: #0B1624
+      }
+    }
+
+    :root[data-theme="dark"] .btn.dg,
+    :root[data-theme="dark"] .wk .p,
+    :root[data-theme="dark"] .wk .p b {
+      color: #0B1624
+    }
+  </style>
 </head>
 
 <body>
@@ -1149,7 +1169,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px"><button class="btn"
                 id="rst1">Reset data demo</button><span id="rst2"
                 style="display:none;gap:8px;align-items:center;flex-wrap:wrap"><b class="sm">Yakin?</b><button
-                  class="btn" id="rstY" style="background:var(--late);color:#fff">Ya, hapus semua data</button><button
+                  class="btn" id="rstY" style="background:#BE3629;color:#fff">Ya, hapus semua data</button><button
                   class="btn" id="rstN">Batal</button></span></div>
           </div>
         </div>
