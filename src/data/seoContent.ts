@@ -166,7 +166,7 @@ export const FAQ_ITEMS: SeoFaqItem[] = [
   },
   {
     "q": "Apakah ada garansi maintenance setelah website/aplikasi rilis?",
-    "a": "Ya, setiap proyek mendapatkan garansi technical support gratis selama 1 bulan penuh pasca rilis untuk penanganan bug atau kendala teknis."
+    "a": "Ya, setiap proyek mendapatkan garansi technical support gratis selama 1 bulan penuh pasca rilis untuk penanganan bug atau kendala teknis melalui kanal dukungan resmi support@arzhaning.my.id."
   },
   {
     "q": "Apakah source code diserahkan 100% ke klien?",

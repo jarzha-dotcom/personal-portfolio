@@ -184,14 +184,27 @@ export const ContactCTA: React.FC<TeaserProps> = ({ darkMode }) => {
               Chat via WhatsApp
             </a>
             <a
+              href={`mailto:${CONTACT_INFO.email}`}
+              className={`inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 rounded-xl border border-teal-500/40 bg-teal-500/10 hover:bg-teal-500/20 active:scale-95 text-teal-200 text-sm font-semibold transition-all ${FOCUS_RING}`}
+            >
+              <Mail className="w-4 h-4" aria-hidden="true" />
+              {CONTACT_INFO.email}
+            </a>
+            <a
               href={ROUTES.contact}
               onClick={(e) => go(e, ROUTES.contact)}
               className={`inline-flex items-center justify-center gap-2 px-6 py-3.5 sm:py-3 rounded-xl border border-slate-600 hover:bg-slate-800 active:scale-95 text-slate-100 text-sm font-semibold transition-all ${FOCUS_RING}`}
             >
-              <Mail className="w-4 h-4" aria-hidden="true" />
-              Form & Kontak Lengkap
+              Form &amp; Kontak Lengkap
+              <ArrowRight className="w-4 h-4" aria-hidden="true" />
             </a>
           </div>
+          <p className="relative text-[11px] text-slate-400 mt-4">
+            Klien aktif yang membutuhkan layanan after-sales / maintenance dapat menghubungi{' '}
+            <a href={`mailto:${CONTACT_INFO.supportEmail}`} className="text-teal-300 hover:underline font-medium">
+              {CONTACT_INFO.supportEmail}
+            </a>
+          </p>
         </div>
       </div>
     </section>

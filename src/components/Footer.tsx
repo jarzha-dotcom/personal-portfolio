@@ -185,6 +185,21 @@ export const Footer: React.FC = () => {
               </a>
             </div>
 
+            <div className="pt-1 space-y-1 text-[11px] text-slate-400">
+              <p>
+                Konsultasi &amp; Proyek:{' '}
+                <a href={`mailto:${CONTACT_INFO.email}`} onClick={handleEmailClick} className="text-slate-200 hover:text-teal-400 font-medium transition-colors">
+                  {CONTACT_INFO.email}
+                </a>
+              </p>
+              <p>
+                After-Sales &amp; Support:{' '}
+                <a href={`mailto:${CONTACT_INFO.supportEmail}`} className="text-slate-200 hover:text-teal-400 font-medium transition-colors">
+                  {CONTACT_INFO.supportEmail}
+                </a>
+              </p>
+            </div>
+
             <div className="pt-1">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-900 text-teal-400 border border-slate-800 text-[10px] font-semibold">
                 <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse"></span>

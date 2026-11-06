@@ -714,7 +714,8 @@ const buildKontakPage = (): string | null => {
       'Cara Menghubungi',
       `<ul style="list-style-type: none; padding-left: 0; display: grid; gap: 0.75rem; margin-top: 1rem;">
             <li style="${styleCard}"><strong style="color: #0f172a;">WhatsApp / Telepon:</strong> <a href="${whatsappUrl()}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.displayPhone)}</a></li>
-            <li style="${styleCard}"><strong style="color: #0f172a;">Email:</strong> <a href="mailto:${escapeHtml(CONTACT_INFO.email)}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.email)}</a></li>
+            <li style="${styleCard}"><strong style="color: #0f172a;">Email Konsultasi &amp; Proyek:</strong> <a href="mailto:${escapeHtml(CONTACT_INFO.email)}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.email)}</a></li>
+            <li style="${styleCard}"><strong style="color: #0f172a;">Email After-Sales &amp; Maintenance:</strong> <a href="mailto:${escapeHtml(CONTACT_INFO.supportEmail)}" style="color: #0d9488; font-weight: 600;">${escapeHtml(CONTACT_INFO.supportEmail)}</a></li>
             <li style="${styleCard}"><strong style="color: #0f172a;">Domisili:</strong> ${escapeHtml(CONTACT_INFO.location)} &mdash; remote &amp; on-site Jabodetabek</li>
           </ul>`
     ) +

@@ -37,6 +37,7 @@ export interface EducationItem {
 
 export interface ContactInfo {
   email: string;
+  supportEmail: string;
   phone: string;
   displayPhone: string;
   location: string;

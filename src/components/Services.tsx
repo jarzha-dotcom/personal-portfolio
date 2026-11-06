@@ -444,7 +444,15 @@ export const Services: React.FC<ServicesProps> = ({ darkMode }) => {
                             <ArrowRight className="w-4 h-4" />
                         </a>
                         <p className={`text-[11px] mt-3 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                            Konsultasi awal gratis, tanpa komitmen.
+                            Konsultasi awal gratis, tanpa komitmen (email:{' '}
+                            <a href={`mailto:${CONTACT_INFO.email}`} className={`font-semibold underline ${darkMode ? 'text-teal-400 hover:text-teal-300' : 'text-teal-600 hover:text-teal-700'}`}>
+                                {CONTACT_INFO.email}
+                            </a>
+                            ). Butuh after-sales / maintenance? Hubungi{' '}
+                            <a href={`mailto:${CONTACT_INFO.supportEmail}`} className={`font-semibold underline ${darkMode ? 'text-teal-400 hover:text-teal-300' : 'text-teal-600 hover:text-teal-700'}`}>
+                                {CONTACT_INFO.supportEmail}
+                            </a>
+                            .
                         </p>
                     </div>
                 </div>

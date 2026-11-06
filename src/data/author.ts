@@ -7,7 +7,7 @@ export const AUTHOR_BIO =
 
 export const AUTHOR_SOCIALS = {
   whatsapp: 'https://wa.me/6282312312734',
-  email: 'mailto:admin@arzhaning.my.id',
+  email: 'mailto:halo@arzhaning.my.id',
   github: 'https://github.com/jarzha-dotcom',
 };
 

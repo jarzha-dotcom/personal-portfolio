@@ -25,6 +25,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [copiedSupportEmail, setCopiedSupportEmail] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -36,7 +37,7 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
     }
 
     if (!WEB3FORMS_ACCESS_KEY) {
-      setErrorMessage('Konfigurasi form belum lengkap (access key tidak ditemukan). Hubungi admin situs.');
+      setErrorMessage(`Konfigurasi form belum lengkap (access key tidak ditemukan). Hubungi ${CONTACT_INFO.email}.`);
       setFormStatus('error');
       return;
     }
@@ -66,14 +67,15 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
         setFormStatus('error');
       }
     } catch (err) {
-      setErrorMessage('Terjadi kesalahan jaringan. Silakan coba lagi atau hubungi lewat email/WhatsApp.');
+      setErrorMessage(`Terjadi kesalahan jaringan. Silakan coba lagi atau hubungi lewat email (${CONTACT_INFO.email}) / WhatsApp.`);
       setFormStatus('error');
     }
   };
 
-  const copyToClipboard = (text: string, type: 'email' | 'phone') => {
+  const copyToClipboard = (text: string, type: 'email' | 'support' | 'phone') => {
     navigator.clipboard.writeText(text);
     if (type === 'email') { setCopiedEmail(true); setTimeout(() => setCopiedEmail(false), 2000); }
+    else if (type === 'support') { setCopiedSupportEmail(true); setTimeout(() => setCopiedSupportEmail(false), 2000); }
     else { setCopiedPhone(true); setTimeout(() => setCopiedPhone(false), 2000); }
   };
 
@@ -122,20 +124,44 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
                 onClick={() => copyToClipboard(CONTACT_INFO.email, 'email')}
                 className={`p-2.5 sm:p-1.5 -m-1 sm:m-0 rounded-lg transition-colors flex items-center gap-1 text-[11px] ${darkMode ? 'text-slate-400 hover:text-emerald-400 hover:bg-slate-800' : 'text-slate-500 hover:text-emerald-600 hover:bg-emerald-50'
                   }`}
+                title="Salin email utama"
               >
                 {copiedEmail ? <><CheckCircle className="mo-pop w-3 h-3" /> Tersalin</> : <Copy className="w-3.5 h-3.5" />}
               </button>
             </div>
             <h3 className={`text-[10px] font-bold uppercase tracking-wider mb-0.5 ${darkMode ? 'text-slate-400' : 'text-slate-400'
-              }`}>Email Resmi</h3>
+              }`}>Email Konsultasi & Proyek</h3>
             <a
               href={`mailto:${CONTACT_INFO.email}`}
               onClick={() => copyToClipboard(CONTACT_INFO.email, 'email')}
               className={`text-sm font-bold block break-all transition-colors ${darkMode ? 'text-white hover:text-emerald-400' : 'text-slate-900 hover:text-emerald-600'
                 }`}>{CONTACT_INFO.email}</a>
             <p className={`text-[11px] mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              {copiedEmail ? 'Email disalin ke clipboard!' : 'Respon cepat untuk pertanyaan proyek'}
+              {copiedEmail ? 'Email utama disalin!' : 'Pertanyaan umum & konsultasi proyek baru'}
             </p>
+
+            {/* Support / After-Sales Email */}
+            <div className={`mt-3 pt-2.5 border-t flex items-center justify-between gap-2 ${darkMode ? 'border-slate-800' : 'border-slate-100'}`}>
+              <div className="min-w-0">
+                <span className={`text-[10px] font-bold uppercase tracking-wider block ${darkMode ? 'text-slate-400' : 'text-slate-400'}`}>
+                  After-Sales & Maintenance
+                </span>
+                <a
+                  href={`mailto:${CONTACT_INFO.supportEmail}`}
+                  onClick={() => copyToClipboard(CONTACT_INFO.supportEmail, 'support')}
+                  className={`text-xs font-semibold block break-all transition-colors ${darkMode ? 'text-teal-400 hover:text-teal-300' : 'text-teal-600 hover:text-teal-700'}`}
+                >
+                  {CONTACT_INFO.supportEmail}
+                </a>
+              </div>
+              <button
+                onClick={() => copyToClipboard(CONTACT_INFO.supportEmail, 'support')}
+                className={`p-1.5 rounded-lg transition-colors shrink-0 flex items-center gap-1 text-[10px] ${darkMode ? 'text-slate-400 hover:text-teal-400 hover:bg-slate-800' : 'text-slate-500 hover:text-teal-600 hover:bg-teal-50'}`}
+                title="Salin email support"
+              >
+                {copiedSupportEmail ? <><CheckCircle className="mo-pop w-3 h-3" /> Tersalin</> : <Copy className="w-3 h-3" />}
+              </button>
+            </div>
           </div>
 
           {/* Phone */}
@@ -194,7 +220,21 @@ export const Contact: React.FC<ContactProps> = ({ darkMode }) => {
               Kirimkan Pesan Langsung
             </h3>
             <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-              Isi formulir di bawah untuk konsultasi proyek atau tawaran kolaborasi
+              Isi formulir di bawah untuk konsultasi proyek &amp; tawaran kolaborasi (atau email langsung ke{' '}
+              <a
+                href={`mailto:${CONTACT_INFO.email}`}
+                className={`font-semibold underline ${darkMode ? 'text-emerald-400 hover:text-emerald-300' : 'text-emerald-600 hover:text-emerald-700'}`}
+              >
+                {CONTACT_INFO.email}
+              </a>
+              ). Khusus klien yang membutuhkan layanan after-sales / maintenance, hubungi{' '}
+              <a
+                href={`mailto:${CONTACT_INFO.supportEmail}`}
+                className={`font-semibold underline ${darkMode ? 'text-teal-400 hover:text-teal-300' : 'text-teal-600 hover:text-teal-700'}`}
+              >
+                {CONTACT_INFO.supportEmail}
+              </a>
+              .
             </p>
           </div>
 

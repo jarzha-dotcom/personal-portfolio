@@ -84,7 +84,8 @@ ${subSeparator}
 Nama Pengembang : K. Arzhaning Jagad (Arzha)
 Spesialisasi    : Web, Mobile Apps, Realtime System & AI Integration (7+ Tahun Pengalaman)
 WhatsApp        : ${CONTACT_INFO.displayPhone} (${CONTACT_INFO.phone})
-Email           : ${CONTACT_INFO.email}
+Email Proyek    : ${CONTACT_INFO.email}
+Email Support   : ${CONTACT_INFO.supportEmail}
 Lokasi          : ${CONTACT_INFO.location}
 
 Link Chat WhatsApp Langsung:

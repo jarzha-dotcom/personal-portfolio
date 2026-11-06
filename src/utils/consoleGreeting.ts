@@ -65,7 +65,8 @@ export function printConsoleGreeting(): void {
         'Punya proyek, atau cuma mau ngobrol sesama pengoprek?',
         '',
         '- WhatsApp  https://wa.me/6282312312734',
-        '- Email     admin@arzhaning.my.id',
+        '- Email     halo@arzhaning.my.id',
+        '- Support   support@arzhaning.my.id',
         '',
       ].join('\n')
     );

@@ -103,7 +103,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'proses',
     quickLabel: 'Ada garansi kalau ada bug?',
     keywords: ['garansi', 'bug', 'error', 'rusak', 'maintenance', 'support', 'after sales'],
-    answer: 'Pasti ada! Setiap proyek dapat garansi technical support gratis 1 bulan pasca rilis. Kalau ada bug atau kendala teknis, Arzha beresin tuntas tanpa biaya tambahan.',
+    answer: 'Pasti ada! Setiap proyek dapat garansi technical support gratis 1 bulan pasca rilis. Kalau ada bug atau kendala teknis, Arzha beresin tuntas tanpa biaya tambahan (klien aktif juga bisa langsung menghubungi support@arzhaning.my.id).',
   },
   {
     id: 'proses-sourcecode',
@@ -211,7 +211,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'kontak',
     quickLabel: 'Kontak WhatsApp & Email?',
     keywords: ['kontak', 'whatsapp', 'nomor hp', 'email', 'hubungi', 'wa'],
-    answer: 'Bisa langsung hubungi WhatsApp di +6282312312734 atau email ke admin@arzhaning.my.id. Mau tanya-tanya santai dulu atau langsung konsultasi ide proyek, siap dilayani!',
+    answer: 'Bisa langsung hubungi WhatsApp di +6282312312734 atau email ke halo@arzhaning.my.id (untuk konsultasi proyek baru) serta support@arzhaning.my.id (khusus after-sales & maintenance klien). Mau tanya-tanya santai dulu atau langsung konsultasi ide proyek, siap dilayani!',
   },
   {
     id: 'kontak-konsultasi',
@@ -254,7 +254,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'harga',
     quickLabel: 'Biaya maintenance setelah garansi habis?',
     keywords: ['biaya maintenance', 'langganan maintenance', 'biaya perawatan web', 'support bulanan', 'biaya update'],
-    answer: 'Setelah garansi 1 bulan selesai, maintenance sifatnya opsional: bisa sistem on-demand (bayar per perbaikan/fitur baru mulai Rp150rb-Rp300rb) atau paket retainer bulanan terjangkau sesuai kebutuhan skala bisnis.',
+    answer: 'Setelah garansi 1 bulan selesai, maintenance sifatnya opsional: bisa sistem on-demand (bayar per perbaikan/fitur baru mulai Rp150rb-Rp300rb) atau paket retainer bulanan terjangkau sesuai kebutuhan skala bisnis. Untuk layanan after-sales atau maintenance, klien dapat menghubungi support@arzhaning.my.id.',
   },
   // ── ⏱️ Tambahan FAQ Alur & Legal ──
   {
