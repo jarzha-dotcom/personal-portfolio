@@ -56,7 +56,7 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
+        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.lvl = 'admin'; return r })(rb(10, 'dina', 'Dina Prameswari', 'Menunggu', 'Transportasi', 90000, 'Taksi ke vendor')), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
@@ -884,6 +884,49 @@
     }
   </style>
   <style>
+    .rb-acts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    .rb-acts .btn {
+      padding: 7px 12px;
+      min-height: 36px
+    }
+
+    .btn.rb-y {
+      background: var(--ok);
+      border-color: var(--ok);
+      color: #fff
+    }
+
+    .btn.rb-d {
+      background: var(--late);
+      border-color: var(--late);
+      color: #fff
+    }
+
+    .rb-th:focus-visible {
+      outline: 3px solid var(--acc);
+      outline-offset: 2px
+    }
+
+    @media(prefers-color-scheme:dark) {
+
+      :root:not([data-theme="light"]) .btn.rb-y,
+      :root:not([data-theme="light"]) .btn.rb-d {
+        color: #0B1624
+      }
+    }
+
+    :root[data-theme="dark"] .btn.rb-y,
+    :root[data-theme="dark"] .btn.rb-d {
+      color: #0B1624
+    }
+  </style>
+  <style>
     @media(prefers-color-scheme:dark) {
 
       :root:not([data-theme="light"]) .btn.dg,
@@ -1094,6 +1137,7 @@
                   <th>Nominal</th>
                   <th>Status</th>
                   <th>Struk</th>
+                  <th>Aksi</th>
                 </tr>
               </thead>
               <tbody id="rbt"></tbody>
@@ -1272,8 +1316,10 @@
     $('#alist').onclick = e => { const b = e.target.closest('[data-del]'); if (!b) return; const d = annLoad(); d.ann = d.ann.filter(a => String(a.id) !== b.dataset.del); annSave(d); renderAnnP(); toast('Pengumuman dihapus') };
     $('#ppub').onclick = () => { const q = $('#pq').value.trim(), o = $('#po').value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 5); if (!q || o.length < 2) { toast('Isi pertanyaan dan minimal dua pilihan'); return } const d = annLoad(); d.poll = { q: q.slice(0, 90), opts: o, votes: {} }; annSave(d); $('#pq').value = ''; $('#po').value = ''; renderAnnP(); toast('Jajak diterbitkan') };
     /*/ANN*/
-    const selfCell = id => { const p = RL.selfie(id); return [p.i && '<img class="rb-th" alt="Selfie masuk" title="Masuk" src="' + p.i + '">', p.o && '<img class="rb-th" alt="Selfie pulang" title="Pulang" src="' + p.o + '">'].filter(Boolean).join(' ') || '<span class="sm">\u2013</span>' };
-    $('#tb').onclick = e => { const i = e.target.closest('.rb-th'); if (i) i.classList.toggle('big') };
+    const selfCell = id => { const p = RL.selfie(id); return [p.i && '<img class="rb-th" role="button" tabindex="0" aria-pressed="false" alt="Selfie masuk" title="Masuk" src="' + p.i + '">', p.o && '<img class="rb-th" role="button" tabindex="0" aria-pressed="false" alt="Selfie pulang" title="Pulang" src="' + p.o + '">'].filter(Boolean).join(' ') || '<span class="sm">\u2013</span>' };
+    const selfToggle = i => { i.classList.toggle('big'); i.setAttribute('aria-pressed', i.classList.contains('big')) };
+    $('#tb').onclick = e => { const i = e.target.closest('.rb-th'); if (i) selfToggle(i) };
+    $('#tb').onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.rb-th')) { e.preventDefault(); selfToggle(e.target) } };
     $('#rst1').onclick = () => { $('#rst1').style.display = 'none'; $('#rst2').style.display = 'flex'; $('#rstN').focus() };
     $('#rstN').onclick = () => { $('#rst2').style.display = 'none'; $('#rst1').style.display = ''; $('#rst1').focus() };
     $('#rstY').onclick = () => { RL.resetAll(); location.reload() };
@@ -1371,22 +1417,49 @@
     const rbNote = r => String(r.detail).split(' \u00b7 ').slice(2).join(' \u00b7 ');
     const rbRows = () => rbAll().filter(r => (RBM === 'all' || r.ym === RBM) && (RBS === 'Semua' || r.st === RBS));
     const rbTag = { Disetujui: 'Hadir', Ditolak: 'Terlambat', Menunggu: 'Cuti' };
-    const rbImg = r => r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<img class="rb-th" alt="Struk ' + RL.esc(r.who) + '" src="' + r.rc + '">' : '<span class="sm">\u2013</span>';
+    const rbImg = r => r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<img class="rb-th" role="button" tabindex="0" aria-pressed="false" title="Klik untuk memperbesar" alt="Struk ' + RL.esc(r.who) + '" src="' + r.rc + '">' : '<span class="sm">\u2013</span>';
+    let RBC = null, RBF = null;
+    const LVN = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }, rbLbl = r => RL.esc(r.who + ', ' + rpf(r.amt || 0));
+    const rbAct = r => {
+      if (r.st !== 'Menunggu') return '<span class="sm">\u2013</span>';
+      if (!canAct(r)) return '<span class="tag Belum">Menunggu ' + (LVN[r.lvl || 'spv'] || 'atasan') + '</span>';
+      const l = rbLbl(r);
+      if (RBC === r.id) return '<div class="rb-acts" role="group" aria-label="Konfirmasi tolak klaim ' + l + '"><button type="button" class="btn rb-d" data-id="' + r.id + '" data-no="1">Ya, tolak</button><button type="button" class="btn" data-id="' + r.id + '" data-cx="1">Batal</button></div>';
+      return '<div class="rb-acts" role="group" aria-label="Keputusan klaim ' + l + '"><button type="button" class="btn rb-y" data-id="' + r.id + '" data-ok="1" aria-label="Setujui klaim ' + l + '">Setujui</button><button type="button" class="btn" data-id="' + r.id + '" data-rj="1" aria-label="Tolak klaim ' + l + '">Tolak</button></div>'
+    };
+    const rbKey = el => { const b = el && el.closest && el.closest('#rbt button[data-id]'); if (!b) return null; const k = ['ok', 'rj', 'no', 'cx'].find(x => b.dataset[x]); return k ? { id: +b.dataset.id, k: k } : null };
     function renderRb() {
+      const fa = document.activeElement, fk = fa && fa.closest ? (fa.closest('#rbm') ? ['#rbm', 'm', fa.dataset.m] : fa.closest('#rbs') ? ['#rbs', 's', fa.dataset.s] : null) : null, bk = rbKey(fa);
       const all = rbAll(), months = [...new Set(all.map(r => r.ym).filter(Boolean))].sort().reverse(); if (RBM !== 'all' && !months.includes(RBM)) RBM = 'all';
       const L = rbRows(), sum = s => L.filter(r => r.st === s).reduce((x, r) => x + (r.amt || 0), 0), cnt = s => L.filter(r => r.st === s).length;
       const card = (t, v, s, hl) => '<div class="rl-card' + (hl ? ' rl-hl' : '') + '"><small>' + t + '</small><b>' + v + '</b><span>' + s + '</span></div>';
       $('#rbk').innerHTML = card('Menunggu', rpf(sum('Menunggu')), cnt('Menunggu') + ' klaim', 1) + card('Disetujui', rpf(sum('Disetujui')), cnt('Disetujui') + ' klaim') + card('Ditolak', rpf(sum('Ditolak')), cnt('Ditolak') + ' klaim') + card('Total klaim', String(L.length), 'sesuai filter');
       const mn = ym => new Date(ym + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
-      $('#rbm').innerHTML = ['all'].concat(months).map(k => '<button data-m="' + k + '" class="' + (k === RBM ? 'on' : '') + '">' + (k === 'all' ? 'Semua bulan' : mn(k)) + '</button>').join('');
-      $('#rbs').innerHTML = ['Semua', 'Menunggu', 'Disetujui', 'Ditolak'].map(k => '<button data-s="' + k + '" class="' + (k === RBS ? 'on' : '') + '">' + k + '</button>').join('');
-      $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span></td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span></td><td>' + rbImg(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
+      $('#rbm').innerHTML = ['all'].concat(months).map(k => '<button data-m="' + k + '" aria-pressed="' + (k === RBM) + '" class="' + (k === RBM ? 'on' : '') + '">' + (k === 'all' ? 'Semua bulan' : mn(k)) + '</button>').join('');
+      $('#rbs').innerHTML = ['Semua', 'Menunggu', 'Disetujui', 'Ditolak'].map(k => '<button data-s="' + k + '" aria-pressed="' + (k === RBS) + '" class="' + (k === RBS ? 'on' : '') + '">' + k + '</button>').join('');
+      $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span></td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span></td><td>' + rbImg(r) + '</td><td>' + rbAct(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
       const dv = {}; L.filter(r => r.st !== 'Ditolak').forEach(r => { dv[r.div] = (dv[r.div] || 0) + (r.amt || 0) }); const mx = Math.max(1, ...Object.values(dv));
-      $('#rbd').innerHTML = Object.keys(dv).length ? Object.keys(dv).sort((x, y) => dv[y] - dv[x]).map(k => '<div class="rl-dv"><span>' + RL.esc(k) + '</span><i><u style="width:' + Math.round(dv[k] / mx * 100) + '%"></u></i><b style="width:90px">' + rpf(dv[k]) + '</b></div>').join('') : '<p class="sm">Belum ada data.</p>'
+      $('#rbd').innerHTML = Object.keys(dv).length ? Object.keys(dv).sort((x, y) => dv[y] - dv[x]).map(k => '<div class="rl-dv"><span>' + RL.esc(k) + '</span><i><u style="width:' + Math.round(dv[k] / mx * 100) + '%"></u></i><b style="width:90px">' + rpf(dv[k]) + '</b></div>').join('') : '<p class="sm">Belum ada data.</p>';
+      const tgt = RBF ? (RBF.id ? $('#rbt button[data-id="' + RBF.id + '"][data-' + RBF.k + ']') : null) || $('#rbs .on') : bk ? $('#rbt button[data-id="' + bk.id + '"][data-' + bk.k + ']') : fk ? $(fk[0] + ' [data-' + fk[1] + '="' + CSS.escape(String(fk[2])) + '"]') : null;
+      RBF = null; if (tgt) tgt.focus()
     }
     $('#rbm').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBM = b.dataset.m; renderRb() };
     $('#rbs').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBS = b.dataset.s; renderRb() };
-    $('#rbt').onclick = e => { const i = e.target.closest('.rb-th'); if (i) i.classList.toggle('big') };
+    const rbToggle = i => { i.classList.toggle('big'); i.setAttribute('aria-pressed', i.classList.contains('big')) };
+    $('#rbt').onclick = e => {
+      const i = e.target.closest('.rb-th'); if (i) { rbToggle(i); return }
+      const b = e.target.closest('button[data-id]'); if (!b) return; const id = +b.dataset.id;
+      if (b.dataset.rj) { RBC = id; RBF = { id: id, k: 'cx' }; renderRb(); return }
+      if (b.dataset.cx) { RBC = null; RBF = { id: id, k: 'rj' }; renderRb(); return }
+      const ok = !!b.dataset.ok, r = rbAll().find(x => x.id === id); if (!r || r.st !== 'Menunggu' || !canAct(r)) return;
+      const Q = rbRows().filter(x => x.st === 'Menunggu' && canAct(x)), k = Q.findIndex(x => x.id === id), nx = Q[k + 1] || Q[k - 1];
+      RBC = null; RBF = nx ? { id: nx.id, k: 'ok' } : { id: 0 };
+      if (RL.decide(id, ok)) toast((ok ? 'Klaim disetujui: ' : 'Klaim ditolak: ') + r.who + ', ' + rpf(r.amt || 0)); else RBF = null
+    };
+    $('#rbt').onkeydown = e => {
+      if (e.key === 'Escape' && RBC !== null) { const id = RBC; RBC = null; RBF = { id: id, k: 'rj' }; renderRb() }
+      else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.rb-th')) { e.preventDefault(); rbToggle(e.target) }
+    };
     $('#rbcsv').onclick = () => {
       const L = rbRows(), cell = c => { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
       const rows = [['Tanggal', 'Nama', 'Divisi', 'Kategori', 'Keterangan', 'Nominal (Rp)', 'Status', 'Struk']].concat(L.map(r => [r.cd || r.ym || '', r.who, r.div, r.cat || '', rbNote(r), r.amt || 0, r.st, r.rc ? 'Ya' : 'Tidak']));

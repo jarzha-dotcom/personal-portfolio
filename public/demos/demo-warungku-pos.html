@@ -31,7 +31,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Aplikasi Kasir (POS) UMKM Kuliner | K. Arzhaning Jagad (Arzha)">
   <meta property="og:description"
-    content="Aplikasi kasir untuk warung dan kedai dengan katalog menu berfilter dan pencarian, keranjang pesanan, makan di tempat atau bungkus, pembayaran tunai/QRIS/debit, stok otomatis, riwayat transaksi, dan c">
+    content="Aplikasi kasir untuk warung dan kedai: katalog menu dengan varian dan add-on, denah meja, split bill, member dengan poin dan voucher, pajak PB1/PPN (PKP) dan service charge, login PIN dengan peran Owner, Manajer, dan Kasir, log aktivitas, manajemen stok dan resep, laporan laba rugi, serta cadangan data.">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-warungku-pos">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-warungku-pos.webp">
@@ -43,7 +43,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WarungKU POS - Aplikasi Kasir UMKM Kuliner</title>
   <meta name="description"
-    content="Dashboard Kasir Point of Sales (POS) modern, cepat, dan intuitif untuk kedai makanan dan UMKM kuliner.">
+    content="Aplikasi kasir untuk warung dan kedai: katalog menu dengan varian dan add-on, denah meja, split bill, member dengan poin dan voucher, pajak PB1/PPN (PKP) dan service charge, login PIN dengan peran Owner, Manajer, dan Kasir, log aktivitas, manajemen stok dan resep, laporan laba rugi, serta cadangan data.">
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1726,10 +1726,305 @@
       color: #d97706;
       line-height: 1.4
     }
+
+    /* ===== Login & peran ===== */
+    #wk-login {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: radial-gradient(1200px 600px at 20% 0%, #fef3c7, transparent 60%), linear-gradient(160deg, #fffbeb, #f5f5f4)
+    }
+
+    .wk-lg-card {
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      border: 1px solid #e7e5e4;
+      border-radius: 22px;
+      box-shadow: 0 24px 60px rgba(120, 53, 15, .16);
+      padding: 28px 24px;
+      text-align: center;
+      font-family: 'Plus Jakarta Sans', sans-serif
+    }
+
+    .wk-lg-logo {
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      margin: 0 auto 12px;
+      background: #f59e0b;
+      color: #fff;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(245, 158, 11, .4)
+    }
+
+    .wk-lg-card h1 {
+      font-size: 20px;
+      font-weight: 800;
+      color: #171717
+    }
+
+    .wk-lg-card p {
+      font-size: 12px;
+      color: #737373;
+      margin: 3px 0 18px
+    }
+
+    .wk-lg-u {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      border: 1px solid #e5e5e5;
+      border-radius: 14px;
+      background: #fafafa;
+      cursor: pointer;
+      text-align: left;
+      transition: .15s
+    }
+
+    .wk-lg-u:hover {
+      border-color: #f59e0b;
+      background: #fffbeb
+    }
+
+    .wk-lg-u .av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font: 800 13px sans-serif;
+      color: #fff;
+      background: #737373;
+      flex: none
+    }
+
+    .wk-lg-u .av.owner {
+      background: #d97706
+    }
+
+    .wk-lg-u .av.manajer {
+      background: #0284c7
+    }
+
+    .wk-lg-u .nm {
+      font-weight: 700;
+      font-size: 13px;
+      color: #171717;
+      flex: 1
+    }
+
+    .wk-lg-u .rl {
+      font: 700 10px sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #78716c
+    }
+
+    #wk-lg-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 6px 0 4px
+    }
+
+    #wk-lg-dots i {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      border: 2px solid #d6d3d1;
+      transition: .12s
+    }
+
+    #wk-lg-dots i.on {
+      background: #f59e0b;
+      border-color: #f59e0b
+    }
+
+    #wk-lg-dots.shake {
+      animation: wkshake .4s
+    }
+
+    @keyframes wkshake {
+
+      20%,
+      60% {
+        transform: translateX(-7px)
+      }
+
+      40%,
+      80% {
+        transform: translateX(7px)
+      }
+    }
+
+    #wk-lg-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin: 14px 0 6px
+    }
+
+    #wk-lg-pad button {
+      height: 50px;
+      border-radius: 14px;
+      border: 1px solid #e5e5e5;
+      background: #fafafa;
+      font: 700 18px 'JetBrains Mono', monospace;
+      color: #262626;
+      cursor: pointer
+    }
+
+    #wk-lg-pad button:active {
+      background: #fde68a
+    }
+
+    .wk-lg-hint {
+      margin-top: 12px;
+      font-size: 10.5px;
+      color: #a8a29e;
+      line-height: 1.6
+    }
+
+    .wk-lg-hint b {
+      font-family: 'JetBrains Mono', monospace;
+      color: #78716c
+    }
+
+    /* ===== Log & pengguna ===== */
+    .wk-lg-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 9px 2px;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 12px
+    }
+
+    .wk-lg-row .ic {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      font-size: 12px;
+      background: #f5f5f4;
+      color: #57534e
+    }
+
+    .wk-lg-row .ic.trx {
+      background: #d1fae5;
+      color: #047857
+    }
+
+    .wk-lg-row .ic.void {
+      background: #ffe4e6;
+      color: #be123c
+    }
+
+    .wk-lg-row .ic.diskon {
+      background: #fef3c7;
+      color: #b45309
+    }
+
+    .wk-lg-row .ic.akses {
+      background: #e0f2fe;
+      color: #0369a1
+    }
+
+    .wk-lg-row .tx {
+      flex: 1;
+      min-width: 0;
+      color: #262626;
+      font-weight: 600
+    }
+
+    .wk-lg-row small {
+      display: block;
+      color: #737373;
+      font-weight: 500;
+      font-size: 10.5px;
+      margin-top: 1px
+    }
+
+    .wk-lg-row .tm {
+      font: 600 10.5px 'JetBrains Mono', monospace;
+      color: #a3a3a3;
+      white-space: nowrap
+    }
+
+    .wk-ur {
+      display: grid;
+      grid-template-columns: 1.6fr 1fr 74px auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0
+    }
+
+    .wk-ur input[type=text],
+    .wk-ur select {
+      width: 100%;
+      font-size: 12px;
+      padding: 7px 9px;
+      background: #fafafa;
+      border: 1px solid #e5e5e5;
+      border-radius: 9px
+    }
+
+    .wk-ur input.pin {
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      letter-spacing: .2em
+    }
+
+    .wk-ur.off {
+      opacity: .55
+    }
+
+    @media(max-width:560px) {
+      .wk-ur {
+        grid-template-columns: 1fr 1fr
+      }
+    }
   </style>
 </head>
 
 <body data-tab="menu" class="bg-neutral-100 text-neutral-900 h-screen w-screen flex flex-col overflow-hidden">
+  <div id="wk-login" role="dialog" aria-modal="true" aria-label="Masuk">
+    <div class="wk-lg-card">
+      <div class="wk-lg-logo"><i class="fa-solid fa-utensils"></i></div>
+      <h1>WarungKU POS</h1>
+      <div id="wk-lg-s1">
+        <p>Pilih pengguna untuk mulai bertugas</p>
+        <div id="wk-lg-users"></div>
+      </div>
+      <div id="wk-lg-s2" style="display:none">
+        <p id="wk-lg-who"></p>
+        <div id="wk-lg-dots"></div>
+        <div id="wk-lg-err" style="visibility:hidden;font-size:11px;font-weight:700;color:#e11d48">PIN salah, coba lagi.
+        </div>
+        <div id="wk-lg-pad"></div>
+        <button type="button" class="wk-link" onclick="wkLoginShow()">← Ganti pengguna</button>
+      </div>
+      <div class="wk-lg-hint">Demo · PIN: Owner <b>1234</b> · Manajer <b>2222</b> · Kasir <b>1111</b><br>Kasir: jualan,
+        hold, shift · Manajer: + void, laporan, diskon &gt;10% · Owner: + menu, bahan, pengaturan</div>
+    </div>
+  </div>
+
   <!-- @jz-bar-start -->
   <style>
     /* Sembunyikan watermark badge lama jika masih ada di cache */
@@ -2015,6 +2310,16 @@
             class="fa-solid fa-moon text-sm"></i>Mode Gelap / Terang</button>
         <button type="button" class="wk-mi" onclick="wkMoreClose();toggleFullscreen()"><i id="fullscreen-icon"
             class="fa-solid fa-expand text-sm"></i>Layar Penuh</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkOpenLog()"><i
+            class="fa-solid fa-clock-rotate-left"></i>Log Aktivitas</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkOpenUsers()"><i
+            class="fa-solid fa-users-gear"></i>Kelola Pengguna</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkBackup()"><i
+            class="fa-solid fa-download"></i>Cadangkan Data</button>
+        <button type="button" class="wk-mi" onclick="wkMoreClose();wkRestore()"><i
+            class="fa-solid fa-upload"></i>Pulihkan Data</button>
+        <input type="file" id="wk-restore-file" accept=".json,application/json" style="display:none"
+          onchange="wkRestoreFile(this)">
         <button type="button" class="wk-mi" onclick="wkMoreClose();wkTourStart()"><i
             class="fa-solid fa-circle-question"></i>Tur Demo</button>
         <button type="button" class="wk-mi danger" onclick="wkMoreClose();wkResetDemo()"><i
@@ -2150,7 +2455,7 @@
           </div>
           <div id="wk-extra-rows" class="flex flex-col gap-1.5"></div>
           <div id="tax-row" class="flex justify-between text-neutral-600">
-            <span id="tax-label">PB1 (10%)</span>
+            <span id="tax-label">Pajak</span>
             <span id="bill-tax" class="font-mono tabular-nums font-semibold">Rp 0</span>
           </div>
           <div class="pt-2 border-t border-neutral-200 flex justify-between items-baseline">
@@ -2587,20 +2892,42 @@
         <div class="flex flex-col gap-3">
           <div class="flex items-center gap-2 text-xs font-bold text-neutral-900 uppercase tracking-wider">
             <i class="fa-solid fa-receipt text-amber-600"></i>
-            <span>Struk & Pajak Restoran (PB1)</span>
+            <span>Struk & Pajak</span>
           </div>
-          <div class="grid grid-cols-2 gap-3">
-            <div class="flex flex-col justify-center">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" id="set-tax-enabled"
-                  class="w-4 h-4 rounded text-amber-600 accent-amber-600 cursor-pointer" />
-                <span class="text-xs font-semibold text-neutral-800">Aktifkan Pajak PB1</span>
-              </label>
-              <span class="text-[10px] text-neutral-400 mt-0.5 ml-6">Pajak daerah makanan & minuman</span>
+          <div class="flex flex-col gap-2.5">
+            <div class="grid grid-cols-2 gap-3">
+              <div><label class="block text-[11px] font-semibold text-neutral-600 mb-1">Jenis Pajak</label>
+                <select id="set-tax-type" onchange="wkTaxUI(true)"
+                  class="w-full text-xs p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl font-mono focus:outline-none focus:ring-1 focus:ring-amber-500">
+                  <option value="pb1">PB1 / Pajak Restoran</option>
+                  <option value="ppn">PPN (khusus PKP)</option>
+                  <option value="none">Tanpa pajak</option>
+                </select>
+              </div>
+              <div><label class="block text-[11px] font-semibold text-neutral-600 mb-1">Tarif (%)</label>
+                <input type="number" id="set-tax-rate" step="1" min="0" max="50"
+                  class="w-full text-xs p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl font-mono focus:outline-none focus:ring-1 focus:ring-amber-500" />
+              </div>
             </div>
-            <div>
-              <label class="block text-[11px] font-semibold text-neutral-600 mb-1">Persentase Pajak (%)</label>
-              <input type="number" id="set-tax-rate" step="1" min="0" max="50"
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" id="set-pkp"
+                  onchange="wkTaxUI()" class="w-4 h-4 mt-0.5 rounded accent-amber-600 cursor-pointer" />
+                <span class="text-xs font-semibold text-neutral-800">Usaha berstatus PKP<small
+                    class="block text-[10px] text-neutral-400 font-normal">Hanya PKP yang boleh memungut
+                    PPN</small></span></label>
+              <label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" id="set-tax-incl"
+                  class="w-4 h-4 mt-0.5 rounded accent-amber-600 cursor-pointer" />
+                <span class="text-xs font-semibold text-neutral-800">Harga sudah termasuk pajak<small
+                    class="block text-[10px] text-neutral-400 font-normal">Pajak diambil dari harga, bukan
+                    ditambah</small></span></label>
+            </div>
+            <div id="set-tax-hint" class="text-[10.5px] leading-snug rounded-lg px-2.5 py-1.5 border"></div>
+            <div class="grid grid-cols-2 gap-3 items-center">
+              <label class="flex items-start gap-2 cursor-pointer"><input type="checkbox" id="set-svc-on"
+                  class="w-4 h-4 mt-0.5 rounded accent-amber-600 cursor-pointer" /><span
+                  class="text-xs font-semibold text-neutral-800">Service charge<small
+                    class="block text-[10px] text-neutral-400 font-normal">Dihitung sebelum pajak</small></span></label>
+              <input type="number" id="set-svc-rate" step="1" min="0" max="30" placeholder="Service (%)"
                 class="w-full text-xs p-2.5 bg-neutral-50 border border-neutral-200 rounded-xl font-mono focus:outline-none focus:ring-1 focus:ring-amber-500" />
             </div>
           </div>
@@ -2666,6 +2993,34 @@
   </div>
 
   <!-- ================= MODAL PESANAN TERSIMPAN (HOLD) ================= -->
+  <div id="log-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:600px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#e0f2fe;color:#0369a1"><i
+              class="fa-solid fa-clock-rotate-left"></i></span><span>Log Aktivitas<small>Jejak transaksi, void,
+              persetujuan, dan akses</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseLog()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div style="padding:10px 18px 0;display:flex;gap:6px;flex-wrap:wrap" id="log-filters"></div>
+      <div class="wk-mbody" id="log-body"></div>
+    </div>
+  </div>
+  <div id="users-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
+    <div class="wk-modal" style="max-width:640px">
+      <div class="wk-mhead">
+        <h3><span class="ic" style="background:#ede9fe;color:#6d28d9"><i
+              class="fa-solid fa-users-gear"></i></span><span>Kelola Pengguna<small>Nama, peran, PIN 4 digit, dan status
+              akun</small></span></h3>
+        <button type="button" class="wk-x" onclick="wkCloseUsers()" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="wk-mbody" id="users-body"></div>
+      <div class="wk-mfoot" style="justify-content:space-between;align-items:center"><span
+          style="font-size:11px;color:#737373">Perubahan tersimpan otomatis.</span><button type="button"
+          class="wk-btn amber" onclick="wkUserAdd()"><i class="fa-solid fa-plus"></i>Tambah Pengguna</button></div>
+    </div>
+  </div>
   <div id="held-modal" role="dialog" aria-modal="true" class="wk-overlay hidden">
     <div class="wk-modal" style="max-width:540px">
       <div class="wk-mhead">
@@ -2923,7 +3278,7 @@
       phone: '0823-1231-2734',
       footerMessage: 'Terima kasih atas kunjungan Anda!\nSemoga hari Anda menyenangkan.',
       taxRate: 0.10,
-      isTaxEnabled: true,
+      isTaxEnabled: true, svcOn: false, svcRate: 0.05, taxType: 'pb1', pkp: false, taxIncl: false,
       soundEnabled: true,
     };
 
@@ -3314,7 +3669,7 @@
         ...t.items.map(it => `${it.name}\n  ${it.quantity}x @${formatRupiah(it.price)} = ${formatRupiah(it.quantity * it.price)}${it.notes ? ' (' + it.notes + ')' : ''}`),
         `--------------------------------`,
         `Subtotal: ${formatRupiah(t.subtotal)}`,
-        storeSettings.isTaxEnabled ? `PB1 (${Math.round(storeSettings.taxRate * 100)}%): ${formatRupiah(t.tax)}` : '',
+        storeSettings.isTaxEnabled ? `${wkTaxName()} (${Math.round(storeSettings.taxRate * 100)}%): ${formatRupiah(t.tax)}` : '',
         `*TOTAL: ${formatRupiah(t.total)}*`,
         `Metode: ${t.paymentMethod === 'cash' ? 'Tunai' : t.paymentMethod === 'qris' ? 'QRIS' : 'Transfer'}`,
         t.paymentMethod === 'cash' ? `Bayar: ${formatRupiah(t.cashTendered)}\nKembalian: ${formatRupiah(t.change)}` : '',
@@ -3396,8 +3751,13 @@
       document.getElementById('set-cashier-name').value = storeSettings.cashierName;
       document.getElementById('set-phone').value = storeSettings.phone;
       document.getElementById('set-address').value = storeSettings.address;
-      document.getElementById('set-tax-enabled').checked = storeSettings.isTaxEnabled;
+      document.getElementById('set-tax-type').value = storeSettings.taxType || (storeSettings.isTaxEnabled ? 'pb1' : 'none');
+      document.getElementById('set-pkp').checked = !!storeSettings.pkp;
+      document.getElementById('set-tax-incl').checked = !!storeSettings.taxIncl;
       document.getElementById('set-tax-rate').value = Math.round(storeSettings.taxRate * 100);
+      document.getElementById('set-svc-on').checked = !!storeSettings.svcOn;
+      document.getElementById('set-svc-rate').value = Math.round((storeSettings.svcRate || 0.05) * 100);
+      wkTaxUI();
       document.getElementById('set-footer-msg').value = storeSettings.footerMessage;
       document.getElementById('set-sound-enabled').checked = storeSettings.soundEnabled;
 
@@ -3412,13 +3772,19 @@
 
     function handleSaveSettings(e) {
       e.preventDefault();
+      if (document.getElementById('set-tax-type').value === 'ppn' && !document.getElementById('set-pkp').checked) { wkToast('PPN hanya untuk usaha PKP. Centang status PKP atau pilih PB1 / tanpa pajak.', 'error'); return; }
       storeSettings.storeName = document.getElementById('set-store-name').value.trim();
       storeSettings.branchName = document.getElementById('set-branch-name').value.trim();
       storeSettings.cashierName = document.getElementById('set-cashier-name').value.trim();
       storeSettings.phone = document.getElementById('set-phone').value.trim();
       storeSettings.address = document.getElementById('set-address').value.trim();
-      storeSettings.isTaxEnabled = document.getElementById('set-tax-enabled').checked;
-      storeSettings.taxRate = parseFloat(document.getElementById('set-tax-rate').value || '10') / 100;
+      storeSettings.taxType = document.getElementById('set-tax-type').value;
+      storeSettings.isTaxEnabled = storeSettings.taxType !== 'none';
+      storeSettings.pkp = document.getElementById('set-pkp').checked;
+      storeSettings.taxIncl = document.getElementById('set-tax-incl').checked;
+      storeSettings.svcOn = document.getElementById('set-svc-on').checked;
+      storeSettings.svcRate = Math.max(0, Math.min(30, parseFloat(document.getElementById('set-svc-rate').value || '0'))) / 100;
+      storeSettings.taxRate = Math.max(0, Math.min(50, parseFloat(document.getElementById('set-tax-rate').value || '0'))) / 100;
       storeSettings.footerMessage = document.getElementById('set-footer-msg').value;
       storeSettings.soundEnabled = document.getElementById('set-sound-enabled').checked;
 
@@ -3458,6 +3824,14 @@
     const wkHM = d => wkPad(d.getHours()) + ':' + wkPad(d.getMinutes());
     const wkProduct = id => PRODUCTS.find(p => p.id === id);
 
+    var WK_LVL = { kasir: 1, manajer: 2, owner: 3 }, WK_RN = { kasir: 'Kasir', manajer: 'Manajer', owner: 'Owner' };
+    var WK_USERS = [
+      { id: 'u1', name: 'Hendra Wijaya', role: 'owner', pin: '1234' },
+      { id: 'u2', name: 'Sari Wulandari', role: 'manajer', pin: '2222' },
+      { id: 'u3', name: 'Radit Pratama', role: 'kasir', pin: '1111' }
+    ];
+    var WK_NEED = { wkOpenReport: 2, wkVoid: 2, wkOpenMenu: 3, wkOpenIng: 3, openSettingsModal: 3, wkResetDemo: 3, wkOpenLog: 2, wkOpenUsers: 3, wkBackup: 3, wkRestore: 3 };
+    var wkLastAp = null, wkLogF = 'all', wkUser = null, wkLgSel = null, wkLgPin = '', wkPinNeed = 3, wkDiscOk = false;
     /* ---- Member, poin & voucher ---- */
     var WK_PT_VAL = 100, WK_EARN = 5000, WK_MIN_REDEEM = 50;
     var WK_TIERS = { reguler: { n: 'Reguler', r: 0 }, silver: { n: 'Silver', r: 0.03 }, gold: { n: 'Gold', r: 0.05 }, platinum: { n: 'Platinum', r: 0.08 } };
@@ -3540,9 +3914,12 @@
       const a2 = a1 - voucherDisc;
       const pointsUsed = x.pts ? Math.max(0, Math.min(x.pts, Math.floor(a2 * 0.5 / WK_PT_VAL))) : 0;
       const pointsDisc = pointsUsed * WK_PT_VAL;
-      const taxable = a2 - pointsDisc;
-      const tax = taxOn ? Math.round(taxable * taxRate) : 0;
-      return { subtotal, discount, memberDisc, voucherDisc, voucherNote, pointsUsed, pointsDisc, tax, total: taxable + tax };
+      const net = a2 - pointsDisc;
+      const svc = storeSettings.svcOn ? Math.round(net * storeSettings.svcRate) : 0;
+      const taxable = net + svc;
+      const incl = !!storeSettings.taxIncl;
+      const tax = taxOn ? (incl ? Math.round(taxable - taxable / (1 + taxRate)) : Math.round(taxable * taxRate)) : 0;
+      return { subtotal, discount, memberDisc, voucherDisc, voucherNote, pointsUsed, pointsDisc, svc, tax, total: incl ? taxable : taxable + tax };
     }
     function wkXtra() { return { voucher: wkVoucher, pts: wkRedeemPts, rate: wkMem ? (WK_TIERS[wkMem.tier] || WK_TIERS.reguler).r : 0 }; }
     const wkCurrent = () => wkCalc(cart, wkDiscount, storeSettings.isTaxEnabled, storeSettings.taxRate, wkXtra());
@@ -3566,7 +3943,7 @@
       const taxRow = wk$('tax-row');
       if (storeSettings.isTaxEnabled) {
         taxRow.classList.remove('hidden');
-        wk$('tax-label').innerText = 'PB1 (' + Math.round(storeSettings.taxRate * 100) + '%)';
+        wk$('tax-label').innerText = wkTaxName() + ' (' + Math.round(storeSettings.taxRate * 100) + '%)' + (storeSettings.taxIncl ? ' · incl.' : '');
         wk$('bill-tax').innerText = formatRupiah(t.tax);
       } else taxRow.classList.add('hidden');
 
@@ -3821,7 +4198,10 @@
     function wkApplyDiscount() {
       const val = Math.max(0, Number(wk$('disc-value').value) || 0);
       if (wkDiscType === 'pct' && val > 100) { wkToast('Persentase diskon maksimal 100%.', 'error'); return; }
+      const dc = wkCalc(cart, { type: wkDiscType, value: val }, false, 0);
+      if (WK_LVL[wkRole] < 2 && !wkDiscOk && dc.subtotal && dc.discount / dc.subtotal > 0.1) { wkAskPin('Diskon di atas 10% butuh persetujuan Manajer / Owner', () => { wkDiscOk = true; wkApplyDiscount(); wkDiscOk = false; }, 2); return; }
       wkDiscount = { type: wkDiscType, value: val };
+      if (val > 0) wkLog('diskon', 'Diskon ' + (wkDiscType === 'pct' ? val + '%' : formatRupiah(val)) + ' pada pesanan aktif', { ap: wkDiscOk ? wkLastAp : null });
       calculateTotals();
       wkCloseDiscount();
       wkToast(val > 0 ? 'Diskon diterapkan.' : 'Diskon dihapus.', 'success');
@@ -3855,6 +4235,7 @@
       const id = 'HLD-' + wkPad(wkHeldSeq);
       wkHeld.push({ id, custId: wkMem ? wkMem.id : null, voucher: wkVoucher, orderType, table: tbl, customer: wk$('customer-name').value.trim(), cart: JSON.parse(JSON.stringify(cart)), discount: { ...wkDiscount }, time: new Date() });
       wkResetOrder(); renderCart(); renderProducts(); wkUpdateBadges();
+      wkLog('hold', 'Pesanan disimpan ' + id + (orderType === 'dine_in' ? ' · ' + tbl : ' · takeaway'));
       wkToast('Pesanan disimpan sebagai ' + id + '. Silakan layani pelanggan berikutnya.', 'success');
       return true;
     }
@@ -3871,7 +4252,7 @@
       box.innerHTML = wkHeld.map(h => {
         const qty = h.cart.reduce((a, c) => a + c.quantity, 0);
         const names = h.cart.map(c => c.quantity + 'x ' + c.name).join(', ');
-        const tot = wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate).total;
+        const tot = wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate, wkHeldX(h)).total;
         return '<div class="wk-card"><div class="main"><div class="top">' + h.id +
           '<span class="wk-tag ' + (h.orderType === 'dine_in' ? 'amber' : 'blue') + '">' + (h.orderType === 'dine_in' ? wkEsc(h.table) : 'Takeaway') + '</span>' +
           (h.customer ? '<span class="wk-tag">' + wkEsc(h.customer) + '</span>' : '') + '<span class="wk-tag">' + WK_ST[wkStat(h)][0] + (h.src === 'qr' ? ' · QR' : '') + '</span></div>' +
@@ -4006,7 +4387,7 @@
         subtotal: t.subtotal, discount: t.discount, tax: t.tax, total: t.total,
         memberDisc: t.memberDisc, voucher: t.voucherDisc > 0 ? wkVoucher : null, voucherDisc: t.voucherDisc, pointsUsed: t.pointsUsed, pointsDisc: t.pointsDisc,
         custId: (xt && wkMem) ? wkMem.id : null, tier: (xt && wkMem) ? wkMem.tier : null, ptsEarned: (xt && wkMem) ? Math.floor(t.total / WK_EARN) : 0,
-        taxPct: Math.round(storeSettings.taxRate * 100),
+        taxPct: Math.round(storeSettings.taxRate * 100), taxName: wkTaxName(), taxIncl: !!storeSettings.taxIncl, svc: t.svc, svcPct: Math.round(storeSettings.svcRate * 100),
         orderType: type,
         tableNumber: type === 'dine_in' ? (opts.table != null ? opts.table : wk$('table-number').value) : 'Takeaway',
         customerName: opts.customer != null ? opts.customer : wk$('customer-name').value.trim(),
@@ -4026,6 +4407,7 @@
       cart.forEach(c => { const p = wkProduct(c.id); if (p) p.stock = Math.max(0, p.stock - c.quantity); });
       transactions.unshift(trx);
       wkAward(trx);
+      wkLog('trx', trx.orderNumber + ' · ' + formatRupiah(trx.total) + ' · ' + trx.methodLabel + (trx.custId ? ' · member' : ''));
       if (method === 'cash') {
         drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'penjualan', amount: trx.total, note: 'Penjualan Tunai #' + trx.orderNumber, timestamp: trx.timeStr + ' WIB' });
       }
@@ -4070,7 +4452,8 @@
     ${trx.memberDisc > 0 ? `<div class="flex justify-between"><span>Diskon Member</span><span>-${formatRupiah(trx.memberDisc)}</span></div>` : ''}
     ${trx.voucherDisc > 0 ? `<div class="flex justify-between"><span>Voucher ${wkEsc(trx.voucher || '')}</span><span>-${formatRupiah(trx.voucherDisc)}</span></div>` : ''}
     ${trx.pointsDisc > 0 ? `<div class="flex justify-between"><span>Tukar ${trx.pointsUsed} poin</span><span>-${formatRupiah(trx.pointsDisc)}</span></div>` : ''}
-    ${trx.tax > 0 ? `<div class="flex justify-between"><span>PB1 (${trx.taxPct}%)</span><span>${formatRupiah(trx.tax)}</span></div>` : ''}
+    ${trx.svc > 0 ? `<div class="flex justify-between"><span>Service (${trx.svcPct}%)</span><span>${formatRupiah(trx.svc)}</span></div>` : ''}
+    ${trx.tax > 0 ? `<div class="flex justify-between"><span>${wkEsc(trx.taxName || 'PB1')} (${trx.taxPct}%)${trx.taxIncl ? ' incl.' : ''}</span><span>${formatRupiah(trx.tax)}</span></div>` : ''}
     <div class="flex justify-between font-bold text-xs pt-1 border-t border-neutral-300 text-neutral-900"><span>TOTAL</span><span>${formatRupiah(trx.total)}</span></div>`;
 
       wk$('receipt-payment').innerHTML = `
@@ -4152,6 +4535,7 @@
       wkAsk('Void transaksi ' + no + '?', 'Stok menu dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari omset serta laporan shift' + (t.paymentMethod === 'cash' ? ' (uang dikembalikan dari laci).' : '.'), 'Ya, Void Transaksi', () => {
         t.voided = true;
         wkRevoke(t);
+        wkLog('void', 'Void ' + no + ' · ' + formatRupiah(t.total), { ap: wkLastAp });
         t.items.forEach(i => { const p = wkProduct(i.id); if (p) p.stock += i.quantity; });
         wkConsume(t.items, 1, true);
         if (t.paymentMethod === 'cash') drawerLogs.unshift({ id: 'dl-' + Date.now(), type: 'void', amount: t.total, note: 'Void #' + no + ' (uang dikembalikan)', timestamp: wkHM(new Date()) + ' WIB' });
@@ -4336,8 +4720,9 @@
         wk$('set-cashier-name').value = 'Radit Pratama';
         wk$('set-phone').value = '0823-1231-2734';
         wk$('set-address').value = 'Jl. Boulevard Kuliner No. 88, Jakarta Selatan';
-        wk$('set-tax-enabled').checked = true;
-        wk$('set-tax-rate').value = 10;
+        wk$('set-tax-type').value = 'pb1'; wk$('set-pkp').checked = false; wk$('set-tax-incl').checked = false;
+        wk$('set-svc-on').checked = false; wk$('set-svc-rate').value = 5;
+        wk$('set-tax-rate').value = 10; wkTaxUI();
         wk$('set-footer-msg').value = 'Terima kasih atas kunjungan Anda!\nSemoga hari Anda menyenangkan.';
         wk$('set-sound-enabled').checked = true;
       });
@@ -4529,18 +4914,20 @@
     let wkRepTab = 'jual';
     function wkReportData() {
       const act = transactions.filter(t => !t.voided);
-      const R = { n: act.length, gross: 0, disc: 0, tax: 0, hpp: 0, items: 0, menu: {}, hour: {}, pay: {} };
+      const R = { n: act.length, promo: 0, taxInc: 0, svc: 0, gross: 0, disc: 0, tax: 0, hpp: 0, items: 0, menu: {}, hour: {}, pay: {} };
       act.forEach(t => {
         R.gross += t.subtotal; R.disc += t.discount; R.tax += t.tax;
+        const pr = (t.memberDisc || 0) + (t.voucherDisc || 0) + (t.pointsDisc || 0), ti = t.taxIncl ? t.tax : 0;
+        R.promo += pr; R.taxInc += ti; R.svc += t.svc || 0;
         t.items.forEach(it => {
           const p = wkProduct(it.id), c = it.cost != null ? it.cost : (p ? p.cost : 0), k = it.id;
           R.hpp += c * it.quantity; R.items += it.quantity;
           const m = R.menu[k] || (R.menu[k] = { name: p ? p.name : it.name, q: 0, rev: 0 }); m.q += it.quantity; m.rev += it.price * it.quantity;
         });
-        const h = parseInt(t.timeStr, 10); R.hour[h] = (R.hour[h] || 0) + t.subtotal - t.discount;
+        const h = parseInt(t.timeStr, 10); R.hour[h] = (R.hour[h] || 0) + t.subtotal - t.discount - pr - ti;
         R.pay[t.methodLabel] = (R.pay[t.methodLabel] || 0) + t.total;
       });
-      R.net = R.gross - R.disc; R.gp = R.net - R.hpp;
+      R.net = R.gross - R.disc - R.promo - R.taxInc; R.gp = R.net - R.hpp;
       R.opex = wkExpenses.reduce((a, e) => a + e.a, 0); R.np = R.gp - R.opex;
       return R;
     }
@@ -4555,7 +4942,7 @@
     function wkRenderReport() {
       const R = wkReportData();
       wk$('rep-sub').textContent = 'Shift #' + wkShift.number + ' · ' + R.n + ' transaksi (tanpa void)';
-      const tabs = `<div class="wk-tabs"><button type="button" class="${wkRepTab === 'jual' ? 'on' : ''}" onclick="wkRepSetTab('jual')">Penjualan</button><button type="button" class="${wkRepTab === 'laba' ? 'on' : ''}" onclick="wkRepSetTab('laba')">Laba Rugi</button><button type="button" class="${wkRepTab === 'dash' ? 'on' : ''}" onclick="wkRepSetTab('dash')">Dashboard</button></div>`;
+      const tabs = `<div class="wk-tabs"><button type="button" class="${wkRepTab === 'jual' ? 'on' : ''}" onclick="wkRepSetTab('jual')">Penjualan</button><button type="button" class="${wkRepTab === 'laba' ? 'on' : ''}" onclick="wkRepSetTab('laba')">Laba Rugi</button><button type="button" class="${wkRepTab === 'dash' ? 'on' : ''}" onclick="wkRepSetTab('dash')">Dashboard</button><button type="button" class="${wkRepTab === 'pajak' ? 'on' : ''}" onclick="wkRepSetTab('pajak')">Pajak</button></div>`;
       let body;
       if (wkRepTab === 'jual') {
         const top = Object.values(R.menu).sort((a, b) => b.q - a.q).slice(0, 5).map(m => [m.name, m.q]);
@@ -4568,17 +4955,19 @@
       <div class="wk-h4">Menu Terlaris (porsi)</div>${wkBars(top, v => v + ' porsi')}
       <div class="wk-h4">Penjualan per Jam</div>${wkBars(hrs, formatRupiah)}
       <div class="wk-h4">Metode Pembayaran</div>${wkBars(Object.entries(R.pay), formatRupiah)}`;
+      } else if (wkRepTab === 'pajak') {
+        body = wkTaxHTML();
       } else if (wkRepTab === 'dash') {
         body = wkDashHTML();
       } else {
         const row = (l, v, cls, neg) => `<tr class="${cls || ''}"><td>${l}</td><td class="${neg ? 'neg' : ''}">${neg ? '− ' : ''}${formatRupiah(Math.abs(v))}</td></tr>`;
         const exp = wkExpenses.map(e => `<tr><td>${wkEsc(e.n)}</td><td style="text-align:right;font:700 12px 'JetBrains Mono',monospace">${formatRupiah(e.a)}</td><td style="width:34px;text-align:right"><button type="button" class="wk-x" onclick="wkDelExpense(${e.id})" aria-label="Hapus biaya"><i class="fa-solid fa-xmark"></i></button></td></tr>`).join('');
         body = `<table class="wk-pl">
-      ${row('Penjualan kotor', R.gross)}${row('Diskon', R.disc, '', true)}${row('Penjualan bersih', R.net, 'sub')}
+      ${row('Penjualan kotor', R.gross)}${row('Diskon &amp; promo <small style="color:#737373">(manual, member, voucher, poin)</small>', R.disc + R.promo, '', true)}${R.taxInc ? row('Pajak yang sudah termasuk harga', R.taxInc, '', true) : ''}${row('Penjualan bersih', R.net, 'sub')}
       ${row('HPP (harga pokok penjualan)', R.hpp, '', true)}${row('Laba kotor <small style="color:#737373">(margin ' + wkPct(R.gp, R.net) + ')</small>', R.gp, 'sub')}
       ${row('Biaya operasional', R.opex, '', true)}
       <tr class="tot"><td>${R.np >= 0 ? 'LABA BERSIH' : 'RUGI BERSIH'} <small style="color:#737373;font-weight:600">(margin ${wkPct(R.np, R.net)})</small></td><td class="${R.np >= 0 ? 'pos' : 'neg'}">${formatRupiah(R.np)}</td></tr></table>
-      <div class="wk-note" style="margin-top:8px">Pajak ${formatRupiah(R.tax)} dipungut dari pelanggan dan tidak dihitung sebagai pendapatan. HPP add-on diasumsikan 40% dari harga add-on. Belanja bahan shift ini ${formatRupiah(wkPurchases.filter(x => x.shift === wkShift.number).reduce((a, x) => a + x.total, 0))} adalah arus kas dan tidak dihitung lagi sebagai biaya karena bahannya sudah masuk HPP.</div>
+      <div class="wk-note" style="margin-top:8px">Pajak ${formatRupiah(R.tax)}${R.svc ? ' dan service charge ' + formatRupiah(R.svc) : ''} dipungut dari pelanggan dan tidak dihitung sebagai pendapatan. HPP add-on diasumsikan 40% dari harga add-on. Belanja bahan shift ini ${formatRupiah(wkPurchases.filter(x => x.shift === wkShift.number).reduce((a, x) => a + x.total, 0))} adalah arus kas dan tidak dihitung lagi sebagai biaya karena bahannya sudah masuk HPP.</div>
       <div class="wk-h4">Biaya Operasional</div>
       <table class="wk-pl">${exp || '<tr><td colspan="3" style="color:#a3a3a3">Belum ada biaya.</td></tr>'}</table>
       <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:6px;margin-top:8px">
@@ -4613,7 +5002,7 @@
       const txt = ['*RINGKASAN SHIFT #' + wkShift.number + ' - ' + storeSettings.storeName.toUpperCase() + '*',
       new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }), '',
       'Transaksi: ' + R.n + ' | Item: ' + R.items, 'Penjualan bersih: ' + f(R.net), 'HPP: ' + f(R.hpp), 'Laba kotor: ' + f(R.gp),
-      'Biaya operasional: ' + f(R.opex), '*' + (R.np >= 0 ? 'Laba' : 'Rugi') + ' bersih: ' + f(R.np) + '*', '',
+      'Biaya operasional: ' + f(R.opex), 'Pajak terpungut: ' + f(R.tax) + (R.svc ? ' | Service: ' + f(R.svc) : ''), '*' + (R.np >= 0 ? 'Laba' : 'Rugi') + ' bersih: ' + f(R.np) + '*', '',
         'Terlaris:', ...top].join('\n');
       window.open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
     }
@@ -4653,7 +5042,7 @@
           let chip, info = '', bg = '#fff', bd = '#d4d4d4;border-style:dashed';
           if (h) {
             const c = WK_ST[wkStat(h)]; chip = wkChip(wkStat(h)); bg = c[2]; bd = c[1] + ';border-style:solid';
-            info = `<div style="font-size:10px;margin-top:4px">${h.customer ? wkEsc(h.customer) + ' · ' : ''}${wkAge(h)} mnt</div><div style="font:800 11px 'JetBrains Mono',monospace;margin-top:2px">${formatRupiah(wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate).total)}</div>`;
+            info = `<div style="font-size:10px;margin-top:4px">${h.customer ? wkEsc(h.customer) + ' · ' : ''}${wkAge(h)} mnt</div><div style="font:800 11px 'JetBrains Mono',monospace;margin-top:2px">${formatRupiah(wkCalc(h.cart, h.discount, storeSettings.isTaxEnabled, storeSettings.taxRate, wkHeldX(h)).total)}</div>`;
           }
           else if (inCashier) { chip = '<span style="font:700 10px sans-serif;padding:2px 7px;border-radius:7px;color:#6d28d9;background:#ede9fe">Di kasir</span>'; bg = '#faf5ff'; bd = '#6d28d9;border-style:solid'; }
           else chip = '<span style="font:700 10px sans-serif;color:#a3a3a3">Kosong</span>';
@@ -4941,28 +5330,28 @@
     const WK_PIN = '1234';
     let wkRole = 'owner', wkPinCb = null;
     const WK_OWNER_FNS = ['wkOpenReport', 'wkOpenMenu', 'wkOpenIng', 'openSettingsModal', 'wkResetDemo', 'wkVoid'];
-    function wkAskPin(msg, cb) {
-      wkPinCb = cb; wk$('pin-msg').textContent = msg; wk$('pin-err').style.display = 'none'; wk$('pin-input').value = '';
+    function wkAskPin(msg, cb, need) {
+      wkPinNeed = need || 3; wkPinCb = cb; wk$('pin-msg').textContent = msg; wk$('pin-err').style.display = 'none'; wk$('pin-input').value = '';
       wk$('pin-modal').classList.remove('hidden'); setTimeout(() => wk$('pin-input').focus(), 40);
     }
     function wkClosePin() { wk$('pin-modal').classList.add('hidden'); wkPinCb = null; }
     function wkPinSubmit() {
-      if (wk$('pin-input').value !== WK_PIN) { wk$('pin-err').style.display = ''; wk$('pin-input').value = ''; wk$('pin-input').focus(); return; }
-      const cb = wkPinCb; wkClosePin(); if (cb) cb();
+      const wkAp = WK_USERS.find(u => u.active !== false && u.pin === wk$('pin-input').value && WK_LVL[u.role] >= wkPinNeed);
+      if (!wkAp) { wk$('pin-err').style.display = ''; wk$('pin-input').value = ''; wk$('pin-input').focus(); return; }
+      const cb = wkPinCb; wkClosePin(); wkLastAp = wkAp; if (cb) cb(wkAp);
     }
     function wkRoleUI() {
-      const o = wkRole === 'owner';
-      wk$('role-label').textContent = o ? 'Owner' : 'Kasir';
-      wk$('role-icon').className = 'fa-solid ' + (o ? 'fa-user-shield text-amber-600' : 'fa-user text-neutral-500');
-      wk$('role-btn').title = o ? 'Beralih ke Kasir' : 'Masuk sebagai Owner (PIN)';
-      document.querySelectorAll(WK_OWNER_FNS.map(f => `[onclick^="${f}("]`).join(',')).forEach(b => { b.style.opacity = o ? '' : '.55'; });
+      wk$('role-label').textContent = (wkUser ? wkUser.name.split(' ')[0] + ' · ' : '') + WK_RN[wkRole];
+      wk$('role-icon').className = 'fa-solid ' + (wkRole === 'owner' ? 'fa-user-shield text-amber-600' : wkRole === 'manajer' ? 'fa-user-tie text-sky-600' : 'fa-user text-neutral-500');
+      wk$('role-btn').title = 'Ganti pengguna / keluar';
+      Object.keys(WK_NEED).forEach(f => document.querySelectorAll('[onclick^="' + f + '("]').forEach(b => { b.style.opacity = WK_LVL[wkRole] >= WK_NEED[f] ? '' : '.55'; }));
     }
     function wkSetRole(r) {
       wkRole = r;
       if (r === 'kasir') { wkCloseReport(); wkCloseMenu(); wkCloseIng(); closeSettingsModal(); }
       wkRoleUI(); wkToast('Peran aktif: ' + (r === 'owner' ? 'Owner (akses penuh).' : 'Kasir (laporan, menu, dan pengaturan butuh PIN Owner).'), 'info');
     }
-    function wkToggleRole() { if (wkRole === 'owner') wkSetRole('kasir'); else wkAskPin('Masuk sebagai Owner', () => wkSetRole('owner')); }
+    function wkToggleRole() { wkLogout(); }
 
     /* ---------- Menu "Lainnya" di header + foto menu opsional ---------- */
     function wkMoreToggle(e) {
@@ -5070,9 +5459,12 @@
 
     /* Tur demo 3 langkah */
     const WK_TOUR = [
-      { sel: '#product-grid', tab: 'menu', t: '1. Pilih menu', d: 'Ketuk kartu menu untuk menambah pesanan. Menu makanan dan minuman punya pilihan varian dan add-on.' },
-      { sel: '#cart-list', tab: 'cart', t: '2. Atur dan bayar', d: 'Pesanan muncul di sini. Atur catatan, diskon, dan tipe pesanan, lalu bayar tunai, QRIS, atau debit. Ada Tiket Dapur dan Split Bill untuk patungan.' },
-      { sel: '#btn-report', tab: 'menu', t: '3. Pantau usaha', d: 'Laporan menampilkan penjualan, menu terlaris, dan laba rugi. Tombol Menu mengatur harga, HPP, dan stok.' }
+      { sel: '#role-btn', tab: 'menu', t: '1. Login &amp; peran', d: 'Masuk dengan PIN sebagai Owner, Manajer, atau Kasir. Tiap peran punya akses berbeda. Void dan diskon di atas 10% butuh persetujuan atasan. Tombol ini untuk ganti pengguna.' },
+      { sel: '#product-grid', tab: 'menu', t: '2. Pilih menu', d: 'Ketuk kartu menu untuk menambah pesanan. Menu makanan dan minuman punya pilihan varian dan add-on.' },
+      { sel: '#wk-member-card', tab: 'cart', t: '3. Member, voucher &amp; poin', d: 'Ketik nama atau no. HP untuk mencari member: dapat diskon sesuai tier dan poin. Coba kode voucher WARUNG10, atau tukar poin untuk memotong tagihan.' },
+      { sel: '#cart-list', tab: 'cart', t: '4. Atur dan bayar', d: 'Atur catatan, diskon, dan tipe pesanan, lalu bayar tunai, QRIS, atau transfer. Ada Tiket Dapur dan Split Bill untuk patungan.' },
+      { sel: '#bill-total', tab: 'cart', t: '5. Pajak &amp; service', d: 'Di Pengaturan (Owner) pilih PB1, PPN khusus PKP, atau tanpa pajak, lengkap dengan service charge dan opsi harga sudah termasuk pajak.' },
+      { sel: '#btn-report', tab: 'menu', t: '6. Pantau &amp; amankan usaha', d: 'Laporan memuat penjualan, laba rugi, dan rekap pajak. Menu titik tiga berisi Log Aktivitas, Kelola Pengguna, serta Cadangkan dan Pulihkan Data.' }
     ];
     let wkTourI = -1;
     function wkTourClear() { document.querySelectorAll('.wk-tour-hl').forEach(e => e.classList.remove('wk-tour-hl')); }
@@ -5131,7 +5523,7 @@
     }
     function wkResetDemo() {
       wkAsk('Reset demo?', 'Transaksi, stok, laci kas, dan pengaturan akan kembali ke data contoh awal.', 'Ya, Reset', () => {
-        wkNoSave = true; try { db.del(WK_KEY); db.del('warungku-tour'); db.del('warungku-members-v1'); } catch (e) { }
+        wkNoSave = true; try { db.del(WK_KEY); db.del('warungku-tour'); db.del('warungku-members-v1'); db.del('warungku-users-v1'); db.del('warungku-log-v1'); } catch (e) { }
         location.reload();
       }, true);
     }
@@ -5211,6 +5603,7 @@
       if (t.memberDisc > 0) rows.push('<div class="wk-xrow"><span>Diskon Member (' + WK_TIERS[wkMem.tier].n + ' ' + Math.round(WK_TIERS[wkMem.tier].r * 100) + '%)</span><b>-' + formatRupiah(t.memberDisc) + '</b></div>');
       if (wkVoucher) rows.push('<div class="wk-xrow"><span class="flex items-center gap-1.5">Voucher ' + wkEsc(wkVoucher) + '<button type="button" class="wk-link" onclick="wkRemoveVoucher()">Lepas</button></span><b>' + (t.voucherDisc > 0 ? '-' + formatRupiah(t.voucherDisc) : 'Rp 0') + '</b></div>' + (t.voucherNote ? '<div class="wk-xnote">' + wkEsc(t.voucherNote) + '</div>' : ''));
       if (t.pointsDisc > 0) rows.push('<div class="wk-xrow"><span>Tukar ' + t.pointsUsed.toLocaleString('id-ID') + ' poin</span><b>-' + formatRupiah(t.pointsDisc) + '</b></div>');
+      if (t.svc > 0) rows.push('<div class="wk-xrow"><span>Service (' + Math.round(storeSettings.svcRate * 100) + '%)</span><b style="color:inherit">' + formatRupiah(t.svc) + '</b></div>');
       wk$('wk-extra-rows').innerHTML = rows.join('');
       const box = wk$('wk-member-card');
       if (!wkMem) { box.innerHTML = '<div class="wk-mc-hint"><i class="fa-solid fa-magnifying-glass"></i> Ketik nama / no. HP untuk mencari member &amp; poinnya</div>'; }
@@ -5237,6 +5630,203 @@
       c.points = Math.max(0, c.points - (t.ptsEarned || 0) + (t.pointsUsed || 0)); c.visits = Math.max(0, c.visits - 1); wkMSave();
     }
 
+
+    /* ================================================================
+       PAJAK (PB1 / PPN-PKP) + LOGIN & PERAN (Owner · Manajer · Kasir)
+    ================================================================ */
+    function wkTaxName() { return storeSettings.taxType === 'ppn' ? 'PPN' : 'PB1'; }
+    function wkTaxUI(changed) {
+      const t = wk$('set-tax-type').value, pkp = wk$('set-pkp').checked, r = wk$('set-tax-rate'), h = wk$('set-tax-hint');
+      if (changed) { if (t === 'ppn' && +r.value === 10) r.value = 11; else if (t === 'pb1' && +r.value === 11) r.value = 10; }
+      r.disabled = t === 'none'; wk$('set-tax-incl').disabled = t === 'none';
+      const bad = t === 'ppn' && !pkp;
+      h.textContent = t === 'pb1' ? 'PB1 adalah pajak daerah atas makanan & minuman (maks. 10%, tarif mengikuti Perda). Status PKP tidak memengaruhi PB1.'
+        : t === 'ppn' ? (pkp ? 'PPN dipungut oleh PKP (tarif efektif umumnya 11%). Untuk makan di tempat biasanya yang berlaku PB1, bukan PPN — konfirmasikan ke konsultan pajak.' : 'PPN hanya boleh dipungut PKP. Centang “Usaha berstatus PKP”, atau pilih PB1 / tanpa pajak.')
+          : 'Struk tanpa baris pajak. Sesuaikan dengan ketentuan daerah Anda (sebagian daerah membebaskan usaha kecil di bawah batas omzet).';
+      h.style.background = bad ? '#fff1f2' : '#fffbeb'; h.style.color = bad ? '#be123c' : '#92400e'; h.style.borderColor = bad ? '#fecdd3' : '#fde68a';
+    }
+    function wkLoginInit() {
+      let id = null; try { id = sessionStorage.getItem('warungku-user'); } catch (e) { }
+      const u = WK_USERS.find(x => x.id === id && x.active !== false);
+      if (u) wkEnter(u, true); else wkLoginShow();
+    }
+    function wkLoginShow() {
+      wkLgSel = null; wkLgPin = '';
+      wk$('wk-lg-users').innerHTML = WK_USERS.filter(u => u.active !== false).map(u => '<button type="button" class="wk-lg-u" onclick="wkLoginPick(\'' + u.id + '\')"><span class="av ' + u.role + '">' + wkEsc(wkIni(u.name)) + '</span><span class="nm">' + wkEsc(u.name) + '</span><span class="rl">' + WK_RN[u.role] + '</span></button>').join('');
+      wk$('wk-lg-s1').style.display = ''; wk$('wk-lg-s2').style.display = 'none'; wk$('wk-login').style.display = 'flex';
+    }
+    function wkLoginPick(id) {
+      wkLgSel = WK_USERS.find(u => u.id === id); wkLgPin = '';
+      wk$('wk-lg-who').textContent = wkLgSel.name + ' · ' + WK_RN[wkLgSel.role]; wk$('wk-lg-err').style.visibility = 'hidden';
+      wk$('wk-lg-pad').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9, '', 0, 'b'].map(k => k === '' ? '<span></span>' : '<button type="button" onclick="wkLgKey(\'' + k + '\')">' + (k === 'b' ? '<i class="fa-solid fa-delete-left"></i>' : k) + '</button>').join('');
+      wk$('wk-lg-s1').style.display = 'none'; wk$('wk-lg-s2').style.display = ''; wkLgDots();
+    }
+    function wkLgDots() { wk$('wk-lg-dots').innerHTML = [0, 1, 2, 3].map(i => '<i class="' + (i < wkLgPin.length ? 'on' : '') + '"></i>').join(''); }
+    function wkLgKey(k) {
+      if (!wkLgSel) return;
+      if (k === 'b') wkLgPin = wkLgPin.slice(0, -1); else if (wkLgPin.length < 4) wkLgPin += k;
+      wkLgDots(); wk$('wk-lg-err').style.visibility = 'hidden';
+      if (wkLgPin.length === 4) {
+        if (wkLgPin === wkLgSel.pin) wkEnter(wkLgSel);
+        else { wkLog('akses', 'PIN salah untuk ' + wkLgSel.name, { by: 'Login' }); const d = wk$('wk-lg-dots'); d.classList.add('shake'); wk$('wk-lg-err').style.visibility = 'visible'; setTimeout(() => { d.classList.remove('shake'); wkLgPin = ''; wkLgDots(); }, 420); }
+      }
+    }
+    function wkEnter(u, silent) {
+      if (window.wkTourPending) { window.wkTourPending = false; setTimeout(wkTourStart, 900); }
+      wkUser = u; wkRole = u.role; storeSettings.cashierName = u.name;
+      ['topbar-cashier-name', 'topbar-shift-cashier'].forEach(id => { const e = wk$(id); if (e) e.innerText = u.name; });
+      try { sessionStorage.setItem('warungku-user', u.id); } catch (e) { }
+      wk$('wk-login').style.display = 'none';
+      if (WK_LVL[wkRole] < 3) { wkCloseMenu(); wkCloseIng(); closeSettingsModal(); }
+      if (WK_LVL[wkRole] < 2) wkCloseReport();
+      wkRoleUI(); if (!silent) wkLog('akses', 'Masuk sebagai ' + WK_RN[u.role]);
+      if (!silent) wkToast('Halo, ' + u.name + '! Masuk sebagai ' + WK_RN[u.role] + '.', 'success');
+    }
+    function wkLogout() { if (wkUser) wkLog('akses', 'Keluar'); try { sessionStorage.removeItem('warungku-user'); } catch (e) { } wkUser = null; wkMoreClose(); wkLoginShow(); }
+    document.addEventListener('keydown', e => {
+      if (wk$('wk-login').style.display !== 'flex' || !wkLgSel) return;
+      if (/^[0-9]$/.test(e.key)) wkLgKey(e.key); else if (e.key === 'Backspace') wkLgKey('b'); else if (e.key === 'Escape') wkLoginShow();
+    });
+
+    /* ================================================================
+       LOG AKTIVITAS · KELOLA PENGGUNA · service charge
+    ================================================================ */
+    var wkLogs = []; try { wkLogs = db.get('warungku-log-v1') || []; } catch (e) { }
+    try { const d = db.get('warungku-users-v1'); if (Array.isArray(d) && d.length) WK_USERS = d; } catch (e) { }
+    function wkHeldX(h) { const c = h.custId && WK_CUSTS.find(x => x.id === h.custId); return { voucher: h.voucher || null, rate: c ? (WK_TIERS[c.tier] || WK_TIERS.reguler).r : 0 }; }
+    function wkLog(type, msg, x) {
+      x = x || {};
+      wkLogs.unshift({ t: Date.now(), type, msg, by: x.by || (wkUser ? wkUser.name : 'Sistem'), ap: (x.ap && (!wkUser || x.ap.id !== wkUser.id)) ? x.ap.name : null });
+      if (wkLogs.length > 200) wkLogs.length = 200;
+      try { db.set('warungku-log-v1', wkLogs); } catch (e) { }
+    }
+    if (!wkLogs.length) {
+      const n = Date.now(); wkLogs = [
+        { t: n - 3600e3 * 2, type: 'akses', msg: 'Masuk sebagai Kasir', by: 'Radit Pratama', ap: null },
+        { t: n - 3600e3 * 2.1, type: 'sistem', msg: 'Shift dibuka · kas awal tercatat', by: 'Hendra Wijaya', ap: null }];
+    }
+    const wkLogIc = { trx: 'fa-receipt', void: 'fa-ban', diskon: 'fa-tag', hold: 'fa-pause', akses: 'fa-right-to-bracket', sistem: 'fa-gear' };
+    function wkOpenLog() { wkLogF = 'all'; wkRenderLog(); wk$('log-modal').classList.remove('hidden'); }
+    function wkCloseLog() { wk$('log-modal').classList.add('hidden'); }
+    function wkLogSet(f) { wkLogF = f; wkRenderLog(); }
+    function wkRenderLog() {
+      const F = [['all', 'Semua'], ['trx', 'Transaksi'], ['void', 'Void'], ['diskon', 'Diskon'], ['akses', 'Akses'], ['sistem', 'Sistem']];
+      wk$('log-filters').innerHTML = F.map(f => '<button type="button" class="wk-chip' + (wkLogF === f[0] ? ' on' : '') + '" onclick="wkLogSet(\'' + f[0] + '\')">' + f[1] + '</button>').join('');
+      const l = wkLogs.filter(e => wkLogF === 'all' || e.type === wkLogF);
+      wk$('log-body').innerHTML = l.length ? l.map(e => {
+        const d = new Date(e.t);
+        return '<div class="wk-lg-row"><span class="ic ' + e.type + '"><i class="fa-solid ' + (wkLogIc[e.type] || 'fa-circle') + '"></i></span><div class="tx">' + wkEsc(e.msg) + '<small>oleh ' + wkEsc(e.by) + (e.ap ? ' · disetujui ' + wkEsc(e.ap) : '') + '</small></div><span class="tm">' + d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }) + ' ' + wkHM(d) + '</span></div>';
+      }).join('')
+        : '<div class="wk-empty"><i class="fa-regular fa-folder-open"></i>Belum ada aktivitas.</div>';
+    }
+    ['wkStartNewShift', 'wkArchiveShift'].forEach(n => {
+      const f = window[n]; if (typeof f !== 'function') return;
+      window[n] = function () { const r = f.apply(this, arguments); wkLog('sistem', n === 'wkStartNewShift' ? 'Shift baru dibuka' : 'Shift ditutup & diarsipkan'); return r; };
+    });
+    {
+      const f = window.handleSaveSettings; window.handleSaveSettings = function () {
+        const r = f.apply(this, arguments);
+        if (wk$('settings-modal').classList.contains('hidden')) wkLog('sistem', 'Pengaturan diperbarui · pajak ' + (storeSettings.taxType === 'none' ? 'nonaktif' : wkTaxName() + ' ' + Math.round(storeSettings.taxRate * 100) + '%') + (storeSettings.svcOn ? ' · service ' + Math.round(storeSettings.svcRate * 100) + '%' : '')); return r;
+      };
+    }
+
+    function wkUsersSave() { try { db.set('warungku-users-v1', WK_USERS); } catch (e) { } }
+    function wkOpenUsers() { wkRenderUsers(); wk$('users-modal').classList.remove('hidden'); }
+    function wkCloseUsers() { wk$('users-modal').classList.add('hidden'); }
+    function wkRenderUsers() {
+      wk$('users-body').innerHTML = WK_USERS.map(u => {
+        const me = wkUser && wkUser.id === u.id;
+        return '<div class="wk-ur' + (u.active === false ? ' off' : '') + '"><input type="text" value="' + wkEsc(u.name) + '" onchange="wkUserSet(\'' + u.id + '\',\'name\',this.value)" aria-label="Nama">' +
+          '<select onchange="wkUserSet(\'' + u.id + '\',\'role\',this.value)" aria-label="Peran">' + ['kasir', 'manajer', 'owner'].map(r => '<option value="' + r + '"' + (u.role === r ? ' selected' : '') + '>' + WK_RN[r] + '</option>').join('') + '</select>' +
+          '<input type="text" class="pin" maxlength="4" inputmode="numeric" value="' + wkEsc(u.pin) + '" onchange="wkUserSet(\'' + u.id + '\',\'pin\',this.value)" aria-label="PIN">' +
+          '<label style="font-size:11px;display:flex;gap:5px;align-items:center;cursor:pointer"><input type="checkbox" ' + (u.active !== false ? 'checked' : '') + ' onchange="wkUserSet(\'' + u.id + '\',\'active\',this.checked)">Aktif</label>' +
+          '<button type="button" class="wk-btn redsoft xs" ' + (me ? 'disabled title="Akun yang sedang dipakai"' : '') + ' onclick="wkUserDel(\'' + u.id + '\')" aria-label="Hapus"><i class="fa-regular fa-trash-can"></i></button></div>';
+      }).join('');
+    }
+    function wkUserSet(id, f, v) {
+      const u = WK_USERS.find(x => x.id === id); if (!u) return;
+      const old = { ...u };
+      if (f === 'name') { v = String(v).trim(); if (!v) { wkToast('Nama tidak boleh kosong.', 'warn'); return wkRenderUsers(); } }
+      if (f === 'pin') {
+        if (!/^\d{4}$/.test(v)) { wkToast('PIN harus 4 digit angka.', 'warn'); return wkRenderUsers(); }
+        if (WK_USERS.some(x => x.id !== id && x.pin === v)) { wkToast('PIN itu sudah dipakai pengguna lain.', 'warn'); return wkRenderUsers(); }
+      }
+      u[f] = v;
+      const owners = WK_USERS.filter(x => x.role === 'owner' && x.active !== false).length;
+      if (!owners || (wkUser && wkUser.id === id && (f === 'role' || f === 'active'))) { Object.assign(u, old); wkToast(!owners ? 'Minimal harus ada satu Owner aktif.' : 'Peran / status akun yang sedang dipakai tidak bisa diubah.', 'warn'); return wkRenderUsers(); }
+      wkUsersSave(); wkLog('sistem', 'Pengguna ' + u.name + ' diubah (' + (f === 'pin' ? 'PIN' : f === 'role' ? 'peran → ' + WK_RN[v] : f === 'active' ? (v ? 'diaktifkan' : 'dinonaktifkan') : 'nama') + ')'); wkRenderUsers();
+    }
+    function wkUserAdd() {
+      const id = 'u' + Date.now(); let pin; do { pin = String(1000 + Math.floor(Math.random() * 9000)); } while (WK_USERS.some(x => x.pin === pin));
+      WK_USERS.push({ id, name: 'Pengguna Baru', role: 'kasir', pin, active: true }); wkUsersSave(); wkLog('sistem', 'Pengguna baru ditambahkan'); wkRenderUsers(); wkToast('Pengguna ditambahkan. PIN awal: ' + pin, 'success');
+    }
+    function wkUserDel(id) {
+      const u = WK_USERS.find(x => x.id === id); if (!u || (wkUser && wkUser.id === id)) return;
+      if (u.role === 'owner' && WK_USERS.filter(x => x.role === 'owner' && x.active !== false).length < 2) { wkToast('Minimal harus ada satu Owner aktif.', 'warn'); return; }
+      wkAsk('Hapus pengguna?', u.name + ' tidak bisa masuk lagi.', 'Ya, Hapus', () => { WK_USERS = WK_USERS.filter(x => x.id !== id); wkUsersSave(); wkLog('sistem', 'Pengguna ' + u.name + ' dihapus'); wkRenderUsers(); }, true);
+    }
+
+    /* ================================================================
+       REKAP PAJAK · CADANGAN & PEMULIHAN DATA
+    ================================================================ */
+    function wkTaxRows() {
+      const g = {};
+      transactions.filter(t => !t.voided).forEach(t => {
+        const k = t.tax > 0 ? (t.taxName || 'PB1') + ' ' + (t.taxPct != null ? t.taxPct : 10) + '%' + (t.taxIncl ? ' (termasuk harga)' : '') : 'Tanpa pajak';
+        const o = g[k] || (g[k] = { n: 0, dpp: 0, tax: 0, svc: 0, tot: 0 });
+        o.n++; o.tax += t.tax; o.svc += t.svc || 0; o.tot += t.total; o.dpp += t.total - t.tax;
+      });
+      return g;
+    }
+    function wkTaxHTML() {
+      const g = wkTaxRows(), ks = Object.keys(g), T = ks.reduce((a, k) => ({ n: a.n + g[k].n, dpp: a.dpp + g[k].dpp, tax: a.tax + g[k].tax, svc: a.svc + g[k].svc, tot: a.tot + g[k].tot }), { n: 0, dpp: 0, tax: 0, svc: 0, tot: 0 });
+      const td = 'style="text-align:right;font:700 12px \'JetBrains Mono\',monospace"';
+      const rows = ks.map(k => '<tr><td>' + wkEsc(k) + '</td><td ' + td + '>' + g[k].n + '</td><td ' + td + '>' + formatRupiah(g[k].dpp) + '</td><td ' + td + '>' + formatRupiah(g[k].tax) + '</td></tr>').join('');
+      return '<div class="wk-kpis"><div class="wk-kpi"><small>Pajak Terpungut</small><b>' + formatRupiah(T.tax) + '</b></div><div class="wk-kpi"><small>Service Charge</small><b>' + formatRupiah(T.svc) + '</b></div>' +
+        '<div class="wk-kpi"><small>Dasar Pengenaan (DPP)</small><b>' + formatRupiah(T.dpp) + '</b></div><div class="wk-kpi"><small>Total Diterima</small><b>' + formatRupiah(T.tot) + '</b></div></div>' +
+        '<div class="wk-h4">Rekap per Jenis Pajak</div><table class="wk-pl"><tr><td style="color:#737373;font-size:11px">Jenis</td><td ' + td + '>Trx</td><td ' + td + '>DPP</td><td ' + td + '>Pajak</td></tr>' + (rows || '<tr><td colspan="4" style="color:#a3a3a3">Belum ada transaksi.</td></tr>') + '</table>' +
+        '<div class="wk-note" style="margin-top:8px">DPP = total diterima dikurangi pajak (sudah termasuk service charge). Pajak dan service dipungut dari pelanggan, bukan pendapatan. Jadwal dan tarif setoran PB1 mengikuti Perda daerah Anda; PPN hanya untuk PKP. Konfirmasikan ke konsultan pajak.</div>' +
+        '<div style="margin-top:10px"><button type="button" class="wk-btn ghost xs" onclick="wkExportTaxCSV()"><i class="fa-solid fa-file-csv"></i>Ekspor rekap pajak (CSV)</button></div>';
+    }
+    function wkDownload(name, text, type) {
+      const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    }
+    function wkExportTaxCSV() {
+      const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+      const rows = [['No Struk', 'Tanggal', 'Jam', 'Status', 'Subtotal', 'Diskon', 'Diskon Member', 'Voucher', 'Tukar Poin', 'Service', 'DPP', 'Jenis Pajak', 'Tarif %', 'Pajak', 'Total'].map(q).join(',')];
+      transactions.forEach(t => rows.push([t.orderNumber, t.dateStr, t.timeStr, t.voided ? 'VOID' : 'OK', t.subtotal, t.discount, t.memberDisc || 0, t.voucherDisc || 0, t.pointsDisc || 0, t.svc || 0, t.total - t.tax, t.tax > 0 ? (t.taxName || 'PB1') : 'Tanpa pajak', t.taxPct != null ? t.taxPct : '', t.tax, t.total].map(q).join(',')));
+      wkDownload('rekap-pajak-warungku-shift-' + wkShift.number + '.csv', '\ufeff' + rows.join('\r\n'), 'text/csv;charset=utf-8');
+      wkToast('Rekap pajak diekspor (' + transactions.length + ' transaksi).', 'success');
+    }
+    const WK_BK_KEYS = [WK_KEY, 'warungku-members-v1', 'warungku-users-v1', 'warungku-log-v1'];
+    function wkBackup() {
+      wkSaveNow(); const data = {};
+      WK_BK_KEYS.forEach(k => { try { const v = db.get(k); if (v != null) data[k] = v; } catch (e) { } });
+      wkDownload('cadangan-warungku-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ app: 'warungku-pos', v: 1, at: new Date().toISOString(), data }), 'application/json');
+      wkLog('sistem', 'Cadangan data diunduh'); wkToast('Cadangan data diunduh.', 'success');
+    }
+    function wkRestore() { wk$('wk-restore-file').click(); }
+    function wkRestoreFile(inp) {
+      const f = inp.files && inp.files[0]; inp.value = ''; if (!f) return;
+      if (f.size > 8e6) { wkToast('File terlalu besar untuk cadangan WarungKU.', 'error'); return; }
+      const r = new FileReader();
+      r.onload = () => {
+        let d = null; try { d = JSON.parse(r.result); } catch (e) { }
+        if (!d || d.app !== 'warungku-pos' || !d.data || !d.data[WK_KEY] || d.data[WK_KEY].v !== 1) { wkToast('File itu bukan cadangan WarungKU yang valid.', 'error'); return; }
+        const when = d.at ? new Date(d.at).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' }) : 'tidak diketahui';
+        wkAsk('Pulihkan data dari cadangan?', 'Transaksi, stok, member, pengguna, dan log saat ini akan diganti dengan cadangan (' + when + '). Halaman akan dimuat ulang.', 'Ya, Pulihkan', () => {
+          wkNoSave = true;
+          try {
+            const lg = Array.isArray(d.data['warungku-log-v1']) ? d.data['warungku-log-v1'] : (d.data['warungku-log-v1'] = []);
+            lg.unshift({ t: Date.now(), type: 'sistem', msg: 'Data dipulihkan dari cadangan (' + when + ')', by: wkUser ? wkUser.name : 'Sistem', ap: null });
+            WK_BK_KEYS.forEach(k => { if (d.data[k] != null) db.set(k, d.data[k]); });
+          } catch (e) { }
+          location.reload();
+        }, true);
+      };
+      r.readAsText(f);
+    }
     wkRestored = wkLoadState();
     wkRecalcCosts(); wkSyncStock();
     if (!wkDaily.length) wkSeedDaily();
@@ -5256,11 +5846,11 @@
       wk$('topbar-cashier-name').innerText = storeSettings.cashierName; wk$('topbar-shift-cashier').innerText = storeSettings.cashierName;
       setOrderType(orderType); renderCart(); renderProducts(); wkUpdateBadges();
     }
-    WK_OWNER_FNS.forEach(n => {
-      const f = window[n];
-      window[n] = function () { const a = arguments, self = this; if (wkRole === 'owner') return f.apply(self, a); wkAskPin('Aksi ini butuh PIN Owner', () => f.apply(self, a)); };
+    Object.keys(WK_NEED).forEach(n => {
+      const f = window[n], need = WK_NEED[n];
+      window[n] = function () { const a = arguments, self = this; if (WK_LVL[wkRole] >= need) { wkLastAp = null; return f.apply(self, a); } wkAskPin('Butuh persetujuan ' + (need === 3 ? 'Owner' : 'Manajer / Owner'), () => f.apply(self, a), need); };
     });
-    wkRoleUI();
+    wkRoleUI(); wkLoginInit();
     const _wkFinish = finishCheckout;
     finishCheckout = function () { const r = _wkFinish.apply(this, arguments); if (transactions[0]) wkConsume(transactions[0].items, -1); renderProducts(); return r; };
     ['renderCart', 'renderProducts', 'calculateTotals', 'updateDrawerStats', 'wkUpdateBadges'].forEach(n => {
@@ -5271,7 +5861,7 @@
     document.addEventListener('visibilitychange', () => { if (document.hidden) wkSaveNow(); });
     wkSaveSoon();
     try { wkApplyTheme(db.get(WK_THEME_KEY) === 'dark'); } catch (e) { }
-    try { if (!wkRestored && !db.get('warungku-tour')) setTimeout(wkTourStart, 900); } catch (e) { }
+    try { window.wkTourPending = !wkRestored && !db.get('warungku-tour'); if (wkUser && window.wkTourPending) { window.wkTourPending = false; setTimeout(wkTourStart, 900); } } catch (e) { }
   </script>
 </body>
 

@@ -2613,7 +2613,7 @@
           <label class="text-xs font-bold text-slate-700 block mb-2">Ketik / scan SKU:</label>
           <div style="display:flex;gap:8px">
             <input id="scan-input" type="text" class="tp-input num" style="font-size:13px;text-transform:uppercase"
-              placeholder="SHR-001 atau TSH-002-L (SKU-ukuran)" onkeydown="if(event.key==='Enter')tpScanSubmit()"
+              placeholder="mis. SHR-001-RT-M atau SHR-001" onkeydown="if(event.key==='Enter')tpScanSubmit()"
               autocomplete="off">
             <button type="button" onclick="tpScanSubmit()" class="tp-btn rose">Tambah</button>
           </div>
@@ -4161,7 +4161,7 @@
       const c = tpCalc(items, o.rate, o.voucher);
       return {
         no: o.no, ts: o.ts, shiftNo: o.shiftNo, customer: o.customer, rate: o.rate, tierName: TP_TIERS[String(o.rate)] || 'MEMBER',
-        items: items.map(i => ({ pid: i.product.id, name: i.product.name, sku: i.product.sku, colorName: i.color.name, colorHex: i.color.hex, size: i.size, qty: i.qty, price: i.price, returned: 0 })),
+        items: items.map(i => ({ pid: i.product.id, name: i.product.name, sku: i.product.sku, colorName: i.color.name, colorHex: i.color.hex, size: i.size, qty: i.qty, price: i.price, cost: i.product.cost != null ? i.product.cost : null, returned: 0 })),
         subtotal: c.subtotal, memberDisc: c.memberDisc, voucherCode: c.voucherDisc > 0 ? o.voucher : null, voucherDisc: c.voucherDisc, tax: c.tax, total: c.total,
         method: o.method, methodLabel: o.label || (o.method === 'cash' ? 'TUNAI' : o.method === 'qris' ? 'QRIS' : 'KARTU EDC'),
         tendered: o.method === 'cash' ? o.tendered : c.total, change: o.method === 'cash' ? Math.max(0, o.tendered - c.total) : 0,
@@ -4175,7 +4175,7 @@
         no, ts: new Date(), shiftNo: tpShift.number, customer: tp$('cust-name-input').value.trim() || 'Pelanggan Walk-In',
         rate: memberDiscountRate, voucher: tpVoucher, method, tendered: cashTendered, label: extra.label, ref: extra.ref
       });
-      cart.forEach(i => { tpVS[i.product.id][i.color.name][i.size] = Math.max(0, tpStock(i.product.id, i.color.name, i.size) - i.qty); tpSyncStock(i.product); });
+      cart.forEach(i => { const _f = tpStock(i.product.id, i.color.name, i.size); tpVS[i.product.id][i.color.name][i.size] = Math.max(0, _f - i.qty); tpSyncStock(i.product); tpMvLog(i.product, i.color.name, i.size, _f, tpStock(i.product.id, i.color.name, i.size), 'jual', no); });
       tpTrx.unshift(trx);
       tpSeq++;
       tpPendingFinish = true; tpReprint = false;
@@ -4450,7 +4450,7 @@
       if (!t || t.voided) return;
       tpAsk('Void transaksi ' + no + '?', `Stok pakaian dikembalikan dan nilai ${formatRupiah(t.total)} dikeluarkan dari laporan shift${t.method === 'cash' ? ' (uang dikembalikan dari laci)' : ''}.`, 'Ya, Void Transaksi', () => {
         t.voided = true;
-        t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
+        t.items.forEach(i => { const _f = tpStock(i.pid, i.colorName, i.size); tpAddStock(i.pid, i.colorName, i.size, i.qty); tpMvLog(tpProd(i.pid), i.colorName, i.size, _f, _f + i.qty, 'void', no); });
         renderProducts(); tpRenderShift();
         showToast(no + ' di-void. Stok dikembalikan.', 'warn');
       }, true);
@@ -4586,10 +4586,13 @@
       const lines = [];
       tpRet.sel.forEach((s, i) => { if (s.checked) { const it = t.items[i]; lines.push({ idx: i, pid: it.pid, name: it.name, colorName: it.colorName, size: it.size, qty: s.qty, nv: tpRet.mode === 'exchange' ? s.nv : null }); } });
       const amount = tpRet.mode === 'refund' ? Math.round(lines.reduce((a, l) => a + t.items[l.idx].price * l.qty, 0) * (t.total / t.subtotal)) : 0;
+      const _rno = 'RET-' + String(tpRetSeq + 1).padStart(4, '0');
       lines.forEach(l => {
         t.items[l.idx].returned += l.qty;
-        if (!defect) tpAddStock(l.pid, l.colorName, l.size, l.qty);
-        if (l.nv) { tpVS[l.pid][l.nv.color][l.nv.size] -= l.qty; tpSyncStock(tpProd(l.pid)); }
+        const _f = tpStock(l.pid, l.colorName, l.size), _p = tpProd(l.pid);
+        if (!defect) { tpAddStock(l.pid, l.colorName, l.size, l.qty); tpMvLog(_p, l.colorName, l.size, _f, _f + l.qty, 'retur', _rno); }
+        else tpMvLog(_p, l.colorName, l.size, _f, _f, 'rusak', _rno + ' \u00b7 cacat, tidak masuk stok jual');
+        if (l.nv) { const _g = tpStock(l.pid, l.nv.color, l.nv.size); tpVS[l.pid][l.nv.color][l.nv.size] -= l.qty; tpSyncStock(_p); tpMvLog(_p, l.nv.color, l.nv.size, _g, _g - l.qty, 'tukar', _rno); }
       });
       const rec = { no: 'RET-' + String(++tpRetSeq).padStart(4, '0'), trxNo: t.no, mode: tpRet.mode, reason: tpRet.reason, defect, lines, amount, method: t.method, methodLabel: t.methodLabel, shiftNo: tpShift.number, ts: new Date() };
       tpReturns.push(rec);
@@ -4877,10 +4880,18 @@
               oninput="tpStQ=this.value;tpRenderStGrid()">
             <select id="st-cat" class="st-sel" onchange="tpStCat=this.value;tpRenderStGrid()"></select>
             <div id="st-chips" class="st-chips"></div>
-            <button class="tp-btn ghost" onclick="tpStCsv()" title="Unduh tabel sesuai filter saat ini"><i
-                class="fa-solid fa-file-csv"></i> Ekspor CSV</button>
-            <button id="st-addbtn" class="tp-btn green" onclick="tpNpOpen()"><i class="fa-solid fa-plus"></i> Tambah
-              Produk</button>
+            <div class="st-acts">
+              <button id="st-lbbtn" class="tp-btn ghost" onclick="tpLbOpen()"><i class="fa-solid fa-tags"></i> Cetak
+                Label</button>
+              <button id="st-rcvbtn" class="tp-btn ghost" onclick="tpRcOpen()"><i
+                  class="fa-solid fa-truck-ramp-box"></i> Terima Barang</button>
+              <button class="tp-btn ghost" onclick="tpOpOpen()"><i class="fa-solid fa-clipboard-check"></i> Opname <span
+                  id="st-opbadge" class="st-badge lo" style="display:none"></span></button>
+              <button class="tp-btn ghost" onclick="tpStCsv()" title="Unduh tabel sesuai filter saat ini"><i
+                  class="fa-solid fa-file-csv"></i> Ekspor CSV</button>
+              <button id="st-addbtn" class="tp-btn green" onclick="tpNpOpen()"><i class="fa-solid fa-plus"></i> Tambah
+                Produk</button>
+            </div>
           </div>
           <div id="st-grid" class="st-tbl"></div>
         </div>
@@ -4891,6 +4902,73 @@
           <div id="st-log"></div>
         </aside>
       </div>
+    </div>
+  </div>
+  <div id="qc-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal" style="max-width:420px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-pen-to-square" style="color:#fbbf24"></i> Koreksi Stok</h4><button
+          onclick="tpQcCancel()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody np-form">
+        <p id="qc-info" style="font-size:13px;color:#334155;line-height:1.6"></p>
+        <label>Alasan koreksi<select id="qc-reason" class="st-sel"
+            onkeydown="if(event.key==='Enter')tpQcOk()"></select></label>
+      </div>
+      <div class="tp-mfoot"><button class="tp-btn ghost" onclick="tpQcCancel()">Batal</button><button
+          class="tp-btn green" onclick="tpQcOk()"><i class="fa-solid fa-check"></i> Simpan koreksi</button></div>
+    </div>
+  </div>
+  <div id="lb-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal" style="max-width:460px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-tags" style="color:#fbbf24"></i> Cetak Label Barcode</h4><button
+          onclick="closeModal('lb-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody np-form">
+        <p id="lb-info" style="font-size:13px;color:#475569"></p>
+        <label>Jumlah label<select id="lb-mode" class="st-sel" onchange="tpLbInfo()">
+            <option value="one">1 label per varian</option>
+            <option value="stock">Sesuai stok saat ini (varian stok 0 dilewati)</option>
+          </select></label>
+        <p style="font-size:12px;color:#94a3b8">Label mengikuti filter di tabel stok (pencarian, kategori, status).
+          Maksimal 400 label per cetak.</p>
+      </div>
+      <div class="tp-mfoot"><button class="tp-btn ghost" onclick="closeModal('lb-modal')">Batal</button><button
+          class="tp-btn green" onclick="tpLbPrint()"><i class="fa-solid fa-print"></i> Cetak</button></div>
+    </div>
+  </div>
+  <div id="rc-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-truck-ramp-box" style="color:#34d399"></i> Terima Barang dari Supplier</h4><button
+          onclick="closeModal('rc-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="np-form np-2" style="padding:12px 16px 0;overflow:visible">
+        <label>Supplier<input id="rc-sup" class="st-in" list="rc-sups" placeholder="mis. CV Garmen Jaya"><datalist
+            id="rc-sups"></datalist></label>
+        <label>No. surat jalan<input id="rc-sj" class="st-in" placeholder="mis. SJ-2026-0412"></label>
+      </div>
+      <div id="rc-tbl" class="st-tbl" style="margin:12px 16px 0"></div>
+      <div id="rc-hist" style="padding:8px 16px;font-size:12px;color:#64748b"></div>
+      <div id="rc-foot" class="tp-mfoot" style="display:flex;gap:8px;align-items:center"></div>
+    </div>
+  </div>
+  <div id="op-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-clipboard-check" style="color:#fbbf24"></i> Opname Stok</h4><button
+          onclick="closeModal('op-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="op-tabs" class="st-chips" style="padding:10px 16px 0"></div>
+      <div id="op-tools" class="st-tools" style="padding:10px 16px 0;margin:0">
+        <input id="op-q" class="st-in" placeholder="Cari produk atau SKU…" oninput="tpOpQ=this.value;tpOpTable()">
+        <select id="op-cat" class="st-sel" onchange="tpOpCat=this.value;tpOpTable()"></select>
+        <label style="font-size:12px;font-weight:700;color:#475569"><input type="checkbox"
+            onchange="tpOpOnly=this.checked;tpOpTable()"> Hanya yang selisih</label>
+      </div>
+      <div id="op-tbl" class="st-tbl" style="margin:10px 16px"></div>
+      <div id="op-foot" class="tp-mfoot" style="display:flex;gap:8px;align-items:center"></div>
     </div>
   </div>
   <div id="np-modal" class="tp-overlay hidden" style="z-index:80">
@@ -4906,15 +4984,17 @@
         </div>
         <div class="np-2"><label>Harga (Rp)<input id="np-price" class="st-in" type="number" min="1"
               placeholder="199000"></label>
-          <label id="np-qtyl">Stok awal per varian<input id="np-qty" class="st-in" type="number" min="0"
-              value="5"></label>
+          <label id="np-qtyl"><span id="np-qtyt">Stok awal per varian</span><input id="np-qty" class="st-in"
+              type="number" min="0" value="5"></label>
         </div>
+        <label id="np-costl">Harga modal / HPP (Rp) <small>opsional · hanya terlihat oleh Owner</small><input
+            id="np-cost" class="st-in" type="number" min="0" placeholder="mis. 110000"></label>
         <label>Batas stok menipis <small>pcs; varian dengan stok ≤ angka ini ditandai menipis</small><input id="np-min"
             class="st-in" type="number" min="0" value="2"></label>
-        <label id="np-colorsl">Warna <small>pisahkan koma, hex opsional</small><input id="np-colors" class="st-in"
-            placeholder="Hitam #111827, Putih #f8fafc, Navy"></label>
-        <label id="np-sizesl">Ukuran <small>pisahkan koma</small><input id="np-sizes" class="st-in"
-            value="S, M, L, XL"></label>
+        <label id="np-colorsl"><span id="np-colort">Warna</span> <small>pisahkan koma, hex opsional</small><input
+            id="np-colors" class="st-in" placeholder="Hitam #111827, Putih #f8fafc, Navy"></label>
+        <label id="np-sizesl"><span id="np-sizest">Ukuran</span> <small>pisahkan koma</small><input id="np-sizes"
+            class="st-in" value="S, M, L, XL"></label>
         <label>Foto produk <small>unggah dari perangkat (otomatis diperkecil)</small><input id="np-file" class="st-in"
             type="file" accept="image/*" onchange="tpNpFile(this)"><img id="np-prev" alt="Pratinjau"></label>
         <label>atau URL gambar <small>opsional</small><input id="np-img" class="st-in" placeholder="https://…"></label>
@@ -4930,7 +5010,7 @@
     let tpStQ = '', tpStSel = { p: PRODUCTS[0].id, c: 0, s: 0 };
     function tpMove(p, c, s, from, to, type, note) {
       tpMoves.unshift({ ts: new Date(), pid: p.id, name: p.name, color: c, size: s, from: from, to: to, type: type, note: note || '' });
-      if (tpMoves.length > 100) tpMoves.length = 100;
+      if (tpMoves.length > 1000) tpMoves.length = 1000;
     }
     function tpStRefresh() { renderProducts(); tpRenderStGrid(); tpRenderStLog(); }
     function tpStSet(pid, ci, si, val) {
@@ -5266,6 +5346,307 @@
       margin-top: 6px
     }
 
+    #op-modal .tp-modal,
+    #rc-modal .tp-modal {
+      display: flex;
+      flex-direction: column;
+      max-width: 980px;
+      height: 92vh;
+      max-height: 92vh
+    }
+
+    .op-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+      background: #fff
+    }
+
+    .op-card small {
+      display: block;
+      font-size: 12px;
+      color: #475569;
+      margin-top: 3px
+    }
+
+    .op-act {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    /* ---- perapihan tampilan ---- */
+    #stock-modal.tp-overlay,
+    #op-modal.tp-overlay,
+    #rc-modal.tp-overlay,
+    #lb-modal.tp-overlay,
+    #np-modal.tp-overlay {
+      bottom: 46px
+    }
+
+    #stock-modal .tp-modal {
+      height: 100% !important;
+      max-height: none !important;
+      width: 100% !important;
+      max-width: none !important
+    }
+
+    #op-modal .tp-modal,
+    #rc-modal .tp-modal {
+      height: calc(100vh - 66px);
+      max-height: calc(100vh - 66px)
+    }
+
+    #stock-modal .tp-mhead,
+    #op-modal .tp-mhead,
+    #rc-modal .tp-mhead,
+    #lb-modal .tp-mhead,
+    #np-modal .tp-mhead {
+      height: auto;
+      min-height: 0;
+      padding: 12px 16px
+    }
+
+    .st-side .st-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px
+    }
+
+    .st-side .st-form>*,
+    .st-side .st-form input,
+    .st-side .st-form select {
+      flex: none !important;
+      width: 100%;
+      height: auto;
+      min-height: 0
+    }
+
+    .st-stat b {
+      font-size: 17px;
+      white-space: nowrap
+    }
+
+    .st-stat span {
+      white-space: nowrap
+    }
+
+    .st-tbl td {
+      vertical-align: middle;
+      white-space: nowrap
+    }
+
+    .st-tbl td .st-badge {
+      vertical-align: middle
+    }
+
+    .st-acts {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-left: auto
+    }
+
+    .st-acts .tp-btn {
+      padding: 8px 12px;
+      font-size: 12.5px
+    }
+
+    @media (max-width: 700px) {
+      .st-tools .st-in {
+        flex: 1 1 100%
+      }
+
+      .st-acts {
+        margin-left: 0;
+        width: 100%
+      }
+
+      .st-acts .tp-btn {
+        flex: 1 1 auto;
+        justify-content: center
+      }
+
+      .st-stats {
+        grid-template-columns: repeat(2, 1fr)
+      }
+
+      .st-tbl td,
+      .st-tbl th {
+        padding: 6px 8px
+      }
+
+      .st-tbl td small.vc {
+        display: none
+      }
+
+      #stock-modal .st-tbl td:nth-child(5),
+      #stock-modal .st-tbl th:nth-child(5) {
+        display: none
+      }
+
+      .st-main {
+        padding: 10px 12px
+      }
+
+      .st-side {
+        padding: 12px
+      }
+    }
+
+    #stock-modal.tp-overlay {
+      padding: 0 !important
+    }
+
+    #stock-modal .tp-mhead h4,
+    #op-modal .tp-mhead h4,
+    #rc-modal .tp-mhead h4,
+    #lb-modal .tp-mhead h4,
+    #np-modal .tp-mhead h4 {
+      margin: 0;
+      line-height: 1.2
+    }
+
+    #stock-modal .tp-mhead,
+    #op-modal .tp-mhead,
+    #rc-modal .tp-mhead,
+    #lb-modal .tp-mhead,
+    #np-modal .tp-mhead {
+      align-items: center
+    }
+
+    #stock-modal .tp-mhead button,
+    #op-modal .tp-mhead button,
+    #rc-modal .tp-mhead button,
+    #lb-modal .tp-mhead button,
+    #np-modal .tp-mhead button {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .st-tbl .st-sw {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 0, 0, .25);
+      margin-right: 8px;
+      vertical-align: -1px
+    }
+
+    .st-tbl .st-ib {
+      vertical-align: middle
+    }
+
+    @media (max-width: 700px) {
+      .st-tools .st-sel {
+        flex: 1 1 100%
+      }
+
+      .st-tbl td,
+      .st-tbl th {
+        padding: 6px 5px
+      }
+
+      #stock-modal .st-tbl td:nth-child(1) {
+        white-space: normal;
+        min-width: 84px
+      }
+
+      #stock-modal .st-qty input {
+        width: 46px
+      }
+
+      #stock-modal .st-qty button {
+        width: 26px
+      }
+
+      #stock-modal .st-tbl .st-badge {
+        font-size: 0;
+        padding: 0;
+        width: 10px;
+        height: 10px;
+        display: inline-block;
+        border-radius: 50%
+      }
+
+      #stock-modal .st-tbl .st-badge.ok {
+        background: #10b981
+      }
+
+      #stock-modal .st-tbl .st-badge.lo {
+        background: #f59e0b
+      }
+
+      #stock-modal .st-tbl .st-badge.zr {
+        background: #ef4444
+      }
+
+      .st-ph td {
+        white-space: normal !important
+      }
+
+      .st-ph small {
+        display: block;
+        margin: 2px 0 0 !important
+      }
+
+      .st-ph .t {
+        float: none !important;
+        display: block;
+        margin-top: 4px;
+        line-height: 1.4 !important
+      }
+    }
+
+    #op-modal.tp-overlay,
+    #rc-modal.tp-overlay,
+    #np-modal.tp-overlay,
+    #lb-modal.tp-overlay {
+      padding: 12px !important
+    }
+
+    #op-modal .tp-modal,
+    #rc-modal .tp-modal {
+      height: 100%;
+      max-height: 100%
+    }
+
+    #np-modal .tp-modal,
+    #lb-modal .tp-modal {
+      max-height: 100%
+    }
+
+    #qc-modal.tp-overlay {
+      padding: 12px !important;
+      bottom: 46px
+    }
+
+    #qc-modal .tp-mhead {
+      padding: 12px 16px;
+      height: auto;
+      min-height: 0;
+      align-items: center
+    }
+
+    #qc-modal .tp-mhead h4 {
+      margin: 0
+    }
+
+    #qc-modal .tp-mhead button {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center
+    }
+
     .np-2 {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -5293,6 +5674,7 @@
   </style>
   <script>
     let tpStCat = 'all', tpStStat = 'all';
+    PRODUCTS.forEach(p => { if (p.cost == null) p.cost = Math.round(p.price * .55 / 1000) * 1000; });
     const TP_CATL = { shirts: 'Atasan', pants: 'Celana', outerwear: 'Outerwear', dress: 'Dress', accessories: 'Aksesoris' };
     const TP_CATP = { shirts: 'SHR', pants: 'PNT', outerwear: 'OUT', dress: 'DRS', accessories: 'ACC' };
     const TP_PAL = ['#111827', '#f8fafc', '#1e3a8a', '#14532d', '#881337', '#b45309', '#64748b', '#84a98c'];
@@ -5312,23 +5694,23 @@
       const sel = tp$('st-cat');
       if (!sel.options.length) sel.innerHTML = '<option value="all">Semua kategori</option>' + Object.keys(TP_CATL).map(k => '<option value="' + k + '">' + TP_CATL[k] + '</option>').join('');
       sel.value = tpStCat;
-      tp$('st-addbtn').style.display = staff ? 'none' : '';
+      tp$('st-addbtn').style.display = staff ? 'none' : ''; tp$('st-rcvbtn').style.display = staff ? 'none' : ''; tp$('st-lbbtn').style.display = staff ? 'none' : ''; tpOpBadge();
       const ps = PRODUCTS.filter(p => (tpStCat === 'all' || p.category === tpStCat) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q)));
-      const cnt = { all: 0, ok: 0, lo: 0, zr: 0 }; let pcs = 0, val = 0, rows = '';
+      const cnt = { all: 0, ok: 0, lo: 0, zr: 0 }; let pcs = 0, val = 0, cval = 0, rows = '';
       ps.forEach(p => {
         let body = '', tot = 0, v = 0;
         p.colors.forEach((c, ci) => p.sizes.forEach((s, si) => {
-          const n = tpStock(p.id, c.name, s), k = tpStS(n, p); cnt.all++; cnt[k]++; tot += n; v += n * p.price;
+          const n = tpStock(p.id, c.name, s), k = tpStS(n, p); cnt.all++; cnt[k]++; tot += n; v += n * p.price; cval += n * (p.cost || 0);
           if (tpStStat !== 'all' && tpStStat !== k) return;
           const call = d => "tpStSet('" + p.id + "'," + ci + ',' + si + ',' + d + ')';
-          body += '<tr class="st-r ' + k + '"><td><span class="st-sw" style="background:' + c.hex + '"></span>' + tpEsc(c.name) + '</td><td><b>' + tpEsc(s) + '</b></td>' +
-            '<td><span class="st-qty"><button onclick="' + call(n - 1) + '" aria-label="Kurangi">−</button><input type="number" min="0" value="' + n + '" onchange="' + call('this.value') + '"><button onclick="' + call(n + 1) + '" aria-label="Tambah">+</button></span></td>' +
-            '<td><span class="st-badge ' + k + '">' + (k === 'zr' ? 'Habis' : k === 'lo' ? 'Menipis' : 'Aman') + '</span></td><td class="r">' + formatRupiah(n * p.price) + '</td></tr>';
+          body += '<tr class="st-r ' + k + '"><td><span class="st-sw" style="background:' + c.hex + '"></span>' + tpEsc(c.name) + '</td><td><b>' + tpEsc(s) + '</b> <small class="vc" style="color:#94a3b8;font-family:\'JetBrains Mono\',monospace;margin-left:6px">' + tpEsc(tpVCode(p, ci, si)) + '</small></td>' +
+            '<td><span class="st-qty"><button' + (staff ? ' disabled style="opacity:.35;cursor:not-allowed"' : '') + ' onclick="' + call(n - 1) + '" aria-label="Kurangi">−</button><input type="number" min="0" value="' + n + '" onchange="' + call('this.value') + '"><button' + (staff ? ' disabled style="opacity:.35;cursor:not-allowed"' : '') + ' onclick="' + call(n + 1) + '" aria-label="Tambah">+</button></span></td>' +
+            '<td><span class="st-badge ' + k + '">' + (k === 'zr' ? 'Habis' : k === 'lo' ? 'Menipis' : 'Aman') + '</span><button class="st-ib" style="margin:0 0 0 6px;width:24px;height:24px" title="Kartu stok varian ini" onclick="tpStCard(\'' + p.id + '\',' + ci + ',' + si + ')"><i class="fa-solid fa-clock-rotate-left"></i></button></td><td class="r">' + formatRupiah(n * p.price) + '</td></tr>';
         }));
         pcs += tot; val += v;
-        if (body) rows += '<tr class="st-ph"><td colspan="5"><img src="' + tpEsc(p.image) + '" alt=""><b>' + tpEsc(p.name) + '</b><small>' + tpEsc(p.sku) + ' · ' + (TP_CATL[p.category] || p.category) + ' · ' + formatRupiah(p.price) + ' · min ' + tpMin(p) + '</small><span class="t">' + (staff ? '' : '<button class="st-ib" title="Edit produk" onclick="tpNpOpen(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button>' + (p.custom ? '<button class="st-ib d" title="Hapus produk" onclick="tpNpDel(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '')) + tot + ' pcs</span></td></tr>' + body;
+        if (body) rows += '<tr class="st-ph"><td colspan="5"><img src="' + tpEsc(p.image) + '" alt=""><b>' + tpEsc(p.name) + '</b><small>' + tpEsc(p.sku) + ' · ' + (TP_CATL[p.category] || p.category) + ' · ' + formatRupiah(p.price) + ' · min ' + tpMin(p) + (tpRole === 'owner' && p.cost != null ? ' · modal ' + formatRupiah(p.cost) + ' (margin ' + (p.price ? Math.round((p.price - p.cost) / p.price * 100) : 0) + '%)' : '') + '</small><span class="t">' + (staff ? '' : '<button class="st-ib" title="Edit produk" onclick="tpNpOpen(\'' + p.id + '\')"><i class="fa-solid fa-pen"></i></button>' + (p.custom ? '<button class="st-ib d" title="Hapus produk" onclick="tpNpDel(\'' + p.id + '\')"><i class="fa-solid fa-trash"></i></button>' : '')) + tot + ' pcs</span></td></tr>' + body;
       });
-      tp$('st-stats').innerHTML = [['Produk', ps.length], ['Total stok (pcs)', pcs], ['Nilai persediaan', formatRupiah(val)], ['Varian menipis (≤ min)', cnt.lo], ['Varian habis', cnt.zr]].map(x => '<div class="st-stat"><span>' + x[0] + '</span><b>' + x[1] + '</b></div>').join('');
+      tp$('st-stats').innerHTML = [['Produk', ps.length], ['Total stok (pcs)', pcs], ['Nilai (jual)', formatRupiah(val)], ...(tpRole === 'owner' ? [['Nilai (modal)', formatRupiah(cval)]] : []), ['Varian menipis', cnt.lo], ['Varian habis', cnt.zr]].map(x => '<div class="st-stat"><span>' + x[0] + '</span><b>' + x[1] + '</b></div>').join('');
       tp$('st-chips').innerHTML = [['all', 'Semua'], ['ok', 'Aman'], ['lo', 'Menipis'], ['zr', 'Habis']].map(x => '<button class="st-chip' + (tpStStat === x[0] ? ' on' : '') + '" onclick="tpStStat=\'' + x[0] + '\';tpRenderStGrid()">' + x[1] + '<i>' + cnt[x[0]] + '</i></button>').join('');
       tp$('st-grid').innerHTML = rows ? '<table><thead><tr><th>Warna</th><th>Ukuran</th><th>Stok</th><th>Status</th><th style="text-align:right">Nilai</th></tr></thead><tbody>' + rows + '</tbody></table>' : '<p style="color:#94a3b8;padding:24px;text-align:center">Tidak ada varian yang cocok dengan filter.</p>';
     };
@@ -5339,18 +5721,219 @@
         p.colors.forEach(c => p.sizes.forEach(s => {
           const n = tpStock(p.id, c.name, s), k = tpStS(n, p);
           if (tpStStat !== 'all' && tpStStat !== k) return;
-          rows.push([p.sku, p.name, TP_CATL[p.category] || p.category, c.name, s, n, tpMin(p), lab[k], p.price, n * p.price, ''].map(qt).join(';'));
+          rows.push([p.sku, p.name, TP_CATL[p.category] || p.category, c.name, s, tpVCodeN(p, c.name, s), n, tpMin(p), lab[k], p.price, n * p.price].concat(tpRole === 'owner' ? [p.cost == null ? '' : p.cost, p.cost == null ? '' : n * p.cost] : [], ['']).map(qt).join(';'));
         })));
       if (!rows.length) { showToast('Tidak ada data untuk diekspor.', 'warn'); return; }
-      const head = ['SKU', 'Produk', 'Kategori', 'Warna', 'Ukuran', 'Stok Sistem', 'Batas Min', 'Status', 'Harga', 'Nilai Stok', 'Stok Fisik (isi manual)'].map(qt).join(';');
+      const head = ['SKU', 'Produk', 'Kategori', 'Warna', 'Ukuran', 'Kode Barcode', 'Stok Sistem', 'Batas Min', 'Status', 'Harga', 'Nilai Stok'].concat(tpRole === 'owner' ? ['Harga Modal', 'Nilai Modal'] : [], ['Stok Fisik (isi manual)']).map(qt).join(';');
       const n = new Date(), url = URL.createObjectURL(new Blob(['\ufeff' + [head].concat(rows).join('\r\n')], { type: 'text/csv;charset=utf-8' }));
       const a = document.createElement('a'); a.href = url; a.download = 'stok-threadpos-' + n.getFullYear() + tpPad(n.getMonth() + 1) + tpPad(n.getDate()) + '.csv';
       document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
       showToast('CSV stok diekspor: ' + rows.length + ' varian.', 'success');
     }
+    function tpMvLog(p, c, s, from, to, type, note) {
+      if (!p) return;
+      tpMoves.unshift({ ts: new Date(), pid: p.id, name: p.name, color: c, size: s, from: from, to: to, type: type, note: note || '' });
+      if (tpMoves.length > 1000) tpMoves.length = 1000;
+    }
+    let tpLogT = 'all', tpLogV = null;
+    const TP_MT = { masuk: ['MASUK', '#059669'], opname: ['OPNAME', '#d97706'], jual: ['JUAL', '#475569'], void: ['VOID', '#4f46e5'], retur: ['RETUR', '#0284c7'], tukar: ['TUKAR', '#7c3aed'], rusak: ['RUSAK', '#be123c'] };
+    function tpStCard(pid, ci, si) { const p = tpProd(pid); tpLogV = { pid: pid, color: p.colors[ci].name, size: p.sizes[si] }; tpLogT = 'all'; tpRenderStLog(); const el = tp$('st-log'); if (el.scrollIntoView) el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+    tpRenderStLog = function () {
+      const v = tpLogV, list = tpMoves.filter(m => (tpLogT === 'all' || m.type === tpLogT) && (!v || (m.pid === v.pid && m.color === v.color && m.size === v.size)));
+      const opts = [['all', 'Semua jenis']].concat(Object.keys(TP_MT).map(k => [k, TP_MT[k][0]])).map(o => '<option value="' + o[0] + '"' + (o[0] === tpLogT ? ' selected' : '') + '>' + o[1] + '</option>').join('');
+      const head = '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px"><select class="st-sel" style="width:auto" onchange="tpLogT=this.value;tpRenderStLog()">' + opts + '</select>' +
+        (v ? '<button class="st-chip on" onclick="tpLogV=null;tpRenderStLog()">Kartu stok: ' + tpEsc((tpProd(v.pid) || {}).name || '') + ' · ' + tpEsc(v.color) + ' · ' + tpEsc(v.size) + ' ✕</button>' : '') + '</div>';
+      tp$('st-log').innerHTML = head + (list.length ? list.slice(0, 150).map(m => {
+        const t = TP_MT[m.type] || [String(m.type).toUpperCase(), '#475569'], d = m.to - m.from;
+        return '<div class="st-log"><em>' + tpDMY(m.ts) + ' ' + tpHM(m.ts) + '</em><span style="font-weight:700;color:' + t[1] + '">' + t[0] + '</span><span style="flex:1">' + tpEsc(m.name) + ' · ' + tpEsc(m.color) + ' · ' + tpEsc(m.size) + (m.note ? ' · <i>' + tpEsc(m.note) + '</i>' : '') + '</span><em>' + m.from + ' → ' + m.to + (d ? ' (' + (d > 0 ? '+' : '') + d + ')' : '') + '</em></div>';
+      }).join('') + (list.length > 150 ? '<p style="color:#94a3b8;font-size:11px;margin-top:6px">Menampilkan 150 dari ' + list.length + ' mutasi.</p>' : '') : '<p style="color:#94a3b8">Belum ada mutasi yang cocok.</p>');
+    };
+    window.tpOpS = window.tpOpS || [];
+    let tpOpTab = 'count', tpOpD = {}, tpOpRows = [], tpOpCat = 'all', tpOpQ = '', tpOpOnly = false;
+    const TP_OPR = ['Salah hitung / salah catat', 'Barang hilang', 'Barang rusak', 'Salah input terima barang', 'Barang ditemukan / selisih lebih', 'Lainnya'], TP_RL = { staff: 'Staff', spv: 'SPV', owner: 'Owner' };
+    const tpOpKey = (p, c, s) => p.id + '|' + c + '|' + s, tpRl = r => TP_RL[r] || String(r || '').toUpperCase();
+    function tpOpBadge() { const n = tpRole === 'staff' ? 0 : tpOpS.filter(x => x.status === 'pending').length, b = tp$('st-opbadge'); if (b) { b.style.display = n ? '' : 'none'; b.textContent = n; } }
+    function tpOpOpen() {
+      tpOpTab = 'count'; tpOpD = {}; tpOpQ = ''; tpOpCat = 'all'; tpOpOnly = false; tp$('op-q').value = '';
+      tp$('op-cat').innerHTML = '<option value="all">Semua kategori</option>' + Object.keys(TP_CATL).map(k => '<option value="' + k + '">' + TP_CATL[k] + '</option>').join('');
+      openModal('op-modal'); tpOpRender();
+    }
+    function tpOpTab_(t) { tpOpTab = t; tpOpRender(); }
+    function tpOpRender() {
+      const pend = tpOpS.filter(x => x.status === 'pending').length;
+      tp$('op-tabs').innerHTML = [['count', 'Hitung stok'], ['list', 'Pengajuan &amp; riwayat' + (pend ? ' (' + pend + ' menunggu)' : '')]].map(x => '<button class="st-chip' + (tpOpTab === x[0] ? ' on' : '') + '" onclick="tpOpTab_(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
+      tp$('op-tools').style.display = tpOpTab === 'count' ? '' : 'none';
+      if (tpOpTab === 'count') tpOpTable(); else tpOpList();
+      tpOpBadge();
+    }
+    function tpOpTable() {
+      const q = tpOpQ.toLowerCase(), opt = '<option value="">Pilih alasan…</option>';
+      tpOpRows = [];
+      PRODUCTS.filter(p => (tpOpCat === 'all' || p.category === tpOpCat) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))).forEach(p => p.colors.forEach(c => p.sizes.forEach(sz => {
+        const d = tpOpD[tpOpKey(p, c.name, sz)]; if (tpOpOnly && !(d && d.phys !== d.sys)) return;
+        tpOpRows.push({ p: p, c: c.name, hex: c.hex, s: sz, sys: tpStock(p.id, c.name, sz) });
+      })));
+      tp$('op-tbl').innerHTML = tpOpRows.length ? '<table><thead><tr><th>Produk</th><th>Ukuran</th><th style="text-align:right">Sistem</th><th>Stok fisik</th><th style="text-align:right">Selisih</th><th>Alasan</th></tr></thead><tbody>' + tpOpRows.map((r, i) => {
+        const d = tpOpD[tpOpKey(r.p, r.c, r.s)] || {};
+        const hd = i === 0 || tpOpRows[i - 1].p !== r.p ? '<tr class="st-ph"><td colspan="6"><b>' + tpEsc(r.p.name) + '</b><small>' + tpEsc(r.p.sku) + '</small></td></tr>' : '';
+        return hd + '<tr><td><span class="st-sw" style="background:' + r.hex + '"></span>' + tpEsc(r.c) + '</td><td>' + tpEsc(r.s) + '</td><td class="r">' + r.sys + '</td><td><input type="number" min="0" value="' + (d.phys == null ? '' : d.phys) + '" oninput="tpOpIn(' + i + ',this.value)" style="width:70px;padding:5px;border:1px solid #cbd5e1;border-radius:8px;text-align:center"></td><td class="r" id="opd-' + i + '">–</td><td><select id="ops-' + i + '" class="st-sel" style="visibility:hidden;width:auto" onchange="tpOpRs(' + i + ',this.value)">' + opt + TP_OPR.map(x => '<option' + (d.reason === x ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></td></tr>';
+      }).join('') + '</tbody></table>' : '<p style="color:#94a3b8;padding:24px;text-align:center">Tidak ada varian yang cocok.</p>';
+      tpOpRows.forEach((_, i) => tpOpRow(i)); tpOpSum();
+    }
+    function tpOpRow(i) { const r = tpOpRows[i], d = tpOpD[tpOpKey(r.p, r.c, r.s)], df = d ? d.phys - r.sys : 0, el = tp$('opd-' + i); el.textContent = d ? (df > 0 ? '+' : '') + df : '–'; el.style.color = df > 0 ? '#059669' : df < 0 ? '#be123c' : ''; tp$('ops-' + i).style.visibility = df ? 'visible' : 'hidden'; }
+    function tpOpIn(i, v) {
+      const r = tpOpRows[i], k = tpOpKey(r.p, r.c, r.s);
+      if (v === '') delete tpOpD[k]; else tpOpD[k] = Object.assign(tpOpD[k] || {}, { pid: r.p.id, color: r.c, size: r.s, sys: r.sys, phys: Math.max(0, Math.floor(Number(v)) || 0) });
+      tpOpRow(i); tpOpSum();
+    }
+    function tpOpRs(i, v) { const r = tpOpRows[i], d = tpOpD[tpOpKey(r.p, r.c, r.s)]; if (d) d.reason = v; }
+    function tpOpSum() {
+      const ds = Object.values(tpOpD), df = ds.filter(d => d.phys !== d.sys); let plus = 0, minus = 0; df.forEach(d => d.phys > d.sys ? plus += d.phys - d.sys : minus += d.sys - d.phys);
+      tp$('op-foot').innerHTML = '<span style="flex:1;font-size:13px;color:#475569">' + ds.length + ' varian dihitung · ' + df.length + ' selisih (+' + plus + ' / −' + minus + ' pcs)</span><button class="tp-btn green" onclick="tpOpSubmit()">' + (tpRole === 'staff' ? 'Ajukan opname' : 'Terapkan opname') + '</button>';
+    }
+    function tpOpSubmit() {
+      const items = [];
+      for (const d of Object.values(tpOpD)) {
+        if (d.phys === d.sys) continue;
+        if (!d.reason) { showToast('Pilih alasan untuk semua varian yang selisih.', 'warn'); return; }
+        items.push({ pid: d.pid, color: d.color, size: d.size, sys: d.sys, phys: d.phys, reason: d.reason });
+      }
+      if (!items.length) { showToast('Belum ada selisih untuk diproses.', 'warn'); return; }
+      const ses = { no: 'OP-' + String(tpOpS.length + 1).padStart(3, '0'), ts: new Date(), by: tpRole, items: items, status: 'pending', approver: null, decidedAt: null };
+      tpOpS.unshift(ses); tpOpD = {};
+      if (tpRole === 'staff') showToast(ses.no + ' diajukan, menunggu persetujuan SPV / Owner.', 'success'); else { tpOpApply(ses, tpRole); showToast(ses.no + ' diterapkan (' + items.length + ' varian).', 'success'); }
+      tpOpTab = 'list'; tpOpRender();
+    }
+    function tpOpApply(ses, by) {
+      ses.items.forEach(it => {
+        const p = tpProd(it.pid); if (!p || !tpVS[it.pid] || !tpVS[it.pid][it.color]) return;
+        const cur = tpStock(it.pid, it.color, it.size), to = Math.max(0, cur + (it.phys - it.sys));
+        tpVS[it.pid][it.color][it.size] = to; tpSyncStock(p); tpMvLog(p, it.color, it.size, cur, to, 'opname', ses.no + ' · ' + it.reason);
+      });
+      ses.status = 'approved'; ses.approver = by; ses.decidedAt = new Date();
+      if (typeof tpLog === 'function') tpLog('stock', 'Opname ' + ses.no + ' disetujui \u00b7 ' + ses.items.length + ' varian');
+      renderProducts(); tpRenderStock();
+    }
+    function tpOpDecide(no, ok) {
+      if (tpRole === 'staff') { showToast('Persetujuan opname khusus SPV / Owner.', 'warn'); return; }
+      const ses = tpOpS.find(x => x.no === no); if (!ses || ses.status !== 'pending') return;
+      if (ok) tpOpApply(ses, tpRole); else { ses.status = 'rejected'; ses.approver = tpRole; ses.decidedAt = new Date(); }
+      showToast(no + (ok ? ' disetujui, stok disesuaikan.' : ' ditolak.'), ok ? 'success' : 'warn'); tpOpRender();
+    }
+    function tpOpList() {
+      const lab = { pending: ['Menunggu', 'lo'], approved: ['Disetujui', 'ok'], rejected: ['Ditolak', 'zr'] };
+      tp$('op-tbl').innerHTML = '<div style="padding:12px">' + (tpOpS.length ? tpOpS.map(x => {
+        const l = lab[x.status] || lab.pending;
+        return '<div class="op-card"><b>' + tpEsc(x.no) + '</b> · ' + tpRl(x.by) + ' · ' + tpDMY(x.ts) + ' ' + tpHM(x.ts) + ' <span class="st-badge ' + l[1] + '">' + l[0] + '</span>' +
+          x.items.slice(0, 30).map(it => { const p = tpProd(it.pid), d = it.phys - it.sys; return '<small>' + tpEsc(p ? p.name : it.pid) + ' · ' + tpEsc(it.color) + ' · ' + tpEsc(it.size) + ': ' + it.sys + ' → ' + it.phys + ' (' + (d > 0 ? '+' : '') + d + ') · <i>' + tpEsc(it.reason) + '</i></small>'; }).join('') +
+          (x.items.length > 30 ? '<small>+' + (x.items.length - 30) + ' varian lainnya</small>' : '') +
+          (x.status === 'pending' ? (tpRole === 'staff' ? '<small><b>Menunggu persetujuan SPV / Owner.</b></small>' : '<div class="op-act"><button class="tp-btn green" onclick="tpOpDecide(\'' + x.no + '\',true)">Setujui &amp; terapkan</button><button class="tp-btn ghost" onclick="tpOpDecide(\'' + x.no + '\',false)">Tolak</button></div>') : '<small>Diputuskan oleh ' + tpRl(x.approver) + (x.decidedAt ? ' · ' + tpDMY(x.decidedAt) + ' ' + tpHM(x.decidedAt) : '') + '</small>') + '</div>';
+      }).join('') : '<p style="color:#94a3b8;text-align:center;padding:24px">Belum ada pengajuan opname.</p>') + '</div>';
+      tp$('op-foot').innerHTML = '';
+    }
+    window.tpRcv = window.tpRcv || [];
+    let tpRcRows = [];
+    function tpRcOpen() {
+      if (tpRole === 'staff') { showToast('Terima barang khusus SPV / Owner.', 'warn'); return; }
+      tp$('rc-sup').value = ''; tp$('rc-sj').value = ''; tpRcRows = [{ pid: PRODUCTS[0].id, ci: 0, si: 0, qty: 1 }];
+      tp$('rc-sups').innerHTML = [...new Set(tpRcv.map(r => r.supplier))].map(x => '<option value="' + tpEsc(x) + '">').join('');
+      tp$('rc-hist').innerHTML = tpRcv.length ? '<b>Penerimaan terakhir:</b> ' + tpRcv.slice(0, 3).map(r => tpEsc(r.no) + ' · ' + tpEsc(r.supplier) + ' · SJ ' + tpEsc(r.sj) + ' · ' + r.pcs + ' pcs · ' + tpDMY(r.ts)).join(' &nbsp;|&nbsp; ') : '';
+      openModal('rc-modal'); tpRcRender(); setTimeout(() => tp$('rc-sup').focus(), 60);
+    }
+    function tpRcRender() {
+      const opt = (arr, sel, val, lab) => arr.map((x, k) => '<option value="' + val(x, k) + '"' + (val(x, k) === sel ? ' selected' : '') + '>' + tpEsc(lab(x)) + '</option>').join('');
+      tp$('rc-tbl').innerHTML = '<table><thead><tr><th>Produk</th><th>Warna</th><th>Ukuran</th><th>Jumlah</th><th></th></tr></thead><tbody>' + tpRcRows.map((r, i) => {
+        const p = tpProd(r.pid);
+        return '<tr><td><select class="st-sel" onchange="tpRcSet(' + i + ',\'p\',this.value)">' + opt(PRODUCTS, r.pid, x => x.id, x => x.name) + '</select></td>' +
+          '<td><select class="st-sel" onchange="tpRcSet(' + i + ',\'c\',this.value)">' + opt(p.colors, r.ci, (x, k) => k, x => x.name) + '</select></td>' +
+          '<td><select class="st-sel" onchange="tpRcSet(' + i + ',\'s\',this.value)">' + opt(p.sizes, r.si, (x, k) => k, x => x) + '</select></td>' +
+          '<td><input type="number" min="1" value="' + r.qty + '" oninput="tpRcRows[' + i + '].qty=Math.max(0,Math.floor(Number(this.value))||0);tpRcSum()" style="width:70px;padding:5px;border:1px solid #cbd5e1;border-radius:8px;text-align:center"></td>' +
+          '<td><button class="st-ib" title="Hapus baris" onclick="tpRcDel(' + i + ')"><i class="fa-solid fa-trash"></i></button></td></tr>';
+      }).join('') + '</tbody></table><div style="padding:10px"><button class="tp-btn ghost" onclick="tpRcAdd()"><i class="fa-solid fa-plus"></i> Tambah baris</button></div>';
+      tpRcSum();
+    }
+    function tpRcSet(i, k, v) { const r = tpRcRows[i]; if (k === 'p') { r.pid = v; r.ci = 0; r.si = 0; } else if (k === 'c') r.ci = Number(v); else r.si = Number(v); tpRcRender(); }
+    function tpRcAdd() { tpRcRows.push({ pid: tpRcRows[tpRcRows.length - 1].pid, ci: 0, si: 0, qty: 1 }); tpRcRender(); }
+    function tpRcDel(i) { if (tpRcRows.length > 1) tpRcRows.splice(i, 1); else tpRcRows[0].qty = 1; tpRcRender(); }
+    function tpRcSum() { const pcs = tpRcRows.reduce((a, r) => a + r.qty, 0); tp$('rc-foot').innerHTML = '<span style="flex:1;font-size:13px;color:#475569">' + tpRcRows.length + ' baris · total ' + pcs + ' pcs</span><button class="tp-btn green" onclick="tpRcSubmit()"><i class="fa-solid fa-check"></i> Terima barang</button>'; }
+    function tpRcSubmit() {
+      if (tpRole === 'staff') { showToast('Terima barang khusus SPV / Owner.', 'warn'); return; }
+      const sup = tp$('rc-sup').value.trim(), sj = tp$('rc-sj').value.trim(), rows = tpRcRows.filter(r => r.qty > 0);
+      const err = !sup ? 'Isi nama supplier.' : !sj ? 'Isi nomor surat jalan.' : tpRcv.some(r => r.supplier.toLowerCase() === sup.toLowerCase() && r.sj.toLowerCase() === sj.toLowerCase()) ? 'Surat jalan ini sudah pernah diterima dari supplier tersebut.' : !rows.length ? 'Isi jumlah minimal 1 pcs.' : '';
+      if (err) { showToast(err, 'warn'); return; }
+      const no = 'GR-' + String(tpRcv.length + 1).padStart(3, '0'); let pcs = 0;
+      rows.forEach(r => { const p = tpProd(r.pid), c = p.colors[r.ci].name, sz = p.sizes[r.si], f = tpStock(p.id, c, sz); tpAddStock(p.id, c, sz, r.qty); tpMvLog(p, c, sz, f, f + r.qty, 'masuk', no + ' · ' + sup + ' · SJ ' + sj); pcs += r.qty; });
+      tpRcv.unshift({ no: no, supplier: sup, sj: sj, ts: new Date(), n: rows.length, pcs: pcs });
+      if (typeof tpLog === 'function') tpLog('stock', 'Terima barang ' + no + ' \u00b7 ' + sup + ' \u00b7 SJ ' + sj + ' \u00b7 ' + pcs + ' pcs');
+      closeModal('rc-modal'); renderProducts(); tpRenderStock(); playAudio('success');
+      showToast(no + ' diterima: ' + rows.length + ' varian, ' + pcs + ' pcs.', 'success');
+    }
+    function tpVColors(p) {
+      const used = {};
+      return p.colors.map(c => {
+        const w = String(c.name).normalize('NFD').replace(/[^A-Za-z0-9 ]/g, '').toUpperCase().split(/\s+/).filter(Boolean);
+        const base = w.length > 1 ? w.map(x => x[0]).join('').slice(0, 3) : (w[0] || 'C').slice(0, 3); let k = base, n = 1;
+        while (used[k]) k = base + (++n); used[k] = 1; return k;
+      });
+    }
+    const tpVCode = (p, ci, si) => p.sku.toUpperCase() + '-' + tpVColors(p)[ci] + '-' + String(p.sizes[si]).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const tpVCodeN = (p, cn, sz) => tpVCode(p, p.colors.findIndex(c => c.name === cn), p.sizes.indexOf(sz));
+
+    tpScanSubmit = function () {
+      const inp = tp$('scan-input'), code = inp.value.trim().toUpperCase();
+      if (!code) { showToast('Masukkan kode barcode / SKU terlebih dahulu.', 'warn'); return; }
+      let p = null, color = null, size = null;
+      for (const x of PRODUCTS) { x.colors.forEach((c, ci) => x.sizes.forEach((sz, si) => { if (!p && tpVCode(x, ci, si) === code) { p = x; color = c; size = sz; } })); if (p) break; }
+      if (!p) {
+        p = PRODUCTS.find(x => x.sku.toUpperCase() === code);
+        if (!p) { const m = code.match(/^(.+)-([A-Z0-9]+)$/); if (m) { p = PRODUCTS.find(x => x.sku.toUpperCase() === m[1]); if (p) size = p.sizes.find(sz => sz.toUpperCase() === m[2]) || null; } }
+      }
+      if (!p) { showToast('Kode ' + code + ' tidak ditemukan.', 'error'); return; }
+      if (color) activeVariants[p.id].color = color;
+      if (size) activeVariants[p.id].size = size;
+      addToCart(p.id); inp.value = ''; closeModal('scanner-modal');
+    };
+
+    function tpLbList() {
+      const q = tpStQ.toLowerCase(), mode = tp$('lb-mode').value, out = []; let total = 0;
+      PRODUCTS.filter(p => (tpStCat === 'all' || p.category === tpStCat) && (p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))).forEach(p => p.colors.forEach((c, ci) => p.sizes.forEach((sz, si) => {
+        const n = tpStock(p.id, c.name, sz); if (tpStStat !== 'all' && tpStStat !== tpStS(n, p)) return;
+        const qty = mode === 'stock' ? n : 1; if (qty > 0) { out.push({ p: p, c: c, sz: sz, code: tpVCode(p, ci, si), qty: qty }); total += qty; }
+      })));
+      return { out: out, total: total };
+    }
+    function tpLbInfo() { const r = tpLbList(); tp$('lb-info').innerHTML = 'Akan dicetak <b>' + r.total + ' label</b> dari <b>' + r.out.length + ' varian</b>.' + (r.total > 400 ? ' <span style="color:#be123c">Melebihi 400, persempit filter.</span>' : ''); }
+    function tpLbOpen() { if (tpRole === 'staff') { showToast('Cetak label khusus SPV / Owner.', 'warn'); return; } openModal('lb-modal'); tpLbInfo(); }
+    function tpLbPrint() {
+      const r = tpLbList();
+      if (!r.total) { showToast('Tidak ada label untuk dicetak.', 'warn'); return; }
+      if (r.total > 400) { showToast('Maksimal 400 label per cetak. Persempit filter.', 'warn'); return; }
+      let labels = ''; r.out.forEach(x => { for (let i = 0; i < x.qty; i++) labels += '<div class="l"><b>' + tpEsc(x.p.name) + '</b><span>' + tpEsc(x.c.name) + ' · ' + tpEsc(x.sz) + '</span><em>' + formatRupiah(x.p.price) + '</em><svg class="bc" jsbarcode-value="' + tpEsc(x.code) + '" jsbarcode-format="CODE128" jsbarcode-height="32" jsbarcode-width="1.3" jsbarcode-fontsize="9" jsbarcode-margin="0" jsbarcode-displayvalue="true"></svg></div>'; });
+      const doc = '<!doctype html><html><head><meta charset="utf-8"><title>Label barcode</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.g{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}.l{border:1px dashed #999;padding:2mm;text-align:center;break-inside:avoid;overflow:hidden}.l b{display:block;font-size:9pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.l span{display:block;font-size:8pt;color:#333}.l em{display:block;font-style:normal;font-weight:700;font-size:10pt;margin:1mm 0}.l svg{max-width:100%}</style></head><body><div class="g">' + labels + '</div><script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script><script>window.onload=function(){try{JsBarcode(".bc").init()}catch(e){}setTimeout(function(){window.focus();window.print()},400)}<\/script></body></html>';
+      const fr = document.createElement('iframe'); fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; fr.srcdoc = doc; document.body.appendChild(fr); setTimeout(() => fr.remove(), 120000);
+      closeModal('lb-modal'); showToast('Menyiapkan ' + r.total + ' label untuk dicetak…', 'success');
+    }
+    let tpQc = null, tpQcLast = TP_OPR[0];
+    tpStSet = function (pid, ci, si, val) {
+      const p = tpProd(pid), c = p.colors[ci].name, s = p.sizes[si], from = tpStock(pid, c, s);
+      if (String(val).trim() === '') { tpRenderStGrid(); return; }
+      const to = Math.max(0, Math.floor(Number(val)));
+      if (isNaN(to) || to === from) { tpRenderStGrid(); return; }
+      tpQc = { pid: pid, c: c, s: s, to: to };
+      tp$('qc-info').innerHTML = '<b>' + tpEsc(p.name) + '</b> · ' + tpEsc(c) + ' · ' + tpEsc(s) + '<br>Stok ' + from + ' → <b>' + to + '</b> (' + (to > from ? '+' : '') + (to - from) + ')';
+      tp$('qc-reason').innerHTML = TP_OPR.map(x => '<option' + (x === tpQcLast ? ' selected' : '') + '>' + tpEsc(x) + '</option>').join('');
+      openModal('qc-modal'); setTimeout(() => tp$('qc-reason').focus(), 60);
+    };
+    function tpQcCancel() { tpQc = null; closeModal('qc-modal'); tpRenderStGrid(); }
+    function tpQcOk() {
+      const q = tpQc; if (!q) return; const p = tpProd(q.pid), why = tp$('qc-reason').value, cur = tpStock(q.pid, q.c, q.s); tpQcLast = why;
+      tpVS[q.pid][q.c][q.s] = q.to; tpSyncStock(p); tpMove(p, q.c, q.s, cur, q.to, 'opname', 'Koreksi cepat · ' + why);
+      tpQc = null; closeModal('qc-modal'); playAudio('success'); tpStRefresh();
+      showToast('Koreksi ' + p.name + ' ' + q.c + '/' + q.s + ': ' + cur + ' → ' + q.to, 'success');
+    }
     function tpStFull() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => { }); }
     document.addEventListener('fullscreenchange', () => { const i = document.querySelector('#st-fs i'); if (i) i.className = 'fa-solid ' + (document.fullscreenElement ? 'fa-compress' : 'fa-expand'); });
-    window.addEventListener('keydown', e => { const m = tp$('np-modal'); if (e.key === 'Escape' && !m.classList.contains('hidden')) { e.stopImmediatePropagation(); closeModal('np-modal'); } }, true);
+    window.addEventListener('keydown', e => { if (e.key !== 'Escape') return;['np-modal', 'op-modal', 'rc-modal', 'lb-modal', 'qc-modal'].some(id => { if (tp$(id).classList.contains('hidden')) return false; e.stopImmediatePropagation(); if (id === 'qc-modal') tpQcCancel(); else closeModal(id); return true; }); }, true);
 
     function tpNpSku() {
       const cat = tp$('np-cat').value, pre = TP_CATP[cat] || 'PRD'; let n = PRODUCTS.length + 1;
@@ -5364,10 +5947,20 @@
       tp$('np-cat').innerHTML = Object.keys(TP_CATL).map(k => '<option value="' + k + '">' + TP_CATL[k] + '</option>').join('');
       tp$('np-title').textContent = p ? 'Edit Produk' : 'Tambah Produk Baru'; tp$('np-savel').textContent = p ? 'Simpan Perubahan' : 'Simpan Produk';
       tpNpImgData = null; tp$('np-file').value = ''; tp$('np-prev').src = p ? p.image : ''; tp$('np-prev').style.display = p ? 'block' : 'none';
-      ['np-qtyl', 'np-colorsl', 'np-sizesl'].forEach(i => tp$(i).style.display = p ? 'none' : '');
-      if (p) { tp$('np-name').value = p.name; tp$('np-cat').value = p.category; tp$('np-sku').value = p.sku; tp$('np-price').value = p.price; tp$('np-min').value = tpMin(p); tp$('np-img').value = p.image.startsWith('data:') ? '' : p.image; }
+      tp$('np-costl').style.display = tpRole === 'owner' ? '' : 'none'; tp$('np-cost').value = p && p.cost != null ? p.cost : '';
+      tp$('np-colort').textContent = p ? 'Tambah warna baru (opsional)' : 'Warna'; tp$('np-sizest').textContent = p ? 'Tambah ukuran baru (opsional)' : 'Ukuran'; tp$('np-qtyt').textContent = p ? 'Stok awal varian baru' : 'Stok awal per varian';
+      if (p) { tp$('np-name').value = p.name; tp$('np-cat').value = p.category; tp$('np-sku').value = p.sku; tp$('np-price').value = p.price; tp$('np-min').value = tpMin(p); tp$('np-img').value = p.image.startsWith('data:') ? '' : p.image; tp$('np-colors').value = ''; tp$('np-sizes').value = ''; tp$('np-qty').value = 0; }
       else { ['np-name', 'np-price', 'np-colors', 'np-img'].forEach(i => tp$(i).value = ''); tp$('np-qty').value = 5; tp$('np-min').value = 2; tp$('np-sizes').value = 'S, M, L, XL'; tpNpSku(); }
       openModal('np-modal'); setTimeout(() => tp$('np-name').focus(), 60);
+    }
+    function tpNpAddVariants(p) {
+      const g = id => tp$(id).value.trim(), q = Math.max(0, Math.floor(Number(g('np-qty'))) || 0), seen = new Set(p.colors.map(c => c.name.toLowerCase()));
+      const nc = g('np-colors').split(',').map(x => x.trim()).filter(Boolean).map((x, i) => { const m = x.match(/^(.*?)\s*(#[0-9a-f]{6}|#[0-9a-f]{3})$/i); return { name: (m ? m[1] : x) || 'Warna ' + (p.colors.length + i + 1), hex: m ? m[2] : TP_PAL[(p.colors.length + i) % TP_PAL.length] }; }).filter(c => { const k = c.name.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+      const ns = [...new Set(g('np-sizes').split(/[,\s]+/).filter(Boolean).map(x => x.toUpperCase()))].filter(x => !p.sizes.includes(x));
+      if (!nc.length && !ns.length) return 0;
+      p.colors = p.colors.concat(nc); p.sizes = p.sizes.concat(ns); let n = 0;
+      p.colors.forEach(c => { tpVS[p.id][c.name] = tpVS[p.id][c.name] || {}; p.sizes.forEach(sz => { if (tpVS[p.id][c.name][sz] == null) { tpVS[p.id][c.name][sz] = q; n++; if (q > 0) tpMvLog(p, c.name, sz, 0, q, 'masuk', 'Varian baru'); } }); });
+      tpSyncStock(p); return n;
     }
     function tpNpFile(inp) {
       const f = inp.files && inp.files[0]; if (!f) return;
@@ -5393,9 +5986,9 @@
       const err = !name ? 'Nama produk wajib diisi.' : !sku ? 'SKU wajib diisi.' : PRODUCTS.some(x => x !== p && x.sku.toLowerCase() === sku.toLowerCase()) ? 'SKU sudah dipakai produk lain.' : !(price > 0) ? 'Harga harus lebih dari 0.' : '';
       if (err) { showToast(err, 'warn'); return; }
       const old = p.name + ' · ' + formatRupiah(p.price);
-      Object.assign(p, { name, sku, price, category: tp$('np-cat').value, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0), edited: true }); if (img) p.image = img;
+      Object.assign(p, { name, sku, price, category: tp$('np-cat').value, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0), edited: true }, tpRole === 'owner' ? { cost: g('np-cost') === '' ? null : (Math.max(0, Math.floor(Number(g('np-cost')))) || 0) } : {}); if (img) p.image = img; const added = tpNpAddVariants(p);
       closeModal('np-modal'); renderProducts(); renderCart(); tpRenderStock(); playAudio('success');
-      showToast('Produk "' + name + '" diperbarui.', 'success');
+      showToast('Produk "' + name + '" diperbarui' + (added ? ' (+' + added + ' varian baru)' : '') + '.', 'success');
       if (typeof tpLog === 'function') tpLog('stock', 'Edit produk \u00b7 ' + old + ' \u2192 ' + name + ' \u00b7 ' + formatRupiah(price));
     }
     function tpNpDel(pid) {
@@ -5421,7 +6014,7 @@
       const err = !name ? 'Nama produk wajib diisi.' : !sku ? 'SKU wajib diisi.' : PRODUCTS.some(p => p.sku.toLowerCase() === sku.toLowerCase()) ? 'SKU sudah dipakai produk lain.' :
         !(price > 0) ? 'Harga harus lebih dari 0.' : !colors.length ? 'Isi minimal satu warna.' : new Set(colors.map(c => c.name.toLowerCase())).size !== colors.length ? 'Nama warna tidak boleh kembar.' : !sizes.length ? 'Isi minimal satu ukuran.' : '';
       if (err) { showToast(err, 'warn'); return; }
-      const p = { id: 'prod-' + Date.now().toString(36), sku, name, category: tp$('np-cat').value, price, image: tpNpImgData || g('np-img') || tpImgFallback(name), colors, sizes, stock: 0, custom: true, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0) };
+      const p = { id: 'prod-' + Date.now().toString(36), sku, name, category: tp$('np-cat').value, price, image: tpNpImgData || g('np-img') || tpImgFallback(name), colors, sizes, stock: 0, custom: true, cost: tpRole === 'owner' && g('np-cost') !== '' ? (Math.max(0, Math.floor(Number(g('np-cost')))) || 0) : null, min: Math.max(0, Math.floor(Number(g('np-min'))) || 0) };
       tpRegisterProduct(p, 0);
       colors.forEach(c => sizes.forEach(s => { if (q > 0) { tpVS[p.id][c.name][s] = q; tpMove(p, c.name, s, 0, q, 'masuk', 'Stok awal produk baru'); } }));
       tpSyncStock(p); tpStSel = { p: p.id, c: 0, s: 0 };
@@ -5436,7 +6029,7 @@
       let last = '', off = false;
       function snap() {
         return JSON.stringify({
-          v: 1, np: PRODUCTS.filter(p => p.custom), pe: PRODUCTS.filter(p => p.edited && !p.custom).map(p => ({ id: p.id, name: p.name, category: p.category, sku: p.sku, price: p.price, image: p.image, min: p.min })), mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
+          v: 1, oq: window.tpOpS || [], rc: window.tpRcv || [], np: PRODUCTS.filter(p => p.custom), pe: PRODUCTS.filter(p => p.edited && !p.custom).map(p => ({ id: p.id, name: p.name, category: p.category, sku: p.sku, price: p.price, image: p.image, min: p.min, cost: p.cost, colors: p.colors, sizes: p.sizes })), mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
           held: tpHeld.map(h => ({ ...h, cart: h.cart.map(i => ({ pid: i.product.id, color: i.color.name, size: i.size, qty: i.qty, price: i.price })) }))
         });
       }
@@ -5447,6 +6040,8 @@
           const d = JSON.parse(raw);
           if (d.v !== 1) return false;
           (d.np || []).forEach(p => tpRegisterProduct(p));
+          window.tpRcv = (d.rc || []).map(x => ({ ...x, ts: new Date(x.ts) }));
+          window.tpOpS = (d.oq || []).map(x => ({ ...x, ts: new Date(x.ts), decidedAt: x.decidedAt ? new Date(x.decidedAt) : null }));
           (d.pe || []).forEach(e => { const p = tpProd(e.id); if (p) Object.assign(p, e, { edited: true }); });
           const held = d.held.map(h => ({
             ...h, time: new Date(h.time),
@@ -6257,8 +6852,8 @@
       const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
       let profitHtml = '';
       if (tpRole === 'owner') {
-        const revEx = Math.round(net / 1.11), hpp = Math.round(0.55 * tpSum(rows, t => tpSum(t.items, i => (i.qty - i.returned) * i.price))), prof = revEx - hpp, mg = revEx ? Math.round(prof / revEx * 100) : 0;
-        profitHtml = '<div class="rp-card" style="margin-top:12px"><div class="rp-h" style="display:flex;justify-content:space-between;align-items:center">Estimasi laba kotor <span class="tp-rolebadge owner" style="text-transform:none">khusus Owner</span></div><div class="rp-kpis" style="margin-top:8px">' + kp('Penjualan (ex-PPN)', formatRupiah(revEx)) + kp('Estimasi HPP (55%)', formatRupiah(hpp)) + kp('Estimasi laba kotor', formatRupiah(prof), 'hl') + kp('Margin', mg + '%') + '</div><div class="rp-note">Perkiraan: HPP diasumsikan 55% dari harga jual karena data modal produk belum diinput.</div></div>';
+        const revEx = Math.round(net / 1.11), cst = i => i.cost != null ? i.cost : ((tpProd(i.pid) || {}).cost != null ? tpProd(i.pid).cost : null), allCost = rows.every(t => t.items.every(i => cst(i) != null)), hpp = Math.round(tpSum(rows, t => tpSum(t.items, i => (i.qty - i.returned) * (cst(i) != null ? cst(i) : 0.55 * i.price)))), prof = revEx - hpp, mg = revEx ? Math.round(prof / revEx * 100) : 0;
+        profitHtml = '<div class="rp-card" style="margin-top:12px"><div class="rp-h" style="display:flex;justify-content:space-between;align-items:center">Estimasi laba kotor <span class="tp-rolebadge owner" style="text-transform:none">khusus Owner</span></div><div class="rp-kpis" style="margin-top:8px">' + kp('Penjualan (ex-PPN)', formatRupiah(revEx)) + kp(allCost ? 'HPP (harga modal)' : 'HPP (sebagian estimasi 55%)', formatRupiah(hpp)) + kp('Estimasi laba kotor', formatRupiah(prof), 'hl') + kp('Margin', mg + '%') + '</div><div class="rp-note">' + (allCost ? 'HPP dihitung dari harga modal tiap produk. Modal produk contoh masih berupa perkiraan 55% dari harga jual; Owner bisa mengoreksinya lewat tombol ✏️ di Manajemen Stok.' : 'Perkiraan: sebagian item belum punya data modal, sehingga HPP-nya diasumsikan 55% dari harga jual.') + '</div></div>';
       }
       tp$('rp-body').innerHTML =
         (tpRole === 'staff' ? '<div class="rp-note" style="margin:0 0 10px"><i class="fa-solid fa-lock"></i> Staff hanya melihat penjualan <b>shift sendiri</b> (#' + tpShift.number + '). Laporan semua hari: SPV / Owner.</div>' : '<div class="rp-seg">' + seg + '</div>') +
@@ -6674,7 +7269,7 @@
       tpAsk('Void transaksi ' + no + '?', 'Stok pakaian dikembalikan dan nilai ' + formatRupiah(t.total) + ' dikeluarkan dari laporan shift' + (t.method === 'cash' ? ' (uang dikembalikan dari laci)' : '') + (t.custId ? '. Poin member ikut dikembalikan.' : '.'), 'Ya, Void Transaksi', () => {
         t.voided = true;
         tpLog('void', 'Void ' + no + ' \u00b7 ' + formatRupiah(t.total), { approver: tpVoidApprover });
-        t.items.forEach(i => tpAddStock(i.pid, i.colorName, i.size, i.qty));
+        t.items.forEach(i => { const _f = tpStock(i.pid, i.colorName, i.size); tpAddStock(i.pid, i.colorName, i.size, i.qty); tpMvLog(tpProd(i.pid), i.colorName, i.size, _f, _f + i.qty, 'void', no); });
         if (t.custId) { const c = TP_CUSTS.find(x => x.id === t.custId); if (c) { c.points = Math.max(0, c.points - (t.ptsEarned || 0) + (t.pointsUsed || 0)); c.visits = Math.max(0, c.visits - 1); tpCustSave(); } }
         renderProducts(); tpRenderShift(); renderMemberCard();
         showToast(no + ' di-void. Stok' + (t.custId ? ' & poin' : '') + ' dikembalikan.', 'warn');
@@ -8392,7 +8987,7 @@
       const staff = tpRole === 'staff', recv = tp$('st-recv'); if (!recv) return;
       recv.style.display = staff ? 'none' : '';
       let note = tp$('st-lock');
-      if (!note) { note = document.createElement('div'); note.id = 'st-lock'; note.className = 'st-lock'; note.innerHTML = '<i class="fa-solid fa-lock"></i> <b>Mode lihat saja.</b> Penerimaan barang &amp; penyesuaian stok (opname) hanya untuk SPV / Owner.'; recv.parentNode.insertBefore(note, recv); }
+      if (!note) { note = document.createElement('div'); note.id = 'st-lock'; note.className = 'st-lock'; note.innerHTML = '<i class="fa-solid fa-lock"></i> <b>Mode lihat saja.</b> Stok tidak bisa diubah langsung. Gunakan tombol <b>Opname</b> untuk mengajukan hasil hitung ke SPV / Owner. Terima barang, tambah dan edit produk khusus SPV / Owner.'; recv.parentNode.insertBefore(note, recv); }
       note.style.display = staff ? 'block' : 'none';
       document.querySelectorAll('#st-grid input').forEach(i => { i.readOnly = staff; });
     }

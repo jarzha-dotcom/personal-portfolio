@@ -2517,6 +2517,7 @@
 
         <!-- Big Checkout Action Button -->
         <div class="mx-payrow">
+          <div id="mx-paytot" hidden><span>Total bayar</span><b id="mx-paytot-v">Rp 0</b></div>
           <button type="button" onclick="holdCurrent()" class="mx-holdbtn" title="Tahan transaksi (F8)"><i
               class="fa-solid fa-pause"></i><span>Tahan</span><small>F8</small></button>
           <button type="button" onclick="mxOpenSplit()" class="mx-holdbtn" title="Bayar gabungan tunai + non-tunai"><i
@@ -3390,9 +3391,12 @@
       var sufficient = paymentMethod !== 'cash' || cashPaid >= b.total;
       if (cart.length > 0 && sufficient && shift.open) {
         btn.disabled = false;
+        var lbl = btn.querySelector('span'); if (lbl) lbl.textContent = 'Bayar & Cetak Struk (F12)';
         btn.className = 'w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-md transition-all flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 cursor-pointer';
       } else {
         btn.disabled = true;
+        var lbl2 = btn.querySelector('span');
+        if (lbl2) lbl2.textContent = !shift.open ? 'Buka shift dulu' : cart.length === 0 ? 'Pilih barang dulu' : cashPaid > 0 ? 'Uang kurang ' + formatRupiah(b.total - cashPaid) : 'Isi uang diterima dulu';
         btn.className = 'w-full py-3 px-4 rounded-xl font-bold text-sm text-white shadow-md transition-all flex items-center justify-center gap-2 bg-slate-300 text-slate-500 cursor-not-allowed';
       }
     }
@@ -3739,9 +3743,53 @@
     /* ================================================================
        RIWAYAT & VOID
     ================================================================ */
-    function openHistoryModal() { renderHistory(); $('history-modal').classList.remove('hidden'); }
+    function openHistoryModal() { hLim = HSTEP; renderHistory(); $('history-modal').classList.remove('hidden'); }
     function closeHistoryModal() { $('history-modal').classList.add('hidden'); }
 
+    var hQ = '', hF = 'all', hLim = 30, hT = null, HSTEP = 30;
+    function histRow(t) {
+      var icons = { cash: 'fa-money-bill-wave', qris: 'fa-qrcode', edc: 'fa-credit-card', split: 'fa-code-branch' };
+      return '<div class="mx-card' + (t.voided ? ' void' : '') + '"><div class="main">' +
+        '<div class="top"><span class="mx-mono">' + t.number + '</span>' +
+        (t.voided ? '<span class="mx-tag red">VOID</span>' : '') + ((t.refunds && t.refunds.length) ? '<span class="mx-tag amber">RETUR</span>' : '') +
+        '<span class="mx-tag ' + (t.method === 'cash' ? 'green' : 'blue') + '"><i class="fa-solid ' + icons[t.method] + '"></i> ' + esc(t.methodLabel) + '</span></div>' +
+        '<div class="sub">' + esc(t.items.map(function (i) { return i.quantity + 'x ' + i.name; }).join(', ')) + '</div>' +
+        '<div class="meta">' + hm(t.date) + ' WIB · ' + (t.member ? esc(t.member.name) : 'Umum') + '</div>' +
+        '</div><div class="side"><div class="money"' + (t.voided ? ' style="text-decoration:line-through;color:#94a3b8"' : '') + '>' + formatRupiah(t.total) + '</div>' +
+        '<div class="acts"><button type="button" class="mx-btn ghost xs" onclick="reprintReceipt(\x27' + t.number + '\x27)"><i class="fa-solid fa-print"></i>Struk</button>' +
+        (!t.voided && shift.open ? '<button type="button" class="mx-btn ghost xs" onclick="openReturn(\x27' + t.number + '\x27)"><i class="fa-solid fa-rotate-left"></i>Retur</button>' : '') +
+        (!t.voided && shift.open && !(t.refunds && t.refunds.length) ? '<button type="button" class="mx-btn redsoft xs" onclick="voidTransaction(\x27' + t.number + '\x27)">Void</button>' : '') +
+        '</div></div></div>';
+
+    }
+    function histMatch(t) {
+      if (hF === 'void' && !t.voided) return false;
+      if (hF === 'retur' && !(t.refunds && t.refunds.length)) return false;
+      if ((hF === 'cash' || hF === 'qris' || hF === 'edc') && t.method !== hF) return false;
+      var ts = hQ.toLowerCase().split(/\s+/).filter(Boolean); if (!ts.length) return true;
+      var h = (t.number + ' ' + t.items.map(function (i) { return i.name; }).join(' ') + ' ' + (t.member ? t.member.name : 'umum') + ' ' + (t.methodLabel || '') + ' ' + t.total).toLowerCase();
+      return ts.every(function (x) { return h.indexOf(x) >= 0; });
+    }
+    function histChips() {
+      var c = { all: transactions.length, cash: 0, qris: 0, edc: 0, void: 0, retur: 0 };
+      transactions.forEach(function (t) { if (c[t.method] != null) c[t.method]++; if (t.voided) c.void++; if (t.refunds && t.refunds.length) c.retur++; });
+      return [['all', 'Semua'], ['cash', 'Tunai'], ['qris', 'QRIS'], ['edc', 'EDC'], ['void', 'Void'], ['retur', 'Retur']].map(function (x) {
+        return '<button type="button" class="mxchip' + (hF === x[0] ? ' on' : '') + '" onclick="mxHF(\'' + x[0] + '\')">' + x[1] + ' <b>' + c[x[0]] + '</b></button>';
+      }).join('');
+    }
+    function histBar() {
+      return '<input id="hist-q" type="search" class="mxiq" style="width:100%;margin-bottom:8px" value="' + esc(hQ) + '" placeholder="Cari no. struk, nama barang, member, atau nominal…" autocomplete="off" aria-label="Cari transaksi" oninput="mxHQ(this.value)"><div id="hist-chips" class="mxic" style="margin-bottom:10px">' + histChips() + '</div>';
+    }
+    function histList() {
+      var L = transactions.filter(histMatch), shown = Math.min(L.length, hLim);
+      if (!L.length) return '<div class="mx-empty"><i class="fa-solid fa-magnifying-glass"></i>Tidak ada transaksi yang cocok' + (hQ ? ' dengan “' + esc(hQ) + '”' : '') + '.<br><a class="mxlink" onclick="mxHClr()">Hapus pencarian dan filter</a></div>';
+      return L.slice(0, hLim).map(histRow).join('') + '<div style="text-align:center;padding:10px 0 2px;font-size:12px;color:#64748b">Menampilkan ' + shown + ' dari ' + L.length + ' transaksi' + (L.length > shown ? '<br><button type="button" class="mx-btn ghost xs" style="margin-top:8px" onclick="mxHMore()">Tampilkan ' + Math.min(HSTEP, L.length - shown) + ' lagi</button>' : '') + '</div>';
+    }
+    function histUpd() { var e = $('hist-list'); if (!e) return; e.innerHTML = histList(); $('hist-chips').innerHTML = histChips(); }
+    function mxHQ(v) { hQ = v; hLim = HSTEP; clearTimeout(hT); hT = setTimeout(histUpd, 100); }
+    function mxHF(f) { hF = f; hLim = HSTEP; histUpd(); }
+    function mxHMore() { hLim += HSTEP; histUpd(); }
+    function mxHClr() { hQ = ''; hF = 'all'; hLim = HSTEP; renderHistory(); }
     function renderHistory() {
       var st = shiftStats();
       var icons = { cash: 'fa-money-bill-wave', qris: 'fa-qrcode', edc: 'fa-credit-card', split: 'fa-code-branch' };
@@ -3749,19 +3797,7 @@
       if (transactions.length === 0) {
         html += '<div class="mx-empty"><i class="fa-solid fa-receipt"></i>Belum ada transaksi pada shift ini.</div>';
       } else {
-        html += transactions.map(function (t) {
-          return '<div class="mx-card' + (t.voided ? ' void' : '') + '"><div class="main">' +
-            '<div class="top"><span class="mx-mono">' + t.number + '</span>' +
-            (t.voided ? '<span class="mx-tag red">VOID</span>' : '') + ((t.refunds && t.refunds.length) ? '<span class="mx-tag amber">RETUR</span>' : '') +
-            '<span class="mx-tag ' + (t.method === 'cash' ? 'green' : 'blue') + '"><i class="fa-solid ' + icons[t.method] + '"></i> ' + esc(t.methodLabel) + '</span></div>' +
-            '<div class="sub">' + esc(t.items.map(function (i) { return i.quantity + 'x ' + i.name; }).join(', ')) + '</div>' +
-            '<div class="meta">' + hm(t.date) + ' WIB · ' + (t.member ? esc(t.member.name) : 'Umum') + '</div>' +
-            '</div><div class="side"><div class="money"' + (t.voided ? ' style="text-decoration:line-through;color:#94a3b8"' : '') + '>' + formatRupiah(t.total) + '</div>' +
-            '<div class="acts"><button type="button" class="mx-btn ghost xs" onclick="reprintReceipt(\x27' + t.number + '\x27)"><i class="fa-solid fa-print"></i>Struk</button>' +
-            (!t.voided && shift.open ? '<button type="button" class="mx-btn ghost xs" onclick="openReturn(\x27' + t.number + '\x27)"><i class="fa-solid fa-rotate-left"></i>Retur</button>' : '') +
-            (!t.voided && shift.open && !(t.refunds && t.refunds.length) ? '<button type="button" class="mx-btn redsoft xs" onclick="voidTransaction(\x27' + t.number + '\x27)">Void</button>' : '') +
-            '</div></div></div>';
-        }).join('');
+        html += histBar() + '<div id="hist-list">' + histList() + '</div>';
       }
       $('history-body').innerHTML = html;
     }
@@ -3916,7 +3952,7 @@
           '<input id="shift-counted" type="text" inputmode="numeric" class="mx-input num" placeholder="Rp 0" oninput="onShiftCount(this)">' +
           '<div id="shift-diff" class="mx-diff"><span>Selisih</span><b>-</b></div>';
         foot.innerHTML = '<button type="button" class="mx-btn ghost" onclick="closeShiftModal()">Batal</button>' +
-          '<button type="button" id="shift-close-btn" class="mx-btn red grow" disabled onclick="requestCloseShift()"><i class="fa-solid fa-lock"></i><span>Tutup Shift & Cetak Laporan</span></button>';
+          '<button type="button" id="shift-close-btn" class="mx-btn red grow" disabled onclick="requestCloseShift()"><i class="fa-solid fa-lock"></i><span>Isi uang fisik di laci dulu</span></button>';
       } else {
         $('shift-title').textContent = 'Laporan Shift #' + shift.number;
         var diff = shift.counted - st.expectedCash;
@@ -3934,7 +3970,9 @@
       inp.value = num ? num.toLocaleString('id-ID') : '';
       var st = shiftStats();
       var d = $('shift-diff'), btn = $('shift-close-btn');
-      if (!num) { d.className = 'mx-diff'; d.innerHTML = '<span>Selisih</span><b>-</b>'; btn.disabled = true; return; }
+      var bl = btn.querySelector('span');
+      if (!num) { d.className = 'mx-diff'; d.innerHTML = '<span>Selisih</span><b>-</b>'; btn.disabled = true; if (bl) bl.textContent = 'Isi uang fisik di laci dulu'; return; }
+      if (bl) bl.textContent = 'Tutup Shift & Cetak Laporan';
       var diff = num - st.expectedCash;
       d.className = 'mx-diff ' + (diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus');
       d.innerHTML = '<span>' + (diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih') + '</span><b>' + (diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))) + '</b>';
@@ -4013,13 +4051,15 @@
     function closeMemberModal() { $('member-modal').classList.add('hidden'); }
 
     function memberMatches() {
-      var q = $('member-search').value.trim().toLowerCase();
-      return MEMBERS.filter(function (m) { return !q || m.name.toLowerCase().indexOf(q) !== -1 || m.card.toLowerCase().indexOf(q) !== -1; });
+      var q = $('member-search').value.trim().toLowerCase(), ts = q.split(/\s+/).filter(Boolean);
+      var a = MEMBERS.filter(function (m) { var h = (m.name + ' ' + m.card + ' ' + (m.phone || '')).toLowerCase(); return ts.every(function (t) { return h.indexOf(t) !== -1; }); });
+      return q ? a.map(function (m, i) { return [m.card.toLowerCase() === q ? 0 : m.name.toLowerCase().indexOf(q) === 0 ? 1 : 2, i, m]; }).sort(function (x, y) { return x[0] - y[0] || x[1] - y[1]; }).map(function (x) { return x[2]; }) : a;
     }
     function renderMemberList() {
       var list = memberMatches();
       var container = $('member-list-container');
       if (list.length === 0) { container.innerHTML = '<div class="mx-empty" style="padding:18px"><i class="fa-regular fa-user"></i>Member tidak ditemukan.</div>'; return; }
+      var totalM = list.length; list = list.slice(0, 20);
       container.innerHTML = list.map(function (m) {
         return '<div onclick="selectMember(\x27' + m.id + '\x27)" class="p-3 border rounded-xl hover:border-emerald-500 cursor-pointer flex justify-between items-center text-xs' + (selectedMember && selectedMember.id === m.id ? ' border-emerald-500 bg-emerald-50' : '') + '">' +
           '<div>' +
@@ -4028,7 +4068,7 @@
           '</div>' +
           '<button class="px-2.5 py-1 bg-slate-900 text-white rounded text-[11px] font-bold cursor-pointer">Pilih</button>' +
           '</div>';
-      }).join('');
+      }).join('') + (totalM > 20 ? '<div style="text-align:center;font-size:11px;color:#64748b;padding:6px 0">Menampilkan 20 dari ' + totalM.toLocaleString('id-ID') + ' member. Ketik nama atau nomor kartu untuk mempersempit.</div>' : '');
     }
     function memberSearchKey(e) {
       if (e.key !== 'Enter') return;
@@ -5442,6 +5482,87 @@
       line-height: 16px
     }
   </style>
+  <style id="mx-review-v3">
+    /* Total bayar selalu terlihat di bar Bayar saat total aslinya tertutup (layar pendek) */
+    #mx-sec-cart .mx-payrow {
+      flex-wrap: wrap
+    }
+
+    #mx-paytot {
+      flex: 0 0 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 0 2px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #475569
+    }
+
+    #mx-paytot[hidden] {
+      display: none
+    }
+
+    #mx-paytot b {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 19px;
+      font-weight: 800;
+      color: #047857
+    }
+
+    body.mx-dark #mx-paytot {
+      color: #94a3b8
+    }
+
+    body.mx-dark #mx-paytot b {
+      color: #34d399
+    }
+
+    /* Layar laptop pendek: lebih banyak produk terlihat, panel ringkasan lebih padat */
+    @media (min-width:1024px) and (max-height:820px) {
+      #products-grid [class~="aspect-4/3"] {
+        aspect-ratio: 16/9
+      }
+
+      #mx-view .mxg .mxc {
+        padding: 9px 13px
+      }
+
+      #mx-view .mxc b.big {
+        font-size: 17px;
+        margin: 0
+      }
+    }
+
+    /* Tabel inventori: judul kolom tetap terlihat saat menggulir daftar panjang */
+    @media (min-width:900px) {
+      .mxsc:has(#mx-ib) {
+        overflow: visible
+      }
+
+      .mxsc:has(#mx-ib) thead th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: var(--cd);
+        box-shadow: 0 1px 0 var(--bd)
+      }
+    }
+
+    /* Mode gelap: tombol Bayar nonaktif tidak menyilaukan */
+    body.mx-dark #btn-submit-payment:disabled {
+      background: #1e293b !important;
+      color: #64748b !important;
+      box-shadow: none !important
+    }
+
+    /* HP: filter inventori rata penuh */
+    @media (max-width:640px) {
+      .mxib select {
+        flex: 1 1 calc(50% - 4px)
+      }
+    }
+  </style>
   <style id="mx-inv-v2">
     .mxib {
       display: flex;
@@ -5951,7 +6072,7 @@
         if (invTab === 'buy') return '';
         var cats = '<option value="">Semua kategori</option>' + Object.keys(CATS).map(function (k) { return '<option value="' + k + '"' + (invC === k ? ' selected' : '') + '>' + CATS[k] + '</option>'; }).join('');
         var so = [['urgent', 'Paling mendesak'], ['name', 'Nama A–Z'], ['lo', 'Stok terendah'], ['hi', 'Stok tertinggi'], ['val', 'Nilai stok terbesar']].map(function (o) { return '<option value="' + o[0] + '"' + (invS === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
-        return '<div class="mxib"><input id="mx-iq" type="search" class="mxiq" value="' + esc(invQ) + '" placeholder="Cari nama, barcode, atau kode produk…  (tekan /)" autocomplete="off" aria-label="Cari produk" oninput="mxIq(this.value)" onkeydown="mxIk(event)"><select aria-label="Kategori" onchange="mxIc(this.value)">' + cats + '</select><select aria-label="Urutkan" onchange="mxIs(this.value)">' + so + '</select></div><div id="mx-ic" class="mxic">' + invChips() + '</div>';
+        return '<div class="mxib"><input id="mx-iq" type="search" class="mxiq" value="' + esc(invQ) + '" placeholder="Cari nama, barcode, atau kode produk…' + (window.matchMedia && matchMedia('(hover:none)').matches ? '' : '  (tekan /)') + '" autocomplete="off" aria-label="Cari produk" oninput="mxIq(this.value)" onkeydown="mxIk(event)"><select aria-label="Kategori" onchange="mxIc(this.value)">' + cats + '</select><select aria-label="Urutkan" onchange="mxIs(this.value)">' + so + '</select></div><div id="mx-ic" class="mxic">' + invChips() + '</div>';
       }
       function invFoot(L) {
         var t = L.length, pg = Math.max(1, Math.ceil(t / invPer)); invPg = Math.min(invPg, pg - 1);
@@ -6001,9 +6122,18 @@
         return '<div class="mxc mxsc" style="margin-top:12px"><h3>Daftar supplier (data contoh)</h3><table class="mxt"><thead><tr><th>Supplier</th><th>Kontak</th><th class="r">Lead time</th><th class="r">Termin bayar</th><th class="r">Hutang</th></tr></thead><tbody>' +
           Object.keys(SUP).map(function (k) { var d = SUPD[k]; return '<tr><td>' + esc(SUP[k]) + '</td><td>' + d.c + '</td><td class="r">' + d.lt + ' hari</td><td class="r">' + (d.tm ? d.tm + ' hari' : 'Tunai') + '</td><td class="r ' + (hutBy(SUP[k]) ? 'dn' : '') + '">' + R(hutBy(SUP[k])) + '</td></tr>'; }).join('') + '</tbody></table></div>';
       }
+      var recLim = 15, poQ = '', poF = '', poLim = 15, poT = null;
+      function poToks(q) { return String(q || '').toLowerCase().split(/\s+/).filter(Boolean); }
+      function poOptHtml() {
+        var low = lowList().map(function (p) { return p.id; }), ts = poToks(poQ);
+        var a = PRODUCTS.filter(function (p) { if (!ts.length) return true; var h = (p.name + ' ' + p.id + ' ' + (p.barcode || '') + ' ' + SUP[p.category]).toLowerCase(); return ts.every(function (t) { return h.indexOf(t) >= 0; }); });
+        a = a.map(function (p, i) { return [low.indexOf(p.id) >= 0 ? 0 : 1, i, p]; }).sort(function (x, y) { return x[0] - y[0] || x[1] - y[1]; }).map(function (x) { return x[2]; });
+        var o = a.slice(0, 50).map(function (p) { return '<option value="' + p.id + '">' + (low.indexOf(p.id) >= 0 ? '⚠ ' : '') + esc(p.name) + ' — ' + esc(SUP[p.category]) + '</option>'; }).join('');
+        return o + (a.length > 50 ? '<option disabled>… ' + (a.length - 50).toLocaleString('id-ID') + ' produk lagi, persempit pencarian</option>' : '') + (a.length ? '' : '<option disabled>Tidak ada produk cocok</option>');
+      }
       function po() {
         X.po = X.po || [];
-        var low = lowList().map(function (p) { return p.id; }), opts = PRODUCTS.slice().sort(function (a, b) { return (low.indexOf(b.id) >= 0) - (low.indexOf(a.id) >= 0); }).map(function (p) { return '<option value="' + p.id + '">' + (low.indexOf(p.id) >= 0 ? '⚠ ' : '') + esc(p.name) + ' — ' + esc(SUP[p.category]) + '</option>'; }).join('');
+        var low = lowList().map(function (p) { return p.id; }), opts = poOptHtml();
         var open = X.po.filter(function (o) { return o.st !== 'Diterima'; }).reduce(function (t, o) { return t + (o.qty - rc(o)) * o.cost; }, 0);
         var hut = X.po.reduce(function (t, o) { return t + owed(o); }, 0);
         hut = Math.max(0, hut - (X.adj || []).filter(function (r) { return r.reason === 'retur'; }).reduce(function (t, r) { return t + r.val; }, 0));
@@ -6014,6 +6144,9 @@
           return tr + (recvId === o.id ? rvRow(o) : '') + (payId === o.id ? pyRow(o) : '');
         };
         var gs = {}, ord = []; X.po.forEach(function (o) { var g = o.grp || o.id; if (!gs[g]) { gs[g] = []; ord.push(g); } gs[g].push(o); }); ord.reverse();
+        var pts = poToks(poF);
+        if (pts.length) ord = ord.filter(function (g) { return gs[g].some(function (o) { var q = productById(o.pid), h = (g + ' ' + o.id + ' ' + q.name + ' ' + SUP[q.category] + ' ' + o.st).toLowerCase(); return pts.every(function (t) { return h.indexOf(t) >= 0; }); }); });
+        var ordAll = ord.length; ord = ord.slice(0, poLim);
         var rows = ord.map(function (g) {
           var L = gs[g], head = '';
           if (L.length > 1) {
@@ -6023,10 +6156,11 @@
           return head + L.map(lineRow).join('');
         }).join('');
         return rec() + '<div class="mxc" style="margin-top:12px"><h3>Pembelian ke supplier (pesanan masuk) · tertunda ' + R(open) + ' · belum dibayar ' + R(hut) + '</h3>' +
-          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><select id="po-p" style="flex:1;min-width:220px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)">' + opts + '</select>' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><input id="po-s" type="search" value="' + esc(poQ) + '" placeholder="Cari produk yang mau dipesan…" autocomplete="off" aria-label="Cari produk" oninput="mxPOS(this.value)" style="flex:1 1 200px;min-width:160px;padding:5px 8px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"><select id="po-p" style="flex:1.4;min-width:220px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)">' + opts + '</select>' +
           '<input id="po-q" type="number" min="1" placeholder="Qty" style="width:80px;padding:5px;border:1px solid var(--bd);border-radius:6px;background:var(--bg);color:var(--tx)"><button class="mxbtn" onclick="mxPOAdd()">Tambah barang</button></div>' + poDraftHtml() +
+          (X.po.length > 8 ? '<input id="po-f" type="search" value="' + esc(poF) + '" placeholder="Cari no. PO, produk, supplier, atau status…" autocomplete="off" aria-label="Cari PO" oninput="mxPOF(this.value)" style="width:100%;margin-bottom:8px;padding:7px 10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx)">' : '') +
           '<div class="mxsc"><table class="mxt"><thead><tr><th>No. PO</th><th>Supplier</th><th>Produk</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th>Tanggal</th><th>Jatuh tempo</th><th>Status</th></tr></thead><tbody>' +
-          (rows || '<tr><td colspan="8" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠, tambahkan beberapa barang dari supplier yang sama, lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
+          (rows ? rows + (ordAll > poLim ? '<tr><td colspan="8" style="text-align:center;color:var(--mu);font-size:12px">Menampilkan ' + poLim + ' dari ' + ordAll.toLocaleString('id-ID') + ' PO <button class="mxbtn" style="margin-left:8px" onclick="mxPOMore()">Tampilkan 15 lagi</button></td></tr>' : '') : poF ? '<tr><td colspan="8" style="color:var(--mu)">Tidak ada PO yang cocok dengan “' + esc(poF) + '”.</td></tr>' : '<tr><td colspan="8" style="color:var(--mu)">Belum ada PO. Pilih produk bertanda ⚠, tambahkan beberapa barang dari supplier yang sama, lalu buat PO.</td></tr>') + '</tbody></table></div></div>';
       }
       function lap() {
         var a = rng(per), net = sum(a, 'net'), hpp = sum(a, 'hpp'), gp = net - hpp, op = sum(a, 'op'), man = sum(a, 'man'), sel = selisih(per), wr = writeoff(per), pphv = X.taxMode === 'non' ? pphOf(a).pph : 0, np = gp - op - man + sel - wr - pphv, q = {}, pc = function (x) { return net ? (x / net * 100).toFixed(1).replace('.', ',') + '%' : '-'; };
@@ -6081,7 +6215,7 @@
         });
         r.sort(function (x, y) { return x.days - y.days; }); lastRec = r;
         return '<div class="mxc" style="margin-top:12px"><h3>Rekomendasi pesan ulang (memperhitungkan lead time supplier)' + (r.length ? ' <button class="mxbtn" style="float:right;text-transform:none" onclick="mxPORecAll()">Buat PO semua (per supplier)</button>' : '') + '</h3>' + (r.length ? '<div class="mxsc"><table class="mxt"><thead><tr><th>Produk</th><th class="r">Terjual/hari</th><th class="r">Stok cukup</th><th class="r">Saran qty</th><th></th></tr></thead><tbody>' +
-          r.map(function (x) { return '<tr><td>' + esc(x.p.name) + '</td><td class="r">' + x.d.toFixed(1).replace('.', ',') + '</td><td class="r ' + (x.days < 2 ? 'dn' : 'am') + '">' + (x.days < 1 ? '< 1' : x.days.toFixed(1).replace('.', ',')) + ' hari</td><td class="r">' + x.q + '</td><td><button class="mxbtn" onclick="mxPOq(\'' + x.p.id + '\',' + x.q + ')">Buat PO</button></td></tr>'; }).join('') + '</tbody></table></div>' : '<small>Tidak ada barang yang diperkirakan habis dalam beberapa hari ke depan.</small>') + '</div>';
+          r.slice(0, recLim).map(function (x) { return '<tr><td>' + esc(x.p.name) + '</td><td class="r">' + x.d.toFixed(1).replace('.', ',') + '</td><td class="r ' + (x.days < 2 ? 'dn' : 'am') + '">' + (x.days < 1 ? '< 1' : x.days.toFixed(1).replace('.', ',')) + ' hari</td><td class="r">' + x.q + '</td><td><button class="mxbtn" onclick="mxPOq(\'' + x.p.id + '\',' + x.q + ')">Buat PO</button></td></tr>'; }).join('') + '</tbody></table>' + (r.length > recLim ? '<div style="text-align:center;padding:10px 0 2px;font-size:12px;color:var(--mu)">Menampilkan ' + recLim + ' dari ' + r.length.toLocaleString('id-ID') + ' rekomendasi, dari yang paling cepat habis.<br><button class="mxbtn" style="margin-top:6px" onclick="mxRecMore()">Tampilkan 15 lagi</button></div>' : '') + '</div>' : '<small>Tidak ada barang yang diperkirakan habis dalam beberapa hari ke depan.</small>') + '</div>';
       }
       function opn() {
         var l = (mxStockLog || []).filter(function (e) { return e.kind === 'Stok opname'; }).slice(0, 8);
@@ -6487,6 +6621,10 @@
         var rows = poDraft.map(function (l, i) { var p = productById(l.pid), v = l.qty * X.cost[l.pid]; tot += v; return '<tr><td>' + esc(p.name) + '</td><td class="r">' + l.qty + '</td><td class="r">' + R(v) + '</td><td><a class="mxlink" style="text-decoration:none" onclick="mxPODel(' + i + ')">✕</a></td></tr>'; }).join('');
         return '<div class="mxsc" style="margin-bottom:10px"><table class="mxt"><thead><tr><th>Barang dalam PO ini</th><th class="r">Qty</th><th class="r">Total (HPP)</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><b>' + esc(sp) + '</b> · total ' + R(tot) + '<button class="mxbtn" onclick="mxPOGo()">Buat PO (' + poDraft.length + ' barang)</button><button class="mxbtn" style="background:#64748b" onclick="mxPOClear()">Kosongkan</button></div>';
       }
+      window.mxPOS = function (v) { poQ = v; var e = $('po-p'); if (e) e.innerHTML = poOptHtml(); };
+      window.mxPOF = function (v) { poF = v; poLim = 15; clearTimeout(poT); poT = setTimeout(function () { draw(); var e = $('po-f'); if (e) { e.focus(); e.setSelectionRange(v.length, v.length); } }, 150); };
+      window.mxPOMore = function () { poLim += 15; draw(); };
+      window.mxRecMore = function () { recLim += 15; draw(); };
       window.mxPOAdd = function () {
         var id = $('po-p').value, q = Math.floor(Number($('po-q').value) || 0), p = productById(id);
         if (q <= 0) { showToast('Isi jumlah pesanan (lebih dari 0).', 'warn'); return; }
@@ -6560,6 +6698,11 @@
     })();
   </script>
 
+  <script>(function () {
+      var g = document.getElementById('bill-grand-total'), t = document.getElementById('mx-paytot'), v = document.getElementById('mx-paytot-v'), sc = document.getElementById('mx-sec-cart'); if (!g || !t || !v || !sc) return;
+      function sync() { v.textContent = g.textContent } new MutationObserver(sync).observe(g, { childList: true, characterData: true, subtree: true }); sync();
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (e) { t.hidden = e[0].intersectionRatio >= .95 }, { root: sc, rootMargin: '0px 0px -86px 0px', threshold: [0, .5, .95, 1] }).observe(g); else t.hidden = false
+    })();</script>
 </body>
 
 </html>

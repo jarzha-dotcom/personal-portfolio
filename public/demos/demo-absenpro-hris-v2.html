@@ -1701,7 +1701,7 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
+        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.lvl = 'admin'; return r })(rb(10, 'dina', 'Dina Prameswari', 'Menunggu', 'Transportasi', 90000, 'Taksi ke vendor')), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
@@ -1900,7 +1900,7 @@
     </div>
     <div class="toast" id="toast" role="status"></div>
     <div class="sheet" id="sheet" hidden>
-      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="shT">
+      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="shT" tabindex="-1">
         <h3 id="shT" style="font-size:18px;margin-bottom:6px"></h3>
         <div class="row"><span>Waktu</span><b id="shTime"></b></div>
         <div class="row"><span>Lokasi</span><b id="shLoc">Kinerja Tower · 38 m</b></div>
@@ -1938,24 +1938,24 @@
       </div>
     </div>
     <div class="sheet" id="lsheet" hidden>
-      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="lst">
+      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="lst" tabindex="-1">
         <h3 id="lst" style="font-size:18px;margin-bottom:6px">Keluar dari AbsenPro?</h3>
         <p class="sm">Status absen hari ini tetap tersimpan untuk akun ini.</p><button class="btn dg"
-          id="lyes">Keluar</button><button class="btn" id="lno"
+          id="lyes">Keluar</button><button class="btn" id="lno" data-af
           style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
       </div>
     </div>
     <div class="sheet" id="rsheet" hidden>
-      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="rst">
+      <div class="sb" role="dialog" aria-modal="true" aria-labelledby="rst" tabindex="-1">
         <h3 id="rst" style="font-size:18px;margin-bottom:6px">Reset data demo?</h3>
         <p class="sm">Semua absen dan selfie, ajuan dan klaim, pengaturan dari admin, serta karyawan tambahan akan
           dihapus. Tema dan bahasa tetap. Tindakan ini tidak bisa dibatalkan.</p><button class="btn dg" id="ryes">Ya,
-          reset data</button><button class="btn" id="rno"
+          reset data</button><button class="btn" id="rno" data-af
           style="background:var(--chip);color:var(--ink);margin-top:8px">Batal</button>
       </div>
     </div>
     <div class="sheet" id="nsheet" hidden>
-      <div class="sb" role="dialog" aria-modal="true" aria-label="Notifikasi">
+      <div class="sb" role="dialog" aria-modal="true" aria-label="Notifikasi" tabindex="-1">
         <h3 style="font-size:18px;margin-bottom:6px">Notifikasi</h3>
         <div class="chips" id="ntabs" style="margin:6px 0"><button class="on" data-t="all">Semua</button><button
             data-t="act">Perlu tindakan <b class="nb2" id="nbAct" hidden></b></button><button
@@ -2496,7 +2496,7 @@
     $('#lgo').onclick = trySubmit;[$('#le'), $('#lp')].forEach(i => i.onkeydown = e => { if (e.key === 'Enter') trySubmit() });
     $('#lacc').onclick = e => { const b = e.target.closest('.acc'); if (!b) return; const u = ACC.find(a => a.id === b.dataset.id); $('#le').value = u.email; $('#lp').value = PW; $('#lerr').textContent = ''; $$('.acc').forEach(x => x.classList.toggle('on', x === b)); $('#lgo').focus() };
     $('#lv').onclick = () => { const p = $('#lp'), s = p.type === 'password'; p.type = s ? 'text' : 'password'; $('#lv').textContent = s ? 'Sembunyi' : 'Lihat' };
-    $('#lo').onclick = () => { $('#lsheet').hidden = false; $('#lyes').focus() };
+    $('#lo').onclick = () => { $('#lsheet').hidden = false; $('#lno').focus() };
     $('#lyes').onclick = () => { $('#lsheet').hidden = true; doLogout() }; $('#lno').onclick = () => { $('#lsheet').hidden = true };
     $('#lsheet').onclick = e => { if (e.target.id === 'lsheet') e.target.hidden = true };
     document.addEventListener('keydown', e => { if (e.key === 'Escape') $('#lsheet').hidden = true });
@@ -2722,6 +2722,45 @@
     lock(true);
     try { const u = ACC.find(a => a.id === localStorage.getItem('absenpro-v2-session')); if (u && !u.off) { $('#login').hidden = true; lock(false); applyUser(u) } } catch (e) { }
     if (LANG === 'en') applyLang('en');
+  </script>
+  <script id="sheet-a11y">
+    // Aksesibilitas sheet (dialog modal): fokus masuk, terkunci di dalam, Esc menutup, fokus kembali ke pemicu.
+    (function () {
+      var sheets = [].slice.call(document.querySelectorAll('.sheet')), opener = null;
+      var FOC = 'a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+      var shown = function (el) { return !el.closest('[hidden]') && el.getClientRects().length > 0 };
+      var items = function (s) { return [].slice.call(s.querySelectorAll(FOC)).filter(shown) };
+      var top = function () { for (var i = sheets.length - 1; i >= 0; i--) if (!sheets[i].hidden) return sheets[i]; return null };
+      var inSheet = function (el) { return !!(el && el.closest && el.closest('.sheet')) };
+      var setBg = function (on) { var m = document.querySelector('main'), n = document.getElementById('nav'); if (m) m.inert = on; if (n) n.inert = on };
+      // catat pemicu sebelum handler klik membuka sheet
+      document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('button,a,[tabindex]'); if (b && !inSheet(b)) opener = b }, true);
+      document.addEventListener('focusin', function (e) { if (!inSheet(e.target) && !top()) opener = e.target });
+      sheets.forEach(function (s) {
+        var was = !s.hidden;
+        new MutationObserver(function () {
+          var open = !s.hidden; if (open === was) return; was = open;
+          if (open) {
+            setBg(true);
+            if (!s.contains(document.activeElement)) { var box = s.querySelector('.sb'), t = s.querySelector('[data-af]') || items(s)[0] || box; if (t) t.focus() }
+          } else if (!top()) {
+            var login = document.getElementById('login'); setBg(!!(login && !login.hidden));
+            var o = opener; opener = null;
+            if (o && document.contains(o) && shown(o) && !o.closest('[inert]') && (inSheet(document.activeElement) || document.activeElement === document.body)) o.focus()
+          }
+        }).observe(s, { attributes: true, attributeFilter: ['hidden'] });
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { var t = top(); if (t) t.hidden = true; return }
+        if (e.key !== 'Tab') return; var s = top(); if (!s) return;
+        var l = items(s), box = s.querySelector('.sb'), a = document.activeElement;
+        if (!l.length) { e.preventDefault(); if (box) box.focus(); return }
+        var i = l.indexOf(a);
+        if (!s.contains(a) || i < 0) { e.preventDefault(); (e.shiftKey ? l[l.length - 1] : l[0]).focus() }
+        else if (e.shiftKey && i === 0) { e.preventDefault(); l[l.length - 1].focus() }
+        else if (!e.shiftKey && i === l.length - 1) { e.preventDefault(); l[0].focus() }
+      }, true);
+    })();
   </script>
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
     <div class="jz-bar-nav">

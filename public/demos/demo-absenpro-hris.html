@@ -5642,6 +5642,7 @@
         + '<p class="s" style="margin-top:14px">Ini simulasi untuk demo. Tidak ada data yang dikirim ke server.</p></div>';
       APP.appendChild(lg);
       $('#lgA').innerHTML = ACC.map(function (a) { return '<button class="acc" data-id="' + a.id + '"><span class="pa">' + a.ini + '</span><span style="flex:1"><b>' + a.name + '</b><br><small>' + a.role + ' \u00b7 ' + a.email + '</small></span><span class="tg' + (a.r === 'spv' ? ' m' : a.r === 'admin' ? ' m2' : '') + '">' + ({ staff: 'Staf', spv: 'Supervisor', admin: 'Admin' })[a.r] + '</span></button>' }).join('');
+      try { (JSON.parse(localStorage.getItem('absenpro-acc-v1')) || []).forEach(function (x) { ACC.push(x) }) } catch (e) { }
       function personalize(u) {
         var all = document.querySelectorAll('h2,h3,span,p');
         for (var i = 0; i < all.length; i++) {
@@ -5681,14 +5682,39 @@
     /* AbsenPro v7: kata sandi per akun (demo, hash ringan di browser, bukan keamanan sungguhan) */
     (function () {
       function cy(s) { var a = 0xdeadbeef, b = 0x41c6ce57, c, i; for (i = 0; i < s.length; i++) { c = s.charCodeAt(i); a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677) } a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909); return String(4294967296 * (2097151 & b) + (a >>> 0)) }
-      window.__HS = [{ d: '2026-05-01', n: 'Hari Buruh Internasional', t: 'Wajib' }, { d: '2026-06-01', n: 'Hari Lahir Pancasila', t: 'Wajib' }, { d: '2026-08-17', n: 'Hari Kemerdekaan RI', t: 'Wajib' }, { d: '2026-12-24', n: 'Cuti bersama Natal', t: 'Opsional' }, { d: '2026-12-25', n: 'Hari Raya Natal', t: 'Wajib' }, { d: '2027-01-01', n: 'Tahun Baru 2027', t: 'Wajib' }]; window.__cy = cy; window.__okpw = function (id, p) { var h = null; try { h = localStorage.getItem('absenpro-pw-' + id) } catch (e) { } return h ? h === cy(p) : p === 'demo123' }
+      window.__HS = [{ d: '2026-05-01', n: 'Hari Buruh Internasional', t: 'Wajib' }, { d: '2026-06-01', n: 'Hari Lahir Pancasila', t: 'Wajib' }, { d: '2026-08-17', n: 'Hari Kemerdekaan RI', t: 'Wajib' }, { d: '2026-12-24', n: 'Cuti bersama Natal', t: 'Opsional' }, { d: '2026-12-25', n: 'Hari Raya Natal', t: 'Wajib' }, { d: '2027-01-01', n: 'Tahun Baru 2027', t: 'Wajib' }]; window.__rp = function (n) { return (n < 0 ? '\u2212' : '') + 'Rp ' + Math.abs(Math.round(n)).toLocaleString('id-ID') };
+      window.__base = function (uid, c) { var s = {}; try { s = JSON.parse(localStorage.getItem('absenpro-sal-v1')) || {} } catch (e) { } return s[uid] >= 1000000 ? s[uid] : c.base };
+      window.__calc = function (reqs, att, c, uid) {
+        var h = c.base / 173, MN = ['jan', 'feb', 'mar', 'apr', 'mei', 'jun', 'jul', 'agu', 'sep', 'okt', 'nov', 'des'], n = new Date(), H = {}, ot = 0, hrs = 0, hl = 0, pend = 0, late = 0, hs = null;
+        try { hs = JSON.parse(localStorage.getItem('absenpro-hol-v1')) } catch (e) { } (hs || window.__HS).forEach(function (x) { if (x.t === 'Wajib') H[x.d] = 1 });
+        reqs.forEach(function (r) {
+          if (r.uid !== uid || r.type !== 'Lembur' || r.st === 'Ditolak') return;
+          var m = /(\d+(?:[.,]\d+)?) jam/.exec(r.detail || ''); if (!m) return; var x = parseFloat(m[1].replace(',', '.')), dm = /^(\d{1,2}) (\S{3})/.exec(r.detail || ''), off = false;
+          if (dm) { var mo = MN.indexOf(dm[2].toLowerCase()); if (mo < 0 || mo !== n.getMonth()) return; var d = new Date(n.getFullYear(), mo, +dm[1]), w = d.getDay(); off = w === 0 || w === 6 || !!H[d.getFullYear() + '-' + ('0' + (mo + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2)] }
+          if (r.st !== 'Disetujui') { pend += x; return }
+          var k = off ? Math.min(x, 8) * 2 + Math.max(0, Math.min(x, 9) - 8) * 3 + Math.max(0, x - 9) * 4 : (x <= 1 ? x * 1.5 : 1.5 + (x - 1) * 2);
+          ot += k * h; hrs += x; if (off) hl += x
+        });
+        att.forEach(function (a) { var d = new Date(a.at); if (a.st === 'Terlambat' && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear()) late++ });
+        return { hrs: hrs, hl: hl, ot: ot, pend: pend, late: late, cut: late * c.late, net: ot - late * c.late }
+      };
+      window.__CF = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } return Object.assign({ late: 25000, base: 14500000, tunj: 2750000, ptkp: 'TK/0', method: 'prog', ter: '', jpcap: 10547400, kscap: 12000000 }, c) };
+      window.__pph = function (g, iu, st) { var P = { 'TK/0': 54e6, 'TK/1': 58.5e6, 'TK/2': 63e6, 'TK/3': 67.5e6, 'K/0': 58.5e6, 'K/1': 63e6, 'K/2': 67.5e6, 'K/3': 72e6 }, a = g * 12, k = Math.max(0, Math.floor((a - Math.min(a * .05, 6e6) - iu * 12 - (P[st] || 54e6)) / 1000) * 1000), t = 0;[[60e6, .05], [190e6, .15], [250e6, .25], [4500e6, .3], [Infinity, .35]].forEach(function (b) { var s = Math.min(k, b[0]); t += s * b[1]; k -= s }); return Math.round(t / 12) };
+      window.__ym = function () { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) };
+      window.__bonus = function (uid) { try { return +((JSON.parse(localStorage.getItem('absenpro-bonus-v1')) || {})[__ym()] || {})[uid] || 0 } catch (e) { return 0 } };
+      window.__ter = function (t) { var o = {}, c = null; String(t || '').split('\n').forEach(function (l) { l = l.trim(); if (!l) return; if (/^[ABC]$/i.test(l)) { c = l.toUpperCase(); o[c] = []; return } if (!c) return; var p = l.split(/[;\t]/), z = (p[0] || '').trim(), lim = /^(~|max|tak)/i.test(z) ? Infinity : parseFloat(z.replace(/\./g, '')), r = parseFloat(String(p[1] || '').replace(',', '.')); if (!isNaN(lim) && !isNaN(r)) o[c].push([lim, r]) }); return o };
+      window.__pphx = function (g, iu, st, C) { if (C.method === 'TER') { var cat = { 'TK/0': 'A', 'TK/1': 'A', 'K/0': 'A', 'TK/2': 'B', 'TK/3': 'B', 'K/1': 'B', 'K/2': 'B', 'K/3': 'C' }[st] || 'A', T = __ter(C.ter)[cat]; if (T && T.length) { var r = T.filter(function (x) { return g <= x[0] })[0] || T[T.length - 1]; return { v: Math.round(g * r[1] / 100), m: 'TER kategori ' + cat + ' (' + r[1] + '%)' } } } return { v: __pph(g, iu, st), m: 'estimasi progresif tahunan' } };
+      window.__slip = function (uid, reqs, att, C) { var base = __base(uid, C), a = __calc(reqs, att, Object.assign({}, C, { base: base }), uid), up = base + C.tunj, kes = Math.round(Math.min(up, C.kscap) * .01), jht = Math.round(up * .02), jp = Math.round(Math.min(up, C.jpcap) * .01), bn = __bonus(uid), gross = up + bn + a.ot, st = (function () { try { return (JSON.parse(localStorage.getItem('absenpro-ptkp-v1')) || {})[uid] } catch (e) { } })() || C.ptkp, px = __pphx(gross, jht + jp, st, C), pph = px.v; return { base: base, tun: C.tunj, ot: a.ot, bonus: bn, hrs: a.hrs, hl: a.hl, pend: a.pend, late: a.late, cut: a.cut, kes: kes, jht: jht, jp: jp, pph: pph, pm: px.m, ptkp: st, gross: gross, net: gross - kes - jht - jp - pph - a.cut } };
+      window.__cy = cy; window.__acc = function () { try { return JSON.parse(localStorage.getItem('absenpro-acc-v1')) || [] } catch (e) { return [] } };
+      window.__who = function (id) { var b = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[id]; if (b) return b; var a = __acc().filter(function (x) { return x.id === id })[0]; return a ? [a.name, String(a.div || '').replace('Divisi ', ''), a.r] : null };
+      window.__okpw = function (id, p) { var h = null; try { h = localStorage.getItem('absenpro-pw-' + id) } catch (e) { } var a = __acc().filter(function (x) { return x.id === id })[0]; if (a && a.emp) { try { var m = (JSON.parse(localStorage.getItem('absenpro-emp-v1')) || []).filter(function (e) { return e.id === a.emp })[0]; if (m && !m.on) return false } catch (e) { } } return h ? h === cy(p) : p === 'demo123' }
     })();
   </script>
   <script>
     /* AbsenPro v3 (app): skor, jam kerja, koreksi absen, layanan HR, data diri */
     (function () {
       var $ = function (s) { return document.querySelector(s) }, sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
-      var P = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[sid];
+      var P = window.__who(sid);
       if (!P || !window.__RL) return;
       var me = { id: sid, name: P[0], div: P[1], r: P[2] };
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } }, wr = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
@@ -5745,7 +5771,7 @@
       var $ = function (s) { return document.querySelector(s) }, AK = 'absenpro-att-' + sid;
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
       var cf = function () { return Object.assign({ in: '08:00', tol: 10, rad: 100, cam: 'Tidak' }, rd('absenpro-cfg-v1', {})) };
-      var nm = { arzha: 'K. Arzhaning Jagad', raka: 'Raka Mahendra', salsa: 'Salsa Anindya', dina: 'Dina Prameswari', hendra: 'Hendra Wijaya' }[sid] || sid;
+      var nm = (window.__who(sid) || [sid])[0];
       var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
       // radius geofence mengikuti pengaturan admin
       var _t = window.showToast; if (_t) window.showToast = function (m, t) { return _t(typeof m === 'string' ? m.replace('maks 50m', 'maks ' + cf().rad + 'm') : m, t) };
@@ -5869,7 +5895,7 @@
     /* AbsenPro v8 (app): hari kerja tanpa libur, kuota cuti dari persetujuan, libur di kalender */
     (function () {
       var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
-      var P = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[sid];
+      var P = window.__who(sid);
       var $ = function (s) { return document.querySelector(s) }; if (!P || !window.__RL || !$('#leaveForm')) return;
       var me = { id: sid, name: P[0], div: P[1], r: P[2] }, pad = function (n) { return ('0' + n).slice(-2) }, toast = function (m, t) { showToast(m, t || 'success') };
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
@@ -5911,6 +5937,86 @@
         $('#agH').textContent = Math.max(0, h); $('#agL').textContent = Math.max(0, l); $('#agI').textContent = Math.max(0, i)
       }
       if (cal && $('#agMon')) { new MutationObserver(mark).observe(cal, { childList: true }); mark() }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v9 (app): notifikasi status pengajuan dan tiket */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var $ = function (s) { return document.querySelector(s) }, bell = $('button[aria-label="Notifikasi"]'); if (!sid || !bell || !window.__RL) return;
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } }, wr = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
+      var KB = 'absenpro-ntfb-' + sid, KE = 'absenpro-ntfe-' + sid, esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+      var orig = bell.onclick; bell.style.position = 'relative';
+      var dot = document.createElement('span'); dot.hidden = true; dot.setAttribute('aria-hidden', 'true'); dot.style.cssText = 'position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#ef4444;color:#fff;font:700 10px/16px system-ui;text-align:center'; bell.appendChild(dot);
+      function badge() { var n = rd(KE, []).filter(function (e) { return !e.r }).length; dot.textContent = n; dot.hidden = !n; bell.setAttribute('aria-label', n ? 'Notifikasi, ' + n + ' belum dibaca' : 'Notifikasi') }
+      function ago(t) { var m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'Baru saja' : m < 60 ? m + ' menit lalu' : m < 1440 ? Math.round(m / 60) + ' jam lalu' : new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }
+      function poll() {
+        var cur = {}, info = {};
+        __RL.mine(sid).forEach(function (r) { cur['r' + r.id] = r.st; info['r' + r.id] = [r.type + ' ' + String(r.detail || '').split(' \u00b7 ')[0], r.st === 'Disetujui' ? 'disetujui' : 'ditolak', 'Keputusan atasan'] });
+        rd('absenpro-tix-all', []).forEach(function (t) { if (t.uid === sid) { cur['t' + t.no] = t.st; info['t' + t.no] = ['Tiket #' + t.no + ' (' + t.cat + ')', t.st === 'Diproses' ? 'sedang diproses HR' : 'selesai', 'Layanan HR'] } });
+        var PL = rd('absenpro-payl-v1', {}); Object.keys(PL).forEach(function (ym) { if (PL[ym].rows.some(function (r) { return r.id === sid })) { cur['p' + ym] = 'Final'; info['p' + ym] = ['Slip gaji ' + new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }), 'sudah final', 'Rekap gaji HR'] } });
+        var B = rd(KB, null); if (!B) { wr(KB, cur); return }
+        var E = rd(KE, []), ch = 0;
+        Object.keys(cur).forEach(function (k) { if ((B[k] || k[0] === 'p') && B[k] !== cur[k] && cur[k] !== 'Menunggu' && cur[k] !== 'Diterima') { var i = info[k]; E.unshift({ a: i[0] + ' ' + i[1], b: i[2], at: Date.now() }); ch++; if (typeof showToast === 'function') showToast(i[0] + ' ' + i[1], i[1] === 'ditolak' ? 'error' : 'success') } });
+        if (ch || Object.keys(cur).length !== Object.keys(B).length) { wr(KB, cur); wr(KE, E.slice(0, 20)) } badge()
+      }
+      bell.onclick = function () {
+        if (orig) orig.apply(this, arguments);
+        var E = rd(KE, []), l = $('#agNl'); if (l && E.length) { l.insertAdjacentHTML('afterbegin', E.slice(0, 8).map(function (e) { return '<div class="ag-row"><div><b>' + esc(e.a) + (e.r ? '' : ' <span style="color:#ef4444">\u2022</span>') + '</b><br><span class="ag-sm">' + esc(e.b) + ' \u00b7 ' + ago(e.at) + '</span></div></div>' }).join('')); wr(KE, E.map(function (e) { e.r = 1; return e })) } badge()
+      };
+      poll(); badge(); setInterval(poll, 2500)
+    })();
+  </script>
+  <script>
+    /* AbsenPro v10 (app): wajib ganti kata sandi awal saat pertama masuk */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var L = window.__acc ? __acc() : [], a = L.filter(function (x) { return x.id === sid })[0], APP = document.getElementById('appContainer'); if (!a || !a.must || !APP) return;
+      var lock = function (on) { ['#scrollContent', 'nav'].forEach(function (s) { var e = APP.querySelector(s); if (e) e.inert = on }) }; lock(true);
+      var o = document.createElement('div'); o.setAttribute('role', 'dialog'); o.setAttribute('aria-modal', 'true'); o.setAttribute('aria-labelledby', 'fpT'); o.style.cssText = 'position:absolute;inset:0;z-index:99999;background:rgba(15,23,42,.65);display:flex;align-items:center;justify-content:center;padding:18px';
+      var f = function (l, id) { return '<label class="x2-l" for="' + id + '">' + l + '</label><input class="x2-in" id="' + id + '" type="password" autocomplete="new-password">' };
+      o.innerHTML = '<div class="ag-card" style="width:100%;max-width:340px;margin:0"><h3 id="fpT">Buat kata sandi baru</h3><p class="ag-sm">Halo ' + a.short + ', kata sandi awal dari HR hanya untuk sekali pakai. Buat kata sandi pribadi (min. 8 karakter, huruf dan angka).</p>' + f('Kata sandi baru', 'fpN') + f('Ulangi kata sandi baru', 'fpC') + '<p class="ag-sm" id="fpE" role="alert" style="color:#dc2626;min-height:16px"></p><button class="x2-go" id="fpG">Simpan dan lanjut</button></div>'; APP.appendChild(o); document.getElementById('fpN').focus();
+      document.getElementById('fpG').onclick = function () {
+        var n = document.getElementById('fpN').value, c = document.getElementById('fpC').value, er = document.getElementById('fpE');
+        if (n.length < 8 || !/[A-Za-z]/.test(n) || !/\d/.test(n)) return er.textContent = 'Minimal 8 karakter dengan huruf dan angka.';
+        if (__okpw(sid, n)) return er.textContent = 'Kata sandi baru harus berbeda dari kata sandi awal.';
+        if (n !== c) return er.textContent = 'Konfirmasi kata sandi tidak cocok.';
+        try { localStorage.setItem('absenpro-pw-' + sid, __cy(n)); a.must = 0; localStorage.setItem('absenpro-acc-v1', JSON.stringify(L)) } catch (e) { return er.textContent = 'Gagal menyimpan. Coba lagi.' }
+        o.remove(); lock(false); if (typeof showToast === 'function') showToast('Kata sandi dibuat. Selamat datang!', 'success')
+      }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v11 (app): estimasi penyesuaian gaji, tanggal lembur */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var py = document.getElementById('tabContent-payroll'); if (!sid || !py || !window.__RL || !window.__calc) return;
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
+      var d = document.createElement('div'); d.className = 'ag-card'; py.appendChild(d);
+      var h = document.createElement('div'); h.className = 'ag-card'; py.appendChild(h);
+      var MOF = function (ym) { return new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) };
+      var row = function (l, v, sub, col) { return '<div class="ag-row"><div><b>' + l + '</b>' + (sub ? '<br><span class="ag-sm">' + sub + '</span>' : '') + '</div><b' + (col ? ' style="color:' + col + '"' : '') + '>' + v + '</b></div>' };
+      function body(s, late) { return '<p class="ag-sm" style="margin-top:2px"><b>Pendapatan</b></p>' + row('Gaji pokok', __rp(s.base)) + row('Tunjangan tetap', __rp(s.tun)) + (s.bonus ? row('Bonus kinerja', '+' + __rp(s.bonus), '', '#059669') : '') + row('Lembur disetujui', (s.ot ? '+' : '') + __rp(s.ot), s.hrs + ' jam' + (s.hl ? ' (' + s.hl + ' jam di hari libur)' : ''), '#059669') + '<p class="ag-sm" style="margin-top:8px"><b>Potongan</b></p>' + row('BPJS Kesehatan (1%)', __rp(-s.kes)) + row('BPJS JHT (2%)', __rp(-s.jht)) + row('BPJS JP (1%)', __rp(-s.jp)) + row('PPh 21', __rp(-s.pph), s.pm + ' \u00b7 PTKP ' + s.ptkp) + row('Potongan terlambat', __rp(-s.cut), s.late + 'x \u00d7 ' + __rp(late), '#dc2626') + '<div class="ag-row" style="border-top:2px solid #0d9488;margin-top:6px"><div><b>Take home pay</b></div><b style="font-size:16px">' + __rp(s.net) + '</b></div>' }
+      function draw() {
+        var C = __CF(), cur = __ym(), PL = rd('absenpro-payl-v1', {}), lk = PL[cur], fr = lk && lk.rows.filter(function (r) { return r.id === sid })[0], s = fr ? fr.s : __slip(sid, __RL.all(), rd('absenpro-att-' + sid, []), C), late = fr && lk.cfg ? lk.cfg.late : C.late;
+        d.innerHTML = '<h3>Slip ' + (fr ? 'final ' : 'estimasi ') + MOF(cur) + '</h3>' + (fr ? '<p class="ag-sm">Dikunci HR pada ' + new Date(lk.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + '.</p>' : '') + body(s, late) + '<p class="ag-sm" style="margin-top:8px">' + (fr ? 'Angka ini final dari rekap HR, namun tetap estimasi dan bisa berbeda dari slip resmi.' : 'Estimasi dari aturan yang diatur admin, bisa berbeda dari slip resmi. Bonus diisi admin per bulan.') + '</p>';
+        var K = Object.keys(PL).sort().reverse().filter(function (m) { return PL[m].rows.some(function (r) { return r.id === sid }) });
+        h.innerHTML = '<h3>Riwayat slip final</h3>' + (K.length ? K.map(function (m) { var r = PL[m].rows.filter(function (x) { return x.id === sid })[0].s; return '<details style="border-top:1px solid rgba(148,163,184,.3);padding:8px 0"><summary style="cursor:pointer"><b>' + MOF(m) + '</b> \u00b7 ' + __rp(r.net) + '</summary>' + body(r, PL[m].cfg ? PL[m].cfg.late : C.late) + '</details>' }).join('') : '<p class="ag-sm">Belum ada slip final. HR mengunci rekap gaji di akhir periode.</p>')
+      }
+      draw(); setInterval(draw, 3000);
+      // tanggal lembur
+      var dur = document.getElementById('otDuration'), _o = window.submitOvertimeAction; if (!dur || !_o) return;
+      var td = new Date(), iso = function (x) { return x.getFullYear() + '-' + ('0' + (x.getMonth() + 1)).slice(-2) + '-' + ('0' + x.getDate()).slice(-2) };
+      dur.parentNode.insertAdjacentHTML('beforebegin', '<div><label class="x2-l" for="otDate">Tanggal lembur</label><input class="x2-in" id="otDate" type="date" max="' + iso(td) + '" value="' + iso(td) + '"></div>');
+      window.submitOvertimeAction = function () {
+        var v = document.getElementById('otDate').value || iso(td), dd = new Date(v + 'T00:00');
+        if (v > iso(td)) return showToast('Tanggal lembur tidak boleh di masa depan', 'error');
+        if (td - dd > 45 * 864e5) return showToast('Lembur maksimal 45 hari ke belakang', 'error');
+        var before = {}; __RL.mine(sid).forEach(function (r) { before[r.id] = 1 });
+        _o.apply(this, arguments);
+        if (v !== iso(td)) { var n = __RL.mine(sid).filter(function (r) { return !before[r.id] && r.type === 'Lembur' })[0]; if (n) { n.detail = dd.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + String(n.detail).split(' \u00b7 ').slice(1).join(' \u00b7 '); try { localStorage.setItem('absenpro-req2-v1', JSON.stringify(__RL.all())) } catch (e) { } } }
+        draw()
+      }
     })();
   </script>
 </body>
