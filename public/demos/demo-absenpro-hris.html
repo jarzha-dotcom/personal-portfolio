@@ -3121,23 +3121,23 @@
         }
         function approvals(el, scope, label) {
           var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && (!scope || scope(r)) }).slice(0, 6);
-          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small></div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
-            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>Alasan: ' + esc(r.why) + '</small>' : '') + '</div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
+          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small></div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button><button data-id="' + r.id + '" data-nt="1" style="background:transparent;border:1px solid var(--rl-line);color:inherit;border-radius:10px;padding:6px 10px;cursor:pointer;font-size:12px">Setujui + catatan</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
+            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>' + (r.st === 'Ditolak' ? 'Alasan: ' : 'Catatan: ') + esc(r.why) + '</small>' : '') + '</div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
           el.querySelector('.rl').onclick = function (e) {
             var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; var row = b.closest('.rl-req');
+            var mk = function (ph, lab, flag, cls) { var w1 = row.querySelector('.rl-why'); if (w1) w1.remove(); var w = document.createElement('div'); w.className = 'rl-why'; w.style.cssText = 'flex-basis:100%;margin-top:8px'; w.innerHTML = '<textarea rows="2" maxlength="140" aria-label="' + ph + '" placeholder="' + ph + '" style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--rl-line);background:transparent;color:inherit;font:inherit;font-size:13px"></textarea><div style="display:flex;gap:8px;margin-top:6px"><button class="' + cls + '" data-id="' + id + '" data-' + flag + '="1">' + lab + '</button><button data-id="' + id + '" data-c="1" style="background:transparent;border:1px solid var(--rl-line);color:inherit;border-radius:10px;padding:6px 12px;cursor:pointer">Batal</button></div>'; row.style.flexWrap = 'wrap'; row.appendChild(w); w.querySelector('textarea').focus() };
             if (b.dataset.ok) { decide(id, true); O.toast('Disetujui: ' + r.type + ' ' + r.who); return }
+            if (b.dataset.y2) { decide(id, true, row.querySelector('textarea').value.trim()); O.toast('Disetujui: ' + r.type + ' ' + r.who); return }
             if (b.dataset.x) { var ta = row.querySelector('textarea'), why = ta.value.trim(); if (why.length < 5) { ta.focus(); ta.style.borderColor = '#dc2626'; O.toast('Isi alasan penolakan (min. 5 karakter)'); return } decide(id, false, why); O.toast('Ditolak: ' + r.type + ' ' + r.who); return }
             if (b.dataset.c) { var w0 = row.querySelector('.rl-why'); if (w0) w0.remove(); return }
-            var w1 = row.querySelector('.rl-why'); if (w1) { w1.querySelector('textarea').focus(); return }
-            var w = document.createElement('div'); w.className = 'rl-why'; w.style.cssText = 'flex-basis:100%;margin-top:8px';
-            w.innerHTML = '<textarea rows="2" maxlength="140" aria-label="Alasan penolakan" placeholder="Alasan penolakan (wajib, dilihat karyawan)" style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--rl-line);background:transparent;color:inherit;font:inherit;font-size:13px"></textarea><div style="display:flex;gap:8px;margin-top:6px"><button class="n" data-id="' + id + '" data-x="1">Kirim penolakan</button><button data-id="' + id + '" data-c="1" style="background:transparent;border:1px solid var(--rl-line);color:inherit;border-radius:10px;padding:6px 12px;cursor:pointer">Batal</button></div>';
-            row.style.flexWrap = 'wrap'; row.appendChild(w); w.querySelector('textarea').focus()
+            if (b.dataset.nt) { mk('Catatan untuk karyawan (opsional)', 'Kirim persetujuan', 'y2', 'y'); return }
+            mk('Alasan penolakan (wajib, dilihat karyawan)', 'Kirim penolakan', 'x', 'n')
           }
         }
         function summary(el) {
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
           EMP.forEach(function (e) { (dv[e[3]] = dv[e[3]] || []).push(e) });
-          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>setelah 08:15</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
+          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>setelah ' + (window.__lt ? __lt() : '08:15') + '</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
             + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + ((d[1] - 70) * 3.6) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
             + '<div class="rl-card"><h3>Per divisi</h3>' + Object.keys(dv).map(function (k) { var p = Math.round(counts(dv[k]).h / dv[k].length * 100); return '<div class="rl-dv"><span>' + k + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>' }).join('') + '</div></div>'
         }
@@ -4187,9 +4187,6 @@
                 <span
                   class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">Disetujui</span>
               </div>
-              <div id="tabContent-spvteam" class="p-4 hidden"></div>
-              <div id="tabContent-spvappr" class="p-4 hidden"></div>
-              <div id="tabContent-agenda" class="p-4 hidden"></div>
 
               <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                 <span>10 Agu 2026 - 12 Agu 2026 (3 Hari)</span>
@@ -4494,6 +4491,10 @@
         </div>
 
       </section>
+
+      <div id="tabContent-spvteam" class="p-4 hidden"></div>
+      <div id="tabContent-spvappr" class="p-4 hidden"></div>
+      <div id="tabContent-agenda" class="p-4 hidden"></div>
 
     </div>
 
@@ -5718,6 +5719,7 @@
       window.__ter = function (t) { var o = {}, c = null; String(t || '').split('\n').forEach(function (l) { l = l.trim(); if (!l) return; if (/^[ABC]$/i.test(l)) { c = l.toUpperCase(); o[c] = []; return } if (!c) return; var p = l.split(/[;\t]/), z = (p[0] || '').trim(), lim = /^(~|max|tak)/i.test(z) ? Infinity : parseFloat(z.replace(/\./g, '')), r = parseFloat(String(p[1] || '').replace(',', '.')); if (!isNaN(lim) && !isNaN(r)) o[c].push([lim, r]) }); return o };
       window.__pphx = function (g, iu, st, C, irr) { if (C.method === 'TER') { var cat = { 'TK/0': 'A', 'TK/1': 'A', 'K/0': 'A', 'TK/2': 'B', 'TK/3': 'B', 'K/1': 'B', 'K/2': 'B', 'K/3': 'C' }[st] || 'A', T = __ter(C.ter)[cat]; if (T && T.length) { var r = T.filter(function (x) { return g <= x[0] })[0] || T[T.length - 1]; return { v: Math.round(g * r[1] / 100), m: 'TER kategori ' + cat + ' (' + r[1] + '%)' } } } return { v: __pph(g - (irr || 0), iu, st, irr || 0), m: 'estimasi progresif tahunan' } };
       window.__slip = function (uid, reqs, att, C, xb) { var base = __base(uid, C), a = __calc(reqs, att, Object.assign({}, C, { base: base }), uid), up = base + C.tunj, kes = Math.round(Math.min(up, C.kscap) * .01), jht = Math.round(up * .02), jp = Math.round(Math.min(up, C.jpcap) * .01), bn = __bonus(uid) + (xb || 0), th = __thr(uid), gross = up + bn + th + a.ot, st = (function () { try { return (JSON.parse(localStorage.getItem('absenpro-ptkp-v1')) || {})[uid] } catch (e) { } })() || C.ptkp, px = __pphx(gross, jht + jp, st, C, bn + th), da = __decap(uid), pph = da === null ? px.v : da; return { base: base, tun: C.tunj, ot: a.ot, bonus: bn, thr: th, hrs: a.hrs, hl: a.hl, pend: a.pend, late: a.late, cut: a.cut, kes: kes, jht: jht, jp: jp, pph: pph, pm: da === null ? px.m : 'penyesuaian Desember', ptkp: st, gross: gross, net: gross - kes - jht - jp - pph - a.cut } };
+      window.__lt = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } var p = (c.in || '08:30').split(':'), m = +p[0] * 60 + +p[1] + (c.tol >= 0 ? +c.tol : 10); return ('0' + Math.floor(m / 60)).slice(-2) + ':' + ('0' + m % 60).slice(-2) };
       window.__cy = cy; window.__acc = function () { try { return JSON.parse(localStorage.getItem('absenpro-acc-v1')) || [] } catch (e) { return [] } };
       window.__who = function (id) { var b = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[id]; if (b) return b; var a = __acc().filter(function (x) { return x.id === id })[0]; return a ? [a.name, String(a.div || '').replace('Divisi ', ''), a.r] : null };
       window.__okpw = function (id, p) { var h = null; try { h = localStorage.getItem('absenpro-pw-' + id) } catch (e) { } var a = __acc().filter(function (x) { return x.id === id })[0]; if (a && a.emp) { try { var m = (JSON.parse(localStorage.getItem('absenpro-emp-v1')) || []).filter(function (e) { return e.id === a.emp })[0]; if (m && !m.on) return false } catch (e) { } } return h ? h === cy(p) : p === 'demo123' }
@@ -5728,7 +5730,7 @@
       var RK = 'absenpro-req2-v1', AK = 'absenpro-audit-v1', base = {}, orig = Storage.prototype.setItem;
       function take() { base = {}; try { (window.RL ? RL.all() : []).forEach(function (r) { base[r.id] = r.st }) } catch (e) { } }
       function actor() { try { if (typeof USER !== 'undefined' && USER && USER.name) return USER.name } catch (e) { } try { var w = __who(localStorage.getItem('absenpro-v1-session')); if (w) return w[0] } catch (e) { } return 'Pengguna' }
-      function log(r) { try { var D = JSON.parse(localStorage.getItem('absenpro-dec-v1')) || {}; D[r.id] = { by: actor(), at: Date.now(), st: r.st }; orig.call(localStorage, 'absenpro-dec-v1', JSON.stringify(D)) } catch (e) { } try { var L = JSON.parse(localStorage.getItem(AK)) || []; L.unshift({ at: Date.now(), who: actor(), c: 'Persetujuan', m: (r.st === 'Disetujui' ? 'Menyetujui ' : 'Menolak ') + (r.type || 'pengajuan') + ' ' + (r.who || '') + (r.detail ? ' (' + String(r.detail).split(' \u00b7 ')[0] + ')' : '') + (r.st === 'Ditolak' && r.why ? ' \u2014 alasan: ' + r.why : '') + (typeof appState !== 'undefined' ? ' [via aplikasi staf]' : '') }); orig.call(localStorage, AK, JSON.stringify(L.slice(0, 300))) } catch (e) { } }
+      function log(r) { try { var D = JSON.parse(localStorage.getItem('absenpro-dec-v1')) || {}; D[r.id] = { by: actor(), at: Date.now(), st: r.st }; orig.call(localStorage, 'absenpro-dec-v1', JSON.stringify(D)) } catch (e) { } try { var L = JSON.parse(localStorage.getItem(AK)) || []; L.unshift({ at: Date.now(), who: actor(), c: 'Persetujuan', m: (r.st === 'Disetujui' ? 'Menyetujui ' : 'Menolak ') + (r.type || 'pengajuan') + ' ' + (r.who || '') + (r.detail ? ' (' + String(r.detail).split(' \u00b7 ')[0] + ')' : '') + (r.why ? ', ' + (r.st === 'Ditolak' ? 'alasan: ' : 'catatan: ') + r.why : '') + (typeof appState !== 'undefined' ? ' [via aplikasi staf]' : '') }); orig.call(localStorage, AK, JSON.stringify(L.slice(0, 300))) } catch (e) { } }
       Storage.prototype.setItem = function (k, v) {
         var res = orig.apply(this, arguments);
         if (k === RK && this === localStorage) { try { RL.all().forEach(function (r) { if (base[r.id] !== undefined && base[r.id] !== r.st && (r.st === 'Disetujui' || r.st === 'Ditolak')) log(r) }) } catch (e) { } take() }
@@ -5747,7 +5749,7 @@
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } }, wr = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } };
       var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
       var toast = function (m, t) { if (typeof showToast === 'function') showToast(m, t || 'success') };
-      var CF = rd('absenpro-cfg-v1', { in: '08:00', out: '17:00', tol: 10, rad: 100, quota: 12 });
+      var CF = rd('absenpro-cfg-v1', { in: '08:30', out: '17:30', tol: 10, rad: 100, quota: 12 });
       var css = document.createElement('style');
       css.textContent = '.x2-ring{display:flex;align-items:center;gap:14px}.x2-big{font-size:26px;font-weight:800;line-height:1}.x2-bars{display:flex;align-items:flex-end;gap:8px;height:92px;margin-top:10px}.x2-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:10px;font-weight:600}.x2-bars i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:#10b981;min-height:4px}.x2-bars i.t{background:#0d9488}.x2-bars i.tw{background:#cbd5e1}.dark .x2-bars i.tw{background:#334155}.x2-bars small{font-size:9.5px;opacity:.7;margin-top:3px}.x2-pill{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}.x2-pill button{border:1px solid #cbd5e1;border-radius:99px;padding:5px 11px;font-size:11.5px;font-weight:600;background:transparent;color:inherit}.x2-pill button[aria-pressed=true]{background:#0d9488;border-color:#0d9488;color:#fff}.x2-in{width:100%;margin:4px 0 8px;padding:9px 11px;border-radius:10px;border:1px solid #cbd5e1;background:transparent;color:inherit;font:inherit;font-size:13px;user-select:auto}.x2-l{font-size:11px;font-weight:700;opacity:.7;display:block;margin-top:4px}.x2-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.x2-go{width:100%;margin-top:6px;padding:11px;border:0;border-radius:12px;background:#0d9488;color:#fff;font-weight:700;font-size:13px}.x2-st{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:99px;white-space:nowrap}.x2-st.a,.x2-st.Menunggu{background:#fef3c7;color:#92400e}.x2-st.b{background:#dbeafe;color:#1e40af}.x2-st.c,.x2-st.Disetujui{background:#d1fae5;color:#065f46}.x2-st.Ditolak{background:#fee2e2;color:#991b1b}';
       document.head.appendChild(css);
@@ -5797,7 +5799,7 @@
       if (!sid || typeof appState === 'undefined') return;
       var $ = function (s) { return document.querySelector(s) }, AK = 'absenpro-att-' + sid;
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
-      var cf = function () { return Object.assign({ in: '08:00', tol: 10, rad: 100, cam: 'Tidak' }, rd('absenpro-cfg-v1', {})) };
+      var cf = function () { return Object.assign({ in: '08:30', tol: 10, rad: 100 }, rd('absenpro-cfg-v1', {})) };
       var nm = (window.__who(sid) || [sid])[0];
       var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
       // radius geofence mengikuti pengaturan admin
@@ -5938,7 +5940,7 @@
       }
       function show() { var q = quota(); appState.leaveBalance = { annual: q.a, sick: q.s, special: q.p }; $('#quotaAnnual').textContent = q.a; $('#quotaSick').textContent = q.s; $('#quotaSpecial').textContent = q.p; hint() }
       var en = $('#leaveEndDate'); en.parentNode.insertAdjacentHTML('afterend', '<p id="lvHint" class="text-[11px] text-slate-500 dark:text-slate-400" aria-live="polite"></p>');
-      function hint() { var s = $('#leaveStartDate').value, e = en.value, h = $('#lvHint'); if (!h) return; if (!s || !e) { h.textContent = 'Hari kerja dihitung tanpa Sabtu, Minggu, dan libur wajib. Kuota yang menunggu persetujuan sudah dikurangi.'; return } if (e < s) { h.textContent = 'Tanggal selesai harus setelah tanggal mulai.'; return } var n = wd(s, e), k = KIND($('#leaveType').value), q = quota(); h.textContent = n + ' hari kerja' + (k ? ' \u00b7 sisa kuota ' + q[k] + ' hari' + (n > q[k] ? ' (tidak cukup)' : '') : '') }
+      function hint() { var s = $('#leaveStartDate').value, e = en.value, h = $('#lvHint'); if (!h) return; if (!s || !e) { h.textContent = 'Dihitung tanpa Sabtu, Minggu, dan libur wajib.'; return } if (e < s) { h.textContent = 'Tanggal selesai harus setelah tanggal mulai.'; return } var n = wd(s, e), k = KIND($('#leaveType').value), q = quota(); h.textContent = n + ' hari kerja' + (k ? ' \u00b7 sisa kuota ' + q[k] + ' hari' + (n > q[k] ? ' (tidak cukup)' : '') : '') }
       ['leaveStartDate', 'leaveEndDate', 'leaveType'].forEach(function (id) { $('#' + id).addEventListener('change', hint) });
       window.handleLeaveSubmit = function (ev) {
         ev.preventDefault(); var t = $('#leaveType').value, s = $('#leaveStartDate').value, e = en.value, r = $('#leaveReason').value.trim();
@@ -5979,7 +5981,7 @@
       function ago(t) { var m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'Baru saja' : m < 60 ? m + ' menit lalu' : m < 1440 ? Math.round(m / 60) + ' jam lalu' : new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }
       function poll() {
         var cur = {}, info = {};
-        __RL.mine(sid).forEach(function (r) { cur['r' + r.id] = r.st; info['r' + r.id] = [r.type + ' ' + String(r.detail || '').split(' \u00b7 ')[0], r.st === 'Disetujui' ? 'disetujui' : 'ditolak', 'Keputusan atasan' + (r.why ? ' \u00b7 Alasan: ' + r.why : '')] });
+        __RL.mine(sid).forEach(function (r) { cur['r' + r.id] = r.st; info['r' + r.id] = [r.type + ' ' + String(r.detail || '').split(' \u00b7 ')[0], r.st === 'Disetujui' ? 'disetujui' : 'ditolak', 'Keputusan atasan' + (r.why ? (r.st === 'Ditolak' ? ' \u00b7 Alasan: ' : ' \u00b7 Catatan: ') + r.why : '')] });
         rd('absenpro-tix-all', []).forEach(function (t) { if (t.uid === sid) { cur['t' + t.no] = t.st; info['t' + t.no] = ['Tiket #' + t.no + ' (' + t.cat + ')', t.st === 'Diproses' ? 'sedang diproses HR' : 'selesai', 'Layanan HR'] } });
         var me = window.__who ? __who(sid) : null;
         if (me && (me[2] === 'spv' || me[2] === 'admin')) {
@@ -6025,16 +6027,16 @@
       var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
       var py = document.getElementById('tabContent-payroll'); if (!sid || !py || !window.__RL || !window.__calc) return;
       var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
-      var d = document.createElement('div'); d.className = 'ag-card'; py.appendChild(d);
+      var d = document.createElement('div'); d.className = 'ag-card'; d.id = 'slipCard'; py.appendChild(d);
       var h = document.createElement('div'); h.className = 'ag-card'; py.appendChild(h);
       var MOF = function (ym) { return new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) };
       var row = function (l, v, sub, col) { return '<div class="ag-row"><div><b>' + l + '</b>' + (sub ? '<br><span class="ag-sm">' + sub + '</span>' : '') + '</div><b' + (col ? ' style="color:' + col + '"' : '') + '>' + v + '</b></div>' };
-      function body(s, late) { return '<p class="ag-sm" style="margin-top:2px"><b>Pendapatan</b></p>' + row('Gaji pokok', __rp(s.base)) + row('Tunjangan tetap', __rp(s.tun)) + (s.bonus ? row('Bonus kinerja', '+' + __rp(s.bonus), '', '#059669') : '') + (s.thr ? row('THR', '+' + __rp(s.thr), '', '#059669') : '') + row('Lembur disetujui', (s.ot ? '+' : '') + __rp(s.ot), s.hrs + ' jam' + (s.hl ? ' (' + s.hl + ' jam di hari libur)' : ''), '#059669') + '<p class="ag-sm" style="margin-top:8px"><b>Potongan</b></p>' + row('BPJS Kesehatan (1%)', __rp(-s.kes)) + row('BPJS JHT (2%)', __rp(-s.jht)) + row('BPJS JP (1%)', __rp(-s.jp)) + row('PPh 21', __rp(-s.pph), s.pm + ' \u00b7 PTKP ' + s.ptkp) + row('Potongan terlambat', __rp(-s.cut), s.late + 'x \u00d7 ' + __rp(late), '#dc2626') + '<div class="ag-row" style="border-top:2px solid #0d9488;margin-top:6px"><div><b>Take home pay</b></div><b style="font-size:16px">' + __rp(s.net) + '</b></div>' }
+      function body(s, late) { return '<p class="slp-h g">Pendapatan</p>' + row('Gaji pokok', __rp(s.base)) + row('Tunjangan tetap', __rp(s.tun)) + (s.bonus ? row('Bonus kinerja', '+' + __rp(s.bonus), '', '#059669') : '') + (s.thr ? row('THR', '+' + __rp(s.thr), '', '#059669') : '') + row('Lembur disetujui', (s.ot ? '+' : '') + __rp(s.ot), s.hrs + ' jam' + (s.hl ? ' (' + s.hl + ' jam di hari libur)' : ''), s.ot ? '#059669' : '') + '<p class="slp-h r">Potongan</p>' + row('BPJS Kesehatan (1%)', __rp(-s.kes)) + row('BPJS JHT (2%)', __rp(-s.jht)) + row('BPJS JP (1%)', __rp(-s.jp)) + row('PPh 21', __rp(-s.pph), s.pm + ' \u00b7 PTKP ' + s.ptkp) + row('Potongan terlambat', __rp(-s.cut), s.late + 'x \u00d7 ' + __rp(late), '#dc2626') + '<div class="ag-row" style="border-top:2px solid #0d9488;margin-top:6px"><div><b>Take home pay</b></div><b style="font-size:16px">' + __rp(s.net) + '</b></div>' }
       function draw() {
         var C = __CF(), cur = __ym(), PL = rd('absenpro-payl-v1', {}), lk = PL[cur], fr = lk && lk.rows.filter(function (r) { return r.id === sid })[0], s = fr ? fr.s : __slip(sid, __RL.all(), rd('absenpro-att-' + sid, []), C), late = fr && lk.cfg ? lk.cfg.late : C.late;
-        d.innerHTML = '<h3>Slip ' + (fr ? 'final ' : 'estimasi ') + MOF(cur) + '</h3>' + (fr ? '<p class="ag-sm">Dikunci HR pada ' + new Date(lk.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + '.</p>' : '') + body(s, late) + '<p class="ag-sm" style="margin-top:8px">' + (fr ? 'Angka ini final dari rekap HR, namun tetap estimasi dan bisa berbeda dari slip resmi.' : 'Estimasi dari aturan yang diatur admin, bisa berbeda dari slip resmi. Bonus diisi admin per bulan.') + '</p>';
+        d.innerHTML = '<h3>Slip ' + (fr ? 'final ' : 'estimasi ') + MOF(cur) + '</h3>' + (fr ? '<p class="ag-sm">Dikunci HR pada ' + new Date(lk.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + '.</p>' : '') + body(s, late) + '<p class="ag-sm" style="margin-top:8px">' + (fr ? 'Angka final dari rekap HR. Slip resmi tetap menjadi rujukan utama.' : 'Estimasi dari pengaturan admin, bisa berbeda dari slip resmi.') + '</p>';
         var K = Object.keys(PL).sort().reverse().filter(function (m) { return PL[m].rows.some(function (r) { return r.id === sid }) });
-        h.innerHTML = '<h3>Riwayat slip final</h3>' + (K.length ? K.map(function (m) { var r = PL[m].rows.filter(function (x) { return x.id === sid })[0].s; return '<details style="border-top:1px solid rgba(148,163,184,.3);padding:8px 0"><summary style="cursor:pointer"><b>' + MOF(m) + '</b> \u00b7 ' + __rp(r.net) + '</summary>' + body(r, PL[m].cfg ? PL[m].cfg.late : C.late) + '</details>' }).join('') : '<p class="ag-sm">Belum ada slip final. HR mengunci rekap gaji di akhir periode.</p>')
+        h.innerHTML = '<h3>Riwayat slip final</h3>' + (K.length ? K.map(function (m) { var r = PL[m].rows.filter(function (x) { return x.id === sid })[0].s; return '<details style="border-top:1px solid rgba(148,163,184,.3);padding:8px 0"><summary style="cursor:pointer"><b>' + MOF(m) + '</b> \u00b7 ' + __rp(r.net) + '</summary>' + body(r, PL[m].cfg ? PL[m].cfg.late : C.late) + '</details>' }).join('') : '<p class="ag-sm">Belum ada slip final. HR mengunci rekap gaji di akhir periode.</p>'); h.style.display = K.length ? '' : 'none'
       }
       draw(); setInterval(draw, 3000);
       // tanggal lembur
@@ -6096,10 +6098,62 @@
       function hist() {
         var D = rd('absenpro-dec-v1', {}), A = __RL.mine(sid).filter(function (r) { return r.st === 'Disetujui' || r.st === 'Ditolak' }), ok = A.filter(function (r) { return r.st === 'Disetujui' }).length, F = A.filter(function (r) { return HF === 'Semua' || r.st === HF });
         F.sort(function (a, b) { return ((D[b.id] || {}).at || 0) - ((D[a.id] || {}).at || 0) });
-        h.innerHTML = '<h3>Riwayat pengajuan</h3><div class="x2-pill">' + ['Semua', 'Disetujui', 'Ditolak'].map(function (f) { return '<button type="button" aria-pressed="' + (f === HF) + '">' + f + '</button>' }).join('') + '</div><p class="ag-sm">' + ok + ' disetujui \u00b7 ' + (A.length - ok) + ' ditolak</p>' + (F.length ? F.slice(0, 10).map(function (r) { var d = D[r.id]; return '<div class="ag-row"><div><b>' + esc(r.type) + '</b><br><span class="ag-sm">' + esc(String(r.detail || '').split(' \u00b7 ').slice(0, 2).join(' \u00b7 ')) + (d ? ' \u00b7 oleh ' + esc(d.by) + ' \u00b7 ' + ago(d.at) : '') + '</span>' + (r.why ? '<br><span class="ag-sm" style="color:#b91c1c">Alasan: ' + esc(r.why) + '</span>' : '') + '</div><span class="x2-st ' + r.st + '">' + r.st + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada pengajuan yang diputuskan.</p>')
+        h.innerHTML = '<h3>Riwayat pengajuan</h3><div class="x2-pill">' + ['Semua', 'Disetujui', 'Ditolak'].map(function (f) { return '<button type="button" aria-pressed="' + (f === HF) + '">' + f + '</button>' }).join('') + '</div><p class="ag-sm">' + ok + ' disetujui \u00b7 ' + (A.length - ok) + ' ditolak</p>' + (F.length ? F.slice(0, 10).map(function (r) { var d = D[r.id]; return '<div class="ag-row"><div><b>' + esc(r.type) + '</b><br><span class="ag-sm">' + esc(String(r.detail || '').split(' \u00b7 ').slice(0, 2).join(' \u00b7 ')) + (d ? ' \u00b7 oleh ' + esc(d.by) + ' \u00b7 ' + ago(d.at) : '') + '</span>' + (r.why ? '<br><span class="ag-sm"' + (r.st === 'Ditolak' ? ' style="color:#b91c1c"' : '') + '>' + (r.st === 'Ditolak' ? 'Alasan: ' : 'Catatan: ') + esc(r.why) + '</span>' : '') + '</div><span class="x2-st ' + r.st + '">' + r.st + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada pengajuan yang diputuskan.</p>')
       }
       h.onclick = function (e) { var b = e.target.closest('.x2-pill button'); if (b) { HF = b.textContent; hist() } };
       hist(); setInterval(hist, 3000)
+    })();
+  </script>
+  <script>
+    /* AbsenPro v14 (app): perapian tampilan */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var $ = function (s) { return document.querySelector(s) }; if (!sid || !$('#appContainer')) return;
+      var rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
+      var cfg = function () { return Object.assign({ in: '08:30', out: '17:30', tol: 10 }, rd('absenpro-cfg-v1', {})) };
+      var css = document.createElement('style');
+      css.textContent = '.slp-h{display:flex;align-items:center;gap:6px;margin:12px 0 2px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.slp-h:before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}.slp-h.g{color:#059669}.slp-h.r{color:#dc2626}#slipCard .ag-row{padding:6px 0}#slipCard .ag-row>div>b{font-size:12.5px;font-weight:500}#slipCard .ag-row>b{font-size:12.5px;font-weight:700;font-variant-numeric:tabular-nums}.lt-bar{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}.lt-bar::-webkit-scrollbar{display:none}.lt-bar button{flex:none;border:1px solid #cbd5e1;border-radius:99px;padding:7px 14px;font-size:12px;font-weight:600;background:transparent;color:inherit;white-space:nowrap}.lt-bar button[aria-pressed=true]{background:#0f766e;border-color:#0f766e;color:#fff}.lt-bar button:focus-visible{outline:2px solid #0f766e;outline-offset:2px}.x2-go.rs-m{background:transparent!important;color:#b45309;border:1px solid #d97706}.x2-go.rs-a{background:transparent!important;color:#b91c1c;border:1px solid #dc2626}';
+      document.head.appendChild(css);
+
+      // lencana lokasi: tombolnya memperbarui GPS, bukan mengubah status
+      [].forEach.call(document.querySelectorAll('#geofenceBadgeBtn *'), function (e) { if (e.children.length === 0 && e.textContent.trim() === 'Ubah') e.textContent = 'Segarkan' });
+
+      // jam kerja mengikuti pengaturan admin
+      function jam() { var c = cfg(), e = [].filter.call(document.querySelectorAll('span'), function (x) { return /^Jam Kerja: /.test(x.textContent) })[0]; if (e) e.textContent = 'Jam Kerja: ' + c.in + ' - ' + c.out + ' WIB' }
+      jam(); setInterval(jam, 3000);
+
+      // ketepatan waktu bulan ini dihitung dari kalender kehadiran
+      var ag = $('#tabContent-agenda'), sk = ag && [].filter.call(ag.querySelectorAll('.ag-card'), function (c) { var h = c.querySelector('h3'); return h && h.textContent.trim() === 'Skor kedisiplinan' })[0], last = null;
+      function skor() {
+        var m = $('#agMon'), now = new Date().toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }).toLowerCase();
+        if (m && m.textContent.trim().toLowerCase() === now) last = { h: +$('#agH').textContent || 0, l: +$('#agL').textContent || 0 };
+        if (!sk) return; var h = last ? last.h : 0, l = last ? last.l : 0, p = h ? Math.round((h - l) / h * 100) : null, R = 30, C = 2 * Math.PI * R;
+        var cf = cfg(), t = (cf.in || '08:30').split(':'), mm = +t[0] * 60 + +t[1] + (+cf.tol || 0), lim = ('0' + Math.floor(mm / 60)).slice(-2) + ':' + ('0' + mm % 60).slice(-2);
+        sk.innerHTML = '<h3>Ketepatan waktu bulan ini</h3><div class="x2-ring"><svg width="76" height="76" viewBox="0 0 76 76" role="img" aria-label="' + (p === null ? 'Belum ada data' : p + ' persen tepat waktu') + '"><circle cx="38" cy="38" r="' + R + '" fill="none" stroke="#e2e8f0" stroke-width="8"/>' + (p === null ? '' : '<circle cx="38" cy="38" r="' + R + '" fill="none" stroke="#0d9488" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + C + '" stroke-dashoffset="' + C * (1 - p / 100) + '" transform="rotate(-90 38 38)"/>') + '<text x="38" y="43" text-anchor="middle" font-size="15" font-weight="800" fill="currentColor">' + (p === null ? '-' : p + '%') + '</text></svg><div><div class="x2-big">' + (p === null ? 'Belum ada data' : h + ' hari hadir') + '</div><p class="ag-sm">' + (p === null ? 'Muncul setelah ada kehadiran bulan ini.' : (h - l) + ' tepat waktu, ' + l + ' terlambat. Terlambat jika absen setelah ' + lim + '.') + '</p></div></div>'
+      }
+      skor(); setInterval(skor, 1500);
+
+      // profil: data pribadi di atas, pengaturan akun lalu keluar, reset data paling bawah
+      var pf = $('#tabContent-profile'), byH = function (t) { return [].filter.call(pf.children, function (c) { var h = c.querySelector('h3'); return h && h.textContent.trim() === t })[0] };
+      if (pf) {
+        var dd = byH('Data diri'), pw = byH('Ganti kata sandi'), rs = byH('Reset data'), st = [].filter.call(pf.children, function (c) { return /Tema Tampilan/.test(c.textContent) && !c.querySelector('h3') })[0];
+        if (st && dd) pf.insertBefore(dd, st); if (st && pw) pf.insertBefore(pw, st); if (rs) pf.appendChild(rs);
+        var m1 = $('#rsM'), a1 = $('#rsA'); if (m1) m1.classList.add('rs-m'); if (a1) a1.classList.add('rs-a');
+        if (rs) { var ps = rs.querySelectorAll('p'); if (ps[0]) ps[0].textContent = 'Menghapus data yang tersimpan di perangkat ini. Akun Anda tetap masuk.'; if (ps[1]) ps[1].textContent = 'Data saya: foto presensi, data diri, tiket, dan pengajuan Anda. Semua data: seluruh akun, persetujuan, karyawan, dan pengaturan.' }
+      }
+
+      // tab Cuti dibagi per topik
+      var lv = $('#tabContent-leave'); if (lv && window.__RL) {
+        var K = [].slice.call(lv.children).filter(function (c) { return c.tagName !== 'BUTTON' }), G = {};
+        function grp(c) { var h = c.querySelector('h3'), t = h ? h.textContent.trim() : ''; if (c.querySelector('#leaveForm') || c.querySelector('#leaveHistoryList') || c.classList.contains('grid')) return 'Cuti'; return { 'Klaim biaya': 'Klaim', 'Koreksi absen': 'Koreksi', 'Layanan HR': 'Bantuan', 'Pengajuan menunggu': 'Status', 'Riwayat pengajuan': 'Status' }[t] || 'Cuti' }
+        K.forEach(function (c) { var g = grp(c); (G[g] = G[g] || []).push(c) });
+        var T = ['Cuti', 'Klaim', 'Koreksi', 'Bantuan', 'Status'].filter(function (t) { return G[t] }), cur = 'Cuti', bar = document.createElement('div'); bar.className = 'lt-bar'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Topik pengajuan');
+        function show() { T.forEach(function (t) { G[t].forEach(function (c) { c.style.display = t === cur ? '' : 'none' }) });[].forEach.call(bar.children, function (b) { b.setAttribute('aria-pressed', b.dataset.t === cur) }) }
+        function lab() { var n = __RL.mine(sid).filter(function (r) { return r.st === 'Menunggu' }).length;[].forEach.call(bar.children, function (b) { if (b.dataset.t === 'Status') b.textContent = n ? 'Status (' + n + ')' : 'Status' }) }
+        T.forEach(function (t) { var b = document.createElement('button'); b.type = 'button'; b.dataset.t = t; b.textContent = t; bar.appendChild(b) });
+        bar.onclick = function (e) { var b = e.target.closest('button'); if (b) { cur = b.dataset.t; show() } };
+        var first = K[0]; lv.insertBefore(bar, first); show(); lab(); setInterval(lab, 3000)
+      }
     })();
   </script>
 </body>

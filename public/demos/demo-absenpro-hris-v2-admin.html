@@ -56,12 +56,26 @@
         var LV = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }; var O = { prefix: 'x', live: null, toast: function () { }, onChange: function () { } }, REQ = [], RK = '', F = 'Semua', Q = '';
         function load() { try { var r = JSON.parse(localStorage.getItem(RK)); if (r && r.length) return r } catch (e) { } return null }
         function save() { try { localStorage.setItem(RK, JSON.stringify(REQ)) } catch (e) { } }
-        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.lvl = 'admin'; return r })(rb(10, 'dina', 'Dina Prameswari', 'Menunggu', 'Transportasi', 90000, 'Taksi ke vendor')), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
+        var AGE = { 1: 4, 2: 5, 3: 1, 4: 2, 6: 0.5, 7: 1 };
+        function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b, ts: Date.now() - (AGE[i] || 0) * 864e5 } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.lvl = 'admin'; return r })(rb(10, 'dina', 'Dina Prameswari', 'Menunggu', 'Transportasi', 90000, 'Taksi ke vendor')), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
-        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
+        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', ts: Date.now(), lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
-        function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
+        function decide(id, ok, why) { REQ.forEach(function (r) { if (r.id === id) { r.st = ok ? 'Disetujui' : 'Ditolak'; r.dt = Date.now(); if (ok) delete r.why; else r.why = String(why || '').slice(0, 140) } }); save(); O.onChange() }
+        function cancel(id, uid) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.uid !== uid || r.st !== 'Menunggu') return null; r.st = 'Dibatalkan'; r.ct = Date.now(); save(); O.onChange(); return r }
+        function waitDays(r) { return r.st === 'Menunggu' && r.ts ? Math.floor((Date.now() - r.ts) / 864e5) : 0 }
+        function ageTag(r) { var d = waitDays(r); return d >= 1 ? '<br><span class="rl-tag rl-age ' + (d > 3 ? 'late' : 'mu') + '">' + d + ' hari menunggu</span>' : '' }
+        function pay(id) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.type !== 'Reimbursement' || r.st !== 'Disetujui') return null; r.st = 'Dibayar'; r.pd = Date.now(); save(); O.onChange(); return r }
+        function whyForm(acts, onSend) {
+          var saved = acts.innerHTML; acts.setAttribute('data-why', '1');
+          acts.innerHTML = '<label class="rl-why"><span>Alasan penolakan (wajib)</span><input type="text" maxlength="140" autocomplete="off"></label><button class="n" data-send="1">Kirim penolakan</button><button data-cx="1">Batal</button>';
+          var inp = acts.querySelector('input'); inp.focus();
+          function cancel() { acts.removeAttribute('data-why'); acts.onclick = null; acts.onkeydown = null; acts.innerHTML = saved; var b = acts.querySelector('button.n'); if (b) b.focus() }
+          function send() { var v = inp.value.trim(); if (v.length < 3) { inp.setAttribute('aria-invalid', 'true'); O.toast('Isi alasan penolakan, minimal 3 huruf'); inp.focus(); return } onSend(v) }
+          acts.onclick = function (e) { var b = e.target.closest('button'); if (!b) return; e.stopPropagation(); if (b.dataset.send) send(); else if (b.dataset.cx) cancel() };
+          acts.onkeydown = function (e) { if (e.key === 'Enter' && e.target === inp) { e.preventDefault(); send() } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); cancel() } }
+        }
         function status(e) { var l = O.live && O.live(e[0]); return l || { st: e[4], t: e[5] } }
         function counts(L) { var c = { h: 0, l: 0, c: 0, b: 0 }; L.forEach(function (e) { var s = status(e).st; if (s === 'Terlambat') { c.l++; c.h++ } else if (s === 'Cuti') c.c++; else if (s === 'Belum absen') c.b++; else c.h++ }); return c }
         function tagc(s) { return s === 'Hadir' ? 'ok' : s === 'Terlambat' ? 'late' : (s === 'Cuti' || s === 'Belum absen') ? 'mu' : '' }
@@ -73,15 +87,15 @@
           el.innerHTML = '<div class="rl">' + hd(label, 'Tim saya') + '<div class="rl-st"><div><b>' + c.h + '</b><small>Hadir</small></div><div><b>' + c.l + '</b><small>Terlambat</small></div><div><b>' + c.b + '</b><small>Belum absen</small></div><div><b>' + c.c + '</b><small>Cuti</small></div></div><div class="rl-card"><h3>Hari ini</h3>' + L.map(person).join('') + '</div></div>'
         }
         function approvals(el, scope, label) {
-          var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && (!scope || scope(r)) }).slice(0, 6);
-          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small>' + rcImg(r) + '</div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
-            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small></div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
-          el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; decide(id, !!b.dataset.ok); O.toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) }
+          var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && r.st !== 'Dibatalkan' && (!scope || scope(r)) }).slice(0, 6);
+          el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small>' + ageTag(r) + rcImg(r) + '</div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
+            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>Alasan: ' + esc(r.why) + '</small>' : '') + '</div><span class="rl-tag ' + (r.st === 'Disetujui' || r.st === 'Dibayar' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
+          el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; if (!b.dataset.ok) { whyForm(b.parentNode, function (why) { decide(id, false, why); O.toast('Ditolak: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }); return } decide(id, true); O.toast('Disetujui: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }
         }
         function summary(el) {
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
           EMP.forEach(function (e) { (dv[e[3]] = dv[e[3]] || []).push(e) });
-          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>' + lateNote() + '</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
+          el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>' + lateNote() + '</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan' + (pending().filter(function (r) { return waitDays(r) > 3 }).length ? ' \u00b7 ' + pending().filter(function (r) { return waitDays(r) > 3 }).length + ' lewat 3 hari' : '') + '</span></div></div>'
             + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + Math.max(4, Math.round(d[1] * 1.0)) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
             + '<div class="rl-card"><h3>Per divisi</h3>' + Object.keys(dv).map(function (k) { var p = Math.round(counts(dv[k]).h / dv[k].length * 100); return '<div class="rl-dv"><span>' + k + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>' }).join('') + '</div></div>'
         }
@@ -109,7 +123,7 @@
           + '.rl-rc{width:64px;height:64px;object-fit:cover;border-radius:10px;margin-top:6px;border:1px solid var(--rl-line)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { all: function () { return REQ }, decide: function (id, ok) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok); return r }, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, selfie: selfie, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok, why) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok, why); return r }, pay: pay, whyForm: whyForm, cancel: cancel, days: waitDays, ageTag: ageTag, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, selfie: selfie, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
       })(window);
 
   </script>
@@ -1047,6 +1061,109 @@
     }
   </style>
   <style>
+    @media(min-width:721px) {
+
+      .rb-tbl td:first-child,
+      .rb-tbl td.fh {
+        white-space: nowrap
+      }
+
+      .rb-acts input {
+        min-width: 150px
+      }
+    }
+
+    .rb-late {
+      color: var(--late);
+      font-weight: 700
+    }
+
+    .tag.Dibayar {
+      background: var(--ok);
+      color: #fff
+    }
+
+    .rb-acts input {
+      font: inherit;
+      font-size: 14px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--ink);
+      min-height: 36px;
+      min-width: 190px;
+      flex: 1
+    }
+
+    .rb-acts input[aria-invalid="true"] {
+      border-color: var(--late)
+    }
+
+    .rb-acts input:focus-visible {
+      outline: 3px solid var(--acc);
+      outline-offset: 1px
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) .tag.Dibayar {
+        color: #0B1624
+      }
+    }
+
+    :root[data-theme="dark"] .tag.Dibayar {
+      color: #0B1624
+    }
+  </style>
+  <style>
+    .rl-req {
+      flex-wrap: wrap
+    }
+
+    .rl-age {
+      margin-top: 4px;
+      display: inline-block
+    }
+
+    .rl-acts[data-why] {
+      flex: 1 1 100%;
+      flex-wrap: wrap;
+      align-items: flex-end
+    }
+
+    .rl-why {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      flex: 1 1 180px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--rl-mute)
+    }
+
+    .rl-why input {
+      font: inherit;
+      font-weight: 400;
+      font-size: 14px;
+      padding: 9px 10px;
+      border-radius: 10px;
+      border: 1px solid var(--rl-line);
+      background: transparent;
+      color: var(--rl-ink);
+      min-height: 38px;
+      width: 100%
+    }
+
+    .rl-why input[aria-invalid="true"] {
+      border-color: var(--rl-late)
+    }
+
+    .rl-why input:focus-visible {
+      outline: 3px solid var(--rl-acc);
+      outline-offset: 1px
+    }
+  </style>
+  <style>
     .rb-acts {
       display: flex;
       gap: 6px;
@@ -1284,7 +1401,8 @@
           <div>
             <p>Klaim biaya karyawan</p>
             <h1>Reimbursement</h1>
-          </div><button class="btn pri" id="rbcsv">Ekspor CSV</button>
+          </div><button class="btn" id="rbpay">Ekspor siap bayar</button><button class="btn pri" id="rbcsv">Ekspor
+            CSV</button>
         </div>
         <div class="rl-kp rbk" id="rbk"></div>
         <div class="chips" id="rbm"></div>
@@ -1310,7 +1428,7 @@
         </div>
         <div class="card">
           <h3>Per divisi</h3>
-          <p class="sm">Klaim menunggu dan disetujui, sesuai filter.</p>
+          <p class="sm">Klaim menunggu, disetujui, dan dibayar, sesuai filter.</p>
           <div id="rbd" style="margin-top:8px"></div>
         </div>
       </section>
@@ -1589,32 +1707,33 @@
     const rbFmt = r => r.cd ? new Date(r.cd + 'T00:00:00').toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : (r.ym || '-');
     const rbNote = r => String(r.detail).split(' \u00b7 ').slice(2).join(' \u00b7 ');
     const rbRows = () => rbAll().filter(r => (RBM === 'all' || r.ym === RBM) && (RBS === 'Semua' || r.st === RBS));
-    const rbTag = { Disetujui: 'Hadir', Ditolak: 'Terlambat', Menunggu: 'Cuti' };
+    const rbTag = { Disetujui: 'Hadir', Dibayar: 'Dibayar', Dibatalkan: 'Belum', Ditolak: 'Terlambat', Menunggu: 'Cuti' };
     const rbImg = r => r.rc && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(r.rc) ? '<img class="rb-th" role="button" tabindex="0" aria-pressed="false" title="Klik untuk memperbesar" alt="Struk ' + RL.esc(r.who) + '" src="' + r.rc + '">' : '<span class="sm">\u2013</span>';
-    let RBC = null, RBF = null;
+    let RBC = null, RBF = null, RBW = '';
     const LVN = { spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' }, rbLbl = r => RL.esc(r.who + ', ' + rpf(r.amt || 0));
     const rbAct = r => {
+      if (r.st === 'Disetujui') return '<div class="rb-acts"><button type="button" class="btn rb-y" data-id="' + r.id + '" data-pay="1" aria-label="Tandai dibayar klaim ' + rbLbl(r) + '">Tandai dibayar</button></div>';
       if (r.st !== 'Menunggu') return '<span class="sm">\u2013</span>';
       if (!canAct(r)) return '<span class="tag Belum">Menunggu ' + (LVN[r.lvl || 'spv'] || 'atasan') + '</span>';
       const l = rbLbl(r);
-      if (RBC === r.id) return '<div class="rb-acts" role="group" aria-label="Konfirmasi tolak klaim ' + l + '"><button type="button" class="btn rb-d" data-id="' + r.id + '" data-no="1">Ya, tolak</button><button type="button" class="btn" data-id="' + r.id + '" data-cx="1">Batal</button></div>';
+      if (RBC === r.id) return '<div class="rb-acts" role="group" aria-label="Konfirmasi tolak klaim ' + l + '"><input type="text" maxlength="140" autocomplete="off" data-id="' + r.id + '" data-wy="1" value="' + RL.esc(RBW) + '" aria-label="Alasan menolak klaim ' + l + ' (wajib)" placeholder="Alasan penolakan"><button type="button" class="btn rb-d" data-id="' + r.id + '" data-no="1">Tolak klaim</button><button type="button" class="btn" data-id="' + r.id + '" data-cx="1">Batal</button></div>';
       return '<div class="rb-acts" role="group" aria-label="Keputusan klaim ' + l + '"><button type="button" class="btn rb-y" data-id="' + r.id + '" data-ok="1" aria-label="Setujui klaim ' + l + '">Setujui</button><button type="button" class="btn" data-id="' + r.id + '" data-rj="1" aria-label="Tolak klaim ' + l + '">Tolak</button></div>'
     };
-    const rbKey = el => { const b = el && el.closest && el.closest('#rbt button[data-id]'); if (!b) return null; const k = ['ok', 'rj', 'no', 'cx'].find(x => b.dataset[x]); return k ? { id: +b.dataset.id, k: k } : null };
+    const rbKey = el => { const b = el && el.closest && el.closest('#rbt button[data-id],#rbt input[data-id]'); if (!b) return null; const k = ['ok', 'rj', 'no', 'cx', 'pay', 'wy'].find(x => b.dataset[x]); return k ? { id: +b.dataset.id, k: k } : null };
     function renderRb() {
       const fa = document.activeElement, fk = fa && fa.closest ? (fa.closest('#rbm') ? ['#rbm', 'm', fa.dataset.m] : fa.closest('#rbs') ? ['#rbs', 's', fa.dataset.s] : null) : null, bk = rbKey(fa);
       const all = rbAll(), months = [...new Set(all.map(r => r.ym).filter(Boolean))].sort().reverse(); if (RBM !== 'all' && !months.includes(RBM)) RBM = 'all';
       const L = rbRows(), sum = s => L.filter(r => r.st === s).reduce((x, r) => x + (r.amt || 0), 0), cnt = s => L.filter(r => r.st === s).length;
       const card = (t, v, s, hl) => '<div class="rl-card' + (hl ? ' rl-hl' : '') + '"><small>' + t + '</small><b>' + v + '</b><span>' + s + '</span></div>';
-      $('#rbk').innerHTML = card('Menunggu', rpf(sum('Menunggu')), cnt('Menunggu') + ' klaim', 1) + card('Disetujui', rpf(sum('Disetujui')), cnt('Disetujui') + ' klaim') + card('Ditolak', rpf(sum('Ditolak')), cnt('Ditolak') + ' klaim') + card('Total klaim', String(L.length), 'sesuai filter');
+      $('#rbk').innerHTML = card('Menunggu', rpf(sum('Menunggu')), cnt('Menunggu') + ' klaim', 1) + card('Siap dibayar', rpf(sum('Disetujui')), cnt('Disetujui') + ' klaim') + card('Dibayar', rpf(sum('Dibayar')), cnt('Dibayar') + ' klaim') + card('Ditolak', rpf(sum('Ditolak')), cnt('Ditolak') + ' klaim');
       const mn = ym => new Date(ym + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
       $('#rbm').innerHTML = ['all'].concat(months).map(k => '<button data-m="' + k + '" aria-pressed="' + (k === RBM) + '" class="' + (k === RBM ? 'on' : '') + '">' + (k === 'all' ? 'Semua bulan' : mn(k)) + '</button>').join('');
-      $('#rbs').innerHTML = ['Semua', 'Menunggu', 'Disetujui', 'Ditolak'].map(k => '<button data-s="' + k + '" aria-pressed="' + (k === RBS) + '" class="' + (k === RBS ? 'on' : '') + '">' + k + '</button>').join('');
-      $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span></td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span></td><td>' + rbImg(r) + '</td><td>' + rbAct(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
-      const dv = {}; L.filter(r => r.st !== 'Ditolak').forEach(r => { dv[r.div] = (dv[r.div] || 0) + (r.amt || 0) }); const mx = Math.max(1, ...Object.values(dv));
+      $('#rbs').innerHTML = ['Semua', 'Menunggu', 'Disetujui', 'Dibayar', 'Ditolak'].map(k => '<button data-s="' + k + '" aria-pressed="' + (k === RBS) + '" class="' + (k === RBS ? 'on' : '') + '">' + k + '</button>').join('');
+      $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span>' + (r.why ? '<br><span class="sm">Alasan: ' + RL.esc(r.why) + '</span>' : '') + '</td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span>' + (r.pd ? '<br><span class="sm">' + new Date(r.pd).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + '</span>' : RL.days(r) >= 1 ? '<br><span class="sm' + (RL.days(r) > 3 ? ' rb-late' : '') + '">' + RL.days(r) + ' hari</span>' : '') + '</td><td>' + rbImg(r) + '</td><td>' + rbAct(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
+      const dv = {}; L.filter(r => r.st !== 'Ditolak' && r.st !== 'Dibatalkan').forEach(r => { dv[r.div] = (dv[r.div] || 0) + (r.amt || 0) }); const mx = Math.max(1, ...Object.values(dv));
       $('#rbd').innerHTML = Object.keys(dv).length ? Object.keys(dv).sort((x, y) => dv[y] - dv[x]).map(k => '<div class="rl-dv"><span>' + RL.esc(k) + '</span><i><u style="width:' + Math.round(dv[k] / mx * 100) + '%"></u></i><b style="width:90px">' + rpf(dv[k]) + '</b></div>').join('') : '<p class="sm">Belum ada data.</p>';
       const hs = [...document.querySelectorAll('.rb-tbl thead th')].map(h => h.textContent); document.querySelectorAll('#rbt tr').forEach(tr => [...tr.cells].forEach((c, i) => { c.dataset.l = hs[i] || ''; if (c.textContent.trim() === '\u2013') c.dataset.e = '1'; else delete c.dataset.e }));
-      const tgt = RBF ? (RBF.id ? $('#rbt button[data-id="' + RBF.id + '"][data-' + RBF.k + ']') : null) || $('#rbs .on') : bk ? $('#rbt button[data-id="' + bk.id + '"][data-' + bk.k + ']') : fk ? $(fk[0] + ' [data-' + fk[1] + '="' + CSS.escape(String(fk[2])) + '"]') : null;
+      const tgt = RBF ? (RBF.id ? $('#rbt [data-id="' + RBF.id + '"][data-' + RBF.k + ']') : null) || $('#rbs .on') : bk ? $('#rbt [data-id="' + bk.id + '"][data-' + bk.k + ']') : fk ? $(fk[0] + ' [data-' + fk[1] + '="' + CSS.escape(String(fk[2])) + '"]') : null;
       RBF = null; if (tgt) tgt.focus()
     }
     $('#rbm').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBM = b.dataset.m; renderRb() };
@@ -1627,22 +1746,27 @@
     $('#rbt').onclick = e => {
       const i = e.target.closest('.rb-th'); if (i) { rbToggle(i); return }
       const b = e.target.closest('button[data-id]'); if (!b) return; const id = +b.dataset.id;
-      if (b.dataset.rj) { RBC = id; RBF = { id: id, k: 'cx' }; renderRb(); return }
-      if (b.dataset.cx) { RBC = null; RBF = { id: id, k: 'rj' }; renderRb(); return }
+      if (b.dataset.rj) { RBC = id; RBW = ''; RBF = { id: id, k: 'wy' }; renderRb(); return }
+      if (b.dataset.cx) { RBC = null; RBW = ''; RBF = { id: id, k: 'rj' }; renderRb(); return }
+      if (b.dataset.pay) { const r = rbAll().find(x => x.id === id); if (!r || r.st !== 'Disetujui') return; const Q = rbRows().filter(x => x.st === 'Disetujui'), k = Q.findIndex(x => x.id === id), nx = Q[k + 1] || Q[k - 1]; RBF = nx ? { id: nx.id, k: 'pay' } : { id: 0 }; if (RL.pay(id)) toast('Klaim dibayar: ' + r.who + ', ' + rpf(r.amt || 0)); else RBF = null; return }
       const ok = !!b.dataset.ok, r = rbAll().find(x => x.id === id); if (!r || r.st !== 'Menunggu' || !canAct(r)) return;
+      let why = ''; if (!ok) { const inp = b.closest('.rb-acts').querySelector('input'); why = inp ? inp.value.trim() : ''; if (why.length < 3) { if (inp) { inp.setAttribute('aria-invalid', 'true'); inp.focus() } toast('Isi alasan penolakan, minimal 3 huruf'); return } }
       const Q = rbRows().filter(x => x.st === 'Menunggu' && canAct(x)), k = Q.findIndex(x => x.id === id), nx = Q[k + 1] || Q[k - 1];
       RBC = null; RBF = nx ? { id: nx.id, k: 'ok' } : { id: 0 };
-      if (RL.decide(id, ok)) toast((ok ? 'Klaim disetujui: ' : 'Klaim ditolak: ') + r.who + ', ' + rpf(r.amt || 0)); else RBF = null
+      RBW = ''; if (RL.decide(id, ok, why)) toast((ok ? 'Klaim disetujui: ' : 'Klaim ditolak: ') + r.who + ', ' + rpf(r.amt || 0)); else RBF = null
     };
     $('#rbt').onkeydown = e => {
-      if (e.key === 'Escape' && RBC !== null) { const id = RBC; RBC = null; RBF = { id: id, k: 'rj' }; renderRb() }
+      if (e.key === 'Escape' && RBC !== null) { const id = RBC; RBC = null; RBW = ''; RBF = { id: id, k: 'rj' }; renderRb() }
+      else if (e.key === 'Enter' && e.target.matches && e.target.matches('input[data-wy]')) { e.preventDefault(); const bt = e.target.closest('.rb-acts').querySelector('[data-no]'); if (bt) bt.click() }
       else if ((e.key === 'Enter' || e.key === ' ') && e.target.matches && e.target.matches('.rb-th')) { e.preventDefault(); rbToggle(e.target) }
     };
-    $('#rbcsv').onclick = () => {
-      const L = rbRows(), cell = c => { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
-      const rows = [['Tanggal', 'Nama', 'Divisi', 'Kategori', 'Keterangan', 'Nominal (Rp)', 'Status', 'Struk']].concat(L.map(r => [r.cd || r.ym || '', r.who, r.div, r.cat || '', rbNote(r), r.amt || 0, r.st, r.rc ? 'Ya' : 'Tidak']));
-      try { const b = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'reimbursement-' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); toast('Mengunduh ' + L.length + ' klaim') } catch (e) { toast('Ekspor tidak didukung di lingkungan ini') }
+    $('#rbt').addEventListener('input', e => { if (e.target.matches('input[data-wy]')) { RBW = e.target.value; e.target.removeAttribute('aria-invalid') } });
+    const rbCsv = (rows, name) => {
+      const cell = c => { c = String(c); if (/^[=+\-@\t\r]/.test(c)) c = "'" + c; return '"' + c.replace(/"/g, '""') + '"' };
+      try { const b = new Blob(['\ufeff' + rows.map(r => r.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name + '-' + new Date().toISOString().slice(0, 10) + '.csv'; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1500); toast('Mengunduh ' + (rows.length - 1) + ' klaim') } catch (e) { toast('Ekspor tidak didukung di lingkungan ini') }
     };
+    $('#rbcsv').onclick = () => rbCsv([['Tanggal', 'Nama', 'Divisi', 'Kategori', 'Keterangan', 'Nominal (Rp)', 'Status', 'Struk', 'Alasan penolakan', 'Dibayar pada']].concat(rbRows().map(r => [r.cd || r.ym || '', r.who, r.div, r.cat || '', rbNote(r), r.amt || 0, r.st, r.rc ? 'Ya' : 'Tidak', r.why || '', r.pd ? new Date(r.pd).toISOString().slice(0, 10) : ''])), 'reimbursement');
+    $('#rbpay').onclick = () => { const L = rbAll().filter(r => r.st === 'Disetujui' && (RBM === 'all' || r.ym === RBM)); if (!L.length) { toast('Tidak ada klaim yang siap dibayar'); return } rbCsv([['Tanggal', 'Nama', 'Divisi', 'Kategori', 'Keterangan', 'Nominal (Rp)']].concat(L.map(r => [r.cd || r.ym || '', r.who, r.div, r.cat || '', rbNote(r), r.amt || 0])), 'klaim-siap-bayar') };
     /*/RB*/
     /*SET*/
     const CF = () => RL.cfg(), rpf = n => 'Rp ' + Number(n).toLocaleString('id-ID');

@@ -3511,11 +3511,11 @@
 
     function processPayment() {
       if (cart.length === 0) {
-        alert('Keranjang belanja masih kosong!');
+        alert('Keranjang belanja masih kosong.');
         return;
       }
       if (paymentMethod === 'cash' && cashTendered < currentGrandTotal) {
-        alert('Jumlah uang tunai kurang dari total tagihan!');
+        alert('Jumlah uang tunai kurang dari total tagihan.');
         return;
       }
 
@@ -3623,7 +3623,7 @@
     function finishReturn() {
       playAudio('success');
       closeModal('return-modal');
-      showToast('Nota Retur #RET-0482 berhasil diterbitkan!');
+      showToast('Nota Retur #RET-0482 berhasil diterbitkan.');
     }
 
     function openModal(id) {
@@ -4408,7 +4408,7 @@
       } else {
         tp$('sh-title').textContent = 'Laporan Shift #' + tpShift.number + ' (Ditutup)';
         const diff = tpShift.counted - s.expectedCash;
-        body.innerHTML = '<div class="tp-done closed"><div class="ic"><i class="fa-solid fa-lock"></i></div><h4>Shift Telah Ditutup</h4><p>Laporan di bawah sudah final dan siap diserahterimakan.</p></div>' + tpShiftRows(s) +
+        body.innerHTML = '<div class="tp-done closed"><div class="ic"><i class="fa-solid fa-lock"></i></div><h4>Shift Telah Ditutup</h4><p>Laporan di bawah sudah final dan siap diserahkan.</p></div>' + tpShiftRows(s) +
           `<div class="tp-rows" style="margin-top:10px"><div class="r"><span>Uang fisik dihitung</span><span>${formatRupiah(tpShift.counted)}</span></div></div>
        <div class="tp-diff ${diff === 0 ? 'ok' : diff < 0 ? 'minus' : 'plus'}"><span>${diff === 0 ? 'Kas sesuai' : diff < 0 ? 'Kas kurang' : 'Kas lebih'}</span><b>${diff === 0 ? 'Rp 0' : (diff < 0 ? '-' : '+') + formatRupiah(Math.abs(diff))}</b></div>`;
         foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="tpShiftPrint();"><i class="fa-solid fa-print"></i>Cetak Rekap</button>' +
@@ -4503,7 +4503,7 @@
       const err = tpRetError();
 
       body.innerHTML = `
-    <div class="tp-banner ${within ? 'ok' : 'bad'}"><i class="fa-solid ${within ? 'fa-circle-check' : 'fa-circle-xmark'}"></i><span>Dibeli ${tpDMY(t.ts)} ${tpHM(t.ts)} (${days === 0 ? 'hari ini' : days + ' hari lalu'}) · ${tpEsc(t.customer)} · ${tpEsc(t.methodLabel)} · ${formatRupiah(t.total)}.<br><b>${within ? 'Masih dalam masa retur 7 hari.' : 'Masa retur 7 hari sudah lewat — retur tidak dapat diproses.'}</b></span></div>
+    <div class="tp-banner ${within ? 'ok' : 'bad'}"><i class="fa-solid ${within ? 'fa-circle-check' : 'fa-circle-xmark'}"></i><span>Dibeli ${tpDMY(t.ts)} ${tpHM(t.ts)} (${days === 0 ? 'hari ini' : days + ' hari lalu'}) · ${tpEsc(t.customer)} · ${tpEsc(t.methodLabel)} · ${formatRupiah(t.total)}.<br><b>${within ? 'Masih dalam masa retur 7 hari.' : 'Masa retur 7 hari sudah lewat, retur tidak bisa diproses.'}</b></span></div>
     <span class="tp-label">Pilih Pakaian yang Diretur / Ditukar</span>
     ${t.items.map((it, i) => {
         const rem = it.qty - it.returned, s = tpRet.sel[i];
@@ -6743,7 +6743,7 @@
         if (t.method === 'cash') L.push('Tunai diterima: ' + R(t.tendered), 'Kembalian: ' + R(t.change));
       }
       if (t.custId) L.push('', '⭐ Poin: +' + (t.ptsEarned || 0) + ' diperoleh' + (t.pointsUsed ? ', ' + t.pointsUsed + ' ditukar' : '') + ' · Saldo ' + (t.ptsBalance || 0) + ' poin');
-      L.push('', 'Terima kasih sudah berbelanja! 🛍️', 'Tukar barang maks. 7 hari dengan struk & hangtag utuh.');
+      L.push('', 'Terima kasih sudah berbelanja.', 'Tukar barang maks. 7 hari dengan struk & hangtag utuh.');
       return L.join('\n');
     }
     function tpNormPhone(v) {
@@ -6760,7 +6760,7 @@
       const url = 'https://wa.me/' + n + '?text=' + encodeURIComponent(tpWaText(tpCurTrx));
       playAudio('click');
       window.open(url, '_blank', 'noopener');
-      showToast(n ? 'Membuka WhatsApp ke +' + n + '…' : 'Membuka WhatsApp — pilih kontak penerima.', 'success');
+      showToast(n ? 'Membuka WhatsApp ke +' + n + '…' : 'Membuka WhatsApp. Pilih kontak penerima.', 'success');
     }
     function tpCopyReceipt() {
       if (!tpCurTrx) return;
@@ -6848,7 +6848,7 @@
       const need = [];
       PRODUCTS.forEach(p => p.colors.forEach(c => p.sizes.forEach(sz => { const n = tpStock(p.id, c.name, sz), q = sold[p.id + '|' + c.name + '|' + sz] || 0; if (n <= tpMin(p) && q >= 2) need.push([p.name, c.name, sz, n, q]); })));
       need.sort((x, y) => y[4] - x[4] || x[3] - y[3]);
-      const lowHtml = need.length ? need.slice(0, 10).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' — stok ' + x[3] + ' · terjual ' + x[4] + '</span>').join('') + (need.length > 10 ? '<span class="rp-chip">+' + (need.length - 10) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Tidak ada varian laris yang stoknya menipis pada periode ini.</p>';
+      const lowHtml = need.length ? need.slice(0, 10).map(x => '<span class="rp-chip ' + (x[3] === 0 ? 'z' : '') + '">' + tpEsc(x[0]) + ' · ' + tpEsc(x[1]) + ' · ' + tpEsc(x[2]) + ' · stok ' + x[3] + ' · terjual ' + x[4] + '</span>').join('') + (need.length > 10 ? '<span class="rp-chip">+' + (need.length - 10) + ' lainnya</span>' : '') : '<p style="color:#94a3b8">Tidak ada varian laris yang stoknya menipis pada periode ini.</p>';
 
       const seg = [['today', 'Hari ini'], ['7d', '7 hari'], ['all', 'Semua']].map(x => '<button class="' + (tpRpRange === x[0] ? 'on' : '') + '" onclick="tpRpSet(\'' + x[0] + '\')">' + x[1] + '</button>').join('');
       const kp = (l, v, c) => '<div class="rp-kpi ' + (c || '') + '"><small>' + l + '</small><b>' + v + '</b></div>';
@@ -7709,7 +7709,7 @@
       aria-label="Reset data demo"><i class="fa-solid fa-rotate-right"></i><span>Reset</span></button>
   </div>
   <div id="tp-demo-panel" role="dialog" aria-label="Menu demo">
-    <div class="tpd-h"><b>Demo ThreadPOS</b><span>Pilih skenario — keranjang langsung terisi, tinggal dicoba.</span>
+    <div class="tpd-h"><b>Demo ThreadPOS</b><span>Pilih skenario, keranjang langsung terisi.</span>
     </div>
     <div class="tpd-grp">Skenario cepat</div>
     <button type="button" class="tpd-s" onclick="tpDemoRun('look')"><span class="ic"><i
@@ -7825,7 +7825,7 @@
       },
       {
         tab: 'cart', before: () => { if (!tpCalc(cart, memberDiscountRate, tpVoucher).promos.length) tpDemoLoad('look', true); }, els: () => innerHeight < 700 ? [tp$('promo-rows'), tp$('discount-row')] : [tp$('promo-rows').parentElement],
-        title: 'Promo otomatis', text: () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Kotak kuning di keranjang mengingatkan promo berikutnya. Tagihan &amp; PPN terhitung real-time.'
+        title: 'Promo otomatis', text: () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Kotak kuning di keranjang mengingatkan promo berikutnya. Tagihan dan PPN ikut berubah saat keranjang diubah.'
       },
       {
         tab: 'cart', before: () => { if (!tpCust) { tpDemoMember('c2'); renderCart(); } }, els: () => [tp$('cust-name-input').closest('.grid'), tp$('member-card')],
@@ -8746,7 +8746,7 @@
                 selisih kas. Laporan semua hari, penyesuaian stok.</small></span><i
               class="fa-solid fa-chevron-right"></i></button>
           <button type="button" class="lg-role owner" onclick="tpLoginPick('owner')"><span class="av">BS</span><span
-              class="tx"><b>Owner <em>Pemilik</em></b><span>Bambang Sutanto</span><small>Akses penuh: dashboard lengkap,
+              class="tx"><b>Owner <em>Pemilik</em></b><span>Bambang Sutanto</span><small>Akses penuh: dashboard,
                 estimasi laba, log aktivitas, ekspor data.</small></span><i
               class="fa-solid fa-chevron-right"></i></button>
         </div>
@@ -9652,6 +9652,10 @@
       pointer-events: auto
     }
 
+    #tp-tour .tt-card.tiny .tt-dots {
+      display: none
+    }
+
     #tp-tour .tt-arrow {
       position: absolute;
       width: 14px;
@@ -9678,7 +9682,7 @@
   </style>
   <script>
     let tpTourReady = false, tpTourStable = 0, tpTourT0 = 0;
-    TP_TOUR[1].text = () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Tagihan &amp; PPN terhitung real-time.';
+    TP_TOUR[1].text = () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Tagihan dan PPN ikut berubah saat keranjang diubah.';
     TP_TOUR[4].els = () => {
       if (!tpWide()) return [tp$('tp-menu-btn')];
       return [document.querySelector('header button[onclick*="report-modal"]'), document.querySelector('header button[onclick*="shift-modal"]')];
@@ -9690,12 +9694,12 @@
     };
     function tpTourPlace() {
       if (tpTourIdx < 0) return;
-      const vw = innerWidth, vh = innerHeight, M = 14, TOP = 8, MIN = 46, tab = tp$('tp-mobtab'), tabTop = tab && tab.getClientRects().length ? tab.getBoundingClientRect().top : vh, bottomLimit = Math.min(vh - 54, tabTop - 6);
+      const vw = innerWidth, vh = innerHeight, M = innerHeight < 700 ? 10 : 14, TOP = 8, MIN = 46, tab = tp$('tp-mobtab'), tabTop = tab && tab.getClientRects().length ? tab.getBoundingClientRect().top : vh, bottomLimit = Math.min(vh - 54, tabTop - 6);
       const els = tpTourEls(), spot = document.querySelector('#tp-tour .tt-spot'), card = document.querySelector('#tp-tour .tt-card');
       if (!card.querySelector('.tt-arrow')) card.insertAdjacentHTML('afterbegin', '<i class="tt-arrow"></i>');
       if (!spot.querySelector('.tt-pin')) spot.insertAdjacentHTML('afterbegin', '<b class="tt-pin"></b>');
       const arrow = card.querySelector('.tt-arrow'), pin = spot.querySelector('.tt-pin');
-      card.classList.toggle('compact', vh < 700);
+      card.classList.toggle('compact', vh < 700); card.classList.toggle('tiny', vh < 620);
       let cw = card.offsetWidth, ch = card.offsetHeight; arrow.style.display = 'none';
       if (!els.length) { pin.style.display = 'none'; spot.style.cssText = 'left:50%;top:40%;width:0;height:0'; card.style.left = Math.max(M, (vw - cw) / 2) + 'px'; card.style.top = Math.max(TOP, (bottomLimit - ch) / 2) + 'px'; return; }
       pin.style.display = ''; pin.textContent = tpTourIdx + 1;

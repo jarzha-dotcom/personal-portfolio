@@ -1,9 +1,24 @@
 // Naikkan CACHE_VERSION tiap kali strategi caching di file ini berubah, biar
 // client lama otomatis pindah ke cache baru lewat event 'activate' di bawah.
-const CACHE_VERSION = 'v1.1.3';
+const CACHE_VERSION = 'v1.1.4';
 const APP_SHELL_CACHE = `app-shell-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `runtime-${CACHE_VERSION}`;
 const OFFLINE_URL = '/offline.html';
+
+// Tipe isi yang wajib untuk ekstensi tertentu. Respons bertipe lain (mis. HTML dari
+// fallback SPA/404 yang sempat terkirim untuk .png/.js/.css) tidak boleh disimpan ke
+// cache maupun disajikan dari cache, kalau tidak ia "meracuni" cache sampai versi
+// cache dinaikkan. Gambar ikon PWA/favicon ikut dijaga di sini.
+const EXPECTED_TYPES = [
+    [/\.js$/, 'javascript'],
+    [/\.css$/, 'css'],
+    [/\.(?:png|jpe?g|webp|gif|avif|ico)$/, 'image/'],
+    [/\.svg$/, 'svg'],
+];
+const typeMatches = (pathname, contentType) => {
+    const hit = EXPECTED_TYPES.find(([re]) => re.test(pathname));
+    return !hit || contentType.includes(hit[1]);
+};
 
 // Galeri demo (folder statis di public/demos/, di luar SPA). File HTML demo
 // besar (sampai ~4 MB) dan jarang dibuka offline, jadi navigasi ke sana tidak
@@ -174,10 +189,8 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response.ok) {
                         const contentType = response.headers.get('content-type') || '';
-                        // Cegah caching jika server merespon dengan text/html (misal fallback SPA 404) untuk file JS/CSS
-                        const isInvalidAsset =
-                            (url.pathname.endsWith('.js') && !contentType.includes('javascript')) ||
-                            (url.pathname.endsWith('.css') && !contentType.includes('css'));
+                        // Cegah caching jika tipe isi tidak cocok dengan ekstensinya (misal HTML fallback SPA untuk JS/CSS/gambar)
+                        const isInvalidAsset = !typeMatches(url.pathname, contentType);
 
                         if (!isInvalidAsset) {
                             const clone = response.clone();
@@ -186,12 +199,16 @@ self.addEventListener('fetch', (event) => {
                     }
                     return response;
                 })
-                .catch(() => cached);
+                .catch(() =>
+                    cached && typeMatches(url.pathname, cached.headers.get('content-type') || '')
+                        ? cached
+                        : Response.error()
+                );
 
-            // Validasi file cached: jika file .js di cache bertipe text/html, hapus dan paksa fetch dari network
+            // Validasi file cached: jika tipenya tidak cocok dengan ekstensi (mis. HTML di balik .js/.css/.png), hapus dan paksa fetch dari network
             if (cached) {
                 const cachedType = cached.headers.get('content-type') || '';
-                if (url.pathname.endsWith('.js') && !cachedType.includes('javascript')) {
+                if (!typeMatches(url.pathname, cachedType)) {
                     caches.open(RUNTIME_CACHE).then((cache) => cache.delete(request));
                     return networkFetch;
                 }
