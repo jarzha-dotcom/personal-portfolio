@@ -3108,7 +3108,7 @@
         function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
-        function decide(id, ok) { REQ.forEach(function (r) { if (r.id === id) r.st = ok ? 'Disetujui' : 'Ditolak' }); save(); O.onChange() }
+        function decide(id, ok, why) { REQ.forEach(function (r) { if (r.id === id) { r.st = ok ? 'Disetujui' : 'Ditolak'; if (why) r.why = why; else delete r.why } }); save(); O.onChange() }
         function status(e) { var l = O.live && O.live(e[0]); return l || { st: e[4], t: e[5] } }
         function counts(L) { var c = { h: 0, l: 0, c: 0, b: 0 }; L.forEach(function (e) { var s = status(e).st; if (s === 'Terlambat') { c.l++; c.h++ } else if (s === 'Cuti') c.c++; else if (s === 'Belum absen') c.b++; else c.h++ }); return c }
         function tagc(s) { return s === 'Hadir' ? 'ok' : s === 'Terlambat' ? 'late' : (s === 'Cuti' || s === 'Belum absen') ? 'mu' : '' }
@@ -3122,8 +3122,17 @@
         function approvals(el, scope, label) {
           var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && (!scope || scope(r)) }).slice(0, 6);
           el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small></div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
-            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small></div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
-          el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; decide(id, !!b.dataset.ok); O.toast((b.dataset.ok ? 'Disetujui: ' : 'Ditolak: ') + r.type + ' ' + r.who) }
+            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>Alasan: ' + esc(r.why) + '</small>' : '') + '</div><span class="rl-tag ' + (r.st === 'Disetujui' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
+          el.querySelector('.rl').onclick = function (e) {
+            var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; var row = b.closest('.rl-req');
+            if (b.dataset.ok) { decide(id, true); O.toast('Disetujui: ' + r.type + ' ' + r.who); return }
+            if (b.dataset.x) { var ta = row.querySelector('textarea'), why = ta.value.trim(); if (why.length < 5) { ta.focus(); ta.style.borderColor = '#dc2626'; O.toast('Isi alasan penolakan (min. 5 karakter)'); return } decide(id, false, why); O.toast('Ditolak: ' + r.type + ' ' + r.who); return }
+            if (b.dataset.c) { var w0 = row.querySelector('.rl-why'); if (w0) w0.remove(); return }
+            var w1 = row.querySelector('.rl-why'); if (w1) { w1.querySelector('textarea').focus(); return }
+            var w = document.createElement('div'); w.className = 'rl-why'; w.style.cssText = 'flex-basis:100%;margin-top:8px';
+            w.innerHTML = '<textarea rows="2" maxlength="140" aria-label="Alasan penolakan" placeholder="Alasan penolakan (wajib, dilihat karyawan)" style="width:100%;padding:8px 10px;border-radius:10px;border:1px solid var(--rl-line);background:transparent;color:inherit;font:inherit;font-size:13px"></textarea><div style="display:flex;gap:8px;margin-top:6px"><button class="n" data-id="' + id + '" data-x="1">Kirim penolakan</button><button data-id="' + id + '" data-c="1" style="background:transparent;border:1px solid var(--rl-line);color:inherit;border-radius:10px;padding:6px 12px;cursor:pointer">Batal</button></div>';
+            row.style.flexWrap = 'wrap'; row.appendChild(w); w.querySelector('textarea').focus()
+          }
         }
         function summary(el) {
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
@@ -5698,16 +5707,34 @@
         att.forEach(function (a) { var d = new Date(a.at); if (a.st === 'Terlambat' && d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear()) late++ });
         return { hrs: hrs, hl: hl, ot: ot, pend: pend, late: late, cut: late * c.late, net: ot - late * c.late }
       };
-      window.__CF = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } return Object.assign({ late: 25000, base: 14500000, tunj: 2750000, ptkp: 'TK/0', method: 'prog', ter: '', jpcap: 10547400, kscap: 12000000 }, c) };
-      window.__pph = function (g, iu, st) { var P = { 'TK/0': 54e6, 'TK/1': 58.5e6, 'TK/2': 63e6, 'TK/3': 67.5e6, 'K/0': 58.5e6, 'K/1': 63e6, 'K/2': 67.5e6, 'K/3': 72e6 }, a = g * 12, k = Math.max(0, Math.floor((a - Math.min(a * .05, 6e6) - iu * 12 - (P[st] || 54e6)) / 1000) * 1000), t = 0;[[60e6, .05], [190e6, .15], [250e6, .25], [4500e6, .3], [Infinity, .35]].forEach(function (b) { var s = Math.min(k, b[0]); t += s * b[1]; k -= s }); return Math.round(t / 12) };
+      window.__CF = function () { var c = {}; try { c = JSON.parse(localStorage.getItem('absenpro-cfg-v1')) || {} } catch (e) { } return Object.assign({ late: 25000, base: 14500000, remind: 48, tunj: 2750000, ptkp: 'TK/0', method: 'prog', ter: '', jpcap: 10547400, kscap: 12000000 }, c) };
+      window.__pph = function (g, iu, st, irr) { var P = { 'TK/0': 54e6, 'TK/1': 58.5e6, 'TK/2': 63e6, 'TK/3': 67.5e6, 'K/0': 58.5e6, 'K/1': 63e6, 'K/2': 67.5e6, 'K/3': 72e6 }, B = [[60e6, .05], [190e6, .15], [250e6, .25], [4500e6, .3], [Infinity, .35]], T = function (k) { var t = 0; B.forEach(function (b) { var s = Math.min(k, b[0]); t += s * b[1]; k -= s }); return t }, f = function (x) { var a = g * 12 + x; return Math.max(0, Math.floor((a - Math.min(a * .05, 6e6) - iu * 12 - (P[st] || 54e6)) / 1000) * 1000) }; return Math.round(T(f(0)) / 12 + (T(f(irr || 0)) - T(f(0)))) };
       window.__ym = function () { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) };
       window.__bonus = function (uid) { try { return +((JSON.parse(localStorage.getItem('absenpro-bonus-v1')) || {})[__ym()] || {})[uid] || 0 } catch (e) { return 0 } };
+      window.__thr = function (uid) { if (window.__noThr) return 0; try { return +((JSON.parse(localStorage.getItem('absenpro-thrap-v1')) || {})[__ym()] || {})[uid] || 0 } catch (e) { return 0 } };
+      window.__tax = function (k) { var t = 0;[[60e6, .05], [190e6, .15], [250e6, .25], [4500e6, .3], [Infinity, .35]].forEach(function (b) { var s = Math.min(k, b[0]); t += s * b[1]; k -= s }); return t };
+      window.__ptkpV = function (st) { return { 'TK/0': 54e6, 'TK/1': 58.5e6, 'TK/2': 63e6, 'TK/3': 67.5e6, 'K/0': 58.5e6, 'K/1': 63e6, 'K/2': 67.5e6, 'K/3': 72e6 }[st] || 54e6 };
+      window.__decap = function (uid) { if (window.__noThr || window.__noDec) return null; try { var v = ((JSON.parse(localStorage.getItem('absenpro-decap-v1')) || {})[__ym()] || {})[uid]; return typeof v === 'number' ? v : null } catch (e) { return null } };
       window.__ter = function (t) { var o = {}, c = null; String(t || '').split('\n').forEach(function (l) { l = l.trim(); if (!l) return; if (/^[ABC]$/i.test(l)) { c = l.toUpperCase(); o[c] = []; return } if (!c) return; var p = l.split(/[;\t]/), z = (p[0] || '').trim(), lim = /^(~|max|tak)/i.test(z) ? Infinity : parseFloat(z.replace(/\./g, '')), r = parseFloat(String(p[1] || '').replace(',', '.')); if (!isNaN(lim) && !isNaN(r)) o[c].push([lim, r]) }); return o };
-      window.__pphx = function (g, iu, st, C) { if (C.method === 'TER') { var cat = { 'TK/0': 'A', 'TK/1': 'A', 'K/0': 'A', 'TK/2': 'B', 'TK/3': 'B', 'K/1': 'B', 'K/2': 'B', 'K/3': 'C' }[st] || 'A', T = __ter(C.ter)[cat]; if (T && T.length) { var r = T.filter(function (x) { return g <= x[0] })[0] || T[T.length - 1]; return { v: Math.round(g * r[1] / 100), m: 'TER kategori ' + cat + ' (' + r[1] + '%)' } } } return { v: __pph(g, iu, st), m: 'estimasi progresif tahunan' } };
-      window.__slip = function (uid, reqs, att, C) { var base = __base(uid, C), a = __calc(reqs, att, Object.assign({}, C, { base: base }), uid), up = base + C.tunj, kes = Math.round(Math.min(up, C.kscap) * .01), jht = Math.round(up * .02), jp = Math.round(Math.min(up, C.jpcap) * .01), bn = __bonus(uid), gross = up + bn + a.ot, st = (function () { try { return (JSON.parse(localStorage.getItem('absenpro-ptkp-v1')) || {})[uid] } catch (e) { } })() || C.ptkp, px = __pphx(gross, jht + jp, st, C), pph = px.v; return { base: base, tun: C.tunj, ot: a.ot, bonus: bn, hrs: a.hrs, hl: a.hl, pend: a.pend, late: a.late, cut: a.cut, kes: kes, jht: jht, jp: jp, pph: pph, pm: px.m, ptkp: st, gross: gross, net: gross - kes - jht - jp - pph - a.cut } };
+      window.__pphx = function (g, iu, st, C, irr) { if (C.method === 'TER') { var cat = { 'TK/0': 'A', 'TK/1': 'A', 'K/0': 'A', 'TK/2': 'B', 'TK/3': 'B', 'K/1': 'B', 'K/2': 'B', 'K/3': 'C' }[st] || 'A', T = __ter(C.ter)[cat]; if (T && T.length) { var r = T.filter(function (x) { return g <= x[0] })[0] || T[T.length - 1]; return { v: Math.round(g * r[1] / 100), m: 'TER kategori ' + cat + ' (' + r[1] + '%)' } } } return { v: __pph(g - (irr || 0), iu, st, irr || 0), m: 'estimasi progresif tahunan' } };
+      window.__slip = function (uid, reqs, att, C, xb) { var base = __base(uid, C), a = __calc(reqs, att, Object.assign({}, C, { base: base }), uid), up = base + C.tunj, kes = Math.round(Math.min(up, C.kscap) * .01), jht = Math.round(up * .02), jp = Math.round(Math.min(up, C.jpcap) * .01), bn = __bonus(uid) + (xb || 0), th = __thr(uid), gross = up + bn + th + a.ot, st = (function () { try { return (JSON.parse(localStorage.getItem('absenpro-ptkp-v1')) || {})[uid] } catch (e) { } })() || C.ptkp, px = __pphx(gross, jht + jp, st, C, bn + th), da = __decap(uid), pph = da === null ? px.v : da; return { base: base, tun: C.tunj, ot: a.ot, bonus: bn, thr: th, hrs: a.hrs, hl: a.hl, pend: a.pend, late: a.late, cut: a.cut, kes: kes, jht: jht, jp: jp, pph: pph, pm: da === null ? px.m : 'penyesuaian Desember', ptkp: st, gross: gross, net: gross - kes - jht - jp - pph - a.cut } };
       window.__cy = cy; window.__acc = function () { try { return JSON.parse(localStorage.getItem('absenpro-acc-v1')) || [] } catch (e) { return [] } };
       window.__who = function (id) { var b = { arzha: ['K. Arzhaning Jagad', 'Digital', 'staff'], raka: ['Raka Mahendra', 'Digital', 'staff'], salsa: ['Salsa Anindya', 'Digital', 'staff'], dina: ['Dina Prameswari', 'Digital', 'spv'], hendra: ['Hendra Wijaya', 'SDM', 'admin'] }[id]; if (b) return b; var a = __acc().filter(function (x) { return x.id === id })[0]; return a ? [a.name, String(a.div || '').replace('Divisi ', ''), a.r] : null };
       window.__okpw = function (id, p) { var h = null; try { h = localStorage.getItem('absenpro-pw-' + id) } catch (e) { } var a = __acc().filter(function (x) { return x.id === id })[0]; if (a && a.emp) { try { var m = (JSON.parse(localStorage.getItem('absenpro-emp-v1')) || []).filter(function (e) { return e.id === a.emp })[0]; if (m && !m.on) return false } catch (e) { } } return h ? h === cy(p) : p === 'demo123' }
+    })();
+
+    /* Log persetujuan: mendeteksi keputusan (setuju/tolak) yang dibuat di tab ini, di portal admin maupun aplikasi staf */
+    (function () {
+      var RK = 'absenpro-req2-v1', AK = 'absenpro-audit-v1', base = {}, orig = Storage.prototype.setItem;
+      function take() { base = {}; try { (window.RL ? RL.all() : []).forEach(function (r) { base[r.id] = r.st }) } catch (e) { } }
+      function actor() { try { if (typeof USER !== 'undefined' && USER && USER.name) return USER.name } catch (e) { } try { var w = __who(localStorage.getItem('absenpro-v1-session')); if (w) return w[0] } catch (e) { } return 'Pengguna' }
+      function log(r) { try { var D = JSON.parse(localStorage.getItem('absenpro-dec-v1')) || {}; D[r.id] = { by: actor(), at: Date.now(), st: r.st }; orig.call(localStorage, 'absenpro-dec-v1', JSON.stringify(D)) } catch (e) { } try { var L = JSON.parse(localStorage.getItem(AK)) || []; L.unshift({ at: Date.now(), who: actor(), c: 'Persetujuan', m: (r.st === 'Disetujui' ? 'Menyetujui ' : 'Menolak ') + (r.type || 'pengajuan') + ' ' + (r.who || '') + (r.detail ? ' (' + String(r.detail).split(' \u00b7 ')[0] + ')' : '') + (r.st === 'Ditolak' && r.why ? ' \u2014 alasan: ' + r.why : '') + (typeof appState !== 'undefined' ? ' [via aplikasi staf]' : '') }); orig.call(localStorage, AK, JSON.stringify(L.slice(0, 300))) } catch (e) { } }
+      Storage.prototype.setItem = function (k, v) {
+        var res = orig.apply(this, arguments);
+        if (k === RK && this === localStorage) { try { RL.all().forEach(function (r) { if (base[r.id] !== undefined && base[r.id] !== r.st && (r.st === 'Disetujui' || r.st === 'Ditolak')) log(r) }) } catch (e) { } take() }
+        return res
+      };
+      take(); window.addEventListener('storage', function (e) { if (e.key === RK) setTimeout(take, 50) });
     })();
   </script>
   <script>
@@ -5952,12 +5979,18 @@
       function ago(t) { var m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'Baru saja' : m < 60 ? m + ' menit lalu' : m < 1440 ? Math.round(m / 60) + ' jam lalu' : new Date(t).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }
       function poll() {
         var cur = {}, info = {};
-        __RL.mine(sid).forEach(function (r) { cur['r' + r.id] = r.st; info['r' + r.id] = [r.type + ' ' + String(r.detail || '').split(' \u00b7 ')[0], r.st === 'Disetujui' ? 'disetujui' : 'ditolak', 'Keputusan atasan'] });
+        __RL.mine(sid).forEach(function (r) { cur['r' + r.id] = r.st; info['r' + r.id] = [r.type + ' ' + String(r.detail || '').split(' \u00b7 ')[0], r.st === 'Disetujui' ? 'disetujui' : 'ditolak', 'Keputusan atasan' + (r.why ? ' \u00b7 Alasan: ' + r.why : '')] });
         rd('absenpro-tix-all', []).forEach(function (t) { if (t.uid === sid) { cur['t' + t.no] = t.st; info['t' + t.no] = ['Tiket #' + t.no + ' (' + t.cat + ')', t.st === 'Diproses' ? 'sedang diproses HR' : 'selesai', 'Layanan HR'] } });
+        var me = window.__who ? __who(sid) : null;
+        if (me && (me[2] === 'spv' || me[2] === 'admin')) {
+          var rm = Object.assign({ remind: 48 }, rd('absenpro-cfg-v1', {})).remind, SN = rd('absenpro-seen-v1', {}), now = Date.now(), sc = 0, NG = rd('absenpro-nudge-v1', {});
+          __RL.all().forEach(function (r) { if (r.st !== 'Menunggu' || r.uid === sid) return; var ok = me[2] === 'spv' ? (r.lvl === 'spv' && r.div === 'Digital') : (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')); if (!ok) return; if (NG[r.id]) { cur['n' + r.id] = String(NG[r.id]); info['n' + r.id] = [r.type + ' ' + r.who + ' (' + String(r.detail || '').split(' \u00b7 ')[0] + ')', 'diingatkan staf, masih menunggu persetujuan Anda', 'Pengingat dari staf'] } var t0 = r.id > 1e12 ? r.id : SN[r.id]; if (!t0) { SN[r.id] = t0 = now; sc = 1 } if (now - t0 >= rm * 36e5) { cur['o' + r.id] = 'Tertunda'; info['o' + r.id] = [r.type + ' ' + r.who + ' (' + String(r.detail || '').split(' \u00b7 ')[0] + ')', 'menunggu persetujuan Anda' + (rm > 0 ? ' lebih dari ' + (rm >= 24 && rm % 24 === 0 ? rm / 24 + ' hari' : rm + ' jam') : ''), 'Pengingat persetujuan'] } });
+          if (sc) { try { localStorage.setItem('absenpro-seen-v1', JSON.stringify(SN)) } catch (e) { } }
+        }
         var PL = rd('absenpro-payl-v1', {}); Object.keys(PL).forEach(function (ym) { if (PL[ym].rows.some(function (r) { return r.id === sid })) { cur['p' + ym] = 'Final'; info['p' + ym] = ['Slip gaji ' + new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }), 'sudah final', 'Rekap gaji HR'] } });
         var B = rd(KB, null); if (!B) { wr(KB, cur); return }
         var E = rd(KE, []), ch = 0;
-        Object.keys(cur).forEach(function (k) { if ((B[k] || k[0] === 'p') && B[k] !== cur[k] && cur[k] !== 'Menunggu' && cur[k] !== 'Diterima') { var i = info[k]; E.unshift({ a: i[0] + ' ' + i[1], b: i[2], at: Date.now() }); ch++; if (typeof showToast === 'function') showToast(i[0] + ' ' + i[1], i[1] === 'ditolak' ? 'error' : 'success') } });
+        Object.keys(cur).forEach(function (k) { if ((B[k] || k[0] === 'p' || k[0] === 'o' || k[0] === 'n') && B[k] !== cur[k] && cur[k] !== 'Menunggu' && cur[k] !== 'Diterima') { var i = info[k]; E.unshift({ a: i[0] + ' ' + i[1], b: i[2], at: Date.now() }); ch++; if (typeof showToast === 'function') showToast(i[0] + ' ' + i[1], i[1] === 'ditolak' ? 'error' : 'success') } });
         if (ch || Object.keys(cur).length !== Object.keys(B).length) { wr(KB, cur); wr(KE, E.slice(0, 20)) } badge()
       }
       bell.onclick = function () {
@@ -5996,7 +6029,7 @@
       var h = document.createElement('div'); h.className = 'ag-card'; py.appendChild(h);
       var MOF = function (ym) { return new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) };
       var row = function (l, v, sub, col) { return '<div class="ag-row"><div><b>' + l + '</b>' + (sub ? '<br><span class="ag-sm">' + sub + '</span>' : '') + '</div><b' + (col ? ' style="color:' + col + '"' : '') + '>' + v + '</b></div>' };
-      function body(s, late) { return '<p class="ag-sm" style="margin-top:2px"><b>Pendapatan</b></p>' + row('Gaji pokok', __rp(s.base)) + row('Tunjangan tetap', __rp(s.tun)) + (s.bonus ? row('Bonus kinerja', '+' + __rp(s.bonus), '', '#059669') : '') + row('Lembur disetujui', (s.ot ? '+' : '') + __rp(s.ot), s.hrs + ' jam' + (s.hl ? ' (' + s.hl + ' jam di hari libur)' : ''), '#059669') + '<p class="ag-sm" style="margin-top:8px"><b>Potongan</b></p>' + row('BPJS Kesehatan (1%)', __rp(-s.kes)) + row('BPJS JHT (2%)', __rp(-s.jht)) + row('BPJS JP (1%)', __rp(-s.jp)) + row('PPh 21', __rp(-s.pph), s.pm + ' \u00b7 PTKP ' + s.ptkp) + row('Potongan terlambat', __rp(-s.cut), s.late + 'x \u00d7 ' + __rp(late), '#dc2626') + '<div class="ag-row" style="border-top:2px solid #0d9488;margin-top:6px"><div><b>Take home pay</b></div><b style="font-size:16px">' + __rp(s.net) + '</b></div>' }
+      function body(s, late) { return '<p class="ag-sm" style="margin-top:2px"><b>Pendapatan</b></p>' + row('Gaji pokok', __rp(s.base)) + row('Tunjangan tetap', __rp(s.tun)) + (s.bonus ? row('Bonus kinerja', '+' + __rp(s.bonus), '', '#059669') : '') + (s.thr ? row('THR', '+' + __rp(s.thr), '', '#059669') : '') + row('Lembur disetujui', (s.ot ? '+' : '') + __rp(s.ot), s.hrs + ' jam' + (s.hl ? ' (' + s.hl + ' jam di hari libur)' : ''), '#059669') + '<p class="ag-sm" style="margin-top:8px"><b>Potongan</b></p>' + row('BPJS Kesehatan (1%)', __rp(-s.kes)) + row('BPJS JHT (2%)', __rp(-s.jht)) + row('BPJS JP (1%)', __rp(-s.jp)) + row('PPh 21', __rp(-s.pph), s.pm + ' \u00b7 PTKP ' + s.ptkp) + row('Potongan terlambat', __rp(-s.cut), s.late + 'x \u00d7 ' + __rp(late), '#dc2626') + '<div class="ag-row" style="border-top:2px solid #0d9488;margin-top:6px"><div><b>Take home pay</b></div><b style="font-size:16px">' + __rp(s.net) + '</b></div>' }
       function draw() {
         var C = __CF(), cur = __ym(), PL = rd('absenpro-payl-v1', {}), lk = PL[cur], fr = lk && lk.rows.filter(function (r) { return r.id === sid })[0], s = fr ? fr.s : __slip(sid, __RL.all(), rd('absenpro-att-' + sid, []), C), late = fr && lk.cfg ? lk.cfg.late : C.late;
         d.innerHTML = '<h3>Slip ' + (fr ? 'final ' : 'estimasi ') + MOF(cur) + '</h3>' + (fr ? '<p class="ag-sm">Dikunci HR pada ' + new Date(lk.at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long' }) + '.</p>' : '') + body(s, late) + '<p class="ag-sm" style="margin-top:8px">' + (fr ? 'Angka ini final dari rekap HR, namun tetap estimasi dan bisa berbeda dari slip resmi.' : 'Estimasi dari aturan yang diatur admin, bisa berbeda dari slip resmi. Bonus diisi admin per bulan.') + '</p>';
@@ -6017,6 +6050,56 @@
         if (v !== iso(td)) { var n = __RL.mine(sid).filter(function (r) { return !before[r.id] && r.type === 'Lembur' })[0]; if (n) { n.detail = dd.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + String(n.detail).split(' \u00b7 ').slice(1).join(' \u00b7 '); try { localStorage.setItem('absenpro-req2-v1', JSON.stringify(__RL.all())) } catch (e) { } } }
         draw()
       }
+    })();
+  </script>
+  <script>
+    /* AbsenPro v12 (app): pemilih status kerja WFO / WFH / On-Site */
+    (function () {
+      var first = document.getElementById('btnWorkWfo'); if (!first || typeof appState === 'undefined') return;
+      var box = first.parentNode, M = [['WFO', 'btnWorkWfo', '#0f766e', 'Absen masuk perlu berada dalam radius kantor (GPS).', '<path d="M4 21V5a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v16M14 9h5a1 1 0 0 1 1 1v11M3 21h18M8 8h2M8 12h2M8 16h2"/>'], ['WFH', 'btnWorkWfh', '#047857', 'Absen dari mana saja, tanpa cek radius kantor.', '<path d="M3 11.5 12 4l9 7.5M5 10v10h14V10M10 20v-5h4v5"/>'], ['On-Site', 'btnWorkOnsite', '#b45309', 'Dinas luar, absen tanpa cek radius kantor.', '<path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>']];
+      var css = document.createElement('style');
+      css.textContent = '.wm{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:14px;background:#eef2f7;margin-top:16px}.dark .wm{background:#1e293b}.wm-i{position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 16px)/3);border-radius:11px;background:var(--c,#0f766e);box-shadow:0 2px 8px rgba(15,23,42,.22);transform:translateX(calc(var(--i,0)*(100% + 4px)));transition:transform .25s cubic-bezier(.4,0,.2,1),background-color .25s}.wm-b{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:40px;border:0;border-radius:11px;background:transparent;color:#475569;font-size:12px;font-weight:600;line-height:1;font-family:inherit;cursor:pointer;transition:color .2s,background-color .2s}.dark .wm-b{color:#94a3b8}.wm-b:hover{background:rgba(148,163,184,.18)}.wm-b[aria-pressed=true]{color:#fff;font-weight:700}.wm-b[aria-pressed=true]:hover{background:transparent}.wm-b:focus-visible{outline:2px solid #0f766e;outline-offset:2px}.wm-b svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}.wm-h{margin:8px 2px 0;font-size:11px;color:#64748b;text-align:center;min-height:15px}.dark .wm-h{color:#94a3b8}@media(prefers-reduced-motion:reduce){.wm-i,.wm-b{transition:none}}';
+      document.head.appendChild(css);
+      box.className = 'wm'; box.setAttribute('role', 'group'); box.setAttribute('aria-label', 'Status kerja');
+      box.innerHTML = '<span class="wm-i" aria-hidden="true"></span>' + M.map(function (m) { return '<button type="button" id="' + m[1] + '" class="wm-b" onclick="setWorkStatus(\'' + m[0] + '\')" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true">' + m[4] + '</svg>' + m[0] + '</button>' }).join('');
+      var hint = document.createElement('p'); hint.className = 'wm-h'; hint.setAttribute('aria-live', 'polite'); box.parentNode.insertBefore(hint, box.nextSibling);
+      function paint(s) { var i = Math.max(0, M.findIndex(function (m) { return m[0] === s })); M.forEach(function (m, k) { document.getElementById(m[1]).setAttribute('aria-pressed', k === i) }); box.querySelector('.wm-i').style.cssText = '--i:' + i + ';--c:' + M[i][2]; hint.textContent = M[i][3] }
+      var MSG = { WFO: 'WFO (Work From Office)', WFH: 'WFH (Work From Home)', 'On-Site': 'On-Site (Dinas Luar)' };
+      window.setWorkStatus = function (s) { if (typeof playBeep === 'function') playBeep('tap'); appState.workMode = s; paint(s); try { localStorage.setItem('absenpro-wm', s) } catch (e) { } if (typeof showToast === 'function') showToast('Status kerja diubah: ' + MSG[s], 'info') };
+      var st = null; try { st = localStorage.getItem('absenpro-wm') } catch (e) { }
+      if (!MSG[st]) st = appState.workMode && MSG[appState.workMode] ? appState.workMode : 'WFO';
+      appState.workMode = st; paint(st);
+    })();
+  </script>
+  <script>
+    /* AbsenPro v13 (app): ingatkan atasan untuk pengajuan yang masih menunggu */
+    (function () {
+      var sid = ''; try { sid = localStorage.getItem('absenpro-v1-session') || '' } catch (e) { }
+      var lv = document.getElementById('tabContent-leave'); if (!sid || !lv || !window.__RL) return;
+      var NK = 'absenpro-nudge-v1', COOL = 864e5, rd = function (k, d) { try { return JSON.parse(localStorage.getItem(k)) || d } catch (e) { return d } };
+      var esc = function (s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] }) };
+      var css = document.createElement('style'); css.textContent = '.x2-b{border:1px solid #0d9488;color:#0f766e;background:transparent;border-radius:10px;padding:6px 11px;font-size:11.5px;font-weight:700;white-space:nowrap}.dark .x2-b{color:#5eead4;border-color:#14b8a6}.x2-b:disabled{opacity:.55;border-color:#94a3b8;color:inherit;cursor:default}';
+      document.head.appendChild(css);
+      var c = document.createElement('div'); c.className = 'ag-card'; lv.appendChild(c);
+      function age(ms) { var h = Math.floor(ms / 36e5); return h < 1 ? 'kurang dari 1 jam' : h < 24 ? h + ' jam' : Math.floor(h / 24) + ' hari' }
+      function draw() {
+        var P = __RL.mine(sid).filter(function (r) { return r.st === 'Menunggu' }), N = rd(NK, {}), now = Date.now();
+        c.innerHTML = '<h3>Pengajuan menunggu</h3>' + (P.length ? P.slice(0, 6).map(function (r) {
+          var left = N[r.id] ? COOL - (now - N[r.id]) : 0, wait = r.id > 1e12 ? ' \u00b7 menunggu ' + age(now - r.id) : '';
+          return '<div class="ag-row"><div><b>' + esc(r.type) + '</b><br><span class="ag-sm">' + esc(String(r.detail || '').split(' \u00b7 ').slice(0, 2).join(' \u00b7 ')) + wait + '</span></div><button class="x2-b" data-n="' + r.id + '"' + (left > 0 ? ' disabled' : '') + '>' + (left > 0 ? 'Diingatkan' : 'Ingatkan atasan') + '</button></div>' + (left > 0 ? '<p class="ag-sm" style="margin:-4px 0 6px">Bisa mengingatkan lagi dalam ' + Math.ceil(left / 36e5) + ' jam.</p>' : '')
+        }).join('') : '<p class="ag-sm">Tidak ada pengajuan yang menunggu persetujuan.</p>')
+      }
+      c.onclick = function (e) { var b = e.target.closest('[data-n]'); if (!b || b.disabled) return; var N = rd(NK, {}); if (N[b.dataset.n] && Date.now() - N[b.dataset.n] < COOL) return; N[b.dataset.n] = Date.now(); try { localStorage.setItem(NK, JSON.stringify(N)) } catch (x) { return } draw(); if (typeof showToast === 'function') showToast('Pengingat dikirim ke atasan', 'success') };
+      draw(); setInterval(draw, 3000);
+      var h = document.createElement('div'); h.className = 'ag-card'; lv.appendChild(h); var HF = 'Semua';
+      function ago(t) { var m = Math.round((Date.now() - t) / 6e4); return m < 1 ? 'baru saja' : m < 60 ? m + ' menit lalu' : m < 1440 ? Math.round(m / 60) + ' jam lalu' : Math.round(m / 1440) + ' hari lalu' }
+      function hist() {
+        var D = rd('absenpro-dec-v1', {}), A = __RL.mine(sid).filter(function (r) { return r.st === 'Disetujui' || r.st === 'Ditolak' }), ok = A.filter(function (r) { return r.st === 'Disetujui' }).length, F = A.filter(function (r) { return HF === 'Semua' || r.st === HF });
+        F.sort(function (a, b) { return ((D[b.id] || {}).at || 0) - ((D[a.id] || {}).at || 0) });
+        h.innerHTML = '<h3>Riwayat pengajuan</h3><div class="x2-pill">' + ['Semua', 'Disetujui', 'Ditolak'].map(function (f) { return '<button type="button" aria-pressed="' + (f === HF) + '">' + f + '</button>' }).join('') + '</div><p class="ag-sm">' + ok + ' disetujui \u00b7 ' + (A.length - ok) + ' ditolak</p>' + (F.length ? F.slice(0, 10).map(function (r) { var d = D[r.id]; return '<div class="ag-row"><div><b>' + esc(r.type) + '</b><br><span class="ag-sm">' + esc(String(r.detail || '').split(' \u00b7 ').slice(0, 2).join(' \u00b7 ')) + (d ? ' \u00b7 oleh ' + esc(d.by) + ' \u00b7 ' + ago(d.at) : '') + '</span>' + (r.why ? '<br><span class="ag-sm" style="color:#b91c1c">Alasan: ' + esc(r.why) + '</span>' : '') + '</div><span class="x2-st ' + r.st + '">' + r.st + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada pengajuan yang diputuskan.</p>')
+      }
+      h.onclick = function (e) { var b = e.target.closest('.x2-pill button'); if (b) { HF = b.textContent; hist() } };
+      hist(); setInterval(hist, 3000)
     })();
   </script>
 </body>

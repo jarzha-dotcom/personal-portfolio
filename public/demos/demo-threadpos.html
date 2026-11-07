@@ -4368,7 +4368,7 @@
 
     function tpShiftRows(s) {
       return `<div class="tp-rows">
-    <div class="r"><span>Kasir</span><span>Zannah Jagad</span></div>
+    <div class="r"><span>Kasir</span><span>${tpShift.cashier || 'Zannah Jagad'}</span></div>
     <div class="r"><span>Shift #${tpShift.number} · dibuka</span><span>${tpShift.openedAt}</span></div>
     ${tpShift.closedAt ? `<div class="r"><span>Shift ditutup</span><span>${tpShift.closedAt}</span></div>` : ''}
     <div class="r sec"><span>Penjualan</span><span></span></div>
@@ -4433,15 +4433,16 @@
       const doClose = () => {
         tpShift.open = false; tpShift.closedAt = tpHM(new Date()) + ' WIB'; tpShift.counted = counted;
         playAudio('success'); tpUpdateShiftUI(); tpRenderShift();
-        showToast('Shift #' + tpShift.number + ' ditutup. Handover selesai.', 'success');
+        showToast(window.tpShiftMode === 'single' ? 'Kasir hari ini ditutup.' : 'Shift #' + tpShift.number + ' ditutup. Handover selesai.', 'success');
       };
       if (cart.length > 0 || tpHeld.length > 0) tpAsk('Masih ada transaksi belum selesai', 'Ada keranjang aktif atau transaksi ditahan. Tetap tutup shift?', 'Ya, Tutup Shift', doClose, true);
       else doClose();
     }
-    function tpStartNewShift() {
-      tpShift = { open: true, number: tpShift.number + 1, openedAt: tpHM(new Date()) + ' WIB', openingCash: 1000000, kicks: 0, closedAt: null, counted: null };
+    function tpStartNewShift(cash) {
+      const oc = Number.isFinite(cash) ? cash : (Number.isFinite(tpShift.leave) ? tpShift.leave : 1000000), u = (typeof TP_USERS !== 'undefined' && tpRole && TP_USERS[tpRole]) ? TP_USERS[tpRole].name : 'Zannah Jagad';
+      tpShift = { open: true, number: tpShift.number + 1, openedAt: tpHM(new Date()) + ' WIB', openingCash: oc, kicks: 0, closedAt: null, counted: null, cashier: u };
       tpCloseShift(); tpUpdateShiftUI();
-      showToast('Shift #' + tpShift.number + ' dimulai dengan modal awal ' + formatRupiah(1000000) + '.', 'success');
+      showToast((window.tpShiftMode === 'single' ? 'Kasir dibuka' : 'Shift #' + tpShift.number + ' dimulai') + ' dengan modal awal ' + formatRupiah(oc) + '.', 'success');
     }
     function tpUpdateShiftUI() { tpRefreshCheckout(); }
 
@@ -4989,13 +4990,13 @@
         </div>
         <label id="np-costl">Harga modal / HPP (Rp) <small>opsional · hanya terlihat oleh Owner</small><input
             id="np-cost" class="st-in" type="number" min="0" placeholder="mis. 110000"></label>
-        <label>Batas stok menipis <small>pcs; varian dengan stok ≤ angka ini ditandai menipis</small><input id="np-min"
+        <label>Batas stok menipis <small>varian dengan stok ≤ angka ini ditandai Menipis</small><input id="np-min"
             class="st-in" type="number" min="0" value="2"></label>
         <label id="np-colorsl"><span id="np-colort">Warna</span> <small>pisahkan koma, hex opsional</small><input
             id="np-colors" class="st-in" placeholder="Hitam #111827, Putih #f8fafc, Navy"></label>
         <label id="np-sizesl"><span id="np-sizest">Ukuran</span> <small>pisahkan koma</small><input id="np-sizes"
             class="st-in" value="S, M, L, XL"></label>
-        <label>Foto produk <small>unggah dari perangkat (otomatis diperkecil)</small><input id="np-file" class="st-in"
+        <label>Foto produk <small>dari perangkat, otomatis diperkecil</small><input id="np-file" class="st-in"
             type="file" accept="image/*" onchange="tpNpFile(this)"><img id="np-prev" alt="Pratinjau"></label>
         <label>atau URL gambar <small>opsional</small><input id="np-img" class="st-in" placeholder="https://…"></label>
       </div>
@@ -5911,7 +5912,7 @@
       let labels = ''; r.out.forEach(x => { for (let i = 0; i < x.qty; i++) labels += '<div class="l"><b>' + tpEsc(x.p.name) + '</b><span>' + tpEsc(x.c.name) + ' · ' + tpEsc(x.sz) + '</span><em>' + formatRupiah(x.p.price) + '</em><svg class="bc" jsbarcode-value="' + tpEsc(x.code) + '" jsbarcode-format="CODE128" jsbarcode-height="32" jsbarcode-width="1.3" jsbarcode-fontsize="9" jsbarcode-margin="0" jsbarcode-displayvalue="true"></svg></div>'; });
       const doc = '<!doctype html><html><head><meta charset="utf-8"><title>Label barcode</title><style>@page{margin:8mm}body{margin:0;font-family:Arial,sans-serif}.g{display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}.l{border:1px dashed #999;padding:2mm;text-align:center;break-inside:avoid;overflow:hidden}.l b{display:block;font-size:9pt;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.l span{display:block;font-size:8pt;color:#333}.l em{display:block;font-style:normal;font-weight:700;font-size:10pt;margin:1mm 0}.l svg{max-width:100%}</style></head><body><div class="g">' + labels + '</div><script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.6/JsBarcode.all.min.js"><\/script><script>window.onload=function(){try{JsBarcode(".bc").init()}catch(e){}setTimeout(function(){window.focus();window.print()},400)}<\/script></body></html>';
       const fr = document.createElement('iframe'); fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'; fr.srcdoc = doc; document.body.appendChild(fr); setTimeout(() => fr.remove(), 120000);
-      closeModal('lb-modal'); showToast('Menyiapkan ' + r.total + ' label untuk dicetak…', 'success');
+      closeModal('lb-modal'); showToast('Menyiapkan ' + r.total + ' label…', 'success');
     }
     let tpQc = null, tpQcLast = TP_OPR[0];
     tpStSet = function (pid, ci, si, val) {
@@ -5995,7 +5996,7 @@
       if (tpRole === 'staff') { showToast('Hapus produk khusus SPV / Owner.', 'warn'); return; }
       const p = tpProd(pid); if (!p) return;
       const why = p.stock > 0 ? 'Stok masih ' + p.stock + ' pcs. Kosongkan stok (opname ke 0) dulu.' :
-        tpTrx.some(t => t.items.some(i => i.pid === pid)) ? 'Produk sudah pernah terjual, jadi tidak bisa dihapus agar laporan tetap utuh.' :
+        tpTrx.some(t => t.items.some(i => i.pid === pid)) ? 'Produk sudah pernah terjual, jadi tidak bisa dihapus.' :
           (cart.concat(...tpHeld.map(h => h.cart))).some(i => i.product.id === pid) ? 'Produk masih ada di keranjang / transaksi tertahan.' : '';
       if (why) { showToast(why, 'warn'); return; }
       tpAsk('Hapus produk?', p.name + ' (' + p.sku + ') akan dihapus dari katalog dan stok.', 'Ya, Hapus', function () {
@@ -6029,7 +6030,7 @@
       let last = '', off = false;
       function snap() {
         return JSON.stringify({
-          v: 1, oq: window.tpOpS || [], rc: window.tpRcv || [], np: PRODUCTS.filter(p => p.custom), pe: PRODUCTS.filter(p => p.edited && !p.custom).map(p => ({ id: p.id, name: p.name, category: p.category, sku: p.sku, price: p.price, image: p.image, min: p.min, cost: p.cost, colors: p.colors, sizes: p.sizes })), mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
+          v: 1, sm: window.tpShiftMode, sl: window.tpShiftLog || [], oq: window.tpOpS || [], rc: window.tpRcv || [], np: PRODUCTS.filter(p => p.custom), pe: PRODUCTS.filter(p => p.edited && !p.custom).map(p => ({ id: p.id, name: p.name, category: p.category, sku: p.sku, price: p.price, image: p.image, min: p.min, cost: p.cost, colors: p.colors, sizes: p.sizes })), mv: window.tpMoves || [], trx: tpTrx, ret: tpReturns, shift: tpShift, seq: tpSeq, rseq: tpRetSeq, hseq: tpHeldSeq, vs: tpVS,
           held: tpHeld.map(h => ({ ...h, cart: h.cart.map(i => ({ pid: i.product.id, color: i.color.name, size: i.size, qty: i.qty, price: i.price })) }))
         });
       }
@@ -6040,6 +6041,7 @@
           const d = JSON.parse(raw);
           if (d.v !== 1) return false;
           (d.np || []).forEach(p => tpRegisterProduct(p));
+          window.tpShiftMode = d.sm || 'multi'; window.tpShiftLog = d.sl || [];
           window.tpRcv = (d.rc || []).map(x => ({ ...x, ts: new Date(x.ts) }));
           window.tpOpS = (d.oq || []).map(x => ({ ...x, ts: new Date(x.ts), decidedAt: x.decidedAt ? new Date(x.decidedAt) : null }));
           (d.pe || []).forEach(e => { const p = tpProd(e.id); if (p) Object.assign(p, e, { edited: true }); });
@@ -6853,7 +6855,7 @@
       let profitHtml = '';
       if (tpRole === 'owner') {
         const revEx = Math.round(net / 1.11), cst = i => i.cost != null ? i.cost : ((tpProd(i.pid) || {}).cost != null ? tpProd(i.pid).cost : null), allCost = rows.every(t => t.items.every(i => cst(i) != null)), hpp = Math.round(tpSum(rows, t => tpSum(t.items, i => (i.qty - i.returned) * (cst(i) != null ? cst(i) : 0.55 * i.price)))), prof = revEx - hpp, mg = revEx ? Math.round(prof / revEx * 100) : 0;
-        profitHtml = '<div class="rp-card" style="margin-top:12px"><div class="rp-h" style="display:flex;justify-content:space-between;align-items:center">Estimasi laba kotor <span class="tp-rolebadge owner" style="text-transform:none">khusus Owner</span></div><div class="rp-kpis" style="margin-top:8px">' + kp('Penjualan (ex-PPN)', formatRupiah(revEx)) + kp(allCost ? 'HPP (harga modal)' : 'HPP (sebagian estimasi 55%)', formatRupiah(hpp)) + kp('Estimasi laba kotor', formatRupiah(prof), 'hl') + kp('Margin', mg + '%') + '</div><div class="rp-note">' + (allCost ? 'HPP dihitung dari harga modal tiap produk. Modal produk contoh masih berupa perkiraan 55% dari harga jual; Owner bisa mengoreksinya lewat tombol ✏️ di Manajemen Stok.' : 'Perkiraan: sebagian item belum punya data modal, sehingga HPP-nya diasumsikan 55% dari harga jual.') + '</div></div>';
+        profitHtml = '<div class="rp-card" style="margin-top:12px"><div class="rp-h" style="display:flex;justify-content:space-between;align-items:center">Estimasi laba kotor <span class="tp-rolebadge owner" style="text-transform:none">khusus Owner</span></div><div class="rp-kpis" style="margin-top:8px">' + kp('Penjualan (ex-PPN)', formatRupiah(revEx)) + kp(allCost ? 'HPP (harga modal)' : 'HPP (sebagian perkiraan)', formatRupiah(hpp)) + kp('Estimasi laba kotor', formatRupiah(prof), 'hl') + kp('Margin', mg + '%') + '</div><div class="rp-note">' + (allCost ? 'HPP memakai harga modal tiap produk. Modal produk demo diisi perkiraan 55% dari harga jual; Owner bisa mengubahnya di Manajemen Stok.' : 'Sebagian item belum punya harga modal, jadi HPP-nya dihitung 55% dari harga jual.') + '</div></div>';
       }
       tp$('rp-body').innerHTML =
         (tpRole === 'staff' ? '<div class="rp-note" style="margin:0 0 10px"><i class="fa-solid fa-lock"></i> Staff hanya melihat penjualan <b>shift sendiri</b> (#' + tpShift.number + '). Laporan semua hari: SPV / Owner.</div>' : '<div class="rp-seg">' + seg + '</div>') +
@@ -7329,7 +7331,7 @@
     const _tpReqClose = tpRequestCloseShift;
     tpRequestCloseShift = function () { tpShift.countDetail = { den: Object.assign({}, tpCount), coin: tpCoin }; _tpReqClose(); };
     const _tpNewShift = tpStartNewShift;
-    tpStartNewShift = function () { tpCount = {}; tpCoin = 0; _tpNewShift(); };
+    tpStartNewShift = function (c) { tpCount = {}; tpCoin = 0; _tpNewShift(c); };
 
     /* init: pelanggan bawaan = Zannah Tan (member Silver) */
     tpCust = TP_CUSTS.find(c => c.name === (tp$('cust-name-input').value || '').trim()) || null;
@@ -8987,7 +8989,7 @@
       const staff = tpRole === 'staff', recv = tp$('st-recv'); if (!recv) return;
       recv.style.display = staff ? 'none' : '';
       let note = tp$('st-lock');
-      if (!note) { note = document.createElement('div'); note.id = 'st-lock'; note.className = 'st-lock'; note.innerHTML = '<i class="fa-solid fa-lock"></i> <b>Mode lihat saja.</b> Stok tidak bisa diubah langsung. Gunakan tombol <b>Opname</b> untuk mengajukan hasil hitung ke SPV / Owner. Terima barang, tambah dan edit produk khusus SPV / Owner.'; recv.parentNode.insertBefore(note, recv); }
+      if (!note) { note = document.createElement('div'); note.id = 'st-lock'; note.className = 'st-lock'; note.innerHTML = '<i class="fa-solid fa-lock"></i> <b>Mode lihat saja.</b> Untuk koreksi stok, ajukan lewat <b>Opname</b>. Terima barang dan kelola produk khusus SPV / Owner.'; recv.parentNode.insertBefore(note, recv); }
       note.style.display = staff ? 'block' : 'none';
       document.querySelectorAll('#st-grid input').forEach(i => { i.readOnly = staff; });
     }
@@ -9436,6 +9438,307 @@
       else return;
       e.preventDefault(); e.stopPropagation();
     }, true);
+  </script>
+  <style>
+    .sh-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-bottom: 12px
+    }
+
+    .sh-bar .st-sel {
+      width: auto
+    }
+
+    .sh-mode {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b
+    }
+
+    #shopen-modal.tp-overlay {
+      padding: 12px !important;
+      bottom: 46px
+    }
+
+    #shopen-modal .tp-mhead {
+      padding: 12px 16px;
+      height: auto;
+      min-height: 0;
+      align-items: center
+    }
+
+    #shopen-modal .tp-mhead h4 {
+      margin: 0
+    }
+
+    #shopen-modal .tp-mhead button {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center
+    }
+
+    .sh-card summary {
+      cursor: pointer;
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      align-items: center
+    }
+
+    .sh-card summary::-webkit-details-marker {
+      display: none
+    }
+
+    .sh-card .tp-rows {
+      margin-top: 10px
+    }
+
+    .sh-card small {
+      display: block;
+      font-size: 12px;
+      color: #475569;
+      margin-top: 3px
+    }
+  </style>
+  <div id="shopen-modal" class="tp-overlay hidden" style="z-index:80">
+    <div class="tp-modal" style="max-width:400px">
+      <div class="tp-mhead">
+        <h4><i class="fa-solid fa-play" style="color:#34d399"></i> <span id="so-title">Mulai Shift Baru</span></h4>
+        <button onclick="closeModal('shopen-modal')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="tp-mbody np-form">
+        <label>Kasir<input id="so-user" class="st-in" readonly></label>
+        <label>Modal awal di laci (Rp)<input id="so-cash" class="st-in" inputmode="numeric" placeholder="1.000.000"
+            oninput="tpShCashFmt(this)" onkeydown="if(event.key==='Enter')tpShOpenGo()"></label>
+        <p style="font-size:12px;color:#64748b">Hitung uang di laci dulu. Angka ini jadi dasar kas seharusnya saat
+          tutup.</p>
+      </div>
+      <div class="tp-mfoot"><button class="tp-btn ghost" onclick="closeModal('shopen-modal')">Batal</button><button
+          class="tp-btn green" onclick="tpShOpenGo()"><i class="fa-solid fa-check"></i> Mulai</button></div>
+    </div>
+  </div>
+  <script>
+    window.tpShiftMode = window.tpShiftMode || 'multi'; window.tpShiftLog = window.tpShiftLog || [];
+    let tpShTabV = 'now';
+    const tpShSingle = () => window.tpShiftMode === 'single';
+    tpShiftGuard = function () {
+      if (!tpShift.open) { showToast(tpShSingle() ? 'Kasir sudah ditutup. Buka kasir hari berikutnya untuk melayani transaksi.' : 'Shift sudah ditutup. Mulai shift baru untuk melayani transaksi.', 'warn'); return false; }
+      return true;
+    };
+    const _tpClose0 = tpCloseShift; tpCloseShift = function () { tpShTabV = 'now'; _tpClose0(); };
+    function tpShLog() {
+      const s = tpShiftStats();
+      tpShiftLog.unshift({ no: tpShift.number, date: new Date().toISOString(), cashier: tpShift.cashier || 'Zannah Jagad', openedAt: tpShift.openedAt, closedAt: tpShift.closedAt, openingCash: tpShift.openingCash, counted: tpShift.counted, leave: tpShift.leave, deposit: tpShift.deposit, expected: s.expectedCash, sales: s.sales, cash: s.cash, edc: s.edc, qris: s.qris, trx: s.count, voided: s.voided, items: s.items, mode: window.tpShiftMode });
+      if (tpShiftLog.length > 60) tpShiftLog.length = 60;
+    }
+    function tpShTab(t) { tpShTabV = t; tpRenderShift(); }
+    function tpShSetMode(v) {
+      if (tpRole === 'staff') return;
+      window.tpShiftMode = v === 'single' ? 'single' : 'multi'; tpRenderShift();
+      showToast(tpShSingle() ? 'Mode shift: satu shift per hari.' : 'Mode shift: beberapa shift per hari.', 'success');
+    }
+    function tpShBar() {
+      const tab = (k, l) => '<button type="button" class="st-chip' + (tpShTabV === k ? ' on' : '') + '" onclick="tpShTab(\'' + k + '\')">' + l + '</button>';
+      const mode = tpRole === 'staff' ? '<span class="sh-mode">' + (tpShSingle() ? 'Satu shift per hari' : 'Beberapa shift per hari') + '</span>' :
+        '<select class="st-sel" title="Mode shift" onchange="tpShSetMode(this.value)"><option value="single"' + (tpShSingle() ? ' selected' : '') + '>Satu shift per hari</option><option value="multi"' + (tpShSingle() ? '' : ' selected') + '>Beberapa shift per hari</option></select>';
+      return '<div class="sh-bar"><div class="st-chips">' + tab('now', tpShSingle() ? 'Hari ini' : 'Shift ini') + tab('hist', 'Riwayat <i style="font-style:normal;opacity:.7">' + tpShiftLog.length + '</i>') + '</div>' + mode + '</div>';
+    }
+    function tpShHist() {
+      if (!tpShiftLog.length) return '<p style="color:#94a3b8;text-align:center;padding:24px">Belum ada shift yang ditutup.</p>';
+      const row = (a, b) => '<div class="r"><span>' + a + '</span><span>' + b + '</span></div>';
+      return tpShiftLog.map(e => {
+        const d = e.counted - e.expected, dt = tpDMY(new Date(e.date)), ttl = e.mode === 'single' ? dt : 'Shift #' + e.no + ' · ' + dt;
+        const bd = d === 0 ? '<span class="st-badge ok">Kas sesuai</span>' : d < 0 ? '<span class="st-badge zr">Kurang ' + formatRupiah(-d) + '</span>' : '<span class="st-badge lo">Lebih ' + formatRupiah(d) + '</span>';
+        return '<details class="op-card sh-card"><summary><b>' + tpEsc(ttl) + '</b> ' + bd + '<small style="flex-basis:100%">' + tpEsc(e.cashier) + ' · ' + tpEsc(e.openedAt) + ' – ' + tpEsc(e.closedAt) + ' · Omset ' + formatRupiah(e.sales) + ' · ' + e.trx + ' transaksi</small></summary><div class="tp-rows">' +
+          row('Transaksi sah / void', e.trx + ' / ' + e.voided) + row('Pakaian terjual', e.items + ' pcs') + row('Tunai', formatRupiah(e.cash)) + row('EDC', formatRupiah(e.edc)) + row('QRIS', formatRupiah(e.qris)) +
+          row('Modal awal', formatRupiah(e.openingCash)) + row('Kas seharusnya', formatRupiah(e.expected)) + row('Kas dihitung', formatRupiah(e.counted)) + (e.deposit != null ? row('Kas ditinggal', formatRupiah(e.leave)) + row('Disetor', formatRupiah(e.deposit)) : '') + '</div></details>';
+      }).join('');
+    }
+    function tpShOpenForm() {
+      tp$('so-title').textContent = tpShSingle() ? 'Buka Kasir Hari Ini' : 'Mulai Shift Baru';
+      tp$('so-user').value = (typeof TP_USERS !== 'undefined' && tpRole && TP_USERS[tpRole]) ? TP_USERS[tpRole].name : 'Kasir';
+      tp$('so-cash').value = (Number.isFinite(tpShift.leave) ? tpShift.leave : 1000000).toLocaleString('id-ID'); openModal('shopen-modal'); setTimeout(() => { const e = tp$('so-cash'); e.focus(); e.select(); }, 60);
+    }
+    function tpShCashFmt(el) { const n = Number(String(el.value).replace(/\D/g, '')) || 0; el.value = n ? n.toLocaleString('id-ID') : ''; }
+    function tpShOpenGo() {
+      const raw = String(tp$('so-cash').value).replace(/\D/g, '');
+      if (raw === '') { showToast('Isi modal awal di laci.', 'warn'); return; }
+      closeModal('shopen-modal'); tpStartNewShift(Number(raw)); tpShTabV = 'now';
+    }
+    function tpShCounted() { const e = tp$('sh-counted'); return e ? Number(String(e.value).replace(/\D/g, '')) || 0 : 0; }
+    function tpShLeave(el) { const n = Number(String(el.value).replace(/\D/g, '')) || 0; el.value = n ? n.toLocaleString('id-ID') : ''; el.dataset.touched = '1'; tpShDep(); }
+    function tpShDep() {
+      const inp = tp$('sh-leave'), el = tp$('sh-dep'); if (!inp || !el) return;
+      const counted = tpShCounted();
+      if (!inp.dataset.touched) inp.value = counted ? Math.min(counted, tpShift.openingCash).toLocaleString('id-ID') : '';
+      const want = Number(String(inp.value).replace(/\D/g, '')) || 0, leave = Math.min(want, counted);
+      el.innerHTML = '<div class="r"><span>Disetor ke bank / brankas</span><span>' + (counted ? formatRupiah(counted - leave) : '-') + '</span></div>' + (want > counted && counted ? '<div class="r"><span style="color:#be123c">Kas ditinggal melebihi uang terhitung</span><span></span></div>' : '');
+    }
+    const _tpOnCount0 = tpOnCount; tpOnCount = function (i) { _tpOnCount0(i); tpShDep(); };
+    const _tpDenSync0 = tpDenSync; tpDenSync = function () { _tpDenSync0.apply(this, arguments); tpShDep(); };
+    const _tpReqClose0 = tpRequestCloseShift;
+    tpRequestCloseShift = function () {
+      const counted = tpShCounted(), inp = tp$('sh-leave'), want = inp ? Number(String(inp.value).replace(/\D/g, '')) || 0 : counted, leave = Math.min(want, counted);
+      tpShift.leave = leave; tpShift.deposit = counted - leave; _tpReqClose0();
+    };
+    const _tpRenderShiftZ = tpRenderShift;
+    tpRenderShift = function () {
+      _tpRenderShiftZ();
+      if (!tpShift.open && tpShift.counted != null && !tpShift.histLogged) { tpShift.histLogged = true; tpShLog(); }
+      const body = tp$('sh-body'), foot = tp$('sh-foot'); if (!body) return;
+      if (tpShTabV === 'hist') {
+        tp$('sh-title').textContent = 'Riwayat Shift'; body.innerHTML = tpShBar() + tpShHist();
+        foot.innerHTML = '<button type="button" class="tp-btn ghost" onclick="tpCloseShift()">Tutup</button>'; return;
+      }
+      foot.querySelectorAll('button').forEach(b => {
+        if ((b.getAttribute('onclick') || '').includes('tpStartNewShift')) { b.setAttribute('onclick', 'tpShOpenForm()'); if (tpShSingle()) b.innerHTML = '<i class="fa-solid fa-play"></i>Buka Kasir Hari Berikutnya'; }
+      });
+      if (tpShSingle()) {
+        tp$('sh-title').textContent = tpShift.open ? 'Rekap Kasir Hari Ini' : 'Laporan Harian (Ditutup)';
+        body.querySelectorAll('.tp-rows .r > span:first-child').forEach(e => { if (/^Shift #\d+ · dibuka$/.test(e.textContent)) e.textContent = 'Kasir dibuka'; else if (e.textContent === 'Shift ditutup') e.textContent = 'Kasir ditutup'; });
+        const h = body.querySelector('.tp-done h4'), p = body.querySelector('.tp-done p'); if (h) h.textContent = 'Kasir Telah Ditutup'; if (p) p.textContent = 'Laporan di bawah sudah final.';
+        const cb = tp$('sh-close-btn'); if (cb) cb.innerHTML = '<i class="fa-solid fa-lock"></i>Tutup Kasir Hari Ini';
+      }
+      if (tpShift.open) {
+        const df = tp$('sh-diff');
+        if (df) { df.insertAdjacentHTML('afterend', '<span class="tp-label">' + (tpShSingle() ? 'Kas ditinggal di laci (modal besok)' : 'Kas ditinggal di laci (modal shift berikut)') + '</span><input id="sh-leave" class="tp-input num" inputmode="numeric" placeholder="Rp 0" oninput="tpShLeave(this)"><div id="sh-dep" class="tp-rows"></div>'); tpShDep(); }
+      } else if (tpShift.deposit != null) {
+        body.insertAdjacentHTML('beforeend', '<span class="tp-label">Setoran</span><div class="tp-rows"><div class="r"><span>Kas ditinggal di laci</span><span>' + formatRupiah(tpShift.leave) + '</span></div><div class="r"><span>Disetor ke bank / brankas</span><span>' + formatRupiah(tpShift.deposit) + '</span></div></div>');
+      }
+      body.insertAdjacentHTML('afterbegin', tpShBar());
+    };
+  </script>
+  <style>
+    #tp-tour .tt-spot {
+      outline: 3px solid #fb7185;
+      box-shadow: 0 0 0 9999px rgba(2, 6, 23, .8), 0 0 0 7px rgba(251, 113, 133, .3);
+      animation: ttPulse 1.8s ease-in-out infinite
+    }
+
+    @keyframes ttPulse {
+
+      0%,
+      100% {
+        outline-offset: 0
+      }
+
+      50% {
+        outline-offset: 3px
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #tp-tour .tt-spot {
+        animation: none
+      }
+    }
+
+    #tp-tour .tt-card {
+      opacity: 0;
+      transition: opacity .18s ease;
+      pointer-events: none
+    }
+
+    #tp-tour .tt-card.show {
+      opacity: 1;
+      pointer-events: auto
+    }
+
+    #tp-tour .tt-arrow {
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      transform: rotate(45deg);
+      border-radius: 3px;
+      display: none
+    }
+
+    #tp-tour .tt-pin {
+      position: absolute;
+      left: -11px;
+      top: -11px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #e11d48;
+      color: #fff;
+      font: 800 12px/24px 'Plus Jakarta Sans', sans-serif;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .45)
+    }
+  </style>
+  <script>
+    let tpTourReady = false, tpTourStable = 0, tpTourT0 = 0;
+    TP_TOUR[1].text = () => 'Kemeja + celana langsung jadi <b>Paket Look</b> (hemat Rp 50.000), ditambah diskon member. Tagihan &amp; PPN terhitung real-time.';
+    TP_TOUR[4].els = () => {
+      if (!tpWide()) return [tp$('tp-menu-btn')];
+      return [document.querySelector('header button[onclick*="report-modal"]'), document.querySelector('header button[onclick*="shift-modal"]')];
+    };
+    const _tpTourGo0 = tpTourGo;
+    tpTourGo = function (d) {
+      const c = document.querySelector('#tp-tour .tt-card'); if (c) { c.style.transition = 'none'; c.classList.remove('show'); void c.offsetWidth; c.style.transition = ''; }
+      tpTourReady = false; tpTourStable = 0; tpTourT0 = performance.now(); _tpTourGo0(d);
+    };
+    function tpTourPlace() {
+      if (tpTourIdx < 0) return;
+      const vw = innerWidth, vh = innerHeight, M = 14, TOP = 8, MIN = 46, tab = tp$('tp-mobtab'), tabTop = tab && tab.getClientRects().length ? tab.getBoundingClientRect().top : vh, bottomLimit = Math.min(vh - 54, tabTop - 6);
+      const els = tpTourEls(), spot = document.querySelector('#tp-tour .tt-spot'), card = document.querySelector('#tp-tour .tt-card');
+      if (!card.querySelector('.tt-arrow')) card.insertAdjacentHTML('afterbegin', '<i class="tt-arrow"></i>');
+      if (!spot.querySelector('.tt-pin')) spot.insertAdjacentHTML('afterbegin', '<b class="tt-pin"></b>');
+      const arrow = card.querySelector('.tt-arrow'), pin = spot.querySelector('.tt-pin');
+      card.classList.toggle('compact', vh < 700);
+      let cw = card.offsetWidth, ch = card.offsetHeight; arrow.style.display = 'none';
+      if (!els.length) { pin.style.display = 'none'; spot.style.cssText = 'left:50%;top:40%;width:0;height:0'; card.style.left = Math.max(M, (vw - cw) / 2) + 'px'; card.style.top = Math.max(TOP, (bottomLimit - ch) / 2) + 'px'; return; }
+      pin.style.display = ''; pin.textContent = tpTourIdx + 1;
+      let l = 1e9, t = 1e9, r = -1, b = -1;
+      els.forEach(e => { const q = e.getBoundingClientRect(); l = Math.min(l, q.left); t = Math.min(t, q.top); r = Math.max(r, q.right); b = Math.max(b, q.bottom); });
+      const P = 8; l = l - P; t = t - P; r = r + P; b = b + P;
+      if (r - l < MIN) { const c = (l + r) / 2; l = c - MIN / 2; r = c + MIN / 2; }
+      if (b - t < MIN) { const c = (t + b) / 2; t = c - MIN / 2; b = c + MIN / 2; }
+      l = Math.max(4, l); t = Math.max(4, t); r = Math.min(vw - 4, r); b = Math.min(bottomLimit - 2, b);
+      const cx = (l + r) / 2, cy = (t + b) / 2;
+      const attempt = () => {
+        const clampX = x => Math.min(Math.max(M, x), vw - cw - M), clampY = y => Math.min(Math.max(TOP, y), bottomLimit - ch - 4), ax = cx > vw / 2 ? r - cw : l;
+        const tries = {
+          below: () => (b + M + ch <= bottomLimit) && { x: clampX(ax), y: b + M, side: 'below' },
+          above: () => (t - M - ch >= TOP) && { x: clampX(ax), y: t - M - ch, side: 'above' },
+          left: () => (vw >= 600 && l - M - cw >= M) && { x: l - M - cw, y: clampY(cy - ch / 2), side: 'left' },
+          right: () => (vw >= 600 && r + M + cw <= vw - M) && { x: r + M, y: clampY(cy - ch / 2), side: 'right' }
+        };
+        const order = t < 120 ? ['below', 'left', 'right', 'above'] : (vw >= 600 && cx > vw * 0.62) ? ['left', 'below', 'above', 'right'] : ['below', 'above', 'right', 'left'];
+        for (const k of order) { const pos = tries[k](); if (pos) return pos; }
+        return null;
+      };
+      let pos = attempt();
+      if (!pos && !card.classList.contains('compact')) { card.classList.add('compact'); cw = card.offsetWidth; ch = card.offsetHeight; pos = attempt(); }
+      if (!pos) {
+        /* tidak ada ruang: kartu di sisi yang lebih lega, area sorotan dipotong agar tidak tertimpa */
+        const below = bottomLimit - b, above = t - TOP;
+        if (below >= above) { const y = bottomLimit - ch - 4; pos = { x: Math.min(Math.max(M, l), vw - cw - M), y: y }; b = Math.max(t + 28, Math.min(b, y - M)); }
+        else { const y = TOP; pos = { x: Math.min(Math.max(M, l), vw - cw - M), y: y }; t = Math.min(b - 28, Math.max(t, y + ch + M)); }
+      } else {
+        const side = pos.side, ac = v => Math.min(Math.max(v, 22), (side === 'below' || side === 'above' ? cw : ch) - 22) - 7;
+        arrow.style.cssText = 'display:block;' + (side === 'below' ? 'top:-7px;left:' + ac(cx - pos.x) + 'px' : side === 'above' ? 'bottom:-7px;left:' + ac(cx - pos.x) + 'px' : side === 'left' ? 'right:-7px;top:' + ac(cy - pos.y) + 'px' : 'left:-7px;top:' + ac(cy - pos.y) + 'px');
+      }
+      spot.style.left = l + 'px'; spot.style.top = t + 'px'; spot.style.width = (r - l) + 'px'; spot.style.height = (b - t) + 'px';
+      card.style.left = pos.x + 'px'; card.style.top = pos.y + 'px';
+    }
+    function tpTourLoop() {
+      if (tpTourIdx < 0) { tpTourRaf = 0; return; }
+      const sig = tpTourEls().map(e => { const q = e.getBoundingClientRect(); return Math.round(q.left) + ',' + Math.round(q.top) + ',' + Math.round(q.width) + ',' + Math.round(q.height); }).join('|') + '#' + innerWidth + 'x' + innerHeight + '#' + tpTourIdx;
+      if (sig !== tpTourSig) { tpTourSig = sig; tpTourStable = 0; tpTourPlace(); } else tpTourStable++;
+      const dt = performance.now() - tpTourT0; if (!tpTourReady && ((tpTourStable >= 8 && dt > 380) || dt > 1400)) { tpTourReady = true; tpTourPlace(); document.querySelector('#tp-tour .tt-card').classList.add('show'); }
+      tpTourRaf = requestAnimationFrame(tpTourLoop);
+    }
   </script>
 </body>
 

@@ -9,14 +9,14 @@
 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Portal Admin — AbsenPro v2</title>
+  <title>Portal Admin AbsenPro v2</title>
   <meta name="description"
-    content="Portal admin HR untuk AbsenPro v2: ringkasan kehadiran, tabel kehadiran dengan ekspor CSV, dan antrean persetujuan.">
+    content="Portal admin HR untuk AbsenPro v2: kehadiran, laporan, persetujuan, reimbursement, karyawan, pengumuman, dan pengaturan kerja.">
   <meta name="author" content="K. Arzhaning Jagad (Arzha)">
   <meta name="copyright" content="© 2026 K. Arzhaning Jagad. All Rights Reserved. Demo Only.">
   <meta name="robots" content="noindex, nofollow">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Portal Admin — AbsenPro v2 | K. Arzhaning Jagad (Arzha)">
+  <meta property="og:title" content="Portal Admin AbsenPro v2 | K. Arzhaning Jagad (Arzha)">
   <meta property="og:url" content="https://arzhaning.my.id/demos/demo-absenpro-hris-v2-admin">
   <meta property="og:site_name" content="arzhaning.my.id">
   <meta property="og:image" content="https://arzhaning.my.id/demos/thumbs/demo-absenpro-hris-v2.webp">
@@ -82,7 +82,7 @@
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
           EMP.forEach(function (e) { (dv[e[3]] = dv[e[3]] || []).push(e) });
           el.innerHTML = '<div class="rl">' + hd(today(), 'Ringkasan perusahaan') + '<div class="rl-kp"><div class="rl-card"><small>Hadir</small><b>' + c.h + '</b><span>dari ' + n + ' \u00b7 ' + pct + '%</span></div><div class="rl-card"><small>Terlambat</small><b>' + c.l + '</b><span>' + lateNote() + '</span></div><div class="rl-card"><small>Belum absen</small><b>' + c.b + '</b><span>akun demo</span></div><div class="rl-card rl-hl"><small>Menunggu</small><b>' + pending().length + '</b><span>persetujuan</span></div></div>'
-            + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + ((d[1] - 70) * 3.6) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
+            + '<div class="rl-card"><h3>Kehadiran 7 hari kerja</h3><div class="rl-bars">' + days.map(function (d, i) { return '<div class="' + (i == 6 ? 't' : '') + '"><b>' + d[1] + '%</b><i style="height:' + Math.max(4, Math.round(d[1] * 1.0)) + 'px"></i><small>' + d[0] + '</small></div>' }).join('') + '</div></div>'
             + '<div class="rl-card"><h3>Per divisi</h3>' + Object.keys(dv).map(function (k) { var p = Math.round(counts(dv[k]).h / dv[k].length * 100); return '<div class="rl-dv"><span>' + k + '</span><i><u style="width:' + p + '%"></u></i><b>' + p + '%</b></div>' }).join('') + '</div></div>'
         }
         function employees(el) {
@@ -102,7 +102,7 @@
           + '.rl-acts{display:flex;gap:6px;flex:none}.rl-acts button{border:0;border-radius:10px;font-weight:700;font-size:12px;padding:9px 12px;cursor:pointer;min-height:36px}.rl-acts .y{background:var(--rl-ok);color:#fff}.rl-acts .n{background:var(--rl-chip);color:var(--rl-ink)}'
           + '.rl-em{text-align:center;color:var(--rl-mute);padding:18px 0;margin:0}.rl-kp{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}.rl-kp .rl-card{margin:0}.rl-kp small{color:var(--rl-mute)}.rl-kp b{display:block;font-size:30px;font-weight:800}.rl-kp span{font-size:12px;color:var(--rl-mute)}'
           + '.rl-hl{background:var(--rl-acc)!important;color:var(--rl-accink)!important;border-color:var(--rl-acc)!important}.rl-hl small,.rl-hl span{color:inherit!important;opacity:.8}'
-          + '.rl-bars{display:flex;align-items:flex-end;gap:8px;height:150px}.rl-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}.rl-bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--rl-chip)}.rl-bars .t i{background:var(--rl-acc)}.rl-bars b{font-size:11px}.rl-bars small{font-size:11px}'
+          + '.rl-bars{display:flex;align-items:flex-end;gap:8px;height:150px}.rl-bars div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;height:100%}.rl-bars i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:var(--rl-chip);background:color-mix(in srgb,var(--ink,#16253A) 14%,var(--rl-chip))}.rl-bars .t i{background:var(--rl-acc)}.rl-bars b{font-size:11px}.rl-bars small{font-size:11px}'
           + '.rl-dv{display:flex;align-items:center;gap:10px;margin:8px 0}.rl-dv span{width:80px;font-size:13px}.rl-dv i{flex:1;height:10px;border-radius:9px;background:var(--rl-chip);overflow:hidden}.rl-dv u{display:block;height:100%;background:var(--rl-acc);border-radius:9px}.rl-dv b{font-size:12px;width:38px;text-align:right}'
           + '.rl-q{width:100%;font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);margin-bottom:10px}'
           + '.rl-ch{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.rl-ch button{border:1px solid var(--rl-line);background:var(--rl-card);color:var(--rl-ink);font-weight:600;font-size:12.5px;padding:7px 12px;border-radius:99px;cursor:pointer;min-height:0}.rl-ch .on{background:var(--rl-ink);color:var(--rl-card);border-color:var(--rl-ink)}'
@@ -884,6 +884,169 @@
     }
   </style>
   <style>
+    @media(max-width:860px) {
+      aside {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        gap: 4px;
+        scrollbar-width: none;
+        align-items: center
+      }
+
+      aside::-webkit-scrollbar {
+        display: none
+      }
+
+      aside .nv,
+      aside .logo {
+        flex: none;
+        white-space: nowrap;
+        margin-top: 0 !important;
+        width: auto
+      }
+
+      .toast {
+        max-width: calc(100vw - 28px);
+        text-align: center
+      }
+    }
+
+    @media(max-width:720px) {
+      table.rb-tbl {
+        min-width: 0
+      }
+
+      .rb-tbl thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0)
+      }
+
+      .rb-tbl tbody,
+      .rb-tbl tr,
+      .rb-tbl td {
+        display: block
+      }
+
+      .rb-tbl tr {
+        padding: 12px 4px;
+        border-bottom: 1px solid var(--line, rgba(128, 128, 128, .25))
+      }
+
+      .rb-tbl td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 5px 10px;
+        border: 0;
+        text-align: right
+      }
+
+      .rb-tbl td::before {
+        content: attr(data-l);
+        color: var(--mute);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        flex: none
+      }
+
+      .rb-tbl td[data-e] {
+        display: none
+      }
+
+      .rb-tbl td:nth-child(2),
+      .rb-tbl td:nth-child(3) {
+        display: block;
+        text-align: left
+      }
+
+      .rb-tbl td:nth-child(2)::before,
+      .rb-tbl td:nth-child(3)::before {
+        display: none
+      }
+
+      .rb-tbl td:nth-child(1) {
+        order: 0;
+        color: var(--mute);
+        font-size: 12px
+      }
+
+      .rb-tbl td:last-child:not([data-e]) {
+        padding-top: 10px
+      }
+
+      .rb-tbl td:last-child .rb-acts {
+        width: 100%;
+        justify-content: flex-end
+      }
+
+      .rb-tbl td:last-child .rb-acts .btn {
+        flex: 1;
+        min-height: 44px
+      }
+    }
+  </style>
+  <style>
+    @media(max-width:720px) {
+      table.rt {
+        min-width: 0
+      }
+
+      .rt thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0)
+      }
+
+      .rt tbody,
+      .rt tr,
+      .rt td {
+        display: block
+      }
+
+      .rt tr {
+        padding: 10px 4px;
+        border-bottom: 1px solid var(--line)
+      }
+
+      .rt td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 4px 10px;
+        border: 0;
+        text-align: right
+      }
+
+      .rt td::before {
+        content: attr(data-l);
+        color: var(--mute);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: left;
+        flex: none
+      }
+
+      .rt td:first-child {
+        display: block;
+        text-align: left;
+        padding-bottom: 6px
+      }
+
+      .rt td:first-child::before,
+      .rt td[data-e] {
+        display: none
+      }
+    }
+  </style>
+  <style>
     .rb-acts {
       display: flex;
       gap: 6px;
@@ -984,7 +1147,7 @@
               aria-label="Cari karyawan"></div>
           <div class="chips" id="fl"></div>
           <div class="tw">
-            <table>
+            <table class="rt">
               <thead>
                 <tr>
                   <th>Karyawan</th>
@@ -1093,7 +1256,7 @@
               aria-label="Cari karyawan"></div>
           <div class="chips" id="es"></div>
           <div class="tw">
-            <table>
+            <table class="rt">
               <thead>
                 <tr>
                   <th>Karyawan</th>
@@ -1108,8 +1271,8 @@
           </div>
           <p class="sm" id="eem" style="display:none;padding:16px 0;text-align:center">Tidak ada karyawan yang cocok.
           </p>
-          <p class="sm" style="margin-top:10px">Akun Supervisor dan Admin tidak bisa diubah di demo, agar alur
-            persetujuan tetap utuh.</p>
+          <p class="sm" style="margin-top:10px">Akun Supervisor dan Admin tidak bisa diubah di demo, supaya alur
+            persetujuan tetap berjalan.</p>
         </div>
         <div class="card">
           <h3>Riwayat perubahan</h3>
@@ -1128,7 +1291,7 @@
         <div class="chips" id="rbs"></div>
         <div class="card">
           <div class="tw">
-            <table>
+            <table class="rb-tbl">
               <thead>
                 <tr>
                   <th>Tanggal</th>
@@ -1299,12 +1462,22 @@
 
     window.renderRep = function () {
       const R = repRows(REPM), nd = R[0].ds.length, MN = RM.find(x => x[0] === REPM)[1];
-      $('#repbody').innerHTML = '<div class="card"><div class="tw"><div class="hm" style="--n:' + nd + '"><div class="hm-h"><span></span>' + Array.from({ length: nd }, (_, i) => '<i>' + (i + 1) + '</i>').join('') + '<b>%</b></div>' + R.map((r, ri) => '<div class="hm-r"><span class="hm-n">' + RL.esc(r.e[1]) + '</span>' + r.ds.map((s, i) => '<button class="hm-c ' + s + '" data-r="' + ri + '" data-d="' + (i + 1) + '" aria-label="' + RL.esc(r.e[1]) + ' tanggal ' + (i + 1) + ' ' + LBL[s] + '"></button>').join('') + '<b>' + r.pct + '%</b></div>').join('') + '</div></div><div class="hm-lg"><span><i style="background:var(--ok)"></i>Tepat waktu</span><span><i style="background:var(--late)"></i>Terlambat</span><span><i style="background:var(--acc)"></i>Izin atau cuti</span><span><i style="border:1px solid var(--line)"></i>Akhir pekan</span></div><p class="sm" id="hmi">Ketuk kotak untuk melihat detail. Data contoh untuk demo.</p></div>';
+      $('#repbody').innerHTML = '<div class="card"><div class="tw"><div class="hm" style="--n:' + nd + '"><div class="hm-h"><span></span>' + Array.from({ length: nd }, (_, i) => '<i>' + (i + 1) + '</i>').join('') + '<b>%</b></div>' + R.map((r, ri) => '<div class="hm-r"><span class="hm-n">' + RL.esc(r.e[1]) + '</span>' + r.ds.map((s, i) => '<button class="hm-c ' + s + '" data-r="' + ri + '" data-d="' + (i + 1) + '" aria-label="' + RL.esc(r.e[1]) + ' tanggal ' + (i + 1) + ' ' + LBL[s] + '"></button>').join('') + '<b>' + r.pct + '%</b></div>').join('') + '</div></div><div class="hm-lg"><span><i style="background:var(--ok)"></i>Tepat waktu</span><span><i style="background:var(--late)"></i>Terlambat</span><span><i style="background:var(--acc)"></i>Izin atau cuti</span><span><i style="border:1px solid var(--line)"></i>Akhir pekan</span></div><p class="sm" id="hmi" role="status">Ketuk kotak untuk melihat detail. Data contoh untuk demo.</p></div>';
+      const hmInit = () => { document.querySelectorAll('#repbody .hm-c').forEach((c, i) => c.tabIndex = i === 0 ? 0 : -1); const g = document.querySelector('#repbody .hm'); if (g && !g.getAttribute('role')) { g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Heatmap kehadiran. Gunakan tombol panah untuk berpindah antar tanggal dan karyawan.') } };
+      new MutationObserver(hmInit).observe($('#repbody'), { childList: true }); hmInit();
+      $('#repbody').addEventListener('keydown', e => {
+        const c = e.target.closest && e.target.closest('.hm-c'); if (!c) return;
+        const rows = [...document.querySelectorAll('#repbody .hm-r')].map(r => [...r.querySelectorAll('.hm-c')]); let ri = rows.findIndex(r => r.includes(c)), ci = rows[ri].indexOf(c); const k = e.key;
+        if (k === 'ArrowRight') ci++; else if (k === 'ArrowLeft') ci--; else if (k === 'ArrowDown') ri++; else if (k === 'ArrowUp') ri--;
+        else if (k === 'Home') { ci = 0; if (e.ctrlKey) ri = 0 } else if (k === 'End') { ci = rows[ri].length - 1; if (e.ctrlKey) ri = rows.length - 1 } else return;
+        e.preventDefault(); ri = Math.max(0, Math.min(rows.length - 1, ri)); ci = Math.max(0, Math.min(rows[ri].length - 1, ci));
+        document.querySelectorAll('#repbody .hm-c').forEach(x => x.tabIndex = -1); const t = rows[ri][ci]; t.tabIndex = 0; t.focus()
+      });
       $('#repbody').onclick = e => { const b = e.target.closest('.hm-c'); if (!b) return; const r = R[+b.dataset.r]; $('#hmi').textContent = r.e[1] + ' \u00b7 ' + b.dataset.d + ' ' + MN + ' \u00b7 ' + LBL[r.ds[b.dataset.d - 1]] }
     };
     /*ANN*/
     const AK = 'absenpro-v2-ann';
-    function annLoad() { try { const r = JSON.parse(localStorage.getItem(AK)); if (r && r.ann) return r } catch (e) { } return { ann: [{ id: 1, title: 'Kebijakan WFH baru berlaku 1 Nov', tag: 'Penting' }, { id: 2, title: 'Town hall kuartal 4 \u00b7 Jumat 30 Okt, 15:00', tag: 'Acara' }, { id: 3, title: 'Survei kepuasan karyawan dibuka sampai 5 Nov', tag: 'Info' }], poll: { q: 'Hari WFH yang paling nyaman buat kamu?', opts: ['Senin', 'Rabu', 'Jumat'], votes: {} } } }
+    function annLoad() { try { const r = JSON.parse(localStorage.getItem(AK)); if (r && r.ann) return r } catch (e) { } return { ann: [{ id: 1, title: 'Kebijakan WFH baru berlaku 1 Nov', tag: 'Penting' }, { id: 2, title: 'Town hall kuartal 4 \u00b7 Jumat 30 Okt, 15:00', tag: 'Acara' }, { id: 3, title: 'Survei kepuasan karyawan dibuka sampai 5 Nov', tag: 'Info' }], poll: { q: 'Hari WFH mana yang paling nyaman bagi Anda?', opts: ['Senin', 'Rabu', 'Jumat'], votes: {} } } }
     function annSave(d) { try { localStorage.setItem(AK, JSON.stringify(d)) } catch (e) { } }
     window.renderAnnP = function () {
       const d = annLoad();
@@ -1337,7 +1510,7 @@
       $('#ecnt').textContent = act + ' aktif \u00b7 ' + (all.length - act) + ' nonaktif';
       $('#es').innerHTML = ['Semua', 'Aktif', 'Nonaktif'].map(k => '<button data-f="' + k + '" class="' + (k === EF ? 'on' : '') + '">' + k + '</button>').join('');
       const L = all.filter(e => (EF === 'Semua' || (EF === 'Aktif') === !e.off) && (!EQ || (e.name + ' ' + e.pos + ' ' + e.div).toLowerCase().indexOf(EQ) > -1));
-      $('#et').innerHTML = L.map(e => { const sh = RL.shiftFor(e.div), me = USER && USER.id === e.id, fix = e.lock || me; return '<tr><td><div class="who"><span class="av">' + RL.esc(e.name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase()) + '</span><div><b>' + RL.esc(e.name) + '</b><br><span class="sm">' + RL.esc(e.pos) + (e.added ? ' \u00b7 baru' : '') + '</span></div></div></td><td>' + (fix ? RL.esc(e.div) : '<select class="edv" data-id="' + RL.esc(e.id) + '" aria-label="Divisi ' + RL.esc(e.name) + '">' + RL.DIVS.map(d => '<option' + (d === e.div ? ' selected' : '') + '>' + d + '</option>').join('') + '</select>') + '</td><td>' + sh.name + '<br><span class="sm">' + sh.in + ' \u2013 ' + sh.out + '</span></td><td><span class="tag ' + (e.off ? 'Terlambat' : 'Hadir') + '">' + (e.off ? 'Nonaktif' : 'Aktif') + '</span></td><td>' + (fix ? '<span class="sm">\u2013</span>' : '<button class="btn" data-id="' + RL.esc(e.id) + '" data-act="' + (e.off ? 'on' : 'off') + '">' + (e.off ? 'Aktifkan' : 'Nonaktifkan') + '</button>') + '</td></tr>' }).join('');
+      $('#et').innerHTML = L.map(e => { const sh = RL.shiftFor(e.div), me = USER && USER.id === e.id, fix = e.lock || me; return '<tr><td><div class="who"><span class="av">' + RL.esc(e.name.split(' ').map(x => x[0]).slice(0, 2).join('').toUpperCase()) + '</span><div><b>' + RL.esc(e.name) + '</b><br><span class="sm">' + RL.esc(e.pos) + (e.added ? ' \u00b7 baru' : '') + '</span></div></div></td><td>' + (fix ? RL.esc(e.div) : '<select class="edv" data-id="' + RL.esc(e.id) + '" aria-label="Divisi ' + RL.esc(e.name) + '">' + RL.DIVS.map(d => '<option' + (d === e.div ? ' selected' : '') + '>' + d + '</option>').join('') + '</select>') + '</td><td><span>' + sh.name + '<br><span class="sm">' + sh.in + ' \u2013 ' + sh.out + '</span></span></td><td><span class="tag ' + (e.off ? 'Terlambat' : 'Hadir') + '">' + (e.off ? 'Nonaktif' : 'Aktif') + '</span></td><td>' + (fix ? '<span class="sm">\u2013</span>' : '<button class="btn" data-id="' + RL.esc(e.id) + '" data-act="' + (e.off ? 'on' : 'off') + '">' + (e.off ? 'Aktifkan' : 'Nonaktifkan') + '</button>') + '</td></tr>' }).join('');
       $('#eem').style.display = L.length ? 'none' : '';
       const lg = RL.empStore().log; $('#elog').innerHTML = lg.length ? lg.slice(0, 8).map(x => '<div class="slg"><b>' + RL.esc(x.by) + '</b> <span class="sm">' + new Date(x.t).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + '</span><br><span class="sm">' + RL.esc(x.txt) + '</span></div>').join('') : '<p class="sm">Belum ada perubahan data karyawan.</p>'
     }
@@ -1440,11 +1613,16 @@
       $('#rbt').innerHTML = L.map(r => '<tr><td>' + rbFmt(r) + '</td><td><b>' + RL.esc(r.who) + '</b><br><span class="sm">' + RL.esc(r.div) + '</span></td><td>' + RL.esc(r.cat || '') + '<br><span class="sm">' + RL.esc(rbNote(r)) + '</span></td><td class="fh">' + rpf(r.amt || 0) + '</td><td><span class="tag ' + rbTag[r.st] + '">' + RL.esc(r.st) + '</span></td><td>' + rbImg(r) + '</td><td>' + rbAct(r) + '</td></tr>').join(''); $('#rbe').hidden = L.length > 0;
       const dv = {}; L.filter(r => r.st !== 'Ditolak').forEach(r => { dv[r.div] = (dv[r.div] || 0) + (r.amt || 0) }); const mx = Math.max(1, ...Object.values(dv));
       $('#rbd').innerHTML = Object.keys(dv).length ? Object.keys(dv).sort((x, y) => dv[y] - dv[x]).map(k => '<div class="rl-dv"><span>' + RL.esc(k) + '</span><i><u style="width:' + Math.round(dv[k] / mx * 100) + '%"></u></i><b style="width:90px">' + rpf(dv[k]) + '</b></div>').join('') : '<p class="sm">Belum ada data.</p>';
+      const hs = [...document.querySelectorAll('.rb-tbl thead th')].map(h => h.textContent); document.querySelectorAll('#rbt tr').forEach(tr => [...tr.cells].forEach((c, i) => { c.dataset.l = hs[i] || ''; if (c.textContent.trim() === '\u2013') c.dataset.e = '1'; else delete c.dataset.e }));
       const tgt = RBF ? (RBF.id ? $('#rbt button[data-id="' + RBF.id + '"][data-' + RBF.k + ']') : null) || $('#rbs .on') : bk ? $('#rbt button[data-id="' + bk.id + '"][data-' + bk.k + ']') : fk ? $(fk[0] + ' [data-' + fk[1] + '="' + CSS.escape(String(fk[2])) + '"]') : null;
       RBF = null; if (tgt) tgt.focus()
     }
     $('#rbm').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBM = b.dataset.m; renderRb() };
     $('#rbs').onclick = e => { const b = e.target.closest('button'); if (!b) return; RBS = b.dataset.s; renderRb() };
+    document.querySelectorAll('table.rt').forEach(t => {
+      const tb = t.tBodies[0], lab = () => { const hs = [...t.tHead.rows[0].cells].map(h => h.textContent.trim());[...tb.rows].forEach(tr => [...tr.cells].forEach((c, i) => { c.dataset.l = hs[i] || ''; const x = c.textContent.trim(); if ((x === '\u2013' || !x) && !c.querySelector('img')) c.dataset.e = '1'; else delete c.dataset.e })) };
+      new MutationObserver(lab).observe(tb, { childList: true }); lab()
+    });
     const rbToggle = i => { i.classList.toggle('big'); i.setAttribute('aria-pressed', i.classList.contains('big')) };
     $('#rbt').onclick = e => {
       const i = e.target.closest('.rb-th'); if (i) { rbToggle(i); return }

@@ -2157,6 +2157,86 @@
       }
     }
   </style>
+  <style id="mx-mobile-fix">
+    /* === Perbaikan mobile: area scroll produk lebih luas === */
+    @media (max-width: 1023px) {
+      #mx-sec-produk {
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+        display: none;
+      }
+
+      body[data-tab="produk"] #mx-sec-produk {
+        display: block !important;
+      }
+
+      #mx-sec-produk>* {
+        flex-shrink: 0;
+      }
+
+      #mx-sec-produk #products-grid {
+        flex: none !important;
+        overflow: visible !important;
+        padding: 8px 8px 24px !important;
+      }
+
+      /* KPI disembunyikan di mobile agar ruang produk maksimal */
+      #mx-sec-produk #mx-kpi {
+        display: none !important;
+      }
+
+      /* search + kategori menempel di atas saat scroll */
+      #mx-sec-produk>.p-3\.5 {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        padding: 8px 10px !important;
+      }
+
+      #mx-sec-produk>.p-3\.5>*+* {
+        margin-top: 6px !important;
+      }
+
+      #mx-sec-produk #search-input {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+      }
+
+      #mx-sec-produk #category-pills {
+        padding-bottom: 0 !important;
+      }
+
+      /* footer status dihapus di mobile */
+      #mx-sec-produk>div:last-child:not(#products-grid) {
+        display: none !important;
+      }
+
+      /* keranjang: daftar item lebih lega */
+      #mx-sec-cart #cart-items-container {
+        max-height: none !important;
+        min-height: 200px;
+      }
+
+      header {
+        padding: 6px 8px !important;
+        position: relative !important;
+        z-index: 80 !important;
+      }
+
+      #products-grid [class~="aspect-4/3"] {
+        aspect-ratio: 16/9 !important;
+      }
+
+      #products-grid {
+        gap: 8px !important;
+      }
+
+      #products-grid>div>div {
+        border-radius: 12px;
+      }
+    }
+  </style>
   <div id="__jz-bar" aria-label="Navigasi demo" role="navigation">
     <div class="jz-bar-nav">
       <a class="jz-btn-gallery" href="https://arzhaning.my.id/demos/" aria-label="Kembali ke Galeri Contoh Desain">
@@ -4608,14 +4688,14 @@
   </script>
   <!-- TAB BAWAH MOBILE -->
   <nav id="mx-mobtab" aria-label="Navigasi kasir">
-    <button type="button" id="mx-tab-produk" class="on" onclick="mxTab('produk')"><i
+    <button type="button" id="mx-tab-produk" class="on" onclick="mxMobTab('produk')"><i
         class="fa-solid fa-boxes-stacked"></i><span>Produk</span></button>
-    <button type="button" id="mx-tab-cart" onclick="mxTab('cart')"><i
+    <button type="button" id="mx-tab-cart" onclick="mxMobTab('cart')"><i
         class="fa-solid fa-basket-shopping"></i><span>Keranjang</span><span class="mx-tb-n" id="mx-tb-n">0</span><span
         class="mx-tb-t" id="mx-tb-t">Rp 0</span></button>
   </nav>
   <script>
-    function mxTab(t) {
+    function mxMobTab(t) {
       document.body.setAttribute('data-tab', t);
       document.getElementById('mx-tab-produk').classList.toggle('on', t === 'produk');
       document.getElementById('mx-tab-cart').classList.toggle('on', t === 'cart');
@@ -4635,7 +4715,7 @@
       // kembali ke tab Produk setelah struk ditutup / transaksi baru
       ['finishReceipt', 'newTransaction'].forEach(function (n) {
         var f = window[n]; if (typeof f !== 'function') return;
-        window[n] = function () { var r = f.apply(this, arguments); if (window.innerWidth < 1024) mxTab('produk'); return r; };
+        window[n] = function () { var r = f.apply(this, arguments); if (window.innerWidth < 1024) mxMobTab('produk'); return r; };
       });
       // animasi singkat pada tab Keranjang saat barang ditambah
       var tb = document.getElementById('mx-tab-cart');
