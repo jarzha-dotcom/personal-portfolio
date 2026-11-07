@@ -23,6 +23,19 @@
   "share_target": {
     "action": "/zhanotes/",
     "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
     "params": { "title": "judul", "text": "teks", "url": "url" }
-  }
+  },
+  "file_handlers": [
+    {
+      "action": "/zhanotes/",
+      "accept": { "application/zip": [".zhn"] },
+      "icons": [{ "src": "/zhanotes/icons/zhn-256.png?v=1", "sizes": "256x256", "type": "image/png" }],
+      "launch_type": "single-client"
+    }
+  ],
+  "screenshots": [
+    { "src": "/zhanotes/screenshots/desktop.png?v=1", "sizes": "1600x764", "type": "image/png", "form_factor": "wide", "label": "Catatan halaman dengan tab Berkas, toolbar, dan daftar isi" },
+    { "src": "/zhanotes/screenshots/mobile.png?v=1", "sizes": "485x706", "type": "image/png", "form_factor": "narrow", "label": "Beranda ZhaNotes di HP" }
+  ]
 }
