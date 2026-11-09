@@ -58,6 +58,7 @@
 
 
 
+  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-warungku-pos.css">
   <!-- FontAwesome 6 Icons CDN -->
@@ -2003,7 +2004,8 @@
   </style>
 
   <style id="fullscreen-modal-fix">
-    /* HP (<1024px): semua modal jadi layar penuh; header & footer tetap, hanya area isi yang di-scroll */
+    /* HP (<1024px): semua modal jadi layar penuh.
+       Header & footer tetap; bagian tengah TIDAK boleh menyusut (penyebab tumpuk/terpotong), hanya area isi yang scroll. */
     @media (max-width: 1023px) {
       [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal) {
         padding: 0 !important;
@@ -2030,14 +2032,143 @@
       }
 
       [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>*:not(:first-child):not(:last-child) {
-        min-height: 0 !important;
+        flex: 0 0 auto !important;
+        min-height: auto !important;
       }
 
-      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>*.overflow-y-auto,
-      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>form.overflow-y-auto {
-        flex: 1 1 auto !important;
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>.overflow-y-auto,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>form.overflow-y-auto,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>.wk-mbody,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#qris-modal>div>div:nth-child(2) {
+        flex: 1 1 0 !important;
+        min-height: 0 !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)>div>*:first-child button {
+        min-width: 40px;
+        min-height: 40px;
+        flex: none;
+      }
+    }
+
+    /* Riwayat & Laci Kasir: seluruh halaman scroll sekali; header & footer menempel */
+    @media (max-width: 1023px) {
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div>*:first-child,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div>*:first-child {
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        padding: 12px 14px !important;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div>*:last-child,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div>*:last-child {
+        position: sticky;
+        bottom: 0;
+        z-index: 5;
+        padding: 12px 14px !important;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div>#history-items-container,
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div>#drawer-logs-container {
+        flex: 1 0 auto !important;
+        min-height: 160px !important;
+        overflow: visible !important;
+        padding: 12px !important;
+      }
+
+      /* Riwayat: kartu ringkasan muat di layar kecil */
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div>*:nth-child(2) {
+        gap: 8px !important;
+        padding: 12px !important;
+      }
+
+      #history-modal>div>*:nth-child(2)>div {
+        padding: 10px !important;
+        min-width: 0;
+      }
+
+      #history-modal>div>*:nth-child(2)>div>span:first-child {
+        font-size: 10px !important;
+        letter-spacing: .02em !important;
+        line-height: 1.25;
+      }
+
+      #history-modal>div>*:nth-child(2)>div>span:last-child {
+        font-size: 13px !important;
+        line-height: 1.3;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#history-modal>div>*:nth-child(3) {
+        padding: 12px !important;
+        gap: 8px !important;
+      }
+
+      #history-modal>div>*:nth-child(3)>.relative {
+        flex: 1 1 100% !important;
+        min-width: 0 !important;
+      }
+
+      #history-modal>div>*:nth-child(3)>div:last-child {
+        flex: 1 1 100%;
+      }
+
+      #history-modal>div>*:nth-child(3)>div:last-child>button {
+        flex: 1 1 0;
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+      }
+
+      #history-modal>div>*:last-child {
+        flex-wrap: nowrap !important;
+      }
+
+      /* Laci kasir: banner ringkas, angka tidak terpecah */
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div>*:nth-child(2) {
+        padding: 14px !important;
+      }
+
+      #drawer-total-display {
+        font-size: 28px !important;
+      }
+
+      [id$="-modal"]:not(#cust-modal):not(#pin-modal):not(#confirm-modal)#drawer-modal>div>*:nth-child(3) {
+        gap: 8px !important;
+        padding: 12px !important;
+      }
+
+      #drawer-modal>div>*:nth-child(3)>div {
+        padding: 8px !important;
+        min-width: 0;
+      }
+
+      #drawer-modal>div>*:nth-child(3)>div>span:last-child {
+        font-size: 12px !important;
+        white-space: nowrap;
+      }
+
+      #drawer-modal>div>*:last-child>.wk-row {
+        width: 100%;
+        display: flex;
+        gap: 8px;
+      }
+
+      #drawer-modal>div>*:last-child>.wk-row>button {
+        flex: 1 1 0;
+        justify-content: center;
       }
     }
   </style>
