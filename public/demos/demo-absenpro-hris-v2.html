@@ -1704,14 +1704,17 @@
         var AGE = { 1: 4, 2: 5, 3: 1, 4: 2, 6: 0.5, 7: 1 };
         function seed() { var ym = new Date().getFullYear() + '-' + ('0' + (new Date().getMonth() + 1)).slice(-2); var rb = function (i, u, w, st, cat, amt, note) { var r = d(i, u, w, 'Digital', 'Reimbursement', cat + ' \u00b7 Rp ' + amt.toLocaleString('id-ID') + ' \u00b7 ' + note, st, 'spv'); r.amt = amt; r.cat = cat; r.ym = ym; r.cd = ym + '-' + ('0' + new Date().getDate()).slice(-2); return r }; var d = function (i, u, w, v, t, x, s, l, a, b) { return { id: i, uid: u, who: w, div: v, type: t, detail: x, st: s, lvl: l, ds: a, de: b, ts: Date.now() - (AGE[i] || 0) * 864e5 } }; return [d(1, 'bima', 'Bima Satria', 'Digital', 'Cuti tahunan', '2\u20134 Nov \u00b7 3 hari', 'Menunggu', 'spv', '2026-11-02', '2026-11-04'), d(2, 'raka', 'Raka Mahendra', 'Digital', 'Lembur', '27 Okt \u00b7 2 j 30 m', 'Menunggu', 'spv'), d(3, 'fajar', 'Fajar Nugroho', 'Keuangan', 'Koreksi absen', '26 Okt \u00b7 lupa absen pulang 17:05', 'Menunggu', 'spv'), d(4, 'yoga', 'Yoga Pratama', 'Penjualan', 'Izin', '30 Okt \u00b7 urusan keluarga', 'Menunggu', 'spv'), d(6, 'dina', 'Dina Prameswari', 'Digital', 'Cuti tahunan', '20\u201321 Nov \u00b7 2 hari', 'Menunggu', 'admin', '2026-11-20', '2026-11-21'), d(5, 'arzha', 'Arzha', 'Digital', 'Cuti tahunan', '12\u201313 Agu \u00b7 2 hari', 'Disetujui', 'spv', '2026-08-12', '2026-08-13'), rb(7, 'raka', 'Raka Mahendra', 'Menunggu', 'Transportasi', 185000, 'Taksi online ke kantor klien'), rb(8, 'arzha', 'Arzha', 'Disetujui', 'Parkir dan tol', 120000, 'Kunjungan vendor'), (function (r) { r.lvl = 'admin'; return r })(rb(10, 'dina', 'Dina Prameswari', 'Menunggu', 'Transportasi', 90000, 'Taksi ke vendor')), (function (r) { r.ym = '2026-09'; r.cd = '2026-09-18'; return r })(rb(9, 'arzha', 'Arzha', 'Disetujui', 'Makan klien', 275000, 'Jamuan vendor September'))] }
         function init(o) { for (var k in o) O[k] = o[k]; RK = 'absenpro-req2-' + O.prefix; REQ = load() || seed(); window.addEventListener('storage', function (e) { if (e.key === RK) { REQ = load() || REQ; O.onChange() } else if (e.key === EK) { empApply(); O.onChange() } }) }
-        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', ts: Date.now(), lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; REQ.unshift(r); save(); O.onChange() }
+        function add(u, type, detail, ex) { var r = { id: Date.now(), uid: u.id, who: u.name, div: String(u.div).replace('Divisi ', ''), type: type, detail: detail, st: 'Menunggu', ts: Date.now(), lvl: u.r === 'admin' ? 'dir' : u.r === 'spv' ? 'admin' : 'spv' }; if (ex) for (var k in ex) r[k] = ex[k]; trail(r, 'Diajukan', u.name); REQ.unshift(r); save(); O.onChange() }
         function mine(id) { return REQ.filter(function (r) { return r.uid === id }) }
         function pending(scope) { return REQ.filter(function (r) { return r.st === 'Menunggu' && (!scope || scope(r)) }) }
-        function decide(id, ok, why) { REQ.forEach(function (r) { if (r.id === id) { r.st = ok ? 'Disetujui' : 'Ditolak'; r.dt = Date.now(); if (ok) delete r.why; else r.why = String(why || '').slice(0, 140) } }); save(); O.onChange() }
-        function cancel(id, uid) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.uid !== uid || r.st !== 'Menunggu') return null; r.st = 'Dibatalkan'; r.ct = Date.now(); save(); O.onChange(); return r }
+        function actor() { var a = O.who && O.who(); return a ? { n: a.name, r: ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[a.r] || '' } : { n: '', r: '' } }
+        function trail(r, e, by, note) { (r.h = r.h || []).push({ t: Date.now(), e: e, by: by || '', n: note || '' }) }
+        function history(r) { var h = (r.h || []).slice(); if (!h.length) { if (r.ts) h.push({ t: r.ts, e: 'Diajukan', by: r.who, n: '' }); if (r.st !== 'Menunggu') h.push({ t: 0, e: r.st, by: '', n: r.why || '' }) } return h }
+        function decide(id, ok, why) { REQ.forEach(function (r) { if (r.id === id) { r.st = ok ? 'Disetujui' : 'Ditolak'; r.dt = Date.now(); if (ok) delete r.why; else r.why = String(why || '').slice(0, 140); var a = actor(); r.by = a.n; trail(r, ok ? 'Disetujui' : 'Ditolak', a.n ? a.n + (a.r ? ' (' + a.r + ')' : '') : '', ok ? '' : r.why) } }); save(); O.onChange() }
+        function cancel(id, uid) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.uid !== uid || r.st !== 'Menunggu') return null; r.st = 'Dibatalkan'; r.ct = Date.now(); trail(r, 'Dibatalkan', r.who); save(); O.onChange(); return r }
         function waitDays(r) { return r.st === 'Menunggu' && r.ts ? Math.floor((Date.now() - r.ts) / 864e5) : 0 }
         function ageTag(r) { var d = waitDays(r); return d >= 1 ? '<br><span class="rl-tag rl-age ' + (d > 3 ? 'late' : 'mu') + '">' + d + ' hari menunggu</span>' : '' }
-        function pay(id) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.type !== 'Reimbursement' || r.st !== 'Disetujui') return null; r.st = 'Dibayar'; r.pd = Date.now(); save(); O.onChange(); return r }
+        function pay(id) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || r.type !== 'Reimbursement' || r.st !== 'Disetujui') return null; r.st = 'Dibayar'; r.pd = Date.now(); var a = actor(); trail(r, 'Dibayar', a.n ? a.n + (a.r ? ' (' + a.r + ')' : '') : ''); save(); O.onChange(); return r }
         function whyForm(acts, onSend) {
           var saved = acts.innerHTML; acts.setAttribute('data-why', '1');
           acts.innerHTML = '<label class="rl-why"><span>Alasan penolakan (wajib)</span><input type="text" maxlength="140" autocomplete="off"></label><button class="n" data-send="1">Kirim penolakan</button><button data-cx="1">Batal</button>';
@@ -1734,8 +1737,8 @@
         function approvals(el, scope, label) {
           var P = pending(scope), D = REQ.filter(function (r) { return r.st !== 'Menunggu' && r.st !== 'Dibatalkan' && (!scope || scope(r)) }).slice(0, 6);
           el.innerHTML = '<div class="rl">' + hd(label, 'Persetujuan') + '<div class="rl-card">' + (P.length ? P.map(function (r) { return '<div class="rl-req"><div class="rl-p"><span class="rl-a">' + ini(r.who) + '</span><div><b>' + esc(r.who) + ' \u00b7 ' + esc(r.type) + '</b><br><small>' + esc(r.detail) + '</small>' + ageTag(r) + rcImg(r) + '</div></div>' + ((O.can ? O.can(r) : true) ? '<div class="rl-acts"><button class="y" data-id="' + r.id + '" data-ok="1">Setujui</button><button class="n" data-id="' + r.id + '">Tolak</button></div>' : '<span class="rl-tag mu">Menunggu ' + LV[r.lvl || 'spv'] + '</span>') + '</div>' }).join('') : '<p class="rl-em">Semua pengajuan sudah ditangani.</p>') + '</div>'
-            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>Alasan: ' + esc(r.why) + '</small>' : '') + '</div><span class="rl-tag ' + (r.st === 'Disetujui' || r.st === 'Dibayar' ? 'ok' : 'mu') + '">' + r.st + '</span></div>' }).join('') + '</div>' : '') + '</div>';
-          el.querySelector('.rl').onclick = function (e) { var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; if (!b.dataset.ok) { whyForm(b.parentNode, function (why) { decide(id, false, why); O.toast('Ditolak: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }); return } decide(id, true); O.toast('Disetujui: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }
+            + (D.length ? '<div class="rl-card"><h3>Keputusan terakhir</h3>' + D.map(function (r) { return '<div class="rl-row"><div><b>' + esc(r.who) + '</b><br><small>' + esc(r.type) + ' \u00b7 ' + esc(r.detail) + '</small>' + (r.why ? '<br><small>Alasan: ' + esc(r.why) + '</small>' : '') + (r.by ? '<br><small>oleh ' + esc(r.by) + '</small>' : '') + '</div><span class="rl-rt"><span class="rl-tag ' + (r.st === 'Disetujui' || r.st === 'Dibayar' ? 'ok' : 'mu') + '">' + r.st + '</span>' + (O.trail ? '<button class="rl-tr" data-tr="' + r.id + '" aria-label="Riwayat ' + esc(r.type + ' ' + r.who) + '">Riwayat</button>' : '') + '</span></div>' }).join('') + '</div>' : '') + '</div>';
+          el.querySelector('.rl').onclick = function (e) { var tb = e.target.closest('button[data-tr]'); if (tb) { var rr = REQ.filter(function (x) { return x.id === +tb.dataset.tr })[0]; if (rr && O.trail) O.trail(rr); return } var b = e.target.closest('button[data-id]'); if (!b) return; var id = +b.dataset.id, r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return; if (!b.dataset.ok) { whyForm(b.parentNode, function (why) { decide(id, false, why); O.toast('Ditolak: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }); return } decide(id, true); O.toast('Disetujui: ' + r.type + ' ' + r.who); var nx = el.querySelector('.rl-acts .y'); if (nx) nx.focus() }
         }
         function summary(el) {
           var c = counts(EMP), n = EMP.length, pct = Math.round(c.h / n * 100), days = [['Sen', 94], ['Sel', 96], ['Rab', 91], ['Kam', 89], ['Jum', 95], ['Sen', 92], ['Hari ini', pct]], dv = {};
@@ -1768,7 +1771,7 @@
           + '.rl-rc{width:64px;height:64px;object-fit:cover;border-radius:10px;margin-top:6px;border:1px solid var(--rl-line)}'
           + '@container (min-width:700px){.rl-kp{grid-template-columns:repeat(4,1fr)}}';
         document.head.appendChild(st);
-        g.RL = { all: function () { return REQ }, decide: function (id, ok, why) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok, why); return r }, pay: pay, whyForm: whyForm, cancel: cancel, days: waitDays, ageTag: ageTag, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
+        g.RL = { all: function () { return REQ }, decide: function (id, ok, why) { var r = REQ.filter(function (x) { return x.id === id })[0]; if (!r || (O.can && !O.can(r))) return null; decide(id, ok, why); return r }, pay: pay, whyForm: whyForm, cancel: cancel, days: waitDays, ageTag: ageTag, history: history, emp: EMP, status: status, init: init, add: add, mine: mine, pending: pending, team: team, approvals: approvals, summary: summary, employees: employees, esc: esc, cfg: cfg, cfgDef: cfgDef, cfgSave: cfgSave, resetAll: resetAll, hm: hm, empStore: empStore, empSave: empSave, empApply: empApply, empAll: empAll, isLive: isLive, DIVS: DIVS, shiftFor: shiftFor, shiftOf: shiftOf };
       })(window);
 
   </script>
@@ -1923,6 +1926,31 @@
     .rl-age {
       margin-top: 4px;
       display: inline-block
+    }
+
+    .rl-rt {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: none
+    }
+
+    .rl-tr {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+      background: transparent;
+      border: 1px solid var(--rl-line);
+      color: var(--rl-ink);
+      border-radius: 10px;
+      padding: 6px 10px;
+      min-height: 32px;
+      cursor: pointer
+    }
+
+    .rl-tr:focus-visible {
+      outline: 3px solid var(--rl-acc);
+      outline-offset: 2px
     }
 
     .rl-acts[data-why] {
@@ -2453,15 +2481,6 @@
     const t1 = new Date(Date.now() + 864e5 * 3), t2 = new Date(Date.now() + 864e5 * 4); d1.value = iso(t1); d2.value = iso(t2);
     $$('#type button').forEach(b => b.onclick = () => { $$('#type button').forEach(x => x.classList.remove('on')); b.classList.add('on') });
     let left = 9;
-    $('#send').onclick = () => {
-      const a = new Date(d1.value), b = new Date(d2.value);
-      if (isNaN(a) || isNaN(b) || b < a) { toast('Tanggal selesai harus sama atau setelah tanggal mulai'); return }
-      const days = Math.round((b - a) / 864e5) + 1, type = $('#type .on').textContent.replace(/\s+/g, ' ').trim();
-      if (type === 'Cuti tahunan') { if (days > CF().l.max) { toast('Maksimal ' + CF().l.max + ' hari berturut-turut untuk sekali pengajuan'); return } if (days > left) { toast('Sisa cuti tinggal ' + left + ' hari'); return } usedL += days; syncLeave() }
-      const f = x => x.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
-      $('#hist').insertAdjacentHTML('afterbegin', `<div class="row"><div><b>${type}</b><br><span style="color:var(--mute);font-size:12px">${f(a)} – ${f(b)} · ${days} hari</span></div><span class="tag">Menunggu</span></div>`);
-      $('#why').value = ''; toast('Pengajuan terkirim ke atasan')
-    };
     // gaji
     const SL = { '08': { n: 'Agustus', a: 'Agu', v: [12000000, 1200000, 820000, -140000, -260000, -410000] }, '09': { n: 'September', a: 'Sep', v: [12000000, 1200000, 860000, -140000, -260000, -415000] }, '10': { n: 'Oktober', a: 'Okt', v: [12000000, 1200000, 880000, -140000, -260000, -420000] } };
     let SM = '10';
@@ -2618,7 +2637,7 @@
     function renderRole() { if (!USER) return; if (USER.r === 'spv') { RL.team($('#sp-team'), 'Digital', 'Divisi Digital'); RL.approvals($('#sp-appr'), r => r.div === 'Digital' && r.lvl === 'spv', 'Tim Digital') } else if (USER.r === 'admin') { RL.team($('#sp-team'), 'SDM', 'Divisi SDM'); RL.approvals($('#sp-appr'), r => r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital'), 'Admin') } }
     let HC = null;
     const histAct = r => { const l = RL.esc(r.type + ' ' + r.detail); return HC === r.id ? `<div class="hacts" role="group" aria-label="Konfirmasi batalkan ${l}"><button type="button" class="hbtn hy" data-hy="${r.id}">Ya, batalkan</button><button type="button" class="hbtn" data-hn="${r.id}">Tidak</button></div>` : `<div class="hacts"><button type="button" class="hbtn" data-hc="${r.id}" aria-label="Batalkan pengajuan ${l}">Batalkan pengajuan</button></div>` };
-    function renderHist() { if (!USER) return; const L = RL.mine(USER.id); $('#hist').innerHTML = L.length ? L.map(r => `<div class="row"><div><b>${RL.esc(r.type)}</b><br><span class="sm">${RL.esc(r.detail)}</span>${r.why ? `<br><span class="sm">Alasan: ${RL.esc(r.why)}</span>` : ''}${RL.ageTag(r)}${r.st === 'Menunggu' ? histAct(r) : ''}</div><span class="tag ${r.st === 'Disetujui' || r.st === 'Dibayar' ? 'ok' : r.st === 'Ditolak' || r.st === 'Dibatalkan' ? 'mu' : ''}">${r.st === 'Menunggu' ? 'Menunggu ' + ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[r.lvl || 'spv'] : r.st}</span></div>`).join('') : '<p class="sm">Belum ada pengajuan.</p>' }
+    function renderHist() { if (!USER) return; const L = RL.mine(USER.id); $('#hist').innerHTML = L.length ? L.map(r => `<div class="row"><div><b>${RL.esc(r.type)}</b><br><span class="sm">${RL.esc(r.detail)}</span>${r.why ? `<br><span class="sm">Alasan: ${RL.esc(r.why)}</span>` : ''}${r.by && (r.st === 'Disetujui' || r.st === 'Ditolak' || r.st === 'Dibayar') ? `<br><span class="sm">${r.st === 'Ditolak' ? 'Ditolak' : 'Disetujui'} oleh ${RL.esc(r.by)}</span>` : ''}${RL.ageTag(r)}${r.st === 'Menunggu' ? histAct(r) : ''}</div><span class="tag ${r.st === 'Disetujui' || r.st === 'Dibayar' ? 'ok' : r.st === 'Ditolak' || r.st === 'Dibatalkan' ? 'mu' : ''}">${r.st === 'Menunggu' ? 'Menunggu ' + ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[r.lvl || 'spv'] : r.st}</span></div>`).join('') : '<p class="sm">Belum ada pengajuan.</p>' }
     function checkDecisions() {
       if (!USER) return; const key = 'absenpro-seen-' + USER.id; let seen = []; try { seen = JSON.parse(localStorage.getItem(key)) || [] } catch (e) { }
       const who = r => ({ spv: 'Supervisor', admin: 'Admin', dir: 'Direksi' })[r.lvl || 'spv'], items = [];
@@ -2638,13 +2657,13 @@
       HC = null; const r = RL.cancel(+b.dataset.hy, USER.id); if (r) { toast('Pengajuan dibatalkan: ' + r.type); const t = $('#hist [data-hc]'); (t || $('#hist')).focus() } else renderHist()
     });
     $('#hist').addEventListener('keydown', e => { if (e.key === 'Escape' && HC !== null) { const id = HC; HC = null; renderHist(); const t = $('#hist [data-hc="' + id + '"]'); if (t) t.focus() } });
-    function rolesChanged() { badges(); renderRole(); renderHist(); checkDecisions(); drawN(); rbRender() }
+    function rolesChanged() { syncLeave(); badges(); renderRole(); renderHist(); checkDecisions(); drawN(); rbRender() }
     function canAct(r) { return !!USER && r.uid !== USER.id && ((USER.r === 'spv' && r.lvl === 'spv' && r.div === 'Digital') || (USER.r === 'admin' && (r.lvl === 'admin' || (r.lvl === 'spv' && r.div !== 'Digital')))) }
     ['t1', 't2', 'tr'].forEach(id => { $('#' + id).insertAdjacentHTML('afterbegin', '<button class="eye bk" type="button" hidden>\u2039 Profil</button>'); $('#' + id + ' .bk').onclick = () => showTab('t3') });
     $('#mymenu').onclick = e => { const b = e.target.closest('[data-go]'); if (b) showTab(b.dataset.go) };
-    RL.init({ prefix: 'v2', toast: toast, live: liveSt, can: canAct, onChange: rolesChanged });
+    RL.init({ prefix: 'v2', toast: toast, live: liveSt, can: canAct, who: () => USER, onChange: rolesChanged });
     // pengajuan staf kini masuk antrean supervisor dan admin
-    $('#send').onclick = () => { const a = new Date(d1.value), b = new Date(d2.value); if (isNaN(a) || isNaN(b) || b < a) { toast('Tanggal selesai harus sama atau setelah tanggal mulai'); return } const days = Math.round((b - a) / 864e5) + 1, type = $('#type .on').textContent.replace(/\s+/g, ' ').trim(); if (type === 'Cuti tahunan') { if (days > CF().l.max) { toast('Maksimal ' + CF().l.max + ' hari berturut-turut untuk sekali pengajuan'); return } if (days > left) { toast('Sisa cuti tinggal ' + left + ' hari'); return } usedL += days; syncLeave() } const f = x => x.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); RL.add(USER, type, f(a) + ' \u2013 ' + f(b) + ' \u00b7 ' + days + ' hari', { ds: d1.value, de: d2.value }); leaveHints(); $('#why').value = ''; toast('Pengajuan terkirim ke atasan'); addN('Pengajuan ' + type + ' dikirim', 'Menunggu persetujuan supervisor') };
+    $('#send').onclick = () => { const a = new Date(d1.value), b = new Date(d2.value); if (isNaN(a) || isNaN(b) || b < a) { toast('Tanggal selesai harus sama atau setelah tanggal mulai'); return } const days = Math.round((b - a) / 864e5) + 1, type = $('#type .on').textContent.replace(/\s+/g, ' ').trim(); if (type === 'Cuti tahunan') { if (days > CF().l.max) { toast('Maksimal ' + CF().l.max + ' hari berturut-turut untuk sekali pengajuan'); return } if (days > left) { toast('Sisa cuti tinggal ' + left + ' hari'); return } } const f = x => x.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }); RL.add(USER, type, f(a) + ' \u2013 ' + f(b) + ' \u00b7 ' + days + ' hari', { ds: d1.value, de: d2.value }); leaveHints(); $('#why').value = ''; toast('Pengajuan terkirim ke atasan'); addN('Pengajuan ' + type + ' dikirim', 'Menunggu persetujuan supervisor') };
     $('#lk').onclick = () => { const d = $('#ld').value, a = $('#la').value, b = $('#lb2').value; if (!d || !a || !b || b <= a) { toast('Isi tanggal, dan jam selesai harus setelah jam mulai'); return } const [h1, m1] = a.split(':'), [h2, m2] = b.split(':'), mins = (h2 * 60 + +m2) - (h1 * 60 + +m1); RL.add(USER, 'Lembur', new Date(d).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + Math.floor(mins / 60) + ' j ' + mins % 60 + ' m'); $('#lr').value = ''; toast('Pengajuan lembur terkirim'); addN('Lembur diajukan', 'Menunggu persetujuan supervisor') };
     $('#kk').onclick = () => { if (!$('#kd').value || !$('#kr').value.trim()) { toast('Isi tanggal dan alasan koreksi'); return } RL.add(USER, 'Koreksi absen', new Date($('#kd').value).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) + ' \u00b7 ' + $('#kr').value.trim().slice(0, 60)); $('#kr').value = ''; toast('Koreksi dikirim ke atasan'); addN('Koreksi absen dikirim', 'Menunggu persetujuan supervisor') };
     function applyUser(u) {
@@ -2674,7 +2693,7 @@
     $('#ntabs').onclick = e => { const b = e.target.closest('button'); if (!b) return; NT = b.dataset.t; drawN() };
     $('#nl').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.go === 'abs') { $('#nsheet').hidden = true; showTab('t0'); return } if (b.dataset.id) { const id = +b.dataset.id; if (!b.dataset.ok) { RL.whyForm(b.parentNode, why => { const r = RL.decide(id, false, why); if (r) toast('Ditolak: ' + r.type + ' ' + r.who) }); return } const r = RL.decide(id, true); if (r) toast('Disetujui: ' + r.type + ' ' + r.who) } };
     Object.assign(EN, { 'Batalkan pengajuan': 'Cancel request', 'Ya, batalkan': 'Yes, cancel', 'Tidak': 'No', 'Dibatalkan': 'Cancelled', 'Dibayar': 'Paid', 'Alasan penolakan (wajib)': 'Rejection reason (required)', 'Kirim penolakan': 'Send rejection', 'Isi alasan penolakan, minimal 3 huruf': 'Enter a reason, at least 3 letters' });
-    TOK.unshift([/^1 hari menunggu$/, '1 day pending'], [/^(\d+) hari menunggu$/, '$1 days pending'], [/^Pengajuan dibatalkan: (.+)$/, 'Request cancelled: $1'], [/^(.+) dibayar$/, '$1 paid'], [/^(.+) ditolak$/, '$1 rejected'], [/^(.+) disetujui$/, '$1 approved'], [/^Alasan: (.+)$/, 'Reason: $1']);
+    TOK.unshift([/^Disetujui oleh (.+)$/, 'Approved by $1'], [/^Ditolak oleh (.+)$/, 'Rejected by $1'], [/^1 hari menunggu$/, '1 day pending'], [/^(\d+) hari menunggu$/, '$1 days pending'], [/^Pengajuan dibatalkan: (.+)$/, 'Request cancelled: $1'], [/^(.+) dibayar$/, '$1 paid'], [/^(.+) ditolak$/, '$1 rejected'], [/^(.+) disetujui$/, '$1 approved'], [/^Alasan: (.+)$/, 'Reason: $1']);
     Object.assign(SL, { '05': { n: 'Mei', a: 'Mei', v: [12000000, 1200000, 800000, -140000, -260000, -400000] }, '06': { n: 'Juni', a: 'Jun', v: [12000000, 1200000, 840000, -140000, -260000, -405000] }, '07': { n: 'Juli', a: 'Jul', v: [12000000, 1200000, 860000, -140000, -260000, -410000] } });
     function drawPay() {
       if (!SL['05']) return; const MK = ['05', '06', '07', '08', '09', '10'], nets = k => SL[k].v.reduce((a, b) => a + b, 0) + rbPaid(k), v = SL[SM].v, e = v.slice(0, 3), tot = e.reduce((a, b) => a + b, 0), C = ['var(--sun)', 'var(--ink)', 'var(--ok)'], NM = ['Gaji pokok', 'Transport', 'Makan'], R = 48, L = 2 * Math.PI * R; let off = 0;
@@ -2729,9 +2748,9 @@
     Object.assign(EN, { 'Di luar radius absen': 'Outside check-in radius', 'Mode ini tidak mewajibkan geofence, jadi absen tetap bisa dilanjutkan.': 'This mode does not require a geofence, so you can still clock in.', 'Di dalam radius, siap verifikasi. Seret titik kuning untuk mencoba posisi lain.': 'Inside the radius, ready to verify. Drag the yellow dot to try another position.', 'Di luar radius 100 m. Pilih mode Rumah atau Dinas luar di Beranda, atau mendekat ke kantor.': 'Outside the 100 m radius. Choose Home or Field work mode on the home screen, or move closer to the office.' });
     TOK.push([/(\d+) m dari titik absen/, '$1 m from check-in point'], [/Bentrok dengan cuti rekan:/, 'Clashes with teammates\u2019 leave:'], [/Tidak ada bentrok dengan rekan satu divisi\./, 'No clashes with teammates in your division.'], [/^Saran: /, 'Suggestion: '], [/ tidak bentrok$/, ' has no clash'], [/^Tim (\w+): (\d+) dari (\d+) orang masuk pada rentang ini\./, 'Team $1: $2 of $3 people available in this range.'], [/, menunggu/, ', pending']);
     // ===== Putaran 3: reimbursement + pengaturan dari Portal Admin
-    let usedL = 3, RBP = null;
+    let RBP = null; const LBASE = 1, daysOf = r => Math.round((new Date(r.de) - new Date(r.ds)) / 864e5) + 1, usedLeave = () => USER ? LBASE + RL.mine(USER.id).filter(r => r.type === 'Cuti tahunan' && (r.st === 'Menunggu' || r.st === 'Disetujui') && r.ds && r.de).reduce((a, r) => a + daysOf(r), 0) : LBASE;
     const ldt = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) };
-    function syncLeave() { const q = CF().l.quota; left = Math.max(0, q - usedL); $('#left').textContent = left; $('#lb').style.width = Math.min(100, left / q * 100) + '%'; $('#lq').textContent = 'dari ' + q + ' hari' }
+    function syncLeave() { const q = CF().l.quota; left = Math.max(0, q - usedLeave()); $('#left').textContent = left; $('#lb').style.width = Math.min(100, left / q * 100) + '%'; $('#lq').textContent = 'dari ' + q + ' hari' }
     function applyCfg() {
       const c = CF(), s = SW(); syncLeave(); thumbs(); camNote();
       if (!inAt) $('#sub').textContent = 'Shift ' + s.in + ' \u2013 ' + s.out;

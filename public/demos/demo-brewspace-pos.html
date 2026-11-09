@@ -953,7 +953,7 @@
         min-height: 38px;
       }
 
-      header button span:not(#tables-count):not(#openbill-count):not(#queue-count),
+      header button span:not(#tables-count):not(#openbill-count):not(#queue-count):not(#office-count),
       header span.uppercase,
       header p.text-xs {
         display: none !important;
@@ -1789,6 +1789,63 @@
       font-family: 'JetBrains Mono', monospace
     }
 
+    .sp-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #241F1B;
+      border: 1px solid #352f2a;
+      margin-bottom: 7px
+    }
+
+    .sp-row b {
+      color: #f5f5f4;
+      font-size: 12.5px;
+      display: block
+    }
+
+    .sp-row small {
+      color: #a8a29e;
+      font-size: 11px
+    }
+
+    .sp-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: none
+    }
+
+    .sp-step button {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      border: 1px solid #44403c;
+      background: #2d2722;
+      color: #e7e5e4;
+      font: 700 15px 'JetBrains Mono', monospace;
+      cursor: pointer
+    }
+
+    .sp-step button:hover {
+      border-color: #d97706;
+      color: #fbbf24
+    }
+
+    .sp-step b {
+      min-width: 22px;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .bx-bill-actions {
+      flex-wrap: wrap;
+      justify-content: flex-end
+    }
+
     .mb-row {
       display: flex;
       justify-content: space-between;
@@ -1865,6 +1922,722 @@
     @media (max-width:1023px) {
       .qk-cols {
         grid-template-columns: 1fr
+      }
+    }
+
+    /* ===== Halaman login ===== */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      background: radial-gradient(1200px 600px at 15% 10%, #3b2410 0%, transparent 60%), linear-gradient(160deg, #16110d, #0d0a08);
+      color: #f5f5f4;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow-y: auto
+    }
+
+    #login-screen.hide {
+      display: none
+    }
+
+    .lg-brand {
+      flex: 1.1;
+      padding: 56px 56px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-width: 0
+    }
+
+    .lg-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font: 800 22px 'Plus Jakarta Sans', sans-serif
+    }
+
+    .lg-logo i {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 20px
+    }
+
+    .lg-brand h1 {
+      font: 800 44px/1.1 'Plus Jakarta Sans', sans-serif;
+      margin: 0 0 12px;
+      letter-spacing: -.02em
+    }
+
+    .lg-brand h1 span {
+      color: #f59e0b
+    }
+
+    .lg-brand p {
+      color: #a8a29e;
+      font-size: 15px;
+      max-width: 420px;
+      line-height: 1.6;
+      margin: 0
+    }
+
+    .lg-meta {
+      display: flex;
+      gap: 22px;
+      color: #a8a29e;
+      font-size: 12px
+    }
+
+    .lg-meta b {
+      display: block;
+      color: #f5f5f4;
+      font: 700 26px 'JetBrains Mono', monospace
+    }
+
+    .lg-card {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      min-width: 0
+    }
+
+    #lg-form {
+      width: 100%;
+      max-width: 380px;
+      background: #1b1612;
+      border: 1px solid #2f2822;
+      border-radius: 22px;
+      padding: 26px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, .45)
+    }
+
+    #lg-form h2 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 800
+    }
+
+    .lg-sub {
+      color: #a8a29e;
+      font-size: 13px;
+      margin: 0 0 16px
+    }
+
+    .lg-users {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px
+    }
+
+    .lg-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid #2f2822;
+      background: #241F1B;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit
+    }
+
+    .lg-user:hover {
+      border-color: #78350f
+    }
+
+    .lg-user.on {
+      border-color: #f59e0b;
+      background: #2c1d0d
+    }
+
+    .lg-user b {
+      display: block;
+      font-size: 14px
+    }
+
+    .lg-user small {
+      color: #a8a29e;
+      font-size: 11.5px
+    }
+
+    .lg-av {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #92400e);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 13px;
+      color: #fff;
+      flex: none
+    }
+
+    .lg-dots {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      margin: 6px 0 6px
+    }
+
+    .lg-dots i {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #57534e
+    }
+
+    .lg-dots i.f {
+      background: #f59e0b;
+      border-color: #f59e0b
+    }
+
+    .lg-dots.bad {
+      animation: lgshake .35s
+    }
+
+    @keyframes lgshake {
+      25% {
+        transform: translateX(-8px)
+      }
+
+      75% {
+        transform: translateX(8px)
+      }
+    }
+
+    .lg-msg {
+      min-height: 18px;
+      text-align: center;
+      font-size: 12px;
+      color: #fb7185;
+      margin-bottom: 8px
+    }
+
+    .lg-msg.ok {
+      color: #a8a29e
+    }
+
+    .lg-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .lg-pad button {
+      height: 54px;
+      border-radius: 14px;
+      border: 1px solid #2f2822;
+      background: #241F1B;
+      color: #f5f5f4;
+      font: 700 20px 'JetBrains Mono', monospace;
+      cursor: pointer
+    }
+
+    .lg-pad button:hover {
+      background: #2f2822
+    }
+
+    .lg-pad button:active {
+      background: #d97706
+    }
+
+    .lg-pad button.s {
+      font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      color: #a8a29e
+    }
+
+    .lg-hint {
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 11px;
+      color: #78716c
+    }
+
+    @media(max-width:900px) {
+      #login-screen {
+        flex-direction: column
+      }
+
+      .lg-brand {
+        flex: none;
+        padding: 22px 22px 6px
+      }
+
+      .lg-brand h1 {
+        font-size: 26px
+      }
+
+      .lg-brand p,
+      .lg-meta {
+        display: none
+      }
+
+      .lg-card {
+        padding: 12px 16px 90px;
+        align-items: flex-start
+      }
+
+      #lg-form {
+        padding: 18px
+      }
+
+      .lg-pad button {
+        height: 48px
+      }
+
+      .lg-users {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ===== Layar pelanggan ===== */
+    #modal-cust {
+      z-index: 90 !important;
+      background: linear-gradient(160deg, #1a120a, #0f0c0a) !important;
+      padding: 0 !important;
+      align-items: stretch !important;
+      backdrop-filter: none !important
+    }
+
+    .cd {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      color: #f5f5f4;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      position: relative
+    }
+
+    .cd-l {
+      flex: 1.3;
+      padding: 28px 32px;
+      overflow-y: auto;
+      min-width: 0
+    }
+
+    .cd-r {
+      flex: 1;
+      padding: 28px 32px;
+      background: #14100d;
+      border-left: 1px solid #2b241e;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0
+    }
+
+    .cd h2 {
+      font-size: 26px;
+      margin: 0 0 2px;
+      font-weight: 800
+    }
+
+    .cd-brand {
+      color: #d97706;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 14px
+    }
+
+    .cd-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #2b241e;
+      font-size: 18px
+    }
+
+    .cd-line small {
+      display: block;
+      font-size: 13px;
+      color: #a8a29e;
+      margin-top: 2px
+    }
+
+    .cd-line b {
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap
+    }
+
+    .cd-tot {
+      font: 800 44px 'JetBrains Mono', monospace;
+      color: #fbbf24;
+      margin: 4px 0 14px
+    }
+
+    .cd-sub {
+      display: flex;
+      justify-content: space-between;
+      color: #a8a29e;
+      font-size: 16px;
+      padding: 3px 0
+    }
+
+    .cd-sub.g {
+      color: #34d399
+    }
+
+    .cd-qr {
+      width: min(260px, 60vw);
+      aspect-ratio: 1;
+      background: #fff;
+      border-radius: 16px;
+      padding: 12px;
+      margin: 12px auto
+    }
+
+    .cd-qr svg {
+      width: 100%;
+      height: 100%
+    }
+
+    .cd-big {
+      text-align: center
+    }
+
+    .cd-big .ic {
+      font-size: 64px;
+      color: #34d399;
+      margin-bottom: 8px
+    }
+
+    .cd-note {
+      color: #a8a29e;
+      font-size: 15px;
+      text-align: center;
+      margin-top: 8px
+    }
+
+    .cd-x {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      z-index: 2;
+      padding: 6px 12px;
+      border-radius: 99px;
+      border: 1px solid #44403c;
+      background: rgba(0, 0, 0, .4);
+      color: #a8a29e;
+      font: 600 11px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer;
+      opacity: .6
+    }
+
+    .cd-x:hover {
+      opacity: 1
+    }
+
+    @media(max-width:900px) {
+      .cd {
+        flex-direction: column
+      }
+
+      .cd-l {
+        flex: 1.2;
+        padding: 50px 18px 14px
+      }
+
+      .cd-r {
+        padding: 16px 18px;
+        border-left: 0;
+        border-top: 1px solid #2b241e;
+        flex: none
+      }
+
+      .cd-tot {
+        font-size: 32px
+      }
+
+      .cd-line {
+        font-size: 15px
+      }
+
+      .cd h2 {
+        font-size: 20px
+      }
+    }
+
+    /* ===== Back Office ===== */
+    .of-ing {
+      padding: 11px 12px;
+      border-radius: 12px;
+      background: #241F1B;
+      border: 1px solid #352f2a;
+      margin-bottom: 8px
+    }
+
+    .of-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px
+    }
+
+    .of-top b {
+      color: #f5f5f4;
+      font-size: 12.5px
+    }
+
+    .of-chip {
+      padding: 2px 9px;
+      border-radius: 99px;
+      font: 700 10px 'Plus Jakarta Sans', sans-serif;
+      border: 1px solid;
+      white-space: nowrap
+    }
+
+    .of-chip.ok {
+      color: #34d399;
+      border-color: #065f46;
+      background: #052e22
+    }
+
+    .of-chip.low {
+      color: #fbbf24;
+      border-color: #92400e;
+      background: #2a1a08
+    }
+
+    .of-chip.out {
+      color: #fecaca;
+      border-color: #b91c1c;
+      background: #7f1d1d
+    }
+
+    .of-bar {
+      height: 7px;
+      border-radius: 99px;
+      background: #352f2a;
+      margin: 8px 0 6px;
+      overflow: hidden
+    }
+
+    .of-bar i {
+      display: block;
+      height: 100%;
+      border-radius: 99px
+    }
+
+    .of-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11px;
+      color: #a8a29e
+    }
+
+    .of-edit {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px
+    }
+
+    .of-edit .rp-input {
+      padding: 6px 9px;
+      font-size: 12px
+    }
+
+    .of-edit .bx-btn {
+      width: auto
+    }
+
+    .po-card {
+      padding: 12px;
+      border-radius: 12px;
+      background: #241F1B;
+      border: 1px solid #352f2a;
+      margin-bottom: 10px
+    }
+
+    .po-st {
+      padding: 2px 9px;
+      border-radius: 99px;
+      font: 700 10px 'Plus Jakarta Sans', sans-serif;
+      border: 1px solid #44403c;
+      color: #d6d3d1;
+      white-space: nowrap
+    }
+
+    .po-st.diajukan {
+      color: #fbbf24;
+      border-color: #92400e;
+      background: #2a1a08
+    }
+
+    .po-st.dipesan {
+      color: #38bdf8;
+      border-color: #075985;
+      background: #0a1e2e
+    }
+
+    .po-st.diterima {
+      color: #34d399;
+      border-color: #065f46;
+      background: #052e22
+    }
+
+    .po-st.ditolak {
+      color: #fecaca;
+      border-color: #b91c1c;
+      background: #7f1d1d
+    }
+
+    .pl-sum {
+      border-top: 1px solid #352f2a;
+      margin-top: 4px;
+      padding-top: 7px !important;
+      color: #f5f5f4 !important;
+      font-weight: 700
+    }
+
+    .rl-grid {
+      display: grid;
+      grid-template-columns: 1fr 54px 54px 54px;
+      gap: 6px 4px;
+      align-items: center;
+      font-size: 11.5px;
+      color: #d6d3d1
+    }
+
+    .rl-grid .h {
+      font-weight: 700;
+      color: #a8a29e;
+      text-transform: uppercase;
+      font-size: 10px;
+      letter-spacing: .04em
+    }
+
+    .rl-grid div:not(:nth-child(4n+1)) {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace
+    }
+
+    .lg-row {
+      display: flex;
+      gap: 10px;
+      padding: 8px 2px;
+      border-bottom: 1px solid #292524;
+      font-size: 11.5px;
+      color: #d6d3d1
+    }
+
+    .lg-row .t {
+      font: 700 11px 'JetBrains Mono', monospace;
+      color: #78716c;
+      flex: none
+    }
+
+    .lg-row em {
+      font-style: normal;
+      font-size: 10px;
+      color: #fbbf24;
+      border: 1px solid #78350f;
+      border-radius: 99px;
+      padding: 0 6px;
+      margin-left: 4px
+    }
+
+    .rp-paper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 8px;
+      font: 600 11px 'Plus Jakarta Sans', sans-serif;
+      color: #a8a29e
+    }
+
+    .rp-paper button {
+      padding: 5px 12px;
+      border-radius: 99px;
+      border: 1px solid #44403c;
+      background: #241F1B;
+      color: #a8a29e;
+      font: 700 11px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer
+    }
+
+    .rp-paper button.on {
+      background: #d97706;
+      border-color: #f59e0b;
+      color: #fff
+    }
+
+    .rp-tab.locked {
+      opacity: .45
+    }
+
+    .rp-tab.locked::after {
+      content: " 🔒";
+      font-size: 9px
+    }
+
+    .rp-role {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 8px;
+      border-radius: 99px;
+      border: 1px solid #78350f;
+      background: #2a1a08;
+      color: #fbbf24;
+      font: 600 11px 'Plus Jakarta Sans', sans-serif;
+      cursor: pointer
+    }
+
+    .rp-role:hover {
+      background: #3a2410
+    }
+
+    .rp-role b {
+      font-weight: 700
+    }
+
+    #office-count {
+      display: none
+    }
+
+    @media (min-width:1024px) and (max-width:1200px) {
+      header>div:last-child button>span:not(#tables-count):not(#openbill-count):not(#queue-count):not(#office-count) {
+        display: none !important
+      }
+
+      header>div:last-child button {
+        padding: 8px 10px !important
+      }
+    }
+
+    @media (max-width:1023px) {
+      .rp-tab {
+        padding: 8px 2px;
+        font-size: 11px
+      }
+
+      header>div:last-child {
+        overflow-x: auto;
+        min-width: 0;
+        scrollbar-width: none
+      }
+
+      header>div:last-child::-webkit-scrollbar {
+        display: none
+      }
+
+      header>div:last-child button {
+        flex: none
       }
     }
   </style>
@@ -2076,8 +2849,12 @@
               class="px-1.5 py-0.5 rounded text-[10px] font-semibold uppercase bg-[#292524] text-amber-400 border border-amber-900/40">v2.4</span>
           </div>
           <p class="text-xs text-stone-400">
-            Outlet: <span class="text-stone-200 font-medium">Downtown Hub</span> · Kasir: <span
-              class="text-amber-300 font-medium">Radit</span>
+            Outlet: <span class="text-stone-200 font-medium" data-set="outlet">Downtown Hub</span> · <button
+              type="button" id="role-chip" class="rp-role" onclick="openRole()" title="Ganti peran"><span
+                id="role-label">Kasir</span>: <b id="role-name">Radit</b> <i class="fa-solid fa-chevron-down"
+                style="font-size:8px"></i></button> <button type="button" class="rp-role" onclick="logout()"
+              title="Ganti pengguna / kunci kasir" aria-label="Ganti pengguna"><i class="fa-solid fa-lock"
+                style="font-size:10px"></i><span class="hidden sm:inline"> Ganti pengguna</span></button>
           </p>
         </div>
       </div>
@@ -2114,6 +2891,14 @@
         <span class="hidden sm:inline">Antrean Bar</span>
         <span id="queue-count"
           class="bg-amber-600 text-white text-[11px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center">0</span>
+      </button>
+
+      <button onclick="openOffice()"
+        class="relative flex items-center gap-2 px-3 py-2 rounded-lg bg-[#26221F] hover:bg-[#322C27] text-stone-300 hover:text-white border border-stone-800 text-xs font-medium transition cursor-pointer">
+        <i class="fa-solid fa-boxes-stacked text-amber-500"></i>
+        <span class="hidden sm:inline">Back Office</span>
+        <span id="office-count"
+          class="bg-rose-600 text-white text-[11px] font-bold px-1.5 py-0.2 rounded-full min-w-4 text-center">0</span>
       </button>
 
       <button onclick="toggleModal('modal-drawer')"
@@ -2234,6 +3019,8 @@
           <button type="button" id="member-btn" class="rp-disc-btn" onclick="openMember()"><i
               class="fa-solid fa-id-card"></i><span id="member-label">Pilih member</span></button>
           <span id="member-pts" class="rp-disc-val"></span>
+          <button type="button" class="rp-disc-btn" onclick="toggleModal('modal-cust', true)"
+            title="Tampilkan ke pelanggan" aria-label="Layar pelanggan"><i class="fa-solid fa-display"></i></button>
         </div>
       </div>
 
@@ -2254,11 +3041,11 @@
             <span id="bill-discount" class="rp-disc-val">Rp 0</span>
           </div>
           <div class="flex justify-between">
-            <span>PPN (11%)</span>
+            <span data-set="tax-bill">PPN (11%)</span>
             <span id="bill-tax" class="font-mono text-stone-300 tabular-nums">Rp 0</span>
           </div>
           <div class="flex justify-between">
-            <span>Layanan Kafe (5%)</span>
+            <span data-set="svc-bill">Layanan Kafe (5%)</span>
             <span id="bill-service" class="font-mono text-stone-300 tabular-nums">Rp 0</span>
           </div>
           <div class="flex justify-between items-baseline pt-2 border-t border-stone-800/80 text-stone-100">
@@ -2531,8 +3318,11 @@
                 class="fa-solid fa-arrow-left"></i><span>Kembali ke Pesanan</span></button>
           </div>
           <div id="ck-actions-done" class="space-y-2 hidden">
-            <button type="button" onclick="window.print()" class="bx-btn ghost"><i
+            <button type="button" onclick="printReceipt()" class="bx-btn ghost"><i
                 class="fa-solid fa-print"></i><span>Cetak Struk Kasir (Print)</span></button>
+            <div class="rp-paper" role="group" aria-label="Lebar kertas struk"><span>Kertas</span><button type="button"
+                id="paper-58" onclick="setPaper(58)">58 mm</button><button type="button" id="paper-80"
+                onclick="setPaper(80)">80 mm</button></div>
             <button type="button" onclick="finishOrder()" class="bx-btn success"><i class="fa-solid fa-plus"></i><span
                 id="ck-finish-label">Selesai & Transaksi Baru</span></button>
           </div>
@@ -2545,9 +3335,9 @@
         style="flex:none">
         <div id="printable-receipt" class="space-y-3">
           <div class="text-center pb-2 border-b border-dashed border-stone-400">
-            <h4 class="font-extrabold text-base tracking-wider text-black">BREWSPACE COFFEE</h4>
-            <p class="text-[10px] text-stone-600">Downtown Hub, Level 1</p>
-            <p class="text-[10px] text-stone-600">Jl. Sudirman No. 42, Jakarta</p>
+            <h4 class="font-extrabold text-base tracking-wider text-black" data-set="brand">BREWSPACE COFFEE</h4>
+            <p class="text-[10px] text-stone-600" data-set="rc-outlet">Downtown Hub, Level 1</p>
+            <p class="text-[10px] text-stone-600" data-set="address">Jl. Sudirman No. 42, Jakarta</p>
             <p class="text-[10px] text-stone-600">Telp: (021) 555-7890</p>
           </div>
           <div id="rcpt-status" class="text-center font-bold text-[10px]" style="letter-spacing:.12em;color:#a16207">
@@ -2557,7 +3347,7 @@
               <span id="rcpt-id">No: BS-84920</span><span id="rcpt-time">10:45 WIB</span>
             </div>
             <div class="flex justify-between">
-              <span>Kasir: Radit Pratama</span><span id="rcpt-date">06 Okt 2026</span>
+              <span id="rcpt-cashier">Kasir: Radit Pratama</span><span id="rcpt-date">06 Okt 2026</span>
             </div>
             <div class="flex justify-between font-bold text-stone-800">
               <span id="rcpt-type">Dine In (Meja 01)</span><span id="rcpt-cust">Tamu Walk-in</span>
@@ -2569,8 +3359,10 @@
             <div class="flex justify-between"><span>Subtotal:</span><span id="rcpt-subtotal">Rp 0</span></div>
             <div id="rcpt-discount-row" class="justify-between" style="display:none"><span
                 id="rcpt-discount-label">Diskon:</span><span id="rcpt-discount">-Rp 0</span></div>
-            <div class="flex justify-between"><span>PPN (11%):</span><span id="rcpt-tax">Rp 0</span></div>
-            <div class="flex justify-between"><span>Layanan (5%):</span><span id="rcpt-service">Rp 0</span></div>
+            <div class="flex justify-between"><span data-set="tax-rc">PPN (11%):</span><span id="rcpt-tax">Rp 0</span>
+            </div>
+            <div class="flex justify-between"><span data-set="svc-rc">Layanan (5%):</span><span id="rcpt-service">Rp
+                0</span></div>
             <div class="flex justify-between text-xs font-bold text-black pt-1">
               <span>TOTAL:</span><span id="rcpt-total">Rp 0</span>
             </div>
@@ -2679,10 +3471,13 @@
       <div style="display:flex;gap:8px;margin-top:10px">
         <button onclick="toast('Struk ringkasan shift dikirim ke printer.', 'ok')" class="bx-btn ghost"><i
             class="fa-solid fa-print"></i><span>Cetak Laporan</span></button>
+        <button onclick="exportTx()" class="bx-btn ghost"><i class="fa-solid fa-file-csv"></i><span>Ekspor
+            CSV</span></button>
         <button onclick="openCloseShift()" class="bx-btn danger-soft"><i class="fa-solid fa-lock"></i><span>Tutup
             Shift</span></button>
       </div>
-      <button type="button" class="rp-reset" onclick="resetDemo()">Reset data demo</button>
+      <button type="button" class="rp-reset" onclick="openRole()">Ganti peran</button>
+      <button type="button" class="rp-reset" onclick="resetDemo()" style="padding-top:0">Reset data demo</button>
     </div>
   </div>
 
@@ -2801,6 +3596,104 @@
     </div>
   </div>
 
+  <!-- MODAL: PISAH BILL -->
+  <div id="modal-split"
+    class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#1C1814] border border-stone-800 rounded-2xl w-full max-w-md p-5 text-xs"
+      style="display:flex;flex-direction:column;max-height:calc(100vh - 100px)">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-base text-stone-100"><i class="fa-solid fa-code-branch text-amber-500 mr-2"></i>Pisah
+          Bill</h3>
+        <button onclick="toggleModal('modal-split', false)" class="text-stone-400 hover:text-white"
+          aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="split-body" style="overflow-y:auto;min-height:0"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: GABUNG BILL -->
+  <div id="modal-merge"
+    class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#1C1814] border border-stone-800 rounded-2xl w-full max-w-md p-5 text-xs"
+      style="display:flex;flex-direction:column;max-height:calc(100vh - 100px)">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-base text-stone-100"><i
+            class="fa-solid fa-object-group text-amber-500 mr-2"></i>Gabung Bill</h3>
+        <button onclick="toggleModal('modal-merge', false)" class="text-stone-400 hover:text-white"
+          aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="merge-body" style="overflow-y:auto;min-height:0"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: BACK OFFICE -->
+  <div id="modal-office"
+    class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#1C1814] border border-stone-800 rounded-2xl w-full p-5 text-xs"
+      style="display:flex;flex-direction:column;max-width:760px;height:min(720px,calc(100vh - 100px))">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-base text-stone-100"><i class="fa-solid fa-boxes-stacked text-amber-500 mr-2"></i>Back
+          Office <span id="office-role" class="rp-role" style="margin-left:6px;cursor:default"></span></h3>
+        <button onclick="toggleModal('modal-office', false)" class="text-stone-400 hover:text-white"
+          aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="office-tabs" class="rp-tabs">
+        <button type="button" class="rp-tab on" data-t="stok" onclick="offGo('stok')">Stok Bahan</button>
+        <button type="button" class="rp-tab" data-t="pl" onclick="offGo('pl')">Laba Rugi</button>
+        <button type="button" class="rp-tab" data-t="po" onclick="offGo('po')">PO Bahan</button>
+        <button type="button" class="rp-tab" data-t="menu" onclick="offGo('menu')">Menu</button>
+        <button type="button" class="rp-tab" data-t="role" onclick="offGo('role')">Peran &amp; Log</button>
+        <button type="button" class="rp-tab" data-t="set" onclick="offGo('set')">Setelan</button>
+      </div>
+      <div id="office-body" style="overflow-y:auto;min-height:0;flex:1"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: GANTI PERAN -->
+  <div id="modal-role"
+    class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-[#1C1814] border border-stone-800 rounded-2xl w-full max-w-md p-5 text-xs"
+      style="max-height:calc(100vh - 100px);overflow-y:auto">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="font-bold text-base text-stone-100"><i class="fa-solid fa-user-shield text-amber-500 mr-2"></i>Ganti
+          Peran</h3>
+        <button onclick="toggleModal('modal-role', false)" class="text-stone-400 hover:text-white" aria-label="Tutup"><i
+            class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div id="role-body"></div>
+    </div>
+  </div>
+
+  <!-- LAYAR PELANGGAN -->
+  <div id="modal-cust" class="hidden fixed inset-0 z-50 flex">
+    <div class="cd">
+      <button type="button" class="cd-x" onclick="toggleModal('modal-cust', false)">Tutup layar pelanggan · Esc</button>
+      <div class="cd-l">
+        <div class="cd-brand">BrewSpace Coffee</div>
+        <div id="cd-left"></div>
+      </div>
+      <div class="cd-r" id="cd-right"></div>
+    </div>
+  </div>
+
+  <!-- HALAMAN LOGIN -->
+  <div id="login-screen">
+    <div class="lg-brand">
+      <div class="lg-logo"><i class="fa-solid fa-mug-hot"></i>BrewSpace</div>
+      <div>
+        <h1>Kasir kedai kopi<br>yang <span>cepat</span> &amp; rapi.</h1>
+        <p>Masuk dengan PIN untuk memulai shift. Hak akses menyesuaikan peran: Kasir, Supervisor, atau Owner.</p>
+      </div>
+      <div class="lg-meta">
+        <div><b id="lg-clock">--:--</b><span data-set="outlet">Downtown Hub</span></div>
+        <div><b>Shift Pagi</b>Modal Rp 500.000</div>
+      </div>
+    </div>
+    <div class="lg-card">
+      <div id="lg-form"></div>
+    </div>
+  </div>
+
   <!-- DIALOG KONFIRMASI -->
   <div id="modal-confirm" class="bx-overlay hidden" role="dialog" aria-modal="true">
     <div class="bx-confirm">
@@ -2843,6 +3736,7 @@
     function renderProducts() {
       const grid = document.getElementById('product-grid');
       const filtered = MENU_DATABASE.filter(item => {
+        if (item.hidden) return false;
         const matchesCat = currentCategory === 'all' || item.category === currentCategory;
         const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase()) || item.desc.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesCat && matchesSearch;
@@ -2948,10 +3842,12 @@
       dv.textContent = t.discount ? '- ' + formatRupiah(t.discount) : 'Rp 0';
       dv.classList.toggle('on', t.discount > 0);
       renderMember();
+      renderCust();
       persist();
     }
 
     function handleClickProduct(id) {
+      { const it0 = menuById(id); if (it0 && isSoldOut(it0)) { toast(`${it0.name} sedang habis${noIngredient(it0) ? ' (bahan tidak cukup)' : ''}.`, 'warn'); return; } }
       const item = MENU_DATABASE.find(m => m.id === id);
       if (!item) return;
 
@@ -2988,7 +3884,23 @@
     /* ================================================================
        STATE & HELPER
     ================================================================ */
-    const TAX_RATE = 0.11, SERVICE_RATE = 0.05;
+    let TAX_RATE = 0.11, SERVICE_RATE = 0.05;
+    /* ---- Setelan outlet ---- */
+    const SET_KEY = 'brewspace-settings';
+    let SETTINGS = { brand: 'BREWSPACE COFFEE', outlet: 'Downtown Hub', address: 'Jl. Sudirman No. 42, Jakarta', tax: 11, service: 5, idleMin: 5 };
+    try { Object.assign(SETTINGS, JSON.parse(localStorage.getItem(SET_KEY) || '{}')); } catch (e) { }
+    const fmtPct = n => String(n).replace('.', ',');
+    function applySettings() {
+      TAX_RATE = SETTINGS.tax / 100; SERVICE_RATE = SETTINGS.service / 100;
+      IDLE_MS = SETTINGS.idleMin * 60000;
+      const m = {
+        outlet: SETTINGS.outlet, brand: SETTINGS.brand.toUpperCase(), address: SETTINGS.address,
+        'rc-outlet': SETTINGS.outlet + ', Level 1',
+        'tax-bill': `PPN (${fmtPct(SETTINGS.tax)}%)`, 'svc-bill': `Layanan Kafe (${fmtPct(SETTINGS.service)}%)`,
+        'tax-rc': `PPN (${fmtPct(SETTINGS.tax)}%):`, 'svc-rc': `Layanan (${fmtPct(SETTINGS.service)}%):`
+      };
+      document.querySelectorAll('[data-set]').forEach(el => { if (m[el.dataset.set] != null) el.textContent = m[el.dataset.set]; });
+    }
     let currentCategory = 'all';
     let searchQuery = '';
     let currentOrderType = 'dine-in';
@@ -3022,8 +3934,15 @@
     let stock = { ...STOCK_INIT };
     const hasStock = item => Object.prototype.hasOwnProperty.call(stock, item.id);
     const inCart = id => cart.reduce((a, c) => a + (c.item.id === id ? c.qty : 0), 0);
-    const isSoldOut = item => hasStock(item) && stock[item.id] <= 0;
-    const stockBadge = item => !hasStock(item) ? '' :
+    const noIngredient = item => {
+      const r = typeof RECIPES !== 'undefined' && RECIPES[item.id];
+      if (!r) return false;
+      return Object.keys(r).some(k => k === 'milk'
+        ? !['susu', 'oat', 'almond'].some(m => ingStock[m] >= r.milk)
+        : ingStock[k] < r[k]);
+    };
+    const isSoldOut = item => (hasStock(item) && stock[item.id] <= 0) || noIngredient(item);
+    const stockBadge = item => noIngredient(item) ? '<span class="rp-stock out">Bahan habis</span>' : !hasStock(item) ? '' :
       (stock[item.id] <= 0 ? '<span class="rp-stock out">Habis</span>'
         : `<span class="rp-stock ${stock[item.id] <= 5 ? 'low' : ''}">Sisa ${stock[item.id]}</span>`);
 
@@ -3076,7 +3995,7 @@
     function seedTransactions() {
       let seed = 20261107;
       const rnd = () => { seed = (seed * 1664525 + 1013904223) >>> 0; return seed / 4294967296; };
-      const pool = MENU_DATABASE.filter(m => m.category !== 'addons');
+      const pool = MENU_DATABASE.filter(m => m.category !== 'addons' && !m.custom);
       const names = ['Tamu Walk-in', 'Rani', 'Bapak Hendra', 'Dewi', 'Kevin', 'Tamu Walk-in', 'Sinta', 'Maya', 'Fajar', 'Tamu Walk-in', 'Lina'];
       const methods = ['qris', 'qris', 'cash', 'cash', 'edc'];
       const out = [];
@@ -3202,6 +4121,92 @@
       toast(`${n} poin ditukar menjadi potongan ${formatRupiah(n * POINT_VALUE)}.`, 'ok');
     }
 
+    /* ---- Pisah & gabung bill ---- */
+    let splitId = null, splitQty = {}, splitDest = 'takeaway', mergeSrc = null;
+    const billQty = b => b.items.reduce((a, c) => a + c.qty, 0);
+    function openSplit(id) {
+      const b = openBills.find(x => x.id === id);
+      if (!b) return;
+      if (id === activeBillId) { toast('Bill sedang terbuka di kasir. Tekan Hold dulu sebelum dipisah.', 'warn'); return; }
+      if (billQty(b) < 2) { toast('Bill hanya berisi 1 item, tidak bisa dipisah.', 'warn'); return; }
+      splitId = id; splitQty = {};
+      const free = TABLES.filter(t => tableState(t.id) === 'free');
+      splitDest = free.length ? free[0].id : 'takeaway';
+      renderSplit();
+      toggleModal('modal-split', true);
+    }
+    function splitAdj(lineId, d) {
+      const b = openBills.find(x => x.id === splitId), l = b && b.items.find(x => x.id === lineId);
+      if (!l) return;
+      splitQty[lineId] = Math.min(l.qty, Math.max(0, (splitQty[lineId] || 0) + d));
+      renderSplit();
+    }
+    function renderSplit() {
+      const b = openBills.find(x => x.id === splitId);
+      if (!b) return;
+      const moved = b.items.reduce((a, l) => a + (splitQty[l.id] || 0), 0);
+      const value = b.items.reduce((a, l) => a + (splitQty[l.id] || 0) * l.unitPrice, 0);
+      const free = TABLES.filter(t => tableState(t.id) === 'free');
+      const ok = moved > 0 && moved < billQty(b);
+      document.getElementById('split-body').innerHTML = `
+        <p class="bx-sub" style="font-family:inherit;margin:0 0 10px">${esc(b.id)} · ${esc(billLabel(b))}. Atur jumlah item yang dipindah ke bill baru.</p>
+        ${b.items.map(l => `<div class="sp-row"><span><b>${esc(l.item.name)}</b><small>${l.qty} item · ${formatRupiah(l.unitPrice)}${l.custom ? ' · ' + (l.custom.temp === 'hot' ? 'Hot' : 'Iced') : ''}</small></span>
+          <span class="sp-step"><button type="button" onclick="splitAdj('${l.id}',-1)" aria-label="Kurangi">−</button><b>${splitQty[l.id] || 0}</b><button type="button" onclick="splitAdj('${l.id}',1)" aria-label="Tambah">+</button></span></div>`).join('')}
+        <span class="bx-label">Bill baru untuk</span>
+        <select id="split-dest" class="bx-input" onchange="splitDest=this.value">
+          ${free.map(t => `<option value="${t.id}" ${splitDest === t.id ? 'selected' : ''}>${t.label} (${t.area})</option>`).join('')}
+          <option value="takeaway" ${splitDest === 'takeaway' ? 'selected' : ''}>Take Away</option>
+        </select>
+        <div class="rp-note" style="margin-top:10px"><span>Dipindah: ${moved} item</span><b>${formatRupiah(value)}</b></div>
+        <button type="button" class="bx-btn amber" style="margin-top:12px" ${ok ? '' : 'disabled'} onclick="doSplit()"><i class="fa-solid fa-code-branch"></i><span>Pisahkan Bill</span></button>
+        <p class="bx-sub" style="font-family:inherit">Sisakan minimal 1 item di bill asal. Diskon &amp; member tetap di bill asal.</p>`;
+    }
+    function doSplit() {
+      const b = openBills.find(x => x.id === splitId);
+      if (!b) return;
+      const moved = b.items.reduce((a, l) => a + (splitQty[l.id] || 0), 0);
+      if (moved <= 0 || moved >= billQty(b)) { toast('Pilih sebagian item untuk dipisah.', 'warn'); return; }
+      const dest = document.getElementById('split-dest').value;
+      if (dest !== 'takeaway' && tableState(dest) !== 'free') { toast(`${tableLabel(dest)} sudah terisi. Pilih meja lain.`, 'warn'); renderSplit(); return; }
+      const newItems = [];
+      b.items.forEach(l => { const n = splitQty[l.id] || 0; if (n > 0) { const c = cloneLine(l); c.qty = n; newItems.push(c); l.qty -= n; } });
+      b.items = b.items.filter(l => l.qty > 0);
+      const nb = {
+        id: 'OB-' + String(++obCounter).padStart(3, '0'), type: dest === 'takeaway' ? 'takeaway' : 'dine-in', table: dest === 'takeaway' ? b.table : dest,
+        customer: b.customer.replace(/ \(\d+\)$/, '') + ' (2)', time: nowHM(), items: newItems, discount: null, member: null
+      };
+      openBills.push(nb);
+      toggleModal('modal-split', false);
+      refreshAll();
+      toast(`${nb.id} dibuat dari ${b.id} · ${billLabel(nb)}.`, 'ok');
+    }
+    function openMerge(id) {
+      const b = openBills.find(x => x.id === id);
+      if (!b) return;
+      if (id === activeBillId) { toast('Bill sedang terbuka di kasir. Tekan Hold dulu sebelum digabung.', 'warn'); return; }
+      const others = openBills.filter(x => x.id !== id && x.id !== activeBillId);
+      if (!others.length) { toast('Tidak ada bill lain yang bisa digabung.', 'info'); return; }
+      mergeSrc = id;
+      document.getElementById('merge-body').innerHTML = `
+        <p class="bx-sub" style="font-family:inherit;margin:0 0 10px">Gabungkan <b style="color:#fbbf24">${esc(b.id)} · ${esc(billLabel(b))}</b> (${formatRupiah(calcTotals(b.items, b.discount).total)}) ke bill:</p>
+        ${others.map(o => `<button type="button" class="mb-item" onclick="doMerge('${o.id}')"><span><b>${esc(billLabel(o))}</b><small>${o.id} · ${billQty(o)} item</small></span><span class="p">${formatRupiah(calcTotals(o.items, o.discount).total)}</span></button>`).join('')}
+        <p class="bx-sub" style="font-family:inherit">Item yang sama digabung jumlahnya. Meja bill ini otomatis kosong.</p>`;
+      toggleModal('modal-merge', true);
+    }
+    function doMerge(targetId) {
+      const src = openBills.find(x => x.id === mergeSrc), tg = openBills.find(x => x.id === targetId);
+      if (!src || !tg) return;
+      src.items.forEach(l => {
+        const same = tg.items.find(x => x.item.id === l.item.id && x.unitPrice === l.unitPrice && JSON.stringify(x.custom) === JSON.stringify(l.custom));
+        if (same) same.qty += l.qty; else tg.items.push(cloneLine(l));
+      });
+      const lostDisc = src.discount ? ` Diskon "${src.discount.label}" pada ${src.id} tidak ikut digabung.` : '';
+      openBills = openBills.filter(x => x.id !== src.id);
+      toggleModal('modal-merge', false);
+      refreshAll();
+      toast(`${src.id} digabung ke ${tg.id}.${lostDisc}`, 'ok');
+    }
+
     /* ---- Pindah meja ---- */
     let moveId = null;
     function openMove(id) {
@@ -3224,6 +4229,745 @@
       toggleModal('modal-move', false);
       refreshAll();
       toast(`${b.id} dipindah dari ${from} ke ${tableLabel(tid)}.`, 'ok');
+    }
+
+    /* ================================================================
+       BACK OFFICE: PERAN, BAHAN & RESEP, LABA RUGI, PO BAHAN
+    ================================================================ */
+    const ROLES = {
+      kasir: { label: 'Kasir', level: 1, name: 'Radit Pratama', pin: '1111', discPct: 10 },
+      supervisor: { label: 'Supervisor', level: 2, name: 'Sari Wulandari', pin: '2222', discPct: 25 },
+      owner: { label: 'Owner', level: 3, name: 'Anindya Putri', pin: '3333', discPct: 100 }
+    };
+    const LEVEL_NAME = { 2: 'Supervisor', 3: 'Owner' };
+    let role = 'kasir';
+    const lvl = () => ROLES[role].level;
+    function need(level, what) {
+      if (lvl() >= level) return true;
+      toast(`${what} khusus ${LEVEL_NAME[level]}${level === 2 ? ' / Owner' : ''}. Ganti peran lewat Laporan › Ganti peran.`, 'warn');
+      return false;
+    }
+    let auditLog = [
+      { at: '09:05', who: 'Sari Wulandari', role: 'supervisor', t: 'Membuka shift pagi · modal Rp 500.000' },
+      { at: '08:40', who: 'Sari Wulandari', role: 'supervisor', t: 'Mengajukan PO-0008 (Oat Milk Barista)' }
+    ];
+    function audit(t) {
+      auditLog.unshift({ at: nowHM(), who: ROLES[role].name, role, t });
+      if (auditLog.length > 60) auditLog.length = 60;
+      persist();
+    }
+    function renderRoleUI() {
+      setText('role-label', ROLES[role].label);
+      setText('role-name', ROLES[role].name.split(' ')[0]);
+    }
+
+    /* ---- Bahan baku & resep ---- */
+    const ING = [
+      { id: 'kopi', name: 'Biji Kopi House Blend', unit: 'g', pack: 1000, packName: 'kg', packCost: 320000, min: 2000, par: 8000, supplier: 'Roastery Nusantara' },
+      { id: 'susu', name: 'Susu Segar Full Cream', unit: 'ml', pack: 1000, packName: 'liter', packCost: 19000, min: 8000, par: 30000, supplier: 'Dairy Fresh' },
+      { id: 'oat', name: 'Oat Milk Barista', unit: 'ml', pack: 1000, packName: 'liter', packCost: 52000, min: 2000, par: 8000, supplier: 'Plant & Co' },
+      { id: 'almond', name: 'Almond Milk', unit: 'ml', pack: 1000, packName: 'liter', packCost: 68000, min: 1500, par: 5000, supplier: 'Plant & Co' },
+      { id: 'gula', name: 'Sirup Gula', unit: 'ml', pack: 1000, packName: 'liter', packCost: 15000, min: 1500, par: 5000, supplier: 'Toko Bahan Kopi' },
+      { id: 'caramel', name: 'Sirup Caramel', unit: 'ml', pack: 750, packName: 'botol', packCost: 98000, min: 500, par: 3000, supplier: 'Toko Bahan Kopi' },
+      { id: 'matcha', name: 'Matcha Ceremonial', unit: 'g', pack: 500, packName: 'kaleng', packCost: 450000, min: 150, par: 1000, supplier: 'Toko Bahan Kopi' },
+      { id: 'coklat', name: 'Dark Chocolate Powder', unit: 'g', pack: 1000, packName: 'kg', packCost: 120000, min: 800, par: 3000, supplier: 'Toko Bahan Kopi' },
+      { id: 'cup', name: 'Cup & Tutup', unit: 'pcs', pack: 50, packName: 'sleeve', packCost: 55000, min: 100, par: 600, supplier: 'Packaging Mart' }
+    ];
+    const ING_STOCK_INIT = { kopi: 5400, susu: 21500, oat: 1800, almond: 3200, gula: 3900, caramel: 1400, matcha: 320, coklat: 2100, cup: 210 };
+    let ingStock = { ...ING_STOCK_INIT };
+    const ingById = id => ING.find(i => i.id === id);
+    const ingUnitCost = i => i.packCost / i.pack;
+    const fmtN = n => Math.round(n).toLocaleString('id-ID');
+    const stockState = i => ingStock[i.id] <= 0 ? 'out' : ingStock[i.id] < i.min ? 'low' : 'ok';
+    const lowIngs = () => ING.filter(i => stockState(i) !== 'ok');
+    // resep per porsi (milk = susu sesuai pilihan modifier)
+    const RECIPES = {
+      'latte': { kopi: 18, milk: 180, cup: 1 }, 'cappuccino': { kopi: 18, milk: 140, cup: 1 },
+      'caramel-macchiato': { kopi: 18, milk: 160, caramel: 20, cup: 1 }, 'americano': { kopi: 18, cup: 1 },
+      'coldbrew': { kopi: 30, cup: 1 }, 'v60-gayo': { kopi: 15, cup: 1 }, 'japanese-drip': { kopi: 20, cup: 1 },
+      'matcha': { matcha: 6, milk: 180, cup: 1 }, 'chocolate': { coklat: 30, milk: 200, cup: 1 },
+      'addon-espresso': { kopi: 18 }, 'addon-oat': { oat: 100 }
+    };
+    const PASTRY_COST = { 'croissant': 12000, 'pain-chocolat': 14000, 'almond-croissant': 16000 };
+    function usageOf(itemId, custom, qty) {
+      const r = RECIPES[itemId], out = {};
+      if (!r) return out;
+      const milkId = custom && custom.milk === 'oat' ? 'oat' : custom && custom.milk === 'almond' ? 'almond' : 'susu';
+      Object.keys(r).forEach(k => { const id = k === 'milk' ? milkId : k; out[id] = (out[id] || 0) + r[k] * qty; });
+      if (custom && r.cup) { const pct = parseInt(custom.sugar, 10) || 0; if (pct > 0) out.gula = (out.gula || 0) + 20 * pct / 100 * qty; }
+      return out;
+    }
+    function lineCost(itemId, custom, qty) {
+      if (PASTRY_COST[itemId] !== undefined) return PASTRY_COST[itemId] * qty;
+      const u = usageOf(itemId, custom, qty);
+      return Object.keys(u).reduce((a, k) => a + u[k] * ingUnitCost(ingById(k)), 0);
+    }
+    function usageToday() {
+      const tot = {};
+      transactions.forEach(t => (t.items || []).forEach(l => { const u = usageOf(l.id, l.custom, l.qty); Object.keys(u).forEach(k => tot[k] = (tot[k] || 0) + u[k]); }));
+      return tot;
+    }
+    function deductStock(items) {
+      const warned = [];
+      items.forEach(c => {
+        const u = usageOf(c.item.id, c.custom, c.qty);
+        Object.keys(u).forEach(k => {
+          const i = ingById(k), before = stockState(i);
+          ingStock[k] = Math.max(0, ingStock[k] - u[k]);
+          if (before === 'ok' && stockState(i) !== 'ok' && !warned.includes(i.name)) warned.push(i.name);
+        });
+      });
+      warned.forEach(n => toast(`Stok ${n} menipis. Buat PO di Back Office.`, 'warn'));
+    }
+
+    /* ---- Biaya operasional & laba rugi ---- */
+    let opex = { gaji: 450000, sewa: 300000, lain: 100000 };
+    function plStats() {
+      const p = { gross: 0, disc: 0, tax: 0, service: 0, cogs: 0, count: transactions.length, byMenu: {} };
+      transactions.forEach(t => {
+        const tt = t.totals || { subtotal: t.total, discount: 0, tax: 0, service: 0 };
+        p.gross += tt.subtotal; p.disc += tt.discount || 0; p.tax += tt.tax || 0; p.service += tt.service || 0;
+        (t.items || []).forEach(l => {
+          const c = lineCost(l.id, l.custom, l.qty);
+          p.cogs += c;
+          const m = p.byMenu[l.name] || (p.byMenu[l.name] = { qty: 0, rev: 0, cogs: 0 });
+          m.qty += l.qty; m.rev += l.qty * l.unitPrice; m.cogs += c;
+        });
+      });
+      p.net = p.gross - p.disc;
+      p.gp = p.net - p.cogs;
+      p.opex = opex.gaji + opex.sewa + opex.lain;
+      p.profit = p.gp - p.opex;
+      return p;
+    }
+
+    /* ---- PO bahan ---- */
+    const PO_ST = { draft: 'Draft', diajukan: 'Menunggu Persetujuan', dipesan: 'Dipesan', diterima: 'Diterima', ditolak: 'Ditolak' };
+    let poCounter = 8;
+    let POS = [
+      { id: 'PO-0008', supplier: 'Plant & Co', status: 'diajukan', at: '07 Nov', by: 'Sari Wulandari', lines: [{ ing: 'oat', packs: 6 }] },
+      { id: 'PO-0007', supplier: 'Roastery Nusantara', status: 'diterima', at: '05 Nov', by: 'Sari Wulandari', lines: [{ ing: 'kopi', packs: 6 }] }
+    ];
+    const poTotal = po => po.lines.reduce((a, l) => a + l.packs * ingById(l.ing).packCost, 0);
+    function draftFor(supplier) {
+      let po = POS.find(p => p.status === 'draft' && p.supplier === supplier);
+      if (!po) {
+        po = { id: 'PO-' + String(++poCounter).padStart(4, '0'), supplier, status: 'draft', at: new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }), by: ROLES[role].name, lines: [] };
+        POS.unshift(po);
+      }
+      return po;
+    }
+    function addToPO(ingId, packs) {
+      const i = ingById(ingId), po = draftFor(i.supplier);
+      const ex = po.lines.find(l => l.ing === ingId);
+      if (ex) ex.packs = Math.max(ex.packs, packs); else po.lines.push({ ing: ingId, packs });
+      return po;
+    }
+    function poSuggest() {
+      if (!need(2, 'Membuat PO')) return;
+      const low = lowIngs();
+      if (!low.length) { toast('Semua stok bahan masih aman, tidak ada saran PO.', 'info'); return; }
+      const ids = new Set();
+      low.forEach(i => ids.add(addToPO(i.id, Math.max(1, Math.ceil((i.par - ingStock[i.id]) / i.pack))).id));
+      audit('Membuat draft PO dari saran stok: ' + [...ids].join(', '));
+      offTab = 'po'; renderOffice();
+      toast(`${ids.size} draft PO dibuat dari ${low.length} bahan yang menipis.`, 'ok');
+    }
+    function poManual() {
+      if (!need(2, 'Membuat PO')) return;
+      const id = document.getElementById('po-ing').value;
+      const packs = Math.round(Number(document.getElementById('po-packs').value) || 0);
+      if (packs <= 0) { toast('Isi jumlah kemasan yang dipesan.', 'warn'); return; }
+      const po = addToPO(id, packs);
+      audit(`Menambah ${packs} ${ingById(id).packName} ${ingById(id).name} ke ${po.id}`);
+      renderOffice();
+    }
+    function poAdj(poId, ingId, d) {
+      const po = POS.find(p => p.id === poId);
+      if (!po || po.status !== 'draft' || !need(2, 'Mengubah PO')) return;
+      const l = po.lines.find(x => x.ing === ingId);
+      if (!l) return;
+      l.packs += d;
+      if (l.packs <= 0) po.lines = po.lines.filter(x => x !== l);
+      if (!po.lines.length) POS = POS.filter(p => p !== po);
+      renderOffice();
+    }
+    function poAct(id, act) {
+      const po = POS.find(p => p.id === id);
+      if (!po) return;
+      if (act === 'ajukan') {
+        if (!need(2, 'Mengajukan PO')) return;
+        po.status = 'diajukan'; audit(`Mengajukan ${po.id} (${fmtRp(poTotal(po))})`);
+        toast(`${po.id} diajukan, menunggu persetujuan Owner.`, 'info');
+      } else if (act === 'setujui') {
+        if (!need(3, 'Menyetujui PO')) return;
+        po.status = 'dipesan'; audit(`Menyetujui ${po.id} (${fmtRp(poTotal(po))})`);
+        toast(`${po.id} disetujui & dikirim ke ${po.supplier}.`, 'ok');
+      } else if (act === 'tolak') {
+        if (!need(3, 'Menolak PO')) return;
+        po.status = 'ditolak'; audit(`Menolak ${po.id}`);
+        toast(`${po.id} ditolak.`, 'warn');
+      } else if (act === 'terima') {
+        if (!need(2, 'Menerima barang')) return;
+        po.lines.forEach(l => { ingStock[l.ing] += l.packs * ingById(l.ing).pack; });
+        po.status = 'diterima'; audit(`Menerima barang ${po.id} dari ${po.supplier}`);
+        toast(`Barang ${po.id} diterima, stok bahan bertambah.`, 'ok');
+        updateBadges(); renderProducts();
+      } else if (act === 'hapus') {
+        if (!need(2, 'Menghapus PO')) return;
+        POS = POS.filter(p => p !== po); audit(`Menghapus draft ${po.id}`);
+      }
+      renderOffice(); persist();
+    }
+    const fmtRp = v => formatRupiah(Math.round(v));
+
+    /* ---- Login ---- */
+    let loginUser = null, loginPin = '', loginFails = 0, loginLockUntil = 0, loginMsg = '';
+    const SESSION_KEY = 'brewspace-session';
+    const loginVisible = () => !document.getElementById('login-screen').classList.contains('hide');
+    function showLogin() {
+      loginUser = null; loginPin = ''; loginFails = 0; loginMsg = '';
+      document.querySelectorAll('[id^="modal-"]').forEach(m => m.classList.add('hidden'));
+      document.getElementById('login-screen').classList.remove('hide');
+      renderLogin();
+    }
+    function renderLogin() {
+      const el = document.getElementById('lg-form');
+      if (!el) return;
+      const locked = Date.now() < loginLockUntil;
+      const ini = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
+      el.innerHTML = `
+        <h2>Masuk ke Kasir</h2>
+        <p class="lg-sub">Pilih pengguna, lalu masukkan PIN 4 digit.</p>
+        <div class="lg-users">${Object.keys(ROLES).map(k => `<button type="button" class="lg-user ${loginUser === k ? 'on' : ''}" onclick="loginSelect('${k}')"><span class="lg-av">${ini(ROLES[k].name)}</span><span><b>${esc(ROLES[k].name)}</b><small>${ROLES[k].label}</small></span></button>`).join('')}</div>
+        <div id="lg-dots" class="lg-dots">${[0, 1, 2, 3].map(i => `<i class="${i < loginPin.length ? 'f' : ''}"></i>`).join('')}</div>
+        <div id="lg-msg" class="lg-msg ${locked || !loginMsg ? '' : ''}">${esc(locked ? 'Terlalu banyak percobaan. Coba lagi dalam ' + Math.ceil((loginLockUntil - Date.now()) / 1000) + ' detik.' : (loginMsg || (loginUser ? '' : 'Pilih pengguna terlebih dahulu')))}</div>
+        <div class="lg-pad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button type="button" onclick="loginKey('${n}')">${n}</button>`).join('')}
+          <button type="button" class="s" onclick="loginKey('clr')">Hapus</button><button type="button" onclick="loginKey('0')">0</button><button type="button" class="s" onclick="loginKey('del')" aria-label="Hapus satu"><i class="fa-solid fa-delete-left"></i></button></div>
+        <p class="lg-hint">PIN demo · Kasir 1111 · Supervisor 2222 · Owner 3333</p>
+        <p class="lg-hint" style="margin-top:4px">Ini aplikasi demo. Semua data hanya tersimpan di browser Anda.</p>`;
+    }
+    function loginSelect(k) { loginUser = k; loginPin = ''; loginMsg = ''; renderLogin(); }
+    function loginKey(d) {
+      if (Date.now() < loginLockUntil) return;
+      if (!loginUser) { loginMsg = 'Pilih pengguna terlebih dahulu'; renderLogin(); return; }
+      loginMsg = '';
+      if (d === 'del') loginPin = loginPin.slice(0, -1);
+      else if (d === 'clr') loginPin = '';
+      else if (loginPin.length < 4) loginPin += d;
+      renderLogin();
+      if (loginPin.length === 4) setTimeout(loginCheck, 120);
+    }
+    function loginCheck() {
+      if (loginPin !== ROLES[loginUser].pin) {
+        loginFails++; loginPin = '';
+        if (loginFails >= 3) { loginLockUntil = Date.now() + 30000; loginFails = 0; loginMsg = ''; }
+        else loginMsg = `PIN salah (${loginFails}/3)`;
+        renderLogin();
+        const d = document.getElementById('lg-dots'); if (d) d.classList.add('bad');
+        return;
+      }
+      doLogin(loginUser);
+    }
+    function doLogin(k) {
+      role = k;
+      try { sessionStorage.setItem(SESSION_KEY, k); } catch (e) { }
+      document.getElementById('login-screen').classList.add('hide');
+      loginPin = '';
+      audit('Login ke kasir');
+      renderRoleUI(); renderOffice();
+      toast(`Selamat datang, ${ROLES[k].name.split(' ')[0]}! (${ROLES[k].label})`, 'ok');
+    }
+    /* ---- Kunci otomatis (idle) ---- */
+    let IDLE_MS = 5 * 60 * 1000, lastActive = Date.now(), idleWarned = false;
+    ['pointerdown', 'keydown', 'touchstart', 'wheel'].forEach(ev => document.addEventListener(ev, () => { lastActive = Date.now(); idleWarned = false; }, true));
+    setInterval(() => {
+      if (loginVisible()) { lastActive = Date.now(); return; }
+      const left = IDLE_MS - (Date.now() - lastActive);
+      if (left <= 0) { autoLock(); }
+      else if (left <= 30000 && !idleWarned) { idleWarned = true; toast('Kasir akan terkunci otomatis dalam 30 detik.', 'error'); }
+    }, 1000);
+    function autoLock() {
+      audit('Kunci otomatis (tidak ada aktivitas)');
+      try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { }
+      showLogin();
+      loginMsg = 'Dikunci otomatis karena tidak ada aktivitas.';
+      renderLogin();
+    }
+    function logout() {
+      audit('Logout / kunci kasir');
+      try { sessionStorage.removeItem(SESSION_KEY); } catch (e) { }
+      showLogin();
+    }
+    document.addEventListener('keydown', e => {
+      if (!loginVisible()) return;
+      if (/^[0-9]$/.test(e.key)) loginKey(e.key);
+      else if (e.key === 'Backspace') loginKey('del');
+      else if (e.key === 'Escape') loginKey('clr');
+      e.stopImmediatePropagation();
+    }, true);
+    setInterval(() => {
+      const c = document.getElementById('lg-clock');
+      if (c) { const d = new Date(); c.textContent = pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+      if (loginVisible() && Date.now() < loginLockUntil) renderLogin();
+      else if (loginVisible() && loginLockUntil && Date.now() >= loginLockUntil) { loginLockUntil = 0; renderLogin(); }
+    }, 1000);
+
+    /* ---- Layar pelanggan ---- */
+    function renderCust() {
+      const m = document.getElementById('modal-cust');
+      if (!m || m.classList.contains('hidden')) return;
+      const L = document.getElementById('cd-left'), R = document.getElementById('cd-right');
+      const co = checkout && !checkout.reprint && !document.getElementById('modal-checkout').classList.contains('hidden') ? checkout : null;
+      const lines = (items, getName) => items.map(c => {
+        const cu = c.custom;
+        const det = cu ? `<small>${cu.temp === 'hot' ? 'Hot' : 'Iced'} · ${esc(cu.milk)} · gula ${esc(cu.sugar)}${cu.notes ? ' · “' + esc(cu.notes) + '”' : ''}</small>` : '';
+        return `<div class="cd-line"><span>${c.qty}× ${esc(getName(c))}${det}</span><b>${formatRupiah(c.unitPrice * c.qty)}</b></div>`;
+      }).join('');
+      const totals = t => `
+        ${t.discount ? `<div class="cd-sub g"><span>${esc(t.discLabel || 'Diskon')}</span><span>- ${formatRupiah(t.discount)}</span></div>` : ''}
+        <div class="cd-sub"><span>Subtotal</span><span>${formatRupiah(t.subtotal)}</span></div>
+        <div class="cd-sub"><span>PPN ${fmtPct(SETTINGS.tax)}% &amp; Layanan ${fmtPct(SETTINGS.service)}%</span><span>${formatRupiah(t.tax + t.service)}</span></div>`;
+      if (co && co.paid) {
+        L.innerHTML = '<h2>Ringkasan Pesanan</h2>' + lines(co.items, c => c.item.name);
+        const mb = co.member ? memberById(co.member) : null;
+        R.innerHTML = `<div class="cd-big"><div class="ic"><i class="fa-solid fa-circle-check"></i></div><h2>Terima kasih${co.customer && co.customer !== 'Tamu Walk-in' ? ', ' + esc(co.customer) : ''}!</h2>
+          <div class="cd-tot">${formatRupiah(co.totals.total)}</div>
+          <div class="cd-note">Dibayar via ${esc(co.result.methodText)}${co.result.change ? ' · kembalian ' + formatRupiah(co.result.change) : ''}</div>
+          ${mb ? `<div class="cd-note" style="color:#fbbf24">+${co.earned || 0} poin · total ${mb.points} poin</div>` : ''}
+          <div class="cd-note">Selamat menikmati ☕</div></div>`;
+      } else if (co) {
+        L.innerHTML = '<h2>Pembayaran</h2><div class="cd-brand" style="margin-top:0">Periksa pesanan Anda</div>' + lines(co.items, c => c.item.name);
+        let pay = '';
+        if (selectedPayment === 'qris') pay = `<div class="cd-note">Scan QRIS dengan aplikasi pembayaran Anda</div><div class="cd-qr">${document.getElementById('qris-box').innerHTML}</div>`;
+        else if (selectedPayment === 'cash') pay = '<div class="cd-note">Silakan serahkan uang tunai ke kasir</div>';
+        else if (selectedPayment === 'edc') pay = '<div class="cd-note">Silakan gesek / tap kartu pada mesin EDC</div>';
+        else pay = `<div class="cd-note">Pembayaran campuran${mixParts.length ? ' · sisa ' + formatRupiah(mixRemaining()) : ''}</div>` + mixParts.map(x => `<div class="cd-sub"><span>${METHOD[x.method].label}</span><span>${formatRupiah(x.amount)}</span></div>`).join('');
+        R.innerHTML = totals(co.totals) + `<div class="cd-brand" style="margin:14px 0 0">Total Pembayaran</div><div class="cd-tot">${formatRupiah(co.totals.total)}</div>` + pay;
+      } else if (cart.length) {
+        const t = calcTotals(cart, discount), mb = member ? memberById(member) : null;
+        L.innerHTML = '<h2>Pesanan Anda</h2>' + (mb ? `<div class="cd-brand" style="margin-top:0">Member · ${esc(mb.name)} · ${mb.points} poin</div>` : '<div class="cd-brand" style="margin-top:0">Silakan periksa pesanan</div>') + lines(cart, c => c.item.name);
+        R.innerHTML = totals(t) + `<div class="cd-brand" style="margin:14px 0 0">Total</div><div class="cd-tot">${formatRupiah(t.total)}</div><div class="cd-note">${billQty({ items: cart })} item</div>`;
+      } else {
+        L.innerHTML = '<h2>Selamat datang ☕</h2><div class="cd-note" style="text-align:left">Pesanan Anda akan tampil di sini.</div>';
+        R.innerHTML = '<div class="cd-big"><div class="ic" style="color:#d97706"><i class="fa-solid fa-mug-hot"></i></div><h2>BrewSpace Coffee</h2><div class="cd-note">Member dapat 1 poin tiap Rp 10.000.<br>Tanyakan voucher hari ini ke kasir.</div></div>';
+      }
+    }
+
+    /* ---- Cetak struk (58 / 80 mm) ---- */
+    let paperMm = 80;
+    function setPaper(mm) {
+      paperMm = mm === 58 ? 58 : 80;
+      const w = paperMm;
+      let st = document.getElementById('print-page-style');
+      if (!st) { st = document.createElement('style'); st.id = 'print-page-style'; document.head.appendChild(st); }
+      st.textContent = `@page{size:${w}mm auto;margin:0}@media print{#printable-receipt{width:${w}mm!important;padding:${w === 58 ? 3 : 4}mm!important;font-size:${w === 58 ? '9px' : '11px'}!important;line-height:1.35}#printable-receipt h4{font-size:${w === 58 ? '13px' : '16px'}!important}}`;
+      ['58', '80'].forEach(x => { const b = document.getElementById('paper-' + x); if (b) b.classList.toggle('on', Number(x) === w); });
+      persist();
+    }
+    function printReceipt() {
+      setPaper(paperMm);
+      if (checkout) audit(`Cetak struk ${checkout.orderNum} (${paperMm} mm)${checkout.reprint ? ' · salinan' : ''}`);
+      window.print();
+    }
+
+    /* ---- Ekspor CSV ---- */
+    function downloadCSV(name, rows) {
+      const esc2 = v => { const t = String(v ?? ''); return /[;"\n]/.test(t) ? '"' + t.replace(/"/g, '""') + '"' : t; };
+      const csv = '\ufeff' + rows.map(r => r.map(esc2).join(';')).join('\r\n');
+      const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+      const a = document.createElement('a');
+      a.href = url; a.download = name + '-' + new Date().toISOString().slice(0, 10) + '.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      audit('Ekspor CSV: ' + a.download);
+      toast(`${a.download} diunduh.`, 'ok');
+    }
+    function exportTx() {
+      const rows = [['No Struk', 'Waktu', 'Tamu', 'Tipe', 'Meja', 'Metode', 'Item', 'Subtotal', 'Diskon', 'PPN', 'Service', 'Total', 'Kasir', 'Member']];
+      transactions.slice().reverse().forEach(t => {
+        const tt = t.totals || { subtotal: t.total, discount: 0, tax: 0, service: 0 };
+        const method = t.parts ? t.parts.map(x => METHOD[x.method].label + ' ' + x.amount).join(' + ') : METHOD[t.method].label;
+        rows.push([t.no, t.time, t.cust, t.type === 'dine-in' ? 'Dine-in' : 'Take Away', t.type === 'dine-in' ? tableLabel(t.table) : '', method,
+        (t.items || []).map(l => l.qty + 'x ' + l.name).join(' | '), tt.subtotal, tt.discount || 0, tt.tax, tt.service, t.total, t.cashier || 'Radit Pratama', t.memberName || '']);
+      });
+      downloadCSV('brewspace-transaksi', rows);
+    }
+    function exportStock() {
+      if (!need(2, 'Ekspor stok')) return;
+      const used = usageToday();
+      const rows = [['Bahan', 'Satuan', 'Stok', 'Minimum', 'Par', 'Status', 'Terpakai shift ini', 'Harga per kemasan', 'Nilai stok', 'Supplier']];
+      ING.forEach(i => rows.push([i.name, i.unit, Math.round(ingStock[i.id]), i.min, i.par, stockState(i), Math.round(used[i.id] || 0), i.packCost, Math.round(ingStock[i.id] * ingUnitCost(i)), i.supplier]));
+      downloadCSV('brewspace-stok-bahan', rows);
+    }
+    function exportPL() {
+      if (!need(3, 'Ekspor laba rugi')) return;
+      const p = plStats();
+      const rows = [['Pos', 'Nilai (Rp)'], ['Penjualan kotor', p.gross], ['Diskon', -p.disc], ['Penjualan bersih', p.net], ['HPP', -Math.round(p.cogs)], ['Laba kotor', Math.round(p.gp)],
+      ['Gaji & upah', -opex.gaji], ['Sewa & utilitas', -opex.sewa], ['Operasional lain', -opex.lain], ['Laba bersih', Math.round(p.profit)],
+      ['Memo PPN', p.tax], ['Memo service charge', p.service], [], ['Menu', 'Terjual', 'Pendapatan', 'HPP', 'Laba']];
+      Object.entries(p.byMenu).forEach(([n, m]) => rows.push([n, m.qty, m.rev, Math.round(m.cogs), Math.round(m.rev - m.cogs)]));
+      downloadCSV('brewspace-laba-rugi', rows);
+    }
+
+    /* ---- Opname stok ---- */
+    function opname(id) {
+      if (!need(2, 'Stok opname')) return;
+      const i = ingById(id), el = document.getElementById('op-' + id);
+      const v = Number(el.value);
+      if (el.value === '' || !(v >= 0)) { toast('Isi jumlah stok hasil hitung fisik.', 'warn'); return; }
+      const before = ingStock[id];
+      ingStock[id] = Math.round(v);
+      audit(`Opname ${i.name}: ${fmtN(before)} → ${fmtN(v)} ${i.unit} (selisih ${v - before >= 0 ? '+' : ''}${fmtN(v - before)})`);
+      updateBadges(); renderProducts(); renderOffice();
+      toast(`Stok ${i.name} disesuaikan menjadi ${fmtN(v)} ${i.unit}.`, 'ok');
+    }
+    function setOpex(k, v) {
+      if (!need(3, 'Mengubah biaya operasional')) { renderOffice(); return; }
+      opex[k] = Math.max(0, Math.round(Number(v) || 0));
+      audit(`Mengubah biaya operasional ${k} menjadi ${fmtRp(opex[k])}/hari`);
+      renderOffice();
+    }
+
+    /* ---- UI Back Office ---- */
+    let offTab = 'stok';
+    const OFF_NEED = { stok: 2, pl: 3, po: 2, role: 2, set: 3, menu: 3 };
+    function openOffice() {
+      if (!need(2, 'Back Office')) return;
+      toggleModal('modal-office', true);
+    }
+    function offGo(t) {
+      if (lvl() < OFF_NEED[t]) { need(OFF_NEED[t], { stok: 'Stok bahan', pl: 'Laporan laba rugi', po: 'PO bahan', role: 'Log aktivitas', set: 'Setelan outlet', menu: 'Kelola menu' }[t]); return; }
+      offTab = t; renderOffice();
+    }
+    function renderOffice() {
+      const body = document.getElementById('office-body');
+      if (!body) return;
+      if (lvl() < OFF_NEED[offTab]) offTab = 'stok';
+      document.querySelectorAll('#office-tabs .rp-tab').forEach(b => {
+        b.classList.toggle('on', b.dataset.t === offTab);
+        b.classList.toggle('locked', lvl() < OFF_NEED[b.dataset.t]);
+      });
+      setText('office-role', ROLES[role].label + ' · ' + ROLES[role].name);
+      if (offTab === 'stok') body.innerHTML = renderStokTab();
+      else if (offTab === 'pl') body.innerHTML = renderPLTab();
+      else if (offTab === 'po') body.innerHTML = renderPOTab();
+      else if (offTab === 'menu') body.innerHTML = renderMenuTab();
+      else if (offTab === 'set') body.innerHTML = renderSetTab();
+      else body.innerHTML = renderRoleTab();
+    }
+    /* ---- Kelola menu (Owner) ---- */
+    const MENU_KEY = 'brewspace-menu';
+    const MENU_CATS = { espresso: 'Espresso', manual: 'Manual Brew', 'non-coffee': 'Non-Coffee', pastry: 'Pastry', addons: 'Add-ons' };
+    const MENU_IMG = "data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22225%22><rect width=%22300%22 height=%22225%22 fill=%22%231c1814%22/><text x=%22150%22 y=%22125%22 font-size=%2260%22 text-anchor=%22middle%22>%E2%98%95</text></svg>";
+    let menuState = { edits: {}, custom: [], recipes: {} }, menuRecOpen = null;
+    function loadMenu() {
+      try { const d = JSON.parse(localStorage.getItem(MENU_KEY) || 'null'); if (d && d.edits && Array.isArray(d.custom)) menuState = { recipes: {}, ...d }; } catch (e) { }
+      menuState.custom.forEach(c => { if (!menuById(c.id)) MENU_DATABASE.push({ id: c.id, name: c.name, category: c.category, price: c.price, img: c.img || MENU_IMG, desc: c.desc, customizable: !!c.customizable, custom: true }); if (c.hpp) PASTRY_COST[c.id] = c.hpp; });
+      Object.keys(menuState.edits).forEach(id => { const m = menuById(id); if (m) Object.assign(m, menuState.edits[id]); });
+      Object.keys(menuState.recipes).forEach(id => { if (!menuById(id)) return; RECIPES[id] = menuState.recipes[id]; if (menuById(id).custom) delete PASTRY_COST[id]; });
+    }
+    function saveMenu() {
+      try { localStorage.setItem(MENU_KEY, JSON.stringify(menuState)); } catch (e) { toast('Penyimpanan penuh — perubahan hanya berlaku sementara.', 'error'); }
+      renderProducts(); renderCart(); renderOffice();
+    }
+    function menuSet(id, field, val) {
+      if (!need(3, 'Kelola menu')) return renderOffice();
+      const m = menuById(id); if (!m) return;
+      if (field === 'price') { val = Math.round(Number(val)); if (!(val >= 1000 && val <= 1000000)) { toast('Harga harus Rp 1.000 – Rp 1.000.000.', 'error'); return renderOffice(); } }
+      if (field === 'name') { val = String(val).trim().slice(0, 40); if (!val) { toast('Nama menu tidak boleh kosong.', 'error'); return renderOffice(); } }
+      const before = m[field]; m[field] = val;
+      (menuState.edits[id] = menuState.edits[id] || {})[field] = val;
+      const c = menuState.custom.find(x => x.id === id); if (c && field !== 'hidden' && field !== 'popular') c[field] = val;
+      if (field === 'img') { audit(`Mengganti foto menu ${m.name}`); return saveMenu(); }
+      if (field === 'customizable') { audit(`${val ? 'Mengaktifkan' : 'Menonaktifkan'} opsi kustom ${m.name}`); return saveMenu(); }
+      audit(field === 'hidden' ? `${val ? 'Menyembunyikan' : 'Menampilkan'} menu ${m.name}` : field === 'popular' ? `${val ? 'Menandai favorit' : 'Menghapus favorit'} ${m.name}` : `Mengubah ${field} menu ${before} → ${val}`);
+      saveMenu();
+    }
+    let menuNewImg = '';
+    function resizeImage(file, cb) {
+      if (!file || !/^image\//.test(file.type)) { toast('Pilih file gambar (JPG/PNG).', 'error'); return; }
+      if (file.size > 8 * 1024 * 1024) { toast('Ukuran foto maksimal 8 MB.', 'error'); return; }
+      const fr = new FileReader();
+      fr.onload = () => {
+        const im = new Image();
+        im.onload = () => {
+          const W = 400, H = 300, cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+          const sc = Math.max(W / im.width, H / im.height), w = im.width * sc, h = im.height * sc;
+          cv.getContext('2d').drawImage(im, (W - w) / 2, (H - h) / 2, w, h);
+          cb(cv.toDataURL('image/jpeg', 0.75));
+        };
+        im.onerror = () => toast('Gambar tidak dapat dibaca.', 'error');
+        im.src = fr.result;
+      };
+      fr.readAsDataURL(file);
+    }
+    function menuPhoto(id, input) {
+      if (!need(3, 'Kelola menu')) return;
+      resizeImage(input.files[0], d => menuSet(id, 'img', d));
+    }
+    function menuNewPhoto(input) {
+      resizeImage(input.files[0], d => { menuNewImg = d; const pv = document.getElementById('mn-prev'); if (pv) { pv.src = d; pv.style.display = 'block'; } });
+    }
+    const REC_ROWS = () => ING.filter(i => i.id !== 'susu' && i.id !== 'gula').map(i => ({ key: i.id, name: i.name, unit: i.unit, ing: i }))
+      .concat([{ key: 'milk', name: 'Susu (sesuai pilihan pelanggan)', unit: 'ml', ing: ingById('susu') }]);
+    function recipeCost(r) {
+      return Object.keys(r).reduce((a, k) => a + r[k] * ingUnitCost(ingById(k === 'milk' ? 'susu' : k)), 0);
+    }
+    function menuRecipeToggle(id) { menuRecOpen = menuRecOpen === id ? null : id; renderOffice(); }
+    function recipeFromInputs() {
+      const r = {};
+      REC_ROWS().forEach(x => { const v = Number(document.getElementById('rc-' + x.key).value); if (v > 0) r[x.key] = v; });
+      return r;
+    }
+    function recipeLive() { const el = document.getElementById('rc-hpp'); if (el) el.textContent = fmtRp(recipeCost(recipeFromInputs())); }
+    function menuRecipeSave(id) {
+      if (!need(3, 'Kelola menu')) return;
+      const m = menuById(id); if (!m) return;
+      const bad = REC_ROWS().some(x => { const v = Number(document.getElementById('rc-' + x.key).value); return !(v >= 0 && v <= 10000); });
+      if (bad) { toast('Takaran harus 0–10.000.', 'error'); return; }
+      const r = recipeFromInputs();
+      if (Object.keys(r).length) {
+        RECIPES[id] = r; menuState.recipes[id] = r; if (m.custom) delete PASTRY_COST[id];
+        audit(`Menyimpan resep ${m.name} (HPP ${fmtRp(recipeCost(r))})`);
+      } else {
+        delete RECIPES[id]; delete menuState.recipes[id];
+        const c = menuState.custom.find(x => x.id === id); if (c && c.hpp) PASTRY_COST[id] = c.hpp;
+        audit(`Menghapus resep ${m.name}`);
+      }
+      toast(`Resep ${m.name} disimpan.`, 'ok'); menuRecOpen = null; saveMenu();
+    }
+    function recipeEditor(m) {
+      const r = RECIPES[m.id] || {};
+      return `<div class="rp-line" style="flex-direction:column;align-items:stretch;gap:6px;background:#17130f;border:1px dashed #44403c;border-radius:10px;padding:10px">
+        <b style="color:#e7e5e4">Resep · ${esc(m.name)}</b>
+        <small style="color:#a8a29e">Takaran per 1 porsi. Gula sirup dihitung otomatis dari pilihan gula pelanggan. Kosongkan semua untuk menghapus resep.</small>
+        ${REC_ROWS().map(x => `<label style="display:flex;gap:8px;align-items:center;justify-content:space-between"><span style="flex:1;color:#d6d3d1">${esc(x.name)}</span><input id="rc-${x.key}" class="rp-input" type="number" min="0" max="10000" inputmode="decimal" value="${r[x.key] || ''}" placeholder="0" style="flex:0 0 84px" oninput="recipeLive()"><small style="width:26px;color:#78716c">${x.unit}</small></label>`).join('')}
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:#a8a29e">HPP bahan / porsi</span><b id="rc-hpp" style="color:#fbbf24">${fmtRp(recipeCost(r))}</b></div>
+        <div style="display:flex;gap:8px"><button type="button" class="bx-btn amber" onclick="menuRecipeSave('${m.id}')"><i class="fa-solid fa-floppy-disk"></i><span>Simpan Resep</span></button><button type="button" class="bx-btn ghost" onclick="menuRecipeToggle('${m.id}')"><span>Tutup</span></button></div></div>`;
+    }
+    function menuAdd() {
+      if (!need(3, 'Kelola menu')) return;
+      const g = id => document.getElementById('mn-' + id).value.trim();
+      const name = g('name').slice(0, 40), price = Math.round(Number(g('price'))), hpp = Math.round(Number(g('hpp')) || 0), cat = g('cat');
+      if (!name) { toast('Nama menu wajib diisi.', 'error'); return; }
+      if (!(price >= 1000 && price <= 1000000)) { toast('Harga harus Rp 1.000 – Rp 1.000.000.', 'error'); return; }
+      if (hpp < 0 || hpp > price) { toast('HPP tidak boleh melebihi harga jual.', 'error'); return; }
+      const id = 'cm-' + Date.now().toString(36);
+      const custom = document.getElementById('mn-custom').checked;
+      const c = { id, name, category: cat, price, desc: g('desc').slice(0, 80) || 'Menu baru', hpp, img: menuNewImg || '', customizable: custom };
+      menuState.custom.push(c);
+      MENU_DATABASE.push({ id, name, category: cat, price, img: c.img || MENU_IMG, desc: c.desc, customizable: custom, custom: true });
+      menuNewImg = '';
+      if (hpp) PASTRY_COST[id] = hpp;
+      audit(`Menambah menu ${name} (${fmtRp(price)})`); toast(`Menu "${name}" ditambahkan.`, 'ok'); saveMenu();
+    }
+    function menuDel(id) {
+      if (!need(3, 'Kelola menu')) return;
+      const m = menuById(id); if (!m || !m.custom) return;
+      if (cart.some(c => c.item.id === id) || openBills.some(b => b.items.some(c => c.item.id === id))) { toast('Menu masih ada di keranjang / open bill.', 'error'); return; }
+      askConfirm('Hapus menu?', `"${m.name}" akan dihapus dari daftar menu. Riwayat transaksi tetap ada.`, 'Ya, Hapus', () => {
+        MENU_DATABASE.splice(MENU_DATABASE.indexOf(m), 1);
+        menuState.custom = menuState.custom.filter(x => x.id !== id); delete menuState.edits[id];
+        audit(`Menghapus menu ${m.name}`); saveMenu();
+      }, true);
+    }
+    function renderMenuTab() {
+      const rows = MENU_DATABASE.map(m => `
+        <div class="rp-line" style="flex-wrap:wrap;gap:6px;align-items:center;${m.hidden ? 'opacity:.55' : ''}">
+          <input class="rp-input" style="flex:1 1 150px;min-width:0" value="${esc(m.name)}" maxlength="40" aria-label="Nama" onchange="menuSet('${m.id}','name',this.value)">
+          <input class="rp-input" style="flex:0 0 96px" type="number" inputmode="numeric" value="${m.price}" aria-label="Harga" onchange="menuSet('${m.id}','price',this.value)">
+          <label class="bx-chip" title="Ganti foto" style="cursor:pointer"><i class="fa-solid fa-camera"></i><input type="file" accept="image/*" hidden onchange="menuPhoto('${m.id}',this)"></label>
+          ${m.custom ? `<button type="button" class="bx-chip" title="Opsi kustom" onclick="menuSet('${m.id}','customizable',${!m.customizable})" style="${m.customizable ? 'border-color:#d97706;color:#fbbf24' : ''}"><i class="fa-solid fa-sliders"></i></button>` : ''}
+          <button type="button" class="bx-chip" title="Favorit" onclick="menuSet('${m.id}','popular',${!m.popular})" style="${m.popular ? 'border-color:#d97706;color:#fbbf24' : ''}"><i class="fa-solid fa-star"></i></button>
+          <button type="button" class="bx-chip" title="${m.hidden ? 'Tampilkan' : 'Sembunyikan'}" onclick="menuSet('${m.id}','hidden',${!m.hidden})"><i class="fa-solid ${m.hidden ? 'fa-eye-slash' : 'fa-eye'}"></i></button>
+          ${m.custom ? `<button type="button" class="bx-chip" title="Hapus" onclick="menuDel('${m.id}')"><i class="fa-solid fa-trash"></i></button>` : ''}
+          ${(m.custom || RECIPES[m.id]) ? `<button type="button" class="bx-chip" title="Resep" onclick="menuRecipeToggle('${m.id}')" style="${RECIPES[m.id] ? 'border-color:#d97706;color:#fbbf24' : ''}"><i class="fa-solid fa-flask"></i></button>` : ''}
+          <small style="flex-basis:100%;color:#78716c">${MENU_CATS[m.category] || m.category}${m.custom ? ' · menu baru' : ''}${m.hidden ? ' · disembunyikan' : ''}</small>
+        </div>${menuRecOpen === m.id ? recipeEditor(m) : ''}`).join('');
+      return `<p class="bx-sub" style="font-family:inherit;margin-bottom:8px">Ubah nama/harga, tandai favorit, atau sembunyikan menu dari kasir. Harga baru berlaku untuk pesanan berikutnya.</p>
+        ${rows}
+        <span class="bx-label" style="margin-top:12px">Tambah menu baru</span>
+        <input id="mn-name" class="rp-input" placeholder="Nama menu" maxlength="40" style="width:100%;margin-bottom:6px">
+        <div style="display:flex;gap:6px;margin-bottom:6px"><select id="mn-cat" class="rp-input" style="flex:1">${Object.keys(MENU_CATS).map(k => `<option value="${k}">${MENU_CATS[k]}</option>`).join('')}</select>
+        <input id="mn-price" class="rp-input" type="number" inputmode="numeric" placeholder="Harga" style="flex:1"><input id="mn-hpp" class="rp-input" type="number" inputmode="numeric" placeholder="HPP (opsional)" style="flex:1"></div>
+        <input id="mn-desc" class="rp-input" placeholder="Deskripsi singkat" maxlength="80" style="width:100%;margin-bottom:8px">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+          <label class="bx-chip" style="cursor:pointer"><i class="fa-solid fa-camera"></i> Foto<input type="file" accept="image/*" hidden onchange="menuNewPhoto(this)"></label>
+          <img id="mn-prev" alt="Pratinjau" style="display:none;width:56px;height:42px;object-fit:cover;border-radius:8px">
+          <label style="display:flex;gap:6px;align-items:center;color:#d6d3d1"><input type="checkbox" id="mn-custom"> Bisa dikustom (suhu, susu, gula)</label>
+        </div>
+        <button type="button" class="bx-btn amber" onclick="menuAdd()"><i class="fa-solid fa-plus"></i><span>Tambah Menu</span></button>`;
+    }
+    function renderSetTab() {
+      const f = (id, label, val, type, extra) => `<label class="bx-label" for="st-${id}">${label}</label><input id="st-${id}" class="rp-input" type="${type}" value="${esc(String(val))}" ${extra || ''} style="width:100%;margin-bottom:8px">`;
+      return `<p class="bx-sub" style="font-family:inherit;margin-bottom:8px">Setelan outlet (khusus Owner). Berlaku langsung ke struk, tagihan, dan layar pelanggan.</p>
+        ${f('brand', 'Nama di struk', SETTINGS.brand, 'text', 'maxlength="32"')}
+        ${f('outlet', 'Nama outlet', SETTINGS.outlet, 'text', 'maxlength="32"')}
+        ${f('address', 'Alamat struk', SETTINGS.address, 'text', 'maxlength="60"')}
+        <div style="display:flex;gap:8px"><div style="flex:1">${f('tax', 'PPN (%)', SETTINGS.tax, 'number', 'min="0" max="30" step="0.5" inputmode="decimal"')}</div>
+        <div style="flex:1">${f('service', 'Layanan (%)', SETTINGS.service, 'number', 'min="0" max="30" step="0.5" inputmode="decimal"')}</div>
+        <div style="flex:1">${f('idle', 'Kunci otomatis (menit)', SETTINGS.idleMin, 'number', 'min="1" max="60" inputmode="numeric"')}</div></div>
+        <div style="display:flex;gap:8px;margin-top:4px"><button type="button" class="bx-btn amber" onclick="saveSettings()"><i class="fa-solid fa-floppy-disk"></i><span>Simpan</span></button>
+        <button type="button" class="bx-btn ghost" onclick="resetSettings()"><span>Kembalikan default</span></button></div>`;
+    }
+    function saveSettings() {
+      if (!need(3, 'Setelan outlet')) return;
+      const g = id => document.getElementById('st-' + id).value.trim();
+      const num = (id, lo, hi) => { const v = Number(g(id)); return isFinite(v) && g(id) !== '' && v >= lo && v <= hi ? v : null; };
+      const tax = num('tax', 0, 30), service = num('service', 0, 30), idle = num('idle', 1, 60);
+      if (!g('brand') || !g('outlet') || !g('address')) { toast('Nama, outlet, dan alamat tidak boleh kosong.', 'error'); return; }
+      if (tax == null || service == null) { toast('PPN dan layanan harus 0–30%.', 'error'); return; }
+      if (idle == null) { toast('Kunci otomatis harus 1–60 menit.', 'error'); return; }
+      SETTINGS = { brand: g('brand'), outlet: g('outlet'), address: g('address'), tax, service, idleMin: Math.round(idle) };
+      persistSettings(); audit(`Mengubah setelan outlet (PPN ${fmtPct(tax)}%, layanan ${fmtPct(service)}%)`);
+      toast('Setelan disimpan.', 'ok'); renderOffice();
+    }
+    function resetSettings() {
+      if (!need(3, 'Setelan outlet')) return;
+      SETTINGS = { brand: 'BREWSPACE COFFEE', outlet: 'Downtown Hub', address: 'Jl. Sudirman No. 42, Jakarta', tax: 11, service: 5, idleMin: 5 };
+      persistSettings(); audit('Mengembalikan setelan outlet ke default'); toast('Setelan dikembalikan ke default.', 'ok'); renderOffice();
+    }
+    function persistSettings() {
+      try { localStorage.setItem(SET_KEY, JSON.stringify(SETTINGS)); } catch (e) { }
+      applySettings(); renderCart(); if (typeof renderCust === 'function') renderCust();
+    }
+    function renderStokTab() {
+      const used = usageToday();
+      const value = ING.reduce((a, i) => a + ingStock[i.id] * ingUnitCost(i), 0);
+      const usedVal = ING.reduce((a, i) => a + (used[i.id] || 0) * ingUnitCost(i), 0);
+      const low = lowIngs();
+      return `
+        <div class="rp-kpis">
+          <div class="rp-kpi hi"><small>Nilai Stok Bahan</small><b>${fmtRp(value)}</b></div>
+          <div class="rp-kpi"><small>Bahan Menipis</small><b style="color:${low.length ? '#fbbf24' : '#34d399'}">${low.length} item</b></div>
+          <div class="rp-kpi"><small>Terpakai Shift Ini</small><b>${fmtRp(usedVal)}</b></div>
+          <div class="rp-kpi"><small>Jumlah Bahan</small><b>${ING.length} item</b></div>
+        </div>
+        ${low.length ? `<button type="button" class="bx-btn amber" style="margin-bottom:10px" onclick="poSuggest()"><i class="fa-solid fa-cart-plus"></i><span>Buat PO dari ${low.length} bahan menipis</span></button>` : ''}
+        <button type="button" class="bx-btn ghost" style="margin-bottom:10px" onclick="exportStock()"><i class="fa-solid fa-file-csv"></i><span>Ekspor Stok CSV</span></button>
+        ${ING.map(i => {
+        const st = stockState(i), pct = Math.min(100, Math.round(ingStock[i.id] / i.par * 100));
+        const col = st === 'out' ? '#b91c1c' : st === 'low' ? '#f59e0b' : '#10b981';
+        return `<div class="of-ing">
+            <div class="of-top"><b>${esc(i.name)}</b><span class="of-chip ${st}">${st === 'out' ? 'Habis' : st === 'low' ? 'Menipis' : 'Aman'}</span></div>
+            <div class="of-bar"><i style="width:${Math.max(2, pct)}%;background:${col}"></i></div>
+            <div class="of-meta"><span><b style="color:#f5f5f4">${fmtN(ingStock[i.id])} ${i.unit}</b> · min ${fmtN(i.min)}</span><span>terpakai ${fmtN(used[i.id] || 0)} ${i.unit}</span></div>
+            <div class="of-edit"><input id="op-${i.id}" type="number" min="0" inputmode="numeric" class="rp-input" placeholder="Hasil hitung fisik (${i.unit})" onkeydown="if(event.key==='Enter')opname('${i.id}')"><button type="button" class="bx-btn ghost xs" onclick="opname('${i.id}')">Opname</button></div>
+          </div>`;
+      }).join('')}`;
+    }
+    function renderPLTab() {
+      const p = plStats();
+      const mg = p.net ? Math.round(p.gp / p.net * 100) : 0;
+      const nm = p.net ? Math.round(p.profit / p.net * 100) : 0;
+      const menus = Object.entries(p.byMenu).map(([n, m]) => ({ n, ...m, profit: m.rev - m.cogs })).sort((a, b) => b.profit - a.profit).slice(0, 6);
+      const inp = (k, label) => `<div class="rp-line"><span>${label}</span><span><input type="number" min="0" inputmode="numeric" class="rp-input" style="width:120px;padding:5px 8px;text-align:right" value="${opex[k]}" onchange="setOpex('${k}',this.value)"></span></div>`;
+      return `
+        <div class="rp-kpis">
+          <div class="rp-kpi hi"><small>Laba Bersih Shift</small><b style="color:${p.profit >= 0 ? '#fbbf24' : '#fb7185'}">${fmtRp(p.profit)}</b></div>
+          <div class="rp-kpi"><small>Margin Kotor</small><b>${mg}%</b></div>
+          <div class="rp-kpi"><small>Penjualan Bersih</small><b>${fmtRp(p.net)}</b></div>
+          <div class="rp-kpi"><small>HPP Bahan</small><b>${fmtRp(p.cogs)}</b></div>
+        </div>
+        <button type="button" class="bx-btn ghost" style="margin-bottom:10px" onclick="exportPL()"><i class="fa-solid fa-file-csv"></i><span>Ekspor Laba Rugi CSV</span></button>
+        <div class="rp-sec">Laporan laba rugi · ${p.count} transaksi</div>
+        <div class="rp-card">
+          <div class="rp-line"><span>Penjualan kotor (sebelum diskon)</span><span>${fmtRp(p.gross)}</span></div>
+          <div class="rp-line"><span>Diskon &amp; potongan</span><span>- ${fmtRp(p.disc)}</span></div>
+          <div class="rp-line pl-sum"><span>Penjualan bersih</span><span>${fmtRp(p.net)}</span></div>
+          <div class="rp-line"><span>HPP (bahan &amp; pastry)</span><span>- ${fmtRp(p.cogs)}</span></div>
+          <div class="rp-line pl-sum"><span>Laba kotor (${mg}%)</span><span>${fmtRp(p.gp)}</span></div>
+          ${inp('gaji', 'Gaji &amp; upah / hari')}${inp('sewa', 'Sewa &amp; utilitas / hari')}${inp('lain', 'Operasional lain / hari')}
+          <div class="rp-line pl-sum"><span>Laba bersih (${nm}%)</span><span style="color:${p.profit >= 0 ? '#34d399' : '#fb7185'}">${fmtRp(p.profit)}</span></div>
+        </div>
+        <div class="rp-card">
+          <div class="rp-line"><span>Memo: PPN terkumpul (disetor ke negara)</span><span>${fmtRp(p.tax)}</span></div>
+          <div class="rp-line"><span>Memo: Service charge (dibagi karyawan)</span><span>${fmtRp(p.service)}</span></div>
+        </div>
+        <div class="rp-sec">Margin per menu (laba terbesar)</div>
+        ${menus.map(m => `<div class="rp-row" style="cursor:default"><span><b>${esc(m.n)}</b><small>${m.qty} terjual · HPP ${fmtRp(m.cogs)}</small></span><span class="m">${fmtRp(m.rev - m.cogs)}<small>margin ${m.rev ? Math.round((m.rev - m.cogs) / m.rev * 100) : 0}%</small></span></div>`).join('') || '<div class="rp-empty">Belum ada penjualan.</div>'}
+        <p class="bx-sub" style="font-family:inherit">HPP dihitung dari resep × harga beli bahan terakhir. Biaya operasional adalah asumsi harian yang bisa diubah Owner.</p>`;
+    }
+    function renderPOTab() {
+      const low = lowIngs();
+      const pending = POS.filter(p => p.status === 'diajukan').length;
+      return `
+        <div class="rp-card" style="margin-bottom:10px">
+          <div class="rp-line"><span>PO menunggu persetujuan Owner</span><span>${pending}</span></div>
+          <div class="rp-line"><span>Bahan di bawah minimum</span><span>${low.length}</span></div>
+        </div>
+        <button type="button" class="bx-btn amber" style="margin-bottom:10px" onclick="poSuggest()"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Saran PO otomatis (isi sampai level par)</span></button>
+        <div class="rp-inline" style="margin-bottom:12px">
+          <select id="po-ing" class="rp-input">${ING.map(i => `<option value="${i.id}">${esc(i.name)} (${i.packName})</option>`).join('')}</select>
+          <input id="po-packs" type="number" min="1" inputmode="numeric" class="rp-input" style="max-width:76px;flex:none" placeholder="Qty">
+          <button type="button" class="bx-btn ghost" onclick="poManual()">Tambah</button>
+        </div>
+        ${POS.length ? POS.map(po => {
+        const acts = [];
+        if (po.status === 'draft') acts.push(`<button class="bx-btn amber xs" onclick="poAct('${po.id}','ajukan')">Ajukan ke Owner</button><button class="bx-btn danger-soft xs" onclick="poAct('${po.id}','hapus')">Hapus</button>`);
+        if (po.status === 'diajukan') acts.push(lvl() >= 3 ? `<button class="bx-btn amber xs" onclick="poAct('${po.id}','setujui')">Setujui</button><button class="bx-btn danger-soft xs" onclick="poAct('${po.id}','tolak')">Tolak</button>` : '<span class="bx-sub" style="margin:0;font-family:inherit">Menunggu persetujuan Owner</span>');
+        if (po.status === 'dipesan') acts.push(`<button class="bx-btn amber xs" onclick="poAct('${po.id}','terima')"><i class="fa-solid fa-box-open"></i> Terima Barang</button>`);
+        return `<div class="po-card">
+            <div class="of-top"><span><b style="color:#f5f5f4;font-size:13px">${po.id} · ${esc(po.supplier)}</b><small style="display:block;color:#a8a29e;font-size:11px">${po.at} · oleh ${esc(po.by)}</small></span><span class="po-st ${po.status}">${PO_ST[po.status]}</span></div>
+            <div style="margin:8px 0">${po.lines.map(l => { const i = ingById(l.ing); return `<div class="rp-line"><span>${esc(i.name)}${po.status === 'draft' ? ` <span class="sp-step" style="display:inline-flex;margin-left:6px"><button type="button" style="width:22px;height:22px;font-size:12px" onclick="poAdj('${po.id}','${l.ing}',-1)">−</button><b style="min-width:18px">${l.packs}</b><button type="button" style="width:22px;height:22px;font-size:12px" onclick="poAdj('${po.id}','${l.ing}',1)">+</button></span>` : ` × ${l.packs}`} ${i.packName}</span><span>${fmtRp(l.packs * i.packCost)}</span></div>`; }).join('')}</div>
+            <div class="of-top"><b style="color:#fbbf24;font-family:'JetBrains Mono',monospace">${fmtRp(poTotal(po))}</b><span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">${acts.join('')}</span></div>
+          </div>`;
+      }).join('') : '<div class="rp-empty">Belum ada PO.</div>'}`;
+    }
+    function renderRoleTab() {
+      const rows = [
+        ['Transaksi, Hold, Pisah/Gabung bill', 1, 1, 1], ['Diskon & voucher', '≤10%', '≤25%', 'bebas'], ['Batalkan open bill', 0, 1, 1],
+        ['Tutup shift', 0, 1, 1], ['Stok bahan & opname', 0, 1, 1], ['Ajukan PO & terima barang', 0, 1, 1],
+        ['Setujui PO', 0, 0, 1], ['Laporan laba rugi', 0, 0, 1], ['Ubah biaya operasional', 0, 0, 1]
+      ];
+      const c = v => typeof v === 'string' ? v : v ? '<span style="color:#34d399">✓</span>' : '<span style="color:#57534e">—</span>';
+      return `
+        <div class="rp-sec">Hak akses per peran</div>
+        <div class="rp-card rl-grid">
+          <div class="h">Fitur</div><div class="h">Kasir</div><div class="h">Spv</div><div class="h">Owner</div>
+          ${rows.map(r => `<div>${r[0]}</div><div>${c(r[1])}</div><div>${c(r[2])}</div><div>${c(r[3])}</div>`).join('')}
+        </div>
+        <div class="rp-sec">Log aktivitas</div>
+        ${auditLog.length ? auditLog.map(a => `<div class="lg-row"><span class="t">${a.at}</span><span><b>${esc(a.who)}</b> <em>${ROLES[a.role].label}</em><br>${esc(a.t)}</span></div>`).join('') : '<div class="rp-empty">Belum ada aktivitas.</div>'}`;
+    }
+
+    /* ---- Ganti peran ---- */
+    let roleSel = null;
+    function openRole() { roleSel = null; renderRole(); toggleModal('modal-role', true); }
+    function renderRole() {
+      const body = document.getElementById('role-body');
+      const desc = { kasir: 'Transaksi, hold, diskon maks. 10%.', supervisor: 'Stok, opname, PO, tutup shift, batalkan bill, diskon maks. 25%.', owner: 'Akses penuh: laba rugi, setujui PO, biaya operasional.' };
+      body.innerHTML = Object.keys(ROLES).map(k => `
+        <button type="button" class="mb-item" style="${role === k ? 'border-color:#d97706' : ''}" onclick="selectRole('${k}')">
+          <span><b>${ROLES[k].label} · ${esc(ROLES[k].name)}</b><small>${desc[k]}</small></span>
+          <span class="p">${role === k ? 'AKTIF' : ''}</span></button>`).join('') +
+        (roleSel ? `<span class="bx-label">PIN ${ROLES[roleSel].label}</span>
+          <div class="rp-inline"><input id="role-pin" type="password" inputmode="numeric" maxlength="4" class="rp-input" placeholder="PIN 4 digit" onkeydown="if(event.key==='Enter')submitPin()"><button type="button" class="bx-btn amber" onclick="submitPin()">Masuk</button></div>
+          <p class="bx-sub" style="font-family:inherit">PIN demo: Supervisor <b style="color:#fbbf24">2222</b>, Owner <b style="color:#fbbf24">3333</b>. Pindah ke peran lebih rendah tidak perlu PIN.</p>` : '<p class="bx-sub" style="font-family:inherit">Pilih peran untuk mencoba hak akses yang berbeda.</p>') +
+        '<button type="button" class="bx-btn danger-soft" style="margin-top:12px" onclick="logout()"><i class="fa-solid fa-lock"></i><span>Keluar / Kunci Kasir</span></button>';
+      const pin = document.getElementById('role-pin'); if (pin) pin.focus();
+    }
+    function selectRole(k) {
+      if (k === role) return;
+      if (ROLES[k].level < lvl()) { setRole(k); return; }
+      roleSel = k; renderRole();
+    }
+    function submitPin() {
+      const v = document.getElementById('role-pin').value;
+      if (v !== ROLES[roleSel].pin) { toast('PIN salah.', 'error'); document.getElementById('role-pin').value = ''; return; }
+      setRole(roleSel);
+    }
+    function setRole(k) {
+      const from = role;
+      role = k; roleSel = null;
+      try { sessionStorage.setItem(SESSION_KEY, k); } catch (e) { }
+      audit(`Berganti peran ${ROLES[from].label} → ${ROLES[k].label}`);
+      renderRoleUI();
+      toggleModal('modal-role', false);
+      const off = document.getElementById('modal-office');
+      if (off && !off.classList.contains('hidden')) { if (lvl() < 2) toggleModal('modal-office', false); else renderOffice(); }
+      toast(`Masuk sebagai ${ROLES[k].label} · ${ROLES[k].name}.`, 'ok');
     }
 
     /* ---- Antrean Bar ---- */
@@ -3346,6 +5090,8 @@
             <div class="bx-bill-actions">
               <button type="button" class="bx-btn amber xs" onclick="recallBill('${b.id}')"><i class="fa-solid fa-rotate-left"></i><span>Panggil</span></button>
               ${b.type === 'dine-in' ? `<button type="button" class="bx-btn ghost xs" onclick="openMove('${b.id}')" aria-label="Pindah meja"><i class="fa-solid fa-right-left"></i></button>` : ''}
+              <button type="button" class="bx-btn ghost xs" onclick="openSplit('${b.id}')" aria-label="Pisah bill" title="Pisah bill"><i class="fa-solid fa-code-branch"></i></button>
+              <button type="button" class="bx-btn ghost xs" onclick="openMerge('${b.id}')" aria-label="Gabung bill" title="Gabung bill"><i class="fa-solid fa-object-group"></i></button>
               <button type="button" class="bx-btn danger-soft xs" onclick="deleteBill('${b.id}')" aria-label="Batalkan bill"><i class="fa-regular fa-trash-can"></i></button>
             </div>
           </div>
@@ -3395,6 +5141,7 @@
     let csCounted = 0;
     const csExpected = () => shift.opening + shiftStats().cash;
     function openCloseShift() {
+      if (!need(2, 'Tutup shift')) return;
       if (openBills.length) { toast(`Masih ada ${openBills.length} open bill. Selesaikan atau batalkan dulu sebelum tutup shift.`, 'warn'); return; }
       const st = shiftStats();
       setText('cs-open', formatRupiah(shift.opening));
@@ -3425,6 +5172,7 @@
       const dt = diff === 0 ? 'kas pas' : (diff > 0 ? 'lebih ' : 'kurang ') + formatRupiah(Math.abs(diff));
       askConfirm('Tutup shift sekarang?', `${st.count} transaksi · omzet ${formatRupiah(st.omzet)} · ${dt}. Data transaksi shift ini diarsipkan dan shift baru dimulai.`, 'Ya, Tutup Shift', () => {
         closedShifts.unshift({ n: closedShifts.length + 1, at: nowHM(), date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }), count: st.count, omzet: st.omzet, expected: csExpected(), counted: csCounted, diff });
+        audit(`Menutup shift #${closedShifts.length} · ${st.count} transaksi · omzet ${formatRupiah(st.omzet)} · ${dt}`);
         transactions = [];
         toggleModal('modal-closeshift', false);
         repTabId = 'sum';
@@ -3444,7 +5192,7 @@
     let repTabId = 'sum', repQ = '', repM = 'all';
     function repTab(t) { repTabId = t; renderShift(); }
     function renderShift() {
-      document.querySelectorAll('.rp-tab').forEach(b => b.classList.toggle('on', b.dataset.t === repTabId));
+      document.querySelectorAll('#modal-shift .rp-tab').forEach(b => b.classList.toggle('on', b.dataset.t === repTabId));
       const body = document.getElementById('rep-body');
       if (!body) return;
       const st = shiftStats();
@@ -3505,7 +5253,7 @@
       const t = transactions.find(x => x.no === no);
       if (!t) return;
       checkout = {
-        orderNum: t.no, reprint: true, paid: true, type: t.type, table: t.table, customer: t.cust, time: new Date(t.ts),
+        orderNum: t.no, reprint: true, paid: true, cashier: t.cashier || 'Radit Pratama', type: t.type, table: t.table, customer: t.cust, time: new Date(t.ts),
         items: (t.items || []).map(l => ({ item: { name: l.name }, qty: l.qty, unitPrice: l.unitPrice, custom: l.custom })),
         totals: t.totals, memberName: t.memberName, earned: t.earned, redeem: t.redeem,
         result: { parts: t.parts, method: t.method, methodText: t.methodText || METHOD[t.method].label.toUpperCase(), tendered: t.tendered, change: t.change, ref: t.ref }
@@ -3518,6 +5266,7 @@
     }
 
     function resetDemo() {
+      if (!need(2, 'Reset data demo')) return;
       askConfirm('Reset data demo?', 'Semua pesanan, open bill, riwayat, dan stok akan dikembalikan ke kondisi awal.', 'Ya, Reset', () => {
         try { localStorage.removeItem(STORE_KEY); } catch (e) { }
         location.reload();
@@ -3540,6 +5289,13 @@
       toggleModal('modal-discount', true);
     }
     function applyDiscount(d) {
+      if (d && !d.points) {
+        const sub = calcTotals(cart, null).subtotal;
+        const pct = sub ? calcTotals(cart, d).discount / sub * 100 : 0;
+        const cap = ROLES[role].discPct;
+        if (pct > cap + 0.001) { toast(`Diskon ${Math.round(pct)}% melebihi batas peran ${ROLES[role].label} (${cap}%). Minta Supervisor menerapkannya.`, 'error'); return; }
+        audit(`Menerapkan ${d.label} (${Math.round(pct)}%) pada pesanan ${formatRupiah(sub)}`);
+      }
       discount = d;
       renderCart();
       toggleModal('modal-discount', false);
@@ -3568,7 +5324,7 @@
         localStorage.setItem(STORE_KEY, JSON.stringify({
           v: 1, cart: cart.map(serLine), discount, activeBillId,
           openBills: openBills.map(b => ({ ...b, items: b.items.map(serLine) })),
-          transactions, seated: [...seatedTables], obCounter, ordCounter, stock, uidCounter, queue, closedShifts, MEMBERS, member
+          transactions, seated: [...seatedTables], obCounter, ordCounter, stock, uidCounter, queue, closedShifts, MEMBERS, member, ingStock, POS, poCounter, opex, role, auditLog, paperMm
         }));
       } catch (e) { }
     }
@@ -3588,6 +5344,13 @@
         if (Array.isArray(d.closedShifts)) closedShifts = d.closedShifts;
         if (Array.isArray(d.MEMBERS)) MEMBERS = d.MEMBERS;
         member = d.member || null;
+        if (d.ingStock) ingStock = { ...ING_STOCK_INIT, ...d.ingStock };
+        if (Array.isArray(d.POS)) POS = d.POS;
+        if (d.poCounter) poCounter = d.poCounter;
+        if (d.opex) opex = d.opex;
+        if (d.paperMm === 58) paperMm = 58;
+        if (d.role && ROLES[d.role]) role = d.role;
+        if (Array.isArray(d.auditLog)) auditLog = d.auditLog;
         obCounter = d.obCounter; ordCounter = d.ordCounter; stock = { ...STOCK_INIT, ...d.stock }; uidCounter = d.uidCounter;
       } catch (e) { }
     }
@@ -3597,6 +5360,8 @@
       setText('tables-count', occupied + '/' + TABLES.length);
       setText('openbill-count', openBills.length);
       setText('queue-count', queue.length);
+      const oc = document.getElementById('office-count'), lo = lowIngs().length;
+      if (oc) { oc.textContent = lo; oc.style.display = lo ? 'inline' : 'none'; }
     }
 
     function updateRecallBanner() {
@@ -3810,7 +5575,9 @@
     function deleteBill(id) {
       const bill = openBills.find(b => b.id === id);
       if (!bill) return;
+      if (!need(2, 'Membatalkan open bill')) return;
       askConfirm('Batalkan open bill?', `${bill.id} · ${billLabel(bill)} (${formatRupiah(calcTotals(bill.items, bill.discount).total)}) akan dihapus permanen.`, 'Ya, Batalkan Bill', () => {
+        audit(`Membatalkan open bill ${bill.id} · ${billLabel(bill)} (${formatRupiah(calcTotals(bill.items, bill.discount).total)})`);
         openBills = openBills.filter(b => b.id !== id);
         if (activeBillId === id) { activeBillId = null; cart = []; resetOrderForm(); renderCart(); }
         refreshAll();
@@ -3884,6 +5651,7 @@
       checkout = {
         orderNum: 'BS-' + ordCounter,
         reprint: false,
+        cashier: ROLES[role].name,
         member,
         redeem: discount && discount.points ? discount.points : 0,
         items: cart.map(c => ({ ...c, custom: c.custom ? { ...c.custom } : null })),
@@ -3907,6 +5675,7 @@
     }
 
     function renderCheckoutPanel() {
+      setTimeout(renderCust, 0);
       const co = checkout;
       if (!co) return;
       const paid = co.paid;
@@ -4035,6 +5804,7 @@
 
     /* ---- Struk ---- */
     function renderReceipt() {
+      setTimeout(renderCust, 0);
       const co = checkout;
       if (!co) return;
       const d = co.time;
@@ -4043,6 +5813,7 @@
       setText('rcpt-date', d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }));
       setText('rcpt-type', co.type === 'dine-in' ? `Dine In (${tableLabel(co.table)})` : 'Take Away');
       setText('rcpt-cust', co.customer);
+      setText('rcpt-cashier', 'Kasir: ' + (co.cashier || ROLES[role].name));
 
       document.getElementById('rcpt-items').innerHTML = co.items.map(c => `
         <div class="flex flex-col">
@@ -4063,7 +5834,7 @@
       setText('rcpt-total', formatRupiah(co.totals.total));
 
       const st = document.getElementById('rcpt-status');
-      st.textContent = co.paid ? 'LUNAS' : 'PRATINJAU · BELUM DIBAYAR';
+      st.textContent = co.paid ? (co.reprint ? 'SALINAN STRUK · LUNAS' : 'LUNAS') : 'PRATINJAU · BELUM DIBAYAR';
       st.style.color = co.paid ? '#047857' : '#a16207';
 
       setText('rcpt-method', co.paid ? co.result.methodText : methodText(selectedPayment));
@@ -4115,8 +5886,9 @@
       transactions.unshift({
         no: co.orderNum, time: nowHM(), ts: Date.now(), method, total, cust: co.customer, type: co.type, table: co.table,
         items: co.items.map(c => ({ id: c.item.id, name: c.item.name, qty: c.qty, unitPrice: c.unitPrice, custom: c.custom })),
-        totals: co.totals, parts: result.parts || undefined, methodText: result.methodText, tendered: result.tendered, change: result.change, ref: result.ref
+        cashier: co.cashier, totals: co.totals, parts: result.parts || undefined, methodText: result.methodText, tendered: result.tendered, change: result.change, ref: result.ref
       });
+      deductStock(co.items);
       ordCounter++;
       const mb = co.member ? memberById(co.member) : null;
       if (mb) { co.earned = earnPoints(total); co.memberName = mb.name; mb.points = Math.max(0, mb.points - co.redeem) + co.earned; transactions[0].memberName = mb.name; transactions[0].earned = co.earned; transactions[0].redeem = co.redeem; }
@@ -4195,6 +5967,9 @@
         if (id === 'modal-shift') renderShift();
         if (id === 'modal-drawer') renderDrawer();
         if (id === 'modal-queue') renderQueue();
+        if (id === 'modal-office') renderOffice();
+        if (id === 'modal-cust') renderCust();
+        if (id === 'modal-role') renderRole();
       }
     }
 
@@ -4206,7 +5981,7 @@
 
     document.addEventListener('keydown', e => {
       if (e.key !== 'Escape') return;
-      const order = ['modal-confirm', 'modal-move', 'modal-member', 'modal-closeshift', 'modal-queue', 'modal-discount', 'modal-modifier', 'modal-openbill', 'modal-tables', 'modal-drawer', 'modal-shift', 'modal-checkout'];
+      const order = ['modal-confirm', 'modal-cust', 'modal-role', 'modal-office', 'modal-split', 'modal-merge', 'modal-move', 'modal-member', 'modal-closeshift', 'modal-queue', 'modal-discount', 'modal-modifier', 'modal-openbill', 'modal-tables', 'modal-drawer', 'modal-shift', 'modal-checkout'];
       const open = order.find(id => { const el = document.getElementById(id); return el && !el.classList.contains('hidden'); });
       if (open) closeModal(open);
     });
@@ -4224,7 +5999,16 @@
     setInterval(tickClock, 1000);
 
     // Init
+    loadMenu();
     loadState();
+    setPaper(paperMm);
+    (function () {
+      let sess = null; try { sess = sessionStorage.getItem(SESSION_KEY); } catch (e) { }
+      if (sess && ROLES[sess]) { role = sess; document.getElementById('login-screen').classList.add('hide'); }
+      else renderLogin();
+    })();
+    applySettings();
+    renderRoleUI();
     tickClock();
     renderDenoms();
     refreshAll();

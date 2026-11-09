@@ -5953,7 +5953,7 @@
         var L = $('#leaveHistoryList'), c = document.createElement('div'); c.className = 'p-3 rounded-xl bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/80 space-y-1 pop-in';
         c.innerHTML = '<div class="flex items-center justify-between"><span class="font-bold text-xs text-slate-800 dark:text-slate-100"></span><span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300">Menunggu atasan</span></div><div class="text-[11px] text-slate-500 dark:text-slate-400"></div>';
         c.querySelectorAll('span,div')[1].textContent = t + (r ? ' (' + r.slice(0, 20) + ')' : ''); c.lastChild.textContent = s + ' s/d ' + e + ' (' + n + ' hari kerja)'; L.insertBefore(c, L.firstChild);
-        $('#leaveForm').reset(); $('#uploadedFileName').textContent = 'Pilih Dokumen PDF / Foto'; $('#leaveHistoryCount').textContent = L.children.length + ' Pengajuan'; show();
+        $('#leaveForm').reset(); $('#uploadedFileName').textContent = 'Pilih Dokumen PDF / Foto'; $('#leaveHistoryCount').textContent = L.children.length + ' Pengajuan'; show(); if (window.__stDraw) __stDraw();
         toast('Pengajuan cuti (' + n + ' hari kerja) dikirim ke atasan.')
       };
       show(); setInterval(show, 2500);
@@ -5990,7 +5990,7 @@
           if (sc) { try { localStorage.setItem('absenpro-seen-v1', JSON.stringify(SN)) } catch (e) { } }
         }
         var PL = rd('absenpro-payl-v1', {}); Object.keys(PL).forEach(function (ym) { if (PL[ym].rows.some(function (r) { return r.id === sid })) { cur['p' + ym] = 'Final'; info['p' + ym] = ['Slip gaji ' + new Date(ym + '-01T00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }), 'sudah final', 'Rekap gaji HR'] } });
-        var B = rd(KB, null); if (!B) { wr(KB, cur); return }
+        var B = rd(KB, null); if (!B) { B = {}; Object.keys(cur).forEach(function (k) { if (k[0] !== 'o' && k[0] !== 'n') B[k] = cur[k] }); wr(KB, B) }
         var E = rd(KE, []), ch = 0;
         Object.keys(cur).forEach(function (k) { if ((B[k] || k[0] === 'p' || k[0] === 'o' || k[0] === 'n') && B[k] !== cur[k] && cur[k] !== 'Menunggu' && cur[k] !== 'Diterima') { var i = info[k]; E.unshift({ a: i[0] + ' ' + i[1], b: i[2], at: Date.now() }); ch++; if (typeof showToast === 'function') showToast(i[0] + ' ' + i[1], i[1] === 'ditolak' ? 'error' : 'success') } });
         if (ch || Object.keys(cur).length !== Object.keys(B).length) { wr(KB, cur); wr(KE, E.slice(0, 20)) } badge()
@@ -6101,7 +6101,7 @@
         h.innerHTML = '<h3>Riwayat pengajuan</h3><div class="x2-pill">' + ['Semua', 'Disetujui', 'Ditolak'].map(function (f) { return '<button type="button" aria-pressed="' + (f === HF) + '">' + f + '</button>' }).join('') + '</div><p class="ag-sm">' + ok + ' disetujui \u00b7 ' + (A.length - ok) + ' ditolak</p>' + (F.length ? F.slice(0, 10).map(function (r) { var d = D[r.id]; return '<div class="ag-row"><div><b>' + esc(r.type) + '</b><br><span class="ag-sm">' + esc(String(r.detail || '').split(' \u00b7 ').slice(0, 2).join(' \u00b7 ')) + (d ? ' \u00b7 oleh ' + esc(d.by) + ' \u00b7 ' + ago(d.at) : '') + '</span>' + (r.why ? '<br><span class="ag-sm"' + (r.st === 'Ditolak' ? ' style="color:#b91c1c"' : '') + '>' + (r.st === 'Ditolak' ? 'Alasan: ' : 'Catatan: ') + esc(r.why) + '</span>' : '') + '</div><span class="x2-st ' + r.st + '">' + r.st + '</span></div>' }).join('') : '<p class="ag-sm">Belum ada pengajuan yang diputuskan.</p>')
       }
       h.onclick = function (e) { var b = e.target.closest('.x2-pill button'); if (b) { HF = b.textContent; hist() } };
-      hist(); setInterval(hist, 3000)
+      hist(); setInterval(hist, 3000); window.__stDraw = function () { draw(); hist() }
     })();
   </script>
   <script>
@@ -6117,6 +6117,13 @@
 
       // lencana lokasi: tombolnya memperbarui GPS, bukan mengubah status
       [].forEach.call(document.querySelectorAll('#geofenceBadgeBtn *'), function (e) { if (e.children.length === 0 && e.textContent.trim() === 'Ubah') e.textContent = 'Segarkan' });
+
+      // status kamera di modal absen mengikuti kondisi sebenarnya
+      var fs = $('#faceDetectStatus');
+      if (fs && typeof appState !== 'undefined') {
+        var paintFs = function () { var t = appState.webcamStream ? 'Kamera aktif' + (window.FaceDetector ? ', wajah dicek saat absen' : '') : 'Kamera belum aktif. Aktifkan kamera untuk absen.'; if (fs.textContent !== t) fs.textContent = t };
+        new MutationObserver(paintFs).observe(fs, { childList: true, characterData: true, subtree: true }); paintFs(); setInterval(paintFs, 700)
+      }
 
       // jam kerja mengikuti pengaturan admin
       function jam() { var c = cfg(), e = [].filter.call(document.querySelectorAll('span'), function (x) { return /^Jam Kerja: /.test(x.textContent) })[0]; if (e) e.textContent = 'Jam Kerja: ' + c.in + ' - ' + c.out + ' WIB' }
