@@ -61,7 +61,6 @@
 
 
 
-  
   <!-- @jz-tw-css -->
   <link rel="stylesheet" href="./css/demo-brewspace-pos.css">
   <!-- FontAwesome 6 -->
@@ -2640,6 +2639,76 @@
       header>div:last-child button {
         flex: none
       }
+    }
+  </style>
+
+  <style id="bx-fullmodal">
+    /* Modal laporan/back office/antrean: layar penuh */
+    #modal-shift,
+    #modal-office,
+    #modal-queue {
+      padding: 0 !important;
+      align-items: stretch !important;
+      justify-content: stretch !important;
+    }
+
+    #modal-shift>div,
+    #modal-office>div,
+    #modal-queue>div {
+      max-width: none !important;
+      max-height: none !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      height: 100dvh !important;
+      border-radius: 0 !important;
+      border: 0 !important;
+      padding: 14px 16px 52px !important;
+      box-sizing: border-box;
+    }
+
+    @media (min-width: 1024px) {
+
+      #modal-shift>div,
+      #modal-office>div,
+      #modal-queue>div {
+        zoom: 1.22;
+        width: calc(100vw / 1.22) !important;
+        height: calc(100vh / 1.22) !important;
+        padding: 18px 40px 44px !important;
+      }
+
+      #modal-shift>div>*,
+      #modal-office>div>*,
+      #modal-queue>div>* {
+        width: 100%;
+        max-width: 1180px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (min-width: 1700px) {
+
+      #modal-shift>div,
+      #modal-office>div,
+      #modal-queue>div {
+        zoom: 1.45;
+        width: calc(100vw / 1.45) !important;
+        height: calc(100vh / 1.45) !important;
+      }
+    }
+
+    /* modal tutup shift, meja, open bill: lebih lega */
+    #modal-closeshift>div {
+      max-width: 640px !important;
+    }
+
+    #modal-tables>div {
+      max-width: 780px !important;
+    }
+
+    #modal-openbill>div {
+      max-width: 680px !important;
     }
   </style>
 </head>
