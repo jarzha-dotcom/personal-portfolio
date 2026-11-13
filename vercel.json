@@ -68,6 +68,9 @@
     "api/chat.ts": {
       "maxDuration": 60
     },
+    "api/whatsapp.ts": {
+      "maxDuration": 60
+    },
     "api/tts.ts": {
       "maxDuration": 30
     },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Loader2, ShieldAlert, RefreshCw } from 'lucide-react';
+import { X, Loader2, ShieldAlert, RefreshCw, MessageSquare, Power, Plus, Trash2 } from 'lucide-react';
 
 interface TierUsage {
   used: number;
@@ -61,6 +61,26 @@ interface ProbeResponse {
   classifier: { version: string; ms: number; verdict: null | { needsWeb: boolean; clarify: boolean }; note?: string };
 }
 
+interface WaAdminStatus {
+  enabled: boolean;
+  redisConfigured: boolean;
+  metaRepliesUsed: number;
+  metaRepliesLimit: number;
+  aiSpendIdr: number;
+  aiBudgetIdr: number;
+  skipList: string[];
+  syncedContactsCount: number;
+  skipSavedContacts: boolean;
+  smartDelaySec: number;
+  lastSelfCommand: { cmd: string; at: string } | null;
+  ownerPhone: string;
+  aiMode: 'vertex' | 'aistudio_dedicated' | 'aistudio_shared' | 'unconfigured';
+  aiConfigured: boolean;
+  privacySafeForMedia: boolean;
+  graphConfigured: boolean;
+  missingEnv: string[];
+}
+
 interface TtsQuotaModalProps {
   onClose: () => void;
 }
@@ -109,6 +129,56 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
   const [probe, setProbe] = useState<ProbeResponse | null>(null);
   const [probeLoading, setProbeLoading] = useState(false);
   const [probeError, setProbeError] = useState<string | null>(null);
+  const [waStatus, setWaStatus] = useState<WaAdminStatus | null>(null);
+  const [waLoading, setWaLoading] = useState(false);
+  const [waActionBusy, setWaActionBusy] = useState(false);
+  const [waError, setWaError] = useState<string | null>(null);
+  const [newSkipPhone, setNewSkipPhone] = useState('');
+
+  const fetchWaStatus = async (pinValue: string) => {
+    setWaLoading(true);
+    setWaError(null);
+    try {
+      const res = await fetch('/api/whatsapp?view=admin', {
+        method: 'GET',
+        headers: { 'x-tts-usage-pin': pinValue },
+        cache: 'no-store',
+      });
+      if (res.status === 401) return setWaError('PIN ditolak oleh endpoint WhatsApp.');
+      if (res.status === 404 || res.status === 405) return setWaError('Endpoint /api/whatsapp belum terdeploy.');
+      if (!res.ok) return setWaError('Gagal memuat status WhatsApp Zannah.');
+      setWaStatus((await res.json()) as WaAdminStatus);
+    } catch {
+      setWaError('Gagal terhubung ke endpoint WhatsApp.');
+    } finally {
+      setWaLoading(false);
+    }
+  };
+
+  const runWaAdminAction = async (payload: Record<string, unknown>) => {
+    if (!pin || waActionBusy) return;
+    setWaActionBusy(true);
+    setWaError(null);
+    try {
+      const res = await fetch('/api/whatsapp?action=admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-tts-usage-pin': pin,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) {
+        setWaError(`Aksi WhatsApp gagal (HTTP ${res.status}).`);
+        return;
+      }
+      setWaStatus((await res.json()) as WaAdminStatus);
+    } catch {
+      setWaError('Gagal mengirim perintah ke server WhatsApp.');
+    } finally {
+      setWaActionBusy(false);
+    }
+  };
 
   // Tes LANGSUNG: server memanggil tiap model grounding + klasifikator sungguhan (maks ~6 panggilan API).
   const runProbe = async () => {
@@ -187,8 +257,9 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
       }
       const json = (await res.json()) as TtsUsageResponse;
       setData(json);
-      // Tidak di-await: tampilan TTS langsung muncul, status riset menyusul.
+      // Tidak di-await: tampilan TTS langsung muncul, status riset & WA menyusul.
       void fetchSearchStatus(pin);
+      void fetchWaStatus(pin);
     } catch {
       setError('Gagal konek ke server.');
     } finally {
@@ -455,6 +526,186 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
                       Angka ini dari memori satu instance server (aktif {fmtUptime(search.instanceUptimeSec)}); bisa
                       berbeda antar refresh kalau Vercel melayani dari instance lain dan kembali 0 saat cold start.
                     </p>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* ── WhatsApp Zannah AI (Mode Coexistence) ────────────────────── */}
+            <div className="border-t border-slate-800 pt-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <MessageSquare className="w-3.5 h-3.5 text-emerald-400" /> WhatsApp Zannah AI
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => void fetchWaStatus(pin)}
+                  disabled={waLoading}
+                  aria-label="Muat ulang status WhatsApp"
+                  className="text-slate-500 hover:text-white disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${waLoading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
+
+              {!waStatus && waLoading && (
+                <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Mengambil status WhatsApp...
+                </p>
+              )}
+              {waError && <p className="text-xs text-red-400">{waError}</p>}
+
+              {waStatus && (() => {
+                const metaPct = pct(waStatus.metaRepliesUsed, waStatus.metaRepliesLimit);
+                const budgetPct = pct(Math.round(waStatus.aiSpendIdr), waStatus.aiBudgetIdr);
+                const aiLabelMap: Record<WaAdminStatus['aiMode'], string> = {
+                  vertex: 'GCP Vertex AI (Aman)',
+                  aistudio_dedicated: 'AI Studio Key Khusus',
+                  aistudio_shared: 'Shared AI Studio',
+                  unconfigured: 'Belum dikonfigurasi',
+                };
+
+                return (
+                  <div className="space-y-3">
+                    {/* Saklar Global ON / OFF */}
+                    <div className="flex items-center justify-between rounded-lg border border-slate-800 bg-slate-950/70 px-3 py-2">
+                      <div>
+                        <p className="text-xs font-semibold text-slate-200">
+                          Status Bot: {waStatus.enabled ? 'Aktif Menjaga WA' : 'Nonaktif (Diam)'}
+                        </p>
+                        <p className="text-[10px] text-slate-500">
+                          Jeda pintar {waStatus.smartDelaySec} dtk · +{waStatus.ownerPhone}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        disabled={waActionBusy}
+                        onClick={() => void runWaAdminAction({ op: 'toggle', enabled: !waStatus.enabled })}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold flex items-center gap-1 transition-colors disabled:opacity-50 ${
+                          waStatus.enabled
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30'
+                            : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white'
+                        }`}
+                      >
+                        <Power className="w-3 h-3" />
+                        {waStatus.enabled ? 'ON' : 'OFF'}
+                      </button>
+                    </div>
+
+                    {/* Kuota Gratis 1.000 Pesan Meta */}
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium">Balasan Gratis Meta</span>
+                        <span className="text-slate-400">
+                          {fmt(waStatus.metaRepliesUsed)} / {fmt(waStatus.metaRepliesLimit)} ({metaPct}%)
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            metaPct >= 90 ? 'bg-red-500' : metaPct >= 70 ? 'bg-amber-500' : 'bg-emerald-500'
+                          }`}
+                          style={{ width: `${metaPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Pagu Anggaran Bulanan Vertex AI */}
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="font-medium">Anggaran AI Bulanan</span>
+                        <span className="text-slate-400">
+                          Rp{waStatus.aiSpendIdr.toLocaleString('id-ID')} / Rp{fmt(waStatus.aiBudgetIdr)} ({budgetPct}%)
+                        </span>
+                      </div>
+                      <div className="h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            budgetPct >= 90 ? 'bg-red-500' : budgetPct >= 70 ? 'bg-amber-500' : 'bg-teal-500'
+                          }`}
+                          style={{ width: `${budgetPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ringkasan Konfigurasi */}
+                    <div className="text-[11px] space-y-1">
+                      <div className="flex justify-between gap-2">
+                        <span className="text-slate-400">Otak AI WA</span>
+                        <span className="text-slate-200 text-right">{aiLabelMap[waStatus.aiMode]}</span>
+                      </div>
+                      <div className="flex justify-between gap-2">
+                        <span className="text-slate-400">Kontak HP Tersinkron</span>
+                        <span className="text-slate-200">
+                          {fmt(waStatus.syncedContactsCount)} kontak ({waStatus.skipSavedContacts ? 'auto-skip' : 'aktif'})
+                        </span>
+                      </div>
+                      {waStatus.lastSelfCommand && (
+                        <div className="flex justify-between gap-2">
+                          <span className="text-slate-400">Perintah WA Terakhir</span>
+                          <span className="font-mono text-slate-300 truncate max-w-[160px]">
+                            {waStatus.lastSelfCommand.cmd} ({fmtTime(waStatus.lastSelfCommand.at)})
+                          </span>
+                        </div>
+                      )}
+                      {waStatus.missingEnv.length > 0 && (
+                        <p className="text-[10px] text-amber-300 bg-amber-500/10 border border-amber-500/25 rounded px-2 py-1 mt-1">
+                          Env belum diset: {waStatus.missingEnv.join(', ')}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Daftar Nomor Pengecualian Manual (Skip List) */}
+                    <div className="space-y-2 pt-1">
+                      <p className="text-[11px] font-medium text-slate-300">
+                        Daftar Nomor Pengecualian ({waStatus.skipList.length})
+                      </p>
+                      <div className="flex gap-1.5">
+                        <input
+                          type="tel"
+                          value={newSkipPhone}
+                          onChange={(e) => setNewSkipPhone(e.target.value)}
+                          placeholder="0812xxxx (abaikan Zannah)"
+                          className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-teal-500 text-white"
+                        />
+                        <button
+                          type="button"
+                          disabled={waActionBusy || !newSkipPhone.trim()}
+                          onClick={() => {
+                            const val = newSkipPhone.trim();
+                            if (!val) return;
+                            setNewSkipPhone('');
+                            void runWaAdminAction({ op: 'add_skip', phone: val });
+                          }}
+                          aria-label="Tambah nomor pengecualian"
+                          className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-teal-300 rounded-lg border border-slate-700 flex items-center gap-1 text-xs"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {waStatus.skipList.length > 0 && (
+                        <ul className="max-h-28 overflow-y-auto space-y-1 pr-0.5">
+                          {waStatus.skipList.map((p) => (
+                            <li
+                              key={p}
+                              className="flex items-center justify-between text-[11px] bg-slate-950/60 border border-slate-800 rounded px-2 py-1"
+                            >
+                              <span className="font-mono text-slate-300">+{p}</span>
+                              <button
+                                type="button"
+                                disabled={waActionBusy}
+                                onClick={() => void runWaAdminAction({ op: 'remove_skip', phone: p })}
+                                aria-label={`Hapus ${p}`}
+                                className="text-slate-500 hover:text-red-400 disabled:opacity-50"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                 );
               })()}
