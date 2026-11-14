@@ -71,12 +71,13 @@ Pesan / Event Masuk ke POST /api/whatsapp
 
 ## 4. Panduan Persiapan Akun Eksternal (Setelah Kode Terdeploy)
 
-### Tahap A — Siapkan Vertex AI di Google Cloud (Kredit `\$300` + Deposit Rp200rb)
-1. Buka **Google Cloud Console** pada project yang terhubung dengan Billing GCP kamu (berbeda dari project AI Studio gratis milik website).
-2. Aktifkan **Vertex AI API** (`aiplatform.googleapis.com`).
-3. Masuk ke **IAM & Admin → Service Accounts → Create Service Account** (misal: `zannah-wa-vertex`).
-4. Berikan role **`Vertex AI User`** (`roles/aiplatform.user`).
-5. Buka tab **Keys → Add Key → Create new key (JSON)**, lalu simpan isi JSON tersebut ke variabel Vercel `GCP_SERVICE_ACCOUNT_JSON`.
+### Tahap A — Siapkan Agent Platform (eks Vertex AI) di Google Cloud
+1. Buka **Google Cloud Console** dan pastikan kamu memilih **Project khusus WhatsApp** yang terhubung ke Billing GCP (jangan gabung di project yang sama dengan `GEMINI_API_KEY` gratis website, supaya API key website tidak ikut berubah jadi berbayar!).
+2. Di **APIs & Services → API Library**, ketik **`Agent Platform API`** (nama baru pengganti *Vertex AI API*, dengan alamat mesin tetap `aiplatform.googleapis.com`) → klik **Enable**. Tunggu ~30 detik lalu refresh halaman.
+3. Masuk ke **IAM & Admin → Service Accounts** (atau **IAM → Grant Access** jika Service Account sudah dibuat).
+4. Berikan role **`Agent Platform User`** (ID internalnya tetap `roles/aiplatform.user`, nama baru pengganti *Vertex AI User*).
+   - *Catatan:* Hapus role `AI Platform Admin` (`roles/ml.admin`) yang lama karena itu produk ML klasik generasi lama, berbeda dari `Agent Platform`.
+5. Buka tab **Keys → Add Key → Create new key (JSON)** pada Service Account tersebut, lalu simpan isi JSON-nya ke variabel Vercel `GCP_SERVICE_ACCOUNT_JSON`.
 
 ### Tahap B — Siapkan Meta Developer App & WhatsApp Coexistence
 1. Buka [developers.facebook.com](https://developers.facebook.com) → **Create App** → pilih tipe **Business**.

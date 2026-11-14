@@ -220,17 +220,19 @@ export async function sendWhatsAppTextReply(params: {
     to: string;
     body: string;
     replyToMessageId?: string;
+    /** Nomor pengirim milik bot saat ini (dari metadata.display_phone_number, mis. nomor uji +1 555...) */
+    senderBotPhone?: string;
 }): Promise<SendWaTextResult> {
     const recipient = normalizeWaPhone(params.to);
-    const ownerPhone = getOwnerWaPhone();
+    const activeBotPhone = normalizeWaPhone(params.senderBotPhone) || getOwnerWaPhone();
 
     if (!recipient) {
         return { ok: false, status: 400, errorMessage: 'Nomor tujuan tidak valid' };
     }
 
     // Hard Guard terhadap Error 131021 ("Recipient cannot be sender")
-    if (recipient === ownerPhone) {
-        console.warn('[whatsappGraph] Diblokir oleh penjaga 131021: percobaan kirim pesan ke nomor utama sendiri.');
+    if (recipient === activeBotPhone) {
+        console.warn('[whatsappGraph] Diblokir oleh penjaga 131021: percobaan kirim pesan ke nomor pengirim sendiri.');
         return {
             ok: false,
             status: 400,

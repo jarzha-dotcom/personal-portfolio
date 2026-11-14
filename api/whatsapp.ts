@@ -399,13 +399,14 @@ async function handleSingleInboundMessage(
     msg: MetaInboundMessage,
     senderName: string | undefined,
     phoneNumberIdFallback: string,
+    botDisplayPhone: string | undefined,
     hasBackgroundWaitUntil: boolean
 ): Promise<void> {
-    const ownerPhone = getOwnerWaPhone();
+    const activeBotPhone = normalizeWaPhone(botDisplayPhone) || getOwnerWaPhone();
     const sender = normalizeWaPhone(msg.from);
 
-    // 1. Cegah pesan dari grup, nomor tidak valid, atau nomor sendiri (anti-Error 131021)
-    if (!sender || sender === ownerPhone) return;
+    // 1. Cegah pesan dari grup, nomor tidak valid, atau nomor bot itu sendiri (anti-Error 131021)
+    if (!sender || sender === activeBotPhone) return;
 
     const bubble = extractBubbleFromInbound(msg, senderName);
     if (!bubble) return;
@@ -561,6 +562,7 @@ async function handleSingleInboundMessage(
             to: sender,
             body: formattedWaBody,
             replyToMessageId: coalescedBubbles.length > 1 ? lastBubble.id : undefined,
+            senderBotPhone: botDisplayPhone,
         });
 
         if (!sendResult.ok) {
@@ -613,6 +615,7 @@ async function processWebhookPayload(
                 }
 
                 const fallbackPhoneId = (value.metadata?.phone_number_id || '').trim();
+                const botDisplayPhone = (value.metadata?.display_phone_number || '').trim();
                 for (const msg of value.messages) {
                     const senderNorm = normalizeWaPhone(msg.from);
                     const senderName = senderNorm ? contactMap.get(senderNorm) : undefined;
@@ -621,6 +624,7 @@ async function processWebhookPayload(
                             msg,
                             senderName,
                             fallbackPhoneId,
+                            botDisplayPhone,
                             hasBackgroundWaitUntil
                         )
                     );
