@@ -255,7 +255,7 @@ function getVertexModelCandidates(): string[] {
         .map((m) => m.trim())
         .filter(Boolean);
     if (custom.length > 0) return custom;
-    return ['gemini-2.5-flash-lite', 'gemini-2.5-flash'];
+    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3-flash-preview'];
 }
 
 function getAiStudioModelCandidates(): string[] {
@@ -264,11 +264,11 @@ function getAiStudioModelCandidates(): string[] {
         .map((m) => m.trim())
         .filter(Boolean);
     if (custom.length > 0) return custom;
-    return ['gemini-2.5-flash-lite', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
+    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash-lite'];
 }
 
 /**
- * Memanggil model AI khusus WhatsApp Zannah (Vertex AI sebagai jalur utama,
+ * Memanggil model AI khusus WhatsApp Zannah (Vertex AI / Agent Platform sebagai jalur utama,
  * atau WA_GEMINI_API_KEY terpisah jika disetel).
  */
 export async function generateWaAiReply(
@@ -277,13 +277,13 @@ export async function generateWaAiReply(
 ): Promise<WaAiResult | null> {
     const sa = parseServiceAccountEnv();
 
-    // ── Jalur 1: Google Cloud Vertex AI (Makan Kredit $300 GCP -> Saldo Rp200rb) ─
+    // ── Jalur 1: Google Cloud Agent Platform / Vertex AI (Kredit $300 GCP -> Saldo Rp200rb) ─
     if (sa) {
-        const location = (process.env.GCP_VERTEX_LOCATION || 'us-central1').trim();
-        const projectId = (process.env.GCP_PROJECT_ID || sa.project_id).trim();
-        const host = location === 'global'
-            ? 'https://aiplatform.googleapis.com'
-            : `https://${location}-aiplatform.googleapis.com`;
+        const configuredLocation = stripOuterQuotes(process.env.GCP_VERTEX_LOCATION || 'global') || 'global';
+        // Model Gemini 3.x di Google Cloud Agent Platform berada di lokasi `global`.
+        // Tetap sertakan `configuredLocation` sebagai cadangan jika user memakai endpoint regional khusus.
+        const locations = configuredLocation === 'global' ? ['global'] : ['global', configuredLocation];
+        const projectId = (stripOuterQuotes(process.env.GCP_PROJECT_ID || '') || sa.project_id).trim();
 
         let accessToken: string;
         try {
@@ -294,68 +294,74 @@ export async function generateWaAiReply(
         }
 
         if (accessToken) {
-            for (const model of getVertexModelCandidates()) {
-                const url = `${host}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
-                const controller = new AbortController();
-                const timer = setTimeout(() => controller.abort(), 14000);
-                try {
-                    const res = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            Authorization: `Bearer ${accessToken}`,
-                            'Content-Type': 'application/json',
-                        },
-                        signal: controller.signal,
-                        body: JSON.stringify({
-                            systemInstruction: { role: 'system', parts: [{ text: systemInstruction }] },
-                            contents,
-                            generationConfig: {
-                                temperature: 0.75,
-                                maxOutputTokens: 1536,
-                                topP: 0.9,
+            for (const location of locations) {
+                const host = location === 'global'
+                    ? 'https://aiplatform.googleapis.com'
+                    : `https://${location}-aiplatform.googleapis.com`;
+
+                for (const model of getVertexModelCandidates()) {
+                    const url = `${host}/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
+                    const controller = new AbortController();
+                    const timer = setTimeout(() => controller.abort(), 14000);
+                    try {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                Authorization: `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json',
                             },
-                            safetySettings: [
-                                { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                                { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-                            ],
-                        }),
-                    });
+                            signal: controller.signal,
+                            body: JSON.stringify({
+                                systemInstruction: { role: 'system', parts: [{ text: systemInstruction }] },
+                                contents,
+                                generationConfig: {
+                                    temperature: 0.75,
+                                    maxOutputTokens: 1536,
+                                    topP: 0.9,
+                                },
+                                safetySettings: [
+                                    { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                                    { category: 'HARM_CATEGORY_HATE_SPEECH', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
+                                ],
+                            }),
+                        });
 
-                    if (!res.ok) {
-                        const errTxt = await res.text().catch(() => '');
-                        console.warn(`[whatsappAi][vertex] ${model} gagal (${res.status}): ${errTxt.slice(0, 180)}`);
-                        continue;
-                    }
+                        if (!res.ok) {
+                            const errTxt = await res.text().catch(() => '');
+                            console.warn(`[whatsappAi][vertex:${location}] ${model} gagal (${res.status}): ${errTxt.slice(0, 180)}`);
+                            continue;
+                        }
 
-                    const data = (await res.json()) as {
-                        candidates?: Array<{ content?: { parts?: unknown[] } }>;
-                        usageMetadata?: {
-                            promptTokenCount?: number;
-                            candidatesTokenCount?: number;
-                            thoughtsTokenCount?: number;
+                        const data = (await res.json()) as {
+                            candidates?: Array<{ content?: { parts?: unknown[] } }>;
+                            usageMetadata?: {
+                                promptTokenCount?: number;
+                                candidatesTokenCount?: number;
+                                thoughtsTokenCount?: number;
+                            };
                         };
-                    };
 
-                    const reply = extractReplyFromParts(data.candidates?.[0]?.content?.parts);
-                    if (!reply) continue;
+                        const reply = extractReplyFromParts(data.candidates?.[0]?.content?.parts);
+                        if (!reply) continue;
 
-                    const promptTokens = data.usageMetadata?.promptTokenCount ?? 0;
-                    const outputTokens =
-                        (data.usageMetadata?.candidatesTokenCount ?? 0) +
-                        (data.usageMetadata?.thoughtsTokenCount ?? 0);
+                        const promptTokens = data.usageMetadata?.promptTokenCount ?? 0;
+                        const outputTokens =
+                            (data.usageMetadata?.candidatesTokenCount ?? 0) +
+                            (data.usageMetadata?.thoughtsTokenCount ?? 0);
 
-                    return {
-                        reply,
-                        model,
-                        provider: 'vertex',
-                        promptTokens,
-                        outputTokens,
-                        estimatedCostIdr: estimateGeminiCostIdr(model, promptTokens, outputTokens, false),
-                    };
-                } catch (err) {
-                    console.warn(`[whatsappAi][vertex] Error memanggil ${model}:`, err);
-                } finally {
-                    clearTimeout(timer);
+                        return {
+                            reply,
+                            model,
+                            provider: 'vertex',
+                            promptTokens,
+                            outputTokens,
+                            estimatedCostIdr: estimateGeminiCostIdr(model, promptTokens, outputTokens, false),
+                        };
+                    } catch (err) {
+                        console.warn(`[whatsappAi][vertex:${location}] Error memanggil ${model}:`, err);
+                    } finally {
+                        clearTimeout(timer);
+                    }
                 }
             }
         }
