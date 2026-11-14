@@ -219,6 +219,80 @@
       flex: none;
     }
 
+    /* ===== Desktop: modal yang isinya padat (laporan, bahan baku, kelola menu, denah, riwayat, log) dibuat
+       hampir layar penuh. Header & isi dipusatkan (maks. 1240px) agar tabel/grafik tetap enak dibaca.
+       --wk-mt = jarak atas modal, --wk-bar = tinggi bar demo di bawah (keduanya bisa ditimpa). Modal kecil
+       (PIN, konfirmasi, catatan, varian, struk, dll.) tidak berubah. ===== */
+    :root {
+      --wk-mt: 24px;
+      --wk-bar: 46px;
+    }
+
+    /* --wk-bar = tinggi bar demo di bawah layar */
+
+    @media (min-width: 1024px) {
+
+      #report-modal,
+      #ing-modal,
+      #menu-modal,
+      #floor-modal,
+      #history-modal,
+      #log-modal {
+        padding: var(--wk-mt) 24px calc(24px + var(--wk-bar)) !important;
+        align-items: stretch !important;
+      }
+
+      #report-modal .wk-modal,
+      #ing-modal .wk-modal,
+      #menu-modal .wk-modal,
+      #floor-modal .wk-modal {
+        max-width: none !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+      }
+
+      #history-modal>div,
+      #log-modal .wk-modal {
+        max-width: 1040px !important;
+        width: 100% !important;
+        height: 100% !important;
+        max-height: none !important;
+        margin: 0 auto;
+      }
+
+      #report-modal .wk-mhead,
+      #ing-modal .wk-mhead,
+      #menu-modal .wk-mhead,
+      #floor-modal .wk-mhead,
+      #report-modal .wk-mfoot {
+        padding-left: max(24px, calc((100% - 1240px) / 2)) !important;
+        padding-right: max(24px, calc((100% - 1240px) / 2)) !important;
+      }
+
+      #report-modal .wk-mbody,
+      #ing-modal .wk-mbody,
+      #menu-modal .wk-mbody,
+      #floor-modal .wk-mbody {
+        padding: 22px max(28px, calc((100% - 1240px) / 2)) !important;
+        font-size: 13px;
+        flex: 1;
+      }
+
+      #report-modal .wk-kpis {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      #report-modal .wk-mfoot {
+        justify-content: flex-end;
+      }
+
+      #report-modal .wk-mfoot .wk-btn {
+        flex: 0 0 auto;
+        min-width: 220px;
+      }
+    }
+
     .wk-btn {
       display: flex;
       align-items: center;
