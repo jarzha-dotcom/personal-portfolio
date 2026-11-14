@@ -255,7 +255,7 @@ function getVertexModelCandidates(): string[] {
         .map((m) => m.trim())
         .filter(Boolean);
     if (custom.length > 0) return custom;
-    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3-flash-preview'];
+    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-3.8-flash'];
 }
 
 function getAiStudioModelCandidates(): string[] {
@@ -264,7 +264,7 @@ function getAiStudioModelCandidates(): string[] {
         .map((m) => m.trim())
         .filter(Boolean);
     if (custom.length > 0) return custom;
-    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-2.5-flash-lite'];
+    return ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.7-flash', 'gemini-3.8-flash'];
 }
 
 /**
@@ -316,7 +316,7 @@ export async function generateWaAiReply(
                                 contents,
                                 generationConfig: {
                                     temperature: 0.75,
-                                    maxOutputTokens: 1536,
+                                    maxOutputTokens: 4096,
                                     topP: 0.9,
                                 },
                                 safetySettings: [
@@ -407,7 +407,7 @@ export async function generateWaAiReply(
                     contents: safeContents,
                     generationConfig: {
                         temperature: 0.75,
-                        maxOutputTokens: 1536,
+                        maxOutputTokens: 4096,
                         topP: 0.9,
                     },
                     safetySettings: [
