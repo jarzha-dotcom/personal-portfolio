@@ -44,8 +44,8 @@ export type GroundedOutcome =
     | { ok: true; text: string; sources: GroundedSource[]; queries: string[]; model: string; cached?: boolean }
     | { ok: false; reason: GroundingFailReason };
 
-// Daftar cadangan kalau ListModels gagal/kosong. Model yang sudah tidak ada otomatis dilewati (404).
-const FALLBACK_MODELS = ['gemini-2.5-flash-lite', 'gemini-2.5-flash', 'gemini-robotics-er-2-preview', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
+// Daftar cadangan kalau ListModels gagal/kosong. Seri 2.5 sudah dimatikan (404), jadi langsung ke Robotics-ER & 3.x.
+const FALLBACK_MODELS = ['gemini-robotics-er-2-preview', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-3.5-flash'];
 const MAX_CANDIDATES = 5;
 const MODEL_LIST_TTL_MS = 6 * 60 * 60 * 1000;
 
@@ -80,19 +80,15 @@ function parseModelId(id: string): ParsedModel | null {
     if (!m) return null;
     const major = parseInt(m[1], 10);
     const minor = m[2] ? parseInt(m[2], 10) : 0;
-    // Keluarga 2.0 (dan yang lebih lama) sudah dimatikan Google.
-    if (major < 2) return null;
+    // Keluarga 2.x standar (2.0 & 2.5) sudah dimatikan Google (404). Hanya seri 3+ yang dipakai.
+    if (major < 3) return null;
     return { id, major, minor, lite: !!m[3], preview: !!m[4] };
 }
 
-/** Urutan: 2.5 -> 2.0 -> 3.x; lite dulu; stabil dulu; versi lebih baru dulu. */
+/** Urutan: Robotics-ER (kuota Search gratis 1.5K/hari) -> Gemma (opt-in) -> 3.x (lite dulu, stabil dulu). */
 function rankModels(ids: string[]): string[] {
     const parsed = ids.map(parseModelId).filter((x): x is ParsedModel => !!x);
-    // Jatah Search grounding tier gratis (dashboard AI Studio): grup Gemini 2.5 dan 2 = 1.5K/hari,
-    // grup Gemini 3 = 0/0 (selalu ditolak). Jadi 2.5 dulu, lalu 2.0, 3.x paling akhir.
-    // Model yang 404 ("no longer available to new users") otomatis diistirahatkan 24 jam.
-    // 2.5 (404 untuk project baru, gagal cepat) -> Robotics-ER (terbukti jalan) -> 2.0 -> Gemma (opt-in) -> 3.x (kuota 0 di tier gratis)
-    const bucket = (p: ParsedModel) => (p.robotics ? 1 : p.gemma ? 3 : p.major === 2 && p.minor === 5 ? 0 : p.major === 2 ? 2 : 4);
+    const bucket = (p: ParsedModel) => (p.robotics ? 0 : p.gemma ? 1 : 2);
     parsed.sort((a, b) => {
         if (bucket(a) !== bucket(b)) return bucket(a) - bucket(b);
         if (a.lite !== b.lite) return a.lite ? -1 : 1;
