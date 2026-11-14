@@ -36,6 +36,7 @@ import {
     normalizeWaPhone,
     pausePhoneForHumanTakeover,
     recordAiSpendIdr,
+    recordLastDeliveryInfo,
     recordLastSelfCommand,
     releaseMetaReplyQuota,
     removeSkipPhones,
@@ -214,6 +215,18 @@ interface MetaInboundMessage {
     };
 }
 
+interface MetaDeliveryStatusItem {
+    id?: string;
+    status?: 'sent' | 'delivered' | 'read' | 'failed' | string;
+    timestamp?: string;
+    errors?: Array<{
+        code?: number;
+        title?: string;
+        message?: string;
+        error_data?: { details?: string };
+    }>;
+}
+
 interface MetaChangeValue {
     metadata?: {
         display_phone_number?: string;
@@ -224,6 +237,7 @@ interface MetaChangeValue {
         profile?: { name?: string };
     }>;
     messages?: MetaInboundMessage[];
+    statuses?: MetaDeliveryStatusItem[];
     message_echoes?: MetaMessageEcho[];
     state_sync?: MetaContactSyncItem[];
 }
@@ -515,6 +529,10 @@ async function handleSingleInboundMessage(
         );
 
         if (!aiResult || !aiResult.reply) {
+            await recordLastDeliveryInfo({
+                state: 'ai_error',
+                detail: 'Vertex AI / Gemini gagal menghasilkan teks balasan.',
+            }).catch(() => undefined);
             return;
         }
 
@@ -567,15 +585,54 @@ async function handleSingleInboundMessage(
 
         if (!sendResult.ok) {
             console.error('[whatsapp] Gagal kirim pesan WA:', sendResult);
+            await recordLastDeliveryInfo({
+                state: 'failed',
+                code: sendResult.errorCode ?? sendResult.status,
+                detail: sendResult.errorMessage || 'Gagal memanggil Graph API /messages',
+            }).catch(() => undefined);
             return;
         }
 
         replyDelivered = true;
+        await recordLastDeliveryInfo({
+            state: 'sent',
+            detail: `Terkirim ke Graph API (${aiResult.model})`,
+        }).catch(() => undefined);
         await appendWaHistory(sender, combinedText, formattedWaBody);
     } finally {
         // Jika pengiriman gagal sebelum benar-benar terkirim ke Meta, kembalikan kuota bulanan
         if (!replyDelivered) {
             await releaseMetaReplyQuota().catch(() => undefined);
+        }
+    }
+}
+
+async function handleDeliveryStatuses(statuses: MetaDeliveryStatusItem[]): Promise<void> {
+    for (const st of statuses) {
+        const state = (st.status || '').toLowerCase();
+        if (state === 'failed') {
+            const msgId = (st.id || '').trim();
+            if (msgId) {
+                const firstFail = await claimMessageDedup(`fail_refund:${msgId}`);
+                if (firstFail) {
+                    await releaseMetaReplyQuota().catch(() => undefined);
+                }
+            }
+            const errObj = st.errors?.[0];
+            const detail =
+                errObj?.error_data?.details ||
+                errObj?.message ||
+                errObj?.title ||
+                'Pengiriman ditolak secara asinkron oleh Meta.';
+            await recordLastDeliveryInfo({
+                state: 'failed',
+                code: errObj?.code,
+                detail,
+            }).catch(() => undefined);
+        } else if (state === 'delivered' || state === 'read') {
+            await recordLastDeliveryInfo({
+                state: state as 'delivered' | 'read',
+            }).catch(() => undefined);
         }
     }
 }
@@ -604,6 +661,10 @@ async function processWebhookPayload(
             if (field === 'smb_message_echoes' && Array.isArray(value.message_echoes)) {
                 tasks.push(handleMessageEchoes(value.message_echoes));
                 continue;
+            }
+
+            if (field === 'messages' && Array.isArray(value.statuses)) {
+                tasks.push(handleDeliveryStatuses(value.statuses));
             }
 
             if (field === 'messages' && Array.isArray(value.messages)) {

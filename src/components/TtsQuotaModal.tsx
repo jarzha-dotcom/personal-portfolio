@@ -73,6 +73,12 @@ interface WaAdminStatus {
   skipSavedContacts: boolean;
   smartDelaySec: number;
   lastSelfCommand: { cmd: string; at: string } | null;
+  lastDelivery?: {
+    state: 'sent' | 'delivered' | 'read' | 'failed' | 'ai_error';
+    code?: number;
+    detail?: string;
+    at: string;
+  } | null;
   ownerPhone: string;
   aiMode: 'vertex' | 'aistudio_dedicated' | 'aistudio_shared' | 'unconfigured';
   aiConfigured: boolean;
@@ -646,6 +652,30 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
                           <span className="font-mono text-slate-300 truncate max-w-[160px]">
                             {waStatus.lastSelfCommand.cmd} ({fmtTime(waStatus.lastSelfCommand.at)})
                           </span>
+                        </div>
+                      )}
+                      {waStatus.lastDelivery && (
+                        <div
+                          className={`rounded px-2 py-1.5 mt-1 border text-[10px] leading-snug ${
+                            waStatus.lastDelivery.state === 'failed' || waStatus.lastDelivery.state === 'ai_error'
+                              ? 'bg-red-500/10 border-red-500/30 text-red-300'
+                              : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-300'
+                          }`}
+                        >
+                          <div className="flex justify-between font-medium">
+                            <span>
+                              Status Kirim Terakhir:{' '}
+                              {waStatus.lastDelivery.state === 'failed'
+                                ? `GAGAL${waStatus.lastDelivery.code ? ` (#${waStatus.lastDelivery.code})` : ''}`
+                                : waStatus.lastDelivery.state === 'ai_error'
+                                ? 'AI ERROR'
+                                : waStatus.lastDelivery.state.toUpperCase()}
+                            </span>
+                            <span className="opacity-75">{fmtTime(waStatus.lastDelivery.at)}</span>
+                          </div>
+                          {waStatus.lastDelivery.detail && (
+                            <p className="mt-0.5 break-words opacity-90">{waStatus.lastDelivery.detail}</p>
+                          )}
                         </div>
                       )}
                       {waStatus.missingEnv.length > 0 && (

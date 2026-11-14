@@ -25,6 +25,13 @@ export interface WaChatTurn {
     parts: { text: string }[];
 }
 
+export interface WaLastDeliveryInfo {
+    state: 'sent' | 'delivered' | 'read' | 'failed' | 'ai_error';
+    code?: number;
+    detail?: string;
+    at: string;
+}
+
 export interface WaAdminSnapshot {
     enabled: boolean;
     redisConfigured: boolean;
@@ -37,6 +44,7 @@ export interface WaAdminSnapshot {
     skipSavedContacts: boolean;
     smartDelaySec: number;
     lastSelfCommand: { cmd: string; at: string } | null;
+    lastDelivery: WaLastDeliveryInfo | null;
 }
 
 // ── Normalisasi Nomor WhatsApp (Standar Internasional Tanpa '+') ──────────────
@@ -273,6 +281,7 @@ function store(): KvAdapter {
 
 const KEY_ENABLED = 'wa:config:enabled';
 const KEY_LAST_SELF_CMD = 'wa:config:last_self_cmd';
+const KEY_LAST_DELIVERY = 'wa:diag:last_delivery';
 const KEY_SKIP_SET = 'wa:contacts:skip';
 const KEY_SYNCED_SET = 'wa:contacts:synced';
 const MONTH_TTL_SEC = 40 * 24 * 60 * 60; // 40 hari
@@ -403,6 +412,16 @@ export async function recordLastSelfCommand(cmd: string): Promise<void> {
         JSON.stringify({ cmd, at: new Date().toISOString() }),
         MONTH_TTL_SEC
     );
+}
+
+export async function recordLastDeliveryInfo(info: Omit<WaLastDeliveryInfo, 'at'> & { at?: string }): Promise<void> {
+    const payload: WaLastDeliveryInfo = {
+        state: info.state,
+        ...(info.code !== undefined ? { code: info.code } : {}),
+        ...(info.detail ? { detail: info.detail.slice(0, 280) } : {}),
+        at: info.at || new Date().toISOString(),
+    };
+    await store().setString(KEY_LAST_DELIVERY, JSON.stringify(payload), 7 * DAY_TTL_SEC);
 }
 
 export async function addSkipPhones(phones: string[]): Promise<string[]> {
@@ -598,13 +617,14 @@ export async function clearWaHistory(phone: string): Promise<void> {
 
 export async function getWaAdminSnapshot(): Promise<WaAdminSnapshot> {
     const s = store();
-    const [enabled, metaRepliesUsed, aiSpendIdr, skipList, syncedContactsCount, lastCmdRaw] = await Promise.all([
+    const [enabled, metaRepliesUsed, aiSpendIdr, skipList, syncedContactsCount, lastCmdRaw, lastDelivRaw] = await Promise.all([
         isWaBotEnabled(),
         getMetaRepliesUsed(),
         getAiSpendIdr(),
         listSkipPhones(),
         s.scard(KEY_SYNCED_SET),
         s.getString(KEY_LAST_SELF_CMD),
+        s.getString(KEY_LAST_DELIVERY),
     ]);
 
     let lastSelfCommand: { cmd: string; at: string } | null = null;
@@ -613,6 +633,15 @@ export async function getWaAdminSnapshot(): Promise<WaAdminSnapshot> {
             lastSelfCommand = JSON.parse(lastCmdRaw) as { cmd: string; at: string };
         } catch {
             lastSelfCommand = null;
+        }
+    }
+
+    let lastDelivery: WaLastDeliveryInfo | null = null;
+    if (lastDelivRaw) {
+        try {
+            lastDelivery = JSON.parse(lastDelivRaw) as WaLastDeliveryInfo;
+        } catch {
+            lastDelivery = null;
         }
     }
 
@@ -628,6 +657,7 @@ export async function getWaAdminSnapshot(): Promise<WaAdminSnapshot> {
         skipSavedContacts: shouldSkipSavedContacts(),
         smartDelaySec: Math.round(getSmartDelayMs(false) / 1000),
         lastSelfCommand,
+        lastDelivery,
     };
 }
 
