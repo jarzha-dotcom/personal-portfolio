@@ -56,12 +56,20 @@ function base64UrlEncode(input: Buffer | string): string {
         .replace(/\//g, '_');
 }
 
+function stripOuterQuotes(val: string): string {
+    const t = val.trim();
+    if ((t.startsWith("'") && t.endsWith("'")) || (t.startsWith('"') && t.endsWith('"'))) {
+        return t.slice(1, -1).trim();
+    }
+    return t;
+}
+
 /**
  * Membaca kredensial Service Account GCP dari `GCP_SERVICE_ACCOUNT_JSON`
- * (mendukung JSON mentah maupun string Base64 agar aman di Vercel Env Vars).
+ * (mendukung JSON mentah, terbungkus tanda kutip, maupun string Base64 agar aman di Vercel Env Vars).
  */
 export function parseServiceAccountEnv(): ServiceAccountCredentials | null {
-    const raw = (process.env.GCP_SERVICE_ACCOUNT_JSON || '').trim();
+    const raw = stripOuterQuotes(process.env.GCP_SERVICE_ACCOUNT_JSON || '');
     if (!raw) return null;
 
     let jsonStr = raw;

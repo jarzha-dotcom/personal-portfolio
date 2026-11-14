@@ -21,6 +21,14 @@ export function getOwnerWaPhone(): string {
     return normalizeWaPhone(process.env.WA_OWNER_PHONE || DEFAULT_OWNER_PHONE) || DEFAULT_OWNER_PHONE;
 }
 
+function stripOuterQuotes(val: string): string {
+    const t = val.trim();
+    if ((t.startsWith("'") && t.endsWith("'")) || (t.startsWith('"') && t.endsWith('"'))) {
+        return t.slice(1, -1).trim();
+    }
+    return t;
+}
+
 export function getWaGraphCredentials(): {
     verifyToken: string;
     appSecret: string;
@@ -29,10 +37,10 @@ export function getWaGraphCredentials(): {
     fullyConfigured: boolean;
     missing: string[];
 } {
-    const verifyToken = (process.env.WA_VERIFY_TOKEN || '').trim();
-    const appSecret = (process.env.WA_APP_SECRET || '').trim();
-    const accessToken = (process.env.WA_ACCESS_TOKEN || '').trim();
-    const phoneNumberId = (process.env.WA_PHONE_NUMBER_ID || '').trim();
+    const verifyToken = stripOuterQuotes(process.env.WA_VERIFY_TOKEN || '');
+    const appSecret = stripOuterQuotes(process.env.WA_APP_SECRET || '');
+    const accessToken = stripOuterQuotes(process.env.WA_ACCESS_TOKEN || '');
+    const phoneNumberId = stripOuterQuotes(process.env.WA_PHONE_NUMBER_ID || '');
 
     const missing: string[] = [];
     if (!verifyToken) missing.push('WA_VERIFY_TOKEN');
