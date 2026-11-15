@@ -260,4 +260,62 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip': [
+    {
+      paragraphs: [
+        'Pengguna yang memilih aplikasi pencatatan local-first seperti ZhaNotes biasanya berangkat dari satu alasan kuat: mereka tidak ingin draf strategi bisnis, catatan rapat direksi, atau dokumen riset pribadinya bisa dibaca oleh server penyedia aplikasi. Namun begitu aplikasi dipakai secara serius setiap hari, muncul kebutuhan kedua yang tampak bertolak belakang — "Saya ingin lanjut membuka catatan laptop kantor ini dari tablet saat di perjalanan, dan membagikan satu halaman kerja ke rekan tim, tapi saya tetap tidak mau server awan bisa mengintip isinya."',
+        'Sekilas terdengar mustahil: bagaimana server awan bisa menyimpan, menyinkronkan perubahan antarperangkat, bahkan melayani tautan kolaborasi secara real-time kalau server itu sendiri buta terhadap isi datanya? Di artikel ini saya membedah arsitektur enkripsi ujung-ke-ujung (End-to-End Encryption / E2EE) berbasis AES-GCM yang saya rancang untuk ZhaNotes Edisi Custom.',
+      ],
+    },
+    {
+      heading: 'Beda Enkripsi Biasa dengan Zero-Knowledge End-to-End Encryption',
+      paragraphs: [
+        'Hampir semua layanan cloud modern mengklaim "data Anda dienkripsi". Pernyataan itu benar secara teknis, tetapi yang jarang dijelaskan adalah siapa yang memegang kuncinya. Pada layanan cloud biasa, data dikirim lewat jalur aman (HTTPS), lalu disimpan dalam keadaan terenkripsi di hard disk server — namun kunci pembukanya tetap dipegang oleh server penyedia layanan tersebut. Artinya, sistem internal penyedia (atau pihak yang berhasil membobol akses admin server) secara teknis tetap bisa membuka isi catatanmu.',
+        'Pada arsitektur Zero-Knowledge E2EE di ZhaNotes Edisi Custom, proses penguncian terjadi sepenuhnya di dalam browser perangkatmu menggunakan Web Crypto API standar industri (algoritma AES-GCM) sebelum satu byte pun dikirim keluar menuju internet. Server penyimpanan hanya menerima gumpalan karakter acak (ciphertext) yang secara matematis tidak bermakna tanpa kata sandi enkripsi milikmu.',
+      ],
+    },
+    {
+      heading: 'Dua Kunci yang Sengaja Dipisah: Token Akses vs Sandi Enkripsi',
+      paragraphs: [
+        'Supaya server bisa memvalidasi izin simpan tanpa pernah mengetahui kunci pembuka data, sistem sengaja memisahkan kredensial pengguna menjadi dua lapis yang tugasnya sama sekali berbeda:',
+        '1. Token Akses (Access Token): dikirim ke API server sebagai "kartu izin masuk" untuk membuktikan bahwa kamu berhak menaruh atau mengambil berkas terenkripsi di ruang simpan milikmu. Satu instalasi server ZhaNotes Edisi Custom bahkan mendukung hingga 5 token ruang terpisah (multi-owner isolation), sehingga lima rekan kerja atau lima divisi bisa memakai satu infrastruktur yang sama tanpa pernah bersinggungan ruang datanya.',
+        '2. Kata Sandi Enkripsi (Encryption Password): hanya diketik di perangkatmu untuk menurunkan kunci kriptografi AES-GCM di memori browser, dan TIDAK PERNAH dikirim ke server dalam bentuk apa pun.',
+        'Konsekuensinya tegas: sekalipun seseorang menyalin mentah seluruh berkas dari penyimpanan awan (Vercel Blob) maupun indeks metadatanya, yang mereka dapatkan hanyalah potongan byte teracak yang terkunci rapat.',
+      ],
+    },
+    {
+      heading: 'Memecah Data ke Potongan 3 MB dan Mencegah Tabrakan Dua Perangkat',
+      paragraphs: [
+        'Ruang kerja catatan yang matang tidak hanya berisi teks pendek, tetapi juga kanvas gambar resolusi tinggi, rekaman suara rapat, hingga lampiran PDF. Mengirim seluruh ruang kerja sebagai satu berkas raksasa setiap kali pengguna mengetik satu paragraf baru jelas akan lambat dan boros kuota.',
+        'Karena itu mesin sinkronisasi ZhaNotes memecah data terenkripsi menjadi potongan-potongan terukur (chunking maksimal sekitar 3 MB per berkas) ke penyimpanan objek, lalu mencatat nomor revisinya di Upstash Redis menggunakan skrip Lua atomik berpola Compare-and-Set (CAS).',
+        'Apa gunanya mekanisme CAS ini di dunia nyata? Bayangkan kamu mengedit Catatan A di laptop kantor saat sinyal Wi-Fi putus, sementara di jam yang sama dari HP kamu menambahkan daftar tugas di Catatan B. Saat kedua perangkat kembali online:',
+        '• Server mendeteksi nomor revisi terakhir secara atomik sehingga unggahan perangkat kedua tidak pernah diam-diam menimpa unggahan perangkat pertama.',
+        '• Jika perubahan terjadi pada catatan atau bagian yang berbeda, mesin di browser akan menggabungkannya secara otomatis (auto-merge) tanpa mengganggu alur kerjamu.',
+        '• Jika kebetulan bagian kalimat yang persis sama diubah berbeda di dua perangkat selagi sama-sama offline, aplikasi memunculkan jendela pembanding berdampingan (conflict resolution) agar kamu memilih sendiri versi mana yang ingin dipertahankan — tidak ada cerita tulisan hilang tanpa jejak.',
+      ],
+    },
+    {
+      heading: 'Rahasia Tautan Berbagi (#Fragment): Kolaborasi Tanpa Membuka Kunci ke Server',
+      paragraphs: [
+        'Bagian paling menarik dari rancangan ini adalah fitur berbagi halaman. Di ZhaNotes Edisi Custom, kamu bisa membagikan catatan atau kanvas dalam tiga mode: Snapshot statis (potret satu waktu), Tautan Hidup (pembaca selalu melihat pembaruan terbarumu), hingga Kolaborasi Edit Bersama.',
+        'Pertanyaannya: bagaimana penerima tautan bisa mendekripsi isi halaman tersebut di browsernya tanpa server pernah mengetahui kunci pembukanya?',
+        'Jawabannya memanfaatkan aturan standar cara kerja alamat web di semua browser modern, yaitu bagian tanda pagar atau URL Fragment (#...). Setiap kali seseorang membuka tautan berbentuk domainkamu.com/zhanotes/#kunciDekripsiUnik, browser hanya mengirimkan alamat sebelum tanda pagar ke server untuk mengunduh paket data terenkripsi, sedangkan deretan kunci sesudah tanda pagar tetap tertahan 100% di dalam browser penerima untuk membuka gembok AES-GCM secara lokal.',
+        'Untuk mode Kolaborasi Edit, sistem menambahkan satu pengaman ekstra berupa verifikasi hash kunci-tulis (write-key hash). Dengan begitu, orang yang hanya diberi tautan baca tidak akan pernah bisa memalsukan permintaan timpa ke dokumen bersama, sementara server tetap hanya bertugas meneruskan paket terenkripsi yang sudah sah.',
+      ],
+    },
+    {
+      heading: 'Konsekuensi Jujur E2EE yang Wajib Dipahami Pemilik Data',
+      paragraphs: [
+        'Keamanan tanpa pintu belakang selalu menuntut tanggung jawab yang sepadan. Berbeda dari aplikasi biasa yang menyediakan tombol "Lupa Password" lewat email — seperti yang sempat saya singgung perbedaannya pada sistem autentikasi di artikel "Enkripsi Password Standar Militer Itu Apa, dan Kenapa Penting untuk Sistem Bisnis Kecil" — pada enkripsi ujung-ke-ujung sejati, tidak ada satu pihak pun yang bisa memulihkan kata sandi enkripsimu jika hilang.',
+        'Jika seluruh perangkat lokalmu rusak di saat bersamaan dan kamu lupa kata sandi enkripsi awan tanpa pernah menyimpan cadangan .zip lokal, maka data di awan tidak akan bisa dibuka oleh siapa pun, termasuk oleh saya sebagai pembuat sistemnya. Itulah bukti paling jujur bahwa kuncinya memang benar-benar hanya milikmu.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Penerapan untuk Dokumen Sensitif Bisnis',
+      paragraphs: [
+        'Privasi lokal dan kenyamanan kerja lintas perangkat tidak harus saling mengorbankan. Dengan meletakkan enkripsi AES-GCM di sisi browser, menjaga ketertiban revisi lewat transaksi atomik, dan memanfaatkan URL fragment untuk berbagi, sebuah tim kecil bisa menikmati sinkronisasi awan modern dengan biaya infrastruktur mendekati nol dan kerahasiaan setingkat brankas pribadi.',
+        'Kalau kamu ingin menjajal pengalaman dasar ZhaNotes terlebih dahulu, versi publiknya selalu terbuka gratis di arzhaning.my.id/zhanotes/. Dan bila perusahaan, firma konsultan, atau institusimu membutuhkan ZhaNotes Edisi Custom Beli-Putus lengkap dengan sinkronisasi E2EE dan domain sendiri, silakan sapa Zannah atau hubungi saya langsung lewat WhatsApp.',
+      ],
+    },
+  ],
 };

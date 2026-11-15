@@ -92,6 +92,127 @@ export interface Article {
 export const ARTICLES: Article[] = [
   // ===== Artikel published, diurutkan dari PALING BARU ke PALING LAMA =====
   {
+    slug: 'zero-server-cost-bukan-gimmick',
+    title: 'Zero Server Cost Bukan Gimmick: Filosofi di Balik Semua Produk yang Saya Bangun',
+    excerpt:
+      'Kenapa "hemat biaya server" bukan sekadar jargon marketing, melainkan disiplin arsitektur yang melindungi arus kas bisnis dari tagihan bulanan yang tidak perlu.',
+    category: 'Reflektif',
+    readMinutes: 6,
+    pillar: 'personal-brand',
+    published: true,
+    publishedAt: '2026-11-15',
+  },
+  {
+    slug: 'tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes',
+    title: 'Tabel yang Menghitung Sendiri, Kanvas Pengenal Bentuk, dan Ekspor Word Tanpa Server: Bedah Mesin Client-Side ZhaNotes',
+    excerpt:
+      'Bagaimana satu aplikasi browser bisa memahami angka "1,5jt" di tabel otomatis, merapikan coretan tangan dalam setengah detik, dan merakit file .docx murni di perangkat pengguna.',
+    category: 'Teknis',
+    readMinutes: 6,
+    pillar: 'bedah-fitur-teknis',
+    published: true,
+    publishedAt: '2026-11-13',
+  },
+  {
+    slug: 'xendit-vs-payment-gateway-lain-kenapa-saya-pilih',
+    title: 'Midtrans & Xendit dengan Saklar .env: Cara Saya Merancang Payment Gateway Anti-Macet di Proyek Saya',
+    excerpt:
+      'Kenapa di B-Games dan Rajendra Pintar saya memasang Midtrans sekaligus mempertahankan jalur Xendit di balik saklar .env — lengkap dengan perbandingan praktis keduanya dan arsitektur webhook di lapangan.',
+    category: 'Teknis',
+    readMinutes: 6,
+    pillar: 'bedah-fitur-teknis',
+    published: true,
+    publishedAt: '2026-11-11',
+  },
+  {
+    slug: 'portal-vendor-terisolasi-dan-knowledge-base-issue-tracker',
+    title: 'Portal Vendor Terisolasi dan Knowledge Base Otomatis: Cara Issue Tracker Menjaga Rahasia Pelanggan Sekaligus Mencegah Masalah Berulang',
+    excerpt:
+      'Bagaimana pemisahan akses tingkat server menjaga nama pelanggan tetap rahasia dari vendor, sambil mengubah setiap kasus selesai menjadi perpustakaan solusi yang menyarankan jawaban otomatis.',
+    category: 'Studi Kasus',
+    readMinutes: 6,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-11-09',
+  },
+  {
+    slug: 'kenapa-ai-chatbot-saya-bisa-bicara',
+    title: 'Kenapa AI Chatbot Saya Bisa Bicara (Bukan Cuma Teks): Di Balik Arsitektur Suara Chirp 3 HD, WaveNet, dan Normalisasi Bahasa',
+    excerpt:
+      'Suara yang fasih mengeja rupiah, nomor telepon, dan istilah teknis itu bukan rekaman manusia — ini cara kerja normalisasi teks dan sintesis suara bertingkat di baliknya.',
+    category: 'Teknis',
+    readMinutes: 5,
+    pillar: 'ai-chatbot-agent',
+    published: true,
+    publishedAt: '2026-11-07',
+  },
+  {
+    slug: 'tanda-bisnismu-butuh-sistem-custom',
+    title: 'Tanda-tanda Bisnismu Butuh Sistem Custom, Bukan Sekadar Excel atau Aplikasi Siap Pakai',
+    excerpt:
+      'Excel dan aplikasi template itu bagus untuk mulai — sampai titik tertentu. Ini tanda-tanda kamu sudah melewati titik itu, lengkap dengan lembar cek mandiri.',
+    category: 'Panduan',
+    readMinutes: 6,
+    pillar: 'panduan-bisnis',
+    published: true,
+    publishedAt: '2026-11-05',
+  },
+  {
+    slug: 'sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip',
+    title: 'Sinkron Awan Tanpa Server Bisa Mengintip: Cara Kerja Enkripsi AES-GCM dan Tautan Hidup di ZhaNotes',
+    excerpt:
+      'Bagaimana catatan di ZhaNotes Edisi Custom bisa disinkronkan antarperangkat dan dibagikan secara kolaboratif tanpa server pernah memegang kunci enkripsinya.',
+    category: 'Teknis',
+    readMinutes: 6,
+    pillar: 'keamanan-data',
+    published: true,
+    publishedAt: '2026-11-03',
+  },
+  {
+    slug: 'anti-afk-bot-di-b-games',
+    title: 'Anti-AFK Bot di B-Games: Kenapa Meja Permainan Nggak Pernah Macet Walau Pemain Disconnect',
+    excerpt:
+      'Detail teknis mekanisme takeover otomatis yang bikin permainan tetap jalan mulus meski salah satu pemain kehilangan koneksi.',
+    category: 'Teknis',
+    readMinutes: 5,
+    pillar: 'bedah-fitur-teknis',
+    published: true,
+    publishedAt: '2026-11-01',
+  },
+  {
+    slug: 'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab',
+    title: 'Dari Chat ke Kontrak Ditandatangani: Alur Zannah, Mesin RAB, dan Portal Klien, End-to-End',
+    excerpt:
+      'Satu alur machine-to-machine penuh — dari diskusi santai di chatbot sampai proposal resmi siap dibayar, tanpa campur tangan manual di tengahnya.',
+    category: 'Studi Kasus',
+    readMinutes: 6,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-10-29',
+  },
+  {
+    slug: 'kapan-google-sheets-cukup-kapan-harus-pindah-postgresql',
+    title: 'Kapan Google Sheets Cukup Jadi Database, Kapan Harus Pindah ke PostgreSQL/Supabase',
+    excerpt:
+      'Bukan soal mana yang lebih bagus — ini soal titik di mana Google Sheets sebagai database mulai kehabisan napas untuk skala datamu.',
+    category: 'Teknis',
+    readMinutes: 6,
+    pillar: 'zero-server-cost',
+    published: true,
+    publishedAt: '2026-10-27',
+  },
+  {
+    slug: 'mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first',
+    title: 'Mengenal ZhaNotes: Membangun Workspace Catatan, Kanvas Bebas, dan Anotasi PDF yang Berjalan 100% di Browser',
+    excerpt:
+      'Satu ruang kerja untuk rich-text, kanvas gambar, kliping riset, dan pembaca PDF yang tersimpan penuh di perangkatmu sendiri — tanpa login, tanpa iklan, dan tanpa biaya server.',
+    category: 'Studi Kasus',
+    readMinutes: 7,
+    pillar: 'studi-kasus-produk',
+    published: true,
+    publishedAt: '2026-10-24',
+  },
+  {
     slug: 'enkripsi-password-standar-militer-itu-apa',
     title: 'Enkripsi Password Standar Militer Itu Apa, dan Kenapa Penting untuk Sistem Bisnis Kecil',
     excerpt:
@@ -383,16 +504,6 @@ export const ARTICLES: Article[] = [
   // Metadata (slug/title/excerpt/category/readMinutes) sudah final sesuai
   // rencana konten; tinggal direview lagi kalau mau ditambah/diisi bodynya. =====
   {
-    slug: 'kapan-google-sheets-cukup-kapan-harus-pindah-postgresql',
-    title: 'Kapan Google Sheets Cukup Jadi Database, Kapan Harus Pindah ke PostgreSQL/Supabase',
-    excerpt:
-      'Bukan soal mana yang lebih bagus — ini soal titik di mana Google Sheets sebagai database mulai kehabisan napas untuk skala datamu.',
-    category: 'Teknis',
-    readMinutes: 4,
-    pillar: 'zero-server-cost',
-    published: false,
-  },
-  {
     slug: 'serverless-vs-vps-bukan-soal-canggih',
     title: 'Serverless vs VPS: Bukan Soal Mana yang Lebih Canggih, Tapi Mana yang Sesuai Skala Bisnis',
     excerpt:
@@ -413,26 +524,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
   {
-    slug: 'kenapa-ai-chatbot-saya-bisa-bicara',
-    title: 'Kenapa AI Chatbot Saya Bisa Bicara (Bukan Cuma Teks): Di Balik Fitur Text-to-Speech WaveNet',
-    excerpt:
-      'Suara yang fasih mengeja rupiah dan tanggal itu bukan rekaman manusia — ini cara kerja sintesis suara di baliknya.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'ai-chatbot-agent',
-    published: false,
-  },
-  {
-    slug: 'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab',
-    title: 'Dari Chat ke Kontrak Ditandatangani: Alur Zannah, Mesin RAB, dan Portal Klien, End-to-End',
-    excerpt:
-      'Satu alur machine-to-machine penuh — dari diskusi santai di chatbot sampai proposal resmi siap dibayar, tanpa campur tangan manual di tengahnya.',
-    category: 'Studi Kasus',
-    readMinutes: 5,
-    pillar: 'studi-kasus-produk',
-    published: false,
-  },
-  {
     slug: 'kenapa-b-games-pakai-postgresql-bukan-google-sheets',
     title: 'Kenapa B-Games Pakai PostgreSQL (Supabase), Bukan Google Sheets Seperti Assets DEMO',
     excerpt:
@@ -442,17 +533,6 @@ export const ARTICLES: Article[] = [
     pillar: 'studi-kasus-produk',
     published: false,
   },
-  {
-    slug: 'tanda-bisnismu-butuh-sistem-custom',
-    title: 'Tanda-tanda Bisnismu Butuh Sistem Custom, Bukan Sekadar Excel atau Aplikasi Siap Pakai',
-    excerpt:
-      'Excel dan aplikasi template itu bagus untuk mulai — sampai titik tertentu. Ini tanda-tanda kamu sudah melewati titik itu.',
-    category: 'Panduan',
-    readMinutes: 4,
-    pillar: 'panduan-bisnis',
-    published: false,
-  },
-
   {
     slug: 'offline-first-dua-aplikasi-saya-tetap-jalan-tanpa-internet',
     title: 'Offline-First: Bagaimana 2 Aplikasi Saya (Assets DEMO & Rajendra Pintar) Tetap Jalan Tanpa Internet',
@@ -464,16 +544,6 @@ export const ARTICLES: Article[] = [
     published: false,
   },
   {
-    slug: 'anti-afk-bot-di-b-games',
-    title: 'Anti-AFK Bot di B-Games: Kenapa Meja Permainan Nggak Pernah Macet Walau Pemain Disconnect',
-    excerpt:
-      'Detail teknis mekanisme takeover otomatis yang bikin permainan tetap jalan mulus meski salah satu pemain kehilangan koneksi.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'bedah-fitur-teknis',
-    published: false,
-  },
-  {
     slug: 'kenapa-daftar-ribuan-aset-tidak-lag-flashlist',
     title: 'Kenapa Daftar Ribuan Aset di HP Nggak Lag: di Balik FlashList dari Shopify',
     excerpt:
@@ -481,16 +551,6 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 3,
     pillar: 'bedah-fitur-teknis',
-    published: false,
-  },
-  {
-    slug: 'zero-server-cost-bukan-gimmick',
-    title: 'Zero Server Cost Bukan Gimmick: Filosofi di Balik Semua Produk yang Saya Bangun',
-    excerpt:
-      'Kenapa "hemat biaya server" bukan sekadar jargon marketing, tapi keputusan arsitektur yang dipegang konsisten dari proyek ke proyek.',
-    category: 'Reflektif',
-    readMinutes: 4,
-    pillar: 'personal-brand',
     published: false,
   },
   {
@@ -511,16 +571,6 @@ export const ARTICLES: Article[] = [
     category: 'Teknis',
     readMinutes: 4,
     pillar: 'zero-server-cost',
-    published: false,
-  },
-  {
-    slug: 'xendit-vs-payment-gateway-lain-kenapa-saya-pilih',
-    title: 'Kenapa Xendit Jadi Payment Gateway Pilihan di Hampir Semua Proyek Saya',
-    excerpt:
-      'QRIS, Virtual Account, e-wallet dalam satu integrasi — pertimbangan di balik pilihan payment gateway yang dipakai berulang kali.',
-    category: 'Teknis',
-    readMinutes: 3,
-    pillar: 'bedah-fitur-teknis',
     published: false,
   },
   {

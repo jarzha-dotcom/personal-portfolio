@@ -113,6 +113,60 @@
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/amankah-data-bisnis-di-google-sheets-drive-0511460a.mp3",
     "storage": "blob"
   },
+  "anti-afk-bot-di-b-games": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 5352,
+    "bytes": 1312992,
+    "duration": 328.248,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 5.976
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 5.976,
+        "end": 54
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 54,
+        "end": 114.624
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 114.624,
+        "end": 195
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 195,
+        "end": 231.648
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 231.648,
+        "end": 290.712
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 290.712,
+        "end": 328.248
+      }
+    ],
+    "hash": "0a4671d8f4a23ae966ac2e0a6719095a568d5be9a04649f07e057f2b6da0387a",
+    "generatedAt": "2026-11-15T05:24:48.999Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/anti-afk-bot-di-b-games-0a4671d8.mp3",
+    "storage": "blob"
+  },
   "apa-itu-audit-trail-dan-kenapa-bisnismu-butuh": {
     "voice": "id-ID-Chirp3-HD-Aoede",
     "rate": 1,
@@ -719,6 +773,66 @@
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/dari-audit-internal-ke-software-development-1024c0f6.mp3",
     "storage": "blob"
   },
+  "dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7635,
+    "bytes": 1904448,
+    "duration": 476.112,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 7.536
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 7.536,
+        "end": 66.432
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 66.432,
+        "end": 155.136
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 155.136,
+        "end": 233.472
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 233.472,
+        "end": 310.128
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 310.128,
+        "end": 378.552
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 378.552,
+        "end": 436.776
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 436.776,
+        "end": 476.112
+      }
+    ],
+    "hash": "a8656e84df9245a99a67e01e29da1e20f4fee53fa8d06a4760f2a9f038acdbae",
+    "generatedAt": "2026-11-15T05:25:56.957Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab-a8656e84.mp3",
+    "storage": "blob"
+  },
   "dari-scan-kamera-ke-data-aset-1-detik": {
     "voice": "id-ID-Chirp3-HD-Aoede",
     "rate": 1,
@@ -923,6 +1037,60 @@
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/enkripsi-password-standar-militer-itu-apa-f54dd2af.mp3",
     "storage": "blob"
   },
+  "kapan-google-sheets-cukup-kapan-harus-pindah-postgresql": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7727,
+    "bytes": 1879680,
+    "duration": 469.92,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.744
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.744,
+        "end": 55.008
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 55.008,
+        "end": 155.424
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 155.424,
+        "end": 292.08
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 292.08,
+        "end": 353.616
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 353.616,
+        "end": 407.712
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 407.712,
+        "end": 469.92
+      }
+    ],
+    "hash": "4aea750a827e45666ebd8586d4f725bb945f9106509a000ba402852947cb6825",
+    "generatedAt": "2026-11-15T05:46:25.004Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kapan-google-sheets-cukup-kapan-harus-pindah-postgresql-4aea750a.mp3",
+    "storage": "blob"
+  },
   "kenapa-1-website-butuh-3-karakter-ai-berbeda": {
     "voice": "id-ID-Chirp3-HD-Aoede",
     "rate": 1,
@@ -1029,6 +1197,66 @@
     "hash": "fab79020ab7fad440a6e9e54de4c7e063d85597f8ace20f8974048c88d3b590b",
     "generatedAt": "2026-10-03T15:09:39.328Z",
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-fab79020.mp3",
+    "storage": "blob"
+  },
+  "kenapa-ai-chatbot-saya-bisa-bicara": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6831,
+    "bytes": 1720032,
+    "duration": 430.008,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 8.808
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 8.808,
+        "end": 61.752
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 61.752,
+        "end": 124.968
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 124.968,
+        "end": 200.856
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 200.856,
+        "end": 281.592
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 281.592,
+        "end": 354.36
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 354.36,
+        "end": 392.304
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 392.304,
+        "end": 430.008
+      }
+    ],
+    "hash": "a173dab1772492f6b9d8cda0b8d910055e3763b0534d51ecfd4881472a17f491",
+    "generatedAt": "2026-11-15T05:21:56.904Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/kenapa-ai-chatbot-saya-bisa-bicara-a173dab1.mp3",
     "storage": "blob"
   },
   "kenapa-google-apps-script-untuk-klien-kecil-menengah": {
@@ -1292,79 +1520,205 @@
   "membangun-aplikasi-100-persen-offline-rajendra-pintar": {
     "voice": "id-ID-Chirp3-HD-Aoede",
     "rate": 1,
-    "chars": 7115,
-    "bytes": 1884864,
-    "duration": 471.216,
+    "chars": 7151,
+    "bytes": 1895520,
+    "duration": 473.88,
     "sections": [
       {
         "kind": "title",
         "start": 0,
-        "end": 5.304
+        "end": 5.568
       },
       {
         "kind": "block",
         "blockIndex": 0,
-        "start": 5.304,
-        "end": 48.288
+        "start": 5.568,
+        "end": 49.512
       },
       {
         "kind": "block",
         "blockIndex": 1,
-        "start": 48.288,
-        "end": 87.024
+        "start": 49.512,
+        "end": 90.576
       },
       {
         "kind": "block",
         "blockIndex": 2,
-        "start": 87.024,
-        "end": 133.032
+        "start": 90.576,
+        "end": 134.544
       },
       {
         "kind": "block",
         "blockIndex": 3,
-        "start": 133.032,
-        "end": 204.12
+        "start": 134.544,
+        "end": 205.632
       },
       {
         "kind": "block",
         "blockIndex": 4,
-        "start": 204.12,
-        "end": 248.736
+        "start": 205.632,
+        "end": 247.536
       },
       {
         "kind": "block",
         "blockIndex": 5,
-        "start": 248.736,
-        "end": 304.2
+        "start": 247.536,
+        "end": 303.624
       },
       {
         "kind": "block",
         "blockIndex": 6,
-        "start": 304.2,
-        "end": 342.648
+        "start": 303.624,
+        "end": 347.832
       },
       {
         "kind": "block",
         "blockIndex": 7,
-        "start": 342.648,
-        "end": 379.992
+        "start": 347.832,
+        "end": 385.008
       },
       {
         "kind": "block",
         "blockIndex": 8,
-        "start": 379.992,
-        "end": 418.728
+        "start": 385.008,
+        "end": 423.864
       },
       {
         "kind": "block",
         "blockIndex": 9,
-        "start": 418.728,
-        "end": 471.216
+        "start": 423.864,
+        "end": 473.88
       }
     ],
-    "hash": "c69293a81d9f1bc70e97be33e397cb59876a9fe66939a3ed24b36b7bb42bc4c6",
-    "generatedAt": "2026-11-01T10:20:06.197Z",
-    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-c69293a8.mp3",
+    "hash": "5395c043a2f1a69e125b385eb75eac18262078e43891d6ae8df476809e01d1d1",
+    "generatedAt": "2026-11-15T05:47:34.271Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-5395c043.mp3",
+    "storage": "blob"
+  },
+  "mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 8830,
+    "bytes": 2240256,
+    "duration": 560.064,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 8.616
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 8.616,
+        "end": 61.392
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 61.392,
+        "end": 133.848
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 133.848,
+        "end": 264.384
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 264.384,
+        "end": 322.872
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 322.872,
+        "end": 373.416
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 373.416,
+        "end": 442.512
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 442.512,
+        "end": 519
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 519,
+        "end": 560.064
+      }
+    ],
+    "hash": "4de0c6f5db252e50277a0ba1162276c296260fab3198292f9ce9f14b20d7ca1e",
+    "generatedAt": "2026-11-15T05:28:20.830Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first-4de0c6f5.mp3",
+    "storage": "blob"
+  },
+  "portal-vendor-terisolasi-dan-knowledge-base-issue-tracker": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7839,
+    "bytes": 1906560,
+    "duration": 476.64,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 9.408
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 9.408,
+        "end": 72.456
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 72.456,
+        "end": 136.152
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 136.152,
+        "end": 229.416
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 229.416,
+        "end": 311.64
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 311.64,
+        "end": 397.008
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 397.008,
+        "end": 439.056
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 439.056,
+        "end": 476.64
+      }
+    ],
+    "hash": "17a1e1792b77884035f788b5d2f5aa010a1615d724125caa9b5d7caae4479d33",
+    "generatedAt": "2026-11-15T05:20:57.597Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/portal-vendor-terisolasi-dan-knowledge-base-issue-tracker-17a1e179.mp3",
     "storage": "blob"
   },
   "single-active-session-mencegah-akun-dibajak": {
@@ -1443,6 +1797,66 @@
     "hash": "1ff199c5f3626c64a5ea648909922d3f5340a1d4695f79ef173c3fb9c65839d5",
     "generatedAt": "2026-11-01T10:18:56.290Z",
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/single-active-session-mencegah-akun-dibajak-1ff199c5.mp3",
+    "storage": "blob"
+  },
+  "sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7490,
+    "bytes": 1895520,
+    "duration": 473.88,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 8.496
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 8.496,
+        "end": 65.832
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 65.832,
+        "end": 129.528
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 129.528,
+        "end": 198.264
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 198.264,
+        "end": 287.52
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 287.52,
+        "end": 370.728
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 370.728,
+        "end": 422.064
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 422.064,
+        "end": 473.88
+      }
+    ],
+    "hash": "2db294b07f47c68ad858869f8b6bfca2e6cfa3975833ee1cee6e3ca363b337d0",
+    "generatedAt": "2026-11-15T05:24:02.641Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip-2db294b0.mp3",
     "storage": "blob"
   },
   "studi-kasus-devrab-proposal-30-detik": {
@@ -1527,6 +1941,132 @@
     "hash": "20a44ffc8b2d66143c9926194135b708dc1f56ff84c36ae7444d54564159244a",
     "generatedAt": "2026-10-03T15:08:05.127Z",
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/studi-kasus-devrab-proposal-30-detik-20a44ffc.mp3",
+    "storage": "blob"
+  },
+  "tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6622,
+    "bytes": 1690752,
+    "duration": 422.688,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 7.488
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 7.488,
+        "end": 51.792
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 51.792,
+        "end": 143.808
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 143.808,
+        "end": 238.992
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 238.992,
+        "end": 335.856
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 335.856,
+        "end": 381.264
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 381.264,
+        "end": 422.688
+      }
+    ],
+    "hash": "1ded1f5da1b0e65f3bdc49369e8e7df09ce9997b4ffb3aceb3e9c416441311d6",
+    "generatedAt": "2026-11-15T05:19:00.319Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes-1ded1f5d.mp3",
+    "storage": "blob"
+  },
+  "tanda-bisnismu-butuh-sistem-custom": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 6582,
+    "bytes": 1643136,
+    "duration": 410.784,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 6.168
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 6.168,
+        "end": 54.672
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 54.672,
+        "end": 94.08
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 94.08,
+        "end": 138.528
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 138.528,
+        "end": 181.056
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 181.056,
+        "end": 228.432
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 228.432,
+        "end": 262.968
+      },
+      {
+        "kind": "block",
+        "blockIndex": 6,
+        "start": 262.968,
+        "end": 298.032
+      },
+      {
+        "kind": "block",
+        "blockIndex": 7,
+        "start": 298.032,
+        "end": 338.088
+      },
+      {
+        "kind": "block",
+        "blockIndex": 8,
+        "start": 338.088,
+        "end": 410.784
+      }
+    ],
+    "hash": "fa221005a40ce2e0a09c768f90e0b6be1c364ee0a543af7d0bfdc2e179d30351",
+    "generatedAt": "2026-11-15T05:22:57.665Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/tanda-bisnismu-butuh-sistem-custom-fa221005.mp3",
     "storage": "blob"
   },
   "tanda-waktunya-migrasi-dari-apps-script": {
@@ -1635,6 +2175,114 @@
     "hash": "c1fb268e76bc02a828aea4e48531193d6d563960bcf5c249b320870db2e423b6",
     "generatedAt": "2026-10-03T15:05:03.270Z",
     "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/web-app-vs-mobile-app-vs-pwa-c1fb268e.mp3",
+    "storage": "blob"
+  },
+  "xendit-vs-payment-gateway-lain-kenapa-saya-pilih": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7727,
+    "bytes": 1980480,
+    "duration": 495.12,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 7.104
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 7.104,
+        "end": 74.4
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 74.4,
+        "end": 157.488
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 157.488,
+        "end": 274.344
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 274.344,
+        "end": 339.048
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 339.048,
+        "end": 441.744
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 441.744,
+        "end": 495.12
+      }
+    ],
+    "hash": "316bfadf084a3b93cfb961a657f4dd1c993b24220f94da3ec59c977054dc0053",
+    "generatedAt": "2026-11-15T05:50:56.640Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/xendit-vs-payment-gateway-lain-kenapa-saya-pilih-316bfadf.mp3",
+    "storage": "blob"
+  },
+  "zero-server-cost-bukan-gimmick": {
+    "voice": "id-ID-Chirp3-HD-Aoede",
+    "rate": 1,
+    "chars": 7084,
+    "bytes": 1707648,
+    "duration": 426.912,
+    "sections": [
+      {
+        "kind": "title",
+        "start": 0,
+        "end": 4.896
+      },
+      {
+        "kind": "block",
+        "blockIndex": 0,
+        "start": 4.896,
+        "end": 59.88
+      },
+      {
+        "kind": "block",
+        "blockIndex": 1,
+        "start": 59.88,
+        "end": 138.144
+      },
+      {
+        "kind": "block",
+        "blockIndex": 2,
+        "start": 138.144,
+        "end": 242.592
+      },
+      {
+        "kind": "block",
+        "blockIndex": 3,
+        "start": 242.592,
+        "end": 304.08
+      },
+      {
+        "kind": "block",
+        "blockIndex": 4,
+        "start": 304.08,
+        "end": 375.144
+      },
+      {
+        "kind": "block",
+        "blockIndex": 5,
+        "start": 375.144,
+        "end": 426.912
+      }
+    ],
+    "hash": "42c6491dfd31d768eca54bb1731edced537be1e46143b084af5d2da1024c81a9",
+    "generatedAt": "2026-11-15T05:18:02.816Z",
+    "url": "https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/audio/articles/zero-server-cost-bukan-gimmick-42c6491d.mp3",
     "storage": "blob"
   }
 }

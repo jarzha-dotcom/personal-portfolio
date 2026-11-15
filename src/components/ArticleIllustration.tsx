@@ -37,6 +37,19 @@ import {
   ListChecks,
   Handshake,
   DatabaseZap,
+  NotebookPen,
+  PenTool,
+  KeyRound,
+  Volume2,
+  AudioLines,
+  CreditCard,
+  Table2,
+  FileCheck2,
+  WifiOff,
+  UserCheck,
+  Database,
+  Coins,
+  FolderLock,
 } from 'lucide-react';
 
 import { ARTICLE_IMAGES, type ArticleImageSet } from '../data/articleImages';
@@ -104,6 +117,22 @@ const SLUG_ILLUSTRATIONS: Record<string, IconPair> = {
   'dari-audit-internal-ke-software-development': { Icon: FileSpreadsheet, Accent: Code2 },
   'dari-scan-kamera-ke-data-aset-1-detik': { Icon: QrCode, Accent: Smartphone },
   'kenapa-riwayat-chat-ai-disimpan-di-browser-kamu': { Icon: DatabaseZap, Accent: ShieldCheck },
+  'kenapa-vendor-balas-seadanya-dan-cara-memaksa-akar-masalah': { Icon: ListChecks, Accent: ShieldCheck },
+  'membangun-aplikasi-100-persen-offline-rajendra-pintar': { Icon: WifiOff, Accent: Smartphone },
+  'single-active-session-mencegah-akun-dibajak': { Icon: UserCheck, Accent: ShieldCheck },
+  'depresiasi-aset-dihitung-otomatis-penjelasan-non-akuntan': { Icon: Calculator, Accent: LineChart },
+  'enkripsi-password-standar-militer-itu-apa': { Icon: KeyRound, Accent: ShieldCheck },
+  'mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first': { Icon: NotebookPen, Accent: PenTool },
+  'kapan-google-sheets-cukup-kapan-harus-pindah-postgresql': { Icon: FileSpreadsheet, Accent: Database },
+  'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab': { Icon: FileSignature, Accent: Workflow },
+  'anti-afk-bot-di-b-games': { Icon: Gamepad2, Accent: Bot },
+  'sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip': { Icon: FolderLock, Accent: Cloud },
+  'tanda-bisnismu-butuh-sistem-custom': { Icon: Compass, Accent: Layers },
+  'kenapa-ai-chatbot-saya-bisa-bicara': { Icon: Volume2, Accent: AudioLines },
+  'portal-vendor-terisolasi-dan-knowledge-base-issue-tracker': { Icon: ShieldCheck, Accent: BookOpen },
+  'xendit-vs-payment-gateway-lain-kenapa-saya-pilih': { Icon: CreditCard, Accent: Wallet },
+  'tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes': { Icon: Table2, Accent: FileCheck2 },
+  'zero-server-cost-bukan-gimmick': { Icon: Coins, Accent: Cloud },
 };
 
 const CATEGORY_ILLUSTRATIONS: Record<string, IconPair> = {

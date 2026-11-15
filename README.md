@@ -110,7 +110,7 @@ Saya lebih percaya pada bukti nyata daripada sekadar janji. Berikut adalah beber
     *   Platform belajar ceria untuk anak usia 4–8 tahun (PAUD, TK, SD Kelas 1 & 2) yang 100% aman (*Kid-Safe*).
     *   **3 Mode Belajar**: Kartu Belajar bersuara dwibahasa (Indonesia & Inggris), Kuis Ceria bergambar dengan efek kembang api animasi (*confetti*), dan Game Memori.
     *   **100% Full Offline**: Dapat dijalankan tanpa sambungan internet, sangat hemat kuota dan cocok untuk anak bermain di perjalanan.
-    *   **Gerbang Orang Tua (*Parent Gate*) & Pembayaran Aman**: Terintegrasi payment gateway lokal resmi (Xendit) untuk pembayaran QRIS dan dompet digital (GoPay, OVO, Dana, ShopeePay).
+    *   **Gerbang Orang Tua (*Parent Gate*) & Pembayaran Aman**: Terintegrasi payment gateway lokal resmi (**Midtrans** & **Xendit** dengan saklar konfigurasi `.env` di versi Web, serta **Google Play Billing** di Android) untuk pembayaran QRIS, e-Wallet (GoPay, OVO, Dana, ShopeePay), dan Virtual Account.
 
 3.  **📦 Assets DEMO — Solusi Manajemen & Inventaris Aset Bisnis**  
     *Kunjungi Demo: [assets.arzhaning.my.id](https://assets.arzhaning.my.id)*  
@@ -179,7 +179,7 @@ Saya memilih teknologi kelas industri terdepan demi menjamin produk yang Anda te
 | **Suara Alami (Voice TTS)** | **Google Cloud Chirp 3 HD & WaveNet** | Sintesis vokal AI generasi terbaru ultra-natural dengan fallback berjenjang (Chirp 3 HD ➔ WaveNet ➔ Web Speech) dan pelindung kuota gratis otomatis via Redis. |
 | **Infrastruktur Cloud (Backend)** | **Vercel Serverless Architecture** | **Hemat Anggaran Server**: Anda tidak perlu pusing membayar biaya sewa server bulanan yang mahal. Server hanya aktif saat ada pengunjung, kuat menampung ribuan pengguna sekaligus. |
 | **Keamanan & Privasi Obrolan** | **Hybrid: Client IndexedDB & Ephemeral 7-Day Server Summary** | **Privasi Maksimal & Ramah Klien**: Riwayat obrolan default tersimpan di IndexedDB browser lokal pengunjung (dibersihkan > 30 hari / kontrol hapus mandiri). Khusus saat pengunjung menekan tombol "Chat via WhatsApp", tautan ringkasan transkrip sesi disimpan sementara di server dengan retensi otomatis 7 hari (Upstash Redis TTL) dan otomatis dilampirkan di WhatsApp agar Mas Arzha dapat membaca konteks proyek sebelum membalas. Dilindungi header *noindex* selaras Kebijakan Privasi. |
-| **Transaksi & Pembayaran** | **Xendit Payment Gateway** | Menerima pembayaran instan dari pelanggan Anda lewat QRIS (semua bank & e-wallet) dengan konfirmasi otomatis tanpa verifikasi manual. |
+| **Transaksi & Pembayaran** | **Midtrans & Xendit Payment Gateway** | Menerima pembayaran instan dari pelanggan Anda lewat QRIS, e-Wallet, dan Virtual Account dengan konfirmasi webhook otomatis serta opsi jalur ganda bersaklar `.env` untuk ketahanan anti-macet. |
 | **Pusat Artikel & Audio Narasi** | **Static Site Generation (SSG) & Custom Audio Player** | Akses artikel super cepat dan ramah SEO Google, dilengkapi fitur dengarkan artikel naratif layaknya podcast interaktif. |
 
 ---

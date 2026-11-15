@@ -357,7 +357,7 @@ export const bodies: Record<string, ArticleBlock[]> = {
       paragraphs: [
         '\"100% offline\" paling jujur dimaknai pada materi belajarnya. Beberapa hal memang secara alami butuh koneksi:',
         '• Masuk dengan akun Google dan sinkronisasi akun cloud.',
-        '• Pembayaran: Xendit di versi web, Google Play Billing di versi Android.',
+        '• Pembayaran: Midtrans & Xendit (bersaklar .env) di versi web, serta Google Play Billing di versi Android.',
         '• Pemuatan pertama dan pembaruan versi aplikasi.',
         'Prinsipnya, hal-hal ini tidak boleh menghalangi anak belajar. Koneksi hanya diperlukan untuk urusan orang tua, bukan urusan anak. Dan karena seluruh kartu belajar gratis, seorang anak tetap bisa belajar penuh walaupun orang tuanya belum login atau sedang tanpa sinyal.',
       ],
@@ -386,6 +386,205 @@ export const bodies: Record<string, ArticleBlock[]> = {
         'Membuat aplikasi yang bekerja saat sinyal bagus itu mudah. Yang membedakan adalah apa yang terjadi saat sinyalnya hilang. Rajendra Pintar saya rancang supaya jawabannya tetap sama: anak tetap bisa belajar.',
         'Kalau kamu sedang menimbang aplikasi untuk anak, tim lapangan, atau pelanggan di daerah dengan sinyal terbatas, pikirkan skenario terburuknya lebih dulu. Sistem yang baik adalah yang tetap berguna justru pada kondisi paling tidak ideal.',
         'Kalau penasaran dengan hasilnya, Rajendra Pintar bisa dicoba langsung di rapin.arzhaning.my.id. Coba uji sendiri dengan cara di atas: buka sekali, aktifkan mode pesawat, lalu lihat apa yang masih jalan. Untuk kebutuhan aplikasi lapangan di bisnismu, kamu juga bisa mengobrol dulu lewat WhatsApp.',
+      ],
+    },
+  ],
+  'mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first': [
+    {
+      paragraphs: [
+        'Pernahkah kamu sedang rapat penting atau duduk di kereta dengan sinyal timbul-tenggelam, lalu aplikasi catatan favoritmu mendadak memutar ikon loading tanpa henti hanya untuk membuka catatan yang kamu tulis sendiri kemarin malam? Atau yang lebih sering terjadi pada pemilik bisnis dan peneliti: catatan rapat ada di satu aplikasi langganan, coretan alur kerja ada di aplikasi papan tulis lain, file PDF kontrak berceceran di folder unduhan, dan hitungan anggaran sederhana terpaksa pindah lagi ke spreadsheet.',
+        'Keresahan itulah yang melahirkan ZhaNotes — ruang kerja pencatatan, kanvas visual bebas, kliping riset, dan anotator PDF yang saya rancang agar berjalan 100% langsung di browser perangkatmu. Tanpa kewajiban daftar akun, tanpa iklan, tanpa biaya server bulanan, dan seluruh datanya tersimpan utuh di perangkat pengguna sendiri.',
+      ],
+    },
+    {
+      heading: 'Dilema Aplikasi Catatan Modern: Sewa Selamanya atau Terpecah-pecah',
+      paragraphs: [
+        'Sebagian besar aplikasi produktivitas modern dibangun dengan model cloud-first berlangganan. Selama kamu rutin membayar biaya bulanan dan selalu terhubung ke internet, semuanya terasa nyaman. Masalahnya baru terasa dalam tiga situasi nyata:',
+        '• Saat koneksi internet bermasalah, dokumen penting justru tidak bisa dibuka atau perubahannya gagal tersimpan.',
+        '• Untuk catatan sensitif seperti draf kontrak klien, SOP internal perusahaan, atau rincian margin harga, tidak semua pemilik usaha tenang menaruh data mentahnya di server pihak ketiga.',
+        '• Begitu masa langganan dihentikan atau penyedia layanan mengubah kebijakan harga, memindahkan ratusan catatan beserta gambar dan tautan antar-halamannya hampir selalu menyisakan format yang berantakan.',
+        'Sebaliknya, kalau kembali ke aplikasi offline tradisional, alur kerjanya terpecah. Aplikasi pengolah kata tidak nyaman dipakai mencoret diagram, pembaca PDF tidak terhubung ke catatan riset, dan papan gambar tidak punya tabel yang bisa berhitung. ZhaNotes saya bangun untuk menyatukan empat ruang kerja itu di satu tempat dengan prinsip local-first.',
+      ],
+    },
+    {
+      heading: 'Empat Mode Ruang Kerja dalam Satu Aplikasi',
+      paragraphs: [
+        'Di ZhaNotes, setiap halaman bukan sekadar lembar teks kosong. Saat membuat dokumen baru, kamu memilih satu dari empat mode kerja yang memang dirancang khusus untuk jenis pemikiran yang berbeda:',
+        '1. Halaman Rich-Text untuk dokumen terstruktur. Dilengkapi bilah alat 4 tab yang rapi, perintah cepat garis miring (/), 11 jenis kotak callout berwarna, daftar isi otomatis, catatan kaki, pelacak status bacaan, hingga 1.795 simbol matematika, mata uang, dan teknis dalam 24 kategori. Untuk peneliti atau mahasiswa, tersedia pula pengelola daftar pustaka hingga 200 sumber dengan 8 gaya sitasi otomatis mulai dari APA 7, IEEE, Harvard, hingga BibTeX.',
+        '2. Kanvas Bebas untuk berpikir secara visual. Menggunakan HTML5 Canvas beresolusi tajam yang mendukung tekanan stylus, 4 preset pena, 23 bentuk geometri dan konektor pintar, minimap navigasi, hingga fitur pengenal bentuk otomatis — cukup tahan goresan tangan sekitar setengah detik, dan coretan kotak atau lingkaran kasar langsung berubah menjadi bangun rapi. Kamu bahkan bisa memasukkan halaman tertentu dari berkas PDF langsung ke atas kanvas untuk dicoret-coret bersama diagram.',
+        '3. Riset & Kliping untuk mengumpulkan referensi web tanpa tercampur opini. Setiap kliping dipisah tegas menjadi empat blok: Tautan Sumber, Kutipan Asli, Tangkapan Layar, dan Catatan Pribadi. Pemisahan ini terinspirasi dari kebiasaan audit: fakta sumber dan interpretasi penulis tidak boleh melebur tanpa batas yang jelas.',
+        '4. Pembaca & Anotator PDF langsung di browser. Tanpa mengunggah berkas ke server mana pun, kamu bisa menstabilo kalimat, memberi garis bawah, mencoret bebas, menempel kartu catatan, lalu mengekspornya kembali menjadi berkas PDF baru lengkap dengan seluruh coretan tersebut. Kutipan penting di PDF juga bisa dikirim lewat satu tombol "Ke Catatan" dan otomatis membuat tautan balik ke dokumen asalnya.',
+      ],
+    },
+    {
+      heading: 'Menghubungkan Ide: Wiki Backlinks, Peta Pengetahuan, dan Memo Suara',
+      paragraphs: [
+        'Keempat mode tadi tidak hidup di pulau masing-masing. Kamu bisa mengetik tanda kurung siku ganda seperti [[Rencana Proyek Q4]] di dalam catatan teks, kartu kanvas, maupun ekstraksi PDF untuk menghubungkan dua halaman secara dua arah.',
+        'Ketika jumlah catatan sudah puluhan atau ratusan, menekan pintasan Alt+G akan membuka Peta Pengetahuan interaktif (force-directed graph). Setiap halaman tampil sebagai titik berwarna sesuai modenya, lengkap dengan garis hubungan yang memperlihatkan topik mana yang menjadi pusat pemikiranmu dan catatan mana yang masih berdiri sendiri.',
+        'Untuk momen ketika mengetik terasa terlalu lambat — misalnya saat inspeksi lapangan atau diskusi lisan — tersedia perekam audio bawaan dengan penanda waktu (timestamp marker). Saat rekaman diputar ulang, kamu tinggal mengeklik penanda menit penting tanpa harus mendengar ulang dari detik nol.',
+      ],
+    },
+    {
+      heading: '72 Template Siap Pakai, dari RAB Bisnis sampai Latihan Anak',
+      paragraphs: [
+        'Halaman kosong sering kali membuat orang bingung harus mulai dari mana. Karena itu ZhaNotes menyertakan 72 template siap pakai yang terbagi ke 9 kategori: Kerja & Rapat, Bisnis & UMKM, Keuangan Pribadi, Kuliah & Belajar, Mengajar & Guru, Riset & Penulisan, Pribadi & Harian, Kreatif & Konten, serta Latihan & Belajar Anak.',
+        'Beberapa template yang paling sering dipakai pemilik usaha adalah tabel pintar yang bisa menghitung sendiri — mulai dari Rencana Anggaran Biaya (RAB), pencatatan stok barang masuk-keluar, anggaran bulanan, hingga hitung patungan. Menariknya, ada juga modul latihan soal acak untuk anak dengan kunci jawaban yang dilindungi PIN Orang Tua 4–6 digit agar anak bisa berlatih mandiri sebelum jawabannya diperiksa bersama.',
+      ],
+    },
+    {
+      heading: '100% di Perangkatmu: Bagaimana Data Disimpan dan Dijaga dari Lock-In',
+      paragraphs: [
+        'Seluruh teks, gambar kanvas, rekaman suara, hingga berkas PDF di ZhaNotes disimpan di IndexedDB milik browser di perangkatmu. Prinsip dasarnya mirip dengan penyimpanan lokal yang pernah saya bahas di artikel "Kenapa Riwayat Chat AI Disimpan di Browser Kamu (IndexedDB), Bukan di Server Saya", namun dalam skala ruang kerja penuh.',
+        'Artinya ada dua keuntungan langsung: kecepatan buka-simpan terasa instan karena tidak ada perjalanan bolak-balik ke server, dan privasi terjaga secara alami karena tidak ada satu byte pun catatanmu yang mampir ke server saya pada versi publik.',
+        'Agar pengguna tidak pernah terjebak di dalam aplikasi (zero vendor lock-in), ZhaNotes menyediakan ekspor murni dari sisi perangkat ke berbagai format standar: dokumen Microsoft Word (.docx), PDF siap cetak, Markdown (.md), HTML mandiri, gambar kanvas (.png dan .svg), hingga cadangan penuh satu ruang kerja dalam bentuk berkas .zip yang memuat seluruh lampiran PDF dan audio.',
+      ],
+    },
+    {
+      heading: 'Batasan Jujur Versi Gratis dan Kapan Butuh Edisi Custom Beli-Putus',
+      paragraphs: [
+        'Sesuai prinsip keterbukaan di semua produk saya, arsitektur murni lokal punya konsekuensi yang wajib dipahami sejak hari pertama:',
+        '• Karena data tinggal di penyimpanan browser perangkat tersebut, membersihkan data situs browser sampai tuntas tanpa menyimpan cadangan .zip terlebih dahulu akan ikut menghapus catatan lokalmu. ZhaNotes sudah memasang pengingat cadangan berkala untuk meminimalkan risiko ini.',
+        '• Berpindah dari laptop ke HP tidak otomatis menyinkronkan isi catatan pada edisi publik gratis — kamu perlu mengekspor berkas atau memakai fitur cadangan.',
+        '• PIN Orang Tua pada modul latihan anak dirancang sebagai pengunci antarmuka agar anak tidak mengintip kunci jawaban, bukan enkripsi kriptografi untuk dokumen rahasia.',
+        'Untuk tim kecil, konsultan, klinik, atau sekolah yang menyukai cara kerja ZhaNotes tetapi membutuhkan logo serta domain perusahaan sendiri sekaligus sinkronisasi antarperangkat, saya menyediakan Edisi Custom Beli-Putus. Di edisi tersebut, sinkronisasi awan berjalan memakai enkripsi ujung-ke-ujung (AES-GCM) sehingga server tetap tidak pernah bisa membaca isi catatan — mekanisme teknisnya saya bedah terpisah di artikel selanjutnya.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Cara Mencoba Langsung',
+      paragraphs: [
+        'Aplikasi produktivitas yang baik seharusnya menyesuaikan diri dengan cara manusia berpikir — kadang lewat paragraf rapi, kadang lewat coretan garis di kanvas, kadang lewat stabilo di atas PDF — tanpa membebani pengguna dengan tagihan langganan seumur hidup.',
+        'Kamu bisa langsung mencoba ZhaNotes secara gratis di arzhaning.my.id/zhanotes/ dari laptop, tablet, maupun HP tanpa perlu mendaftar apa pun. Dan bila bisnismu membutuhkan ruang kerja serupa dengan identitas brand sendiri serta sinkronisasi terenkripsi untuk tim, kamu bisa berdiskusi langsung lewat Zannah di pojok layar atau menghubungi saya via WhatsApp.',
+      ],
+    },
+  ],
+  'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab': [
+    {
+      paragraphs: [
+        'Dalam proyek pengembangan software konvensional, perjalanan dari obrolan pertama sampai kontrak ditandatangani sering kali lebih melelahkan daripada proses kodingnya sendiri. Calon klien bercerita panjang lebar lewat chat, developer mencatat sepotong-sepotong, lalu menghilang tiga sampai lima hari untuk mengetik dokumen penawaran di Word dan menghitung angka di Excel. Saat PDF-nya dikirim, angkanya ternyata di atas anggaran klien, lalu proses negosiasi dan revisi dokumen dimulai lagi dari awal.',
+        'Di artikel "Mengenal DevRAB: Mesin Proposal di Balik Tombol \'Buatkan RAB\' Milik Zannah", saya pernah memperkenalkan mesin pembuat proposal yang saya bangun. Kali ini kita akan menelusuri pipa sambungan utuhnya dari ujung ke ujung: bagaimana percakapan santai di chatbot berubah secara machine-to-machine menjadi draf teknis, portal penawaran interaktif, tanda tangan digital layar sentuh, hingga invoice pembayaran resmi tanpa satu kali pun salin-tempel manual di tengah jalan.',
+      ],
+    },
+    {
+      heading: 'Tahap 1: Gerbang Kesiapan 7 Poin di Zannah',
+      paragraphs: [
+        'Semuanya dimulai di widget chat Zannah di situs ini. Banyak orang mengira menghubungkan AI ke pembuat proposal berarti membiarkan chatbot langsung menembak harga begitu pengunjung mengetik "Saya mau bikin aplikasi kasir, berapa biayanya?". Kalau itu dibiarkan, angka yang keluar pasti ngawur karena konteksnya kosong.',
+        'Sebaliknya, Zannah diprogram memegang daftar periksa (readiness gate) berisi 7 informasi kunci sebelum diizinkan memicu pembuatan proposal:',
+        '1. Platform target (Web App, PWA, Android, iOS, atau kombinasi).',
+        '2. Fitur-fitur utama dan alur kerja inti yang diinginkan.',
+        '3. Siapa pengguna akhirnya (staf internal, vendor luar, atau pelanggan umum) beserta perkiraan skalanya.',
+        '4. Target tenggat waktu rilis (deadline).',
+        '5. Kisaran anggaran (budget) yang disiapkan klien.',
+        '6. Nama lengkap penanggung jawab.',
+        '7. Alamat email aktif untuk pengiriman akses portal resmi.',
+        'Selama ketujuh poin ini belum lengkap, Zannah akan bertanya balik secara natural — bahkan bisa ikut membaca lampiran sketsa tangan, PDF spesifikasi lama, atau tabel CSV yang diunggah pengunjung. Baru setelah ketujuhnya terkonfirmasi jelas, Zannah memunculkan tombol konfirmasi untuk meneruskan ringkasan terstruktur ke mesin DevRAB.',
+      ],
+    },
+    {
+      heading: 'Tahap 2: Handoff Terstruktur dan Riset Pasar Otomatis di DevRAB',
+      paragraphs: [
+        'Begitu tombol pembuatan RAB ditekan, backend chatbot tidak mengirim tumpukan obrolan mentah begitu saja, melainkan merakit paket data JSON terstruktur yang dikirim lewat jalur server-ke-server terotentikasi menuju API Edge DevRAB di jaringan Cloudflare.',
+        'Di dalam DevRAB, dua proses berjalan berurutan dalam hitungan puluhan detik:',
+        '• Pertama, mesin pencari pasar memindai referensi tarif dan komponen teknis relevan di pasar Indonesia agar estimasi tidak lepas dari realitas industri lokal.',
+        '• Kedua, mesin perumus ruang lingkup (Budget-Fitting Engine) memecah kebutuhan klien menjadi modul-modul kerja terukur lengkap dengan bobot hari kerja (man-days). Kalau anggaran yang disebut klien di chat Zannah terbatas, mesin tidak sekadar memangkas harga secara asal, melainkan memisahkan mana modul inti yang wajib ada di fase pertama (wajib/mandatory) dan mana fitur pelengkap yang sifatnya opsional.',
+        'Pada tahap yang sama, sistem juga menyusun batas ruang lingkup kerja (Statement of Work): apa saja yang termasuk di dalam harga dan apa saja yang secara tegas berada di luar cakupan, beserta jadwal tahapan pembayaran (termin). Kejelasan batas di awal inilah yang kelak melindungi klien maupun developer dari salah paham di tengah proyek.',
+      ],
+    },
+    {
+      heading: 'Tahap 3: Portal Klien Interaktif, Bukan PDF Mati',
+      paragraphs: [
+        'Hasil kerja DevRAB tidak dikirim sebagai lampiran PDF kaku yang bikin klien hanya bisa menjawab "kemahalan" atau "oke". Sebagai gantinya, klien menerima tautan unik menuju Portal Klien yang dilindungi verifikasi email atau PIN akses.',
+        'Di dalam portal tersebut, klien memegang kendali penuh untuk menyesuaikan ruang lingkup proyeknya sendiri secara langsung:',
+        '• Mencermati deskripsi setiap modul fitur dan estimasi hari pengerjaannya.',
+        '• Menyalakan atau mematikan centang pada modul-modul opsional sesuai prioritas bisnis saat ini.',
+        '• Melihat total biaya investasi, durasi pengerjaan, dan rincian nominal tiap termin berubah secara real-time setiap kali satu fitur digeser.',
+        'Psikologi negosiasinya berubah total. Klien tidak merasa sedang berhadapan dengan angka misterius sebagaimana sering terjadi di proposal konvensional — topik yang pernah saya ulas di artikel "Kenapa Harga Proposal Bisa Beda-beda Padahal Fiturnya Kelihatan Mirip". Kalau masih ada detail alur bisnis yang ingin disesuaikan, klien tinggal menulis catatan revisi langsung di portal tanpa perlu bertukar belasan file dokumen versi revisi.',
+      ],
+    },
+    {
+      heading: 'Tahap 4: Tanda Tangan Layar Sentuh, Pembayaran Xendit, dan Kontrak A4',
+      paragraphs: [
+        'Saat komposisi fitur dan anggaran sudah dirasa pas, klien tidak perlu mencetak dokumen, menandatangani di atas kertas, memindai ulang, lalu mengirim balik lewat chat. Di bagian persetujuan portal, tersedia kanvas tanda tangan digital yang bisa langsung digoreskan memakai jari di layar HP atau kursor di laptop.',
+        'Begitu tanda tangan dikunci, tiga hal terjadi secara otomatis:',
+        '1. Sistem mengunci daftar fitur yang disepakati beserta jejak waktu dan identitas persetujuan sehingga isi penawaran tidak bisa berubah sepihak.',
+        '2. Tagihan termin pertama (DP) langsung diterbitkan melalui integrasi Xendit — klien bebas memilih membayar lewat QRIS, Virtual Account bank besar (BCA, Mandiri, BNI, BRI), e-wallet, atau mengunggah bukti transfer manual bila perusahaan klien memakai prosedur giro/rekening korporat.',
+        '3. Dokumen proposal sekaligus kontrak kerja dan kuitansi berformat A4 eksekutif siap diunduh kapan saja, lengkap dengan penulisan angka rupiah dan ejaan "terbilang" bahasa Indonesia yang rapi.',
+      ],
+    },
+    {
+      heading: 'Batasan yang Tetap Membutuhkan Sentuhan Manusia',
+      paragraphs: [
+        'Walaupun pipa dari Zannah ke DevRAB berjalan otomatis penuh dari hulu ke hilir, saya tetap menarik garis tegas tentang kapan penilaian manusia wajib masuk:',
+        '• Untuk proyek standar seperti landing page, company profile, chatbot bisnis, atau aplikasi operasional UMKM yang polanya jelas, draf dari Zannah dan DevRAB biasanya sudah langsung presisi dan siap dieksekusi.',
+        '• Namun untuk sistem yang melibatkan integrasi perangkat keras khusus, migrasi puluhan ribu data warisan yang strukturnya belum rapi, atau aturan pajak dan akuntansi lintas entitas, draf otomatis tersebut berfungsi sebagai titik awal 80%. Dua puluh persen sisanya tetap saya tinjau dan tajamkan bersama klien lewat putaran revisi di portal sebelum tanda tangan dikunci.',
+        'Otomasi di sini bukan untuk menghilangkan diskusi manusia, melainkan menghapus pekerjaan administratif berulang agar waktu diskusi kita habis untuk membahas solusi bisnisnya, bukan menunggu draf tabel diketik.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Pelajaran untuk Proses Bisnis Kamu',
+      paragraphs: [
+        'Alur Zannah ke DevRAB membuktikan bahwa hambatan terbesar dalam penutupan penjualan jasa sering kali bukan pada harga, melainkan pada gesekan waktu tunggu di antara ketertarikan awal klien dan kejelasan penawaran tertulis.',
+        'Pola yang sama persis bisa diterapkan di banyak industri di luar software: kontraktor interior, agensi kreatif, klinik perawatan, hingga distributor B2B yang setiap minggu menyusun penawaran kustom. Kalau kamu penasaran merasakan langsung bagaimana percakapan berubah menjadi portal penawaran interaktif dalam hitungan detik, silakan sapa Zannah di pojok kanan bawah halaman ini dan ceritakan ide sistem yang sedang kamu rencanakan.',
+      ],
+    },
+  ],
+  'portal-vendor-terisolasi-dan-knowledge-base-issue-tracker': [
+    {
+      paragraphs: [
+        'Di banyak perusahaan distribusi dan manufaktur, meneruskan komplain pelanggan ke pemasok atau vendor sering dilakukan dengan cara paling cepat yang ada di tangan: tangkap layar chat pelanggan, lalu teruskan bulat-bulat ke grup WhatsApp vendor. Sekilas praktis. Namun tanpa disadari, kebiasaan kecil itu membuka dua lubang sekaligus — nama dan kontak pelanggan penting perusahaan bocor ke pihak luar, sementara solusi teknis yang ditemukan susah payah minggu ini menguap begitu saja saat staf berganti tiga bulan kemudian.',
+        'Pada artikel "Kenapa Vendor Balas Seadanya, dan Cara Memaksa Akar Masalah", saya sudah membahas bagaimana Issue Tracker mendisiplinkan vendor lewat formulir analisis 4M dan penghitung tenggat otomatis. Di artikel ini, kita membedah dua fondasi arsitektur lainnya yang tidak kalah krusial di sistem yang sama: bagaimana isolasi akses tingkat server menjaga kerahasiaan pelanggan, dan bagaimana kasus yang selesai disulap menjadi basis pengetahuan (Knowledge Base) yang mencegah masalah kembar terulang.',
+      ],
+    },
+    {
+      heading: 'Bahaya Tersembunyi di Balik "Forward Chat" ke Vendor',
+      paragraphs: [
+        'Ketika perusahaan bekerja sama dengan belasan vendor — misalnya satu vendor memasok komponen mesin, vendor kedua mengurus kemasan, dan vendor ketiga menangani pengiriman — satu keluhan pelanggan sering kali menyentuh lebih dari satu pihak sekaligus.',
+        'Jika koordinasinya dilakukan lewat grup chat atau lembar kerja bersama yang terbuka, tiga risiko bisnis langsung mengintai:',
+        '• Kebocoran daftar pelanggan inti: vendor bisa mengetahui persis siapa pembeli terbesar perusahaanmu, volume pesanannya, hingga kontak person di sisi pembeli.',
+        '• Saling lempar tanggung jawab: alih-alih fokus memperbaiki bagiannya, Vendor A dan Vendor B malah berdebat di kolom yang sama karena saling mengintip catatan pihak sebelah.',
+        '• Tautan foto bukti yang bebas diakses siapa saja: folder bukti kerusakan sering disetel "siapa saja yang memiliki link dapat melihat" demi kepraktisan, sehingga foto dokumen surat jalan atau label pelanggan bisa dibuka ulang oleh orang yang sudah tidak lagi bekerja di vendor tersebut.',
+      ],
+    },
+    {
+      heading: 'Isolasi Tingkat Server: Bukan Sekadar Menyembunyikan Kolom di Layar',
+      paragraphs: [
+        'Di Issue Tracker, satu nomor kasus utama dari pelanggan dapat dipecah menjadi beberapa bagian masalah (sub-part), dan masing-masing bagian bisa ditugaskan ke vendor yang berbeda. Pembagian hak akses diatur ketat ke dalam empat peran: Admin, Staff, Viewer, dan Vendor.',
+        'Kunci keamanannya terletak pada di mana penyaringan data dilakukan. Banyak aplikasi web pemula menyembunyikan data rahasia hanya di tampilan layar (frontend), padahal kalau respons jaringan dibuka lewat alat inspeksi browser, nama pelanggan masih ikut terkirim di balik layar. Di Issue Tracker, pemotongan data dilakukan mutlak di sisi server sebelum paket data meninggalkan backend:',
+        '• Saat akun berstatus Vendor membuka portalnya, server hanya mengirimkan baris bagian masalah yang ditugaskan ke vendor tersebut — bagian milik vendor lain pada kasus yang sama sama sekali tidak ikut dikirim.',
+        '• Kolom identitas pelanggan dipangkas habis di seluruh jalur komunikasi vendor: tidak tampil di tabel portal, tidak muncul di lonceng notifikasi dalam aplikasi, tidak tercetak di email pengingat tenggat otomatis, dan tidak ikut tersalin pada fitur rekap WhatsApp sekali klik.',
+        '• Seluruh berkas bukti foto maupun dokumen di Google Drive disimpan tertutup tanpa satu pun link publik. Setiap kali pengguna melihat pratinjau atau mengunduh lampiran (maksimal 10 MB dengan kompresi foto otomatis di perangkat), permintaan wajib melewati pemeriksaan sesi dan kecocokan peran di server lebih dulu.',
+      ],
+    },
+    {
+      heading: 'Mengubah Kasus Selesai Menjadi Ingatan Perusahaan (Knowledge Base)',
+      paragraphs: [
+        'Menyelesaikan keluhan hari ini baru setengah pekerjaan. Pertanyaan audit yang jauh lebih mahal adalah: kalau enam bulan lagi gejala kerusakan yang persis sama muncul pada batch berikutnya, sementara staf senior yang dulu menanganinya sudah pindah divisi, apakah tim baru harus mengulang investigasi dari nol?',
+        'Untuk memutus siklus amnesia operasional itu, Issue Tracker menyambungkan penutupan kasus langsung ke modul Knowledge Base:',
+        '1. Ketika sebuah kasus telah tuntas beserta akar masalah 4M dan tindakan perbaikannya, staf atau admin dapat mengubah kasus tersebut menjadi draf artikel solusi hanya dalam beberapa klik.',
+        '2. Admin melakukan verifikasi akhir agar hanya panduan perbaikan yang sudah teruji yang masuk ke perpustakaan resmi, lalu memilih apakah panduan tersebut hanya untuk tim internal atau ikut dibagikan ke portal vendor terkait.',
+        '3. Saat tim menerima keluhan baru dan mulai mengetik kategori atau gejala masalah di formulir pembuatan kasus, sistem secara otomatis memunculkan saran artikel solusi serupa yang pernah berhasil di masa lalu.',
+        'Hasilnya terasa nyata pada kecepatan layanan: banyak keluhan teknis ringan bisa langsung dijawab tim internal dalam hitungan menit berbekal catatan terverifikasi, tanpa harus menunggu eskalasi berhari-hari ke vendor.',
+      ],
+    },
+    {
+      heading: 'Menjaga Kecepatan di Atas 17 Sheet dan Cadangan Otomatis Jam 2 Pagi',
+      paragraphs: [
+        'Membangun fitur sekompleks multi-peran, pengingat SLA, dan Knowledge Base di atas ekosistem Google Apps Script dan Google Sheets tentu menuntut rekayasa performa yang disiplin. Di balik layar, struktur database Issue Tracker terbagi rapi ke dalam 17 tab terpisah (skema versi 14 dengan migrasi kolom otomatis) yang telah diuji menampung sekitar 20.000 kasus.',
+        'Agar aplikasi tetap terasa gesit seperti aplikasi web modern, sistem menggabungkan penyimpanan cache memori (CacheService), pola pemuatan stale-while-revalidate di sisi layar, penomoran halaman dari server (server-side pagination), penulisan massal berkelompok saat admin melakukan aksi banyak baris sekaligus, hingga pengarsipan otomatis terjadwal untuk kasus lawas berusia 1, 3, 6, atau 12 bulan.',
+        'Dan bagaimana jika suatu hari seseorang tidak sengaja merusak isi spreadsheet langsung dari Google Drive? Setiap pukul 02.00 dini hari, pemicu otomatis menjalankan pencadangan harian: sistem menyimpan hingga 14 salinan bergilir spreadsheet database beserta cadangan bertahap (incremental backup) untuk berkas lampiran. Jika terjadi keadaan darurat, admin cukup menekan tombol pemulihan dari panel pengaturan untuk mengarahkan sistem ke salinan sehat dan menyambungkan ulang tautan lampiran secara otomatis.',
+      ],
+    },
+    {
+      heading: 'Batasan yang Tetap Perlu Diperhitungkan',
+      paragraphs: [
+        'Sebagaimana saya jelaskan secara terbuka kepada setiap perusahaan yang menimbang arsitektur ini, pemakaian Google Sheets dan Apps Script bebas biaya server bulanan punya pagar teknis yang jelas: kuota pengiriman email pengingat mengikuti batas harian akun Google (sekitar 100 email/hari di Gmail biasa atau 1.500 di Google Workspace), ukuran lampiran dibatasi 10 MB per berkas agar eksekusi tidak melampaui batas waktu 6 menit Apps Script, dan rentang nyamannya berada di kisaran puluhan ribu kasus — bukan jutaan baris transaksi per jam.',
+        'Namun justru untuk skala distributor, pabrik menengah, atau pengelola gedung dengan puluhan vendor aktif, pagar tersebut jarang sekali tersentuh, sementara penghematan biaya infrastruktur tahunannya sangat signifikan.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan & Langkah Evaluasi',
+      paragraphs: [
+        'Kerahasiaan data pelanggan dan ingatan teknis perusahaan tidak boleh bergantung pada seberapa hati-hati staf menyunting tangkapan layar sebelum menekan tombol kirim di grup chat. Keduanya harus dijaga oleh desain sistem sejak baris kode pertama.',
+        'Kamu bisa menjajal langsung perbedaan tampilan antara akun internal dan portal vendor yang terisolasi di demo Issue Tracker pada alamat itrack.arzhaning.my.id. Jika perusahaanmu punya alur koordinasi vendor atau cabang yang butuh disesuaikan dengan SOP sendiri, silakan sapa Zannah atau hubungi saya lewat WhatsApp untuk berdiskusi.',
       ],
     },
   ],

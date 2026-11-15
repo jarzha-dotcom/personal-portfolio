@@ -15,6 +15,10 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/amankah-data-bisnis-di-google-sheets-drive-top-3f32fbd4.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/amankah-data-bisnis-di-google-sheets-drive-middle-20ef61d4.jpeg',
   },
+  'anti-afk-bot-di-b-games': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/anti-afk-bot-di-b-games-top-46c42dbc.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/anti-afk-bot-di-b-games-middle-3907124d.jpeg',
+  },
   'apa-itu-audit-trail-dan-kenapa-bisnismu-butuh': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh-top-69e96d1a.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/apa-itu-audit-trail-dan-kenapa-bisnismu-butuh-middle-cb42b254.jpeg',
@@ -55,6 +59,10 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-audit-internal-ke-software-development-top-23b987fe.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-audit-internal-ke-software-development-middle-a56a8a59.jpeg',
   },
+  'dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab-top-5627c29b.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab-middle-231e7c96.jpeg',
+  },
   'dari-scan-kamera-ke-data-aset-1-detik': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-top-f41e899f.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/dari-scan-kamera-ke-data-aset-1-detik-middle-9c23e955.jpeg',
@@ -67,6 +75,10 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/enkripsi-password-standar-militer-itu-apa-top-fba378a0.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/enkripsi-password-standar-militer-itu-apa-middle-ea24ff5d.jpeg',
   },
+  'kapan-google-sheets-cukup-kapan-harus-pindah-postgresql': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kapan-google-sheets-cukup-kapan-harus-pindah-postgresql-top-62e55a90.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kapan-google-sheets-cukup-kapan-harus-pindah-postgresql-middle-2031ed08.jpeg',
+  },
   'kenapa-1-website-butuh-3-karakter-ai-berbeda': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-top-f9c694b1.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-1-website-butuh-3-karakter-ai-berbeda-middle-8d0ce023.jpeg',
@@ -74,6 +86,10 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
   'kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-top-e06ae23f.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-4-proyek-saya-pakai-4-arsitektur-backend-berbeda-middle-23c858cc.jpeg',
+  },
+  'kenapa-ai-chatbot-saya-bisa-bicara': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-ai-chatbot-saya-bisa-bicara-top-5b51fc8f.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-ai-chatbot-saya-bisa-bicara-middle-26164525.jpeg',
   },
   'kenapa-google-apps-script-untuk-klien-kecil-menengah': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/kenapa-google-apps-script-untuk-klien-kecil-menengah-top-cdfe9cfb.jpeg',
@@ -95,13 +111,33 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-top-2116f1c6.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/membangun-aplikasi-100-persen-offline-rajendra-pintar-middle-9d46c657.jpeg',
   },
+  'mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first-top-d74f6601.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first-middle-25e8ac46.jpeg',
+  },
+  'portal-vendor-terisolasi-dan-knowledge-base-issue-tracker': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/portal-vendor-terisolasi-dan-knowledge-base-issue-tracker-top-dff98497.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/portal-vendor-terisolasi-dan-knowledge-base-issue-tracker-middle-c952451e.jpeg',
+  },
   'single-active-session-mencegah-akun-dibajak': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/single-active-session-mencegah-akun-dibajak-top-e7f06097.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/single-active-session-mencegah-akun-dibajak-middle-e2704cef.jpeg',
   },
+  'sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip-top-821c735e.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip-middle-ee1ec41f.jpeg',
+  },
   'studi-kasus-devrab-proposal-30-detik': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/studi-kasus-devrab-proposal-30-detik-top-1615f26d.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/studi-kasus-devrab-proposal-30-detik-middle-f23d8826.jpeg',
+  },
+  'tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes-top-7694223d.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes-middle-21189ecb.jpeg',
+  },
+  'tanda-bisnismu-butuh-sistem-custom': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/tanda-bisnismu-butuh-sistem-custom-top-b26c5784.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/tanda-bisnismu-butuh-sistem-custom-middle-20d825f1.jpeg',
   },
   'tanda-waktunya-migrasi-dari-apps-script': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/tanda-waktunya-migrasi-dari-apps-script-top-7e7ee869.jpeg',
@@ -110,5 +146,13 @@ export const ARTICLE_IMAGES: Record<string, ArticleImageSet> = {
   'web-app-vs-mobile-app-vs-pwa': {
     top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/web-app-vs-mobile-app-vs-pwa-top-b5172d88.jpeg',
     middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/web-app-vs-mobile-app-vs-pwa-middle-22f46949.jpeg',
+  },
+  'xendit-vs-payment-gateway-lain-kenapa-saya-pilih': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/xendit-vs-payment-gateway-lain-kenapa-saya-pilih-top-a7719c05.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/xendit-vs-payment-gateway-lain-kenapa-saya-pilih-middle-896bf428.jpeg',
+  },
+  'zero-server-cost-bukan-gimmick': {
+    top: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/zero-server-cost-bukan-gimmick-top-3e8e0907.jpeg',
+    middle: 'https://0padm4ym3zbnjgka.public.blob.vercel-storage.com/articles/zero-server-cost-bukan-gimmick-middle-ee65affe.jpeg',
   },
 };

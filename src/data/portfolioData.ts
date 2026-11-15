@@ -199,15 +199,15 @@ export const PROJECTS: ProjectItem[] = [
     category: 'Game & App',
     badge: 'Board Game Platform',
     description: 'Platform arena game papan klasik modern gratis & bebas iklan: Ludo Classic, Ludo Hexagon (hingga 6 pemain), Ular Tangga 3D, dan Tic-Tac-Toe — dimainkan instan via Web/PWA, Android, & iOS.',
-    longDescription: 'B-Games menghadirkan nostalgia permainan papan klasik keluarga ke dalam genggaman digital yang modern, kompetitif, dan bebas iklan. Menggunakan arsitektur event-driven realtime berbasis boardgame.io dan Koa.js WebSocket game server dengan latensi rendah (<50ms), reconnect recovery otomatis, serta Smart Bot AI Anti-AFK takeover jika pemain terputus koneksi. Mendukung Instant Guest Play (masukkan nama tanpa registrasi), sinkronisasi akun Google OAuth & Cloud Save via Supabase PostgreSQL, in-game reactions & emoticon, daftar teman & Friend Chat, leaderboard global, puluhan achievements, dompet koin harian, serta 4 kustomisasi tema visual papan (Wood, Marble, Grass, Sand) beranimasi Skia 60 FPS dan audio haptic realistis.',
+    longDescription: 'B-Games menghadirkan nostalgia permainan papan klasik keluarga ke dalam genggaman digital yang modern, kompetitif, dan bebas iklan. Menggunakan arsitektur event-driven realtime berbasis boardgame.io dan Koa.js WebSocket game server dengan latensi rendah (<50ms), reconnect recovery otomatis, serta Smart Bot AI Anti-AFK takeover jika pemain terputus koneksi. Mendukung Instant Guest Play (masukkan nama tanpa registrasi), sinkronisasi akun Google OAuth & Cloud Save via Supabase PostgreSQL, in-game reactions & emoticon, daftar teman & Friend Chat, leaderboard global, puluhan achievements, dompet koin harian & pembelian item virtual (via Midtrans & Xendit dengan saklar .env di Web serta Google Play Billing di mobile), serta 4 kustomisasi tema visual papan (Wood, Marble, Grass, Sand) beranimasi Skia 60 FPS dan audio haptic realistis.',
     highlights: [
       '4 Game Papan Klasik: Ludo Classic (2-4 Pemain), Ludo Hexagon (Inovasi hingga 6 Pemain), Ular Tangga 3D & Tic-Tac-Toe Duel',
       'Multiplayer Realtime & Smart Anti-AFK: Sinkronisasi WebSockets instan via Koa.js + boardgame.io dengan bot cerdas auto-takeover saat pemain AFK/disconnect',
       'Sistem Akun Hybrid & Cloud Save: Instant Guest Play tanpa daftar + Google OAuth & Supabase PostgreSQL untuk rekor pertandingan',
       'Visual Skia 60 FPS & Audio Haptic: Animasi dadu 3D, 4 tema papan (Wood/Marble/Grass/Sand), in-game reactions, dan efek getaran taktil',
-      'Multiplatform & PWA: Berjalan mulus di Web/PWA, Android & iOS dari basis kode terpadu dengan dukungan offline cache'
+      'Multiplatform, PWA & Dual Payment Gateway: Berjalan mulus di Web/PWA, Android & iOS dengan pembayaran Midtrans & Xendit (saklar .env) serta Google Play Billing'
     ],
-    techStack: ['React Native', 'Expo (v57)', 'Expo Router', 'boardgame.io', 'Koa.js / Node.js', 'Supabase (PostgreSQL)', 'Skia & Reanimated', 'TypeScript', 'WebSockets', 'Expo Audio & Haptics', 'PWA'],
+    techStack: ['React Native', 'Expo (v57)', 'Expo Router', 'boardgame.io', 'Koa.js / Node.js', 'Supabase (PostgreSQL)', 'Midtrans & Xendit', 'Skia & Reanimated', 'TypeScript', 'WebSockets', 'Expo Audio & Haptics', 'PWA'],
     role: 'Solo Creator (Game Logic, UI/UX, Realtime Backend, Deployment)',
     year: '2024 - 2025',
     demoUrl: 'https://bgames.arzhaning.my.id/',
@@ -233,16 +233,16 @@ export const PROJECTS: ProjectItem[] = [
     tagline: 'Platform edukasi ramah anak usia 4–8 tahun (PAUD, TK, SD) dengan Flashcard dwibahasa, Kuis Suara, Gamifikasi & Full Offline PWA.',
     category: 'Edukasi',
     badge: 'Edukasi Anak (PAUD - SD)',
-    description: 'Aplikasi edukasi interaktif ramah anak usia 4–8 tahun dengan kurikulum adaptif 5 usia, 9 kategori tematik, 3 mode belajar (Flashcard TTS dwibahasa ID/EN, Kuis Ceria + Confetti, Petualangan Mini Game Memori), maskot & toko kosmetik lengkap dengan VIP Lifetime via Xendit, sinkronisasi cloud Google, Parent Gate, dan 100% full offline.',
-    longDescription: 'Rajendra Pintar (Pintar Ceria Kids) dirancang khusus mendampingi masa emas tumbuh kembang anak usia 4 hingga 8 tahun (PAUD, TK, SD Kelas 1 & 2) secara aman, ceria, dan kid-safe. Dilengkapi kurikulum adaptif 5 tahapan usia dan 9 kategori pengetahuan tematik (Pendidikan Agama Islam, Satwa, Buah & Sayur Sehat, Angka & Matematika Ceria, English Vocab, Bentuk & Warna, Transportasi, Pakaian & Aksesori, Profesi & Cita-cita). Menyajikan 3 mode interaktif: Flashcard Mode dengan Text-to-Speech dwibahasa (ID/EN) & fakta seru, Mode Kuis Ceria dengan semburan Canvas Confetti apresiasi, serta Island Adventure Memory Game. Memiliki 6 maskot hidup penyemangat dan Toko Kosmetik lengkap (13 topi/aksesori, 11 tema visual, bingkai kartu, paket efek suara & sentuhan, musik latar) yang bisa dibuka gratis lewat Bintang harian & iklan reward, dengan opsi upgrade VIP Lifetime dan Bintang Premium via payment gateway lokal Xendit (QRIS/e-Wallet) berikut webhook auto-fulfillment. Login Google opsional (dilindungi Parent Gate) menyinkronkan progres, kosmetik, dan status VIP lintas perangkat via Supabase. Ditutup dengan arsitektur 100% Full Offline via Service Worker PWA dan APK Native Android via Capacitor 8.',
+    description: 'Aplikasi edukasi interaktif ramah anak usia 4–8 tahun dengan kurikulum adaptif 5 usia, 9 kategori tematik, 3 mode belajar (Flashcard TTS dwibahasa ID/EN, Kuis Ceria + Confetti, Petualangan Mini Game Memori), maskot & toko kosmetik lengkap dengan VIP Lifetime via Midtrans & Xendit (saklar .env), sinkronisasi cloud Google, Parent Gate, dan 100% full offline.',
+    longDescription: 'Rajendra Pintar (Pintar Ceria Kids) dirancang khusus mendampingi masa emas tumbuh kembang anak usia 4 hingga 8 tahun (PAUD, TK, SD Kelas 1 & 2) secara aman, ceria, dan kid-safe. Dilengkapi kurikulum adaptif 5 tahapan usia dan 9 kategori pengetahuan tematik (Pendidikan Agama Islam, Satwa, Buah & Sayur Sehat, Angka & Matematika Ceria, English Vocab, Bentuk & Warna, Transportasi, Pakaian & Aksesori, Profesi & Cita-cita). Menyajikan 3 mode interaktif: Flashcard Mode dengan Text-to-Speech dwibahasa (ID/EN) & fakta seru, Mode Kuis Ceria dengan semburan Canvas Confetti apresiasi, serta Island Adventure Memory Game. Memiliki 6 maskot hidup penyemangat dan Toko Kosmetik lengkap (13 topi/aksesori, 11 tema visual, bingkai kartu, paket efek suara & sentuhan, musik latar) yang bisa dibuka gratis lewat Bintang harian & iklan reward, dengan opsi upgrade VIP Lifetime dan Bintang Premium via payment gateway lokal Midtrans & Xendit (jalur ganda bersaklar .env untuk QRIS/e-Wallet/VA di Web, serta Google Play Billing di Android) berikut webhook auto-fulfillment. Login Google opsional (dilindungi Parent Gate) menyinkronkan progres, kosmetik, dan status VIP lintas perangkat via Supabase. Ditutup dengan arsitektur 100% Full Offline via Service Worker PWA dan APK Native Android via Capacitor 8.',
     highlights: [
       'Kurikulum Adaptif 5 Usia (4–8 Tahun) & 9 Kategori Tematik (PAI, Satwa, Buah/Sayur, Matematika, English Vocab, dll.)',
       '3 Mode Belajar: Flashcard Interaktif (TTS dwibahasa ID/EN), Kuis Ceria bergambar + Canvas Confetti, & Island Memory Game',
       '6 Maskot Interaktif & Toko Kosmetik Lengkap: 13 topi/aksesori, 11 tema visual, bingkai kartu, efek suara & sentuhan — dibuka gratis via Bintang/iklan',
-      'Monetisasi Adil & Cloud Sync: VIP Lifetime & Bintang Premium via Xendit (QRIS/e-Wallet), sinkronisasi progres lintas perangkat via Google Sign-In & Supabase',
+      'Monetisasi Adil & Cloud Sync: VIP Lifetime & Bintang Premium via Midtrans & Xendit (saklar .env di Web) + Google Play Billing (Android), sinkronisasi via Google Sign-In & Supabase',
       'Kid-Safe & 100% Full Offline: Parent Gate proteksi orang tua, berjalan tanpa internet via PWA Service Worker Caching & instalasi native Android (.APK) via Capacitor 8'
     ],
-    techStack: ['React 19', 'TypeScript ~5.8', 'Vite 6', 'Tailwind CSS v4', 'Motion (v12)', 'Capacitor 8', 'Web Audio API', 'TTS Dwibahasa', 'Canvas Confetti', 'PWA Offline Cache', 'Supabase', 'Xendit', 'Cloudflare CDN'],
+    techStack: ['React 19', 'TypeScript ~5.8', 'Vite 6', 'Tailwind CSS v4', 'Motion (v12)', 'Capacitor 8', 'Web Audio API', 'TTS Dwibahasa', 'Canvas Confetti', 'PWA Offline Cache', 'Supabase', 'Midtrans & Xendit', 'Cloudflare CDN'],
     role: 'Full-stack Indie Developer & Content Designer',
     year: '2024 - 2025',
     demoUrl: 'https://rapin.arzhaning.my.id/',
@@ -251,13 +251,13 @@ export const PROJECTS: ProjectItem[] = [
     iconType: 'GraduationCap',
     businessCase: {
       problem: 'Anak usia dini rentan terhadap paparan iklan yang tidak aman di internet serta kendala kuota/sinyal saat belajar mandiri di perjalanan atau area minim jaringan, sementara orang tua butuh kepastian transaksi mikro yang aman jika ingin membuka fitur tambahan.',
-      solution: 'Aplikasi edukasi ramah anak dengan kurikulum terarah, sistem suara dwibahasa, proteksi Parent Gate, kemampuan berjalan 100% offline, serta model monetisasi transparan (konten edukasi tetap gratis, kosmetik bisa dibuka gratis via Bintang/iklan, dan opsi VIP Lifetime/Bintang Premium lewat payment gateway lokal Xendit yang tepercaya).',
-      impact: 'Ruang belajar yang aman dan bebas risiko konten luar, hemat kuota internet 100% berkat mode offline, engagement anak meningkat lewat gamifikasi toko kosmetik, dan kepercayaan orang tua terjaga berkat transaksi Xendit yang jelas dan Parent Gate di setiap akses sensitif.'
+      solution: 'Aplikasi edukasi ramah anak dengan kurikulum terarah, sistem suara dwibahasa, proteksi Parent Gate, kemampuan berjalan 100% offline, serta model monetisasi transparan (konten edukasi tetap gratis, kosmetik bisa dibuka gratis via Bintang/iklan, dan opsi VIP Lifetime/Bintang Premium lewat payment gateway lokal Midtrans & Xendit bersaklar .env maupun Google Play Billing).',
+      impact: 'Ruang belajar yang aman dan bebas risiko konten luar, hemat kuota internet 100% berkat mode offline, engagement anak meningkat lewat gamifikasi toko kosmetik, dan kepercayaan orang tua terjaga berkat transaksi resmi ber-failover serta Parent Gate di setiap akses sensitif.'
     },
     architectureFlow: [
       'Pilih Tingkat Usia & Materi',
       'Flashcard TTS Dwibahasa & Kuis Ceria',
-      'Toko Kosmetik, VIP & Xendit Checkout',
+      'Toko Kosmetik, VIP & Midtrans/Xendit Checkout',
       'Cloud Sync via Google Sign-In & Supabase',
       'PWA Offline Cache & Parent Gate'
     ]
@@ -426,7 +426,7 @@ export const TECH_STACK_GROUPS: TechStackGroup[] = [
   },
   {
     category: 'Backend, Serverless & Databases',
-    items: ['Serverless Engine (Google Apps Script - Zero Server Cost)', 'Supabase (PostgreSQL Enterprise)', 'Node.js / Koa Server', 'Google Sheets DB & Drive Storage', 'Xendit Payment Gateway', 'Vercel Serverless & Cloudflare CDN', 'RESTful APIs & Offline Queue']
+    items: ['Serverless Engine (Google Apps Script - Zero Server Cost)', 'Supabase (PostgreSQL Enterprise)', 'Node.js / Koa Server', 'Google Sheets DB & Drive Storage', 'Midtrans & Xendit Payment Gateway', 'Vercel Serverless & Cloudflare CDN', 'RESTful APIs & Offline Queue']
   },
   {
     category: 'Audit, Security & Enterprise Tools',

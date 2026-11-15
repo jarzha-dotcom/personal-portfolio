@@ -50,4 +50,53 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'zero-server-cost-bukan-gimmick': [
+    {
+      paragraphs: [
+        'Hampir setiap kali saya menuliskan frasa "Zero Server Cost" atau "tanpa biaya sewa server bulanan" pada penjelasan produk saya, reaksi pertama dari sesama programmer biasanya terbagi dua: ada yang penasaran bagaimana arsitekturnya dirakit, dan ada pula yang skeptis mengira itu sekadar kalimat pemanis pemasaran. Di sisi lain, pemilik usaha kecil sering bertanya dengan nada hati-hati: "Mas, kalau biaya servernya nol rupiah, jangan-jangan pakai hosting gratisan murahan yang bulan depan tiba-tiba mati?"',
+        'Keduanya salah sangka yang sangat wajar. Bagi saya, Zero Server Cost sama sekali bukan soal mencari layanan abal-abal, melainkan disiplin arsitektur yang lahir dari satu pemandangan menyedihkan yang berkali-kali saya saksikan di dunia bisnis nyata: aplikasi internal yang sebenarnya bagus dan terpakai, akhirnya mati terkubur di tahun kedua hanya karena tagihan server bulanannya terasa memberatkan saat omzet perusahaan sedang melambat.',
+      ],
+    },
+    {
+      heading: 'Tragedi Tahun Kedua pada Proyek Digitalisasi UMKM',
+      paragraphs: [
+        'Coba tengok pola yang sering terjadi ketika sebuah usaha menengah pertama kali memesan aplikasi kustom. Di bulan pertama peluncuran, semangat masih tinggi. Developer menyewakan satu Virtual Private Server (VPS), database terkelola, dan layanan penyimpanan terpisah dengan total tagihan katakanlah lima ratus ribu hingga satu setengah juta rupiah setiap bulan.',
+        'Masalahnya, untuk aplikasi internal seperti pencatatan inventaris kantor, pelacak keluhan vendor, atau ruang kerja dokumen tim, aplikasi tersebut tidak langsung mencetak uang tunai per klik seperti toko online ramai. Ia bekerja diam-diam menghemat jam kerja dan mencegah kebocoran.',
+        'Memasuki bulan ke-14 atau ke-18, ketika bisnis kebetulan menghadapi musim sepi, bagian keuangan mulai menyisir pengeluaran rutin. Tagihan server bulanan mulai dipertanyakan, perpanjangan kartu kredit sempat terlambat beberapa hari, server otomatis disuspensi penyedia layanan, dan seluruh sistem yang sudah dibangun jutaan rupiah mendadak lumpuh. Sebagai orang yang berangkat dari latar belakang operasional dan audit internal, bagi saya merancang sistem dengan beban biaya tetap (fixed cost) yang tidak sebanding dengan frekuensi pakainya adalah cacat perencanaan sejak awal.',
+      ],
+    },
+    {
+      heading: 'Tiga Pilar Teknis di Balik Filosofi Zero Server Cost Saya',
+      paragraphs: [
+        'Menekan biaya infrastruktur rutin menjadi Rp0 di atas infrastruktur kelas dunia bukanlah sulap, melainkan soal meletakkan beban komputasi dan penyimpanan di tempat yang paling tepat. Di enam produk portofolio saya, filosofi ini mewujud dalam tiga pola arsitektur yang berbeda:',
+        '1. Pindahkan beban kerja 100% ke browser pengguna (Local-First). Di ZhaNotes dan inti materi belajar Rajendra Pintar, perangkat ponsel atau laptop pengguna hari ini sudah memiliki prosesor cepat dan penyimpanan IndexedDB yang sangat lega. Mengapa kita harus menyewa server awan setiap bulan hanya untuk menyimpan catatan pribadi pengguna atau merakit berkas Word yang sebenarnya bisa dikerjakan langsung oleh browser mereka sendiri dalam hitungan milidetik?',
+        '2. Manfaatkan infrastruktur akun kerja yang memang sudah dimiliki klien. Di Assets DEMO dan Issue Tracker, perusahaan tidak perlu menyewa server database baru karena akun Google mereka sendiri sudah menyediakan Google Sheets, Google Drive, dan mesin eksekusi Google Apps Script di atas pusat data resmi Google. Datanya 100% berada di tangan pemilik bisnis, bukan menumpang di server developer.',
+        '3. Gunakan jaringan Serverless Edge modern dengan pagar kuota pintar. Untuk sistem yang tetap membutuhkan kecerdasan terpusat seperti portal kontrak DevRAB (Cloudflare Edge + Turso) maupun asisten AI Zannah dan Rajendra, server hanya "bangun" selama beberapa ratus milidetik saat ada permintaan masuk — tidak ada biaya mesin menganggur jam tiga pagi. Ditambah pagar pembatas kuota otomatis di Redis dan sistem fallback berlapis, kualitas layanan tinggi tetap berjalan di dalam koridor bebas tagihan kejutan.',
+      ],
+    },
+    {
+      heading: 'Apa Bedanya dengan "Hosting Gratisan" Zaman Dulu?',
+      paragraphs: [
+        'Penting sekali membedakan antara arsitektur tanpa biaya server tetap dengan hosting gratisan tidak jelas di masa lalu:',
+        '• Hosting gratis murahan zaman dulu menaruh situsmu di satu komputer tua yang dibagi ribuan orang, disisipi iklan pop-up, lambat diakses, dan penyedianya bisa tutup kapan saja.',
+        '• Sebaliknya, fondasi yang saya pakai hari ini berdiri di atas jaringan global perusahaan infrastruktur terbesar dunia — Cloudflare, Vercel, Google Cloud, Supabase, dan Upstash — yang memang menyediakan alokasi pemakaian awal (free tier / serverless) yang sangat besar untuk menarik ekosistem developer modern, selama kode kita ditulis efisien dan tidak boros.',
+        'Justru untuk menjaga sistem tetap ringan di dalam koridor tersebut, developer dituntut bekerja lebih rapi: menulis skema cache yang hemat, mengompresi foto langsung dari layar HP sebelum diunggah, melakukan penulisan data secara berkelompok, dan menyingkirkan kueri berulang yang mubazir.',
+      ],
+    },
+    {
+      heading: 'Garis Jujur: Kapan Zero Server Cost Memang Harus Berakhir?',
+      paragraphs: [
+        'Filosofi yang sehat tidak boleh berubah menjadi dogma buta. Saya selalu jujur kepada klien bahwa tidak semua jenis aplikasi di muka bumi bisa atau boleh dipaksa gratis biaya server selamanya.',
+        'Contoh paling nyatanya ada di portofolio saya sendiri, yaitu B-Games. Karena permainan multipemain menuntut ruang WebSocket yang terus menyala menjaga giliran enam pemain secara real-time beserta database PostgreSQL relasional, ada titik di mana layanan komputasi berbayar yang selalu siaga memang wajib dipakai. Begitu juga ketika sebuah sistem bisnis sudah tumbuh melayani ratusan ribu transaksi per bulan atau membutuhkan kapasitas penyimpanan terenkripsi skala besar.',
+        'Namun perhatikan perbedaannya: ketika bisnismu sudah mencapai skala ribuan pengguna aktif harian, tagihan server beberapa ratus ribu rupiah sebulan bukan lagi beban yang menakutkan — melainkan remah kecil dari nilai ekonomi besar yang sedang berputar di atas sistem tersebut. Masalahnya bukan pada membayar server saat bisnis sudah berlari kencang, melainkan pada memaksa bisnis kecil membayar sewa truk kontainer padahal barang yang diangkut baru dua kardus sehari.',
+      ],
+    },
+    {
+      heading: 'Kesimpulan: Software Seharusnya Menjadi Aset, Bukan Pajak Bulanan',
+      paragraphs: [
+        'Pada akhirnya, Zero Server Cost adalah bentuk rasa hormat saya terhadap arus kas pemilik bisnis. Ketika kamu berinvestasi membangun sistem kerja kustom, uangmu seharusnya berubah menjadi aset produktif yang bekerja tenang bertahun-tahun tanpa terus-menerus menodongkan tagihan sewa bulanan yang tidak perlu.',
+        'Prinsip itulah yang saya pegang konsisten dari produk pertama hingga hari ini — baik saat merancang aplikasi manajemen aset gudang, portal pelacak vendor, ruang kerja catatan ZhaNotes, maupun asisten AI yang menemanimu di situs ini. Jika kamu sedang menimbang pembuatan sistem untuk bisnismu dan ingin tahu apakah kebutuhanmu bisa dirancang dengan pendekatan hemat biaya server seperti ini, silakan mengobrol santai dengan Zannah di pojok layar atau hubungi saya langsung lewat WhatsApp.',
+      ],
+    },
+  ],
 };

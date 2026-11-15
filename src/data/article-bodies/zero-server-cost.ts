@@ -126,4 +126,60 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'kapan-google-sheets-cukup-kapan-harus-pindah-postgresql': [
+    {
+      paragraphs: [
+        'Salah satu pertanyaan paling jujur yang sering diajukan calon klien saat melihat portofolio saya adalah: "Mas, kenapa untuk sistem manajemen aset dan pelacak komplain vendor kamu pakai Google Sheets sebagai database, tapi giliran membangun B-Games dan Rajendra Pintar kamu malah pakai PostgreSQL di Supabase? Jadi sebenarnya Google Sheets itu bagus atau tidak?"',
+        'Jawabannya bukan soal mana yang lebih keren di mata programmer, melainkan soal kecocokan beban kerja. Memakai PostgreSQL berbayar untuk sistem inventaris kantor yang transaksinya puluhan kali sehari sering kali mubazir, sama berbahayanya dengan memaksakan Google Sheets menampung ribuan langkah permainan multiplayer per menit. Artikel ini membedah garis batas teknis di antara keduanya berdasarkan pengalaman langsung mengoperasikan kedua kubu tersebut di produksi.',
+      ],
+    },
+    {
+      heading: 'Kapan Google Sheets Justru Menang Telak',
+      paragraphs: [
+        'Banyak developer memandang sebelah mata spreadsheet sebagai penyimpan data aplikasi karena membayangkan satu tabel berantakan yang diedit ramai-ramai secara manual. Padahal ketika Google Sheets diletakkan di belakang lapisan aplikasi seperti Google Apps Script — sebagaimana saya terapkan di Assets DEMO dan Issue Tracker — pengguna sehari-hari tetap berinteraksi lewat antarmuka web modern yang terkunci hak aksesnya.',
+        'Pendekatan ini sangat unggul ketika sistem bisnismu memiliki empat ciri berikut:',
+        '• Volume data bertumbuh terukur, bukan meledak tiap detik: misalnya daftar ribuan aset fisik perusahaan, ratusan jadwal pemeliharaan, atau belasan hingga sekitar 20.000 tiket keluhan pelanggan dalam setahun.',
+        '• Frekuensi tulis (write) bersifat manusiawi: pencatatan dilakukan oleh belasan staf atau vendor sepanjang jam kerja, bukan ratusan pengguna menekan tombol simpan pada milidetik yang sama.',
+        '• Transparansi data milik sendiri menjadi nilai tambah: pemilik bisnis merasa jauh lebih tenang karena seluruh tabel masternya tersimpan di Google Drive perusahaan sendiri, mudah diaudit sewaktu-waktu, dan tidak menimbulkan tagihan sewa database bulanan.',
+        '• Kebutuhan notifikasi lekat dengan ekosistem kantor: pengiriman email pengingat tenggat maupun penyimpanan berkas lampiran bukti langsung menyatu dengan Gmail dan Google Drive tanpa biaya integrasi tambahan.',
+        'Di Issue Tracker misalnya, arsitektur 17 tab terpisah lengkap dengan cache memori (CacheService), penomoran halaman di sisi server, dan pencadangan harian otomatis 14 salinan terbukti sanggup melayani alur multi-vendor dengan sangat gesit tanpa sepeser pun biaya server.',
+      ],
+    },
+    {
+      heading: 'Titik Balik: Di Mana Google Sheets Mulai Kehabisan Napas',
+      paragraphs: [
+        'Lalu kenapa saya tidak memakai resep yang sama saat membangun platform game multiplayer B-Games atau aplikasi edukasi Rajendra Pintar? Karena begitu karakteristik datanya berubah di empat titik krusial ini, spreadsheet bukan lagi alat yang tepat:',
+        '1. Penulisan serentak berkecepatan tinggi (high-concurrency writes). Di Google Sheets, ketika dua proses hendak menulis ke tabel yang sama bersamaan, kita wajib memasang antrean pengunci (LockService) agar baris tidak saling menimpa. Untuk tiga staf yang kebetulan klik bersamaan, jeda tunggu setengah detik tidak terasa. Namun untuk ratusan pemain di B-Games yang menyelesaikan pertandingan dan memperbarui skor peringkat secara serentak, antrean pengunci spreadsheet akan langsung menciptakan kemacetan panjang.',
+        '2. Relasi antartabel dan kueri agregasi kompleks. PostgreSQL adalah database relasional sejati. Menghitung papan peringkat musiman, memfilter riwayat transaksi koin per pengguna, menjaga konsistensi saldo lewat transaksi ACID, hingga mencocokkan status pertemanan pemain bisa dieksekusi PostgreSQL dalam hitungan milidetik lewat indeks B-Tree. Di spreadsheet, operasi serupa mengharuskan skrip menarik ribuan baris ke memori lalu menyaringnya secara manual.',
+        '3. Waktu respons di bawah 100 milidetik dan Webhook pihak ketiga. Saat payment gateway seperti Midtrans, Xendit, atau Google Play Billing menembakkan notifikasi pembayaran otomatis (webhook), server penerima harus merespons cepat, memverifikasi tanda tangan kriptografi, dan memastikan satu pembayaran tidak pernah tercatat dua kali (idempotency constraint). PostgreSQL di Supabase bersama Edge API menangani pola ini jauh lebih presisi dibanding batas eksekusi dan jeda cold-start Apps Script.',
+        '4. Autentikasi publik berskala luas dan Row-Level Security (RLS). Untuk aplikasi konsumen di mana ribuan orang umum bisa mendaftar mandiri memakai akun Google dalam satu klik — seperti orang tua pengguna Rajendra Pintar — Supabase menyediakan sistem autentikasi bawaan yang langsung terikat ke aturan keamanan tingkat baris di PostgreSQL.',
+      ],
+    },
+    {
+      heading: 'Perbandingan Singkat dalam Bahasa Pemilik Bisnis',
+      paragraphs: [
+        'Kalau diringkas tanpa istilah rumit, bayangkan Google Sheets sebagai buku besar di ruang brankas kantor yang dijaga satu petugas rapi, sedangkan PostgreSQL sebagai mesin kasir tol otomatis berlajur banyak:',
+        '• Biaya awal & bulanan: Google Sheets nyaris Rp0 selamanya di akun Google milikmu; Supabase/PostgreSQL punya tier gratis yang sangat lega di awal (cukup untuk ribuan pengguna awal), namun akan beralih ke langganan bulanan terukur ketika kapasitas penyimpanan dan lalu lintasnya sudah besar.',
+        '• Kecepatan respon baca-tulis: Google Sheets berada di kisaran 0,8 hingga 2,5 detik per aksi tulis (nyaman untuk form kerja internal); PostgreSQL merespons dalam puluhan milidetik (wajib untuk aplikasi konsumen cepat, kasir ramai, dan game).',
+        '• Keutuhan struktur data: di Google Sheets, admin pemilik file harus disiplin tidak menggeser kolom sembarangan; di PostgreSQL, tipe data angka, tanggal, dan kunci relasi dijaga kaku oleh mesin database sehingga mustahil terisi format yang salah.',
+      ],
+    },
+    {
+      heading: 'Kabar Baiknya: Memulai dari Google Sheets Bukan Jalan Buntu',
+      paragraphs: [
+        'Kekhawatiran terbesar pemilik bisnis biasanya berbunyi: "Kalau sekarang saya bangun pakai Google Sheets supaya hemat modal awal, lalu dua tahun lagi bisnis saya membesar sepuluh kali lipat, apakah saya harus membuang semuanya?"',
+        'Tidak, selama sejak hari pertama arsitekturnya dirancang selayaknya database sungguhan — itulah alasan saya selalu memisahkan tab layaknya tabel relasional, memakai ID unik di setiap baris, dan memisahkan antarmuka aplikasi (frontend React) dari penyimpanan belakangnya. Ketika waktunya tiba untuk pindah ke PostgreSQL — tanda-tanda operasionalnya sudah pernah saya rinci di artikel "5 Tanda Bisnismu Sudah Waktunya Migrasi dari Google Apps Script ke Server Sendiri" — tampilan layar yang sudah akrab dipakai stafmu tetap sama, sementara data tabelnya tinggal dimigrasikan ke skema SQL yang sepadan.',
+      ],
+    },
+    {
+      heading: 'Tiga Pertanyaan Penentu Sebelum Memilih Fondasi Sistemmu',
+      paragraphs: [
+        'Sebelum memutuskan fondasi proyek barumu, cukup jawab tiga pertanyaan praktis ini:',
+        '1. Siapa penggunanya — puluhan staf/vendor internal yang terdata, atau ribuan pelanggan publik yang mendaftar sendiri kapan saja?',
+        '2. Seberapa rapat frekuensi transaksinya — puluhan/ratusan entri sehari, atau puluhan transaksi pada detik yang sama?',
+        '3. Apakah sistemmu perlu menerima pembayaran otomatis real-time dari banyak kanal luar?',
+        'Kalau jawabanmu condong ke sisi kiri di ketiga poin tadi, besar kemungkinan arsitektur berbasis Google Sheets sudah sangat mumpuni dan menghemat jutaan rupiah biaya langganan tahunanmu. Kalau condong ke kanan, PostgreSQL di Supabase atau database edge seperti Turso adalah investasi yang jauh lebih sehat sejak hari pertama. Masih ragu bisnismu berada di titik yang mana? Ceritakan perkiraan jumlah pengguna dan alur transaksimu ke Zannah di pojok layar, nanti kita petakan arsitektur yang paling masuk akal untuk skalanya.',
+      ],
+    },
+  ],
 };

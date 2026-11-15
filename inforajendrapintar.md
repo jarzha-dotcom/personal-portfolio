@@ -24,7 +24,7 @@ Aplikasi ini dapat diakses secara fleksibel melalui **peramban web (Web App / PW
 | 🔒 **100% Aman untuk Anak (*Kid-Safe*)** | Dilengkapi sistem **Gerbang Pengaman Orang Tua (*Parent Gate*)** berhitung acak. Tidak ada iklan luar yang mengganggu atau konten berbahaya! |
 | ⚡ **Bisa Dimainkan Tanpa Internet** | Hemat kuota orang tua! Begitu aplikasi dibuka, semua materi belajar siap dimainkan di mana saja (di mobil, pesawat, atau daerah minim sinyal). |
 | ☁️ **Pencadangan Cloud Otomatis** | Progres bintang dan koleksi anak tersimpan aman di akun Google, sehingga tidak akan hilang saat berganti ponsel atau tablet. |
-| 💳 **Dukungan Pembayaran Resmi & Fleksibel** | Mendukung QRIS, GoPay, OVO, Dana untuk web (via Xendit) serta Google Play Billing resmi untuk rilis Google Play Store. |
+| 💳 **Dukungan Pembayaran Resmi & Fleksibel** | Mendukung QRIS, GoPay, OVO, Dana, ShopeePay, dan VA untuk web (via **Midtrans** & **Xendit** dengan saklar `.env`) serta Google Play Billing resmi untuk rilis Google Play Store. |
 
 ---
 
@@ -127,7 +127,7 @@ Tampilan aplikasi dapat diganti sesuai dunia imajinasi favorit anak:
 
 ### 8. 💳 Sistem Pembayaran Cerdas Dua Jalur (Web & Android)
 Aplikasi memiliki arsitektur cerdas yang otomatis menyesuaikan tempat aplikasi dijalankan:
-* **Di Versi Website (Web App):** Menggunakan sistem pembayaran **Xendit**, mendukung metode pembayaran lokal terpopuler di Indonesia:
+* **Di Versi Website (Web App):** Menggunakan sistem pembayaran **Midtrans** sekaligus mempertahankan jalur **Xendit** yang siap dialihkan kapan saja lewat saklar konfigurasi `.env`, mendukung metode pembayaran lokal terpopuler di Indonesia:
   * 📱 **QRIS** (bisa di-scan dari BCA, Mandiri, BRI, BNI, GoPay, OVO, Dana, LinkAja, ShopeePay).
   * ⚡ **E-Wallet** (GoPay, OVO, Dana, ShopeePay).
   * 🏦 **Virtual Account Bank**.
@@ -165,7 +165,7 @@ Aplikasi **Rajendra Pintar** dibangun menggunakan deretan teknologi perangkat lu
 │    Text-to-Speech  •  Haptics    │    Progressive Web App (PWA) 100%   │
 ├──────────────────────────────────┼─────────────────────────────────────┤
 │      KEAMANAN & AKUN CLOUD       │          PEMBAYARAN RESMI           │
-│  Supabase Cloud  •  Google Auth  │   Xendit (QRIS & E-Wallet Web)      │
+│  Supabase Cloud  •  Google Auth  │  Midtrans & Xendit (.env Switch)    │
 │     Parent Gate Security         │   Google Play In-App Billing (APK)  │
 └──────────────────────────────────┴─────────────────────────────────────┘
 ```
@@ -195,7 +195,7 @@ Aplikasi **Rajendra Pintar** dibangun menggunakan deretan teknologi perangkat lu
 ### 🛡️ 5. Layanan Cloud, Keamanan, & Pembayaran
 * **Supabase Cloud Database:** Penyimpanan cloud berbasis PostgreSQL terenkripsi untuk menyimpan skor bintang, pencapaian belajar, dan status VIP anak secara aman.
 * **Google OAuth Sign-In:** Sistem masuk akun Google yang praktis dan terlindungi oleh Parent Gate.
-* **Xendit Payment Gateway:** Layanan pembayaran resmi berlisensi Bank Indonesia untuk pemrosesan pembayaran QRIS dan e-Wallet di versi web.
+* **Midtrans & Xendit Payment Gateway (Saklar .env):** Dua layanan pembayaran resmi berlisensi Bank Indonesia untuk pemrosesan QRIS, e-Wallet, dan Virtual Account di versi web — Midtrans berjalan aktif sementara integrasi Xendit tetap utuh di balik saklar konfigurasi `.env` sebagai jalur cadangan (*failover*) instan tanpa ubah kode.
 * **Google Play In-App Billing:** Modul transaksi resmi Google Play Store untuk pembelian aman di versi aplikasi Android.
 * **Cloudflare Enterprise CDN:** Jaringan distribusi konten global yang melindungi aplikasi selama 24 jam non-stop dari serangan siber serta menjamin kecepatan akses dari mana saja.
 

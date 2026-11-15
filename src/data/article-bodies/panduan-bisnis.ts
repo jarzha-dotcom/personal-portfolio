@@ -303,4 +303,76 @@ export const bodies: Record<string, ArticleBlock[]> = {
       ],
     },
   ],
+  'tanda-bisnismu-butuh-sistem-custom': [
+    {
+      paragraphs: [
+        'Sebagai developer yang sehari-hari membangun aplikasi kustom, kalimat pertama yang sering saya ucapkan kepada calon klien justru terdengar aneh: "Kalau urusan ini masih beres dan rapi pakai Google Sheets biasa atau aplikasi langganan seratus ribuan sebulan, jangan buru-buru bikin sistem custom."',
+        'Saya serius. Di fase awal bisnis, ketika alur operasional masih berubah setiap dua minggu dan jumlah transaksi masih bisa dihitung jari, spreadsheet adalah sahabat terbaik karena fleksibel dan gratis. Namun ada satu titik tumbuh di mana alat serbaguna maupun aplikasi siap pakai (SaaS template) justru berubah menjadi penghambat yang diam-diam menggerogoti jam kerja tim dan akurasi uang perusahaan. Artikel ini merangkum enam tanda paling nyata bahwa bisnismu sudah melewati garis tersebut.',
+      ],
+    },
+    {
+      heading: '1. Stafmu Berubah Jadi "Jembatan Salin-Tempel" Antar-Aplikasi',
+      paragraphs: [
+        'Coba perhatikan rutinitas admin di kantormu setiap sore. Apakah mereka harus mengunduh laporan penjualan dari aplikasi kasir, merapikan kolomnya di Excel, mencocokkan stoknya dengan catatan gudang di file lain, lalu mengetik ulang ringkasannya ke grup WhatsApp vendor atau pimpinan?',
+        'Ketika manusia dipaksa menjadi kabel penyambung di antara tiga atau empat alat yang tidak saling bicara, dua biaya tak terlihat langsung muncul: waktu produktif staf habis untuk pekerjaan mekanis, dan risiko salah ketik satu angka nol meningkat tajam setiap kali kelelahan melanda.',
+      ],
+    },
+    {
+      heading: '2. SOP Unik Bisnismu Terpaksa Mengalah pada Keterbatasan Aplikasi Template',
+      paragraphs: [
+        'Aplikasi langganan siap pakai dibuat untuk rata-rata ribuan bisnis sekaligus, bukan khusus untuk cara kerjamu. Selama alur bisnismu 90% mirip standar umum, aplikasi siap pakai sangat efisien.',
+        'Masalahnya muncul ketika keunggulan kompetitif bisnismu justru terletak pada alur yang spesifik — misalnya perhitungan komisi bertingkat lintas cabang, pembagian satu keluhan pelanggan ke beberapa vendor tanpa membocorkan nama pembeli, atau penyesuaian harga otomatis berdasarkan umur aset. Jika timmu mulai membuat "catatan sampingan di luar aplikasi" karena kolom dan aturannya tidak tersedia di aplikasi langganan, berarti sistem itu sudah tidak lagi memotret kenyataan operasionalmu.',
+      ],
+    },
+    {
+      heading: '3. Tagihan Langganan Per-Akun Membengkak Saat Tim dan Mitra Bertambah',
+      paragraphs: [
+        'Model harga per pengguna per bulan ($10–$25 per kursi/bulan) tampak sangat murah ketika timmu baru tiga orang. Namun hitung ulang ketika dua tahun kemudian kamu punya 20 staf gudang, 10 kepala toko, dan 25 vendor luar yang masing-masing butuh akun login terbatas hanya untuk memperbarui status satu tugas.',
+        'Membayar biaya kursi penuh setiap bulan untuk puluhan akun eksternal yang hanya membuka sistem lima menit sehari sering kali membuat total tagihan tiga tahunnya jauh melampaui investasi membangun satu sistem custom beli-putus yang jumlah penggunanya bebas kamu atur sendiri.',
+      ],
+    },
+    {
+      heading: '4. File Spreadsheet Utama Mulai Lambat, Rawan Tertimpa, dan Tanpa Jejak Audit',
+      paragraphs: [
+        'Gejala klasik perusahaan yang bertumbuh cepat adalah lahirnya satu "File Master Sakti" berisi belasan tab dengan ribuan rumus VLOOKUP yang saling mengait. Begitu lima orang membukanya bersamaan, browser melambat. Lebih parah lagi, ketika angka rekap akhir bulan tiba-tiba selisih jutaan rupiah, tidak ada yang tahu siapa yang tidak sengaja menghapus satu rumus tiga minggu lalu.',
+        'Ketika nilai finansial di balik tabel tersebut sudah besar, kamu membutuhkan validasi input yang mengunci aturan hitung dan jejak audit (audit trail) yang tidak bisa dihapus — topik yang pernah saya bahas khusus di artikel "Apa Itu Audit Trail, dan Kenapa Bisnismu Mungkin Butuh Fitur Ini Lebih dari yang Kamu Kira".',
+      ],
+    },
+    {
+      heading: '5. Pihak Luar Butuh Akses Sebagian Tanpa Boleh Mengintip Dapur Utama',
+      paragraphs: [
+        'Spreadsheet pada dasarnya menganut akses serba-semua atau tidak sama sekali: begitu seseorang diberi izin lihat atau edit pada satu berkas, sangat sulit menyembunyikan tab dan kolom rahasia secara benar-benar aman.',
+        'Begitu bisnismu menuntut portal di mana klien hanya boleh melihat progres pesanannya sendiri, vendor hanya melihat tiket tugasnya sendiri, dan staf cabang hanya melihat stok cabangnya masing-masing, kamu sudah membutuhkan pemisahan hak akses di tingkat aplikasi dan server.',
+      ],
+    },
+    {
+      heading: '6. Pimpinan Selalu Mengambil Keputusan Berdasarkan Data Minggu Lalu',
+      paragraphs: [
+        'Jika untuk menjawab pertanyaan sederhana seperti "Aset mana yang bulan depan habis masa pakainya?" atau "Vendor mana yang paling sering terlambat bulan ini?" kamu harus menunggu staf menyusun rekap manual selama dua hari, artinya datamu sebenarnya mati.',
+        'Sistem custom yang dirancang tepat tidak menuntut kerja dua kali: begitu transaksi harian diinput oleh petugas lapangan — baik lewat scan kamera HP maupun formulir sederhana — ringkasan eksekutif dan indikator keterlambatan otomatis terhitung detik itu juga.',
+      ],
+    },
+    {
+      heading: 'Jangan Bikin Semuanya Sekaligus: Mulai dari Satu Titik Paling Berdarah',
+      paragraphs: [
+        'Kesalahan terbesar pemilik bisnis saat memutuskan beralih ke sistem custom adalah langsung ingin membangun "ERP raksasa serba-bisa" dari gudang, HRD, kasir, sampai akuntansi pajak dalam satu proyek pertama. Proyek semacam itu hampir selalu molor berbulan-bulan dan membuat staf kaget saat harus bermigrasi serentak.',
+        'Pendekatan yang jauh lebih sehat adalah memilih satu titik kemacetan paling menyakitkan lebih dulu — misalnya tertibkan dulu pelacakan aset fisik atau alur komplain vendornya sampai berjalan mulus 100%, baru sambungkan modul berikutnya secara bertahap.',
+      ],
+    },
+    {
+      heading: 'Lembar Cek Mandiri sebelum Memutuskan',
+      paragraphs: [
+        'Kamu bisa menyalin lembar evaluasi singkat di bawah ini untuk didiskusikan bersama tim operasionalmu, atau langsung menempelkannya ke chat Zannah agar dibantu memetakan apakah kebutuhanmu cukup diselesaikan dengan otomasi ringan atau sudah layak naik ke aplikasi custom:',
+      ],
+      template: [
+        'EVALUASI KEBUTUHAN SISTEM BISNIS',
+        '1. Proses paling menyita waktu manual saat ini: [mis. rekap stok / komplain vendor / pembuatan RAB]',
+        '2. Alat yang dipakai sekarang & kendalanya: [mis. 4 file Excel terpisah + grup WA, sering selisih angka]',
+        '3. Siapa saja yang akan mengakses sistem & perkiraan jumlah orangnya: [mis. 2 Admin, 8 Staf, 15 Vendor luar]',
+        '4. Data rahasia yang TIDAK boleh terlihat oleh peran tertentu: [mis. harga modal / nama pelanggan inti]',
+        '5. Kondisi pemakaian di lapangan: [mis. dipakai dari HP di gudang bersinyal lemah / butuh scan QR]',
+        '6. Biaya langganan aplikasi/lembur rekap per bulan saat ini (jika ada): [Rp ...]',
+      ],
+    },
+  ],
 };

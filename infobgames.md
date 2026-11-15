@@ -71,7 +71,7 @@ Aplikasi ini dibangun menggunakan arsitektur teknologi web dan mobile generasi t
 ### 3. ☁️ Database, Keamanan & Layanan Cloud
 - **Supabase (PostgreSQL Enterprise):** Database relasional tangguh untuk menyimpan profil pengguna, data pertemanan, dompet koin, papan peringkat, dan log pertandingan secara aman.
 - **Google OAuth:** Sistem autentikasi satu klik yang aman menggunakan standar enkripsi Google Cloud.
-- **In-App Purchase & Payment Gateway:** Integrasi sistem pembayaran aman via Google Play Billing dan Xendit untuk pembelian item virtual.
+- **In-App Purchase & Payment Gateway:** Integrasi sistem pembayaran aman via **Midtrans** dan **Xendit** (jalur ganda siap pakai dengan saklar konfigurasi `.env` di versi Web/PWA) serta **Google Play Billing** untuk pembelian item virtual di toko aplikasi.
 
 ### 4. 🔊 Audio & Getaran Realistis
 - **Expo Audio:** Tata suara dinamis dengan musik latar ceria, efek lemparan dadu, ketukan bidak, serta efek kemenangan yang menggugah semangat.

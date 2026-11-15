@@ -156,6 +156,50 @@
       "destination": "/artikel/index.html"
     },
     {
+      "source": "/artikel/zero-server-cost-bukan-gimmick",
+      "destination": "/artikel/zero-server-cost-bukan-gimmick/index.html"
+    },
+    {
+      "source": "/artikel/tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes",
+      "destination": "/artikel/tabel-berhitung-kanvas-pengenal-bentuk-ekspor-docx-zhanotes/index.html"
+    },
+    {
+      "source": "/artikel/xendit-vs-payment-gateway-lain-kenapa-saya-pilih",
+      "destination": "/artikel/xendit-vs-payment-gateway-lain-kenapa-saya-pilih/index.html"
+    },
+    {
+      "source": "/artikel/portal-vendor-terisolasi-dan-knowledge-base-issue-tracker",
+      "destination": "/artikel/portal-vendor-terisolasi-dan-knowledge-base-issue-tracker/index.html"
+    },
+    {
+      "source": "/artikel/kenapa-ai-chatbot-saya-bisa-bicara",
+      "destination": "/artikel/kenapa-ai-chatbot-saya-bisa-bicara/index.html"
+    },
+    {
+      "source": "/artikel/tanda-bisnismu-butuh-sistem-custom",
+      "destination": "/artikel/tanda-bisnismu-butuh-sistem-custom/index.html"
+    },
+    {
+      "source": "/artikel/sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip",
+      "destination": "/artikel/sinkron-awan-terenkripsi-e2ee-zhanotes-tanpa-server-bisa-mengintip/index.html"
+    },
+    {
+      "source": "/artikel/anti-afk-bot-di-b-games",
+      "destination": "/artikel/anti-afk-bot-di-b-games/index.html"
+    },
+    {
+      "source": "/artikel/dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab",
+      "destination": "/artikel/dari-chat-ke-kontrak-ditandatangani-alur-zannah-devrab/index.html"
+    },
+    {
+      "source": "/artikel/kapan-google-sheets-cukup-kapan-harus-pindah-postgresql",
+      "destination": "/artikel/kapan-google-sheets-cukup-kapan-harus-pindah-postgresql/index.html"
+    },
+    {
+      "source": "/artikel/mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first",
+      "destination": "/artikel/mengenal-zhanotes-workspace-catatan-kanvas-pdf-local-first/index.html"
+    },
+    {
       "source": "/artikel/enkripsi-password-standar-militer-itu-apa",
       "destination": "/artikel/enkripsi-password-standar-militer-itu-apa/index.html"
     },
