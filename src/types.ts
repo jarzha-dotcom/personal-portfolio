@@ -38,6 +38,7 @@ export interface EducationItem {
 export interface ContactInfo {
   email: string;
   supportEmail: string;
+  zhanotesEmail?: string;
   phone: string;
   displayPhone: string;
   location: string;

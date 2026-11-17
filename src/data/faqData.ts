@@ -189,14 +189,14 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'portfolio',
     quickLabel: 'Tentang proyek ZhaNotes?',
     keywords: ['zhanotes', 'zha notes', 'catatan', 'canvas workspace', 'notetaking', 'obsidian', 'pkm', 'pdf annotator', 'template', 'tabel hitung'],
-    answer: 'ZhaNotes adalah workspace catatan visual & PKM modern Local-First tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan pengenal bentuk otomatis & minimap, Riset Terstruktur, PDF Annotator dengan stabilo & ekstrak catatan), 72 template siap pakai (tabel hitung otomatis, modul latihan anak acak berproteksi PIN orang tua), tugas berulang otomatis, filter cari canggih, Wiki Backlinks [[ ]], perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip, PDF, serta ZIP. Coba langsung di: arzhaning.my.id/zhanotes/',
+    answer: 'ZhaNotes adalah workspace catatan visual & PKM modern Local-First tanpa server (Zero Server Cost) via IndexedDB. Fitur: 4 mode (Rich-Text Editor, Infinite Canvas dengan pengenal bentuk otomatis & minimap, Riset Terstruktur, PDF Annotator dengan stabilo & ekstrak catatan), 72 template siap pakai (tabel hitung otomatis, modul latihan anak acak berproteksi PIN orang tua), tugas berulang otomatis, filter cari canggih, Wiki Backlinks [[ ]], perekam audio memo berpenanda waktu, dan ekspor Word (.docx) murni via JSZip, PDF, serta ZIP. Coba langsung di: arzhaning.my.id/zhanotes/ — pertanyaan atau masukan? Hubungi zhanotes@arzhaning.my.id',
   },
   {
     id: 'portfolio-zhanotes-kustom',
     categoryId: 'portfolio',
     quickLabel: 'Bisa ZhaNotes dengan nama/logo bisnis saya?',
     keywords: ['zhanotes kustom', 'zhanotes custom', 'edisi kustom', 'beli putus', 'aplikasi catatan sendiri', 'white label', 'sinkron antar perangkat', 'sinkron awan', 'catatan sinkron hp laptop', 'logo sendiri'],
-    answer: 'Bisa! Ada edisi kustom ZhaNotes dengan sistem beli putus (tanpa langganan): nama, logo, dan desain disesuaikan dengan bisnis Kakak. Opsional ada sinkron awan otomatis antar perangkat yang terenkripsi, disiapkan di akun Vercel dan penyimpanan milik Kakak sendiri. Versi umumnya tetap gratis dan offline. Estimasi biaya dan detail serah terima dibahas di konsultasi gratis lewat WhatsApp ya 😊',
+    answer: 'Bisa! Ada edisi kustom ZhaNotes dengan sistem beli putus (tanpa langganan): nama, logo, dan desain disesuaikan dengan bisnis Kakak. Opsional ada sinkron awan otomatis antar perangkat yang terenkripsi, disiapkan di akun Vercel dan penyimpanan milik Kakak sendiri. Versi umumnya tetap gratis dan offline. Estimasi biaya dan detail serah terima dibahas di konsultasi gratis lewat WhatsApp atau email zhanotes@arzhaning.my.id ya 😊',
   },
   {
     id: 'portfolio-itrack',

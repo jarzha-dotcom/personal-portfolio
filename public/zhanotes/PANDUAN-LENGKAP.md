@@ -392,7 +392,8 @@ ZhaNotes dibuat oleh **K. Arzhaning Jagad (Arzha)**, Indie Developer & Data/Syst
 Ingin ZhaNotes dengan **nama, logo, dan desain bisnis Anda**? Tersedia edisi kustom *beli putus* (tanpa langganan), opsional dengan sinkron awan terenkripsi di akun Vercel/penyimpanan milik Anda sendiri.
 
 - 💬 WhatsApp: [+62 823-1231-2734](https://wa.me/6282312312734)
-- ✉️ Email: halo@arzhaning.my.id (Konsultasi) · support@arzhaning.my.id (Support & Maintenance)
+- ✉️ Email ZhaNotes: zhanotes@arzhaning.my.id · Email Umum: halo@arzhaning.my.id (Konsultasi) · support@arzhaning.my.id (Support & Maintenance)
+- 🔒 Kebijakan Privasi: [arzhaning.my.id/zhanotes/privacy](https://arzhaning.my.id/zhanotes/privacy/) · 📜 Syarat & Ketentuan: [arzhaning.my.id/zhanotes/terms](https://arzhaning.my.id/zhanotes/terms/)
 - 🌐 Website: [arzhaning.my.id](https://arzhaning.my.id) · Galeri demo: [arzhaning.my.id/demos](https://arzhaning.my.id/demos)
 
 ---

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kebijakan Privasi | ZhaNotes</title>
+<meta name="description" content="Kebijakan Privasi ZhaNotes — Komitmen privasi local-first: data tersimpan di perangkat Anda, tanpa akun, tanpa pelacak iklan pihak ketiga." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://arzhaning.my.id/zhanotes/privacy/" />
+<link rel="icon" type="image/png" sizes="96x96" href="/zhanotes/icons/favicon-96x96.png?v=2" />
+
+<script>
+(function () {
+  try {
+    var saved = localStorage.getItem('zn-theme') || localStorage.getItem('theme');
+    var preferDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && preferDark)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch (e) {}
+})();
+</script>
+
+<style>
+:root {
+  --bg: #faf9f7;
+  --bg-card: #ffffff;
+  --bg-elevated: #f4f2ec;
+  --text: #1d1d1f;
+  --text-muted: #64748b;
+  --border: #e8e6e1;
+  --primary: #2d4399;
+  --primary-soft: rgba(45, 67, 153, 0.08);
+  --primary-glow: rgba(45, 67, 153, 0.2);
+  --accent-green: #059669;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  --shadow-lg: 0 16px 24px -4px rgb(0 0 0 / 0.08);
+}
+
+.dark {
+  --bg: #161618;
+  --bg-card: #1e1e21;
+  --bg-elevated: #26262a;
+  --text: #ececee;
+  --text-muted: #9ca3af;
+  --border: #2c2c30;
+  --primary: #6a85e6;
+  --primary-soft: rgba(106, 133, 230, 0.12);
+  --primary-glow: rgba(106, 133, 230, 0.25);
+  --accent-green: #10b981;
+  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 16px 24px -4px rgb(0 0 0 / 0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 85px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.65;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: var(--text);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.brand-badge {
+  font-size: 0.7rem;
+  font-weight: 600;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-nav a {
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.header-nav a:hover, .header-nav a.active {
+  color: var(--primary);
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.theme-toggle svg { width: 17px; height: 17px; }
+.dark .icon-moon { display: none; }
+.icon-sun { display: none; }
+.dark .icon-sun { display: block; }
+
+.hero {
+  padding: 3rem 1.25rem 2rem;
+  text-align: center;
+  background: radial-gradient(ellipse 70% 50% at 50% 0%, var(--primary-glow), transparent);
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-size: 2.1rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+
+.hero-meta {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 4rem;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 820px) {
+  .container { grid-template-columns: 1fr; }
+  .toc { display: none; }
+}
+
+.toc {
+  position: sticky;
+  top: 80px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.toc h2 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.65rem;
+}
+
+.toc ol {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.toc a {
+  display: block;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.8rem;
+  transition: all 0.15s;
+}
+
+.toc a:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.content-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.6rem;
+  margin-bottom: 1.4rem;
+  box-shadow: var(--shadow);
+}
+
+.content-section h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.85rem;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.content-section p {
+  color: var(--text);
+  margin-bottom: 0.85rem;
+  font-size: 0.92rem;
+}
+
+.content-section ul, .content-section ol {
+  margin-left: 1.25rem;
+  margin-bottom: 0.85rem;
+  color: var(--text);
+  font-size: 0.92rem;
+}
+
+.content-section li { margin-bottom: 0.35rem; }
+
+.callout {
+  background: var(--bg-elevated);
+  border-left: 4px solid var(--primary);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+}
+
+.callout-green {
+  background: rgba(16, 185, 129, 0.08);
+  border-left-color: var(--accent-green);
+}
+
+.highlight-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.highlight-item {
+  background: var(--bg-elevated);
+  padding: 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.highlight-item strong {
+  display: block;
+  font-size: 0.88rem;
+  margin-bottom: 0.2rem;
+  color: var(--primary);
+}
+
+.highlight-item span {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: 2rem 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+footer a { color: var(--primary); text-decoration: none; }
+footer a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a href="/zhanotes/" class="brand">
+      <span>✍️ ZhaNotes</span>
+      <span class="brand-badge">Local-First</span>
+    </a>
+    <nav class="header-nav">
+      <a href="/zhanotes/">Buka Aplikasi</a>
+      <a href="/zhanotes/privacy/" class="active">Privasi</a>
+      <a href="/zhanotes/terms/">Syarat & Ketentuan</a>
+      <button class="theme-toggle" id="themeBtn" aria-label="Ganti tema">
+        <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9h-1m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+      </button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-badge">🔒 Privasi Terjamin & Transparan</div>
+  <h1>Kebijakan Privasi ZhaNotes</h1>
+  <p class="hero-meta">Terakhir diperbarui: 17 November 2026 • Berlaku efektif segera</p>
+</div>
+
+<div class="container">
+  <aside class="toc">
+    <h2>Daftar Isi</h2>
+    <ol>
+      <li><a href="#filosofi">1. Filosofi Local-First</a></li>
+      <li><a href="#data-disimpan">2. Data yang Disimpan</a></li>
+      <li><a href="#fitur-berbagi">3. Fitur Berbagi Tautan</a></li>
+      <li><a href="#izin-perangkat">4. Izin Mikrofon & File</a></li>
+      <li><a href="#layanan-pihak-ketiga">5. Layanan Eksternal & CDN</a></li>
+      <li><a href="#edisi-kustom">6. Edisi Kustom & Cloud</a></li>
+      <li><a href="#hak-pengguna">7. Hak Kendali Anda</a></li>
+      <li><a href="#kontak">8. Hubungi Kami</a></li>
+    </ol>
+  </aside>
+
+  <main>
+    <section id="filosofi" class="content-section">
+      <h2>🛡️ 1. Filosofi Dasar: Local-First & Privasi Mutlak</h2>
+      <p><strong>ZhaNotes</strong> dirancang dengan prinsip dasar <em>Local-First Software</em>. Kami meyakini bahwa pemikiran pribadi, dokumen riset, coretan sketsa, dan catatan penting Anda adalah milik Anda seutuhnya, bukan aset korporasi atau kecerdasan buatan pihak ketiga.</p>
+      
+      <div class="callout callout-green">
+        <strong>Inti Kebijakan Privasi Kami:</strong>
+        <br>• Tidak ada pembuatan akun wajib (tanpa login / registrasi).
+        <br>• Tidak ada pelacak analitik perilaku atau piksel pemasaran.
+        <br>• Tidak ada iklan pihak ketiga.
+        <br>• Data utama Anda tidak dikirim ke server pusat kami.
+      </div>
+    </section>
+
+    <section id="data-disimpan" class="content-section">
+      <h2>💾 2. Di Mana & Bagaimana Data Anda Disimpan?</h2>
+      <p>Secara bawaan (*default*), 100% konten yang Anda buat di ZhaNotes tersimpan di media penyimpanan internal peramban (*browser*) perangkat Anda:</p>
+      
+      <div class="highlight-box">
+        <div class="highlight-item">
+          <strong>IndexedDB Browser</strong>
+          <span>Menyimpan teks catatan, halaman kanvas, riwayat versi (*snapshots*), lampiran audio memo, serta berkas PDF beranotasi.</span>
+        </div>
+        <div class="highlight-item">
+          <strong>LocalStorage</strong>
+          <span>Menyimpan preferensi tampilan seperti mode tema (terang/gelap), ukuran halaman, dan bookmark pencarian cepat.</span>
+        </div>
+      </div>
+
+      <p>Jika Anda membersihkan cache dan riwayat browser secara total (*Clear Browsing Data*), data lokal di IndexedDB berpotensi ikut terhapus. Oleh karena itu, ZhaNotes menyediakan fitur ekspor berkas <strong>.zhn</strong>, format Word <strong>.docx</strong>, serta <strong>ZIP Backup Utuh</strong> agar Anda dapat mencadangkan dokumen Anda ke penyimpanan fisik Anda sendiri.</p>
+    </section>
+
+    <section id="fitur-berbagi" class="content-section">
+      <h2>📤 3. Fitur "Bagikan Lewat Tautan" (Opsional)</h2>
+      <p>ZhaNotes menyediakan fitur opsional untuk membagikan catatan kepada rekan kerja atau publik via tautan:</p>
+      <ul>
+        <li><strong>Enkripsi di Sisi Pengguna (Client-Side Encryption):</strong> Saat Anda membuat tautan bagikan, konten catatan dienkripsi langsung di browser Anda menggunakan Web Crypto API sebelum dikirim ke infrastruktur penyimpanan.</li>
+        <li><strong>Kunci Rahasia di URL Hash:</strong> Kunci dekripsi catatan berada di bagian hash URL (setelah tanda pagar <code>#key=...</code>). Sesuai standar web, fragmen hash ini <em>tidak pernah dikirimkan ke server kami</em>. Artinya, server kami hanya menyimpan teks acak terenkripsi tanpa mampu membaca isinya.</li>
+        <li><strong>Masa Berlaku:</strong> Anda dapat memilih batas waktu tautan (1 hari, 7 hari, 30 hari, atau tanpa batas). Anda juga dapat mencabut tautan sewaktu-waktu melalui dialog kelola tautan.</li>
+      </ul>
+    </section>
+
+    <section id="izin-perangkat" class="content-section">
+      <h2>🎙️ 4. Izin Perangkat & Akses Hardware</h2>
+      <p>ZhaNotes meminta izin browser hanya jika Anda secara aktif menggunakan fitur berikut:</p>
+      <ul>
+        <li><strong>Mikrofon (Perekam Audio Memo):</strong> Digunakan untuk merekam catatan suara dengan penanda waktu. File suara diproses langsung via <code>MediaRecorder API</code> dan disimpan ke IndexedDB lokal perangkat Anda. Rekaman tidak pernah diunggah ke server.</li>
+        <li><strong>Akses Sistem Berkas (File System Access API):</strong> Di browser berbasis Chromium desktop, izin ini digunakan agar tombol <code>Ctrl+S</code> dapat menyimpan perubahan langsung ke berkas <code>.zhn</code> di hard drive Anda tanpa mengunduh ulang berulang kali.</li>
+      </ul>
+    </section>
+
+    <section id="layanan-pihak-ketiga" class="content-section">
+      <h2>🌐 5. Layanan Eksternal & Pustaka Pihak Ketiga</h2>
+      <p>Untuk menjaga ukuran aplikasi tetap sangat ringan tanpa mengorbankan fungsionalitas tingkat lanjut, ZhaNotes memuat beberapa pustaka pendukung secara dinamis (*lazy load*):</p>
+      <ul>
+        <li><strong>Penyedia CDN (jsDelivr / cdnjs):</strong> Komponen rumus matematika (KaTeX) dan diagram (Mermaid) dimuat melalui CDN publik terpercaya dengan verifikasi hash integritas (SRI). Pihak CDN dapat mencatat alamat IP dan header peramban standar saat berkas diunduh pertama kali.</li>
+        <li><strong>Fitur Dikte Suara (Web Speech API):</strong> Jika Anda menggunakan fitur dikte suara Bahasa Indonesia, peramban Anda (seperti Google Chrome) memproses suara melalui layanan pengenalan suara bawaan browser mereka yang tunduk pada Kebijakan Privasi masing-masing vendor peramban.</li>
+        <li><strong>Kutip Wikipedia & DOI Crossref:</strong> Saat Anda memasukkan URL Wikipedia atau nomor DOI untuk sitasi otomatis, browser akan melakukan panggilan HTTP publik langsung ke API Wikipedia atau Crossref untuk mengambil metadata kutipan.</li>
+      </ul>
+    </section>
+
+    <section id="edisi-kustom" class="content-section">
+      <h2>🏢 6. Privasi pada Edisi Kustom (Beli Putus)</h2>
+      <p>Bagi klien korporat atau tim yang memesan <strong>Edisi Kustom ZhaNotes</strong> dengan fitur sinkronisasi awan multi-perangkat:</p>
+      <ul>
+        <li>Sinkronisasi menggunakan enkripsi menyeluruh <strong>End-to-End Encryption (E2EE) AES-GCM</strong>.</li>
+        <li>Infrastruktur awan (Vercel KV / Cloudflare / Database) disiapkan di akun kepemilikan klien sendiri. Pihak pembuat ZhaNotes tidak memiliki akses atau pintu belakang (*backdoor*) ke database tersebut.</li>
+      </ul>
+    </section>
+
+    <section id="hak-pengguna" class="content-section">
+      <h2>⚖️ 7. Hak Kendali Penuh Pengguna</h2>
+      <p>Anda memegang kendali 100% atas data Anda:</p>
+      <ul>
+        <li><strong>Hak Menghapus:</strong> Anda dapat menghapus catatan kapan saja. Catatan yang dihapus masuk ke Tempat Sampah dan dapat dikosongkan permanen.</li>
+        <li><strong>Hak Portabilitas:</strong> Anda bebas mengekspor seluruh catatan dalam format terbuka (.docx, .pdf, .md, .zip) tanpa terkunci sistem (*zero vendor lock-in*).</li>
+      </ul>
+    </section>
+
+    <section id="kontak" class="content-section">
+      <h2>📫 8. Hubungi Kami Mengenai Privasi</h2>
+      <p>Jika Anda memiliki pertanyaan, masukan, atau permintaan klarifikasi terkait privasi penggunaan ZhaNotes, silakan hubungi tim kami:</p>
+      <div class="callout">
+        ✉️ <strong>Email Khusus ZhaNotes:</strong> <a href="mailto:zhanotes@arzhaning.my.id">zhanotes@arzhaning.my.id</a><br>
+        💬 <strong>WhatsApp:</strong> <a href="https://wa.me/6282312312734" target="_blank">+62 823-1231-2734</a><br>
+        🏢 <strong>Pengembang:</strong> K. Arzhaning Jagad (Arzha) — Cibitung, Bekasi, Jawa Barat
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>
+  <p>© 2026 ZhaNotes • Dikelola oleh <a href="https://arzhaning.my.id">K. Arzhaning Jagad</a>. Hak cipta dilindungi undang-undang.</p>
+  <p style="margin-top: 0.5rem;">
+    <a href="/zhanotes/">Aplikasi</a> • 
+    <a href="/zhanotes/privacy/">Kebijakan Privasi</a> • 
+    <a href="/zhanotes/terms/">Syarat & Ketentuan</a> • 
+    <a href="/zhanotes/PANDUAN-LENGKAP.md">Panduan Lengkap</a>
+  </p>
+</footer>
+
+<script>
+var themeBtn = document.getElementById('themeBtn');
+themeBtn.addEventListener('click', function () {
+  var isDark = document.documentElement.classList.toggle('dark');
+  try {
+    localStorage.setItem('zn-theme', isDark ? 'dark' : 'light');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  } catch (e) {}
+});
+</script>
+
+</body>
+</html>
