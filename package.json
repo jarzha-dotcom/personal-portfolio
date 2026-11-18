@@ -12,7 +12,6 @@
     "audio": "tsx --env-file=.env.local scripts/generate-article-audio.ts",
     "audio:upload": "tsx --env-file=.env.local scripts/generate-article-audio.ts --upload=blob",
     "preview": "vite preview",
-    "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "demo:watermark": "node scripts/inject-demo-watermark.js",
