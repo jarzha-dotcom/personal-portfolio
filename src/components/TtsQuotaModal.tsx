@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2, ShieldAlert, RefreshCw, MessageSquare, Power, Plus, Trash2 } from 'lucide-react';
+import { WaInboxTab } from './WaInboxTab';
 
 interface TierUsage {
   used: number;
@@ -126,6 +127,7 @@ const pct = (used: number, limit: number) => (limit > 0 ? Math.min(100, Math.rou
  */
 export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
   const [pin, setPin] = useState('');
+  const [activeTab, setActiveTab] = useState<'quota' | 'inbox'>('quota');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TtsUsageResponse | null>(null);
@@ -282,12 +284,15 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
       onClick={onClose}
     >
       <div
-        className="bg-slate-900 border border-slate-800 rounded-xl p-5 w-full max-w-sm text-slate-200 shadow-xl max-h-[88vh] overflow-y-auto"
+        className={`bg-slate-900 border border-slate-800 rounded-xl p-5 w-full text-slate-200 shadow-xl max-h-[88vh] overflow-y-auto transition-all ${
+          activeTab === 'inbox' && data ? 'max-w-lg' : 'max-w-sm'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-sm font-bold flex items-center gap-1.5">
-            <ShieldAlert className="w-4 h-4 text-teal-400" /> Kuota & Usage
+            <ShieldAlert className="w-4 h-4 text-teal-400" />
+            {data ? (activeTab === 'inbox' ? 'Inbox WhatsApp' : 'Kuota & Status') : 'Panel Kontrol Admin'}
           </h2>
           <button onClick={onClose} aria-label="Tutup" className="text-slate-500 hover:text-white">
             <X className="w-4 h-4" />
@@ -316,7 +321,37 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
           </form>
         ) : (
           <div className="space-y-4">
-            {(['chirp', 'wavenet'] as const).map((tier) => {
+            {/* Tab Navigasi Admin */}
+            <div className="flex border-b border-slate-800 -mt-2 pb-1 text-xs">
+              <button
+                type="button"
+                onClick={() => setActiveTab('quota')}
+                className={`flex-1 py-1.5 font-semibold text-center border-b-2 transition-colors ${
+                  activeTab === 'quota'
+                    ? 'border-teal-400 text-teal-300'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                📊 Kuota & Sistem
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('inbox')}
+                className={`flex-1 py-1.5 font-semibold text-center border-b-2 transition-colors ${
+                  activeTab === 'inbox'
+                    ? 'border-emerald-400 text-emerald-300'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                💬 Inbox WhatsApp
+              </button>
+            </div>
+
+            {activeTab === 'inbox' ? (
+              <WaInboxTab pin={pin} />
+            ) : (
+              <div className="space-y-4">
+                {(['chirp', 'wavenet'] as const).map((tier) => {
               const { used, limit } = data[tier];
               const percentage = pct(used, limit);
               const label = tier === 'chirp' ? 'Chirp 3 HD' : 'WaveNet';
@@ -740,6 +775,8 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
                 );
               })()}
             </div>
+          </div>
+            )}
           </div>
         )}
       </div>

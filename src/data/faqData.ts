@@ -211,7 +211,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     categoryId: 'kontak',
     quickLabel: 'Kontak WhatsApp & Email?',
     keywords: ['kontak', 'whatsapp', 'nomor hp', 'email', 'hubungi', 'wa'],
-    answer: 'Bisa langsung hubungi WhatsApp di +6282312312734 atau email ke halo@arzhaning.my.id (untuk konsultasi proyek baru) serta support@arzhaning.my.id (khusus after-sales & maintenance klien). Mau tanya-tanya santai dulu atau langsung konsultasi ide proyek, siap dilayani!',
+    answer: 'Bisa langsung hubungi WhatsApp di +1 555-749-9583 atau email ke halo@arzhaning.my.id (untuk konsultasi proyek baru) serta support@arzhaning.my.id (khusus after-sales & maintenance klien). Mau tanya-tanya santai dulu atau langsung konsultasi ide proyek, siap dilayani!',
   },
   {
     id: 'kontak-konsultasi',

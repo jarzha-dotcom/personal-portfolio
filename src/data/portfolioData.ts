@@ -21,8 +21,8 @@ export const CONTACT_INFO: ContactInfo = {
   email: 'halo@arzhaning.my.id',
   supportEmail: 'support@arzhaning.my.id',
   zhanotesEmail: 'zhanotes@arzhaning.my.id',
-  phone: '+6282312312734',
-  displayPhone: '0823-1231-2734',
+  phone: '+15557499583',
+  displayPhone: '+1 (555) 749-9583',
   location: 'Cibitung, Bekasi, Jawa Barat',
   availableForWork: true,
 };

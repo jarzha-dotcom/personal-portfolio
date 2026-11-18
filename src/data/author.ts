@@ -6,7 +6,7 @@ export const AUTHOR_BIO =
   '7+ tahun pengalaman di operasional dan audit korporat, sekarang juga menerima proyek freelance sebagai developer. Fokus: game multiplayer, edukasi anak, internal tools, dan AI agent. End-to-end, transparan, dan responsif.';
 
 export const AUTHOR_SOCIALS = {
-  whatsapp: 'https://wa.me/6282312312734',
+  whatsapp: 'https://wa.me/15557499583',
   email: 'mailto:halo@arzhaning.my.id',
   github: 'https://github.com/jarzha-dotcom',
 };

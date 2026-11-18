@@ -16,6 +16,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import {
     addSkipPhones,
     appendWaHistory,
+    upsertInboxContact,
     checkSenderRateLimit,
     claimMessageDedup,
     clearPendingBubbles,
@@ -429,6 +430,9 @@ async function handleSingleInboundMessage(
     // 2. Deduplikasi idempotency jika Meta mengirim ulang webhook
     const isNewMessage = await claimMessageDedup(bubble.id);
     if (!isNewMessage) return;
+
+    // 2b. Catat ke inbox (sebelum filter, agar semua pengirim terlihat di inbox)
+    upsertInboxContact(sender, senderName, bubble.text).catch(() => undefined);
 
     // 3. Gerbang Filter Berlapis (SEBELUM menyentuh Vertex AI / Gemini)
     if (!(await isWaBotEnabled())) return;

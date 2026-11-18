@@ -770,7 +770,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return {
                 ...resData,
                 reply:
-                    reply.replace(WA_DANGLING_RE, `[💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/6282312312734?text=${brief})`) +
+                    reply.replace(WA_DANGLING_RE, `[💬 Lanjut Diskusi ke WhatsApp Mas Arzha](https://wa.me/15557499583?text=${brief})`) +
                     '\n\nNanti pas Kakak klik, ringkasan obrolan kita ikut terkirim ke Mas Arzha ya, biar beliau langsung paham konteksnya.',
             };
         };

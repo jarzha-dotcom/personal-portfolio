@@ -213,7 +213,7 @@ export function documentFooterHtml(): string {
     return `
   <div class="footer">
     <strong>K. Arzhaning Jagad (Arzha)</strong> — Indie Developer &amp; Data Specialist, 7+ tahun pengalaman di operasional dan audit korporat<br/>
-    WhatsApp: 0823-1231-2734 &middot; Email: halo@arzhaning.my.id &middot; Support: support@arzhaning.my.id &middot; Cibitung, Bekasi<br/>
+    WhatsApp: +6282312312734 &middot; Email: halo@arzhaning.my.id &middot; Support: support@arzhaning.my.id &middot; Cibitung, Bekasi<br/>
     <a href="https://wa.me/6282312312734?text=Halo%20Mas%20Arzha,%20saya%20mau%20diskusi%20soal%20dokumen%20ini.">Lanjut diskusi via WhatsApp →</a>
   </div>`;
 }
@@ -618,8 +618,8 @@ export function deterministicNarration(facts: RabOutcomeFacts, mode: RabNarratio
             mode === 'retry'
                 ? 'Kali ini berhasil, Kak! Proposal RAB resminya sudah jadi.'
                 : mode === 'update'
-                ? 'Sudah Zannah update, Kak! Ini proposal RAB versi terbarunya.'
-                : 'Proposal RAB resminya sudah jadi, Kak!'
+                    ? 'Sudah Zannah update, Kak! Ini proposal RAB versi terbarunya.'
+                    : 'Proposal RAB resminya sudah jadi, Kak!'
         );
         if (facts.projectTitle) lines.push(`Proyek: ${facts.projectTitle}${facts.proposalId ? ` (No. ${facts.proposalId})` : ''}`);
         lines.push('');
@@ -866,10 +866,10 @@ ${replyText.slice(0, 10000)}
                 projectType === 'mobile_app'
                     ? ['Android', 'iOS']
                     : projectType === 'web_mobile'
-                    ? ['Web', 'Android', 'iOS']
-                    : projectType === 'game'
-                    ? ['Web', 'Mobile']
-                    : ['Web'];
+                        ? ['Web', 'Android', 'iOS']
+                        : projectType === 'game'
+                            ? ['Web', 'Mobile']
+                            : ['Web'];
 
             // Cobalah panggil DevRAB Engine untuk proposal interaktif yang terhubung ke cloud database & payment
             try {
@@ -895,11 +895,11 @@ ${replyText.slice(0, 10000)}
                         phone: doc?.clientPhone?.trim() || undefined,
                     },
                 },
-                // timeout per percobaan 20 detik, total maksimal 30 detik -- menyisakan waktu
-                // untuk Zannah menarasikan hasil (maxDuration handler chat.ts = 60 detik).
-                20000,
-                2,
-                30000);
+                    // timeout per percobaan 20 detik, total maksimal 30 detik -- menyisakan waktu
+                    // untuk Zannah menarasikan hasil (maxDuration handler chat.ts = 60 detik).
+                    20000,
+                    2,
+                    30000);
 
                 if (devrabResult && devrabResult.proposalId && devrabResult.previewUrl) {
                     consumeDevRABDailyQuota();
@@ -1040,7 +1040,7 @@ export function generateSummaryAttachment(
     lines.push('Pengalaman      : 7+ tahun pengalaman di operasional dan audit korporat ( + Full-Stack)');
     lines.push('WhatsApp        : 0823-1231-2734 (+6282312312734)');
     lines.push('Email Proyek    : halo@arzhaning.my.id');
-  lines.push('Email Support   : support@arzhaning.my.id');
+    lines.push('Email Support   : support@arzhaning.my.id');
     lines.push('Lokasi          : Cibitung, Bekasi, Jawa Barat');
     lines.push('');
     lines.push('Link WhatsApp Langsung:');

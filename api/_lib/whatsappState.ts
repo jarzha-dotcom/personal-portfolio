@@ -92,6 +92,8 @@ interface KvAdapter {
     scard(key: string): Promise<number>;
     rpush(key: string, item: string, ttlSec: number): Promise<void>;
     lrangeAndDel(key: string): Promise<string[]>;
+    zadd(key: string, score: number, member: string): Promise<void>;
+    zrevrange(key: string, start: number, stop: number): Promise<string[]>;
 }
 
 let cachedRedis: Redis | null = null;
@@ -206,6 +208,26 @@ const memoryAdapter: KvAdapter = {
         if (!rec || (rec.exp > 0 && Date.now() > rec.exp)) return [];
         return [...rec.items];
     },
+    async zadd(key, score, member) {
+        // Memory fallback: gunakan map sorted by score
+        let set = memSets.get(key);
+        if (!set) { set = new Set<string>(); memSets.set(key, set); }
+        // simpan sebagai JSON "score:member" di set biasa (simplifikasi test)
+        // hapus entry lama dengan member yang sama
+        for (const entry of Array.from(set)) {
+            if (entry.endsWith(':' + member)) { set.delete(entry); break; }
+        }
+        set.add(`${score}:${member}`);
+    },
+    async zrevrange(key, start, stop) {
+        const set = memSets.get(key);
+        if (!set) return [];
+        const entries = Array.from(set)
+            .map((e) => { const idx = e.indexOf(':'); return { score: Number(e.slice(0, idx)), member: e.slice(idx + 1) }; })
+            .sort((a, b) => b.score - a.score);
+        const count = stop < 0 ? entries.length : stop - start + 1;
+        return entries.slice(start, start + count).map((e) => e.member);
+    },
 };
 
 const redisAdapter: KvAdapter = {
@@ -271,6 +293,14 @@ const redisAdapter: KvAdapter = {
         await redis.del(key);
         return (items ?? []).map((x) => (typeof x === 'string' ? x : JSON.stringify(x)));
     },
+    async zadd(key, score, member) {
+        await getUpstashClient().zadd(key, { score, member });
+    },
+    async zrevrange(key, start, stop) {
+        const redis = getUpstashClient();
+        const res = await redis.zrange<string[]>(key, stop, start, { rev: true });
+        return res ?? [];
+    },
 };
 
 function store(): KvAdapter {
@@ -284,8 +314,10 @@ const KEY_LAST_SELF_CMD = 'wa:config:last_self_cmd';
 const KEY_LAST_DELIVERY = 'wa:diag:last_delivery';
 const KEY_SKIP_SET = 'wa:contacts:skip';
 const KEY_SYNCED_SET = 'wa:contacts:synced';
+const KEY_INBOX_SET = 'wa:inbox:phones';          // Sorted set: phone → timestamp last message
 const MONTH_TTL_SEC = 40 * 24 * 60 * 60; // 40 hari
 const DAY_TTL_SEC = 24 * 60 * 60; // 24 jam
+const INBOX_TTL_SEC = 7 * 24 * 60 * 60; // 7 hari
 
 const PT_MONTH_FMT = new Intl.DateTimeFormat('en-US', {
     timeZone: 'America/Los_Angeles',
@@ -552,7 +584,63 @@ export async function clearPendingBubbles(phone: string): Promise<void> {
     await s.del(`wa:debounce:${norm}`);
 }
 
-// ── Riwayat Percakapan per Nomor WA (TTL Otomatis 24 Jam) ─────────────────────
+// ── Inbox: Daftar Thread WA (phone → metadata) ────────────────────────────────
+
+export interface WaInboxContact {
+    phone: string;
+    name?: string;
+    lastMessage: string;
+    lastAt: number;        // unix ms
+    unread: boolean;       // true = belum dibalas manual
+}
+
+/** Catat pesan masuk ke inbox (dipanggil tiap ada pesan masuk dari user) */
+export async function upsertInboxContact(phone: string, name: string | undefined, lastMessage: string): Promise<void> {
+    const norm = normalizeWaPhone(phone);
+    if (!norm) return;
+    const s = store();
+    const meta: WaInboxContact = {
+        phone: norm,
+        name: name || undefined,
+        lastMessage: lastMessage.slice(0, 200),
+        lastAt: Date.now(),
+        unread: true,
+    };
+    // Simpan metadata per nomor
+    await s.setString(`wa:inbox:meta:${norm}`, JSON.stringify(meta), INBOX_TTL_SEC);
+    // Tambahkan ke sorted set (score = timestamp) agar bisa diurut
+    await s.zadd(KEY_INBOX_SET, Date.now(), norm);
+}
+
+/** Tandai thread sudah dibaca / dibalas */
+export async function markInboxRead(phone: string): Promise<void> {
+    const norm = normalizeWaPhone(phone);
+    if (!norm) return;
+    const raw = await store().getString(`wa:inbox:meta:${norm}`);
+    if (!raw) return;
+    try {
+        const meta = JSON.parse(raw) as WaInboxContact;
+        meta.unread = false;
+        await store().setString(`wa:inbox:meta:${norm}`, JSON.stringify(meta), INBOX_TTL_SEC);
+    } catch { /* ignore */ }
+}
+
+/** Ambil semua thread inbox, diurutkan terbaru dulu (max 50) */
+export async function listInboxContacts(): Promise<WaInboxContact[]> {
+    const s = store();
+    const phones = await s.zrevrange(KEY_INBOX_SET, 0, 49);
+    if (!phones.length) return [];
+    const metas = await Promise.all(
+        phones.map(async (p) => {
+            const raw = await s.getString(`wa:inbox:meta:${p}`);
+            if (!raw) return null;
+            try { return JSON.parse(raw) as WaInboxContact; } catch { return null; }
+        })
+    );
+    return metas.filter((m): m is WaInboxContact => m !== null);
+}
+
+
 
 const MAX_RECENT_TURNS = 12; // 6 pasang chat terakhir untuk konteks model cepat & hemat token
 const MAX_TRANSCRIPT_TURNS = 30; // Transkrip lengkap 24 jam khusus ekstraksi checklist RAB
@@ -589,18 +677,22 @@ export async function appendWaHistory(phone: string, userText: string, modelRepl
     const s = store();
 
     const recent = await getWaHistory(norm);
-    recent.push(
-        { role: 'user', parts: [{ text: userText.slice(0, 2000) }] },
-        { role: 'model', parts: [{ text: modelReply.slice(0, 3000) }] }
-    );
+    if (userText) {
+        recent.push({ role: 'user', parts: [{ text: userText.slice(0, 2000) }] });
+    }
+    if (modelReply) {
+        recent.push({ role: 'model', parts: [{ text: modelReply.slice(0, 3000) }] });
+    }
     const trimmedRecent = recent.slice(-MAX_RECENT_TURNS);
     await s.setString(`wa:history:${norm}`, JSON.stringify(trimmedRecent), DAY_TTL_SEC);
 
     const full = await getWaFullTranscript(norm);
-    full.push(
-        { role: 'user', parts: [{ text: userText.slice(0, 3000) }] },
-        { role: 'model', parts: [{ text: modelReply.slice(0, 4000) }] }
-    );
+    if (userText) {
+        full.push({ role: 'user', parts: [{ text: userText.slice(0, 3000) }] });
+    }
+    if (modelReply) {
+        full.push({ role: 'model', parts: [{ text: modelReply.slice(0, 4000) }] });
+    }
     const trimmedFull = full.slice(-MAX_TRANSCRIPT_TURNS);
     await s.setString(`wa:transcript:${norm}`, JSON.stringify(trimmedFull), DAY_TTL_SEC);
 }
