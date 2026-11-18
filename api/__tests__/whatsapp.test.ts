@@ -18,6 +18,7 @@ import {
     parseOwnerSelfCommand,
 } from '../_lib/whatsappPrompt.js';
 import {
+    notifyOwnerViaWhatsApp,
     sanitizeMediaMimeType,
     sendWhatsAppTextReply,
 } from '../_lib/whatsappGraph.js';
@@ -625,5 +626,43 @@ describe('Integrasi Webhook /api/whatsapp & Kontrol Admin', () => {
 
         expect(outboundTextCalls).toHaveLength(1);
         expect(outboundTextCalls[0].text.body).not.toContain('[[RAB_READY]]');
+    });
+
+    it('mengirimkan notifikasi ke owner (+62) saat ada chat dari lead baru jika WA_NOTIFY_OWNER=true', async () => {
+        vi.stubEnv('WA_NOTIFY_OWNER', 'true');
+        vi.stubEnv('WA_DISPLAY_NUMBER', '+15557499583');
+
+        const payload = {
+            object: 'whatsapp_business_account',
+            entry: [
+                {
+                    changes: [
+                        {
+                            field: 'messages',
+                            value: {
+                                metadata: { display_phone_number: '15557499583', phone_number_id: PHONE_ID },
+                                contacts: [{ wa_id: '6289998887777', profile: { name: 'Klien Baru' } }],
+                                messages: [{ from: '6289998887777', id: 'wamid.lead01', timestamp: '1760000000', type: 'text', text: { body: 'Halo, mau tanya pembuatan web' } }],
+                            },
+                        },
+                    ],
+                },
+            ],
+        };
+
+        const res = makeRes();
+        await handler(makeSignedPostReq(payload), res as any);
+        expect(res.statusCode).toBe(200);
+
+        const outboundTextCalls = fetchMock.mock.calls
+            .filter(([u]) => String(u).includes(`/${PHONE_ID}/messages`))
+            .map(([, init]) => JSON.parse((init as { body: string }).body))
+            .filter((b) => b.type === 'text');
+
+        expect(outboundTextCalls).toHaveLength(2);
+        expect(outboundTextCalls[0].to).toBe('6289998887777');
+        expect(outboundTextCalls[1].to).toBe(OWNER_PHONE);
+        expect(outboundTextCalls[1].text.body).toContain('[Zannah]');
+        expect(outboundTextCalls[1].text.body).toContain('Pesan baru dari');
     });
 });

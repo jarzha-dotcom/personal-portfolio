@@ -62,6 +62,7 @@ import {
     getOwnerWaPhone,
     getWaGraphCredentials,
     markMessageReadAndTyping,
+    notifyOwnerViaWhatsApp,
     sendWhatsAppTextReply,
     verifyMetaWebhookSignature,
 } from './_lib/whatsappGraph.js';
@@ -599,6 +600,31 @@ async function handleSingleInboundMessage(
             detail: `Terkirim ke Graph API (${aiResult.model})`,
         }).catch(() => undefined);
         await appendWaHistory(sender, combinedText, formattedWaBody);
+
+        // 13. Notifikasi ke HP pribadi Mas Arzha (+62) jika ada lead baru atau permintaan RAB
+        const ownerPhone = getOwnerWaPhone();
+        if (sender !== ownerPhone) {
+            if (!isOngoing) {
+                const preview = combinedText.replace(/\s+/g, ' ').slice(0, 120);
+                const senderLabel = effectiveSenderName ? `+${sender} (${effectiveSenderName})` : `+${sender}`;
+                const noteMsg = `🔔 *[Zannah]* Pesan baru dari ${senderLabel}:\n"${preview}"\n\n_Zannah sudah menyapa. Balas manual atau kirim #skip ${sender} jika tidak relevan._`;
+                notifyOwnerViaWhatsApp({
+                    phoneNumberId,
+                    accessToken: graphCreds.accessToken,
+                    message: noteMsg,
+                    senderBotPhone: botDisplayPhone,
+                }).catch((err) => console.warn('[whatsapp] Gagal kirim notif lead baru ke owner:', err));
+            } else if (rabTriggered) {
+                const senderLabel = effectiveSenderName ? `+${sender} (${effectiveSenderName})` : `+${sender}`;
+                const rabMsg = `💼 *[Zannah]* Konsultasi proyek dari ${senderLabel} mencapai tahap RAB!\n_Draf estimasi sudah diproseskan untuk klien._`;
+                notifyOwnerViaWhatsApp({
+                    phoneNumberId,
+                    accessToken: graphCreds.accessToken,
+                    message: rabMsg,
+                    senderBotPhone: botDisplayPhone,
+                }).catch((err) => console.warn('[whatsapp] Gagal kirim notif RAB ke owner:', err));
+            }
+        }
     } finally {
         // Jika pengiriman gagal sebelum benar-benar terkirim ke Meta, kembalikan kuota bulanan
         if (!replyDelivered) {

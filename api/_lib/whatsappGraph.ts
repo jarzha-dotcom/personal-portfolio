@@ -21,6 +21,10 @@ export function getOwnerWaPhone(): string {
     return normalizeWaPhone(process.env.WA_OWNER_PHONE || DEFAULT_OWNER_PHONE) || DEFAULT_OWNER_PHONE;
 }
 
+export function getBotWaPhone(): string {
+    return normalizeWaPhone(process.env.WA_DISPLAY_NUMBER || process.env.WA_BOT_PHONE) || getOwnerWaPhone();
+}
+
 function stripOuterQuotes(val: string): string {
     const t = val.trim();
     if ((t.startsWith("'") && t.endsWith("'")) || (t.startsWith('"') && t.endsWith('"'))) {
@@ -228,11 +232,11 @@ export async function sendWhatsAppTextReply(params: {
     to: string;
     body: string;
     replyToMessageId?: string;
-    /** Nomor pengirim milik bot saat ini (dari metadata.display_phone_number, mis. nomor uji +1 555...) */
+    /** Nomor pengirim milik bot saat ini (dari metadata.display_phone_number, mis. nomor virtual +1 555...) */
     senderBotPhone?: string;
 }): Promise<SendWaTextResult> {
     const recipient = normalizeWaPhone(params.to);
-    const activeBotPhone = normalizeWaPhone(params.senderBotPhone) || getOwnerWaPhone();
+    const activeBotPhone = normalizeWaPhone(params.senderBotPhone) || getBotWaPhone();
 
     if (!recipient) {
         return { ok: false, status: 400, errorMessage: 'Nomor tujuan tidak valid' };
@@ -310,5 +314,30 @@ export async function sendWhatsAppTextReply(params: {
     } finally {
         clearTimeout(timer);
     }
+}
+
+/**
+ * Mengirim notifikasi ringkas dari nomor bot ke nomor HP pribadi Mas Arzha (+62).
+ * Dipicu saat ada pesan pertama dari nomor baru atau saat konsultasi proyek mencapai tahap RAB.
+ */
+export async function notifyOwnerViaWhatsApp(params: {
+    phoneNumberId: string;
+    accessToken: string;
+    message: string;
+    senderBotPhone?: string;
+}): Promise<SendWaTextResult | null> {
+    const notifyEnabled = (process.env.WA_NOTIFY_OWNER || '').trim().toLowerCase() === 'true';
+    if (!notifyEnabled) return null;
+
+    const ownerPhone = getOwnerWaPhone();
+    if (!ownerPhone) return null;
+
+    return sendWhatsAppTextReply({
+        phoneNumberId: params.phoneNumberId,
+        accessToken: params.accessToken,
+        to: ownerPhone,
+        body: params.message,
+        senderBotPhone: params.senderBotPhone,
+    });
 }
 
