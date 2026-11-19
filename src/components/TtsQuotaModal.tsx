@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Loader2, ShieldAlert, RefreshCw, MessageSquare, Power, Plus, Trash2 } from 'lucide-react';
+import { X, Loader2, ShieldAlert, RefreshCw, MessageSquare, Power, Plus, Trash2, Maximize2, Minimize2 } from 'lucide-react';
 import { WaInboxTab } from './WaInboxTab';
 
 interface TierUsage {
@@ -128,6 +128,7 @@ const pct = (used: number, limit: number) => (limit > 0 ? Math.min(100, Math.rou
 export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
   const [pin, setPin] = useState('');
   const [activeTab, setActiveTab] = useState<'quota' | 'inbox'>('quota');
+  const [isExpanded, setIsExpanded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TtsUsageResponse | null>(null);
@@ -280,23 +281,38 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
       role="dialog"
       aria-modal="true"
       aria-label="Kuota & Usage"
-      className="fixed inset-0 z-[999] bg-black/70 flex items-center justify-center px-4"
+      className="fixed inset-0 z-[999] bg-black/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4"
       onClick={onClose}
     >
       <div
-        className={`bg-slate-900 border border-slate-800 rounded-xl p-5 w-full text-slate-200 shadow-xl max-h-[88vh] overflow-y-auto transition-all ${
-          activeTab === 'inbox' && data ? 'max-w-lg' : 'max-w-sm'
+        className={`bg-slate-900 border border-slate-800 rounded-xl text-slate-200 shadow-2xl transition-all duration-200 flex flex-col ${
+          isExpanded
+            ? 'w-[96vw] max-w-6xl h-[92vh] max-h-[92vh] p-4 md:p-5'
+            : `w-full ${activeTab === 'inbox' && data ? 'max-w-xl' : 'max-w-sm'} max-h-[88vh] p-5 overflow-y-auto`
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-3 shrink-0">
           <h2 className="text-sm font-bold flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-teal-400" />
             {data ? (activeTab === 'inbox' ? 'Inbox WhatsApp' : 'Kuota & Status') : 'Panel Kontrol Admin'}
           </h2>
-          <button onClick={onClose} aria-label="Tutup" className="text-slate-500 hover:text-white">
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-1">
+            {data && (
+              <button
+                type="button"
+                onClick={() => setIsExpanded((prev) => !prev)}
+                aria-label={isExpanded ? 'Perkecil modal' : 'Layar penuh (Fullscreen)'}
+                title={isExpanded ? 'Perkecil modal' : 'Layar penuh (Fullscreen)'}
+                className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition-colors"
+              >
+                {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+            )}
+            <button onClick={onClose} aria-label="Tutup" className="text-slate-400 hover:text-white p-1 rounded hover:bg-slate-800 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {!data ? (
@@ -320,9 +336,9 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
             </button>
           </form>
         ) : (
-          <div className="space-y-4">
+          <div className={`flex flex-col min-h-0 ${isExpanded ? 'flex-1' : 'space-y-4'}`}>
             {/* Tab Navigasi Admin */}
-            <div className="flex border-b border-slate-800 -mt-2 pb-1 text-xs">
+            <div className="flex border-b border-slate-800 pb-1 text-xs shrink-0 mb-3">
               <button
                 type="button"
                 onClick={() => setActiveTab('quota')}
@@ -336,7 +352,10 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
               </button>
               <button
                 type="button"
-                onClick={() => setActiveTab('inbox')}
+                onClick={() => {
+                  setActiveTab('inbox');
+                  setIsExpanded(true);
+                }}
                 className={`flex-1 py-1.5 font-semibold text-center border-b-2 transition-colors ${
                   activeTab === 'inbox'
                     ? 'border-emerald-400 text-emerald-300'
@@ -348,9 +367,11 @@ export const TtsQuotaModal: React.FC<TtsQuotaModalProps> = ({ onClose }) => {
             </div>
 
             {activeTab === 'inbox' ? (
-              <WaInboxTab pin={pin} />
+              <div className={`min-h-0 ${isExpanded ? 'flex-1 flex flex-col' : ''}`}>
+                <WaInboxTab pin={pin} isExpanded={isExpanded} />
+              </div>
             ) : (
-              <div className="space-y-4">
+              <div className={`space-y-4 ${isExpanded ? 'flex-1 overflow-y-auto pr-1' : ''}`}>
                 {(['chirp', 'wavenet'] as const).map((tier) => {
               const { used, limit } = data[tier];
               const percentage = pct(used, limit);

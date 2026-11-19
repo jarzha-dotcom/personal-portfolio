@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   MessageSquare,
   RefreshCw,
@@ -12,6 +12,9 @@ import {
   Clock,
   ArrowLeft,
   CheckCheck,
+  Search,
+  Sparkles,
+  Phone,
 } from 'lucide-react';
 
 interface WaInboxContact {
@@ -29,13 +32,15 @@ interface WaChatTurn {
 
 interface WaInboxTabProps {
   pin: string;
+  isExpanded?: boolean;
 }
 
-export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin }) => {
+export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false }) => {
   const [contacts, setContacts] = useState<WaInboxContact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
   const [selectedPhone, setSelectedPhone] = useState<string | null>(null);
   const [selectedContact, setSelectedContact] = useState<WaInboxContact | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [turns, setTurns] = useState<WaChatTurn[]>([]);
   const [paused, setPaused] = useState(false);
@@ -45,6 +50,8 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin }) => {
   const [sending, setSending] = useState(false);
   const [actionBusy, setActionBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const chatScrollRef = useRef<HTMLDivElement | null>(null);
 
   const fetchContacts = useCallback(async () => {
     if (!pin) return;
@@ -184,239 +191,390 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin }) => {
       : d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
   };
 
-  return (
-    <div className="space-y-3">
-      {/* Header Info */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          {selectedPhone && (
+  // Filter kontak berdasarkan search input
+  const filteredContacts = contacts.filter((c) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase().trim();
+    return (
+      (c.name && c.name.toLowerCase().includes(q)) ||
+      c.phone.toLowerCase().includes(q) ||
+      (c.lastMessage && c.lastMessage.toLowerCase().includes(q))
+    );
+  });
+
+  /* ----------------- SUB-KOMPONEN: DAFTAR KONTAK ----------------- */
+  const renderContactList = () => (
+    <div className="flex flex-col h-full min-h-0 bg-slate-900/40">
+      {/* Search & Actions */}
+      <div className="p-3 border-b border-slate-800 space-y-2 shrink-0">
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+            Percakapan ({filteredContacts.length})
+          </span>
+          <button
+            type="button"
+            onClick={fetchContacts}
+            disabled={loadingContacts}
+            className="text-slate-400 hover:text-white disabled:opacity-50 p-1 rounded hover:bg-slate-800 transition-colors"
+            title="Muat ulang kontak"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loadingContacts ? 'animate-spin' : ''}`} />
+          </button>
+        </div>
+
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Cari nomor, nama, atau isi chat..."
+            className="w-full bg-slate-950/80 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+          />
+        </div>
+      </div>
+
+      {/* List Scroll Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto p-2 space-y-1">
+        {loadingContacts && contacts.length === 0 && (
+          <div className="py-8 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> Memuat pesan...
+          </div>
+        )}
+
+        {!loadingContacts && filteredContacts.length === 0 && (
+          <div className="py-8 px-4 text-center text-xs text-slate-500">
+            {searchQuery ? (
+              <p>Tidak ada pesan yang cocok dengan &quot;{searchQuery}&quot;</p>
+            ) : (
+              <div className="space-y-1.5">
+                <MessageSquare className="w-7 h-7 text-slate-600 mx-auto opacity-50" />
+                <p className="font-medium text-slate-400">Belum ada chat masuk</p>
+                <p className="text-[11px] text-slate-500">
+                  Setiap pesan WhatsApp ke nomor bot akan muncul di sini.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {filteredContacts.map((c) => {
+          const isSelected = selectedPhone === c.phone;
+          const isOwner = c.phone === '6282312312734' || (c.name && c.name.includes('Pemilik'));
+
+          return (
+            <button
+              key={c.phone}
+              type="button"
+              onClick={() => {
+                setSelectedPhone(c.phone);
+                setSelectedContact(c);
+              }}
+              className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-start gap-2.5 ${
+                isSelected
+                  ? 'bg-emerald-950/40 border-emerald-500/50 shadow-sm'
+                  : c.unread
+                  ? 'bg-slate-950/80 border-emerald-500/30 hover:bg-slate-800/80'
+                  : 'bg-slate-950/40 border-slate-800/70 hover:bg-slate-800/50'
+              }`}
+            >
+              {/* Avatar Icon */}
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 mt-0.5 text-xs font-bold ${
+                  isOwner
+                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                    : 'bg-slate-800 text-slate-300 border border-slate-700'
+                }`}
+              >
+                {isOwner ? <Sparkles className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
+              </div>
+
+              {/* Detail Kontak */}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-1">
+                  <span
+                    className={`font-semibold text-xs truncate ${
+                      isSelected ? 'text-emerald-300' : 'text-slate-200'
+                    }`}
+                  >
+                    {c.name ? c.name : `+${c.phone}`}
+                  </span>
+                  <span className="text-[10px] text-slate-500 shrink-0">{fmtDate(c.lastAt)}</span>
+                </div>
+
+                <div className="flex items-center justify-between gap-1 mt-0.5">
+                  <p className="text-[11px] text-slate-400 truncate">
+                    {c.lastMessage || '(Pesan media)'}
+                  </p>
+                  {c.unread && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+                  )}
+                </div>
+
+                {isOwner && (
+                  <span className="inline-block mt-1 text-[9px] px-1.5 py-0.2 rounded bg-emerald-500/15 text-emerald-300 font-medium">
+                    Owner
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  /* ----------------- SUB-KOMPONEN: CHAT THREAD & COMPOSER ----------------- */
+  const renderChatThread = () => {
+    if (!selectedPhone) {
+      return (
+        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-500">
+          <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3 text-emerald-400">
+            <MessageSquare className="w-8 h-8 opacity-80" />
+          </div>
+          <h4 className="text-sm font-semibold text-slate-200 mb-1">WhatsApp Web Inbox</h4>
+          <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
+            Pilih salah satu percakapan di sebelah kiri untuk membaca transkrip lengkap dan membalas pesan klien secara langsung.
+          </p>
+          <div className="mt-4 flex items-center gap-1.5 text-[11px] text-emerald-400/90 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-full">
+            <Bot className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Zannah AI aktif melayani pertanyaan 24/7</span>
+          </div>
+        </div>
+      );
+    }
+
+    const isOwner =
+      selectedPhone === '6282312312734' || (selectedContact?.name && selectedContact.name.includes('Pemilik'));
+
+    return (
+      <div className="flex flex-col h-full min-h-0 bg-slate-950/60">
+        {/* Thread Header */}
+        <div className="p-3 border-b border-slate-800 bg-slate-900/60 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {/* Tombol Back di mobile */}
             <button
               type="button"
               onClick={() => {
                 setSelectedPhone(null);
                 setSelectedContact(null);
               }}
-              className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white"
-              title="Kembali ke daftar pesan"
+              className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white md:hidden"
+              title="Kembali ke kontak"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
-          )}
-          <h3 className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
-            {selectedPhone
-              ? `${selectedContact?.name || selectedPhone}`
-              : 'Inbox Percakapan WhatsApp'}
-          </h3>
-        </div>
-        <button
-          type="button"
-          onClick={() => (selectedPhone ? fetchThread(selectedPhone) : fetchContacts())}
-          disabled={loadingContacts || loadingThread}
-          className="text-slate-500 hover:text-white disabled:opacity-50 p-1"
-          title="Muat ulang"
-        >
-          <RefreshCw
-            className={`w-3.5 h-3.5 ${loadingContacts || loadingThread ? 'animate-spin' : ''}`}
-          />
-        </button>
-      </div>
 
-      {error && (
-        <div className="p-2 rounded bg-red-500/10 border border-red-500/30 text-xs text-red-400">
-          {error}
-        </div>
-      )}
-
-      {/* VIEW 1: DAFTAR CONTACTS / THREADS */}
-      {!selectedPhone && (
-        <div className="space-y-2">
-          {loadingContacts && contacts.length === 0 && (
-            <div className="py-8 text-center text-xs text-slate-500 flex items-center justify-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" /> Memuat daftar pesan...
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold ${
+                isOwner
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-slate-800 text-slate-300 border border-slate-700'
+              }`}
+            >
+              {isOwner ? <Sparkles className="w-3.5 h-3.5" /> : <User className="w-3.5 h-3.5" />}
             </div>
-          )}
 
-          {!loadingContacts && contacts.length === 0 && (
-            <div className="py-8 text-center text-xs text-slate-500 bg-slate-950/40 rounded-lg border border-slate-800/80">
-              <MessageSquare className="w-8 h-8 text-slate-600 mx-auto mb-2 opacity-50" />
-              <p className="font-medium text-slate-400">Belum ada pesan masuk di nomor virtual.</p>
-              <p className="text-[11px] text-slate-500 mt-1">
-                Setiap pesan masuk dari WhatsApp otomatis tercatat di sini secara real-time.
-              </p>
-            </div>
-          )}
-
-          <div className="max-h-[360px] overflow-y-auto space-y-1.5 pr-1">
-            {contacts.map((c) => (
-              <button
-                key={c.phone}
-                type="button"
-                onClick={() => {
-                  setSelectedPhone(c.phone);
-                  setSelectedContact(c);
-                }}
-                className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-start justify-between gap-3 ${
-                  c.unread
-                    ? 'bg-emerald-950/20 border-emerald-500/40 hover:bg-emerald-950/30'
-                    : 'bg-slate-900/60 border-slate-800 hover:bg-slate-800/60'
-                }`}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-xs text-slate-200 truncate">
-                      {c.name ? `${c.name} (+${c.phone})` : `+${c.phone}`}
-                    </span>
-                    {c.unread && (
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
-                    )}
-                  </div>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {c.lastMessage || '(Pesan media)'}
-                  </p>
-                </div>
-                <span className="text-[10px] text-slate-500 shrink-0 flex items-center gap-1 mt-0.5">
-                  <Clock className="w-2.5 h-2.5" />
-                  {fmtDate(c.lastAt)}
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xs text-slate-100 truncate">
+                  {selectedContact?.name || `+${selectedPhone}`}
                 </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* VIEW 2: TRANSKRIP & BALAS MANUAL */}
-      {selectedPhone && (
-        <div className="space-y-3">
-          {/* Status Bot & Takeover Toggle */}
-          <div className="flex items-center justify-between p-2 rounded bg-slate-950 border border-slate-800 text-[11px]">
-            <div className="flex items-center gap-1.5">
-              <Bot
-                className={`w-3.5 h-3.5 ${paused ? 'text-amber-400' : 'text-emerald-400'}`}
-              />
-              <span className="text-slate-300">
-                Bot AI:{' '}
-                <strong className={paused ? 'text-amber-400' : 'text-emerald-400'}>
-                  {paused ? 'Dijeda (Manual Mode)' : 'Aktif Membalas'}
-                </strong>
-              </span>
+                {isOwner ? (
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-300 font-semibold border border-emerald-500/30">
+                    Mas Arzha (Pemilik)
+                  </span>
+                ) : (
+                  <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-medium border border-slate-700">
+                    Tamu / Klien
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-1.5 text-[10px] text-slate-400">
+                <Phone className="w-2.5 h-2.5" />
+                <span>+{selectedPhone}</span>
+              </div>
             </div>
+          </div>
+
+          {/* Controls: Bot pause toggle & refresh thread */}
+          <div className="flex items-center gap-2 shrink-0">
             <button
               type="button"
               disabled={actionBusy}
               onClick={handleTogglePause}
-              className={`px-2 py-0.5 rounded text-[10px] font-semibold flex items-center gap-1 border transition-colors disabled:opacity-50 ${
+              className={`px-2 py-1 rounded text-[11px] font-semibold flex items-center gap-1 border transition-colors disabled:opacity-50 ${
                 paused
-                  ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/20'
-                  : 'bg-amber-500/10 text-amber-300 border-amber-500/30 hover:bg-amber-500/20'
+                  ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 hover:bg-emerald-500/25'
+                  : 'bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25'
               }`}
+              title={paused ? 'Aktifkan kembali bot AI untuk nomor ini' : 'Jeda bot agar bisa chat manual'}
             >
               {paused ? (
                 <>
-                  <PlayCircle className="w-3 h-3" /> Lanjutkan Bot
+                  <PlayCircle className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Lanjutkan Bot</span>
                 </>
               ) : (
                 <>
-                  <PauseCircle className="w-3 h-3" /> Jeda Bot
+                  <PauseCircle className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Jeda Bot</span>
                 </>
               )}
             </button>
+
+            <button
+              type="button"
+              onClick={() => fetchThread(selectedPhone)}
+              disabled={loadingThread}
+              className="text-slate-400 hover:text-white disabled:opacity-50 p-1.5 rounded hover:bg-slate-800 transition-colors"
+              title="Perbarui transkrip chat"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingThread ? 'animate-spin' : ''}`} />
+            </button>
           </div>
+        </div>
 
-          {/* Area Pesan Chat */}
-          <div className="h-[280px] overflow-y-auto space-y-2 p-2 rounded-lg bg-slate-950/70 border border-slate-800 text-xs flex flex-col-reverse">
-            {loadingThread && turns.length === 0 && (
-              <div className="m-auto text-slate-500 flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" /> Memuat riwayat chat...
-              </div>
-            )}
+        {/* Chat Messages Stream */}
+        <div
+          ref={chatScrollRef}
+          className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 flex flex-col-reverse text-xs"
+        >
+          {loadingThread && turns.length === 0 && (
+            <div className="m-auto text-slate-500 flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> Memuat riwayat chat...
+            </div>
+          )}
 
-            {!loadingThread && turns.length === 0 && (
-              <div className="m-auto text-slate-500 text-center">
-                Belum ada rekaman chat tersimpan untuk nomor ini.
-              </div>
-            )}
+          {!loadingThread && turns.length === 0 && (
+            <div className="m-auto text-slate-500 text-center py-6">
+              Belum ada percakapan tersimpan untuk nomor ini.
+            </div>
+          )}
 
-            {/* Render turns in chronological order */}
-            {[...turns].reverse().map((t, idx) => {
-              const isUser = t.role === 'user';
-              const text = t.parts?.[0]?.text || '';
-              const isArzhaManual = text.startsWith('[Mas Arzha]:');
-              const displayBody = isArzhaManual ? text.replace('[Mas Arzha]:', '').trim() : text;
+          {[...turns].reverse().map((t, idx) => {
+            const isUser = t.role === 'user';
+            const text = t.parts?.[0]?.text || '';
+            const isArzhaManual = text.startsWith('[Mas Arzha]:');
+            const displayBody = isArzhaManual ? text.replace('[Mas Arzha]:', '').trim() : text;
 
-              return (
-                <div
-                  key={idx}
-                  className={`flex flex-col ${isUser ? 'items-start' : 'items-end'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-lg p-2.5 leading-relaxed text-xs ${
-                      isUser
-                        ? 'bg-slate-900 border border-slate-700/80 text-slate-200'
-                        : isArzhaManual
-                        ? 'bg-teal-950/50 border border-teal-500/40 text-teal-100'
-                        : 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-100'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1 text-[10px] opacity-70 mb-1 font-semibold">
-                      {isUser ? (
-                        <>
-                          <User className="w-2.5 h-2.5" />
-                          <span>{selectedContact?.name || `+${selectedPhone}`}</span>
-                        </>
-                      ) : isArzhaManual ? (
-                        <>
-                          <UserCheck className="w-2.5 h-2.5 text-teal-300" />
-                          <span className="text-teal-300 font-bold">Mas Arzha (Manual)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Bot className="w-2.5 h-2.5 text-emerald-400" />
-                          <span className="text-emerald-400">Zannah AI</span>
-                        </>
-                      )}
-                    </div>
-                    <p className="whitespace-pre-wrap select-text">{displayBody}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Input Balasan Manual */}
-          <div className="space-y-1.5">
-            <div className="flex gap-2">
-              <textarea
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    handleSendReply();
-                  }
-                }}
-                placeholder="Tulis balasan manual sebagai Mas Arzha... (Ctrl+Enter kirim)"
-                rows={2}
-                disabled={sending}
-                className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none disabled:opacity-50"
-              />
-              <button
-                type="button"
-                onClick={handleSendReply}
-                disabled={sending || !replyText.trim()}
-                className="px-3 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors shrink-0"
+            return (
+              <div
+                key={idx}
+                className={`flex flex-col ${isUser ? 'items-start' : 'items-end'}`}
               >
-                {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                <span>Kirim</span>
-              </button>
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-slate-500">
-              <span className="flex items-center gap-1 text-emerald-400/80">
-                <CheckCheck className="w-3 h-3" /> Balasan dalam 24 jam gratis (Service Window)
-              </span>
-              <span>Bot dijeda otomatis saat Anda membalas</span>
-            </div>
+                <div
+                  className={`max-w-[85%] md:max-w-[75%] rounded-xl p-3 leading-relaxed shadow-sm ${
+                    isUser
+                      ? 'bg-slate-900 border border-slate-700/80 text-slate-200'
+                      : isArzhaManual
+                      ? 'bg-teal-950/70 border border-teal-500/50 text-teal-100'
+                      : 'bg-emerald-950/60 border border-emerald-500/40 text-emerald-100'
+                  }`}
+                >
+                  <div className="flex items-center gap-1.5 text-[10px] opacity-75 mb-1.5 font-semibold">
+                    {isUser ? (
+                      <>
+                        <User className="w-3 h-3 text-slate-300" />
+                        <span>{selectedContact?.name || `+${selectedPhone}`}</span>
+                      </>
+                    ) : isArzhaManual ? (
+                      <>
+                        <UserCheck className="w-3 h-3 text-teal-300" />
+                        <span className="text-teal-300 font-bold">Mas Arzha (Manual)</span>
+                      </>
+                    ) : (
+                      <>
+                        <Bot className="w-3 h-3 text-emerald-400" />
+                        <span className="text-emerald-400 font-bold">Zannah AI</span>
+                      </>
+                    )}
+                  </div>
+                  <p className="whitespace-pre-wrap select-text text-xs">{displayBody}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Chat Composer */}
+        <div className="p-3 border-t border-slate-800 bg-slate-900/60 space-y-2 shrink-0">
+          <div className="flex gap-2 items-end">
+            <textarea
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                  e.preventDefault();
+                  handleSendReply();
+                }
+              }}
+              placeholder="Tulis balasan manual sebagai Mas Arzha... (Ctrl+Enter untuk kirim)"
+              rows={2}
+              disabled={sending}
+              className="flex-1 bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none disabled:opacity-50"
+            />
+            <button
+              type="button"
+              onClick={handleSendReply}
+              disabled={sending || !replyText.trim()}
+              className="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors shrink-0 shadow-md"
+            >
+              {sending ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Send className="w-4 h-4" />
+              )}
+              <span>Kirim</span>
+            </button>
           </div>
+
+          <div className="flex items-center justify-between text-[10px] text-slate-500 px-1">
+            <span className="flex items-center gap-1 text-emerald-400/90 font-medium">
+              <CheckCheck className="w-3.5 h-3.5 text-emerald-400" /> Balasan dalam 24 jam gratis (Service Window)
+            </span>
+            <span>Bot otomatis dijeda saat Anda membalas</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* ----------------- RENDER UTAMA ----------------- */
+  return (
+    <div className="flex flex-col h-full min-h-0 space-y-2">
+      {error && (
+        <div className="p-2 rounded bg-red-500/10 border border-red-500/30 text-xs text-red-400 shrink-0">
+          {error}
+        </div>
+      )}
+
+      {/* JIKA MODE EXPANDED (FULLSCREEN / SPLIT 2-KOLOM ALA WA WEB) */}
+      {isExpanded ? (
+        <div className="flex-1 min-h-0 flex flex-col md:flex-row rounded-lg border border-slate-800 overflow-hidden bg-slate-950/40">
+          {/* Kolom Kiri: Daftar Kontak */}
+          <div
+            className={`w-full md:w-80 md:border-r border-slate-800 flex flex-col min-h-0 shrink-0 ${
+              selectedPhone ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            {renderContactList()}
+          </div>
+
+          {/* Kolom Kanan: Percakapan Aktif */}
+          <div
+            className={`flex-1 flex flex-col min-h-0 ${
+              !selectedPhone ? 'hidden md:flex' : 'flex'
+            }`}
+          >
+            {renderChatThread()}
+          </div>
+        </div>
+      ) : (
+        /* JIKA MODE STANDAR / COMPACT POPUP */
+        <div className="min-h-0">
+          {!selectedPhone ? renderContactList() : renderChatThread()}
         </div>
       )}
     </div>
