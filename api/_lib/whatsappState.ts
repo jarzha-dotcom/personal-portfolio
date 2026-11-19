@@ -75,6 +75,22 @@ export function normalizeWaPhone(raw: string | undefined | null): string {
     return digits;
 }
 
+export const DEFAULT_OWNER_PHONE = '6282312312734';
+export const DEFAULT_BOT_PHONE = '15557499583';
+
+export function getOwnerWaPhone(): string {
+    return normalizeWaPhone(process.env.WA_OWNER_PHONE || DEFAULT_OWNER_PHONE) || DEFAULT_OWNER_PHONE;
+}
+
+export function getBotWaPhone(): string {
+    return normalizeWaPhone(process.env.WA_DISPLAY_NUMBER || process.env.WA_BOT_PHONE) || DEFAULT_BOT_PHONE;
+}
+
+export function isOwnerPhone(phone: string | undefined | null): boolean {
+    if (!phone) return false;
+    return normalizeWaPhone(phone) === getOwnerWaPhone();
+}
+
 // ── Abstraksi Store (Upstash Redis + Fallback In-Memory untuk Test/Dev) ───────
 
 interface KvAdapter {
@@ -298,7 +314,7 @@ const redisAdapter: KvAdapter = {
     },
     async zrevrange(key, start, stop) {
         const redis = getUpstashClient();
-        const res = await redis.zrange<string[]>(key, stop, start, { rev: true });
+        const res = await redis.zrange<string[]>(key, start, stop, { rev: true });
         return res ?? [];
     },
 };
@@ -599,9 +615,11 @@ export async function upsertInboxContact(phone: string, name: string | undefined
     const norm = normalizeWaPhone(phone);
     if (!norm) return;
     const s = store();
+    const isOwner = norm === getOwnerWaPhone();
+    const displayName = isOwner ? 'Mas Arzha (Pemilik)' : (name || undefined);
     const meta: WaInboxContact = {
         phone: norm,
-        name: name || undefined,
+        name: displayName,
         lastMessage: lastMessage.slice(0, 200),
         lastAt: Date.now(),
         unread: true,

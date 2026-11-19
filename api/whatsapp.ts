@@ -60,6 +60,7 @@ import {
 } from './_lib/whatsappAi.js';
 import {
     downloadWhatsAppMediaAsBase64,
+    getBotWaPhone,
     getOwnerWaPhone,
     getWaGraphCredentials,
     markMessageReadAndTyping,
@@ -418,7 +419,7 @@ async function handleSingleInboundMessage(
     botDisplayPhone: string | undefined,
     hasBackgroundWaitUntil: boolean
 ): Promise<void> {
-    const activeBotPhone = normalizeWaPhone(botDisplayPhone) || getOwnerWaPhone();
+    const activeBotPhone = normalizeWaPhone(botDisplayPhone) || getBotWaPhone();
     const sender = normalizeWaPhone(msg.from);
 
     // 1. Cegah pesan dari grup, nomor tidak valid, atau nomor bot itu sendiri (anti-Error 131021)
@@ -434,12 +435,16 @@ async function handleSingleInboundMessage(
     // 2b. Catat ke inbox (sebelum filter, agar semua pengirim terlihat di inbox)
     upsertInboxContact(sender, senderName, bubble.text).catch(() => undefined);
 
+    const isOwner = sender === getOwnerWaPhone();
+
     // 3. Gerbang Filter Berlapis (SEBELUM menyentuh Vertex AI / Gemini)
     if (!(await isWaBotEnabled())) return;
-    if (await isPhoneSkipped(sender)) return;
-    if (shouldSkipSavedContacts() && (await isPhoneInSyncedContacts(sender))) return;
-    if (await isPhonePaused(sender)) return;
-    if (!(await checkSenderRateLimit(sender))) return;
+    if (!isOwner) {
+        if (await isPhoneSkipped(sender)) return;
+        if (shouldSkipSavedContacts() && (await isPhoneInSyncedContacts(sender))) return;
+        if (await isPhonePaused(sender)) return;
+        if (!(await checkSenderRateLimit(sender))) return;
+    }
 
     const aiConfig = getWaAiConfigStatus();
     const graphCreds = getWaGraphCredentials();
@@ -530,7 +535,7 @@ async function handleSingleInboundMessage(
         // 10. Panggil Vertex AI / Dedicated Gemini
         const aiResult = await generateWaAiReply(
             contents,
-            buildZannahWaSystemInstruction(effectiveSenderName)
+            buildZannahWaSystemInstruction(effectiveSenderName, sender)
         );
 
         if (!aiResult || !aiResult.reply) {

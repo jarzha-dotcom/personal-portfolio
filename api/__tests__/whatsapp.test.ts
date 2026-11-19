@@ -10,14 +10,18 @@ import { createHmac, generateKeyPairSync } from 'node:crypto';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
     getMetaRepliesUsed,
+    listInboxContacts,
     normalizeWaPhone,
     resetWaMemoryStoreForTests,
+    upsertInboxContact,
 } from '../_lib/whatsappState.js';
 import {
+    buildZannahWaSystemInstruction,
     formatForWhatsApp,
     parseOwnerSelfCommand,
 } from '../_lib/whatsappPrompt.js';
 import {
+    getBotWaPhone,
     notifyOwnerViaWhatsApp,
     sanitizeMediaMimeType,
     sendWhatsAppTextReply,
@@ -160,6 +164,33 @@ describe('Unit Utilitas WhatsApp Zannah AI', () => {
     it('membersihkan parameter codec pada MIME voice note WhatsApp agar diterima Vertex AI', () => {
         expect(sanitizeMediaMimeType('audio/ogg; codecs=opus')).toBe('audio/ogg');
         expect(sanitizeMediaMimeType('image/jpeg')).toBe('image/jpeg');
+    });
+
+    it('mengenali Mas Arzha secara autoritatif dari nomor telepon (+6282312312734) dan bukan dari nama profile', () => {
+        const ownerPrompt = buildZannahWaSystemInstruction('Arzha Testing', '0823-1231-2734');
+        expect(ownerPrompt).toContain('STATUS PENGIRIM: PEMILIK / BOS RESMI');
+        expect(ownerPrompt).toContain('MAS ARZHA SENDIRI');
+        expect(ownerPrompt).toContain('JANGAN PERNAH menawarkan jasa website');
+    });
+
+    it('menolak klaim penyamaran jika pengirim bernama Arzha tetapi nomornya bukan milik Mas Arzha', () => {
+        const imposterPrompt = buildZannahWaSystemInstruction('Arzha', '0812-9999-8888');
+        expect(imposterPrompt).toContain('BUKAN MAS ARZHA');
+        expect(imposterPrompt).toContain('ANTI-PENYAMARAN');
+        expect(imposterPrompt).toContain('DILARANG KERAS memberikan data rahasia');
+    });
+
+    it('mencatat thread pesan ke Inbox dan mengurutkannya dari yang terbaru', async () => {
+        await upsertInboxContact('0813-1111-2222', 'Budi Client', 'Halo Zannah');
+        await new Promise((r) => setTimeout(r, 20));
+        await upsertInboxContact('0823-1231-2734', 'Arzha', 'Tes inbox Zannah');
+
+        const inbox = await listInboxContacts();
+        expect(inbox.length).toBeGreaterThanOrEqual(2);
+        // Yang terakhir masuk (Arzha) harus berada di urutan teratas
+        expect(inbox[0].phone).toBe('6282312312734');
+        expect(inbox[0].name).toContain('Mas Arzha (Pemilik)');
+        expect(inbox[0].lastMessage).toBe('Tes inbox Zannah');
     });
 });
 
@@ -527,7 +558,7 @@ describe('Integrasi Webhook /api/whatsapp & Kontrol Admin', () => {
         const res = await sendWhatsAppTextReply({
             phoneNumberId: PHONE_ID,
             accessToken: ACCESS_TOKEN,
-            to: '0823-1231-2734',
+            to: getBotWaPhone(),
             body: 'Tes kirim ke diri sendiri',
         });
         expect(res.ok).toBe(false);

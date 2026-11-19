@@ -10,20 +10,26 @@
  */
 
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { normalizeWaPhone } from './whatsappState.js';
+import {
+    normalizeWaPhone,
+    DEFAULT_OWNER_PHONE,
+    DEFAULT_BOT_PHONE,
+    getOwnerWaPhone,
+    getBotWaPhone,
+    isOwnerPhone,
+} from './whatsappState.js';
 
 const GRAPH_API_VERSION = (process.env.WA_GRAPH_API_VERSION || 'v22.0').trim();
 const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
-const DEFAULT_OWNER_PHONE = '6282312312734';
 const MAX_MEDIA_BYTES = 4 * 1024 * 1024; // 4 MB aman untuk memori Vercel & kuota token
 
-export function getOwnerWaPhone(): string {
-    return normalizeWaPhone(process.env.WA_OWNER_PHONE || DEFAULT_OWNER_PHONE) || DEFAULT_OWNER_PHONE;
-}
-
-export function getBotWaPhone(): string {
-    return normalizeWaPhone(process.env.WA_DISPLAY_NUMBER || process.env.WA_BOT_PHONE) || getOwnerWaPhone();
-}
+export {
+    DEFAULT_OWNER_PHONE,
+    DEFAULT_BOT_PHONE,
+    getOwnerWaPhone,
+    getBotWaPhone,
+    isOwnerPhone,
+};
 
 function stripOuterQuotes(val: string): string {
     const t = val.trim();
