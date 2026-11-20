@@ -16,6 +16,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import {
     addSkipPhones,
     appendWaHistory,
+    appendWaTranscriptUserTurn,
     upsertInboxContact,
     checkSenderRateLimit,
     claimMessageDedup,
@@ -46,6 +47,7 @@ import {
     shouldSkipSavedContacts,
     syncPhoneContacts,
     type PendingBubble,
+    type WaMediaAttachment,
 } from './_lib/whatsappState.js';
 import {
     buildZannahWaSystemInstruction,
@@ -68,6 +70,12 @@ import {
     sendWhatsAppTextReply,
     verifyMetaWebhookSignature,
 } from './_lib/whatsappGraph.js';
+import { getGoogleDriveConfig } from './_lib/googleDrive.js';
+import {
+    buildMediaPreviewLabel,
+    getWaMediaMaxBytes,
+    processInboundMedia,
+} from './_lib/whatsappMedia.js';
 import {
     buildAgentDocumentAttachment,
     narrateOutcome,
@@ -208,6 +216,7 @@ interface MetaInboundMessage {
     text?: { body?: string };
     image?: { id?: string; mime_type?: string; caption?: string };
     audio?: { id?: string; mime_type?: string; voice?: boolean };
+    video?: { id?: string; mime_type?: string; caption?: string };
     document?: { id?: string; mime_type?: string; filename?: string; caption?: string };
     location?: { name?: string; address?: string; latitude?: number; longitude?: number };
     button?: { text?: string };
@@ -282,9 +291,24 @@ function extractBubbleFromInbound(msg: MetaInboundMessage, senderName?: string):
             timestamp,
             senderName,
             text: caption || '[Pengirim mengirimkan sebuah foto]',
+            caption: caption || undefined,
             mediaId: msg.image?.id,
             mediaMimeType: msg.image?.mime_type || 'image/jpeg',
             mediaKind: 'image',
+        };
+    }
+
+    if (type === 'video') {
+        const caption = (msg.video?.caption || '').trim();
+        return {
+            id,
+            timestamp,
+            senderName,
+            text: caption || '[Pengirim mengirimkan sebuah video]',
+            caption: caption || undefined,
+            mediaId: msg.video?.id,
+            mediaMimeType: msg.video?.mime_type || 'video/mp4',
+            mediaKind: 'video',
         };
     }
 
@@ -309,6 +333,7 @@ function extractBubbleFromInbound(msg: MetaInboundMessage, senderName?: string):
             timestamp,
             senderName,
             text: caption ? `[Lampiran dokumen: ${fname}] ${caption}` : `[Pengirim melampirkan dokumen: ${fname}]`,
+            caption: caption || undefined,
             mediaId: msg.document?.id,
             mediaMimeType: msg.document?.mime_type || 'application/pdf',
             mediaKind: 'document',
@@ -408,7 +433,98 @@ async function handleMessageEchoes(echoes: MetaMessageEcho[]): Promise<void> {
 
         // Skenario B: Mas Arzha membalas manual ke orang lain dari HP -> Auto-Pause 24 jam!
         await pausePhoneForHumanTakeover(to);
-        await clearPendingBubbles(to);
+        await recordIdleMediaBubbles(to, await drainPendingBubbles(to));
+    }
+}
+
+// ── Arsip Media Masuk ke Google Drive ─────────────────────────────────────────
+
+/** Catat bubble bermedia ke transkrip Inbox saja (bot tidak membalas, mis. di-pause). */
+async function recordIdleMediaBubbles(phone: string, bubbles: PendingBubble[]): Promise<void> {
+    for (const b of bubbles) {
+        if (!b.media) continue;
+        const label = b.caption || buildMediaPreviewLabel(b.media.type, b.media.fileName);
+        await appendWaTranscriptUserTurn(phone, label, [b.media]).catch(() => undefined);
+    }
+}
+
+/** Peringatan maksimal 1x/hari ke Mas Arzha bila refresh token Drive mati (`invalid_grant`). */
+async function notifyDriveAuthProblem(
+    phoneNumberId: string,
+    accessToken: string,
+    botDisplayPhone: string | undefined
+): Promise<void> {
+    const day = new Date().toISOString().slice(0, 10);
+    if (!(await claimMessageDedup(`drive_invalid_grant:${day}`))) return;
+    await notifyOwnerViaWhatsApp({
+        phoneNumberId,
+        accessToken,
+        message:
+            '⚠️ *[Zannah]* Akses Google Drive ditolak (refresh token mati/dicabut). ' +
+            'Lampiran klien belum bisa diarsipkan. Jalankan `npm run google:auth`, lalu perbarui GDRIVE_REFRESH_TOKEN di Vercel.',
+        senderBotPhone: botDisplayPhone,
+    }).catch((err) => console.warn('[whatsapp] Gagal kirim peringatan Drive ke owner:', err));
+}
+
+const MEDIA_KIND_LABEL: Record<string, string> = {
+    image: 'foto',
+    video: 'video',
+    audio: 'audio',
+    document: 'dokumen',
+};
+
+/**
+ * Unduh media bubble → arsip Drive. Mengubah `bubble` di tempat:
+ *   - sukses arsip  → `bubble.media` terisi
+ *   - file terlalu besar / tipe tak didukung → teks bubble diberi konteks agar Zannah menjawab sopan,
+ *     dan `mediaId` dikosongkan (tidak dikirim ke Gemini)
+ *   - galat lain (Drive mati, unduhan gagal) → pipeline Zannah tetap jalan seperti biasa
+ * Tidak pernah melempar galat.
+ */
+async function archiveInboundMedia(
+    bubble: PendingBubble,
+    sender: string,
+    accessToken: string,
+    phoneNumberId: string,
+    botDisplayPhone: string | undefined
+): Promise<void> {
+    if (!bubble.mediaId) return;
+    try {
+        const result = await processInboundMedia({
+            accessToken,
+            mediaId: bubble.mediaId,
+            senderPhone: sender,
+            mimeType: bubble.mediaMimeType,
+            fileName: bubble.filename,
+            caption: bubble.caption,
+        });
+
+        if (!result.ok) {
+            const kind = MEDIA_KIND_LABEL[bubble.mediaKind || 'document'] || 'berkas';
+            const suffix = bubble.caption ? ` ${bubble.caption}` : '';
+            if (result.reason === 'too_large') {
+                const maxMb = Math.round(getWaMediaMaxBytes() / (1024 * 1024));
+                bubble.text = `[Pengirim mengirimkan ${kind}, tetapi ukurannya melebihi batas penyimpanan ${maxMb} MB sehingga tidak tersimpan]${suffix}`;
+                bubble.mediaId = undefined;
+            } else if (result.reason === 'unsupported_type') {
+                bubble.text = `[Pengirim mengirimkan ${kind} dengan format yang tidak didukung, sehingga tidak tersimpan]${suffix}`;
+                bubble.mediaId = undefined;
+            } else {
+                console.warn('[whatsapp] Gagal mengunduh media untuk arsip:', result.reason, result.detail);
+            }
+            return;
+        }
+
+        if (result.attachment) {
+            bubble.media = result.attachment;
+            return;
+        }
+
+        if (result.driveErrorCode === 'invalid_grant') {
+            await notifyDriveAuthProblem(phoneNumberId, accessToken, botDisplayPhone);
+        }
+    } catch (err) {
+        console.warn('[whatsapp] Galat tak terduga saat arsip media:', err);
     }
 }
 
@@ -433,25 +549,44 @@ async function handleSingleInboundMessage(
     if (!isNewMessage) return;
 
     // 2b. Catat ke inbox (sebelum filter, agar semua pengirim terlihat di inbox)
-    upsertInboxContact(sender, senderName, bubble.text).catch(() => undefined);
+    const inboxPreview = bubble.mediaKind
+        ? bubble.caption || buildMediaPreviewLabel(bubble.mediaKind, bubble.filename)
+        : bubble.text;
+    upsertInboxContact(sender, senderName, inboxPreview).catch(() => undefined);
 
     const isOwner = sender === getOwnerWaPhone();
 
     // 3. Gerbang Filter Berlapis (SEBELUM menyentuh Vertex AI / Gemini)
-    if (!(await isWaBotEnabled())) return;
+    //    `botIdle` = bot tidak akan membalas (dimatikan / di-pause), tetapi lampiran tetap diarsipkan.
+    //    Nomor di Skip List & kontak tersimpan tidak pernah diarsipkan.
+    let botIdle = !(await isWaBotEnabled());
     if (!isOwner) {
         if (await isPhoneSkipped(sender)) return;
         if (shouldSkipSavedContacts() && (await isPhoneInSyncedContacts(sender))) return;
-        if (await isPhonePaused(sender)) return;
+        if (await isPhonePaused(sender)) botIdle = true;
+        if (botIdle && !bubble.mediaId) return;
         if (!(await checkSenderRateLimit(sender))) return;
+    } else if (botIdle && !bubble.mediaId) {
+        return;
     }
 
     const aiConfig = getWaAiConfigStatus();
     const graphCreds = getWaGraphCredentials();
     const phoneNumberId = graphCreds.phoneNumberId || phoneNumberIdFallback;
 
+    // 3b. Arsipkan lampiran ke Google Drive saat pesan diterima (hanya bila Drive sudah dikonfigurasi)
+    if (bubble.mediaId && graphCreds.accessToken && getGoogleDriveConfig().configured) {
+        await archiveInboundMedia(bubble, sender, graphCreds.accessToken, phoneNumberId, botDisplayPhone);
+    }
+
+    if (botIdle) {
+        await recordIdleMediaBubbles(sender, [bubble]);
+        return;
+    }
+
     if (!aiConfig.configured || !graphCreds.accessToken || !phoneNumberId) {
         console.warn('[whatsapp] Melewati balasan karena kredensial AI atau Graph API belum lengkap.');
+        await recordIdleMediaBubbles(sender, [bubble]);
         return;
     }
 
@@ -476,7 +611,7 @@ async function handleSingleInboundMessage(
         (await isPhonePaused(sender)) ||
         (await isPhoneSkipped(sender))
     ) {
-        await clearPendingBubbles(sender);
+        await recordIdleMediaBubbles(sender, await drainPendingBubbles(sender));
         return;
     }
 
@@ -506,7 +641,9 @@ async function handleSingleInboundMessage(
         const userParts: WaAiPart[] = [];
 
         if (aiConfig.privacySafeForMedia) {
-            const mediaBubbles = coalescedBubbles.filter((b) => Boolean(b.mediaId)).slice(0, 2);
+            const mediaBubbles = coalescedBubbles
+                .filter((b) => Boolean(b.mediaId) && b.mediaKind !== 'video')
+                .slice(0, 2);
             for (const mb of mediaBubbles) {
                 if (!mb.mediaId) continue;
                 const downloaded = await downloadWhatsAppMediaAsBase64(
@@ -608,7 +745,10 @@ async function handleSingleInboundMessage(
             state: 'sent',
             detail: `Terkirim ke Graph API (${aiResult.model})`,
         }).catch(() => undefined);
-        await appendWaHistory(sender, combinedText, formattedWaBody);
+        const archivedMedia = coalescedBubbles
+            .map((b) => b.media)
+            .filter((m): m is WaMediaAttachment => Boolean(m));
+        await appendWaHistory(sender, combinedText, formattedWaBody, archivedMedia);
 
         // 13. Notifikasi ke HP pribadi Mas Arzha (+62) jika ada lead baru atau permintaan RAB
         const ownerPhone = getOwnerWaPhone();

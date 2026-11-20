@@ -15,7 +15,19 @@ import {
   Search,
   Sparkles,
   Phone,
+  Paperclip,
+  X,
+  FileText,
 } from 'lucide-react';
+import {
+  prepareAttachment,
+  blobToBase64,
+  uploadToDriveSession,
+  formatBytes,
+  WA_SEND_ACCEPT,
+  type PreparedAttachment,
+} from '../lib/waAttachment';
+import { WaMediaBubble, stripMediaPlaceholder, type WaMediaAttachment } from './WaMediaBubble';
 
 interface WaInboxContact {
   phone: string;
@@ -28,6 +40,7 @@ interface WaInboxContact {
 interface WaChatTurn {
   role: 'user' | 'model';
   parts: { text: string }[];
+  media?: WaMediaAttachment[];
 }
 
 interface WaInboxTabProps {
@@ -52,6 +65,118 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
   const [error, setError] = useState<string | null>(null);
 
   const chatScrollRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [attachment, setAttachment] = useState<PreparedAttachment | null>(null);
+  const [attachmentPreview, setAttachmentPreview] = useState<string | null>(null);
+  const [preparing, setPreparing] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!attachment || !attachment.isImage) {
+      setAttachmentPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(attachment.blob);
+    setAttachmentPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [attachment]);
+
+  // Ganti thread → buang lampiran yang belum terkirim
+  useEffect(() => {
+    setAttachment(null);
+  }, [selectedPhone]);
+
+  const handlePickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setPreparing(true);
+    setError(null);
+    try {
+      setAttachment(await prepareAttachment(file));
+    } catch (err: any) {
+      setAttachment(null);
+      setError(err.message || 'Gagal menyiapkan lampiran');
+    } finally {
+      setPreparing(false);
+    }
+  };
+
+  const handleSendAttachment = async () => {
+    if (!selectedPhone || !attachment || sending) return;
+    const caption = replyText.trim();
+    if (caption && attachment.isAudio) {
+      setError('Pesan audio tidak mendukung caption. Hapus teks, atau kirim teks terpisah.');
+      return;
+    }
+    setSending(true);
+    setError(null);
+    try {
+      const authHeaders = { 'Content-Type': 'application/json', 'x-tts-usage-pin': pin };
+      const common = {
+        phone: selectedPhone,
+        fileName: attachment.fileName,
+        mimeType: attachment.mimeType,
+        caption: caption || undefined,
+      };
+      let payload: Record<string, unknown>;
+
+      if (attachment.viaDrive) {
+        // Berkas besar: minta sesi upload → unggah langsung ke Drive → server meneruskan ke WhatsApp
+        const prep = await fetch('/api/wa-inbox', {
+          method: 'POST',
+          headers: authHeaders,
+          body: JSON.stringify({ action: 'prepare_upload', ...common, sizeBytes: attachment.blob.size }),
+        });
+        const prepData = await prep.json().catch(() => ({}));
+        if (!prep.ok || !prepData.ok) {
+          throw new Error(prepData.error || `Gagal menyiapkan upload (HTTP ${prep.status})`);
+        }
+        setUploadProgress(0);
+        const driveFileId = await uploadToDriveSession(
+          prepData.sessionUrl,
+          attachment.blob,
+          attachment.mimeType,
+          setUploadProgress
+        );
+        setUploadProgress(1);
+        payload = { action: 'reply_media', ...common, driveFileId };
+      } else {
+        payload = { action: 'reply_media', ...common, dataBase64: await blobToBase64(attachment.blob) };
+      }
+
+      const res = await fetch('/api/wa-inbox', {
+        method: 'POST',
+        headers: authHeaders,
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || `Gagal mengirim lampiran (HTTP ${res.status})`);
+      }
+      const label = `[Lampiran: ${attachment.fileName}]`;
+      setTurns((prev) => [
+        ...prev,
+        {
+          role: 'model',
+          parts: [{ text: `[Mas Arzha]: ${data.attachment ? '' : label}${caption ? `\n${caption}` : ''}`.trimEnd() }],
+          media: data.attachment ? [data.attachment] : undefined,
+        },
+      ]);
+      if (!data.archived) {
+        setError('Lampiran terkirim ke klien, tetapi salinan Drive gagal disimpan' + (data.driveError ? `: ${data.driveError}` : '.'));
+      }
+      setPaused(true);
+      setAttachment(null);
+      setReplyText('');
+      fetchContacts();
+    } catch (err: any) {
+      setError(err.message || 'Gagal mengirim lampiran');
+    } finally {
+      setSending(false);
+      setUploadProgress(null);
+    }
+  };
 
   const fetchContacts = useCallback(async () => {
     if (!pin) return;
@@ -115,6 +240,7 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
   }, [selectedPhone, fetchThread]);
 
   const handleSendReply = async () => {
+    if (attachment) return handleSendAttachment();
     if (!selectedPhone || !replyText.trim() || sending) return;
     setSending(true);
     setError(null);
@@ -457,7 +583,10 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
             const isUser = t.role === 'user';
             const text = t.parts?.[0]?.text || '';
             const isArzhaManual = text.startsWith('[Mas Arzha]:');
-            const displayBody = isArzhaManual ? text.replace('[Mas Arzha]:', '').trim() : text;
+            const rawBody = isArzhaManual ? text.replace('[Mas Arzha]:', '').trim() : text;
+            const mediaList = t.media ?? [];
+            // Bila ada lampiran, sembunyikan teks placeholder otomatis ("[Pengirim mengirimkan sebuah foto]", dst.)
+            const displayBody = mediaList.length > 0 ? stripMediaPlaceholder(rawBody) : rawBody;
 
             return (
               <div
@@ -491,7 +620,16 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
                       </>
                     )}
                   </div>
-                  <p className="whitespace-pre-wrap select-text text-xs">{displayBody}</p>
+                  {mediaList.length > 0 && (
+                    <div className={`flex flex-col gap-2 ${displayBody ? 'mb-2' : ''}`}>
+                      {mediaList.map((m) => (
+                        <WaMediaBubble key={m.driveFileId} media={m} pin={pin} />
+                      ))}
+                    </div>
+                  )}
+                  {displayBody && (
+                    <p className="whitespace-pre-wrap select-text text-xs">{displayBody}</p>
+                  )}
                 </div>
               </div>
             );
@@ -500,7 +638,54 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
 
         {/* Chat Composer */}
         <div className="p-3 border-t border-slate-800 bg-slate-900/60 space-y-2 shrink-0">
+          {attachment && (
+            <div className="flex items-center gap-2 bg-slate-950 border border-slate-700/80 rounded-lg p-2 text-[11px] text-slate-300">
+              {attachmentPreview ? (
+                <img src={attachmentPreview} alt="" className="w-10 h-10 rounded object-cover shrink-0" />
+              ) : (
+                <FileText className="w-6 h-6 text-slate-400 shrink-0" />
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{attachment.fileName}</p>
+                <p className="text-slate-500">
+                  {formatBytes(attachment.blob.size)}
+                  {attachment.viaDrive && ' · lewat Drive'}
+                  {uploadProgress !== null && ` · ${Math.round(uploadProgress * 100)}%`}
+                </p>
+                {uploadProgress !== null && (
+                  <div className="mt-1 h-1 rounded bg-slate-800 overflow-hidden">
+                    <div className="h-full bg-emerald-500 transition-all" style={{ width: `${Math.round(uploadProgress * 100)}%` }} />
+                  </div>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttachment(null)}
+                disabled={sending}
+                className="p-1 rounded hover:bg-slate-800 text-slate-400 hover:text-white disabled:opacity-50"
+                title="Batalkan lampiran"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept={WA_SEND_ACCEPT}
+              onChange={handlePickFile}
+              className="hidden"
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={sending || preparing}
+              className="p-2.5 rounded-lg border border-slate-700/80 text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-50 transition-colors shrink-0"
+              title="Lampirkan berkas (maks 15 MB)"
+            >
+              {preparing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Paperclip className="w-4 h-4" />}
+            </button>
             <textarea
               value={replyText}
               onChange={(e) => setReplyText(e.target.value)}
@@ -510,7 +695,7 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
                   handleSendReply();
                 }
               }}
-              placeholder="Tulis balasan manual sebagai Mas Arzha... (Ctrl+Enter untuk kirim)"
+              placeholder={attachment ? 'Caption (opsional)... (Ctrl+Enter untuk kirim)' : 'Tulis balasan manual sebagai Mas Arzha... (Ctrl+Enter untuk kirim)'}
               rows={2}
               disabled={sending}
               className="flex-1 bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none disabled:opacity-50"
@@ -518,7 +703,7 @@ export const WaInboxTab: React.FC<WaInboxTabProps> = ({ pin, isExpanded = false 
             <button
               type="button"
               onClick={handleSendReply}
-              disabled={sending || !replyText.trim()}
+              disabled={sending || preparing || (!replyText.trim() && !attachment)}
               className="px-4 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs flex items-center justify-center gap-1.5 disabled:opacity-50 transition-colors shrink-0 shadow-md"
             >
               {sending ? (

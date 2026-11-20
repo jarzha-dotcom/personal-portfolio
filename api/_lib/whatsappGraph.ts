@@ -18,9 +18,10 @@ import {
     getBotWaPhone,
     isOwnerPhone,
 } from './whatsappState.js';
+import type { WaMediaKind } from './whatsappMedia.js';
 
 const GRAPH_API_VERSION = (process.env.WA_GRAPH_API_VERSION || 'v22.0').trim();
-const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
+export const GRAPH_BASE_URL = `https://graph.facebook.com/${GRAPH_API_VERSION}`;
 const MAX_MEDIA_BYTES = 4 * 1024 * 1024; // 4 MB aman untuk memori Vercel & kuota token
 
 export {
@@ -123,7 +124,7 @@ export async function markMessageReadAndTyping(
     }
 }
 
-function isAllowedMetaMediaHost(rawUrl: string): boolean {
+export function isAllowedMetaMediaHost(rawUrl: string): boolean {
     try {
         const parsed = new URL(rawUrl);
         if (parsed.protocol !== 'https:') return false;
@@ -311,6 +312,156 @@ export async function sendWhatsAppTextReply(params: {
             status: res.status,
             messageId: data.messages?.[0]?.id,
         };
+    } catch (err) {
+        return {
+            ok: false,
+            status: 500,
+            errorMessage: err instanceof Error ? err.message : String(err),
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+// ── Pengiriman Media Keluar (Fase 5) ──────────────────────────────────────────
+
+export interface UploadMetaMediaResult {
+    ok: boolean;
+    status: number;
+    mediaId?: string;
+    errorCode?: number;
+    errorMessage?: string;
+}
+
+/**
+ * Mengunggah berkas ke Meta (`POST /{phone_number_id}/media`) dan mengembalikan `media id`
+ * yang dipakai untuk mengirim pesan. Unggahan tidak dikenai biaya terpisah.
+ */
+export async function uploadMetaMedia(params: {
+    phoneNumberId: string;
+    accessToken: string;
+    buffer: Buffer;
+    mimeType: string;
+    fileName: string;
+}): Promise<UploadMetaMediaResult> {
+    if (!params.buffer.length) {
+        return { ok: false, status: 400, errorMessage: 'Berkas kosong' };
+    }
+
+    const form = new FormData();
+    form.append('messaging_product', 'whatsapp');
+    form.append('type', params.mimeType);
+    form.append(
+        'file',
+        new Blob([new Uint8Array(params.buffer)], { type: params.mimeType }),
+        params.fileName
+    );
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 25000);
+    try {
+        const res = await fetch(`${GRAPH_BASE_URL}/${encodeURIComponent(params.phoneNumberId)}/media`, {
+            method: 'POST',
+            headers: { Authorization: `Bearer ${params.accessToken}` },
+            signal: controller.signal,
+            body: form,
+        });
+        const data = (await res.json().catch(() => ({}))) as {
+            id?: string;
+            error?: { code?: number; message?: string };
+        };
+        if (!res.ok || !data.id) {
+            return {
+                ok: false,
+                status: res.status,
+                errorCode: data.error?.code,
+                errorMessage: data.error?.message || `HTTP ${res.status}`,
+            };
+        }
+        return { ok: true, status: res.status, mediaId: data.id };
+    } catch (err) {
+        return {
+            ok: false,
+            status: 500,
+            errorMessage: err instanceof Error ? err.message : String(err),
+        };
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+/**
+ * Mengirim pesan media (gambar / dokumen / video / audio) memakai `media id` hasil upload.
+ * Memakai penjaga anti-131021 yang sama dengan pesan teks. `caption` tidak berlaku untuk audio;
+ * `filename` hanya untuk dokumen.
+ */
+export async function sendWhatsAppMediaMessage(params: {
+    phoneNumberId: string;
+    accessToken: string;
+    to: string;
+    type: WaMediaKind;
+    mediaId: string;
+    caption?: string;
+    filename?: string;
+    senderBotPhone?: string;
+}): Promise<SendWaTextResult> {
+    const recipient = normalizeWaPhone(params.to);
+    const activeBotPhone = normalizeWaPhone(params.senderBotPhone) || getBotWaPhone();
+
+    if (!recipient) {
+        return { ok: false, status: 400, errorMessage: 'Nomor tujuan tidak valid' };
+    }
+    if (recipient === activeBotPhone) {
+        console.warn('[whatsappGraph] Diblokir oleh penjaga 131021: percobaan kirim media ke nomor pengirim sendiri.');
+        return {
+            ok: false,
+            status: 400,
+            errorCode: 131021,
+            errorMessage: 'Recipient cannot be sender (blocked by 131021 guard)',
+        };
+    }
+    if (!/^[A-Za-z0-9_.-]{4,128}$/.test(params.mediaId || '')) {
+        return { ok: false, status: 400, errorMessage: 'media id tidak valid' };
+    }
+
+    const mediaObject: Record<string, unknown> = { id: params.mediaId };
+    const caption = params.caption?.trim();
+    if (caption && params.type !== 'audio') mediaObject.caption = caption.slice(0, 1024);
+    if (params.type === 'document' && params.filename) mediaObject.filename = params.filename.slice(0, 240);
+
+    const payload = {
+        messaging_product: 'whatsapp',
+        recipient_type: 'individual',
+        to: recipient,
+        type: params.type,
+        [params.type]: mediaObject,
+    };
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    try {
+        const res = await fetch(`${GRAPH_BASE_URL}/${encodeURIComponent(params.phoneNumberId)}/messages`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${params.accessToken}`,
+                'Content-Type': 'application/json',
+            },
+            signal: controller.signal,
+            body: JSON.stringify(payload),
+        });
+        const data = (await res.json().catch(() => ({}))) as {
+            messages?: Array<{ id?: string }>;
+            error?: { code?: number; message?: string };
+        };
+        if (!res.ok) {
+            return {
+                ok: false,
+                status: res.status,
+                errorCode: data.error?.code,
+                errorMessage: data.error?.message || `HTTP ${res.status}`,
+            };
+        }
+        return { ok: true, status: res.status, messageId: data.messages?.[0]?.id };
     } catch (err) {
         return {
             ok: false,

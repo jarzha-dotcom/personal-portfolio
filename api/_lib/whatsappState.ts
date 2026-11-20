@@ -8,6 +8,10 @@
  */
 
 import { Redis } from '@upstash/redis';
+import type { WaMediaAttachment, WaMediaKind } from './whatsappMedia.js';
+
+// Tipe media didefinisikan di whatsappMedia.ts; di-re-export agar semua modul mengimpor dari sini.
+export type { WaMediaAttachment, WaMediaKind } from './whatsappMedia.js';
 
 export interface PendingBubble {
     id: string;
@@ -16,13 +20,19 @@ export interface PendingBubble {
     text: string;
     mediaId?: string;
     mediaMimeType?: string;
-    mediaKind?: 'image' | 'audio' | 'document';
+    mediaKind?: WaMediaKind;
     filename?: string;
+    /** Caption asli dari pengirim (tanpa teks placeholder). */
+    caption?: string;
+    /** Terisi bila lampiran berhasil diarsipkan ke Google Drive. */
+    media?: WaMediaAttachment;
 }
 
 export interface WaChatTurn {
     role: 'user' | 'model';
     parts: { text: string }[];
+    /** Lampiran yang diarsipkan di Drive (opsional, kompatibel mundur). */
+    media?: WaMediaAttachment[];
 }
 
 export interface WaLastDeliveryInfo {
@@ -643,6 +653,28 @@ export async function markInboxRead(phone: string): Promise<void> {
     } catch { /* ignore */ }
 }
 
+/** Jendela layanan Meta: pesan bebas hanya boleh dikirim ≤ 24 jam setelah pesan terakhir klien. */
+export const WA_SERVICE_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+/** `lastInboundAt` = unix ms pesan masuk terakhir. Margin 1 menit menghindari balapan di tepi jendela. */
+export function isWithinServiceWindow(lastInboundAt: number | undefined, now = Date.now()): boolean {
+    if (!lastInboundAt || !Number.isFinite(lastInboundAt)) return false;
+    return now - lastInboundAt < WA_SERVICE_WINDOW_MS - 60_000;
+}
+
+/** Metadata 1 thread Inbox (null bila tidak ada / sudah kedaluwarsa 7 hari). */
+export async function getInboxContact(phone: string): Promise<WaInboxContact | null> {
+    const norm = normalizeWaPhone(phone);
+    if (!norm) return null;
+    const raw = await store().getString(`wa:inbox:meta:${norm}`);
+    if (!raw) return null;
+    try {
+        return JSON.parse(raw) as WaInboxContact;
+    } catch {
+        return null;
+    }
+}
+
 /** Ambil semua thread inbox, diurutkan terbaru dulu (max 50) */
 export async function listInboxContacts(): Promise<WaInboxContact[]> {
     const s = store();
@@ -689,30 +721,76 @@ export async function getWaFullTranscript(phone: string): Promise<WaChatTurn[]> 
     }
 }
 
-export async function appendWaHistory(phone: string, userText: string, modelReply: string): Promise<void> {
+const MAX_MEDIA_PER_TURN = 10;
+
+function buildModelTurn(text: string, maxLen: number, media?: WaMediaAttachment[]): WaChatTurn {
+    const turn: WaChatTurn = { role: 'model', parts: [{ text: text.slice(0, maxLen) }] };
+    const attachments = (media ?? []).slice(0, MAX_MEDIA_PER_TURN);
+    if (attachments.length > 0) turn.media = attachments;
+    return turn;
+}
+
+function buildUserTurn(text: string, maxLen: number, media?: WaMediaAttachment[]): WaChatTurn | null {
+    const clipped = text ? text.slice(0, maxLen) : '';
+    const attachments = (media ?? []).slice(0, MAX_MEDIA_PER_TURN);
+    if (!clipped && attachments.length === 0) return null;
+    const turn: WaChatTurn = { role: 'user', parts: [{ text: clipped }] };
+    if (attachments.length > 0) turn.media = attachments;
+    return turn;
+}
+
+export async function appendWaHistory(
+    phone: string,
+    userText: string,
+    modelReply: string,
+    userMedia?: WaMediaAttachment[],
+    /** Lampiran pada giliran model (balasan manual Mas Arzha dengan berkas). */
+    modelMedia?: WaMediaAttachment[]
+): Promise<void> {
     const norm = normalizeWaPhone(phone);
     if (!norm) return;
     const s = store();
 
     const recent = await getWaHistory(norm);
-    if (userText) {
-        recent.push({ role: 'user', parts: [{ text: userText.slice(0, 2000) }] });
-    }
+    const recentUser = buildUserTurn(userText, 2000, userMedia);
+    if (recentUser) recent.push(recentUser);
     if (modelReply) {
-        recent.push({ role: 'model', parts: [{ text: modelReply.slice(0, 3000) }] });
+        recent.push(buildModelTurn(modelReply, 3000, modelMedia));
     }
     const trimmedRecent = recent.slice(-MAX_RECENT_TURNS);
     await s.setString(`wa:history:${norm}`, JSON.stringify(trimmedRecent), DAY_TTL_SEC);
 
     const full = await getWaFullTranscript(norm);
-    if (userText) {
-        full.push({ role: 'user', parts: [{ text: userText.slice(0, 3000) }] });
-    }
+    const fullUser = buildUserTurn(userText, 3000, userMedia);
+    if (fullUser) full.push(fullUser);
     if (modelReply) {
-        full.push({ role: 'model', parts: [{ text: modelReply.slice(0, 4000) }] });
+        full.push(buildModelTurn(modelReply, 4000, modelMedia));
     }
     const trimmedFull = full.slice(-MAX_TRANSCRIPT_TURNS);
     await s.setString(`wa:transcript:${norm}`, JSON.stringify(trimmedFull), DAY_TTL_SEC);
+}
+
+/**
+ * Mencatat giliran pengirim HANYA ke transkrip Inbox (bukan ke konteks AI).
+ * Dipakai untuk pesan bermedia saat bot tidak membalas (di-pause / dimatikan), agar lampiran
+ * tetap tampil di Inbox tanpa mengubah `isOngoing` atau konteks percakapan Zannah.
+ */
+export async function appendWaTranscriptUserTurn(
+    phone: string,
+    userText: string,
+    userMedia?: WaMediaAttachment[]
+): Promise<void> {
+    const norm = normalizeWaPhone(phone);
+    if (!norm) return;
+    const turn = buildUserTurn(userText, 3000, userMedia);
+    if (!turn) return;
+    const full = await getWaFullTranscript(norm);
+    full.push(turn);
+    await store().setString(
+        `wa:transcript:${norm}`,
+        JSON.stringify(full.slice(-MAX_TRANSCRIPT_TURNS)),
+        DAY_TTL_SEC
+    );
 }
 
 export async function clearWaHistory(phone: string): Promise<void> {

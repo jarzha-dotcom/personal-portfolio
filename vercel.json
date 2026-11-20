@@ -71,6 +71,12 @@
     "api/whatsapp.ts": {
       "maxDuration": 60
     },
+    "api/wa-media.ts": {
+      "maxDuration": 30
+    },
+    "api/wa-inbox.ts": {
+      "maxDuration": 60
+    },
     "api/tts.ts": {
       "maxDuration": 30
     },

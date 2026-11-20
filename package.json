@@ -11,6 +11,7 @@
     "upload:images": "tsx --env-file=.env.local scripts/upload-images.ts",
     "audio": "tsx --env-file=.env.local scripts/generate-article-audio.ts",
     "audio:upload": "tsx --env-file=.env.local scripts/generate-article-audio.ts --upload=blob",
+    "google:auth": "node --env-file=.env.local scripts/google-drive-auth.mjs",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
     "test": "vitest run",

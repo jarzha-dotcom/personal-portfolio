@@ -1,259 +1,241 @@
-# Rencana Implementasi: Integrasi Media WhatsApp & Google Drive Storage
+# Rencana Implementasi (Rev. 2): Integrasi Media WhatsApp & Arsip Google Drive
 
-Dokumen ini memuat arsitektur lengkap, panduan konfigurasi, struktur data, rincian file yang akan dibuat/diperbarui, serta langkah-langkah implementasi teknis untuk mengelola lampiran file (gambar, dokumen PDF, video, audio) percakapan WhatsApp menggunakan **Google Drive (Akun Khusus)** dan menampilkannya secara interaktif di **Inbox WhatsApp Web Portfolio**.
+Dokumen ini memuat arsitektur, konfigurasi, struktur data, daftar file, dan fase pelaksanaan untuk mengarsipkan lampiran WhatsApp (gambar, PDF/dokumen, video, audio) ke **Google Drive akun khusus**, lalu menampilkannya di **Inbox WhatsApp** portfolio.
+
+> **Status:** Fase 2–5b selesai (helper backend, webhook, proxy + bubble Inbox, kirim lampiran manual termasuk berkas besar via Drive). Fase 1 menunggu setup dari Mas Arzha. Fase 6 (test akhir & deploy) belum dikerjakan.
+
+## 0. Perubahan dari Rev. 1
+
+| # | Rev. 1 | Rev. 2 | Alasan |
+|:--|:--|:--|:--|
+| 1 | Autentikasi **Service Account** | **OAuth2 refresh token** milik Gmail khusus | Service Account tidak punya kuota storage di My Drive Gmail biasa; upload gagal dengan `Service Accounts do not have storage quota`. Solusi resmi (Shared Drive) butuh Workspace berbayar. |
+| 2 | Folder dibuat manual, ID disalin ke env | Folder **dibuat otomatis** (scope `drive.file`) dan dibagikan ke email pribadi | Scope `drive.file` hanya bisa mengakses file/folder buatan app sendiri. Setup user lebih singkat. |
+| 3 | Inbox menampilkan `thumbnailLink` / link Drive langsung | **Endpoint proxy** `api/wa-media.ts` ber-PIN | `thumbnailLink` berumur pendek dan `webViewLink` butuh login Google; `<img>` di Inbox tidak akan tampil. File klien juga tidak perlu dibuat publik. |
+| 4 | Unggah lampiran manual lewat `wa-inbox` | Dibatasi ±4 MB, atau upload langsung dari browser | Batas body request Vercel Function 4,5 MB. |
+| 5 | Pengiriman keluar via `mediaUrl` | Pengiriman keluar via **`media id`** hasil upload ke Meta | Link Drive bukan URL langsung yang bisa diambil Meta. |
+| 6 | "1.000 percakapan gratis, media tidak berbiaya" | Penjelasan biaya diperbarui (bagian 10) | Aturan harga WABA berubah per 1 Okt 2026. |
+| 7 | Batas aman 15 MB tanpa dasar | Batas dapat diatur `WA_MEDIA_MAX_MB` (default 15, maks 25); batas inline Gemini tetap 4 MB | Dua kebutuhan berbeda: arsip vs. analisis AI. |
+| 8 | Asumsi media belum diproses sama sekali | Menyesuaikan kode yang **sudah ada** (bagian 2) | Webhook sudah mengunduh media dan mengirimnya ke Gemini. |
 
 ---
 
-## 1. Ringkasan Eksekutif & Prinsip Arsitektur
+## 1. Prinsip Arsitektur
 
-### 1.1 Prinsip Zero Server Cost & Isolasi Data
-* **Serverless Backend (Vercel):** Tidak menggunakan server fisik 24/7. Seluruh pemrosesan berjalan on-demand.
-* **Storage Terpusat di Google Drive Khusus:**
-  * Menggunakan akun Google/Gmail baru yang terpisah (misal: `arzha.chatbot@gmail.com` atau sejenisnya).
-  * **Kapasitas 15 GB Utuh:** 100% kuota gratis digunakan khusus untuk menampung file klien tanpa mengganggu email atau Google Photos pribadi Mas Arzha.
-  * **Akses Mudah:** Folder media di akun baru tersebut cukup dibagikan (*shared*) ke akun email utama Mas Arzha (`jarzha@gmail.com`). Mas Arzha bisa membuka seluruh file klien langsung dari aplikasi Google Drive di smartphone.
-* **Penyimpanan Ringan di Vercel/Redis:**
-  * Vercel dan Redis **hanya menyimpan metadata JSON dan link Google Drive**.
-  * Tidak ada file biner (binary blob) yang membebani memori Redis.
+* **Serverless & zero server cost:** semua proses berjalan on-demand di Vercel Functions.
+* **Storage terpisah:** akun Gmail khusus (misal `arzha.chatbot@gmail.com`) dengan kuota 15 GB utuh, terpisah dari email dan Google Photos pribadi. Folder otomatis dibagikan sebagai Editor ke `jarzha@gmail.com` sehingga file klien bisa dibuka dari aplikasi Drive di HP.
+* **Redis hanya menyimpan metadata** (ID file Drive, nama, MIME, ukuran, caption). Tidak ada binary di Redis.
+* **Privasi:** file klien **tidak dibuat publik** ("anyone with the link"). Inbox mengaksesnya lewat proxy ber-PIN.
+* **Kegagalan Drive tidak boleh mematikan bot:** jika upload gagal, pipeline Zannah tetap berjalan; media hanya tidak diarsipkan.
+* **Tanpa dependensi baru:** Drive API dipanggil dengan `fetch` native.
 
 ---
 
-## 2. Arsitektur & Alur Kerja Sistem
+## 2. Kondisi Codebase Saat Ini (Temuan)
 
-### 2.1 Alur Pesan Masuk (Inbound Media dari Klien)
+Hasil membaca file yang dikirim:
+
+| Area | Kondisi sekarang | Dampak ke rencana |
+|:--|:--|:--|
+| Unduh media masuk | `downloadWhatsAppMediaAsBase64` di `whatsappGraph.ts`: batas 4 MB, timeout 10 dtk, keluaran base64 | Dipertahankan untuk Gemini. Arsip Drive memakai fungsi baru yang mengembalikan `Buffer`. |
+| Gemini multimodal | Sudah ada (`inlineData`), maks 2 media per giliran, **hanya jika `privacySafeForMedia`** (key berbayar / Vertex) | Fase 3 tidak perlu membangun multimodal dari nol. Arsip Drive **tidak bergantung** pada flag ini. |
+| Tipe pesan webhook | `image`, `audio`, `document` sudah diekstrak ke `PendingBubble` | `video` belum ditangani; ditambahkan di Fase 3. |
+| Dedup & burst | `claimMessageDedup`, jeda pintar (`WA_SMART_DELAY_MS=15000`), `maxDuration` 60 dtk untuk `api/whatsapp.ts` | Dedup sudah ada, tidak perlu dibuat. Proses arsip harus muat dalam 60 dtk. |
+| `WaChatTurn` | `parts: { text: string }[]`, tanpa media | Diperluas dengan `media?` (opsional, kompatibel mundur). |
+| `appendWaHistory` | Hanya menerima teks | Ditambah parameter lampiran. |
+| `wa-inbox.ts` | Hanya `reply` teks / `pause` / `resume`; `maxDuration` ditulis sebagai `export const` | Ditambah aksi lampiran. `maxDuration` yang efektif ada di `vercel.json`, bukan di export. |
+| Kuota Meta | `reserveMetaReplyQuota` dipakai bot, **tidak** dipakai balasan manual di `wa-inbox` | Balasan manual (termasuk lampiran) perlu ikut menghitung kuota (Fase 5). |
+| Dokumen keluar | AI membuat draf RAB via `buildAgentDocumentAttachment`, tetapi balasan ke WA tetap teks | Pengiriman dokumen via Meta belum ada; dibangun di Fase 5. |
+
+---
+
+## 3. Arsitektur & Alur Kerja
+
+### 3.1 Pesan Masuk (Klien → Drive → Inbox)
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant Klien as Klien (WhatsApp)
-    participant Meta as Meta WhatsApp Cloud API
-    participant Vercel as Webhook (/api/whatsapp)
-    participant Drive as Google Drive (Akun Baru)
-    participant Gemini as Zannah AI (Gemini Flash)
-    participant Redis as Redis (wa:history & inbox)
-    participant Admin as Inbox Web Mas Arzha
+    participant Meta as Meta Cloud API
+    participant Hook as Webhook /api/whatsapp
+    participant Drive as Google Drive (akun khusus)
+    participant Gemini as Zannah (Gemini)
+    participant Redis as Redis
+    participant Admin as Inbox Web (ber-PIN)
+    participant Proxy as /api/wa-media
 
-    Klien->>Meta: Kirim Foto / PDF Dokumen / Video
-    Meta->>Vercel: POST Webhook (type: image/document/video, media_id)
-    Vercel->>Meta: GET /v21.0/{media_id} (Ambil Download URL)
-    Meta-->>Vercel: URL Download Sementara (berlaku 5 menit)
-    Vercel->>Meta: Download Stream File Biner
-    Vercel->>Drive: Upload Stream ke Folder Khusus via Service Account
-    Drive-->>Vercel: Return fileId, webViewLink, webContentLink, thumbnailLink
-    
-    alt Jika tipe Gambar/PDF & AI Aktif
-        Vercel->>Gemini: Kirim Prompt + Buffer Media (Analisis Multimodal)
-        Gemini-->>Vercel: Respon Analisis Cerdas
-        Vercel->>Meta: Kirim Balasan AI ke WhatsApp Klien
+    Klien->>Meta: Kirim foto / PDF / video / audio
+    Meta->>Hook: POST webhook (media_id, mime, caption)
+    Hook->>Redis: Dedup wamid, simpan bubble (sudah ada)
+    Hook->>Meta: GET /{media_id} lalu unduh biner (<= WA_MEDIA_MAX_MB)
+    Hook->>Drive: Upload (OAuth refresh token) ke folder otomatis
+    Drive-->>Hook: fileId, viewLink
+    Hook->>Redis: Simpan metadata media + label pratinjau Inbox
+    opt Gambar/PDF/audio <= 4 MB dan privacySafeForMedia
+        Hook->>Gemini: Prompt + inlineData
+        Gemini-->>Hook: Balasan
+        Hook->>Meta: Kirim balasan teks
     end
-
-    Vercel->>Redis: Simpan Transkrip + Metadata Google Drive
-    Admin->>Vercel: Buka Inbox WhatsApp
-    Vercel-->>Admin: Render Bubble Chat (Thumbnail Foto / Kartu File PDF)
+    Admin->>Proxy: GET /api/wa-media?id=fileId (header PIN)
+    Proxy->>Drive: Stream konten (dukung Range)
+    Proxy-->>Admin: Gambar / PDF / video
 ```
 
-### 2.2 Alur Balasan Manual dengan Lampiran (Outbound Media Mas Arzha)
-1. Mas Arzha membuka percakapan klien di modal Inbox.
-2. Klik ikon **Lampiran (📎)** dan pilih file PDF penawaran/RAB atau foto dari laptop.
-3. Frontend mengunggah file ke endpoint `/api/wa-inbox?action=upload_media`.
-4. Backend menyimpan file ke folder Google Drive dan mengunggahnya ke Meta Graph API `/v21.0/{phone_number_id}/media`.
-5. Meta mengirimkan pesan dokumen/gambar tersebut langsung ke WhatsApp klien.
-6. Percakapan diperbarui di Inbox dengan tanda `Mas Arzha (Manual)` beserta tautan Google Drive.
+**Keputusan penempatan (dikonfirmasi saat Fase 3 setelah membaca `handleSingleInboundMessage`):** arsip dilakukan **saat pesan diterima**, bukan setelah jeda 15 dtk dan panggilan AI. Alasannya: (a) file tetap terarsip walau bot sedang di-pause/skip karena Mas Arzha mengambil alih, (b) Inbox langsung menampilkan lampiran, (c) kegagalan AI tidak menghilangkan file. Konsekuensinya: Gemini mengunduh ulang dari Meta (media_id berlaku jauh lebih lama dari URL unduhannya) atau memakai buffer yang sama bila masih dalam satu invokasi.
+
+### 3.2 Balasan Manual dengan Lampiran (Mas Arzha → Klien)
+
+1. Mas Arzha memilih file lewat ikon 📎 di composer Inbox.
+2. Frontend mengirim file ke `/api/wa-inbox` (aksi `reply_media`), maksimal **3 MB** mentah (base64 dalam JSON harus muat di batas body Vercel 4,5 MB; foto dikompres otomatis di browser). File lebih besar: Fase 5b (upload langsung ke Drive via resumable session).
+3. Backend memeriksa **jendela 24 jam** (pesan klien terakhir). Di luar jendela, Meta menolak pesan bebas; UI menampilkan pesan error jelas.
+4. Backend: upload ke Meta `POST /{phone_number_id}/media` → dapat `media id` → kirim pesan `document`/`image` memakai `media id`.
+5. Salinan file diarsipkan ke Drive, riwayat Inbox ditandai `[Mas Arzha]` beserta metadata lampiran, bot di-pause 2 jam (perilaku yang sudah ada).
+6. Kuota pesan keluar bulanan dihitung (`reserveMetaReplyQuota`) dan dikembalikan jika gagal.
 
 ---
 
-## 3. Struktur Data & Metadata Lampiran
+## 4. Struktur Data
 
-Di Upstash Redis, pesan media dicatat dalam format `WaChatTurn` dengan metadata terstruktur:
+Didefinisikan di `api/_lib/whatsappMedia.ts` (Fase 2). Pada Fase 3 tipe ini di-*re-export* dari `whatsappState.ts` agar semua modul mengimpor dari satu tempat.
 
 ```typescript
+export type WaMediaKind = 'image' | 'document' | 'video' | 'audio';
+
 export interface WaMediaAttachment {
-  type: 'image' | 'document' | 'video' | 'audio';
+  type: WaMediaKind;
   driveFileId: string;
-  driveViewLink: string;       // Link untuk membuka di Google Drive
-  driveThumbnailLink?: string;  // Link thumbnail untuk gambar
-  fileName?: string;           // Contoh: "RAB_Aplikasi_V1.pdf"
-  mimeType: string;            // Contoh: "application/pdf", "image/jpeg"
+  driveViewLink: string;        // untuk "Buka di Drive" (butuh login Google)
+  driveThumbnailLink?: string;  // sementara; Inbox memakai proxy, bukan link ini
+  fileName?: string;            // nama asli, mis. "RAB_Aplikasi_V1.pdf"
+  mimeType: string;
   fileSizeBytes?: number;
-  caption?: string;            // Keterangan teks dari pengirim
+  caption?: string;
 }
 
+// Fase 3: perluasan kompatibel mundur
 export interface WaChatTurn {
   role: 'user' | 'model';
-  parts: {
-    text: string;
-    media?: WaMediaAttachment;
-  }[];
-  timestamp?: number;
+  parts: { text: string }[];
+  media?: WaMediaAttachment[];  // baru, opsional
 }
 ```
 
+Catatan:
+* Metadata media mengikuti TTL Redis yang sudah ada untuk riwayat/Inbox. File di Drive tetap ada setelah metadata kedaluwarsa. Karena nama file Drive memuat tanggal & nomor, file masih mudah dicari manual.
+* Nama file di Drive: `YYYY-MM-DD_HHmm_<nomor>_<nama asli>` (jam WIB), mis. `2026-11-21_0030_628123456789_Spesifikasi.pdf`.
+* Transkrip dibatasi 30 giliran; metadata kecil sehingga tidak membebani Redis.
+
 ---
 
-## 4. Panduan Konfigurasi Akun Google & Service Account (Step-by-Step)
+## 5. Setup Google (Satu Kali, ±15 Menit)
 
-Mas Arzha hanya perlu melakukan setup ini satu kali:
+### Langkah 1 — Akun & Google Cloud
+1. Buat akun Gmail khusus (misal `arzha.chatbot@gmail.com`).
+2. Buka [Google Cloud Console](https://console.cloud.google.com) (project baru atau yang sudah ada) → aktifkan **Google Drive API**.
+3. **OAuth consent screen**: pilih *External*, isi nama app, tambahkan akun khusus sebagai *Test user*, lalu ubah status ke **In production**. Jika dibiarkan *Testing*, refresh token **kedaluwarsa tiap 7 hari**. Scope `drive.file` tidak memerlukan verifikasi Google untuk pemakaian pribadi (akan muncul layar "app belum diverifikasi" saat login; pilih *Advanced → Continue*).
+4. **Credentials → Create credentials → OAuth client ID → Desktop app.** Salin Client ID dan Client Secret.
 
-### Langkah 1: Siapkan Akun Google Baru & Folder Drive
-1. Buat akun Google baru (misal: `arzha.chatbot@gmail.com`).
-2. Buka [Google Drive](https://drive.google.com).
-3. Buat sebuah folder baru bernama: `WhatsApp-Bot-Media`.
-4. Buka folder tersebut, lalu perhatikan URL di browser:
-   `https://drive.google.com/drive/folders/1A2b3C4d5E6F7G8H9I...`
-   *Salin kode acak setelah `/folders/`* → Ini adalah **`GOOGLE_DRIVE_FOLDER_ID`**.
-5. Klik kanan folder `WhatsApp-Bot-Media` → **Bagikan (Share)**:
-   * Masukkan email utama Mas Arzha (`jarzha@gmail.com`) sebagai **Editor** (agar bisa akses dari HP kapan saja).
+### Langkah 2 — Ambil Refresh Token
+1. Isi `GDRIVE_CLIENT_ID` dan `GDRIVE_CLIENT_SECRET` di `.env.local`.
+2. Jalankan `npm run google:auth`, buka URL yang tercetak, login dengan **akun Gmail khusus**, izinkan akses.
+3. Terminal mencetak akun yang terhubung, sisa kuota, dan baris `GDRIVE_REFRESH_TOKEN="..."`.
+4. Jika Google tidak mengembalikan refresh token (akses pernah diberikan sebelumnya), cabut akses di <https://myaccount.google.com/permissions> lalu ulangi.
 
-### Langkah 2: Buat Service Account di Google Cloud Console
-1. Buka [Google Cloud Console](https://console.cloud.google.com) (bisa menggunakan project yang sudah ada atau buat project baru).
-2. Di menu pencarian atas, cari **Google Drive API** → Klik **Enable (Aktifkan)**.
-3. Masuk ke menu **IAM & Admin** → **Service Accounts** → Klik **Create Service Account**:
-   * Nama: `wa-drive-storage`
-   * Klik **Create and Continue**, lalu **Done**.
-4. Di daftar Service Account, salin alamat email robot yang baru dibuat:
-   Contoh: `wa-drive-storage@project-id.iam.gserviceaccount.com`.
-5. Klik Service Account tersebut → Tab **Keys** → **Add Key** → **Create new key** → Pilih **JSON** → Download file JSON-nya ke komputer.
+### Langkah 3 — Environment Variable (Vercel & `.env.local`)
 
-### Langkah 3: Bagikan Folder Drive ke Email Service Account
-1. Buka kembali folder `WhatsApp-Bot-Media` di Google Drive.
-2. Klik kanan folder → **Bagikan (Share)**.
-3. Masukkan email Service Account tadi (`wa-drive-storage@...`) dengan akses **Editor**.
-4. Hapus centang *Notify people*, lalu klik **Share**.
-
-### Langkah 4: Daftarkan Environment Variable di Vercel / `.env.local`
-Dari file JSON Service Account yang di-download, ambil 3 informasi penting:
 ```env
-GOOGLE_DRIVE_FOLDER_ID="1A2b3C4d5E6F7G8H9I..."
-GOOGLE_SERVICE_ACCOUNT_EMAIL="wa-drive-storage@project-id.iam.gserviceaccount.com"
-GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQD..."
+GDRIVE_CLIENT_ID=""
+GDRIVE_CLIENT_SECRET=""
+GDRIVE_REFRESH_TOKEN=""
+GDRIVE_FOLDER_NAME="WhatsApp-Bot-Media"   # opsional
+GDRIVE_SHARE_EMAIL="jarzha@gmail.com"     # folder otomatis dibagikan sebagai Editor
+GDRIVE_FOLDER_ID=""                       # opsional, kosongkan kecuali folder dibuat oleh client OAuth yang sama
+WA_MEDIA_MAX_MB="15"                      # opsional (1–25)
 ```
 
----
-
-## 5. Matriks & Daftar Lengkap File yang Dibuat / Diperbarui
-
-Berikut adalah pemetaan menyeluruh file-file di codebase yang terdampak:
-
-| No | File Path | Status | Lapisan | Deskripsi & Peran Perubahan |
-|:---|:---|:---:|:---:|:---|
-| 1 | `api/_lib/googleDrive.ts` | **BARU** | Backend (Lib) | Client Google Drive API v3: autentikasi JWT service account, upload buffer/stream ke folder Drive, set permission link viewing, dan generate view/thumbnail URL. |
-| 2 | `api/_lib/whatsappMedia.ts` | **BARU** | Backend (Lib) | Handler media Meta Graph API: mengambil temporary download URL dari `media_id`, mengunduh binary stream dari Meta, memvalidasi mime-type/ukuran, dan meneruskan ke `googleDrive.ts`. |
-| 3 | `api/whatsapp.ts` | **UPDATE** | Backend (API) | Webhook WhatsApp: menangani payload `type: image/document/video/audio`, memanggil handler media Drive, meneruskan buffer gambar ke Gemini Flash Multimodal, dan mencatat metadata file ke Inbox. |
-| 4 | `api/_lib/whatsappState.ts` | **UPDATE** | Backend (State) | Penyesuaian skema `WaChatTurn` & `WaInboxContact` untuk menampung field `media?: WaMediaAttachment`, serta update helper `appendWaHistory` dan `upsertInboxContact`. |
-| 5 | `api/_lib/whatsappGraph.ts` | **UPDATE** | Backend (API) | Menambahkan fungsi helper `sendWhatsAppMediaReply` atau `uploadMetaMedia` agar Mas Arzha bisa mengirim file/dokumen (outbound) ke WhatsApp klien. |
-| 6 | `api/wa-inbox.ts` | **UPDATE** | Backend (API) | Menambahkan action handler untuk pengiriman lampiran manual oleh Mas Arzha (`action: 'reply'` dengan media, atau endpoint upload media) dan mengembalikan URL Drive ke frontend. |
-| 7 | `src/components/WaInboxTab.tsx` | **UPDATE** | Frontend (UI) | Menambahkan rendering bubble media di chat stream (thumbnail foto dengan modal preview/zoom, kartu dokumen PDF dengan icon & tombol download, video player/link), serta tombol 📎 (lampirkan file) di composer balasan. |
-| 8 | `api/__tests__/whatsapp.test.ts` | **UPDATE** | Unit Testing | Menambahkan skenario test pengujian: validasi webhook menerima gambar/dokumen, mocking Google Drive upload, verifikasi struktur metadata tersimpan di state, dan memastikan 17 test lama tetap hijau. |
-| 9 | `.env.local` / `.env.example` | **UPDATE** | Config | Menambahkan dokumentasi variabel environment baru (`GOOGLE_DRIVE_FOLDER_ID`, `GOOGLE_SERVICE_ACCOUNT_EMAIL`, `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY`). |
+Folder `WhatsApp-Bot-Media` dibuat otomatis pada upload pertama. Setelah itu muncul di bagian *Shared with me* pada akun `jarzha@gmail.com` (tidak ada email notifikasi). Tambahkan pintasan ke My Drive jika ingin lebih mudah diakses.
 
 ---
 
-### Penjelasan Rinci Per File:
+## 6. Matriks File
 
-#### 1. `api/_lib/googleDrive.ts` (FILE BARU)
-* **Fungsi Utama:**
-  * Menggunakan token autentikasi Service Account (Google OAuth2 via JWT) tanpa perlu library `@googleapis/drive` yang berat (menjaga bundle size Vercel function tetap ramping dengan native `fetch` ke endpoint REST `https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart`).
-  * Mengekspor fungsi:
-    * `uploadFileToDrive({ buffer, fileName, mimeType, folderId })`: Mengunggah file biner ke folder Google Drive akun baru.
-    * `getFileMetadata(fileId)`: Mengambil `webViewLink`, `webContentLink`, dan `thumbnailLink`.
-
-#### 2. `api/_lib/whatsappMedia.ts` (FILE BARU)
-* **Fungsi Utama:**
-  * Jembatan antara server Meta WhatsApp dengan Google Drive.
-  * Mengekspor fungsi:
-    * `downloadMetaMedia(mediaId: string)`: Memanggil `GET https://graph.facebook.com/v21.0/{media_id}` dengan header `Bearer WA_ACCESS_TOKEN`, kemudian mengunduh stream file dari URL sementara Meta.
-    * `processInboundMedia(mediaPayload)`: Otomatis mengunduh dari Meta -> upload ke Google Drive -> mengembalikan objek `WaMediaAttachment`.
-
-#### 3. `api/whatsapp.ts` (DI-UPDATE)
-* **Perubahan Logika:**
-  * Saat ini webhook hanya mengekstrak `message.text?.body`.
-  * Ditambahkan ekstraksi:
-    * `message.type === 'image'` -> ambil `message.image.id`, `caption`, `mime_type`.
-    * `message.type === 'document'` -> ambil `message.document.id`, `filename`, `caption`, `mime_type`.
-    * `message.type === 'video'` -> ambil `message.video.id`, `caption`, `mime_type`.
-    * `message.type === 'audio'` -> ambil `message.audio.id`, `mime_type`.
-  * **Multimodal Gemini Flash:** Jika file adalah gambar (`image/jpeg`, `image/png`), buffer gambar di-encode base64 dan diteruskan ke Vertex AI / Gemini API bersama prompt percakapan Zannah. Zannah dapat memahami gambar yang dikirim (misal: "Wah di screenshot ini tombol daftarnya tidak merespon ya Mas?").
-
-#### 4. `api/_lib/whatsappState.ts` (DI-UPDATE)
-* **Perubahan Skema:**
-  * Mendefinisikan tipe `WaMediaAttachment`.
-  * Memperbarui penyimpanan Redis: Jika pesan memiliki lampiran, transkrip tidak hanya mencatat `text`, tetapi juga metadata media.
-  * Preview kontak di inbox (`lastMessage`) disesuaikan: Jika tidak ada teks caption, otomatis menampilkan `[📷 Foto]`, `[📄 Dokumen: namafile.pdf]`, atau `[🎥 Video]`.
-
-#### 5. `api/_lib/whatsappGraph.ts` (DI-UPDATE)
-* **Fungsi Baru:**
-  * `sendWhatsAppMediaMessage({ to, type, mediaUrl, caption, filename })`: Mengirim pesan berupa dokumen (PDF/Word) atau gambar ke WhatsApp klien menggunakan Meta Cloud API `messages` endpoint dengan parameter `document` atau `image`.
-
-#### 6. `api/wa-inbox.ts` (DI-UPDATE)
-* **Endpoint Baru/Tambahan:**
-  * Mendukung payload multipart / base64 saat Mas Arzha mengirim file balasan dari modal Inbox.
-  * Menyimpan file kiriman Mas Arzha ke Google Drive, lalu memanggil `sendWhatsAppMediaMessage` ke nomor klien.
-
-#### 7. `src/components/WaInboxTab.tsx` (DI-UPDATE)
-* **Peningkatan Komponen Tampilan:**
-  * **Image Card:** Menampilkan thumbnail gambar langsung di dalam bubble chat. Saat diklik, muncul modal preview besar (lightbox) atau tautan buka di Google Drive.
-  * **Document Card:** Kotak file dengan ikon dokumen (merah untuk PDF, biru untuk Word/Excel), nama file, ukuran file, dan tombol "Lihat Dokumen di Google Drive".
-  * **Composer Attachment:** Menambahkan tombol 📎 di samping input chat manual untuk memilih file dari komputer Mas Arzha, dengan progress loading saat upload.
-
-#### 8. `api/__tests__/whatsapp.test.ts` (DI-UPDATE)
-* **Penambahan Test Case:**
-  * Test simulasi webhook menerima pesan foto dengan caption.
-  * Test simulasi webhook menerima dokumen PDF.
-  * Test mocking upload ke Google Drive menghasilkan link yang benar di transkrip chat.
-  * Memastikan seluruh 17 unit test yang sudah ada tetap 100% lulus.
+| No | File | Status | Fase | Peran |
+|:--|:--|:--:|:--:|:--|
+| 1 | `api/_lib/googleDrive.ts` | **BARU ✅** | 2 | Klien Drive v3: OAuth refresh token, folder otomatis + berbagi, upload multipart, metadata, stream konten (Range). |
+| 2 | `api/_lib/whatsappMedia.ts` | **BARU ✅** | 2 | Unduh media Meta sebagai Buffer (whitelist MIME, validasi host & ukuran), arsip ke Drive, nama file aman, label pratinjau. |
+| 3 | `api/_lib/whatsappGraph.ts` | **UPDATE ✅ (minor)** | 2 | Hanya `export` untuk `GRAPH_BASE_URL` dan `isAllowedMetaMediaHost`. Fungsi kirim media menyusul di Fase 5. |
+| 4 | `scripts/google-drive-auth.mjs` | **BARU ✅** | 1/2 | Mengambil refresh token sekali jalan. |
+| 5 | `package.json` | **UPDATE ✅** | 2 | Script `google:auth`. Tanpa dependensi baru. |
+| 6 | `.env.example` | **UPDATE ✅** | 2 | Variabel `GDRIVE_*` dan `WA_MEDIA_MAX_MB`. |
+| 7 | `api/__tests__/googleDrive.test.ts` | **BARU ✅** | 2 | 13 test (token, folder, upload, metadata). |
+| 8 | `api/__tests__/whatsappMedia.test.ts` | **BARU ✅** | 2 | 17 test (unduh, whitelist, batas ukuran, arsip, toleransi gagal). |
+| 9 | `api/whatsapp.ts` | UPDATE | 3 | Tangani `video`; panggil `processInboundMedia` saat pesan masuk; catat metadata & label Inbox; Gemini tetap mengikuti `privacySafeForMedia` dan batas 4 MB. |
+| 10 | `api/_lib/whatsappState.ts` | UPDATE | 3 | Re-export tipe media; `WaChatTurn.media?`; `PendingBubble.media?`; `appendWaHistory` menerima lampiran; `lastMessage` Inbox memakai label bila tanpa caption. |
+| 11 | `api/wa-media.ts` | **BARU ✅** | 4 | Proxy ber-PIN: stream file Drive ke Inbox (Range, `Content-Type` dari metadata, `nosniff`, tanpa cache publik). |
+| 12 | `src/components/WaInboxTab.tsx` + `WaMediaBubble.tsx` | UPDATE ✅ (4) / 5 menyusul | 4 & 5 | Bubble media (gambar + lightbox, kartu dokumen, audio/video player), tombol 📎, progress upload. |
+| 13 | `api/_lib/whatsappGraph.ts` | UPDATE | 5 | `uploadMetaMedia`, `sendWhatsAppMediaMessage({ to, type, mediaId, caption, filename })` dengan penjaga 131021 yang sama. |
+| 14 | `api/wa-inbox.ts` | UPDATE | 5 | Aksi `reply_media`: validasi jendela 24 jam, kuota, upload Meta → kirim → arsip Drive → riwayat. |
+| 15 | `vercel.json` | UPDATE | 4/5 | `functions` untuk `api/wa-inbox.ts` (mis. 30 dtk) dan `api/wa-media.ts` (30 dtk). Export `maxDuration` di file TS tidak dipakai Vercel. |
+| 16 | `api/__tests__/whatsapp.test.ts` | UPDATE | 3 & 6 | Webhook foto/PDF/video dengan mock Drive; 17 test lama tetap hijau; test `reply_media` dan proxy. |
 
 ---
 
-## 6. Roadmap & Jadwal Pelaksanaan
+## 7. Detail Per File (Yang Sudah Dibuat)
 
-| Fase | Fokus Pekerjaan | Estimasi Waktu | Output Kunci |
-| :--- | :--- | :--- | :--- |
-| **Fase 1** | Setup Akun Google Baru & Kredensial Service Account | 15 menit (User) | `FOLDER_ID` & JSON Key siap dimasukkan ke env |
-| **Fase 2** | Implementasi `googleDrive.ts` & `whatsappMedia.ts` | 30 menit | Backend helper untuk upload ke Drive teruji |
-| **Fase 3** | Update Webhook Inbound (`api/whatsapp.ts`) + Multimodal Gemini | 30 menit | File dari WA klien otomatis masuk ke Drive & dipahami AI |
-| **Fase 4** | Update UI Inbox Web (`WaInboxTab.tsx`) | 30 menit | Preview foto & kartu file PDF muncul di modal Inbox |
-| **Fase 5** | Fitur Kirim Lampiran Manual dari Inbox | 25 menit | Mas Arzha bisa kirim file PDF langsung ke WA klien |
-| **Fase 6** | Automated Tests & Deploy ke Production | 15 menit | Semua test lulus (vitest), deploy live di Vercel |
+### `api/_lib/googleDrive.ts`
+* `getGoogleDriveConfig()` / `isGoogleDriveConfigured()`: membaca env (mengabaikan tanda kutip pembungkus), melaporkan variabel yang kurang.
+* `getGoogleDriveAccessToken()`: menukar refresh token, cache sampai ±1 menit sebelum kedaluwarsa; 401 → refresh ulang sekali. Galat `invalid_grant` (token dicabut/kedaluwarsa) dilempar sebagai `GoogleDriveError` dengan `code`.
+* `ensureMediaFolder()`: `GDRIVE_FOLDER_ID` → cache → cari berdasarkan nama → buat baru dan bagikan ke `GDRIVE_SHARE_EMAIL` (gagal berbagi hanya memberi peringatan). Catatan: dua cold start bersamaan pada upload **pertama** bisa membuat folder ganda; pencarian memilih yang tertua sehingga akhirnya konsisten.
+* `uploadFileToDrive({ buffer, fileName, mimeType })`: multipart upload (cocok untuk ≤ ±25 MB).
+* `getDriveFileMetadata(fileId)`, `fetchDriveFileContent(fileId, range?)`: dipakai proxy di Fase 4. ID file divalidasi regex sebelum dipakai di URL.
 
----
-
-## 7. Mitigasi Risiko & Keamanan
-
-1. **Batas Ukuran File Meta & Timeout Serverless:**
-   * Meta mengizinkan file dokumen hingga 100 MB dan video 16 MB.
-   * Vercel Serverless Function memiliki batas timeout eksekusi (10 detik pada free tier, 60 detik pada pro).
-   * *Mitigasi:* Menggunakan direct buffer streaming dan batasan ukuran aman (misal maksimum 15 MB untuk pemrosesan instan webhook) agar tidak terjadi timeout.
-2. **Keamanan Private Key:**
-   * Private key Service Account disimpan di Environment Variable Vercel (encrypted), tidak pernah di-commit ke Git repo.
-3. **Penyalahgunaan Storage:**
-   * Filter anti-spam dan pembatasan kuota pesan Meta yang sudah ada otomatis membatasi frekuensi kiriman file dari nomor tak dikenal.
+### `api/_lib/whatsappMedia.ts`
+* `downloadWhatsAppMediaBuffer`: validasi `media_id`, host unduhan (daftar host Meta yang sama dengan kode lama), whitelist MIME (JPEG/PNG/WebP, MP4/3GP, OGG/MP3/M4A/AAC/AMR, PDF, DOC/DOCX, XLS/XLSX, PPT/PPTX, TXT), batas ukuran dicek dua kali (metadata dan isi sebenarnya). Mengembalikan alasan gagal yang terstruktur (`too_large`, `unsupported_type`, …) agar Fase 3 bisa memberi balasan yang sesuai.
+* `processInboundMedia`: unduh → arsip Drive → `WaMediaAttachment`. Mengembalikan `buffer` agar bisa dipakai ulang untuk Gemini. Drive belum dikonfigurasi / upload gagal → `ok: true` dengan `driveError`, tanpa melempar.
+* `sanitizeDriveFileName`, `buildDriveFileName`, `buildMediaPreviewLabel`.
 
 ---
 
-## 8. Analisis Biaya Token AI & Kuota WhatsApp Business (WABA)
+## 8. Roadmap
 
-Fitur ini dirancang dengan prinsip hemat biaya agar **tidak membebani kuota gratis WABA maupun biaya token AI**:
+| Fase | Fokus | Estimasi | Output | Status |
+|:--|:--|:--|:--|:--:|
+| 1 | Setup akun Google, OAuth client, jalankan `npm run google:auth`, isi env | 15 mnt (Mas Arzha) | `GDRIVE_*` terisi di Vercel | ⏳ Menunggu |
+| 2 | `googleDrive.ts`, `whatsappMedia.ts`, script auth, env, test | — | Helper backend teruji (30 test hijau, typecheck bersih) | ✅ Selesai |
+| 3 | Webhook inbound: `video`, arsip saat pesan masuk, metadata & label Inbox, `whatsappState` | ±30 mnt | File klien otomatis masuk Drive; Gemini tetap berfungsi | ✅ |
+| 4 | Proxy `wa-media.ts` + bubble media di `WaInboxTab.tsx` | ±40 mnt | Foto/PDF/video/audio tampil di Inbox | ✅ |
+| 5 | Kirim lampiran manual (jendela 24 jam, kuota, media id) | ±30 mnt | Mas Arzha kirim PDF/foto dari Inbox | ✅ |
+| 5b | File > 3 MB via upload langsung ke Drive (sesi resumable) | ±30 mnt | Lampiran hingga 15 MB | ✅ |
+| 6 | Test akhir, `vercel.json`, deploy | ±15 mnt | Live di production | ⬜ |
 
-### 8.1 Kuota & Biaya WhatsApp Cloud API (Meta WABA) 👉 **100% GRATIS**
-* **Aturan Jendela Layanan 24 Jam (Customer Service Window):**
-  * Meta memberikan **1.000 percakapan Service (User-Initiated) gratis per bulan**.
-  * Setiap kali klien mengirim chat (baik teks, foto, dokumen PDF, maupun video), ini membuka jendela layanan 24 jam.
-  * Di dalam jendela 24 jam tersebut, **kirim atau terima pesan teks, foto, maupun file PDF berulang kali TIDAK DIKENAKAN BIAYA TAMBAHAN**. Seluruh pertukaran pesan media dihitung sebagai **1 sesi yang sama** dari kuota 1.000 gratis bulanan.
-* **Biaya Download & Upload Media ke Meta:**
-  * Endpoint Meta Graph API untuk mengunduh media dari klien (`GET /v21.0/{media_id}`) dan mengunggah lampiran balasan (`POST /v21.0/{phone_number_id}/media`) **100% GRATIS** tanpa biaya bandwidth dari Meta.
+Fase 2 sengaja dipilih sebagai langkah pertama: seluruhnya file baru, tidak mengubah perilaku produksi (satu-satunya perubahan di file lama hanyalah kata `export`), dan bisa diuji penuh tanpa kredensial asli.
 
-### 8.2 Biaya Token AI (Gemini / Vertex AI) 👉 **Hampir Nol (Smart Filtering)**
-Untuk menjaga efisiensi token AI, diterapkan strategi pemilahan pintar:
-1. **Untuk Gambar / Screenshot:**
-   * Gemini Flash menghitung 1 gambar setara **~258 token input** (biaya kurang dari Rp 0,5 per gambar, atau gratis dalam batas free-tier).
-2. **Untuk Dokumen PDF Tebal / Video Besar:**
-   * **Tidak dikirim utuh ke model AI.**
-   * File video atau dokumen PDF berhalaman banyak langsung dialirkan (*stream*) dan disimpan ke Google Drive.
-   * Bot Zannah hanya diberi konteks teks ringkas (hanya memakan ~10 token teks biasa):
-     `[Pengguna mengirimkan file dokumen: Spesifikasi_Proyek.pdf]`
-   * Zannah merespons secara natural dan sopan: *"Terima kasih sudah melampirkan dokumennya Mas/Mbak, filenya sudah tersimpan aman dan akan langsung dipelajari oleh Mas Arzha."*
+---
 
-### 8.3 Google Drive Storage & API 👉 **100% GRATIS**
-* Kuota 15 GB pada akun Google baru gratis selamanya.
-* Google Drive API v3 gratis dengan batas jutaan request per hari, sangat melampaui kebutuhan chat portfolio.
+## 9. Risiko & Mitigasi
 
+1. **Refresh token kedaluwarsa/dicabut** (consent screen masih *Testing*, password akun diganti, akses dicabut). Gejala: `invalid_grant`. Mitigasi: set *In production*; kegagalan arsip tidak mematikan bot; log jelas. Pertimbangkan notifikasi ke Mas Arzha saat `invalid_grant` (Fase 3).
+2. **Timeout serverless.** Unduh + upload bisa belasan detik untuk file besar. `api/whatsapp.ts` sudah 60 dtk; timeout per langkah 25 dtk. Batas ukuran default 15 MB. Meta membatasi dokumen hingga 100 MB, jadi file di atas batas kita **tidak diarsipkan** dan bot memberi tahu pengirim dengan sopan.
+3. **Batas 4,5 MB request/response Vercel Function.** Upload manual dibatasi ±4 MB (Fase 5b untuk yang lebih besar). Respons proxy harus di-*stream* agar video besar tidak terkena batas.
+4. **Privasi file klien.** Tidak ada izin publik; akses hanya via akun khusus, akun pribadi Mas Arzha (berbagi folder), dan proxy ber-PIN. `Content-Type` proxy diambil dari metadata tervalidasi + `X-Content-Type-Options: nosniff`.
+5. **Konten berbahaya dari pengirim tak dikenal.** Whitelist MIME ketat (tanpa arsip/executable/HTML/SVG), nama file disanitasi, host unduhan divalidasi, rate-limit pengirim yang sudah ada tetap berlaku.
+6. **Kuota Drive 15 GB.** Cukup untuk beberapa ribu foto/PDF. Tambahkan peringatan saat pemakaian > 80% (opsional, memakai `about.storageQuota`).
+7. **Kredensial.** `GDRIVE_CLIENT_SECRET` dan `GDRIVE_REFRESH_TOKEN` hanya di Vercel env / `.env.local` (jangan di-commit). Scope `drive.file` membatasi dampak jika bocor: hanya file buatan app ini yang terjangkau, bukan seluruh Drive.
+
+---
+
+## 10. Biaya (Diperbarui)
+
+### 10.1 WhatsApp Cloud API (Meta)
+* **Pesan masuk dari klien (termasuk foto/dokumen/video) gratis.** Unduh media via `GET /{media_id}` dan unggah media via `POST /{phone_number_id}/media` tidak dikenai biaya terpisah.
+* **Pesan keluar bebas (service message) di dalam jendela 24 jam** mulai **1 Oktober 2026** ditagih **per pesan**, dengan **1.000 pesan layanan gratis per bulan** (sumber berbeda menyebut "per nomor" atau "per WABA"; cek halaman *Pricing* di dashboard Meta untuk angka dan tarif Indonesia yang berlaku). Ini menggantikan skema lama "pesan layanan gratis tak terbatas".
+* Implikasinya untuk fitur ini: **setiap lampiran yang dikirim Mas Arzha dihitung 1 pesan keluar**, sama seperti teks. Karena itu aksi `reply_media` ikut `reserveMetaReplyQuota` (Fase 5), dan batas `WA_MONTHLY_MESSAGE_LIMIT` yang sudah ada tetap menjadi pagar pengaman.
+* Pesan keluar di luar jendela 24 jam hanya bisa lewat *template* (berbayar) dan di luar cakupan fitur ini.
+
+### 10.2 Token AI (Gemini)
+* Gambar kecil (≤ 384 px kedua sisi) ≈ 258 token. **Foto biasa dipecah menjadi beberapa tile**, jadi perkirakan sekitar 258–1.500 token per foto; tetap sangat murah, dan `recordAiSpendIdr` / `hasAiBudgetRemaining` yang sudah ada menjadi pagar anggaran.
+* Perilaku saat ini dipertahankan: maksimal 2 media per giliran, inline ≤ 4 MB, hanya jika `privacySafeForMedia`. Video dan dokumen besar **tidak dikirim ke AI**; Zannah hanya menerima teks ringkas seperti `[Pengirim mengirimkan file dokumen: Spesifikasi_Proyek.pdf]` dan membalas bahwa file sudah tersimpan dan akan dilihat Mas Arzha.
+* Arsip Drive tidak memakai token AI sama sekali.
+
+### 10.3 Google Drive
+* Kuota 15 GB akun Gmail gratis. Drive API v3 gratis dengan kuota harian yang jauh melampaui kebutuhan ini.
